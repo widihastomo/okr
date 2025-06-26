@@ -272,32 +272,33 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="objective.parentId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Parent Objective (Optional)</FormLabel>
-                        <Select onValueChange={(value) => field.onChange(value === "none" ? undefined : parseInt(value))} defaultValue={field.value?.toString() || "none"}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select parent objective" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="none">No Parent (Top Level)</SelectItem>
-                            {objectives.map((objective) => (
-                              <SelectItem key={objective.id} value={objective.id.toString()}>
-                                {objective.title}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                 </div>
+
+                <FormField
+                  control={form.control}
+                  name="objective.parentId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Parent Objective (Optional)</FormLabel>
+                      <Select onValueChange={(value) => field.onChange(value === "none" ? undefined : parseInt(value))} defaultValue={field.value?.toString() || "none"}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select parent objective" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="none">No Parent (Top Level)</SelectItem>
+                          {objectives.map((objective) => (
+                            <SelectItem key={objective.id} value={objective.id.toString()}>
+                              {objective.title}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </CardContent>
             </Card>
 
