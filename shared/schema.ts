@@ -28,7 +28,9 @@ export const objectives = pgTable("objectives", {
   title: text("title").notNull(),
   description: text("description"),
   timeframe: text("timeframe").notNull(), // e.g., "Q4 2024"
-  owner: text("owner").notNull(),
+  owner: text("owner").notNull(), // kept for backward compatibility
+  ownerType: text("owner_type").notNull().default("user"), // "user" or "team"
+  ownerId: text("owner_id").notNull(), // user ID or team ID
   status: text("status").notNull().default("in_progress"), // "on_track", "at_risk", "completed", "in_progress"
   teamId: integer("team_id").references(() => teams.id), // for team OKRs
   parentId: integer("parent_id"), // self-reference for parent-child hierarchy

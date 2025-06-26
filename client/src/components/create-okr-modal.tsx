@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import type { Cycle, User, Objective } from "@shared/schema";
+import type { Cycle, User, Objective, Team } from "@shared/schema";
 
 const createOKRSchema = z.object({
   objective: z.object({
@@ -21,6 +21,8 @@ const createOKRSchema = z.object({
     description: z.string().optional(),
     timeframe: z.string().min(1, "Timeframe is required"),
     owner: z.string().min(1, "Owner is required"),
+    ownerType: z.enum(["user", "team"]).default("user"),
+    ownerId: z.string().min(1, "Owner is required"),
     status: z.string().default("in_progress"),
     teamId: z.number().optional(),
     parentId: z.number().optional(),
@@ -65,6 +67,11 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
     queryKey: ['/api/objectives'],
   });
 
+  // Fetch teams for owner selection
+  const { data: teams = [], isLoading: teamsLoading } = useQuery<Team[]>({
+    queryKey: ['/api/teams'],
+  });
+
 
 
   const form = useForm<CreateOKRFormData>({
@@ -75,6 +82,8 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
         description: "",
         timeframe: "",
         owner: "",
+        ownerType: "user" as const,
+        ownerId: "",
         status: "in_progress",
         teamId: undefined,
         parentId: undefined,
@@ -143,7 +152,27 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
   });
 
   const onSubmit = (data: CreateOKRFormData) => {
-    createOKRMutation.mutate(data);
+    // Set owner name based on ownerType and ownerId
+    let ownerName = "";
+    if (data.objective.ownerType === "team") {
+      const selectedTeam = teams.find(team => team.id.toString() === data.objective.ownerId);
+      ownerName = selectedTeam ? selectedTeam.name : "";
+    } else {
+      const selectedUser = users.find(user => user.id === data.objective.ownerId);
+      ownerName = selectedUser 
+        ? (selectedUser.firstName && selectedUser.lastName 
+            ? `${selectedUser.firstName} ${selectedUser.lastName}` 
+            : selectedUser.email || selectedUser.id)
+        : "";
+    }
+    
+    createOKRMutation.mutate({
+      ...data,
+      objective: {
+        ...data.objective,
+        owner: ownerName,
+      }
+    });
   };
 
   const addKeyResult = () => {
@@ -241,35 +270,85 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
                     )}
                   />
 
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="objective.ownerType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Tipe Owner</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih tipe" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="user">User</SelectItem>
+                              <SelectItem value="team">Tim</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="objective.ownerId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Owner</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih owner" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {form.watch("objective.ownerType") === "team" ? (
+                                teamsLoading ? (
+                                  <SelectItem value="loading" disabled>Loading teams...</SelectItem>
+                                ) : teams.length === 0 ? (
+                                  <SelectItem value="no-teams" disabled>Tidak ada tim tersedia</SelectItem>
+                                ) : (
+                                  teams.map((team) => (
+                                    <SelectItem key={team.id} value={team.id.toString()}>
+                                      {team.name}
+                                    </SelectItem>
+                                  ))
+                                )
+                              ) : (
+                                usersLoading ? (
+                                  <SelectItem value="loading" disabled>Loading users...</SelectItem>
+                                ) : users.length === 0 ? (
+                                  <SelectItem value="no-users" disabled>Tidak ada user tersedia</SelectItem>
+                                ) : (
+                                  users.map((user) => (
+                                    <SelectItem key={user.id} value={user.id}>
+                                      {user.firstName && user.lastName 
+                                        ? `${user.firstName} ${user.lastName}` 
+                                        : user.email || user.id}
+                                    </SelectItem>
+                                  ))
+                                )
+                              )}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
                   <FormField
                     control={form.control}
                     name="objective.owner"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Owner</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select owner" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {usersLoading ? (
-                              <SelectItem value="loading" disabled>Loading users...</SelectItem>
-                            ) : users.length === 0 ? (
-                              <SelectItem value="no-users" disabled>No users available</SelectItem>
-                            ) : (
-                              users.map((user) => (
-                                <SelectItem key={user.id} value={user.id}>
-                                  {user.firstName && user.lastName 
-                                    ? `${user.firstName} ${user.lastName}` 
-                                    : user.email || user.id}
-                                </SelectItem>
-                              ))
-                            )}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
+                      <FormItem style={{ display: 'none' }}>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
                       </FormItem>
                     )}
                   />

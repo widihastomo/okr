@@ -620,6 +620,28 @@ export class MemStorage implements IStorage {
     this.users.set("user2", user2);
     this.users.set("user3", user3);
 
+    // Sample Teams
+    const team1: Team = {
+      id: 1,
+      name: "Engineering Team",
+      description: "Product development and engineering team",
+      ownerId: "user1",
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    const team2: Team = {
+      id: 2,
+      name: "Marketing Team", 
+      description: "Marketing and growth team",
+      ownerId: "user2",
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    this.teams.set(1, team1);
+    this.teams.set(2, team2);
+
     // Sample Cycles
     const cycle1: Cycle = {
       id: 1,
@@ -694,7 +716,9 @@ export class MemStorage implements IStorage {
       title: "Increase Product Adoption and User Engagement",
       description: "Drive user acquisition and improve engagement metrics to establish stronger market presence",
       timeframe: "Q1 2025",
-      owner: "user1", // John Doe as CEO
+      owner: "John Doe", // Display name
+      ownerType: "user",
+      ownerId: "user1",
       status: "on_track",
       teamId: null,
       parentId: null // Top level objective
@@ -755,7 +779,9 @@ export class MemStorage implements IStorage {
       title: "Strengthen Team Performance and Culture",
       description: "Build a high-performing team culture with improved collaboration and skill development",
       timeframe: "Q1 2025",
-      owner: "Sarah Johnson",
+      owner: "Jane Smith",
+      ownerType: "user",
+      ownerId: "user2",
       status: "at_risk",
       teamId: 1,
       parentId: 1 // Child of Company objective
@@ -769,7 +795,9 @@ export class MemStorage implements IStorage {
       title: "Improve Personal Productivity and Skills",
       description: "Individual development goals to support team objectives",
       timeframe: "Q1 2025",
-      owner: "Individual Contributor",
+      owner: "Mike Wilson",
+      ownerType: "user",
+      ownerId: "user3",
       status: "on_track",
       teamId: 1,
       parentId: 2 // Child of Team objective
@@ -994,6 +1022,8 @@ export class MemStorage implements IStorage {
         description: templateObj.description,
         timeframe: cycle.name,
         owner: templateObj.owner,
+        ownerId: "user1", // Default to first user
+        ownerType: "user",
         status: "in_progress"
       });
 
@@ -1044,7 +1074,10 @@ export class MemStorage implements IStorage {
       id,
       description: insertObjective.description || null,
       status: insertObjective.status || "in_progress",
-      cycleId: insertObjective.cycleId || null
+      cycleId: insertObjective.cycleId || null,
+      ownerType: insertObjective.ownerType || "user",
+      teamId: insertObjective.teamId || null,
+      parentId: insertObjective.parentId || null
     };
     this.objectives.set(id, objective);
     return objective;
