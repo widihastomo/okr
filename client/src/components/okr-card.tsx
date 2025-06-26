@@ -42,7 +42,7 @@ export default function OKRCard({ okr, onEditProgress }: OKRCardProps) {
     }
   };
 
-  const calculateProgress = (current: string, target: string, keyResultType: string, baseline?: string | null): number => {
+  const calculateProgress = (current: string, target: string, keyResultType: string, baseValue?: string | null): number => {
     const currentNum = parseFloat(current);
     const targetNum = parseFloat(target);
     
@@ -53,10 +53,10 @@ export default function OKRCard({ okr, onEditProgress }: OKRCardProps) {
         return Math.min(100, Math.max(0, (currentNum / targetNum) * 100));
         
       case "decrease_to":
-        // Progress = ((Baseline - Current) / (Baseline - Target)) * 100%
-        const baselineNum = baseline && baseline !== null ? parseFloat(baseline) : targetNum * 2; // Default baseline if not provided
-        if (baselineNum <= targetNum) return currentNum <= targetNum ? 100 : 0; // Invalid baseline case
-        const decreaseProgress = ((baselineNum - currentNum) / (baselineNum - targetNum)) * 100;
+        // Progress = ((Base Value - Current) / (Base Value - Target)) * 100%
+        const baseNum = baseValue && baseValue !== null ? parseFloat(baseValue) : targetNum * 2; // Default base value if not provided
+        if (baseNum <= targetNum) return currentNum <= targetNum ? 100 : 0; // Invalid base value case
+        const decreaseProgress = ((baseNum - currentNum) / (baseNum - targetNum)) * 100;
         return Math.min(100, Math.max(0, decreaseProgress));
         
       case "achieve_or_not":
@@ -116,7 +116,7 @@ export default function OKRCard({ okr, onEditProgress }: OKRCardProps) {
         <h4 className="text-sm font-semibold text-gray-700 mb-4">Key Results</h4>
         <div className="space-y-4">
           {okr.keyResults.map((kr) => {
-            const progress = calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baselineValue);
+            const progress = calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
             const getKeyResultTypeLabel = (type: string) => {
               switch (type) {
                 case "increase_to": return "↗ Increase to";

@@ -27,7 +27,7 @@ const createOKRSchema = z.object({
     description: z.string().optional(),
     currentValue: z.string().default("0"),
     targetValue: z.string().min(1, "Target value is required"),
-    baselineValue: z.string().optional(),
+    baseValue: z.string().optional(),
     unit: z.string().default("number"),
     keyResultType: z.string().default("increase_to"),
     status: z.string().default("in_progress"),
@@ -61,7 +61,7 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
         description: "",
         currentValue: "0",
         targetValue: "",
-        baselineValue: "",
+        baseValue: "",
         unit: "number",
         keyResultType: "increase_to",
         status: "in_progress",
@@ -109,7 +109,7 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
       description: "",
       currentValue: "0",
       targetValue: "",
-      baselineValue: "",
+      baseValue: "",
       unit: "number",
       keyResultType: "increase_to",
       status: "in_progress",
@@ -324,11 +324,11 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
                         <div className="grid grid-cols-3 gap-3">
                           <FormField
                             control={form.control}
-                            name={`keyResults.${index}.currentValue`}
+                            name={`keyResults.${index}.baseValue`}
                             render={({ field }) => (
                               <FormItem>
                                 <FormControl>
-                                  <Input placeholder="Current value" {...field} />
+                                  <Input placeholder="Base value" {...field} />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -350,15 +350,11 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
 
                           <FormField
                             control={form.control}
-                            name={`keyResults.${index}.baselineValue`}
+                            name={`keyResults.${index}.currentValue`}
                             render={({ field }) => (
                               <FormItem>
                                 <FormControl>
-                                  <Input 
-                                    placeholder="Baseline (for decrease)" 
-                                    {...field}
-                                    disabled={form.watch(`keyResults.${index}.keyResultType`) !== "decrease_to"}
-                                  />
+                                  <Input placeholder="Current value" {...field} />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
