@@ -25,20 +25,23 @@ export default function UsersPage() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [newTeamDialog, setNewTeamDialog] = useState<{ open: boolean; user?: User }>({ open: false });
 
-  const { data: users = [], isLoading: usersLoading } = useQuery({
+  const { data: users = [], isLoading: usersLoading } = useQuery<User[]>({
     queryKey: ["/api/users"],
   });
 
-  const { data: teams = [] } = useQuery({
+  const { data: teams = [], isLoading: teamsLoading } = useQuery<Team[]>({
     queryKey: ["/api/teams"],
   });
 
   const updateUserMutation = useMutation({
     mutationFn: async (data: { id: string; role: string }) => {
-      return await apiRequest(`/api/users/${data.id}`, {
+      const response = await fetch(`/api/users/${data.id}`, {
         method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role: data.role }),
       });
+      if (!response.ok) throw new Error('Failed to update user');
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });
@@ -59,9 +62,11 @@ export default function UsersPage() {
 
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      return await apiRequest(`/api/users/${userId}`, {
+      const response = await fetch(`/api/users/${userId}`, {
         method: "DELETE",
       });
+      if (!response.ok) throw new Error('Failed to delete user');
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });
@@ -81,10 +86,13 @@ export default function UsersPage() {
 
   const createTeamMutation = useMutation({
     mutationFn: async (data: { name: string; description: string; ownerId: string }) => {
-      return await apiRequest("/api/teams", {
+      const response = await fetch("/api/teams", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
+      if (!response.ok) throw new Error('Failed to create team');
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/teams"] });
@@ -159,10 +167,19 @@ export default function UsersPage() {
             </TabsList>
 
             <TabsContent value="users" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {users.map((user: User) => {
-                  const RoleIcon = getRoleIcon(user.role);
-                  return (
+              {usersLoading ? (
+                <div className="text-center py-8">
+                  <div className="text-gray-500">Loading users...</div>
+                </div>
+              ) : users.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="text-gray-500">No users found</div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {users.map((user: User) => {
+                    const RoleIcon = getRoleIcon(user.role);
+                    return (
                     <Card key={user.id} className="hover:shadow-md transition-shadow">
                       <CardHeader className="pb-3">
                         <div className="flex items-center space-x-3">
@@ -241,9 +258,10 @@ export default function UsersPage() {
                         </div>
                       </CardContent>
                     </Card>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="teams" className="space-y-6">
@@ -309,24 +327,34 @@ export default function UsersPage() {
                 </Dialog>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {teams.map((team: Team) => (
-                  <Card key={team.id} className="hover:shadow-md transition-shadow">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Users className="h-5 w-5" />
-                        {team.name}
-                      </CardTitle>
-                      <CardDescription>{team.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-sm text-gray-500">
-                        Created {new Date(team.createdAt || '').toLocaleDateString()}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+              {teamsLoading ? (
+                <div className="text-center py-8">
+                  <div className="text-gray-500">Loading teams...</div>
+                </div>
+              ) : teams.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="text-gray-500">No teams found</div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {teams.map((team: Team) => (
+                    <Card key={team.id} className="hover:shadow-md transition-shadow">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Users className="h-5 w-5" />
+                          {team.name}
+                        </CardTitle>
+                        <CardDescription>{team.description}</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-sm text-gray-500">
+                          Created {new Date(team.createdAt || '').toLocaleDateString()}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>
