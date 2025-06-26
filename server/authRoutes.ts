@@ -51,7 +51,7 @@ export function setupEmailAuth(app: Express) {
     }
   });
 
-  // Logout endpoint
+  // Logout endpoint (POST)
   app.post('/api/auth/logout', (req, res) => {
     req.session.destroy((err) => {
       if (err) {
@@ -59,6 +59,17 @@ export function setupEmailAuth(app: Express) {
       }
       res.clearCookie('connect.sid');
       res.json({ message: "Berhasil logout" });
+    });
+  });
+
+  // Logout endpoint (GET) - for simple redirect logout
+  app.get('/api/logout', (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Logout error:', err);
+      }
+      res.clearCookie('connect.sid');
+      res.redirect('/');
     });
   });
 
