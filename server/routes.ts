@@ -169,6 +169,184 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User management endpoints
+  app.get('/api/users', async (req, res) => {
+    try {
+      const users = await storage.getUsers();
+      res.json(users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  app.get('/api/users/:id', async (req, res) => {
+    try {
+      const user = await storage.getUser(req.params.id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  app.put('/api/users/:id', async (req, res) => {
+    try {
+      const updatedUser = await storage.updateUser(req.params.id, req.body);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ message: "Failed to update user" });
+    }
+  });
+
+  app.delete('/api/users/:id', async (req, res) => {
+    try {
+      const deleted = await storage.deleteUser(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json({ message: "User deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ message: "Failed to delete user" });
+    }
+  });
+
+  // Team management endpoints
+  app.get('/api/teams', async (req, res) => {
+    try {
+      const teams = await storage.getTeams();
+      res.json(teams);
+    } catch (error) {
+      console.error("Error fetching teams:", error);
+      res.status(500).json({ message: "Failed to fetch teams" });
+    }
+  });
+
+  app.get('/api/teams/:id', async (req, res) => {
+    try {
+      const teamId = parseInt(req.params.id);
+      const team = await storage.getTeam(teamId);
+      if (!team) {
+        return res.status(404).json({ message: "Team not found" });
+      }
+      res.json(team);
+    } catch (error) {
+      console.error("Error fetching team:", error);
+      res.status(500).json({ message: "Failed to fetch team" });
+    }
+  });
+
+  app.post('/api/teams', async (req, res) => {
+    try {
+      const newTeam = await storage.createTeam(req.body);
+      res.json(newTeam);
+    } catch (error) {
+      console.error("Error creating team:", error);
+      res.status(500).json({ message: "Failed to create team" });
+    }
+  });
+
+  app.put('/api/teams/:id', async (req, res) => {
+    try {
+      const teamId = parseInt(req.params.id);
+      const updatedTeam = await storage.updateTeam(teamId, req.body);
+      if (!updatedTeam) {
+        return res.status(404).json({ message: "Team not found" });
+      }
+      res.json(updatedTeam);
+    } catch (error) {
+      console.error("Error updating team:", error);
+      res.status(500).json({ message: "Failed to update team" });
+    }
+  });
+
+  app.delete('/api/teams/:id', async (req, res) => {
+    try {
+      const teamId = parseInt(req.params.id);
+      const deleted = await storage.deleteTeam(teamId);
+      if (!deleted) {
+        return res.status(404).json({ message: "Team not found" });
+      }
+      res.json({ message: "Team deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting team:", error);
+      res.status(500).json({ message: "Failed to delete team" });
+    }
+  });
+
+  // Team member endpoints
+  app.get('/api/teams/:id/members', async (req, res) => {
+    try {
+      const teamId = parseInt(req.params.id);
+      const members = await storage.getTeamMembers(teamId);
+      res.json(members);
+    } catch (error) {
+      console.error("Error fetching team members:", error);
+      res.status(500).json({ message: "Failed to fetch team members" });
+    }
+  });
+
+  app.get('/api/users/:id/teams', async (req, res) => {
+    try {
+      const userTeams = await storage.getUserTeams(req.params.id);
+      res.json(userTeams);
+    } catch (error) {
+      console.error("Error fetching user teams:", error);
+      res.status(500).json({ message: "Failed to fetch user teams" });
+    }
+  });
+
+  app.post('/api/teams/:id/members', async (req, res) => {
+    try {
+      const teamId = parseInt(req.params.id);
+      const memberData = { ...req.body, teamId };
+      const newMember = await storage.addTeamMember(memberData);
+      res.json(newMember);
+    } catch (error) {
+      console.error("Error adding team member:", error);
+      res.status(500).json({ message: "Failed to add team member" });
+    }
+  });
+
+  app.delete('/api/teams/:teamId/members/:userId', async (req, res) => {
+    try {
+      const teamId = parseInt(req.params.teamId);
+      const userId = req.params.userId;
+      const removed = await storage.removeTeamMember(teamId, userId);
+      if (!removed) {
+        return res.status(404).json({ message: "Team member not found" });
+      }
+      res.json({ message: "Team member removed successfully" });
+    } catch (error) {
+      console.error("Error removing team member:", error);
+      res.status(500).json({ message: "Failed to remove team member" });
+    }
+  });
+
+  app.put('/api/teams/:teamId/members/:userId/role', async (req, res) => {
+    try {
+      const teamId = parseInt(req.params.teamId);
+      const userId = req.params.userId;
+      const { role } = req.body;
+      const updatedMember = await storage.updateTeamMemberRole(teamId, userId, role);
+      if (!updatedMember) {
+        return res.status(404).json({ message: "Team member not found" });
+      }
+      res.json(updatedMember);
+    } catch (error) {
+      console.error("Error updating team member role:", error);
+      res.status(500).json({ message: "Failed to update team member role" });
+    }
+  });
+
   // Get all OKRs with key results
   app.get("/api/okrs", async (req, res) => {
     try {

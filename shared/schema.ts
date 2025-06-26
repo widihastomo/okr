@@ -1,6 +1,7 @@
-import { pgTable, text, serial, integer, decimal, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, decimal, timestamp, boolean, varchar, jsonb, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { relations } from "drizzle-orm";
 
 export const cycles = pgTable("cycles", {
   id: serial("id").primaryKey(),
@@ -31,6 +32,48 @@ export const objectives = pgTable("objectives", {
   status: text("status").notNull().default("in_progress"), // "on_track", "at_risk", "completed", "in_progress"
 });
 
+// Session storage table for authentication
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// Users table
+export const users = pgTable("users", {
+  id: varchar("id").primaryKey().notNull(),
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
+  role: text("role").notNull().default("member"), // "admin", "manager", "member"
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Teams table
+export const teams = pgTable("teams", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  ownerId: varchar("owner_id").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Team members junction table
+export const teamMembers = pgTable("team_members", {
+  id: serial("id").primaryKey(),
+  teamId: integer("team_id").notNull(),
+  userId: varchar("user_id").notNull(),
+  role: text("role").notNull().default("member"), // "admin", "member"
+  joinedAt: timestamp("joined_at").defaultNow(),
+});
+
 export const keyResults = pgTable("key_results", {
   id: serial("id").primaryKey(),
   objectiveId: integer("objective_id").notNull(),
@@ -42,6 +85,7 @@ export const keyResults = pgTable("key_results", {
   unit: text("unit").notNull().default("number"), // "number", "percentage", "currency"
   keyResultType: text("key_result_type").notNull().default("increase_to"), // "increase_to", "decrease_to", "achieve_or_not"
   status: text("status").notNull().default("in_progress"), // "on_track", "at_risk", "completed", "in_progress"
+  assignedTo: varchar("assigned_to"), // user id who is responsible
 });
 
 export const insertCycleSchema = createInsertSchema(cycles).omit({
@@ -77,6 +121,64 @@ export type InsertObjective = z.infer<typeof insertObjectiveSchema>;
 export type InsertKeyResult = z.infer<typeof insertKeyResultSchema>;
 export type UpdateKeyResultProgress = z.infer<typeof updateKeyResultProgressSchema>;
 export type CreateOKRFromTemplate = z.infer<typeof createOKRFromTemplateSchema>;
+
+// Relations
+export const usersRelations = relations(users, ({ many }) => ({
+  ownedTeams: many(teams),
+  teamMemberships: many(teamMembers),
+}));
+
+export const teamsRelations = relations(teams, ({ one, many }) => ({
+  owner: one(users, {
+    fields: [teams.ownerId],
+    references: [users.id],
+  }),
+  members: many(teamMembers),
+}));
+
+export const teamMembersRelations = relations(teamMembers, ({ one }) => ({
+  team: one(teams, {
+    fields: [teamMembers.teamId],
+    references: [teams.id],
+  }),
+  user: one(users, {
+    fields: [teamMembers.userId],
+    references: [users.id],
+  }),
+}));
+
+export const keyResultsRelations = relations(keyResults, ({ one }) => ({
+  assignee: one(users, {
+    fields: [keyResults.assignedTo],
+    references: [users.id],
+  }),
+}));
+
+// Insert schemas for new tables
+export const insertUserSchema = createInsertSchema(users).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertTeamSchema = createInsertSchema(teams).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertTeamMemberSchema = createInsertSchema(teamMembers).omit({
+  id: true,
+  joinedAt: true,
+});
+
+// Types
+export type User = typeof users.$inferSelect;
+export type Team = typeof teams.$inferSelect;
+export type TeamMember = typeof teamMembers.$inferSelect;
+export type UpsertUser = typeof users.$inferInsert;
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type InsertTeam = z.infer<typeof insertTeamSchema>;
+export type InsertTeamMember = z.infer<typeof insertTeamMemberSchema>;
 
 export type Cycle = typeof cycles.$inferSelect;
 export type Template = typeof templates.$inferSelect;

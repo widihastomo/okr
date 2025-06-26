@@ -1,0 +1,336 @@
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { User, Team, TeamMember } from "@shared/schema";
+import { apiRequest } from "@/lib/queryClient";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Users, Plus, Edit, Trash2, UserPlus, Shield, User as UserIcon } from "lucide-react";
+import Sidebar from "./sidebar";
+import { useToast } from "@/hooks/use-toast";
+
+type UserWithTeams = User & {
+  teams?: (TeamMember & { team: Team })[];
+};
+
+export default function UsersPage() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [newTeamDialog, setNewTeamDialog] = useState<{ open: boolean; user?: User }>({ open: false });
+
+  const { data: users = [], isLoading: usersLoading } = useQuery({
+    queryKey: ["/api/users"],
+  });
+
+  const { data: teams = [] } = useQuery({
+    queryKey: ["/api/teams"],
+  });
+
+  const updateUserMutation = useMutation({
+    mutationFn: async (data: { id: string; role: string }) => {
+      return await apiRequest(`/api/users/${data.id}`, {
+        method: "PUT",
+        body: JSON.stringify({ role: data.role }),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      toast({
+        title: "Success",
+        description: "User role updated successfully",
+      });
+      setEditingUser(null);
+    },
+    onError: () => {
+      toast({
+        title: "Error", 
+        description: "Failed to update user role",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      return await apiRequest(`/api/users/${userId}`, {
+        method: "DELETE",
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      toast({
+        title: "Success",
+        description: "User deleted successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete user",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const createTeamMutation = useMutation({
+    mutationFn: async (data: { name: string; description: string; ownerId: string }) => {
+      return await apiRequest("/api/teams", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/teams"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      toast({
+        title: "Success",
+        description: "Team created successfully",
+      });
+      setNewTeamDialog({ open: false });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to create team",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const getRoleBadge = (role: string) => {
+    const roleStyles = {
+      admin: "bg-red-100 text-red-800",
+      manager: "bg-blue-100 text-blue-800", 
+      member: "bg-green-100 text-green-800",
+    };
+    return roleStyles[role as keyof typeof roleStyles] || "bg-gray-100 text-gray-800";
+  };
+
+  const getRoleIcon = (role: string) => {
+    switch (role) {
+      case "admin": return Shield;
+      case "manager": return UserPlus;
+      case "member": return UserIcon;
+      default: return UserIcon;
+    }
+  };
+
+  if (usersLoading) {
+    return (
+      <div className="flex h-screen bg-gray-50">
+        <Sidebar />
+        <div className="flex-1 p-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-48 bg-gray-200 rounded-lg"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-screen bg-gray-50">
+      <Sidebar />
+      <div className="flex-1 overflow-auto">
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
+              <p className="text-gray-600">Manage users and their permissions</p>
+            </div>
+          </div>
+
+          <Tabs defaultValue="users" className="space-y-6">
+            <TabsList>
+              <TabsTrigger value="users">Users</TabsTrigger>
+              <TabsTrigger value="teams">Teams</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="users" className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {users.map((user: User) => {
+                  const RoleIcon = getRoleIcon(user.role);
+                  return (
+                    <Card key={user.id} className="hover:shadow-md transition-shadow">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center space-x-3">
+                          <Avatar>
+                            <AvatarImage src={user.profileImageUrl || undefined} />
+                            <AvatarFallback>
+                              {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <CardTitle className="text-lg">
+                              {user.firstName} {user.lastName}
+                            </CardTitle>
+                            <CardDescription>{user.email}</CardDescription>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <Badge className={`${getRoleBadge(user.role)} flex items-center gap-1`}>
+                            <RoleIcon className="h-3 w-3" />
+                            {user.role}
+                          </Badge>
+                          <div className="flex space-x-2">
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => setEditingUser(user)}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>Edit User Role</DialogTitle>
+                                  <DialogDescription>
+                                    Change the role for {user.firstName} {user.lastName}
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <div className="space-y-4">
+                                  <div>
+                                    <Label htmlFor="role">Role</Label>
+                                    <Select 
+                                      defaultValue={user.role}
+                                      onValueChange={(value) => {
+                                        updateUserMutation.mutate({ id: user.id, role: value });
+                                      }}
+                                    >
+                                      <SelectTrigger>
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="member">Member</SelectItem>
+                                        <SelectItem value="manager">Manager</SelectItem>
+                                        <SelectItem value="admin">Admin</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => deleteUserMutation.mutate(user.id)}
+                              disabled={deleteUserMutation.isPending}
+                            >
+                              <Trash2 className="h-4 w-4 text-red-500" />
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          Joined {new Date(user.createdAt || '').toLocaleDateString()}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="teams" className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold">Teams</h2>
+                <Dialog open={newTeamDialog.open} onOpenChange={(open) => setNewTeamDialog({ open })}>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Team
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Create New Team</DialogTitle>
+                      <DialogDescription>
+                        Create a new team and assign an owner
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={(e) => {
+                      e.preventDefault();
+                      const formData = new FormData(e.currentTarget);
+                      createTeamMutation.mutate({
+                        name: formData.get('name') as string,
+                        description: formData.get('description') as string,
+                        ownerId: formData.get('ownerId') as string,
+                      });
+                    }}>
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="name">Team Name</Label>
+                          <Input name="name" placeholder="Enter team name" required />
+                        </div>
+                        <div>
+                          <Label htmlFor="description">Description</Label>
+                          <Input name="description" placeholder="Enter team description" />
+                        </div>
+                        <div>
+                          <Label htmlFor="ownerId">Team Owner</Label>
+                          <Select name="ownerId" required>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select team owner" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {users.map((user: User) => (
+                                <SelectItem key={user.id} value={user.id}>
+                                  {user.firstName} {user.lastName}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <Button 
+                          type="submit" 
+                          className="w-full"
+                          disabled={createTeamMutation.isPending}
+                        >
+                          {createTeamMutation.isPending ? "Creating..." : "Create Team"}
+                        </Button>
+                      </div>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {teams.map((team: Team) => (
+                  <Card key={team.id} className="hover:shadow-md transition-shadow">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Users className="h-5 w-5" />
+                        {team.name}
+                      </CardTitle>
+                      <CardDescription>{team.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-sm text-gray-500">
+                        Created {new Date(team.createdAt || '').toLocaleDateString()}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+    </div>
+  );
+}

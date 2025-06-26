@@ -11,6 +11,7 @@ The application follows a monorepo structure with clear separation between clien
 - **Frontend**: React with TypeScript, using Vite as the build tool
 - **Backend**: Node.js with Express server
 - **Database**: PostgreSQL with Drizzle ORM for type-safe database operations
+- **Authentication**: User and team management with role-based access control
 - **UI Components**: Radix UI primitives with custom styling via Tailwind CSS
 - **State Management**: TanStack Query for server state management
 
@@ -32,9 +33,14 @@ The application follows a monorepo structure with clear separation between clien
 - **Development**: Hot reloading with Vite middleware integration
 
 ### Database Schema
-The system uses two main entities:
+The system uses multiple interconnected entities:
+- **Users**: Manages user accounts with roles (admin, manager, member), authentication data, and profile information
+- **Teams**: Organization groups with owners, descriptions, and member management
+- **Team Members**: Junction table linking users to teams with specific roles
+- **Cycles**: Time-based containers (monthly, quarterly, annual) for organizing objectives
+- **Templates**: Reusable OKR structures for common objective patterns
 - **Objectives**: Contains title, description, timeframe, owner, and status
-- **Key Results**: Linked to objectives, tracks current/target values with units, key result types, and status
+- **Key Results**: Linked to objectives, tracks current/target values with units, key result types, and assigned users
 - **Types**: Support for various measurement units (number, percentage, currency)
 - **Key Result Types**: Three calculation methods for different goal types:
   - `increase_to`: Traditional progress calculation ((Current - Baseline) / (Target - Baseline)) * 100%
@@ -91,6 +97,14 @@ The application is configured for deployment on Replit with the following setup:
 ```
 Changelog:
 - June 26, 2025. Initial setup
+- June 26, 2025. Added comprehensive user and team management system:
+  * Database schema extended with users, teams, and team members tables
+  * Full CRUD API endpoints for user and team operations
+  * User management interface with role-based permissions (admin, manager, member)
+  * Team creation and management functionality
+  * Team member assignment and role management
+  * Database storage implementation with PostgreSQL
+  * Updated navigation to include Users page
 ```
 
 ## User Preferences

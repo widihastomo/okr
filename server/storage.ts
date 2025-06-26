@@ -1,9 +1,12 @@
 import { 
-  cycles, templates, objectives, keyResults, 
-  type Cycle, type Template, type Objective, type KeyResult, 
+  cycles, templates, objectives, keyResults, users, teams, teamMembers,
+  type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
   type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
+  type InsertUser, type InsertTeam, type InsertTeamMember, type UpsertUser,
   type OKRWithKeyResults, type CycleWithOKRs, type UpdateKeyResultProgress, type CreateOKRFromTemplate 
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, and } from "drizzle-orm";
 
 export interface IStorage {
   // Cycles
@@ -39,9 +42,413 @@ export interface IStorage {
   updateKeyResultProgress(update: UpdateKeyResultProgress): Promise<KeyResult | undefined>;
   deleteKeyResult(id: number): Promise<boolean>;
   
+  // Users
+  getUser(id: string): Promise<User | undefined>;
+  getUsers(): Promise<User[]>;
+  upsertUser(user: UpsertUser): Promise<User>;
+  updateUser(id: string, user: Partial<UpsertUser>): Promise<User | undefined>;
+  deleteUser(id: string): Promise<boolean>;
+  
+  // Teams
+  getTeam(id: number): Promise<Team | undefined>;
+  getTeams(): Promise<Team[]>;
+  createTeam(team: InsertTeam): Promise<Team>;
+  updateTeam(id: number, team: Partial<InsertTeam>): Promise<Team | undefined>;
+  deleteTeam(id: number): Promise<boolean>;
+  
+  // Team Members
+  getTeamMembers(teamId: number): Promise<(TeamMember & { user: User })[]>;
+  getUserTeams(userId: string): Promise<(TeamMember & { team: Team })[]>;
+  addTeamMember(teamMember: InsertTeamMember): Promise<TeamMember>;
+  removeTeamMember(teamId: number, userId: string): Promise<boolean>;
+  updateTeamMemberRole(teamId: number, userId: string, role: "admin" | "member"): Promise<TeamMember | undefined>;
+
   // Combined
   getOKRsWithKeyResults(): Promise<OKRWithKeyResults[]>;
   getOKRWithKeyResults(id: number): Promise<OKRWithKeyResults | undefined>;
+}
+
+export class DatabaseStorage implements IStorage {
+  // User operations
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async getUsers(): Promise<User[]> {
+    return await db.select().from(users);
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return user;
+  }
+
+  async updateUser(id: string, userData: Partial<UpsertUser>): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({ ...userData, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return user;
+  }
+
+  async deleteUser(id: string): Promise<boolean> {
+    const result = await db.delete(users).where(eq(users.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Team operations
+  async getTeam(id: number): Promise<Team | undefined> {
+    const [team] = await db.select().from(teams).where(eq(teams.id, id));
+    return team;
+  }
+
+  async getTeams(): Promise<Team[]> {
+    return await db.select().from(teams);
+  }
+
+  async createTeam(teamData: InsertTeam): Promise<Team> {
+    const [team] = await db.insert(teams).values(teamData).returning();
+    return team;
+  }
+
+  async updateTeam(id: number, teamData: Partial<InsertTeam>): Promise<Team | undefined> {
+    const [team] = await db
+      .update(teams)
+      .set({ ...teamData, updatedAt: new Date() })
+      .where(eq(teams.id, id))
+      .returning();
+    return team;
+  }
+
+  async deleteTeam(id: number): Promise<boolean> {
+    const result = await db.delete(teams).where(eq(teams.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Team member operations
+  async getTeamMembers(teamId: number): Promise<(TeamMember & { user: User })[]> {
+    const result = await db
+      .select()
+      .from(teamMembers)
+      .innerJoin(users, eq(teamMembers.userId, users.id))
+      .where(eq(teamMembers.teamId, teamId));
+    
+    return result.map(row => ({
+      ...row.team_members,
+      user: row.users
+    }));
+  }
+
+  async getUserTeams(userId: string): Promise<(TeamMember & { team: Team })[]> {
+    const result = await db
+      .select()
+      .from(teamMembers)
+      .innerJoin(teams, eq(teamMembers.teamId, teams.id))
+      .where(eq(teamMembers.userId, userId));
+    
+    return result.map(row => ({
+      ...row.team_members,
+      team: row.teams
+    }));
+  }
+
+  async addTeamMember(teamMemberData: InsertTeamMember): Promise<TeamMember> {
+    const [teamMember] = await db.insert(teamMembers).values(teamMemberData).returning();
+    return teamMember;
+  }
+
+  async removeTeamMember(teamId: number, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(teamMembers)
+      .where(and(eq(teamMembers.teamId, teamId), eq(teamMembers.userId, userId)));
+    return result.rowCount > 0;
+  }
+
+  async updateTeamMemberRole(teamId: number, userId: string, role: "admin" | "member"): Promise<TeamMember | undefined> {
+    const [teamMember] = await db
+      .update(teamMembers)
+      .set({ role })
+      .where(and(eq(teamMembers.teamId, teamId), eq(teamMembers.userId, userId)))
+      .returning();
+    return teamMember;
+  }
+
+  // Continue with existing OKR methods (will need to be adapted for database)
+  async getCycles(): Promise<Cycle[]> {
+    return await db.select().from(cycles);
+  }
+
+  async getCycle(id: number): Promise<Cycle | undefined> {
+    const [cycle] = await db.select().from(cycles).where(eq(cycles.id, id));
+    return cycle;
+  }
+
+  async createCycle(cycleData: InsertCycle): Promise<Cycle> {
+    const [cycle] = await db.insert(cycles).values(cycleData).returning();
+    return cycle;
+  }
+
+  async updateCycle(id: number, cycleData: Partial<InsertCycle>): Promise<Cycle | undefined> {
+    const [cycle] = await db
+      .update(cycles)
+      .set(cycleData)
+      .where(eq(cycles.id, id))
+      .returning();
+    return cycle;
+  }
+
+  async deleteCycle(id: number): Promise<boolean> {
+    const result = await db.delete(cycles).where(eq(cycles.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getCycleWithOKRs(id: number): Promise<CycleWithOKRs | undefined> {
+    const cycle = await this.getCycle(id);
+    if (!cycle) return undefined;
+
+    const cycleObjectives = await db.select().from(objectives).where(eq(objectives.cycleId, id));
+    const objectivesWithKeyResults = await Promise.all(
+      cycleObjectives.map(async (obj) => {
+        const keyResults = await db.select().from(keyResults).where(eq(keyResults.objectiveId, obj.id));
+        const overallProgress = this.calculateOverallProgress(keyResults);
+        return { ...obj, keyResults, overallProgress };
+      })
+    );
+
+    const totalObjectives = objectivesWithKeyResults.length;
+    const completedObjectives = objectivesWithKeyResults.filter(obj => obj.status === "completed").length;
+    const avgProgress = totalObjectives > 0 
+      ? objectivesWithKeyResults.reduce((sum, obj) => sum + obj.overallProgress, 0) / totalObjectives 
+      : 0;
+
+    return {
+      ...cycle,
+      objectives: objectivesWithKeyResults,
+      totalObjectives,
+      completedObjectives,
+      avgProgress
+    };
+  }
+
+  private calculateProgress(current: string, target: string, keyResultType: string, baseValue?: string | null): number {
+    const currentNum = parseFloat(current);
+    const targetNum = parseFloat(target);
+    const baseNum = baseValue ? parseFloat(baseValue) : 0;
+
+    switch (keyResultType) {
+      case "increase_to":
+        if (baseValue) {
+          return Math.min(100, Math.max(0, ((currentNum - baseNum) / (targetNum - baseNum)) * 100));
+        }
+        return Math.min(100, (currentNum / targetNum) * 100);
+      case "decrease_to":
+        if (baseValue) {
+          return Math.min(100, Math.max(0, ((baseNum - currentNum) / (baseNum - targetNum)) * 100));
+        }
+        return currentNum <= targetNum ? 100 : 0;
+      case "achieve_or_not":
+        return currentNum >= targetNum ? 100 : 0;
+      default:
+        return 0;
+    }
+  }
+
+  private calculateOverallProgress(keyResults: KeyResult[]): number {
+    if (keyResults.length === 0) return 0;
+    const totalProgress = keyResults.reduce((sum, kr) => {
+      return sum + this.calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
+    }, 0);
+    return totalProgress / keyResults.length;
+  }
+
+  // Continue implementing other methods for templates, objectives, key results...
+  async getTemplates(): Promise<Template[]> {
+    return await db.select().from(templates);
+  }
+
+  async getTemplate(id: number): Promise<Template | undefined> {
+    const [template] = await db.select().from(templates).where(eq(templates.id, id));
+    return template;
+  }
+
+  async createTemplate(templateData: InsertTemplate): Promise<Template> {
+    const [template] = await db.insert(templates).values(templateData).returning();
+    return template;
+  }
+
+  async updateTemplate(id: number, templateData: Partial<InsertTemplate>): Promise<Template | undefined> {
+    const [template] = await db
+      .update(templates)
+      .set(templateData)
+      .where(eq(templates.id, id))
+      .returning();
+    return template;
+  }
+
+  async deleteTemplate(id: number): Promise<boolean> {
+    const result = await db.delete(templates).where(eq(templates.id, id));
+    return result.rowCount > 0;
+  }
+
+  async createOKRFromTemplate(data: CreateOKRFromTemplate): Promise<OKRWithKeyResults[]> {
+    // Implementation for creating OKRs from templates
+    const template = await this.getTemplate(data.templateId);
+    if (!template) throw new Error("Template not found");
+
+    const templateObjectives = JSON.parse(template.objectives);
+    const createdOKRs: OKRWithKeyResults[] = [];
+
+    for (const templateObj of templateObjectives) {
+      const [objective] = await db.insert(objectives).values({
+        cycleId: data.cycleId,
+        title: templateObj.title,
+        description: templateObj.description,
+        timeframe: templateObj.timeframe || "",
+        owner: templateObj.owner || "",
+        status: "in_progress"
+      }).returning();
+
+      const keyResultsData = templateObj.keyResults.map((kr: any) => ({
+        objectiveId: objective.id,
+        title: kr.title,
+        description: kr.description || null,
+        currentValue: "0",
+        targetValue: kr.targetValue,
+        baseValue: kr.baseValue || null,
+        unit: kr.unit,
+        keyResultType: kr.type,
+        status: "in_progress",
+        assignedTo: null
+      }));
+
+      const createdKeyResults = await Promise.all(
+        keyResultsData.map(async (krData) => {
+          const [kr] = await db.insert(keyResults).values(krData).returning();
+          return kr;
+        })
+      );
+
+      const overallProgress = this.calculateOverallProgress(createdKeyResults);
+      createdOKRs.push({ ...objective, keyResults: createdKeyResults, overallProgress });
+    }
+
+    return createdOKRs;
+  }
+
+  async getObjectivesByCycleId(cycleId: number): Promise<Objective[]> {
+    return await db.select().from(objectives).where(eq(objectives.cycleId, cycleId));
+  }
+
+  async getObjectives(): Promise<Objective[]> {
+    return await db.select().from(objectives);
+  }
+
+  async getObjective(id: number): Promise<Objective | undefined> {
+    const [objective] = await db.select().from(objectives).where(eq(objectives.id, id));
+    return objective;
+  }
+
+  async createObjective(objectiveData: InsertObjective): Promise<Objective> {
+    const [objective] = await db.insert(objectives).values(objectiveData).returning();
+    return objective;
+  }
+
+  async updateObjective(id: number, objectiveData: Partial<InsertObjective>): Promise<Objective | undefined> {
+    const [objective] = await db
+      .update(objectives)
+      .set(objectiveData)
+      .where(eq(objectives.id, id))
+      .returning();
+    return objective;
+  }
+
+  async deleteObjective(id: number): Promise<boolean> {
+    const result = await db.delete(objectives).where(eq(objectives.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getKeyResults(): Promise<KeyResult[]> {
+    return await db.select().from(keyResults);
+  }
+
+  async getKeyResultsByObjectiveId(objectiveId: number): Promise<KeyResult[]> {
+    return await db.select().from(keyResults).where(eq(keyResults.objectiveId, objectiveId));
+  }
+
+  async getKeyResult(id: number): Promise<KeyResult | undefined> {
+    const [keyResult] = await db.select().from(keyResults).where(eq(keyResults.id, id));
+    return keyResult;
+  }
+
+  async createKeyResult(keyResultData: InsertKeyResult): Promise<KeyResult> {
+    const [keyResult] = await db.insert(keyResults).values({
+      ...keyResultData,
+      assignedTo: keyResultData.assignedTo || null
+    }).returning();
+    return keyResult;
+  }
+
+  async updateKeyResult(id: number, keyResultData: Partial<InsertKeyResult>): Promise<KeyResult | undefined> {
+    const [keyResult] = await db
+      .update(keyResults)
+      .set({
+        ...keyResultData,
+        assignedTo: keyResultData.assignedTo ?? null
+      })
+      .where(eq(keyResults.id, id))
+      .returning();
+    return keyResult;
+  }
+
+  async updateKeyResultProgress(update: UpdateKeyResultProgress): Promise<KeyResult | undefined> {
+    const [keyResult] = await db
+      .update(keyResults)
+      .set({
+        currentValue: update.currentValue.toString(),
+        status: update.status
+      })
+      .where(eq(keyResults.id, update.id))
+      .returning();
+    return keyResult;
+  }
+
+  async deleteKeyResult(id: number): Promise<boolean> {
+    const result = await db.delete(keyResults).where(eq(keyResults.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getOKRsWithKeyResults(): Promise<OKRWithKeyResults[]> {
+    const allObjectives = await db.select().from(objectives);
+    const okrsWithKeyResults = await Promise.all(
+      allObjectives.map(async (obj) => {
+        const objKeyResults = await db.select().from(keyResults).where(eq(keyResults.objectiveId, obj.id));
+        const overallProgress = this.calculateOverallProgress(objKeyResults);
+        return { ...obj, keyResults: objKeyResults, overallProgress };
+      })
+    );
+    return okrsWithKeyResults;
+  }
+
+  async getOKRWithKeyResults(id: number): Promise<OKRWithKeyResults | undefined> {
+    const objective = await this.getObjective(id);
+    if (!objective) return undefined;
+
+    const objKeyResults = await this.getKeyResultsByObjectiveId(id);
+    const overallProgress = this.calculateOverallProgress(objKeyResults);
+    return { ...objective, keyResults: objKeyResults, overallProgress };
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -49,10 +456,15 @@ export class MemStorage implements IStorage {
   private templates: Map<number, Template>;
   private objectives: Map<number, Objective>;
   private keyResults: Map<number, KeyResult>;
+  private users: Map<string, User>;
+  private teams: Map<number, Team>;
+  private teamMembersMap: Map<number, TeamMember>;
   private currentCycleId: number;
   private currentTemplateId: number;
   private currentObjectiveId: number;
   private currentKeyResultId: number;
+  private currentTeamId: number;
+  private currentTeamMemberId: number;
 
   constructor() {
     this.cycles = new Map();
@@ -159,7 +571,8 @@ export class MemStorage implements IStorage {
       baseValue: null,
       unit: "number",
       keyResultType: "increase_to",
-      status: "on_track"
+      status: "on_track",
+      assignedTo: null
     };
     
     const kr2: KeyResult = {
@@ -172,7 +585,8 @@ export class MemStorage implements IStorage {
       baseValue: null,
       unit: "number",
       keyResultType: "increase_to",
-      status: "at_risk"
+      status: "at_risk",
+      assignedTo: null
     };
     
     const kr3: KeyResult = {
@@ -185,7 +599,8 @@ export class MemStorage implements IStorage {
       baseValue: "8.5",
       unit: "percentage",
       keyResultType: "decrease_to",
-      status: "completed"
+      status: "completed",
+      assignedTo: null
     };
 
     this.keyResults.set(1, kr1);
@@ -215,7 +630,8 @@ export class MemStorage implements IStorage {
       baseValue: null,
       unit: "percentage",
       keyResultType: "increase_to",
-      status: "at_risk"
+      status: "at_risk",
+      assignedTo: null
     };
     
     const kr5: KeyResult = {
@@ -228,7 +644,8 @@ export class MemStorage implements IStorage {
       baseValue: null,
       unit: "number",
       keyResultType: "achieve_or_not",
-      status: "in_progress"
+      status: "in_progress",
+      assignedTo: null
     };
 
     this.keyResults.set(4, kr4);
@@ -507,7 +924,8 @@ export class MemStorage implements IStorage {
       currentValue: insertKeyResult.currentValue || "0",
       unit: insertKeyResult.unit || "number",
       keyResultType: insertKeyResult.keyResultType || "increase_to",
-      baseValue: insertKeyResult.baseValue || null
+      baseValue: insertKeyResult.baseValue || null,
+      assignedTo: insertKeyResult.assignedTo || null
     };
     this.keyResults.set(id, keyResult);
     return keyResult;
@@ -570,4 +988,4 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
