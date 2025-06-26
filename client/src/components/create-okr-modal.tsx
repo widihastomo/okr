@@ -3,7 +3,7 @@ import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import type { Cycle, User } from "@shared/schema";
+import type { Cycle, User, Objective } from "@shared/schema";
 
 const createOKRSchema = z.object({
   objective: z.object({
@@ -22,7 +22,6 @@ const createOKRSchema = z.object({
     timeframe: z.string().min(1, "Timeframe is required"),
     owner: z.string().min(1, "Owner is required"),
     status: z.string().default("in_progress"),
-    level: z.string().default("individual"),
     teamId: z.number().optional(),
     parentId: z.number().optional(),
   }),
@@ -61,6 +60,11 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
     queryKey: ['/api/users'],
   });
 
+  // Fetch existing objectives for parent selection
+  const { data: objectives = [] } = useQuery<Objective[]>({
+    queryKey: ['/api/objectives'],
+  });
+
   const form = useForm<CreateOKRFormData>({
     resolver: zodResolver(createOKRSchema),
     defaultValues: {
@@ -70,7 +74,6 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
         timeframe: cycles.length > 0 ? cycles[0].name : "",
         owner: users.length > 0 ? users[0].id : "",
         status: "in_progress",
-        level: "individual",
         teamId: undefined,
         parentId: undefined,
       },
@@ -140,6 +143,9 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create New OKR</DialogTitle>
+          <DialogDescription>
+            Create a new objective with key results. You can organize objectives in a hierarchy by selecting a parent objective.
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -249,20 +255,23 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
 
                   <FormField
                     control={form.control}
-                    name="objective.level"
+                    name="objective.parentId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>OKR Level</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormLabel>Parent Objective (Optional)</FormLabel>
+                        <Select onValueChange={(value) => field.onChange(value === "none" ? undefined : parseInt(value))} defaultValue={field.value?.toString() || "none"}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select OKR level" />
+                              <SelectValue placeholder="Select parent objective" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="company">Company OKR</SelectItem>
-                            <SelectItem value="team">Team OKR</SelectItem>
-                            <SelectItem value="individual">Individual OKR</SelectItem>
+                            <SelectItem value="none">No Parent (Top Level)</SelectItem>
+                            {objectives.map((objective) => (
+                              <SelectItem key={objective.id} value={objective.id.toString()}>
+                                {objective.title}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -380,12 +389,13 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
                           />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-3 gap-3">
                           <FormField
                             control={form.control}
                             name={`keyResults.${index}.baseValue`}
                             render={({ field }) => (
                               <FormItem>
+                                <FormLabel>Base Value</FormLabel>
                                 <FormControl>
                                   <Input placeholder="Base value" {...field} />
                                 </FormControl>
@@ -399,8 +409,23 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
                             name={`keyResults.${index}.targetValue`}
                             render={({ field }) => (
                               <FormItem>
+                                <FormLabel>Target Value</FormLabel>
                                 <FormControl>
                                   <Input placeholder="Target value" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name={`keyResults.${index}.currentValue`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Current Value</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Current value" {...field} />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
