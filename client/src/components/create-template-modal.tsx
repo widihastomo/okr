@@ -1,42 +1,38 @@
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
-import { Plus, Trash2 } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Plus, Trash2, Target, Building, Users } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
-import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import { insertTemplateSchema } from "@shared/schema";
 
-const keyResultTemplateSchema = z.object({
+const keyResultSchema = z.object({
   title: z.string().min(1, "Key result title is required"),
-  description: z.string().optional(),
-  unit: z.string().default("number"),
-  keyResultType: z.string().default("increase_to"),
+  type: z.enum(["increase_to", "decrease_to", "achieve_or_not"]),
+  unit: z.enum(["number", "percentage", "currency"]),
+  targetValue: z.string().min(1, "Target value is required"),
+  baseValue: z.string().optional(),
 });
 
-const objectiveTemplateSchema = z.object({
+const objectiveSchema = z.object({
   title: z.string().min(1, "Objective title is required"),
   description: z.string().optional(),
-  owner: z.string().min(1, "Owner is required"),
-  keyResults: z.array(keyResultTemplateSchema).min(1, "At least one key result is required"),
+  keyResults: z.array(keyResultSchema).min(1, "At least one key result is required"),
 });
 
-const createTemplateFormSchema = z.object({
-  name: z.string().min(1, "Template name is required"),
-  description: z.string().optional(),
-  type: z.string().min(1, "Template type is required"),
-  isDefault: z.boolean().default(false),
-  objectives: z.array(objectiveTemplateSchema).min(1, "At least one objective is required"),
+const createTemplateFormSchema = insertTemplateSchema.extend({
+  type: z.enum(["company", "team", "individual"]),
+  objectives: z.array(objectiveSchema).min(1, "At least one objective is required"),
 });
 
 type CreateTemplateFormData = z.infer<typeof createTemplateFormSchema>;
@@ -49,210 +45,195 @@ interface CreateTemplateModalProps {
 
 export default function CreateTemplateModal({ open, onOpenChange, onSuccess }: CreateTemplateModalProps) {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-
+  
   const form = useForm<CreateTemplateFormData>({
     resolver: zodResolver(createTemplateFormSchema),
     defaultValues: {
       name: "",
       description: "",
-      type: "quarterly",
+      type: "team",
       isDefault: false,
       objectives: [{
         title: "",
         description: "",
-        owner: "",
         keyResults: [{
           title: "",
-          description: "",
+          type: "increase_to",
           unit: "number",
-          keyResultType: "increase_to",
+          targetValue: "",
+          baseValue: "",
         }]
-      }],
+      }]
     },
   });
 
-  const { fields: objectiveFields, append: appendObjective, remove: removeObjective } = useFieldArray({
+  const { fields: objectives, append: addObjective, remove: removeObjective } = useFieldArray({
     control: form.control,
-    name: "objectives",
+    name: "objectives"
   });
 
-  const createTemplateMutation = useMutation({
+  const mutation = useMutation({
     mutationFn: async (data: CreateTemplateFormData) => {
       const templateData = {
-        name: data.name,
-        description: data.description || null,
-        type: data.type,
-        isDefault: data.isDefault,
+        ...data,
         objectives: JSON.stringify(data.objectives)
       };
-      const response = await apiRequest("POST", "/api/templates", templateData);
+      
+      const response = await apiRequest('POST', '/api/templates', templateData);
       return response.json();
     },
     onSuccess: () => {
       toast({
         title: "Success",
-        description: "Template created successfully"
+        description: "Template created successfully",
       });
       form.reset();
       onSuccess();
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: "Failed to create template",
-        variant: "destructive"
+        description: error.message || "Failed to create template",
+        variant: "destructive",
       });
-    }
+    },
   });
 
   const onSubmit = (data: CreateTemplateFormData) => {
-    createTemplateMutation.mutate(data);
+    mutation.mutate(data);
   };
 
-  const addObjective = () => {
-    appendObjective({
-      title: "",
-      description: "",
-      owner: "",
-      keyResults: [{
-        title: "",
-        description: "",
-        unit: "number",
-        keyResultType: "increase_to",
-      }]
-    });
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case "company": return Building;
+      case "team": return Users;
+      case "individual": return Target;
+      default: return Target;
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create New Template</DialogTitle>
+          <DialogDescription>
+            Create a reusable OKR template for your organization
+          </DialogDescription>
         </DialogHeader>
-
+        
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Template Basic Info */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Template Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Template Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Product Growth Template" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Template Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., Product Growth Template" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                  <FormField
-                    control={form.control}
-                    name="type"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Template Type</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select type" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="quarterly">Quarterly</SelectItem>
-                            <SelectItem value="annual">Annual</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description (Optional)</FormLabel>
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Template Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <Textarea 
-                          placeholder="Describe what this template is used for..."
-                          {...field}
-                          value={field.value || ""}
-                        />
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select template type" />
+                        </SelectTrigger>
                       </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                      <SelectContent>
+                        <SelectItem value="company">Company</SelectItem>
+                        <SelectItem value="team">Team</SelectItem>
+                        <SelectItem value="individual">Individual</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="Brief description of this template"
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      name={field.name}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Separator />
+
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium">Objectives</h3>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => addObjective({
+                    title: "",
+                    description: "",
+                    keyResults: [{
+                      title: "",
+                      type: "increase_to",
+                      unit: "number",
+                      targetValue: "",
+                      baseValue: "",
+                    }]
+                  })}
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add Objective
+                </Button>
+              </div>
+
+              {objectives.map((objective, objIndex) => (
+                <ObjectiveTemplate
+                  key={objective.id}
+                  objIndex={objIndex}
+                  form={form}
+                  onRemove={() => removeObjective(objIndex)}
+                  canRemove={objectives.length > 1}
                 />
+              ))}
+            </div>
 
-                <FormField
-                  control={form.control}
-                  name="isDefault"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">Default Template</FormLabel>
-                        <div className="text-sm text-muted-foreground">
-                          Mark this as a default template for this type
-                        </div>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-
-            {/* Objectives */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">Objectives</CardTitle>
-                  <Button type="button" onClick={addObjective} variant="outline" size="sm">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Objective
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {objectiveFields.map((objective, objIndex) => (
-                  <ObjectiveTemplate
-                    key={objective.id}
-                    objIndex={objIndex}
-                    form={form}
-                    onRemove={() => removeObjective(objIndex)}
-                    canRemove={objectiveFields.length > 1}
-                  />
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* Form Actions */}
-            <div className="flex items-center justify-end space-x-3 pt-6 border-t">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => onOpenChange(false)}
+              >
                 Cancel
               </Button>
               <Button 
                 type="submit" 
-                disabled={createTemplateMutation.isPending}
+                disabled={mutation.isPending}
                 className="bg-primary hover:bg-blue-700"
               >
-                {createTemplateMutation.isPending ? "Creating..." : "Create Template"}
+                {mutation.isPending ? "Creating..." : "Create Template"}
               </Button>
             </div>
           </form>
@@ -268,62 +249,44 @@ function ObjectiveTemplate({ objIndex, form, onRemove, canRemove }: {
   onRemove: () => void;
   canRemove: boolean;
 }) {
-  const { fields: keyResultFields, append: appendKeyResult, remove: removeKeyResult } = useFieldArray({
+  const { fields: keyResults, append: addKeyResult, remove: removeKeyResult } = useFieldArray({
     control: form.control,
-    name: `objectives.${objIndex}.keyResults`,
+    name: `objectives.${objIndex}.keyResults`
   });
 
-  const addKeyResult = () => {
-    appendKeyResult({
-      title: "",
-      description: "",
-      unit: "number",
-      keyResultType: "increase_to",
-    });
-  };
-
   return (
-    <Card className="border-l-4 border-l-primary">
-      <CardHeader>
+    <Card className="border-2">
+      <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base">Objective {objIndex + 1}</CardTitle>
           {canRemove && (
-            <Button type="button" onClick={onRemove} variant="destructive" size="sm">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={onRemove}
+              className="text-red-600 hover:text-red-700"
+            >
               <Trash2 className="w-4 h-4" />
             </Button>
           )}
         </div>
       </CardHeader>
+      
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name={`objectives.${objIndex}.title`}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Objective Title</FormLabel>
-                <FormControl>
-                  <Input placeholder="Increase Product Adoption" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name={`objectives.${objIndex}.owner`}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Owner</FormLabel>
-                <FormControl>
-                  <Input placeholder="Product Team" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name={`objectives.${objIndex}.title`}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Objective Title</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g., Increase Product Adoption" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}
@@ -333,9 +296,8 @@ function ObjectiveTemplate({ objIndex, form, onRemove, canRemove }: {
               <FormLabel>Description (Optional)</FormLabel>
               <FormControl>
                 <Textarea 
-                  placeholder="Objective description..."
-                  {...field}
-                  value={field.value || ""}
+                  placeholder="Additional context for this objective"
+                  {...field} 
                 />
               </FormControl>
               <FormMessage />
@@ -343,111 +305,133 @@ function ObjectiveTemplate({ objIndex, form, onRemove, canRemove }: {
           )}
         />
 
-        <Separator />
-
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h4 className="text-sm font-semibold">Key Results</h4>
-            <Button type="button" onClick={addKeyResult} variant="outline" size="sm">
-              <Plus className="w-4 h-4 mr-2" />
+            <h4 className="font-medium text-sm">Key Results</h4>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => addKeyResult({
+                title: "",
+                type: "increase_to",
+                unit: "number",
+                targetValue: "",
+                baseValue: "",
+              })}
+            >
+              <Plus className="w-3 h-3 mr-1" />
               Add Key Result
             </Button>
           </div>
 
-          {keyResultFields.map((keyResult, krIndex) => (
-            <Card key={keyResult.id} className="bg-gray-50">
-              <CardContent className="p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <h5 className="text-sm font-medium">Key Result {krIndex + 1}</h5>
-                  {keyResultFields.length > 1 && (
-                    <Button 
-                      type="button" 
-                      onClick={() => removeKeyResult(krIndex)}
-                      variant="ghost" 
-                      size="sm"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  )}
-                </div>
+          {keyResults.map((keyResult, krIndex) => (
+            <div key={keyResult.id} className="border rounded-lg p-4 bg-gray-50 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Key Result {krIndex + 1}</span>
+                {keyResults.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeKeyResult(krIndex)}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                )}
+              </div>
 
+              <FormField
+                control={form.control}
+                name={`objectives.${objIndex}.keyResults.${krIndex}.title`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., Increase monthly active users" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-3 gap-3">
                 <FormField
                   control={form.control}
-                  name={`objectives.${objIndex}.keyResults.${krIndex}.title`}
+                  name={`objectives.${objIndex}.keyResults.${krIndex}.type`}
                   render={({ field }) => (
                     <FormItem>
-                      <FormControl>
-                        <Input placeholder="Key result title" {...field} />
-                      </FormControl>
+                      <FormLabel>Type</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="increase_to">Increase To</SelectItem>
+                          <SelectItem value="decrease_to">Decrease To</SelectItem>
+                          <SelectItem value="achieve_or_not">Achieve or Not</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                <div className="grid grid-cols-2 gap-3">
-                  <FormField
-                    control={form.control}
-                    name={`objectives.${objIndex}.keyResults.${krIndex}.keyResultType`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Type" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="increase_to">Should Increase To</SelectItem>
-                            <SelectItem value="decrease_to">Should Decrease To</SelectItem>
-                            <SelectItem value="achieve_or_not">Achieve or Not</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name={`objectives.${objIndex}.keyResults.${krIndex}.unit`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Unit" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="number">Number</SelectItem>
-                            <SelectItem value="percentage">Percentage</SelectItem>
-                            <SelectItem value="currency">Currency</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                <FormField
+                  control={form.control}
+                  name={`objectives.${objIndex}.keyResults.${krIndex}.unit`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Unit</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="number">Number</SelectItem>
+                          <SelectItem value="percentage">Percentage</SelectItem>
+                          <SelectItem value="currency">Currency</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}
-                  name={`objectives.${objIndex}.keyResults.${krIndex}.description`}
+                  name={`objectives.${objIndex}.keyResults.${krIndex}.targetValue`}
                   render={({ field }) => (
                     <FormItem>
+                      <FormLabel>Target Value</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          placeholder="Key result description (optional)"
-                          {...field}
-                          value={field.value || ""}
-                        />
+                        <Input placeholder="1000" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              </CardContent>
-            </Card>
+              </div>
+
+              <FormField
+                control={form.control}
+                name={`objectives.${objIndex}.keyResults.${krIndex}.baseValue`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Base Value (Optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Starting value" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           ))}
         </div>
       </CardContent>

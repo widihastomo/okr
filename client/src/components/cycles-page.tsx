@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import CreateCycleModal from "./create-cycle-modal";
+import Sidebar from "./sidebar";
 import type { Cycle, CycleWithOKRs } from "@shared/schema";
 
 export default function CyclesPage() {
@@ -55,13 +56,18 @@ export default function CyclesPage() {
 
   if (isLoading) {
     return (
-      <div className="p-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="h-48 bg-gray-200 rounded-lg"></div>
-            ))}
+      <div className="flex h-screen bg-gray-50">
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <div className="p-6">
+            <div className="animate-pulse space-y-4">
+              <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="h-48 bg-gray-200 rounded-lg"></div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -69,8 +75,11 @@ export default function CyclesPage() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+    <div className="flex h-screen bg-gray-50">
+      <Sidebar />
+      <div className="flex-1 overflow-auto">
+        <div className="p-6 max-w-7xl mx-auto">
+          <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">OKR Cycles</h1>
           <p className="text-gray-600 mt-2">Manage quarterly and annual OKR cycles</p>
@@ -159,6 +168,8 @@ export default function CyclesPage() {
           queryClient.invalidateQueries({ queryKey: ["/api/cycles"] });
         }}
       />
+        </div>
+      </div>
     </div>
   );
 }

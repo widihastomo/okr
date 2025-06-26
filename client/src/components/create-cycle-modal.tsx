@@ -1,20 +1,20 @@
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { apiRequest } from "@/lib/queryClient";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import { insertCycleSchema } from "@shared/schema";
 
 const createCycleFormSchema = insertCycleSchema.extend({
-  startDate: z.string().min(1, "Start date is required"),
-  endDate: z.string().min(1, "End date is required"),
+  type: z.enum(["quarterly", "annual"]),
 });
 
 type CreateCycleFormData = z.infer<typeof createCycleFormSchema>;
@@ -27,99 +27,76 @@ interface CreateCycleModalProps {
 
 export default function CreateCycleModal({ open, onOpenChange, onSuccess }: CreateCycleModalProps) {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-
+  
   const form = useForm<CreateCycleFormData>({
     resolver: zodResolver(createCycleFormSchema),
     defaultValues: {
       name: "",
+      description: "",
       type: "quarterly",
       startDate: "",
       endDate: "",
-      status: "planning",
-      description: "",
     },
   });
 
-  const createCycleMutation = useMutation({
+  const mutation = useMutation({
     mutationFn: async (data: CreateCycleFormData) => {
-      const response = await apiRequest("POST", "/api/cycles", data);
+      const response = await apiRequest('POST', '/api/cycles', data);
       return response.json();
     },
     onSuccess: () => {
       toast({
         title: "Success",
-        description: "Cycle created successfully"
+        description: "Cycle created successfully",
       });
       form.reset();
       onSuccess();
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: "Failed to create cycle",
-        variant: "destructive"
+        description: error.message || "Failed to create cycle",
+        variant: "destructive",
       });
-    }
+    },
   });
 
   const onSubmit = (data: CreateCycleFormData) => {
-    createCycleMutation.mutate(data);
+    mutation.mutate(data);
   };
 
-  const getQuarterDates = (quarter: string, year: string) => {
-    const y = parseInt(year);
-    switch (quarter) {
-      case "Q1":
-        return { start: `${y}-01-01`, end: `${y}-03-31` };
-      case "Q2":
-        return { start: `${y}-04-01`, end: `${y}-06-30` };
-      case "Q3":
-        return { start: `${y}-07-01`, end: `${y}-09-30` };
-      case "Q4":
-        return { start: `${y}-10-01`, end: `${y}-12-31` };
-      default:
-        return { start: "", end: "" };
-    }
-  };
-
-  const handleQuickFill = (type: string) => {
+  const handleTypeChange = (type: "quarterly" | "annual") => {
     const currentYear = new Date().getFullYear();
-    const nextYear = currentYear + 1;
+    const currentMonth = new Date().getMonth();
     
     if (type === "quarterly") {
-      const currentMonth = new Date().getMonth();
-      let quarter = "Q1";
-      let year = nextYear;
+      const quarter = Math.floor(currentMonth / 3) + 1;
+      const quarterStart = new Date(currentYear, (quarter - 1) * 3, 1);
+      const quarterEnd = new Date(currentYear, quarter * 3, 0);
       
-      if (currentMonth < 3) quarter = "Q2";
-      else if (currentMonth < 6) quarter = "Q3";
-      else if (currentMonth < 9) quarter = "Q4";
-      else {
-        quarter = "Q1";
-        year = nextYear;
-      }
-      
-      const dates = getQuarterDates(quarter, year.toString());
-      form.setValue("name", `${quarter} ${year}`);
-      form.setValue("startDate", dates.start);
-      form.setValue("endDate", dates.end);
-      form.setValue("description", `${quarter} objectives for ${year}`);
+      form.setValue("name", `Q${quarter} ${currentYear}`);
+      form.setValue("startDate", quarterStart.toISOString().split('T')[0]);
+      form.setValue("endDate", quarterEnd.toISOString().split('T')[0]);
     } else {
-      form.setValue("name", `Annual ${nextYear}`);
-      form.setValue("startDate", `${nextYear}-01-01`);
-      form.setValue("endDate", `${nextYear}-12-31`);
-      form.setValue("description", `Annual strategic objectives for ${nextYear}`);
+      const yearStart = new Date(currentYear, 0, 1);
+      const yearEnd = new Date(currentYear, 11, 31);
+      
+      form.setValue("name", `Annual ${currentYear}`);
+      form.setValue("startDate", yearStart.toISOString().split('T')[0]);
+      form.setValue("endDate", yearEnd.toISOString().split('T')[0]);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Create New Cycle</DialogTitle>
+          <DialogDescription>
+            Create a new OKR cycle for your organization
+          </DialogDescription>
         </DialogHeader>
-
+        
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -127,11 +104,11 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
               name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Cycle Type</FormLabel>
+                  <FormLabel>Type</FormLabel>
                   <Select 
                     onValueChange={(value) => {
                       field.onChange(value);
-                      handleQuickFill(value);
+                      handleTypeChange(value as "quarterly" | "annual");
                     }} 
                     defaultValue={field.value}
                   >
@@ -155,9 +132,29 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Cycle Name</FormLabel>
+                  <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Q1 2025" {...field} />
+                    <Input placeholder="e.g., Q1 2025" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="Brief description of this cycle's focus"
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      name={field.name}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -194,57 +191,20 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
               />
             </div>
 
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Status</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select status" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="planning">Planning</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description (Optional)</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Describe the focus and goals for this cycle..."
-                      {...field}
-                      value={field.value || ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="flex items-center justify-end space-x-3 pt-6 border-t">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => onOpenChange(false)}
+              >
                 Cancel
               </Button>
               <Button 
                 type="submit" 
-                disabled={createCycleMutation.isPending}
+                disabled={mutation.isPending}
                 className="bg-primary hover:bg-blue-700"
               >
-                {createCycleMutation.isPending ? "Creating..." : "Create Cycle"}
+                {mutation.isPending ? "Creating..." : "Create Cycle"}
               </Button>
             </div>
           </form>
