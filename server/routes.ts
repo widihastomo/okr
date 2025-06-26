@@ -180,6 +180,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post('/api/users', async (req, res) => {
+    try {
+      const user = await storage.upsertUser(req.body);
+      res.status(201).json(user);
+    } catch (error) {
+      console.error("Error creating user:", error);
+      res.status(500).json({ message: "Failed to create user" });
+    }
+  });
+
   app.get('/api/users/:id', async (req, res) => {
     try {
       const user = await storage.getUser(req.params.id);
