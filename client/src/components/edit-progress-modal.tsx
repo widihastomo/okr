@@ -79,7 +79,7 @@ export default function EditProgressModal({
     updateProgressMutation.mutate(data);
   };
 
-  const calculateProgress = (current: string, target: string, keyResultType: string): number => {
+  const calculateProgress = (current: string, target: string, keyResultType: string, baseline?: string | null): number => {
     const currentNum = parseFloat(current);
     const targetNum = parseFloat(target || "1");
     
@@ -90,11 +90,12 @@ export default function EditProgressModal({
         return Math.min(100, Math.max(0, (currentNum / targetNum) * 100));
         
       case "decrease_to":
-        // Progress = 100% when current <= target, decreasing as current exceeds target
+        // Progress toward desired decrease from baseline to target
+        const baselineNum = baseline && baseline !== null ? parseFloat(baseline) : targetNum * 2;
+        if (baselineNum <= targetNum) return currentNum <= targetNum ? 100 : 0;
+        if (currentNum >= baselineNum) return 0;
         if (currentNum <= targetNum) return 100;
-        // Calculate how much we've exceeded the target and reduce progress
-        const excessRatio = (currentNum - targetNum) / targetNum;
-        return Math.max(0, 100 - (excessRatio * 100));
+        return Math.max(0, Math.min(100, ((baselineNum - currentNum) / (baselineNum - targetNum)) * 100));
         
       case "achieve_or_not":
         // Binary: 100% if current >= target, 0% otherwise
@@ -106,7 +107,7 @@ export default function EditProgressModal({
   };
 
   const currentProgress = keyResult 
-    ? calculateProgress(form.watch("currentValue") || keyResult.currentValue, keyResult.targetValue, keyResult.keyResultType)
+    ? calculateProgress(form.watch("currentValue") || keyResult.currentValue, keyResult.targetValue, keyResult.keyResultType, keyResult.baselineValue)
     : 0;
 
   return (

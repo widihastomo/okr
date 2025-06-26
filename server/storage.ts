@@ -58,6 +58,7 @@ export class MemStorage implements IStorage {
       description: "Current: 39,200 users | Target: 50,000 users",
       currentValue: "39200",
       targetValue: "50000",
+      baselineValue: null,
       unit: "number",
       keyResultType: "increase_to",
       status: "on_track"
@@ -70,6 +71,7 @@ export class MemStorage implements IStorage {
       description: "Current: 4.2 rating | Target: 4.5 rating",
       currentValue: "4.2",
       targetValue: "4.5",
+      baselineValue: null,
       unit: "number",
       keyResultType: "increase_to",
       status: "at_risk"
@@ -82,6 +84,7 @@ export class MemStorage implements IStorage {
       description: "Current: 3.2% | Target: <5%",
       currentValue: "3.2",
       targetValue: "5",
+      baselineValue: "8.5",
       unit: "percentage",
       keyResultType: "decrease_to",
       status: "completed"
@@ -110,6 +113,7 @@ export class MemStorage implements IStorage {
       description: "Current: 78% | Target: 90%",
       currentValue: "78",
       targetValue: "90",
+      baselineValue: null,
       unit: "percentage",
       keyResultType: "increase_to",
       status: "at_risk"
@@ -122,6 +126,7 @@ export class MemStorage implements IStorage {
       description: "Current: 6/12 members | Target: 12/12 members",
       currentValue: "6",
       targetValue: "12",
+      baselineValue: null,
       unit: "number",
       keyResultType: "achieve_or_not",
       status: "in_progress"
@@ -134,7 +139,7 @@ export class MemStorage implements IStorage {
     this.currentKeyResultId = 6;
   }
 
-  private calculateProgress(current: string, target: string, keyResultType: string): number {
+  private calculateProgress(current: string, target: string, keyResultType: string, baseline?: string | null): number {
     const currentNum = parseFloat(current);
     const targetNum = parseFloat(target);
     
@@ -145,11 +150,13 @@ export class MemStorage implements IStorage {
         return Math.min(100, Math.max(0, (currentNum / targetNum) * 100));
         
       case "decrease_to":
-        // Progress = 100% when current <= target, decreasing as current exceeds target
-        if (currentNum <= targetNum) return 100;
-        // Calculate how much we've exceeded the target and reduce progress
-        const excessRatio = (currentNum - targetNum) / targetNum;
-        return Math.max(0, 100 - (excessRatio * 100));
+        // Progress toward desired decrease from baseline to target
+        const baselineNum = baseline && baseline !== null ? parseFloat(baseline) : targetNum * 2; // Default baseline if not provided
+        if (baselineNum <= targetNum) return currentNum <= targetNum ? 100 : 0; // Fallback for invalid baseline
+        if (currentNum >= baselineNum) return 0; // No progress if still at baseline
+        if (currentNum <= targetNum) return 100; // Full progress if at or below target
+        // Calculate linear progress between baseline and target
+        return Math.max(0, Math.min(100, ((baselineNum - currentNum) / (baselineNum - targetNum)) * 100));
         
       case "achieve_or_not":
         // Binary: 100% if current >= target, 0% otherwise
@@ -163,7 +170,7 @@ export class MemStorage implements IStorage {
   private calculateOverallProgress(keyResults: KeyResult[]): number {
     if (keyResults.length === 0) return 0;
     const totalProgress = keyResults.reduce((sum, kr) => 
-      sum + this.calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType), 0);
+      sum + this.calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baselineValue), 0);
     return Math.round(totalProgress / keyResults.length);
   }
 
@@ -230,7 +237,8 @@ export class MemStorage implements IStorage {
       status: insertKeyResult.status || "in_progress",
       currentValue: insertKeyResult.currentValue || "0",
       unit: insertKeyResult.unit || "number",
-      keyResultType: insertKeyResult.keyResultType || "increase_to"
+      keyResultType: insertKeyResult.keyResultType || "increase_to",
+      baselineValue: insertKeyResult.baselineValue || null
     };
     this.keyResults.set(id, keyResult);
     return keyResult;

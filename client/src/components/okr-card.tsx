@@ -42,7 +42,7 @@ export default function OKRCard({ okr, onEditProgress }: OKRCardProps) {
     }
   };
 
-  const calculateProgress = (current: string, target: string, keyResultType: string): number => {
+  const calculateProgress = (current: string, target: string, keyResultType: string, baseline?: string | null): number => {
     const currentNum = parseFloat(current);
     const targetNum = parseFloat(target);
     
@@ -53,11 +53,12 @@ export default function OKRCard({ okr, onEditProgress }: OKRCardProps) {
         return Math.min(100, Math.max(0, (currentNum / targetNum) * 100));
         
       case "decrease_to":
-        // Progress = 100% when current <= target, decreasing as current exceeds target
+        // Progress toward desired decrease from baseline to target
+        const baselineNum = baseline && baseline !== null ? parseFloat(baseline) : targetNum * 2;
+        if (baselineNum <= targetNum) return currentNum <= targetNum ? 100 : 0;
+        if (currentNum >= baselineNum) return 0;
         if (currentNum <= targetNum) return 100;
-        // Calculate how much we've exceeded the target and reduce progress
-        const excessRatio = (currentNum - targetNum) / targetNum;
-        return Math.max(0, 100 - (excessRatio * 100));
+        return Math.max(0, Math.min(100, ((baselineNum - currentNum) / (baselineNum - targetNum)) * 100));
         
       case "achieve_or_not":
         // Binary: 100% if current >= target, 0% otherwise
@@ -116,7 +117,7 @@ export default function OKRCard({ okr, onEditProgress }: OKRCardProps) {
         <h4 className="text-sm font-semibold text-gray-700 mb-4">Key Results</h4>
         <div className="space-y-4">
           {okr.keyResults.map((kr) => {
-            const progress = calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType);
+            const progress = calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baselineValue);
             const getKeyResultTypeLabel = (type: string) => {
               switch (type) {
                 case "increase_to": return "↗ Increase to";
