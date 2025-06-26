@@ -150,9 +150,10 @@ export class MemStorage implements IStorage {
         return Math.min(100, Math.max(0, (currentNum / targetNum) * 100));
         
       case "decrease_to":
-        // Progress = (target / current) * 100, where lower current values = higher progress
-        if (currentNum === 0) return 0; // Avoid division by zero
-        const decreaseProgress = (targetNum / currentNum) * 100;
+        // Progress = ((Baseline - Current) / (Baseline - Target)) * 100%
+        const baselineNum = baseline && baseline !== null ? parseFloat(baseline) : targetNum * 2; // Default baseline if not provided
+        if (baselineNum <= targetNum) return currentNum <= targetNum ? 100 : 0; // Invalid baseline case
+        const decreaseProgress = ((baselineNum - currentNum) / (baselineNum - targetNum)) * 100;
         return Math.min(100, Math.max(0, decreaseProgress));
         
       case "achieve_or_not":
