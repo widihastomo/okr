@@ -8,7 +8,7 @@ import EditProgressModal from "@/components/edit-progress-modal";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
-import type { OKRWithKeyResults, KeyResult } from "@shared/schema";
+import type { OKRWithKeyResults, KeyResult, Cycle } from "@shared/schema";
 
 export default function Dashboard() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -20,6 +20,10 @@ export default function Dashboard() {
 
   const { data: okrs = [], isLoading, refetch } = useQuery<OKRWithKeyResults[]>({
     queryKey: ["/api/okrs", { status: statusFilter, timeframe: timeframeFilter }],
+  });
+
+  const { data: cycles = [] } = useQuery<Cycle[]>({
+    queryKey: ['/api/cycles'],
   });
 
   const handleEditProgress = (keyResult: KeyResult) => {
@@ -59,10 +63,11 @@ export default function Dashboard() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Periods</SelectItem>
-                    <SelectItem value="Q4 2024">Q4 2024</SelectItem>
-                    <SelectItem value="Q3 2024">Q3 2024</SelectItem>
-                    <SelectItem value="Q2 2024">Q2 2024</SelectItem>
-                    <SelectItem value="Q1 2025">Q1 2025</SelectItem>
+                    {cycles.map((cycle) => (
+                      <SelectItem key={cycle.id} value={cycle.name}>
+                        {cycle.name} ({cycle.type})
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

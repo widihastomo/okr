@@ -32,6 +32,7 @@ const createOKRSchema = z.object({
     unit: z.string().default("number"),
     keyResultType: z.string().default("increase_to"),
     status: z.string().default("in_progress"),
+    assignedTo: z.string().optional(),
   })).min(1, "At least one key result is required"),
 });
 
@@ -76,6 +77,7 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
         unit: "number",
         keyResultType: "increase_to",
         status: "in_progress",
+        assignedTo: users.length > 0 ? users[0].id : "",
       }],
     },
   });
@@ -376,6 +378,39 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
                             )}
                           />
                         </div>
+
+                        <FormField
+                          control={form.control}
+                          name={`keyResults.${index}.assignedTo`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Assigned To</FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select assignee" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {usersLoading ? (
+                                    <SelectItem value="" disabled>Loading users...</SelectItem>
+                                  ) : users.length === 0 ? (
+                                    <SelectItem value="" disabled>No users available</SelectItem>
+                                  ) : (
+                                    users.map((user) => (
+                                      <SelectItem key={user.id} value={user.id}>
+                                        {user.firstName && user.lastName 
+                                          ? `${user.firstName} ${user.lastName}` 
+                                          : user.email || user.id}
+                                      </SelectItem>
+                                    ))
+                                  )}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </div>
                     </CardContent>
                   </Card>
