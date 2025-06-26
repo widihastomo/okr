@@ -246,7 +246,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/users/:id', async (req, res) => {
+  app.put('/api/users/:id', isAuthenticated, async (req, res) => {
+    try {
+      const updatedUser = await storage.updateUser(req.params.id, req.body);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ message: "Failed to update user" });
+    }
+  });
+
+  app.patch('/api/users/:id', isAuthenticated, async (req, res) => {
     try {
       const updatedUser = await storage.updateUser(req.params.id, req.body);
       if (!updatedUser) {

@@ -1,8 +1,9 @@
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Target, TrendingUp, Users, Calendar, LogOut, User as UserIcon } from "lucide-react";
+import { Target, TrendingUp, Users, Calendar, User as UserIcon } from "lucide-react";
 import { Link } from "wouter";
+import { LogoutButton } from "@/components/logout-button";
 
 export default function Home() {
   const quickActions = [
@@ -61,14 +62,10 @@ export default function Home() {
                   <p className="text-gray-500">Member</p>
                 </div>
               </div>
-              <Button
+              <LogoutButton
                 variant="outline"
-                onClick={() => window.location.href = '/api/logout'}
                 className="flex items-center space-x-2"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Keluar</span>
-              </Button>
+              />
             </div>
           </div>
         </div>

@@ -12,6 +12,7 @@ import CompanyOKRsPage from "@/pages/company-okrs";
 import KeyResultDetail from "@/pages/key-result-detail";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
+import Profile from "@/pages/profile";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -39,6 +40,7 @@ function Router() {
       <Route path="/" component={Dashboard} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/home" component={Home} />
+      <Route path="/profile" component={Profile} />
       <Route path="/company-okrs" component={CompanyOKRsPage} />
       <Route path="/key-results/:id" component={KeyResultDetail} />
       <Route path="/cycles" component={CyclesPage} />
