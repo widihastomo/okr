@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import type { Cycle, User } from "@shared/schema";
 
 const createOKRSchema = z.object({
   objective: z.object({
@@ -46,14 +47,24 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Fetch cycles from database
+  const { data: cycles = [], isLoading: cyclesLoading } = useQuery<Cycle[]>({
+    queryKey: ['/api/cycles'],
+  });
+
+  // Fetch users from database
+  const { data: users = [], isLoading: usersLoading } = useQuery<User[]>({
+    queryKey: ['/api/users'],
+  });
+
   const form = useForm<CreateOKRFormData>({
     resolver: zodResolver(createOKRSchema),
     defaultValues: {
       objective: {
         title: "",
         description: "",
-        timeframe: "Q1 2025",
-        owner: "John Doe",
+        timeframe: cycles.length > 0 ? cycles[0].name : "",
+        owner: users.length > 0 ? users[0].id : "",
         status: "in_progress",
       },
       keyResults: [{
@@ -177,10 +188,17 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="Q1 2025">Q1 2025</SelectItem>
-                            <SelectItem value="Q4 2024">Q4 2024</SelectItem>
-                            <SelectItem value="Q3 2024">Q3 2024</SelectItem>
-                            <SelectItem value="Q2 2024">Q2 2024</SelectItem>
+                            {cyclesLoading ? (
+                              <SelectItem value="" disabled>Loading cycles...</SelectItem>
+                            ) : cycles.length === 0 ? (
+                              <SelectItem value="" disabled>No cycles available</SelectItem>
+                            ) : (
+                              cycles.map((cycle) => (
+                                <SelectItem key={cycle.id} value={cycle.name}>
+                                  {cycle.name} ({cycle.type})
+                                </SelectItem>
+                              ))
+                            )}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -201,9 +219,19 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="John Doe">John Doe</SelectItem>
-                            <SelectItem value="Sarah Johnson">Sarah Johnson</SelectItem>
-                            <SelectItem value="Mike Chen">Mike Chen</SelectItem>
+                            {usersLoading ? (
+                              <SelectItem value="" disabled>Loading users...</SelectItem>
+                            ) : users.length === 0 ? (
+                              <SelectItem value="" disabled>No users available</SelectItem>
+                            ) : (
+                              users.map((user) => (
+                                <SelectItem key={user.id} value={user.id}>
+                                  {user.firstName && user.lastName 
+                                    ? `${user.firstName} ${user.lastName}` 
+                                    : user.email || user.id}
+                                </SelectItem>
+                              ))
+                            )}
                           </SelectContent>
                         </Select>
                         <FormMessage />
