@@ -5,6 +5,7 @@ import StatsOverview from "@/components/stats-overview";
 import OKRCard from "@/components/okr-card";
 import CreateOKRModal from "@/components/create-okr-modal";
 import EditProgressModal from "@/components/edit-progress-modal";
+import { KeyResultDetailModal } from "@/components/key-result-detail-modal";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
@@ -15,6 +16,9 @@ export default function Dashboard() {
   const [timeframeFilter, setTimeframeFilter] = useState<string>("all");
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editProgressModal, setEditProgressModal] = useState<{ open: boolean; keyResult?: KeyResult }>({
+    open: false
+  });
+  const [keyResultDetailModal, setKeyResultDetailModal] = useState<{ open: boolean; keyResultId?: number }>({
     open: false
   });
 
@@ -28,6 +32,10 @@ export default function Dashboard() {
 
   const handleEditProgress = (keyResult: KeyResult) => {
     setEditProgressModal({ open: true, keyResult });
+  };
+
+  const handleKeyResultClick = (keyResultId: number) => {
+    setKeyResultDetailModal({ open: true, keyResultId });
   };
 
   return (
@@ -118,6 +126,7 @@ export default function Dashboard() {
                   okr={okr} 
                   onEditProgress={handleEditProgress}
                   onRefresh={refetch}
+                  onKeyResultClick={handleKeyResultClick}
                 />
               ))
             )}
@@ -137,6 +146,14 @@ export default function Dashboard() {
         keyResult={editProgressModal.keyResult}
         onSuccess={refetch}
       />
+
+      {keyResultDetailModal.keyResultId && (
+        <KeyResultDetailModal
+          keyResultId={keyResultDetailModal.keyResultId}
+          isOpen={keyResultDetailModal.open}
+          onClose={() => setKeyResultDetailModal({ open: false })}
+        />
+      )}
     </div>
   );
 }

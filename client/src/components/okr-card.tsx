@@ -12,9 +12,10 @@ interface OKRCardProps {
   okr: OKRWithKeyResults;
   onEditProgress: (keyResult: KeyResult) => void;
   onRefresh: () => void;
+  onKeyResultClick: (keyResultId: number) => void;
 }
 
-export default function OKRCard({ okr, onEditProgress }: OKRCardProps) {
+export default function OKRCard({ okr, onEditProgress, onKeyResultClick }: OKRCardProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "on_track":
@@ -134,12 +135,12 @@ export default function OKRCard({ okr, onEditProgress }: OKRCardProps) {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <Link 
-                        href={`/key-results/${kr.id}`}
-                        className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
+                      <button 
+                        onClick={() => onKeyResultClick(kr.id)}
+                        className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer text-left"
                       >
                         {kr.title}
-                      </Link>
+                      </button>
                       <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
                         {getKeyResultTypeLabel(kr.keyResultType)}
                       </span>
