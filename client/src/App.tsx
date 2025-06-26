@@ -13,7 +13,6 @@ import KeyResultDetail from "@/pages/key-result-detail";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
 import NotFound from "@/pages/not-found";
-import Sidebar from "@/components/sidebar";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -36,22 +35,17 @@ function Router() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <Sidebar />
-      <main className="flex-1 lg:ml-64">
-        <Switch>
-          <Route path="/" component={Dashboard} />
-          <Route path="/dashboard" component={Dashboard} />
-          <Route path="/home" component={Home} />
-          <Route path="/company-okrs" component={CompanyOKRsPage} />
-          <Route path="/key-results/:id" component={KeyResultDetail} />
-          <Route path="/cycles" component={CyclesPage} />
-          <Route path="/templates" component={TemplatesPage} />
-          <Route path="/users" component={UsersPage} />
-          <Route component={NotFound} />
-        </Switch>
-      </main>
-    </div>
+    <Switch>
+      <Route path="/" component={Dashboard} />
+      <Route path="/dashboard" component={Dashboard} />
+      <Route path="/home" component={Home} />
+      <Route path="/company-okrs" component={CompanyOKRsPage} />
+      <Route path="/key-results/:id" component={KeyResultDetail} />
+      <Route path="/cycles" component={CyclesPage} />
+      <Route path="/templates" component={TemplatesPage} />
+      <Route path="/users" component={UsersPage} />
+      <Route component={NotFound} />
+    </Switch>
   );
 }
 
