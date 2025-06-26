@@ -68,20 +68,20 @@ export default function TemplatesPage() {
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
-      <div className="flex-1 overflow-auto">
-        <div className="p-6 max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">OKR Templates</h1>
-          <p className="text-gray-600 mt-2">Create and manage reusable OKR templates</p>
-        </div>
-        <Button onClick={() => setCreateModalOpen(true)} className="bg-primary hover:bg-blue-700">
-          <Plus className="w-4 h-4 mr-2" />
-          New Template
-        </Button>
-      </div>
+      <div className="flex-1 overflow-auto pt-16 lg:pt-0">
+        <div className="p-4 lg:p-6 max-w-7xl mx-auto">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 lg:mb-8 space-y-4 sm:space-y-0">
+            <div>
+              <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">OKR Templates</h1>
+              <p className="text-gray-600 mt-2 text-sm lg:text-base">Create and manage reusable OKR templates</p>
+            </div>
+            <Button onClick={() => setCreateModalOpen(true)} className="bg-primary hover:bg-blue-700 w-full sm:w-auto">
+              <Plus className="w-4 h-4 mr-2" />
+              New Template
+            </Button>
+          </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
         {templates.map((template) => {
           const TypeIcon = getTypeIcon(template.type);
           let objectives = [];

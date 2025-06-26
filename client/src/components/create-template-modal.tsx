@@ -114,10 +114,10 @@ export default function CreateTemplateModal({ open, onOpenChange, onSuccess }: C
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create New Template</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-lg">Create New Template</DialogTitle>
+          <DialogDescription className="text-sm">
             Create a reusable OKR template for your organization
           </DialogDescription>
         </DialogHeader>

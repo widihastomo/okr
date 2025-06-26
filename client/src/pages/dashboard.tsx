@@ -30,18 +30,18 @@ export default function Dashboard() {
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden pt-16 lg:pt-0">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
+        <header className="bg-white border-b border-gray-200 px-4 lg:px-6 py-4">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900">OKR Dashboard</h1>
-              <p className="text-gray-600 mt-1">Q4 2024 • Track your objectives and key results</p>
+              <h1 className="text-xl lg:text-2xl font-semibold text-gray-900">OKR Dashboard</h1>
+              <p className="text-gray-600 mt-1 text-sm lg:text-base">Q4 2024 • Track your objectives and key results</p>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-32">
+                  <SelectTrigger className="w-full sm:w-32">
                     <SelectValue placeholder="All Status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -54,7 +54,7 @@ export default function Dashboard() {
                 </Select>
                 
                 <Select value={timeframeFilter} onValueChange={setTimeframeFilter}>
-                  <SelectTrigger className="w-32">
+                  <SelectTrigger className="w-full sm:w-32">
                     <SelectValue placeholder="All Periods" />
                   </SelectTrigger>
                   <SelectContent>

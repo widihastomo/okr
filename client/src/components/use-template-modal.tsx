@@ -80,10 +80,10 @@ export default function UseTemplateModal({ open, template, onOpenChange, onSucce
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] w-[95vw] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Use Template: {template.name}</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-lg">Use Template: {template.name}</DialogTitle>
+          <DialogDescription className="text-sm">
             Select a cycle to create OKRs from this template
           </DialogDescription>
         </DialogHeader>

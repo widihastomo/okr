@@ -89,10 +89,10 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] w-[95vw] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create New Cycle</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-lg">Create New Cycle</DialogTitle>
+          <DialogDescription className="text-sm">
             Create a new OKR cycle for your organization
           </DialogDescription>
         </DialogHeader>
