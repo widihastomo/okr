@@ -90,12 +90,10 @@ export default function EditProgressModal({
         return Math.min(100, Math.max(0, (currentNum / targetNum) * 100));
         
       case "decrease_to":
-        // Progress toward desired decrease from baseline to target
-        const baselineNum = baseline && baseline !== null ? parseFloat(baseline) : targetNum * 2;
-        if (baselineNum <= targetNum) return currentNum <= targetNum ? 100 : 0;
-        if (currentNum >= baselineNum) return 0;
-        if (currentNum <= targetNum) return 100;
-        return Math.max(0, Math.min(100, ((baselineNum - currentNum) / (baselineNum - targetNum)) * 100));
+        // Progress = (target / current) * 100, where lower current values = higher progress
+        if (currentNum === 0) return 0; // Avoid division by zero
+        const decreaseProgress = (targetNum / currentNum) * 100;
+        return Math.min(100, Math.max(0, decreaseProgress));
         
       case "achieve_or_not":
         // Binary: 100% if current >= target, 0% otherwise

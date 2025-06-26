@@ -38,7 +38,7 @@ The system uses two main entities:
 - **Types**: Support for various measurement units (number, percentage, currency)
 - **Key Result Types**: Three calculation methods for different goal types:
   - `increase_to`: Traditional progress calculation (current/target * 100)
-  - `decrease_to`: Reverse progress where lower values = better progress
+  - `decrease_to`: Inverse progress calculation (target/current * 100)
   - `achieve_or_not`: Binary achievement (100% when target is met, 0% otherwise)
 
 ## Data Flow
