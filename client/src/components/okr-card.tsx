@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Calendar, User, Clock, Edit, MoreVertical } from "lucide-react";
 import type { OKRWithKeyResults, KeyResult } from "@shared/schema";
+import { Link } from "wouter";
 
 interface OKRCardProps {
   okr: OKRWithKeyResults;
@@ -130,7 +131,12 @@ export default function OKRCard({ okr, onEditProgress }: OKRCardProps) {
               <div key={kr.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="font-medium text-gray-900">{kr.title}</p>
+                    <Link 
+                      href={`/key-results/${kr.id}`}
+                      className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
+                    >
+                      {kr.title}
+                    </Link>
                     <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
                       {getKeyResultTypeLabel(kr.keyResultType)}
                     </span>
