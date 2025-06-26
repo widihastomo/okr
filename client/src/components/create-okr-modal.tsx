@@ -408,7 +408,7 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
                           />
                         </div>
 
-                        <div className="grid grid-cols-3 gap-3">
+                        <div className="grid grid-cols-2 gap-3">
                           <FormField
                             control={form.control}
                             name={`keyResults.${index}.baseValue`}
@@ -437,19 +437,7 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
                             )}
                           />
 
-                          <FormField
-                            control={form.control}
-                            name={`keyResults.${index}.currentValue`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Current Value</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Current value" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                          
                         </div>
 
                         
