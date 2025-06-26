@@ -255,6 +255,69 @@ export default function Login() {
 
             <Separator />
 
+            {/* Demo Accounts Section */}
+            {!isRegister && (
+              <div className="bg-blue-50 rounded-lg p-4 space-y-3">
+                <h3 className="text-sm font-medium text-blue-900">Akun Demo untuk Testing:</h3>
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between items-center bg-white p-2 rounded border">
+                    <div>
+                      <div className="font-medium text-gray-900">Admin User</div>
+                      <div className="text-gray-600">admin@example.com</div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        loginForm.setValue("email", "admin@example.com");
+                        loginForm.setValue("password", "123456");
+                      }}
+                      className="text-xs"
+                    >
+                      Isi Otomatis
+                    </Button>
+                  </div>
+                  <div className="flex justify-between items-center bg-white p-2 rounded border">
+                    <div>
+                      <div className="font-medium text-gray-900">Manager User</div>
+                      <div className="text-gray-600">manager@example.com</div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        loginForm.setValue("email", "manager@example.com");
+                        loginForm.setValue("password", "123456");
+                      }}
+                      className="text-xs"
+                    >
+                      Isi Otomatis
+                    </Button>
+                  </div>
+                  <div className="flex justify-between items-center bg-white p-2 rounded border">
+                    <div>
+                      <div className="font-medium text-gray-900">Member User</div>
+                      <div className="text-gray-600">john@example.com</div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        loginForm.setValue("email", "john@example.com");
+                        loginForm.setValue("password", "123456");
+                      }}
+                      className="text-xs"
+                    >
+                      Isi Otomatis
+                    </Button>
+                  </div>
+                </div>
+                <p className="text-xs text-blue-700 mt-2">
+                  Semua akun demo menggunakan password: <span className="font-mono bg-blue-100 px-1 rounded">123456</span>
+                </p>
+              </div>
+            )}
+
             <div className="text-center">
               <p className="text-sm text-gray-600">
                 {isRegister ? "Sudah punya akun?" : "Belum punya akun?"}

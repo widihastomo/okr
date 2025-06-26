@@ -84,13 +84,13 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
   next();
 };
 
-export async function getCurrentUser(userId: number): Promise<User | null> {
+export async function getCurrentUser(userId: string): Promise<User | null> {
   const user = await storage.getUser(userId);
   return user || null;
 }
 
 declare module "express-session" {
   interface SessionData {
-    userId: number;
+    userId: string;
   }
 }

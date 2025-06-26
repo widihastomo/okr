@@ -41,11 +41,11 @@ export class MemStorage implements IStorage {
   }
 
   private initializeSampleData() {
-    // Create sample users
+    // Create sample users with password "123456"
     const user1: User = {
       id: "1",
       email: "admin@example.com",
-      password: "$2a$10$sample.hash.for.password123", // This would be a real bcrypt hash
+      password: "$2b$10$6D94g.O4bv4WhZc5n5PbUOmrckdaAosKKZInMOET74YbhC/sRiT9i", // password: 123456
       firstName: "Admin",
       lastName: "User",
       profileImageUrl: null,
@@ -58,7 +58,7 @@ export class MemStorage implements IStorage {
     const user2: User = {
       id: "2",
       email: "manager@example.com",
-      password: "$2a$10$sample.hash.for.password123",
+      password: "$2b$10$6D94g.O4bv4WhZc5n5PbUOmrckdaAosKKZInMOET74YbhC/sRiT9i", // password: 123456
       firstName: "Manager",
       lastName: "User",
       profileImageUrl: null,
@@ -68,9 +68,23 @@ export class MemStorage implements IStorage {
       updatedAt: new Date(),
     };
 
+    const user3: User = {
+      id: "3",
+      email: "john@example.com",
+      password: "$2b$10$6D94g.O4bv4WhZc5n5PbUOmrckdaAosKKZInMOET74YbhC/sRiT9i", // password: 123456
+      firstName: "John",
+      lastName: "Doe",
+      profileImageUrl: null,
+      role: "member",
+      isActive: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
     this.users.set("1", user1);
     this.users.set("2", user2);
-    this.currentUserId = 3;
+    this.users.set("3", user3);
+    this.currentUserId = 4;
 
     // Create sample teams
     const team1: Team = {

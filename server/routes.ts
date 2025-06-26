@@ -14,6 +14,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
   setupEmailAuth(app);
 
+  // Debug endpoint to check users
+  app.get("/api/debug/users", async (req, res) => {
+    try {
+      const users = await storage.getUsers();
+      res.json(users.map(u => ({ id: u.id, email: u.email, firstName: u.firstName, lastName: u.lastName })));
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
   // Note: Auth routes are handled in authRoutes.ts
   // Cycles endpoints
   app.get("/api/cycles", async (req, res) => {
