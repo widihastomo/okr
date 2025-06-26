@@ -61,9 +61,15 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
   });
 
   // Fetch existing objectives for parent selection
-  const { data: objectives = [] } = useQuery<Objective[]>({
+  const { data: objectives = [], isLoading: objectivesLoading } = useQuery<Objective[]>({
     queryKey: ['/api/objectives'],
   });
+
+  // Debug: Log objectives data
+  React.useEffect(() => {
+    console.log('Objectives data:', objectives);
+    console.log('Objectives loading:', objectivesLoading);
+  }, [objectives, objectivesLoading]);
 
   const form = useForm<CreateOKRFormData>({
     resolver: zodResolver(createOKRSchema),
@@ -288,11 +294,15 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="none">No Parent (Top Level)</SelectItem>
-                          {objectives.map((objective) => (
-                            <SelectItem key={objective.id} value={objective.id.toString()}>
-                              {objective.title}
-                            </SelectItem>
-                          ))}
+                          {objectives.length === 0 ? (
+                            <SelectItem value="loading" disabled>No objectives available</SelectItem>
+                          ) : (
+                            objectives.map((objective) => (
+                              <SelectItem key={objective.id} value={objective.id.toString()}>
+                                {objective.title}
+                              </SelectItem>
+                            ))
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />
