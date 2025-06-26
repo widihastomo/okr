@@ -43,7 +43,7 @@ export function CheckInModal({
 
   const checkInMutation = useMutation({
     mutationFn: async (data: { value: string; notes: string; confidence: number }) => {
-      return await apiRequest(`/api/key-results/${keyResultId}/check-ins`, "POST", data);
+      return await apiRequest("POST", `/api/key-results/${keyResultId}/check-ins`, data);
     },
     onSuccess: () => {
       toast({
