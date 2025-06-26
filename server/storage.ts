@@ -88,8 +88,8 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   // User operations
-  async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, parseInt(id)));
     return user;
   }
 
@@ -110,11 +110,30 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    if (userData.id) {
+      // Update existing user
+      const [user] = await db
+        .update(users)
+        .set({ ...userData, updatedAt: new Date() })
+        .where(eq(users.id, parseInt(userData.id)))
+        .returning();
+      return user;
+    } else {
+      // Create new user
+      const [user] = await db
+        .insert(users)
+        .values(userData)
+        .returning();
+      return user;
+    }
+  }
+
   async updateUser(id: string, userData: Partial<UpsertUser>): Promise<User | undefined> {
     const [user] = await db
       .update(users)
       .set({ ...userData, updatedAt: new Date() })
-      .where(eq(users.id, id))
+      .where(eq(users.id, parseInt(id)))
       .returning();
     return user;
   }
@@ -555,5 +574,5 @@ export class DatabaseStorage implements IStorage {
 
 // MemStorage moved to storage-memory.ts
 
-import { MemStorage } from "./storage-memory";
-export const storage = new MemStorage();
+// DatabaseStorage akan diimport dari file ini
+export const storage = new DatabaseStorage();
