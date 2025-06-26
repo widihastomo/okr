@@ -120,6 +120,21 @@ export const initiatives = pgTable("initiatives", {
   createdBy: integer("created_by").notNull(), // user ID
 });
 
+// Tasks linked to initiatives
+export const tasks = pgTable("tasks", {
+  id: serial("id").primaryKey(),
+  initiativeId: integer("initiative_id").references(() => initiatives.id).notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  status: text("status").notNull().default("pending"), // "pending", "in_progress", "completed", "cancelled"
+  priority: text("priority").notNull().default("medium"), // "low", "medium", "high"
+  assignedTo: integer("assigned_to"), // user ID
+  dueDate: timestamp("due_date"),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  createdBy: integer("created_by").notNull(), // user ID
+});
+
 export const insertCycleSchema = createInsertSchema(cycles).omit({
   id: true,
 });
@@ -146,6 +161,12 @@ export const insertInitiativeSchema = createInsertSchema(initiatives).omit({
   createdAt: true,
 });
 
+export const insertTaskSchema = createInsertSchema(tasks).omit({
+  id: true,
+  createdAt: true,
+  completedAt: true,
+});
+
 export const updateKeyResultProgressSchema = z.object({
   id: z.number(),
   currentValue: z.number(),
@@ -163,6 +184,7 @@ export type InsertObjective = z.infer<typeof insertObjectiveSchema>;
 export type InsertKeyResult = z.infer<typeof insertKeyResultSchema>;
 export type InsertCheckIn = z.infer<typeof insertCheckInSchema>;
 export type InsertInitiative = z.infer<typeof insertInitiativeSchema>;
+export type InsertTask = z.infer<typeof insertTaskSchema>;
 export type UpdateKeyResultProgress = z.infer<typeof updateKeyResultProgressSchema>;
 export type CreateOKRFromTemplate = z.infer<typeof createOKRFromTemplateSchema>;
 
@@ -211,13 +233,29 @@ export const checkInsRelations = relations(checkIns, ({ one }) => ({
   }),
 }));
 
-export const initiativesRelations = relations(initiatives, ({ one }) => ({
+export const initiativesRelations = relations(initiatives, ({ one, many }) => ({
   keyResult: one(keyResults, {
     fields: [initiatives.keyResultId],
     references: [keyResults.id],
   }),
   creator: one(users, {
     fields: [initiatives.createdBy],
+    references: [users.id],
+  }),
+  tasks: many(tasks),
+}));
+
+export const tasksRelations = relations(tasks, ({ one }) => ({
+  initiative: one(initiatives, {
+    fields: [tasks.initiativeId],
+    references: [initiatives.id],
+  }),
+  assignee: one(users, {
+    fields: [tasks.assignedTo],
+    references: [users.id],
+  }),
+  creator: one(users, {
+    fields: [tasks.createdBy],
     references: [users.id],
   }),
 }));
@@ -270,6 +308,7 @@ export type Objective = typeof objectives.$inferSelect;
 export type KeyResult = typeof keyResults.$inferSelect;
 export type CheckIn = typeof checkIns.$inferSelect;
 export type Initiative = typeof initiatives.$inferSelect;
+export type Task = typeof tasks.$inferSelect;
 
 export type KeyResultWithDetails = KeyResult & {
   checkIns: CheckIn[];

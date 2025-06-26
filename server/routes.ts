@@ -435,6 +435,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get OKRs with full 4-level hierarchy (Objective → Key Results → Initiatives → Tasks)
+  app.get("/api/okrs-with-hierarchy", async (req, res) => {
+    try {
+      const { cycleId } = req.query;
+      const okrs = await storage.getOKRsWithFullHierarchy(cycleId ? parseInt(cycleId as string) : undefined);
+      res.json(okrs);
+    } catch (error) {
+      console.error("Error fetching OKRs with hierarchy:", error);
+      res.status(500).json({ message: "Failed to fetch OKRs with hierarchy" });
+    }
+  });
+
+  // Create sample OKR data for testing
+  app.post("/api/create-sample-data", async (req, res) => {
+    try {
+      const { createSampleOKRData } = await import("./sample-data");
+      const success = await createSampleOKRData();
+      if (success) {
+        res.json({ message: "Sample OKR data created successfully" });
+      } else {
+        res.status(500).json({ message: "Failed to create sample data" });
+      }
+    } catch (error) {
+      console.error("Error creating sample data:", error);
+      res.status(500).json({ message: "Failed to create sample data" });
+    }
+  });
+
   // Get single OKR with key results
   app.get("/api/okrs/:id", async (req, res) => {
     try {

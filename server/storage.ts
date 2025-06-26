@@ -1,7 +1,7 @@
 import { 
-  cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives,
+  cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives, tasks,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
-  type CheckIn, type Initiative, type KeyResultWithDetails,
+  type CheckIn, type Initiative, type Task, type KeyResultWithDetails,
   type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
   type InsertUser, type InsertTeam, type InsertTeamMember,
   type InsertCheckIn, type InsertInitiative,
@@ -84,6 +84,7 @@ export interface IStorage {
   // Combined
   getOKRsWithKeyResults(): Promise<OKRWithKeyResults[]>;
   getOKRWithKeyResults(id: number): Promise<OKRWithKeyResults | undefined>;
+  getOKRsWithFullHierarchy(cycleId?: number): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -569,6 +570,73 @@ export class DatabaseStorage implements IStorage {
     const objKeyResults = await this.getKeyResultsByObjectiveId(id);
     const overallProgress = this.calculateOverallProgress(objKeyResults);
     return { ...objective, keyResults: objKeyResults, overallProgress };
+  }
+
+  async getOKRsWithFullHierarchy(cycleId?: number): Promise<any[]> {
+    try {
+      // Get all objectives, optionally filtered by cycle
+      let allObjectives;
+      if (cycleId) {
+        allObjectives = await db.select().from(objectives).where(eq(objectives.cycleId, cycleId));
+      } else {
+        allObjectives = await db.select().from(objectives);
+      }
+
+      // Build full hierarchy for each objective
+      const hierarchyData = await Promise.all(
+        allObjectives.map(async (objective) => {
+          // Get key results for this objective
+          const objKeyResults = await db.select().from(keyResults).where(eq(keyResults.objectiveId, objective.id));
+          
+          // For each key result, get initiatives and tasks
+          const keyResultsWithInitiatives = await Promise.all(
+            objKeyResults.map(async (keyResult) => {
+              // Get initiatives for this key result
+              const keyResultInitiatives = await db.select().from(initiatives).where(eq(initiatives.keyResultId, keyResult.id));
+              
+              // For each initiative, get tasks
+              const initiativesWithTasks = await Promise.all(
+                keyResultInitiatives.map(async (initiative) => {
+                  const initiativeTasks = await db.select().from(tasks).where(eq(tasks.initiativeId, initiative.id));
+                  return {
+                    ...initiative,
+                    tasks: initiativeTasks
+                  };
+                })
+              );
+
+              // Calculate progress for key result
+              const progress = this.calculateProgress(
+                keyResult.currentValue, 
+                keyResult.targetValue, 
+                keyResult.keyResultType, 
+                keyResult.baseValue
+              );
+
+              return {
+                ...keyResult,
+                progress,
+                initiatives: initiativesWithTasks
+              };
+            })
+          );
+
+          // Calculate overall progress for objective
+          const overallProgress = this.calculateOverallProgress(objKeyResults);
+
+          return {
+            ...objective,
+            overallProgress,
+            keyResults: keyResultsWithInitiatives
+          };
+        })
+      );
+
+      return hierarchyData;
+    } catch (error) {
+      console.error("Error fetching OKRs with full hierarchy:", error);
+      throw error;
+    }
   }
 }
 
