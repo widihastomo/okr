@@ -11,6 +11,7 @@ import UsersPage from "@/components/users-page";
 import CompanyOKRsPage from "@/pages/company-okrs";
 import KeyResultDetail from "@/pages/key-result-detail";
 import Landing from "@/pages/landing";
+import Login from "@/pages/login";
 import Home from "@/pages/home";
 import Profile from "@/pages/profile";
 import NotFound from "@/pages/not-found";
@@ -32,7 +33,12 @@ function Router() {
   }
 
   if (!isAuthenticated) {
-    return <Landing />;
+    return (
+      <Switch>
+        <Route path="/login" component={Login} />
+        <Route component={Landing} />
+      </Switch>
+    );
   }
 
   return (

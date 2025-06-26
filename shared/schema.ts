@@ -30,7 +30,7 @@ export const objectives = pgTable("objectives", {
   timeframe: text("timeframe").notNull(), // e.g., "Q4 2024"
   owner: text("owner").notNull(), // kept for backward compatibility
   ownerType: text("owner_type").notNull().default("user"), // "user" or "team"
-  ownerId: text("owner_id").notNull(), // user ID or team ID
+  ownerId: integer("owner_id").notNull(), // user ID or team ID
   status: text("status").notNull().default("in_progress"), // "on_track", "at_risk", "completed", "in_progress"
   teamId: integer("team_id").references(() => teams.id), // for team OKRs
   parentId: integer("parent_id"), // self-reference for parent-child hierarchy
@@ -47,14 +47,16 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
-// Users table
+// Users table with email/password authentication
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey().notNull(),
-  email: varchar("email").unique(),
-  firstName: varchar("first_name"),
-  lastName: varchar("last_name"),
-  profileImageUrl: varchar("profile_image_url"),
+  id: serial("id").primaryKey(),
+  email: varchar("email", { length: 255 }).unique().notNull(),
+  password: varchar("password", { length: 255 }).notNull(),
+  firstName: varchar("first_name", { length: 100 }),
+  lastName: varchar("last_name", { length: 100 }),
+  profileImageUrl: varchar("profile_image_url", { length: 500 }),
   role: text("role").notNull().default("member"), // "admin", "manager", "member"
+  isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -64,7 +66,7 @@ export const teams = pgTable("teams", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   description: text("description"),
-  ownerId: varchar("owner_id").notNull(),
+  ownerId: integer("owner_id").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -73,7 +75,7 @@ export const teams = pgTable("teams", {
 export const teamMembers = pgTable("team_members", {
   id: serial("id").primaryKey(),
   teamId: integer("team_id").notNull(),
-  userId: varchar("user_id").notNull(),
+  userId: integer("user_id").notNull(),
   role: text("role").notNull().default("member"), // "admin", "member"
   joinedAt: timestamp("joined_at").defaultNow(),
 });
@@ -102,7 +104,7 @@ export const checkIns = pgTable("check_ins", {
   notes: text("notes"),
   confidence: integer("confidence").notNull().default(5), // 1-10 scale
   createdAt: timestamp("created_at").defaultNow(),
-  createdBy: varchar("created_by").notNull(), // user ID
+  createdBy: integer("created_by").notNull(), // user ID
 });
 
 // Initiatives/Projects linked to key results
@@ -115,7 +117,7 @@ export const initiatives = pgTable("initiatives", {
   priority: text("priority").notNull().default("medium"), // "low", "medium", "high"
   dueDate: timestamp("due_date"),
   createdAt: timestamp("created_at").defaultNow(),
-  createdBy: varchar("created_by").notNull(), // user ID
+  createdBy: integer("created_by").notNull(), // user ID
 });
 
 export const insertCycleSchema = createInsertSchema(cycles).omit({
@@ -220,8 +222,22 @@ export const initiativesRelations = relations(initiatives, ({ one }) => ({
   }),
 }));
 
+// Authentication schemas
+export const loginSchema = z.object({
+  email: z.string().email("Email tidak valid"),
+  password: z.string().min(6, "Password minimal 6 karakter"),
+});
+
+export const registerSchema = z.object({
+  email: z.string().email("Email tidak valid"),
+  password: z.string().min(6, "Password minimal 6 karakter"),
+  firstName: z.string().min(1, "Nama depan harus diisi"),
+  lastName: z.string().optional(),
+});
+
 // Insert schemas for new tables
 export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
   createdAt: true,
   updatedAt: true,
 });
@@ -241,10 +257,11 @@ export const insertTeamMemberSchema = createInsertSchema(teamMembers).omit({
 export type User = typeof users.$inferSelect;
 export type Team = typeof teams.$inferSelect;
 export type TeamMember = typeof teamMembers.$inferSelect;
-export type UpsertUser = typeof users.$inferInsert;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type InsertTeam = z.infer<typeof insertTeamSchema>;
 export type InsertTeamMember = z.infer<typeof insertTeamMemberSchema>;
+export type LoginData = z.infer<typeof loginSchema>;
+export type RegisterData = z.infer<typeof registerSchema>;
 
 export type Cycle = typeof cycles.$inferSelect;
 export type Template = typeof templates.$inferSelect;
