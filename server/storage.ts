@@ -469,8 +469,11 @@ export class DatabaseStorage implements IStorage {
 
   async createCheckIn(checkInData: InsertCheckIn): Promise<CheckIn> {
     const [checkIn] = await db.insert(checkIns).values({
-      ...checkInData,
-      createdBy: "current-user", // TODO: Replace with actual user ID from session
+      keyResultId: checkInData.keyResultId,
+      value: checkInData.value,
+      notes: checkInData.notes || null,
+      confidence: checkInData.confidence || 5,
+      createdBy: checkInData.createdBy || "user1",
       createdAt: new Date(),
     }).returning();
     return checkIn;

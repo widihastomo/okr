@@ -59,10 +59,11 @@ export function CheckInModal({
       setNotes("");
       setConfidence([5]);
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Check-in error:", error);
       toast({
         title: "Gagal melakukan check-in",
-        description: "Terjadi kesalahan saat memperbarui progress",
+        description: error instanceof Error ? error.message : "Terjadi kesalahan saat memperbarui progress",
         variant: "destructive",
       });
     },

@@ -503,6 +503,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/key-results/:id/check-ins", async (req, res) => {
     try {
       const keyResultId = parseInt(req.params.id);
+      
+      if (isNaN(keyResultId)) {
+        return res.status(400).json({ message: "Invalid key result ID" });
+      }
+
+      if (!req.body.value) {
+        return res.status(400).json({ message: "Value is required" });
+      }
+
       const checkInData = {
         keyResultId,
         value: req.body.value,
@@ -521,7 +530,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.status(201).json(checkIn);
     } catch (error) {
-      res.status(500).json({ message: "Failed to create check-in" });
+      console.error("Check-in creation error:", error);
+      res.status(500).json({ 
+        message: "Failed to create check-in",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 
