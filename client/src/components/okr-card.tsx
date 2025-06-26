@@ -42,11 +42,30 @@ export default function OKRCard({ okr, onEditProgress }: OKRCardProps) {
     }
   };
 
-  const calculateProgress = (current: string, target: string): number => {
+  const calculateProgress = (current: string, target: string, keyResultType: string): number => {
     const currentNum = parseFloat(current);
     const targetNum = parseFloat(target);
-    if (targetNum === 0) return 0;
-    return Math.min(100, Math.max(0, (currentNum / targetNum) * 100));
+    
+    switch (keyResultType) {
+      case "increase_to":
+        // Progress = (current / target) * 100, capped at 100%
+        if (targetNum === 0) return 0;
+        return Math.min(100, Math.max(0, (currentNum / targetNum) * 100));
+        
+      case "decrease_to":
+        // Progress = 100% when current <= target, decreasing as current exceeds target
+        if (currentNum <= targetNum) return 100;
+        // Calculate how much we've exceeded the target and reduce progress
+        const excessRatio = (currentNum - targetNum) / targetNum;
+        return Math.max(0, 100 - (excessRatio * 100));
+        
+      case "achieve_or_not":
+        // Binary: 100% if current >= target, 0% otherwise
+        return currentNum >= targetNum ? 100 : 0;
+        
+      default:
+        return 0;
+    }
   };
 
   return (
@@ -97,11 +116,25 @@ export default function OKRCard({ okr, onEditProgress }: OKRCardProps) {
         <h4 className="text-sm font-semibold text-gray-700 mb-4">Key Results</h4>
         <div className="space-y-4">
           {okr.keyResults.map((kr) => {
-            const progress = calculateProgress(kr.currentValue, kr.targetValue);
+            const progress = calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType);
+            const getKeyResultTypeLabel = (type: string) => {
+              switch (type) {
+                case "increase_to": return "↗ Increase to";
+                case "decrease_to": return "↘ Decrease to";
+                case "achieve_or_not": return "✓ Achieve";
+                default: return type;
+              }
+            };
+            
             return (
               <div key={kr.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
                 <div className="flex-1">
-                  <p className="font-medium text-gray-900 mb-1">{kr.title}</p>
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="font-medium text-gray-900">{kr.title}</p>
+                    <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
+                      {getKeyResultTypeLabel(kr.keyResultType)}
+                    </span>
+                  </div>
                   <p className="text-sm text-gray-600 mb-3">{kr.description}</p>
                   <div className="flex items-center space-x-3">
                     <Progress value={progress} className="flex-1" />

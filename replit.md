@@ -34,8 +34,12 @@ The application follows a monorepo structure with clear separation between clien
 ### Database Schema
 The system uses two main entities:
 - **Objectives**: Contains title, description, timeframe, owner, and status
-- **Key Results**: Linked to objectives, tracks current/target values with units and status
+- **Key Results**: Linked to objectives, tracks current/target values with units, key result types, and status
 - **Types**: Support for various measurement units (number, percentage, currency)
+- **Key Result Types**: Three calculation methods for different goal types:
+  - `increase_to`: Traditional progress calculation (current/target * 100)
+  - `decrease_to`: Reverse progress where lower values = better progress
+  - `achieve_or_not`: Binary achievement (100% when target is met, 0% otherwise)
 
 ## Data Flow
 

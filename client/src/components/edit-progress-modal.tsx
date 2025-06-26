@@ -79,15 +79,34 @@ export default function EditProgressModal({
     updateProgressMutation.mutate(data);
   };
 
-  const calculateProgress = (current: string, target: string): number => {
+  const calculateProgress = (current: string, target: string, keyResultType: string): number => {
     const currentNum = parseFloat(current);
     const targetNum = parseFloat(target || "1");
-    if (targetNum === 0) return 0;
-    return Math.min(100, Math.max(0, (currentNum / targetNum) * 100));
+    
+    switch (keyResultType) {
+      case "increase_to":
+        // Progress = (current / target) * 100, capped at 100%
+        if (targetNum === 0) return 0;
+        return Math.min(100, Math.max(0, (currentNum / targetNum) * 100));
+        
+      case "decrease_to":
+        // Progress = 100% when current <= target, decreasing as current exceeds target
+        if (currentNum <= targetNum) return 100;
+        // Calculate how much we've exceeded the target and reduce progress
+        const excessRatio = (currentNum - targetNum) / targetNum;
+        return Math.max(0, 100 - (excessRatio * 100));
+        
+      case "achieve_or_not":
+        // Binary: 100% if current >= target, 0% otherwise
+        return currentNum >= targetNum ? 100 : 0;
+        
+      default:
+        return 0;
+    }
   };
 
   const currentProgress = keyResult 
-    ? calculateProgress(form.watch("currentValue") || keyResult.currentValue, keyResult.targetValue)
+    ? calculateProgress(form.watch("currentValue") || keyResult.currentValue, keyResult.targetValue, keyResult.keyResultType)
     : 0;
 
   return (
@@ -101,7 +120,14 @@ export default function EditProgressModal({
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <div>
-                <h3 className="font-medium text-gray-900 mb-2">{keyResult.title}</h3>
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="font-medium text-gray-900">{keyResult.title}</h3>
+                  <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full">
+                    {keyResult.keyResultType === "increase_to" && "↗ Increase to"}
+                    {keyResult.keyResultType === "decrease_to" && "↘ Decrease to"}
+                    {keyResult.keyResultType === "achieve_or_not" && "✓ Achieve"}
+                  </span>
+                </div>
                 <p className="text-sm text-gray-600 mb-4">{keyResult.description}</p>
               </div>
 

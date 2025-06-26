@@ -59,6 +59,7 @@ export class MemStorage implements IStorage {
       currentValue: "39200",
       targetValue: "50000",
       unit: "number",
+      keyResultType: "increase_to",
       status: "on_track"
     };
     
@@ -70,6 +71,7 @@ export class MemStorage implements IStorage {
       currentValue: "4.2",
       targetValue: "4.5",
       unit: "number",
+      keyResultType: "increase_to",
       status: "at_risk"
     };
     
@@ -81,6 +83,7 @@ export class MemStorage implements IStorage {
       currentValue: "3.2",
       targetValue: "5",
       unit: "percentage",
+      keyResultType: "decrease_to",
       status: "completed"
     };
 
@@ -108,6 +111,7 @@ export class MemStorage implements IStorage {
       currentValue: "78",
       targetValue: "90",
       unit: "percentage",
+      keyResultType: "increase_to",
       status: "at_risk"
     };
     
@@ -119,6 +123,7 @@ export class MemStorage implements IStorage {
       currentValue: "6",
       targetValue: "12",
       unit: "number",
+      keyResultType: "achieve_or_not",
       status: "in_progress"
     };
 
@@ -129,17 +134,36 @@ export class MemStorage implements IStorage {
     this.currentKeyResultId = 6;
   }
 
-  private calculateProgress(current: string, target: string): number {
+  private calculateProgress(current: string, target: string, keyResultType: string): number {
     const currentNum = parseFloat(current);
     const targetNum = parseFloat(target);
-    if (targetNum === 0) return 0;
-    return Math.min(100, Math.max(0, (currentNum / targetNum) * 100));
+    
+    switch (keyResultType) {
+      case "increase_to":
+        // Progress = (current / target) * 100, capped at 100%
+        if (targetNum === 0) return 0;
+        return Math.min(100, Math.max(0, (currentNum / targetNum) * 100));
+        
+      case "decrease_to":
+        // Progress = 100% when current <= target, decreasing as current exceeds target
+        if (currentNum <= targetNum) return 100;
+        // Calculate how much we've exceeded the target and reduce progress
+        const excessRatio = (currentNum - targetNum) / targetNum;
+        return Math.max(0, 100 - (excessRatio * 100));
+        
+      case "achieve_or_not":
+        // Binary: 100% if current >= target, 0% otherwise
+        return currentNum >= targetNum ? 100 : 0;
+        
+      default:
+        return 0;
+    }
   }
 
   private calculateOverallProgress(keyResults: KeyResult[]): number {
     if (keyResults.length === 0) return 0;
     const totalProgress = keyResults.reduce((sum, kr) => 
-      sum + this.calculateProgress(kr.currentValue, kr.targetValue), 0);
+      sum + this.calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType), 0);
     return Math.round(totalProgress / keyResults.length);
   }
 
@@ -153,7 +177,12 @@ export class MemStorage implements IStorage {
 
   async createObjective(insertObjective: InsertObjective): Promise<Objective> {
     const id = this.currentObjectiveId++;
-    const objective: Objective = { ...insertObjective, id };
+    const objective: Objective = { 
+      ...insertObjective, 
+      id,
+      description: insertObjective.description || null,
+      status: insertObjective.status || "in_progress"
+    };
     this.objectives.set(id, objective);
     return objective;
   }
@@ -162,7 +191,12 @@ export class MemStorage implements IStorage {
     const existing = this.objectives.get(id);
     if (!existing) return undefined;
     
-    const updated: Objective = { ...existing, ...updateData };
+    const updated: Objective = { 
+      ...existing, 
+      ...updateData,
+      description: updateData.description !== undefined ? updateData.description : existing.description,
+      status: updateData.status || existing.status
+    };
     this.objectives.set(id, updated);
     return updated;
   }
@@ -189,7 +223,15 @@ export class MemStorage implements IStorage {
 
   async createKeyResult(insertKeyResult: InsertKeyResult): Promise<KeyResult> {
     const id = this.currentKeyResultId++;
-    const keyResult: KeyResult = { ...insertKeyResult, id };
+    const keyResult: KeyResult = { 
+      ...insertKeyResult, 
+      id,
+      description: insertKeyResult.description || null,
+      status: insertKeyResult.status || "in_progress",
+      currentValue: insertKeyResult.currentValue || "0",
+      unit: insertKeyResult.unit || "number",
+      keyResultType: insertKeyResult.keyResultType || "increase_to"
+    };
     this.keyResults.set(id, keyResult);
     return keyResult;
   }
@@ -198,7 +240,15 @@ export class MemStorage implements IStorage {
     const existing = this.keyResults.get(id);
     if (!existing) return undefined;
     
-    const updated: KeyResult = { ...existing, ...updateData };
+    const updated: KeyResult = { 
+      ...existing, 
+      ...updateData,
+      description: updateData.description !== undefined ? updateData.description : existing.description,
+      status: updateData.status || existing.status,
+      currentValue: updateData.currentValue || existing.currentValue,
+      unit: updateData.unit || existing.unit,
+      keyResultType: updateData.keyResultType || existing.keyResultType
+    };
     this.keyResults.set(id, updated);
     return updated;
   }

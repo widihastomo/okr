@@ -28,6 +28,7 @@ const createOKRSchema = z.object({
     currentValue: z.string().default("0"),
     targetValue: z.string().min(1, "Target value is required"),
     unit: z.string().default("number"),
+    keyResultType: z.string().default("increase_to"),
     status: z.string().default("in_progress"),
   })).min(1, "At least one key result is required"),
 });
@@ -60,6 +61,7 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
         currentValue: "0",
         targetValue: "",
         unit: "number",
+        keyResultType: "increase_to",
         status: "in_progress",
       }],
     },
@@ -106,6 +108,7 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
       currentValue: "0",
       targetValue: "",
       unit: "number",
+      keyResultType: "increase_to",
       status: "in_progress",
     });
   };
@@ -269,7 +272,53 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
                           )}
                         />
 
-                        <div className="grid grid-cols-3 gap-3">
+                        <div className="grid grid-cols-2 gap-3 mb-3">
+                          <FormField
+                            control={form.control}
+                            name={`keyResults.${index}.keyResultType`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Key Result Type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="increase_to">Should Increase To</SelectItem>
+                                      <SelectItem value="decrease_to">Should Decrease To</SelectItem>
+                                      <SelectItem value="achieve_or_not">Achieve or Not</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name={`keyResults.${index}.unit`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Unit" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="number">Number</SelectItem>
+                                    <SelectItem value="percentage">Percentage</SelectItem>
+                                    <SelectItem value="currency">Currency</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
                           <FormField
                             control={form.control}
                             name={`keyResults.${index}.currentValue`}
@@ -291,28 +340,6 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
                                 <FormControl>
                                   <Input placeholder="Target value" {...field} />
                                 </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={form.control}
-                            name={`keyResults.${index}.unit`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                  <FormControl>
-                                    <SelectTrigger>
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="number">Number</SelectItem>
-                                    <SelectItem value="percentage">Percentage</SelectItem>
-                                    <SelectItem value="currency">Currency</SelectItem>
-                                  </SelectContent>
-                                </Select>
                                 <FormMessage />
                               </FormItem>
                             )}

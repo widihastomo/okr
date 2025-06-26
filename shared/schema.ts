@@ -19,6 +19,7 @@ export const keyResults = pgTable("key_results", {
   currentValue: decimal("current_value", { precision: 10, scale: 2 }).notNull().default("0"),
   targetValue: decimal("target_value", { precision: 10, scale: 2 }).notNull(),
   unit: text("unit").notNull().default("number"), // "number", "percentage", "currency"
+  keyResultType: text("key_result_type").notNull().default("increase_to"), // "increase_to", "decrease_to", "achieve_or_not"
   status: text("status").notNull().default("in_progress"), // "on_track", "at_risk", "completed", "in_progress"
 });
 
