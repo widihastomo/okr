@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Users, Plus, Edit, Trash2, UserPlus, Shield, User as UserIcon, Search } from "lucide-react";
+import { Users, Plus, Edit, Trash2, UserPlus, Shield, User as UserIcon, Search, UserCheck, UserX } from "lucide-react";
 import Sidebar from "./sidebar";
 import { useToast } from "@/hooks/use-toast";
 
@@ -26,6 +26,9 @@ export default function UsersPage() {
   const [newTeamDialog, setNewTeamDialog] = useState<{ open: boolean; user?: User }>({ open: false });
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+  const [teamMembersDialog, setTeamMembersDialog] = useState(false);
+  const [addMemberDialog, setAddMemberDialog] = useState(false);
 
   const { data: users = [], isLoading: usersLoading } = useQuery<User[]>({
     queryKey: ["/api/users"],
@@ -33,6 +36,12 @@ export default function UsersPage() {
 
   const { data: teams = [], isLoading: teamsLoading } = useQuery<Team[]>({
     queryKey: ["/api/teams"],
+  });
+
+  // Fetch team members for selected team
+  const { data: teamMembers = [] } = useQuery({
+    queryKey: ["/api/teams", selectedTeam?.id, "members"],
+    enabled: !!selectedTeam,
   });
 
   const createUserMutation = useMutation({
@@ -148,6 +157,86 @@ export default function UsersPage() {
       toast({
         title: "Error",
         description: "Failed to create team",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Add team member mutation
+  const addTeamMemberMutation = useMutation({
+    mutationFn: async (data: { teamId: number; userId: string; role: string }) => {
+      const response = await fetch(`/api/teams/${data.teamId}/members`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: data.userId, role: data.role }),
+      });
+      if (!response.ok) throw new Error('Failed to add team member');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/teams", selectedTeam?.id, "members"] });
+      setAddMemberDialog(false);
+      toast({
+        title: "Success",
+        description: "Team member added successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Remove team member mutation
+  const removeTeamMemberMutation = useMutation({
+    mutationFn: async (data: { teamId: number; userId: string }) => {
+      const response = await fetch(`/api/teams/${data.teamId}/members/${data.userId}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) throw new Error('Failed to remove team member');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/teams", selectedTeam?.id, "members"] });
+      toast({
+        title: "Success",
+        description: "Team member removed successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update team member role mutation
+  const updateTeamMemberRoleMutation = useMutation({
+    mutationFn: async (data: { teamId: number; userId: string; role: string }) => {
+      const response = await fetch(`/api/teams/${data.teamId}/members/${data.userId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: data.role }),
+      });
+      if (!response.ok) throw new Error('Failed to update member role');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/teams", selectedTeam?.id, "members"] });
+      toast({
+        title: "Success",
+        description: "Member role updated successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
         variant: "destructive",
       });
     },
@@ -568,9 +657,25 @@ export default function UsersPage() {
                         </CardTitle>
                         <CardDescription>{team.description}</CardDescription>
                       </CardHeader>
-                      <CardContent>
+                      <CardContent className="space-y-3">
                         <div className="text-sm text-gray-500">
                           Created {new Date(team.createdAt || '').toLocaleDateString()}
+                        </div>
+                        
+                        {/* Team Actions */}
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="flex-1"
+                            onClick={() => {
+                              setSelectedTeam(team);
+                              setTeamMembersDialog(true);
+                            }}
+                          >
+                            <UserCheck className="h-4 w-4 mr-2" />
+                            Manage Members
+                          </Button>
                         </div>
                       </CardContent>
                     </Card>
@@ -581,6 +686,169 @@ export default function UsersPage() {
           </Tabs>
         </div>
       </div>
+
+      {/* Team Members Management Dialog */}
+      <Dialog open={teamMembersDialog} onOpenChange={setTeamMembersDialog}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Manage Team Members - {selectedTeam?.name}
+            </DialogTitle>
+            <DialogDescription>
+              Add, remove, and manage roles for team members
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {/* Add Member Button */}
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-medium">Team Members</h3>
+              <Button 
+                onClick={() => setAddMemberDialog(true)}
+                size="sm"
+              >
+                <UserPlus className="h-4 w-4 mr-2" />
+                Add Member
+              </Button>
+            </div>
+
+            {/* Team Members List */}
+            <div className="border rounded-lg">
+              {teamMembers.length === 0 ? (
+                <div className="p-6 text-center text-gray-500">
+                  No team members found
+                </div>
+              ) : (
+                <div className="divide-y">
+                  {teamMembers.map((member: any) => (
+                    <div key={member.user.id} className="p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium">
+                          {member.user.firstName?.[0] || member.user.email[0].toUpperCase()}
+                        </div>
+                        <div>
+                          <div className="font-medium">
+                            {member.user.firstName} {member.user.lastName}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {member.user.email}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        {/* Role Badge & Selector */}
+                        <Select 
+                          value={member.role} 
+                          onValueChange={(newRole) => {
+                            updateTeamMemberRoleMutation.mutate({
+                              teamId: selectedTeam!.id,
+                              userId: member.user.id,
+                              role: newRole
+                            });
+                          }}
+                        >
+                          <SelectTrigger className="w-28">
+                            <SelectValue>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleBadge(member.role).className}`}>
+                                {member.role}
+                              </span>
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="member">Member</SelectItem>
+                            <SelectItem value="admin">Admin</SelectItem>
+                          </SelectContent>
+                        </Select>
+
+                        {/* Remove Member Button */}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            removeTeamMemberMutation.mutate({
+                              teamId: selectedTeam!.id,
+                              userId: member.user.id
+                            });
+                          }}
+                          disabled={removeTeamMemberMutation.isPending}
+                        >
+                          <UserX className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Team Member Dialog */}
+      <Dialog open={addMemberDialog} onOpenChange={setAddMemberDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Team Member</DialogTitle>
+            <DialogDescription>
+              Add a new member to {selectedTeam?.name}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            const formData = new FormData(e.currentTarget);
+            addTeamMemberMutation.mutate({
+              teamId: selectedTeam!.id,
+              userId: formData.get('userId') as string,
+              role: formData.get('role') as string,
+            });
+          }}>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="userId">Select User</Label>
+                <Select name="userId" required>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose a user to add" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {users
+                      .filter(user => !teamMembers.some((member: any) => member.user.id === user.id))
+                      .map((user: User) => (
+                        <SelectItem key={user.id} value={user.id}>
+                          {user.firstName} {user.lastName} ({user.email})
+                        </SelectItem>
+                      ))
+                    }
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label htmlFor="role">Role</Label>
+                <Select name="role" defaultValue="member" required>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="member">Member</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <Button 
+                type="submit" 
+                className="w-full"
+                disabled={addTeamMemberMutation.isPending}
+              >
+                {addTeamMemberMutation.isPending ? "Adding..." : "Add Member"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
