@@ -197,9 +197,9 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
                           </FormControl>
                           <SelectContent>
                             {cyclesLoading ? (
-                              <SelectItem value="" disabled>Loading cycles...</SelectItem>
+                              <SelectItem value="loading" disabled>Loading cycles...</SelectItem>
                             ) : cycles.length === 0 ? (
-                              <SelectItem value="" disabled>No cycles available</SelectItem>
+                              <SelectItem value="no-cycles" disabled>No cycles available</SelectItem>
                             ) : (
                               cycles.map((cycle) => (
                                 <SelectItem key={cycle.id} value={cycle.name}>
@@ -228,9 +228,9 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
                           </FormControl>
                           <SelectContent>
                             {usersLoading ? (
-                              <SelectItem value="" disabled>Loading users...</SelectItem>
+                              <SelectItem value="loading" disabled>Loading users...</SelectItem>
                             ) : users.length === 0 ? (
-                              <SelectItem value="" disabled>No users available</SelectItem>
+                              <SelectItem value="no-users" disabled>No users available</SelectItem>
                             ) : (
                               users.map((user) => (
                                 <SelectItem key={user.id} value={user.id}>
@@ -422,9 +422,9 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
                                 </FormControl>
                                 <SelectContent>
                                   {usersLoading ? (
-                                    <SelectItem value="" disabled>Loading users...</SelectItem>
+                                    <SelectItem value="loading" disabled>Loading users...</SelectItem>
                                   ) : users.length === 0 ? (
-                                    <SelectItem value="" disabled>No users available</SelectItem>
+                                    <SelectItem value="no-users" disabled>No users available</SelectItem>
                                   ) : (
                                     users.map((user) => (
                                       <SelectItem key={user.id} value={user.id}>
