@@ -65,11 +65,7 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
     queryKey: ['/api/objectives'],
   });
 
-  // Debug: Log objectives data
-  React.useEffect(() => {
-    console.log('Objectives data:', objectives);
-    console.log('Objectives loading:', objectivesLoading);
-  }, [objectives, objectivesLoading]);
+
 
   const form = useForm<CreateOKRFormData>({
     resolver: zodResolver(createOKRSchema),

@@ -170,6 +170,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Objectives endpoints
+  app.get("/api/objectives", async (req, res) => {
+    try {
+      const objectives = await storage.getObjectives();
+      res.json(objectives);
+    } catch (error) {
+      console.error("Error fetching objectives:", error);
+      res.status(500).json({ message: "Failed to fetch objectives" });
+    }
+  });
+
+  app.get("/api/objectives/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const objective = await storage.getObjective(id);
+      
+      if (!objective) {
+        return res.status(404).json({ message: "Objective not found" });
+      }
+      
+      res.json(objective);
+    } catch (error) {
+      console.error("Error fetching objective:", error);
+      res.status(500).json({ message: "Failed to fetch objective" });
+    }
+  });
+
   // User management endpoints
   app.get('/api/users', async (req, res) => {
     try {
