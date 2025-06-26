@@ -39,7 +39,7 @@ export default function UsersPage() {
   });
 
   // Fetch team members for selected team
-  const { data: teamMembers = [] } = useQuery({
+  const { data: teamMembers = [], isLoading: teamMembersLoading } = useQuery<Array<TeamMember & { user: User }>>({
     queryKey: ["/api/teams", selectedTeam?.id, "members"],
     enabled: !!selectedTeam,
   });
@@ -715,24 +715,31 @@ export default function UsersPage() {
 
             {/* Team Members List */}
             <div className="border rounded-lg">
-              {teamMembers.length === 0 ? (
+              {teamMembersLoading ? (
+                <div className="p-6 text-center text-gray-500">
+                  Loading team members...
+                </div>
+              ) : teamMembers.length === 0 ? (
                 <div className="p-6 text-center text-gray-500">
                   No team members found
                 </div>
               ) : (
                 <div className="divide-y">
-                  {teamMembers.map((member: any) => (
+                  {teamMembers.map((member) => (
                     <div key={member.user.id} className="p-4 flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium">
-                          {member.user.firstName?.[0] || member.user.email[0].toUpperCase()}
+                          {member.user?.firstName?.[0] || member.user?.email?.[0]?.toUpperCase() || 'U'}
                         </div>
                         <div>
                           <div className="font-medium">
-                            {member.user.firstName} {member.user.lastName}
+                            {member.user?.firstName || member.user?.lastName 
+                              ? `${member.user?.firstName || ''} ${member.user?.lastName || ''}`.trim()
+                              : member.user?.email || 'Unknown User'
+                            }
                           </div>
                           <div className="text-sm text-gray-500">
-                            {member.user.email}
+                            {member.user?.email || 'No email'}
                           </div>
                         </div>
                       </div>
@@ -751,7 +758,7 @@ export default function UsersPage() {
                         >
                           <SelectTrigger className="w-28">
                             <SelectValue>
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleBadge(member.role).className}`}>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleBadge(member.role)}`}>
                                 {member.role}
                               </span>
                             </SelectValue>
@@ -814,10 +821,13 @@ export default function UsersPage() {
                   </SelectTrigger>
                   <SelectContent>
                     {users
-                      .filter(user => !teamMembers.some((member: any) => member.user.id === user.id))
+                      .filter(user => !teamMembers.some((member) => member.user.id === user.id))
                       .map((user: User) => (
                         <SelectItem key={user.id} value={user.id}>
-                          {user.firstName} {user.lastName} ({user.email})
+                          {user.firstName || user.lastName 
+                            ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
+                            : user.email
+                          } ({user.email})
                         </SelectItem>
                       ))
                     }

@@ -140,15 +140,29 @@ export class DatabaseStorage implements IStorage {
   // Team member operations
   async getTeamMembers(teamId: number): Promise<(TeamMember & { user: User })[]> {
     const result = await db
-      .select()
+      .select({
+        // TeamMember fields
+        id: teamMembers.id,
+        teamId: teamMembers.teamId,
+        userId: teamMembers.userId,
+        role: teamMembers.role,
+        joinedAt: teamMembers.joinedAt,
+        // User fields
+        user: {
+          id: users.id,
+          email: users.email,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImageUrl: users.profileImageUrl,
+          createdAt: users.createdAt,
+          updatedAt: users.updatedAt,
+        }
+      })
       .from(teamMembers)
       .innerJoin(users, eq(teamMembers.userId, users.id))
       .where(eq(teamMembers.teamId, teamId));
     
-    return result.map(row => ({
-      ...row.team_members,
-      user: row.users
-    }));
+    return result;
   }
 
   async getUserTeams(userId: string): Promise<(TeamMember & { team: Team })[]> {
@@ -173,7 +187,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .delete(teamMembers)
       .where(and(eq(teamMembers.teamId, teamId), eq(teamMembers.userId, userId)));
-    return result.rowCount > 0;
+    return (result.rowCount || 0) > 0;
   }
 
   async updateTeamMemberRole(teamId: number, userId: string, role: "admin" | "member"): Promise<TeamMember | undefined> {
