@@ -585,6 +585,41 @@ export class MemStorage implements IStorage {
   }
 
   private initializeSampleData() {
+    // Sample Users (for testing hierarchy system)
+    const user1: User = {
+      id: "user1",
+      email: "john.doe@company.com",
+      firstName: "John",
+      lastName: "Doe",
+      profileImageUrl: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const user2: User = {
+      id: "user2", 
+      email: "jane.smith@company.com",
+      firstName: "Jane",
+      lastName: "Smith",
+      profileImageUrl: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const user3: User = {
+      id: "user3",
+      email: "mike.wilson@company.com", 
+      firstName: "Mike",
+      lastName: "Wilson",
+      profileImageUrl: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    this.users.set("user1", user1);
+    this.users.set("user2", user2);
+    this.users.set("user3", user3);
+
     // Sample Cycles
     const cycle1: Cycle = {
       id: 1,
@@ -659,7 +694,7 @@ export class MemStorage implements IStorage {
       title: "Increase Product Adoption and User Engagement",
       description: "Drive user acquisition and improve engagement metrics to establish stronger market presence",
       timeframe: "Q1 2025",
-      owner: "CEO",
+      owner: "user1", // John Doe as CEO
       status: "on_track",
       teamId: null,
       parentId: null // Top level objective

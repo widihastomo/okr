@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -71,8 +71,8 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
       objective: {
         title: "",
         description: "",
-        timeframe: cycles.length > 0 ? cycles[0].name : "",
-        owner: users.length > 0 ? users[0].id : "",
+        timeframe: "",
+        owner: "",
         status: "in_progress",
         teamId: undefined,
         parentId: undefined,
@@ -86,10 +86,29 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
         unit: "number",
         keyResultType: "increase_to",
         status: "in_progress",
-        assignedTo: users.length > 0 ? users[0].id : "",
+        assignedTo: "",
       }],
     },
   });
+
+  // Update default values when data loads
+  React.useEffect(() => {
+    if (cycles.length > 0 && !form.getValues('objective.timeframe')) {
+      form.setValue('objective.timeframe', cycles[0].name);
+    }
+  }, [cycles, form]);
+
+  React.useEffect(() => {
+    if (users.length > 0 && !form.getValues('objective.owner')) {
+      form.setValue('objective.owner', users[0].id);
+    }
+  }, [users, form]);
+
+  React.useEffect(() => {
+    if (users.length > 0 && !form.getValues('keyResults.0.assignedTo')) {
+      form.setValue('keyResults.0.assignedTo', users[0].id);
+    }
+  }, [users, form]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
