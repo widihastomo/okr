@@ -88,7 +88,30 @@ export const keyResults = pgTable("key_results", {
   unit: text("unit").notNull().default("number"), // "number", "percentage", "currency"
   keyResultType: text("key_result_type").notNull().default("increase_to"), // "increase_to", "decrease_to", "achieve_or_not"
   status: text("status").notNull().default("in_progress"), // "on_track", "at_risk", "completed", "in_progress"
-  assignedTo: varchar("assigned_to"), // user id who is responsible
+});
+
+// Check-ins for tracking progress updates
+export const checkIns = pgTable("check_ins", {
+  id: serial("id").primaryKey(),
+  keyResultId: integer("key_result_id").references(() => keyResults.id).notNull(),
+  value: decimal("value", { precision: 10, scale: 2 }).notNull(),
+  notes: text("notes"),
+  confidence: integer("confidence").notNull().default(5), // 1-10 scale
+  createdAt: timestamp("created_at").defaultNow(),
+  createdBy: varchar("created_by").notNull(), // user ID
+});
+
+// Initiatives/Projects linked to key results
+export const initiatives = pgTable("initiatives", {
+  id: serial("id").primaryKey(),
+  keyResultId: integer("key_result_id").references(() => keyResults.id).notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  status: text("status").notNull().default("not_started"), // "not_started", "in_progress", "completed", "on_hold"
+  priority: text("priority").notNull().default("medium"), // "low", "medium", "high"
+  dueDate: timestamp("due_date"),
+  createdAt: timestamp("created_at").defaultNow(),
+  createdBy: varchar("created_by").notNull(), // user ID
 });
 
 export const insertCycleSchema = createInsertSchema(cycles).omit({
@@ -107,6 +130,16 @@ export const insertKeyResultSchema = createInsertSchema(keyResults).omit({
   id: true,
 });
 
+export const insertCheckInSchema = createInsertSchema(checkIns).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertInitiativeSchema = createInsertSchema(initiatives).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const updateKeyResultProgressSchema = z.object({
   id: z.number(),
   currentValue: z.number(),
@@ -122,6 +155,8 @@ export type InsertCycle = z.infer<typeof insertCycleSchema>;
 export type InsertTemplate = z.infer<typeof insertTemplateSchema>;
 export type InsertObjective = z.infer<typeof insertObjectiveSchema>;
 export type InsertKeyResult = z.infer<typeof insertKeyResultSchema>;
+export type InsertCheckIn = z.infer<typeof insertCheckInSchema>;
+export type InsertInitiative = z.infer<typeof insertInitiativeSchema>;
 export type UpdateKeyResultProgress = z.infer<typeof updateKeyResultProgressSchema>;
 export type CreateOKRFromTemplate = z.infer<typeof createOKRFromTemplateSchema>;
 
@@ -150,9 +185,33 @@ export const teamMembersRelations = relations(teamMembers, ({ one }) => ({
   }),
 }));
 
-export const keyResultsRelations = relations(keyResults, ({ one }) => ({
-  assignee: one(users, {
-    fields: [keyResults.assignedTo],
+export const keyResultsRelations = relations(keyResults, ({ one, many }) => ({
+  objective: one(objectives, {
+    fields: [keyResults.objectiveId],
+    references: [objectives.id],
+  }),
+  checkIns: many(checkIns),
+  initiatives: many(initiatives),
+}));
+
+export const checkInsRelations = relations(checkIns, ({ one }) => ({
+  keyResult: one(keyResults, {
+    fields: [checkIns.keyResultId],
+    references: [keyResults.id],
+  }),
+  creator: one(users, {
+    fields: [checkIns.createdBy],
+    references: [users.id],
+  }),
+}));
+
+export const initiativesRelations = relations(initiatives, ({ one }) => ({
+  keyResult: one(keyResults, {
+    fields: [initiatives.keyResultId],
+    references: [keyResults.id],
+  }),
+  creator: one(users, {
+    fields: [initiatives.createdBy],
     references: [users.id],
   }),
 }));
@@ -187,6 +246,14 @@ export type Cycle = typeof cycles.$inferSelect;
 export type Template = typeof templates.$inferSelect;
 export type Objective = typeof objectives.$inferSelect;
 export type KeyResult = typeof keyResults.$inferSelect;
+export type CheckIn = typeof checkIns.$inferSelect;
+export type Initiative = typeof initiatives.$inferSelect;
+
+export type KeyResultWithDetails = KeyResult & {
+  checkIns: CheckIn[];
+  initiatives: Initiative[];
+  progressHistory: { date: string; value: number; notes?: string }[];
+};
 
 export type OKRWithKeyResults = Objective & {
   keyResults: KeyResult[];

@@ -1,8 +1,10 @@
 import { 
-  cycles, templates, objectives, keyResults, users, teams, teamMembers,
+  cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
+  type CheckIn, type Initiative, type KeyResultWithDetails,
   type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
   type InsertUser, type InsertTeam, type InsertTeamMember, type UpsertUser,
+  type InsertCheckIn, type InsertInitiative,
   type OKRWithKeyResults, type CycleWithOKRs, type UpdateKeyResultProgress, type CreateOKRFromTemplate 
 } from "@shared/schema";
 import { db } from "./db";
@@ -62,6 +64,20 @@ export interface IStorage {
   addTeamMember(teamMember: InsertTeamMember): Promise<TeamMember>;
   removeTeamMember(teamId: number, userId: string): Promise<boolean>;
   updateTeamMemberRole(teamId: number, userId: string, role: "admin" | "member"): Promise<TeamMember | undefined>;
+
+  // Check-ins
+  getCheckIns(): Promise<CheckIn[]>;
+  getCheckInsByKeyResultId(keyResultId: number): Promise<CheckIn[]>;
+  createCheckIn(checkIn: InsertCheckIn): Promise<CheckIn>;
+  
+  // Initiatives
+  getInitiatives(): Promise<Initiative[]>;
+  getInitiativesByKeyResultId(keyResultId: number): Promise<Initiative[]>;
+  createInitiative(initiative: InsertInitiative): Promise<Initiative>;
+  updateInitiative(id: number, initiative: Partial<InsertInitiative>): Promise<Initiative | undefined>;
+  
+  // Key Result with Details
+  getKeyResultWithDetails(id: number): Promise<KeyResultWithDetails | undefined>;
 
   // Combined
   getOKRsWithKeyResults(): Promise<OKRWithKeyResults[]>;
@@ -410,20 +426,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createKeyResult(keyResultData: InsertKeyResult): Promise<KeyResult> {
-    const [keyResult] = await db.insert(keyResults).values({
-      ...keyResultData,
-      assignedTo: keyResultData.assignedTo || null
-    }).returning();
+    const [keyResult] = await db.insert(keyResults).values(keyResultData).returning();
     return keyResult;
   }
 
   async updateKeyResult(id: number, keyResultData: Partial<InsertKeyResult>): Promise<KeyResult | undefined> {
     const [keyResult] = await db
       .update(keyResults)
-      .set({
-        ...keyResultData,
-        assignedTo: keyResultData.assignedTo ?? null
-      })
+      .set(keyResultData)
       .where(eq(keyResults.id, id))
       .returning();
     return keyResult;
@@ -443,7 +453,79 @@ export class DatabaseStorage implements IStorage {
 
   async deleteKeyResult(id: number): Promise<boolean> {
     const result = await db.delete(keyResults).where(eq(keyResults.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  // Check-ins
+  async getCheckIns(): Promise<CheckIn[]> {
+    return await db.select().from(checkIns).orderBy(checkIns.createdAt);
+  }
+
+  async getCheckInsByKeyResultId(keyResultId: number): Promise<CheckIn[]> {
+    return await db.select().from(checkIns)
+      .where(eq(checkIns.keyResultId, keyResultId))
+      .orderBy(checkIns.createdAt);
+  }
+
+  async createCheckIn(checkInData: InsertCheckIn): Promise<CheckIn> {
+    const [checkIn] = await db.insert(checkIns).values({
+      ...checkInData,
+      createdBy: "current-user", // TODO: Replace with actual user ID from session
+      createdAt: new Date(),
+    }).returning();
+    return checkIn;
+  }
+
+  // Initiatives
+  async getInitiatives(): Promise<Initiative[]> {
+    return await db.select().from(initiatives).orderBy(initiatives.createdAt);
+  }
+
+  async getInitiativesByKeyResultId(keyResultId: number): Promise<Initiative[]> {
+    return await db.select().from(initiatives)
+      .where(eq(initiatives.keyResultId, keyResultId))
+      .orderBy(initiatives.createdAt);
+  }
+
+  async createInitiative(initiativeData: InsertInitiative): Promise<Initiative> {
+    const [initiative] = await db.insert(initiatives).values({
+      ...initiativeData,
+      createdBy: "current-user", // TODO: Replace with actual user ID from session
+      createdAt: new Date(),
+    }).returning();
+    return initiative;
+  }
+
+  async updateInitiative(id: number, initiativeData: Partial<InsertInitiative>): Promise<Initiative | undefined> {
+    const [initiative] = await db
+      .update(initiatives)
+      .set(initiativeData)
+      .where(eq(initiatives.id, id))
+      .returning();
+    return initiative;
+  }
+
+  // Key Result with Details
+  async getKeyResultWithDetails(id: number): Promise<KeyResultWithDetails | undefined> {
+    const keyResult = await this.getKeyResult(id);
+    if (!keyResult) return undefined;
+
+    const keyResultCheckIns = await this.getCheckInsByKeyResultId(id);
+    const keyResultInitiatives = await this.getInitiativesByKeyResultId(id);
+
+    // Generate progress history from check-ins
+    const progressHistory = keyResultCheckIns.map(checkIn => ({
+      date: checkIn.createdAt.toISOString().split('T')[0],
+      value: checkIn.value,
+      notes: checkIn.notes || undefined,
+    }));
+
+    return {
+      ...keyResult,
+      checkIns: keyResultCheckIns,
+      initiatives: keyResultInitiatives,
+      progressHistory,
+    };
   }
 
   async getOKRsWithKeyResults(): Promise<OKRWithKeyResults[]> {

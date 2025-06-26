@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { 
   insertCycleSchema, insertTemplateSchema, insertObjectiveSchema, insertKeyResultSchema, 
+  insertCheckInSchema, insertInitiativeSchema,
   updateKeyResultProgressSchema, createOKRFromTemplateSchema 
 } from "@shared/schema";
 import { z } from "zod";
@@ -484,6 +485,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete OKR" });
+    }
+  });
+
+  // Get key result details
+  app.get("/api/key-results/:id/details", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const keyResult = await storage.getKeyResultWithDetails(id);
+      
+      if (!keyResult) {
+        return res.status(404).json({ message: "Key result not found" });
+      }
+
+      res.json(keyResult);
+    } catch (error) {
+      console.error("Error fetching key result details:", error);
+      res.status(500).json({ message: "Failed to fetch key result details" });
+    }
+  });
+
+  // Check-in routes
+  app.post("/api/check-ins", async (req, res) => {
+    try {
+      const result = insertCheckInSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid check-in data", errors: result.error.errors });
+      }
+
+      const checkIn = await storage.createCheckIn(result.data);
+      res.status(201).json(checkIn);
+    } catch (error) {
+      console.error("Error creating check-in:", error);
+      res.status(500).json({ message: "Failed to create check-in" });
+    }
+  });
+
+  // Initiative routes
+  app.post("/api/initiatives", async (req, res) => {
+    try {
+      const result = insertInitiativeSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid initiative data", errors: result.error.errors });
+      }
+
+      const initiative = await storage.createInitiative(result.data);
+      res.status(201).json(initiative);
+    } catch (error) {
+      console.error("Error creating initiative:", error);
+      res.status(500).json({ message: "Failed to create initiative" });
     }
   });
 

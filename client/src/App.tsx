@@ -8,6 +8,7 @@ import CyclesPage from "@/components/cycles-page";
 import TemplatesPage from "@/components/templates-page";
 import UsersPage from "@/components/users-page";
 import CompanyOKRsPage from "@/pages/company-okrs";
+import KeyResultDetail from "@/pages/key-result-detail";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -16,6 +17,7 @@ function Router() {
       <Route path="/" component={Dashboard} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/company-okrs" component={CompanyOKRsPage} />
+      <Route path="/key-results/:id" component={KeyResultDetail} />
       <Route path="/cycles" component={CyclesPage} />
       <Route path="/templates" component={TemplatesPage} />
       <Route path="/users" component={UsersPage} />

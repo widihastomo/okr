@@ -108,22 +108,27 @@ export default function CompanyOKRs({ onRefresh }: CompanyOKRsProps) {
                   <div key={kr.id} className="border rounded p-3 bg-gray-50">
                     <div className="flex justify-between items-start mb-2">
                       <h4 className="font-medium text-sm">{kr.title}</h4>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setEditProgressModal({ open: true, keyResult: kr })}
-                        className="text-xs"
-                      >
-                        Update
-                      </Button>
+                      <div className="flex space-x-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => window.location.href = `/key-results/${kr.id}`}
+                          className="text-xs"
+                        >
+                          Detail
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setEditProgressModal({ open: true, keyResult: kr })}
+                          className="text-xs"
+                        >
+                          Update
+                        </Button>
+                      </div>
                     </div>
                     <div className="text-xs text-gray-600 mb-2">
                       {kr.currentValue} / {kr.targetValue} {kr.unit}
-                      {kr.assignedTo && (
-                        <span className="ml-2 text-blue-600">
-                          Assigned to: {kr.assignedTo}
-                        </span>
-                      )}
                     </div>
                     <Progress 
                       value={Math.max(0, Math.min(100, 
