@@ -331,7 +331,10 @@ export class DatabaseStorage implements IStorage {
         description: templateObj.description,
         timeframe: templateObj.timeframe || "",
         owner: templateObj.owner || "",
-        status: "in_progress"
+        status: "in_progress",
+        level: "individual",
+        teamId: null,
+        parentId: null
       }).returning();
 
       const keyResultsData = templateObj.keyResults.map((kr: any) => ({

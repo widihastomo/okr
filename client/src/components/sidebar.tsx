@@ -1,4 +1,4 @@
-import { Target, BarChart3, ChartLine, Calendar, FileText, User, Settings, Menu, X, Users } from "lucide-react";
+import { Target, BarChart3, ChartLine, Calendar, FileText, User, Settings, Menu, X, Users, Building2 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ export default function Sidebar() {
   
   const navigation = [
     { name: "Dashboard", icon: ChartLine, href: "/", active: location === "/" },
+    { name: "Company OKRs", icon: Building2, href: "/company-okrs", active: location === "/company-okrs" },
     { name: "Cycles", icon: Calendar, href: "/cycles", active: location === "/cycles" },
     { name: "Templates", icon: FileText, href: "/templates", active: location === "/templates" },
     { name: "Users", icon: Users, href: "/users", active: location === "/users" },

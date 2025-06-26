@@ -22,6 +22,9 @@ const createOKRSchema = z.object({
     timeframe: z.string().min(1, "Timeframe is required"),
     owner: z.string().min(1, "Owner is required"),
     status: z.string().default("in_progress"),
+    level: z.string().default("individual"),
+    teamId: z.number().optional(),
+    parentId: z.number().optional(),
   }),
   keyResults: z.array(z.object({
     title: z.string().min(1, "Key result title is required"),
@@ -67,6 +70,9 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
         timeframe: cycles.length > 0 ? cycles[0].name : "",
         owner: users.length > 0 ? users[0].id : "",
         status: "in_progress",
+        level: "individual",
+        teamId: undefined,
+        parentId: undefined,
       },
       keyResults: [{
         title: "",
@@ -234,6 +240,29 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
                                 </SelectItem>
                               ))
                             )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="objective.level"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>OKR Level</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select OKR level" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="company">Company OKR</SelectItem>
+                            <SelectItem value="team">Team OKR</SelectItem>
+                            <SelectItem value="individual">Individual OKR</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
