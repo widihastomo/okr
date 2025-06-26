@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Plus, ChevronDown, ChevronRight, Building2, Users, User } from "lucide-react";
+import { Plus, ChevronDown, ChevronRight, Building2, Users, User, Target } from "lucide-react";
 import CreateOKRModal from "./create-okr-modal";
 import EditProgressModal from "./edit-progress-modal";
 import type { OKRWithKeyResults, KeyResult } from "@shared/schema";
@@ -22,13 +22,20 @@ export default function CompanyOKRs({ onRefresh }: CompanyOKRsProps) {
     queryKey: ['/api/okrs']
   });
 
-  // Group OKRs by level and hierarchy
-  const companyOKRs = okrs.filter(okr => okr.level === 'company');
-  const teamOKRs = okrs.filter(okr => okr.level === 'team');
-  const individualOKRs = okrs.filter(okr => okr.level === 'individual');
+  // Build flexible hierarchy structure
+  const buildHierarchy = (parentId: number | null = null): (OKRWithKeyResults & { children: any[] })[] => {
+    return okrs
+      .filter(okr => okr.parentId === parentId)
+      .map(okr => ({
+        ...okr,
+        children: buildHierarchy(okr.id)
+      }));
+  };
+
+  const hierarchicalOKRs = buildHierarchy();
 
   const getChildOKRs = (parentId: number) => {
-    return [...teamOKRs, ...individualOKRs].filter(okr => okr.parentId === parentId);
+    return okrs.filter(okr => okr.parentId === parentId);
   };
 
   const toggleExpanded = (okrId: number) => {
@@ -50,19 +57,19 @@ export default function CompanyOKRs({ onRefresh }: CompanyOKRsProps) {
     }
   };
 
-  const getLevelIcon = (level: string) => {
+  const getLevelIcon = (level: number) => {
     switch (level) {
-      case 'company': return <Building2 className="w-4 h-4" />;
-      case 'team': return <Users className="w-4 h-4" />;
-      case 'individual': return <User className="w-4 h-4" />;
-      default: return <User className="w-4 h-4" />;
+      case 0: return <Building2 className="w-4 h-4" />; // Root level
+      case 1: return <Users className="w-4 h-4" />; // Second level
+      case 2: return <User className="w-4 h-4" />; // Third level
+      default: return <Target className="w-4 h-4" />; // Deeper levels
     }
   };
 
-  const renderOKR = (okr: OKRWithKeyResults, level: number = 0) => {
-    const hasChildren = getChildOKRs(okr.id).length > 0;
+  const renderOKR = (okr: OKRWithKeyResults & { children?: any[] }, level: number = 0) => {
+    const children = okr.children || getChildOKRs(okr.id);
+    const hasChildren = children.length > 0;
     const isExpanded = expandedOKRs.has(okr.id);
-    const children = getChildOKRs(okr.id);
 
     return (
       <div key={okr.id} className={`${level > 0 ? 'ml-6 border-l-2 border-gray-200 pl-4' : ''}`}>
@@ -81,7 +88,7 @@ export default function CompanyOKRs({ onRefresh }: CompanyOKRsProps) {
                   </Button>
                 )}
                 {!hasChildren && <div className="w-6" />}
-                {getLevelIcon(okr.level)}
+                {getLevelIcon(level)}
                 <CardTitle className="text-lg">{okr.title}</CardTitle>
                 <Badge className={getStatusColor(okr.status)}>
                   {okr.status.replace('_', ' ')}
@@ -192,44 +199,23 @@ export default function CompanyOKRs({ onRefresh }: CompanyOKRsProps) {
         </Button>
       </div>
 
-      {companyOKRs.length === 0 ? (
+      {hierarchicalOKRs.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Building2 className="w-12 h-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Company OKRs</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No OKRs Found</h3>
             <p className="text-gray-500 text-center mb-4">
-              Start by creating a company-level objective to align your organization
+              Start by creating your first objective to track progress
             </p>
             <Button onClick={() => setCreateModal(true)}>
               <Plus className="w-4 h-4 mr-2" />
-              Create First Company OKR
+              Create First OKR
             </Button>
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-4">
-          {companyOKRs.map(okr => renderOKR(okr))}
-          
-          {/* Show orphaned team and individual OKRs */}
-          {teamOKRs.filter(okr => !okr.parentId).length > 0 && (
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                Independent Team OKRs
-              </h3>
-              {teamOKRs.filter(okr => !okr.parentId).map(okr => renderOKR(okr))}
-            </div>
-          )}
-          
-          {individualOKRs.filter(okr => !okr.parentId).length > 0 && (
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <User className="w-5 h-5" />
-                Independent Individual OKRs
-              </h3>
-              {individualOKRs.filter(okr => !okr.parentId).map(okr => renderOKR(okr))}
-            </div>
-          )}
+          {hierarchicalOKRs.map(okr => renderOKR(okr, 0))}
         </div>
       )}
 

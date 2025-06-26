@@ -570,10 +570,15 @@ export class MemStorage implements IStorage {
     this.templates = new Map();
     this.objectives = new Map();
     this.keyResults = new Map();
+    this.users = new Map();
+    this.teams = new Map();
+    this.teamMembersMap = new Map();
     this.currentCycleId = 4;
     this.currentTemplateId = 1;
     this.currentObjectiveId = 1;
     this.currentKeyResultId = 1;
+    this.currentTeamId = 0;
+    this.currentTeamMemberId = 0;
     
     // Initialize with sample data
     this.initializeSampleData();
@@ -647,15 +652,17 @@ export class MemStorage implements IStorage {
     
     this.templates.set(1, template1);
     
-    // Sample Objective 1
+    // Company Level Objective (Parent)
     const obj1: Objective = {
       id: 1,
       cycleId: 1,
       title: "Increase Product Adoption and User Engagement",
       description: "Drive user acquisition and improve engagement metrics to establish stronger market presence",
       timeframe: "Q1 2025",
-      owner: "John Doe",
-      status: "on_track"
+      owner: "CEO",
+      status: "on_track",
+      teamId: null,
+      parentId: null // Top level objective
     };
     this.objectives.set(1, obj1);
 
@@ -706,7 +713,7 @@ export class MemStorage implements IStorage {
     this.keyResults.set(2, kr2);
     this.keyResults.set(3, kr3);
 
-    // Sample Objective 2
+    // Team Level Objective (Child of Company Objective)
     const obj2: Objective = {
       id: 2,
       cycleId: 1,
@@ -714,9 +721,25 @@ export class MemStorage implements IStorage {
       description: "Build a high-performing team culture with improved collaboration and skill development",
       timeframe: "Q1 2025",
       owner: "Sarah Johnson",
-      status: "at_risk"
+      status: "at_risk",
+      teamId: 1,
+      parentId: 1 // Child of Company objective
     };
     this.objectives.set(2, obj2);
+
+    // Individual Level Objective (Child of Team Objective)
+    const obj3: Objective = {
+      id: 3,
+      cycleId: 1,
+      title: "Improve Personal Productivity and Skills",
+      description: "Individual development goals to support team objectives",
+      timeframe: "Q1 2025",
+      owner: "Individual Contributor",
+      status: "on_track",
+      teamId: 1,
+      parentId: 2 // Child of Team objective
+    };
+    this.objectives.set(3, obj3);
 
     // Sample Key Results for Objective 2
     const kr4: KeyResult = {
@@ -729,8 +752,7 @@ export class MemStorage implements IStorage {
       baseValue: null,
       unit: "percentage",
       keyResultType: "increase_to",
-      status: "at_risk",
-      assignedTo: null
+      status: "at_risk"
     };
     
     const kr5: KeyResult = {
@@ -743,17 +765,31 @@ export class MemStorage implements IStorage {
       baseValue: null,
       unit: "number",
       keyResultType: "achieve_or_not",
-      status: "in_progress",
-      assignedTo: null
+      status: "in_progress"
+    };
+
+    // Add key result for individual objective
+    const kr6: KeyResult = {
+      id: 6,
+      objectiveId: 3,
+      title: "Complete 3 professional courses",
+      description: "Current: 1/3 courses | Target: 3/3 courses",
+      currentValue: "1",
+      targetValue: "3",
+      baseValue: null,
+      unit: "courses",
+      keyResultType: "increase_to",
+      status: "on_track"
     };
 
     this.keyResults.set(4, kr4);
     this.keyResults.set(5, kr5);
+    this.keyResults.set(6, kr6);
 
     this.currentCycleId = 3;
     this.currentTemplateId = 2;
-    this.currentObjectiveId = 3;
-    this.currentKeyResultId = 6;
+    this.currentObjectiveId = 4;
+    this.currentKeyResultId = 7;
   }
 
   private calculateProgress(current: string, target: string, keyResultType: string, baseValue?: string | null): number {
@@ -1064,6 +1100,191 @@ export class MemStorage implements IStorage {
     return this.keyResults.delete(id);
   }
 
+  // User management methods
+  async getUser(id: string): Promise<User | undefined> {
+    return this.users.get(id);
+  }
+
+  async getUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const user: User = {
+      id: userData.id,
+      email: userData.email || null,
+      firstName: userData.firstName || null,
+      lastName: userData.lastName || null,
+      profileImageUrl: userData.profileImageUrl || null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.users.set(user.id, user);
+    return user;
+  }
+
+  async updateUser(id: string, userData: Partial<UpsertUser>): Promise<User | undefined> {
+    const existing = this.users.get(id);
+    if (!existing) return undefined;
+    
+    const updated: User = {
+      ...existing,
+      ...userData,
+      updatedAt: new Date()
+    };
+    this.users.set(id, updated);
+    return updated;
+  }
+
+  async deleteUser(id: string): Promise<boolean> {
+    return this.users.delete(id);
+  }
+
+  // Team management methods
+  async getTeam(id: number): Promise<Team | undefined> {
+    return this.teams.get(id);
+  }
+
+  async getTeams(): Promise<Team[]> {
+    return Array.from(this.teams.values());
+  }
+
+  async createTeam(teamData: InsertTeam): Promise<Team> {
+    const team: Team = {
+      id: ++this.currentTeamId,
+      ...teamData,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.teams.set(team.id, team);
+    return team;
+  }
+
+  async updateTeam(id: number, teamData: Partial<InsertTeam>): Promise<Team | undefined> {
+    const existing = this.teams.get(id);
+    if (!existing) return undefined;
+    
+    const updated: Team = {
+      ...existing,
+      ...teamData,
+      updatedAt: new Date()
+    };
+    this.teams.set(id, updated);
+    return updated;
+  }
+
+  async deleteTeam(id: number): Promise<boolean> {
+    return this.teams.delete(id);
+  }
+
+  async getTeamMembers(teamId: number): Promise<(TeamMember & { user: User })[]> {
+    const members = Array.from(this.teamMembersMap.values())
+      .filter(member => member.teamId === teamId);
+    
+    return members.map(member => {
+      const user = this.users.get(member.userId);
+      return {
+        ...member,
+        user: user!
+      };
+    });
+  }
+
+  async getUserTeams(userId: string): Promise<(TeamMember & { team: Team })[]> {
+    const memberships = Array.from(this.teamMembersMap.values())
+      .filter(member => member.userId === userId);
+    
+    return memberships.map(member => {
+      const team = this.teams.get(member.teamId);
+      return {
+        ...member,
+        team: team!
+      };
+    });
+  }
+
+  async addTeamMember(teamMemberData: InsertTeamMember): Promise<TeamMember> {
+    const teamMember: TeamMember = {
+      id: ++this.currentTeamMemberId,
+      ...teamMemberData,
+      joinedAt: new Date()
+    };
+    this.teamMembersMap.set(teamMember.id, teamMember);
+    return teamMember;
+  }
+
+  async removeTeamMember(teamId: number, userId: string): Promise<boolean> {
+    const member = Array.from(this.teamMembersMap.values())
+      .find(m => m.teamId === teamId && m.userId === userId);
+    
+    if (!member) return false;
+    return this.teamMembersMap.delete(member.id);
+  }
+
+  async updateTeamMemberRole(teamId: number, userId: string, role: "admin" | "member"): Promise<TeamMember | undefined> {
+    const member = Array.from(this.teamMembersMap.values())
+      .find(m => m.teamId === teamId && m.userId === userId);
+    
+    if (!member) return undefined;
+    
+    const updated: TeamMember = {
+      ...member,
+      role
+    };
+    this.teamMembersMap.set(member.id, updated);
+    return updated;
+  }
+
+  // Check-ins and initiatives (stub implementations)
+  async getCheckIns(): Promise<CheckIn[]> {
+    return [];
+  }
+
+  async getCheckInsByKeyResultId(keyResultId: number): Promise<CheckIn[]> {
+    return [];
+  }
+
+  async createCheckIn(checkIn: InsertCheckIn): Promise<CheckIn> {
+    return {
+      id: 1,
+      ...checkIn,
+      createdAt: new Date()
+    };
+  }
+
+  async getInitiatives(): Promise<Initiative[]> {
+    return [];
+  }
+
+  async getInitiativesByKeyResultId(keyResultId: number): Promise<Initiative[]> {
+    return [];
+  }
+
+  async createInitiative(initiative: InsertInitiative): Promise<Initiative> {
+    return {
+      id: 1,
+      ...initiative,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+  }
+
+  async updateInitiative(id: number, initiative: Partial<InsertInitiative>): Promise<Initiative | undefined> {
+    return undefined;
+  }
+
+  async getKeyResultWithDetails(id: number): Promise<KeyResultWithDetails | undefined> {
+    const keyResult = this.keyResults.get(id);
+    if (!keyResult) return undefined;
+    
+    return {
+      ...keyResult,
+      checkIns: [],
+      initiatives: [],
+      progressHistory: []
+    };
+  }
+
   async getOKRsWithKeyResults(): Promise<OKRWithKeyResults[]> {
     const objectives = await this.getObjectives();
     const result: OKRWithKeyResults[] = [];
@@ -1087,4 +1308,4 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new DatabaseStorage();
+export const storage = new MemStorage();

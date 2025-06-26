@@ -30,9 +30,8 @@ export const objectives = pgTable("objectives", {
   timeframe: text("timeframe").notNull(), // e.g., "Q4 2024"
   owner: text("owner").notNull(),
   status: text("status").notNull().default("in_progress"), // "on_track", "at_risk", "completed", "in_progress"
-  level: text("level").notNull().default("individual"), // "company", "team", "individual"
-  teamId: integer("team_id").references(() => teams.id), // for team-level OKRs
-  parentId: integer("parent_id").references(() => objectives.id), // for linking to parent OKR
+  teamId: integer("team_id").references(() => teams.id), // for team OKRs
+  parentId: integer("parent_id"), // self-reference for parent-child hierarchy
 });
 
 // Session storage table for authentication
