@@ -1,180 +1,32 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useParams, useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { useParams, Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useState } from "react";
-import { ArrowLeft, Plus, TrendingUp, Calendar, Target, CheckCircle2, AlertCircle, History, Lightbulb } from "lucide-react";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import type { KeyResultWithDetails, InsertCheckIn, InsertInitiative } from "@shared/schema";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import { ArrowLeft, Calendar, Target, TrendingUp, Users, Clock, BarChart3 } from "lucide-react";
 import { CheckInModal } from "@/components/check-in-modal";
 import { ProgressStatus } from "@/components/progress-status";
-
-const checkInSchema = z.object({
-  keyResultId: z.number(),
-  value: z.number(),
-  notes: z.string().optional(),
-});
-
-const initiativeSchema = z.object({
-  keyResultId: z.number(),
-  title: z.string().min(1, "Judul inisiatif harus diisi"),
-  description: z.string().optional(),
-  status: z.enum(["not_started", "in_progress", "completed", "on_hold"]).default("not_started"),
-  dueDate: z.string().optional(),
-});
-
-type CheckInFormData = z.infer<typeof checkInSchema>;
-type InitiativeFormData = z.infer<typeof initiativeSchema>;
+import { format } from "date-fns";
+import type { KeyResultWithDetails } from "@shared/schema";
 
 export default function KeyResultDetail() {
   const { id } = useParams();
-  const [, setLocation] = useLocation();
-  const { toast } = useToast();
-  const [checkInModalOpen, setCheckInModalOpen] = useState(false);
-  const [initiativeModalOpen, setInitiativeModalOpen] = useState(false);
+  const keyResultId = parseInt(id || "0");
 
   const { data: keyResult, isLoading } = useQuery<KeyResultWithDetails>({
-    queryKey: ["/api/key-results", id, "details"],
+    queryKey: [`/api/key-results/${keyResultId}`],
+    enabled: !!keyResultId,
   });
-
-  const checkInForm = useForm<CheckInFormData>({
-    resolver: zodResolver(checkInSchema),
-    defaultValues: {
-      keyResultId: parseInt(id || "0"),
-      value: 0,
-      notes: "",
-    },
-  });
-
-  const initiativeForm = useForm<InitiativeFormData>({
-    resolver: zodResolver(initiativeSchema),
-    defaultValues: {
-      keyResultId: parseInt(id || "0"),
-      title: "",
-      description: "",
-      status: "not_started",
-      dueDate: "",
-    },
-  });
-
-  const createCheckInMutation = useMutation({
-    mutationFn: async (data: CheckInFormData) => {
-      await apiRequest("/api/check-ins", "POST", {
-        keyResultId: parseInt(id!),
-        value: data.value,
-        notes: data.notes || undefined,
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/key-results", id, "details"] });
-      setCheckInModalOpen(false);
-      checkInForm.reset();
-      toast({
-        title: "Berhasil",
-        description: "Check-in berhasil ditambahkan",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Gagal",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const createInitiativeMutation = useMutation({
-    mutationFn: async (data: InitiativeFormData) => {
-      await apiRequest("/api/initiatives", "POST", {
-        keyResultId: parseInt(id!),
-        title: data.title,
-        status: data.status,
-        description: data.description || undefined,
-        dueDate: data.dueDate || undefined,
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/key-results", id, "details"] });
-      setInitiativeModalOpen(false);
-      initiativeForm.reset();
-      toast({
-        title: "Berhasil",
-        description: "Inisiatif berhasil ditambahkan",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Gagal",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const calculateProgress = (current: string, target: string, keyResultType: string, baseValue?: string | null): number => {
-    const currentNum = parseFloat(current);
-    const targetNum = parseFloat(target);
-    const baseNum = baseValue ? parseFloat(baseValue) : 0;
-
-    if (keyResultType === "achieve_or_not") {
-      return currentNum >= targetNum ? 100 : 0;
-    } else if (keyResultType === "decrease_to") {
-      if (baseNum === targetNum) return 100;
-      return Math.max(0, Math.min(100, ((baseNum - currentNum) / (baseNum - targetNum)) * 100));
-    } else {
-      if (baseNum === targetNum) return 100;
-      return Math.max(0, Math.min(100, ((currentNum - baseNum) / (targetNum - baseNum)) * 100));
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed": return "bg-green-500";
-      case "on_track": return "bg-blue-500";
-      case "at_risk": return "bg-yellow-500";
-      case "in_progress": return "bg-orange-500";
-      default: return "bg-gray-500";
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "completed": return "Selesai";
-      case "on_track": return "Sesuai Target";
-      case "at_risk": return "Berisiko";
-      case "in_progress": return "Dalam Progress";
-      case "not_started": return "Belum Dimulai";
-      case "on_hold": return "Ditunda";
-      default: return status;
-    }
-  };
-
-  const onCheckInSubmit = (data: CheckInFormData) => {
-    createCheckInMutation.mutate(data);
-  };
-
-  const onInitiativeSubmit = (data: InitiativeFormData) => {
-    createInitiativeMutation.mutate(data);
-  };
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded mb-4"></div>
-          <div className="h-64 bg-gray-200 rounded mb-6"></div>
+      <div className="container mx-auto p-6">
+        <div className="animate-pulse space-y-6">
+          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
           <div className="h-32 bg-gray-200 rounded"></div>
+          <div className="h-64 bg-gray-200 rounded"></div>
         </div>
       </div>
     );
@@ -182,88 +34,88 @@ export default function KeyResultDetail() {
 
   if (!keyResult) {
     return (
-      <div className="container mx-auto py-6">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Key Result tidak ditemukan</h1>
-          <Button onClick={() => setLocation("/company-okrs")}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Kembali ke Company OKRs
-          </Button>
+      <div className="container mx-auto p-6">
+        <div className="text-center space-y-4">
+          <h1 className="text-2xl font-bold text-gray-900">Key Result Tidak Ditemukan</h1>
+          <p className="text-gray-600">Key result yang Anda cari tidak dapat ditemukan.</p>
+          <Link href="/">
+            <Button>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Kembali ke Dashboard
+            </Button>
+          </Link>
         </div>
       </div>
     );
   }
 
-  const progress = calculateProgress(keyResult.currentValue, keyResult.targetValue, keyResult.keyResultType, keyResult.baseValue);
+  const calculateProgress = () => {
+    const current = parseFloat(keyResult.currentValue);
+    const target = parseFloat(keyResult.targetValue);
+    const base = keyResult.baseValue ? parseFloat(keyResult.baseValue) : 0;
+    
+    switch (keyResult.keyResultType) {
+      case "increase_to":
+        if (target === 0) return 0;
+        return Math.min(100, Math.max(0, (current / target) * 100));
+        
+      case "decrease_to":
+        const baseNum = base || target * 2;
+        if (baseNum <= target) return current <= target ? 100 : 0;
+        const decreaseProgress = ((baseNum - current) / (baseNum - target)) * 100;
+        return Math.min(100, Math.max(0, decreaseProgress));
+        
+      case "achieve_or_not":
+        return current >= target ? 100 : 0;
+        
+      default:
+        return 0;
+    }
+  };
+
+  const getUnitDisplay = (unit: string) => {
+    switch (unit) {
+      case "percentage":
+        return "%";
+      case "currency":
+        return "Rp";
+      case "number":
+      default:
+        return "";
+    }
+  };
+
+  const getKeyResultTypeLabel = (type: string) => {
+    switch (type) {
+      case "increase_to":
+        return "Tingkatkan ke";
+      case "decrease_to":
+        return "Turunkan ke";
+      case "achieve_or_not":
+        return "Capai atau tidak";
+      default:
+        return type;
+    }
+  };
+
+  const progress = calculateProgress();
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Button 
-            variant="ghost" 
-            onClick={() => setLocation("/company-okrs")}
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Kembali
-          </Button>
+          <Link href="/">
+            <Button variant="ghost" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Kembali
+            </Button>
+          </Link>
           <div>
-            <h1 className="text-2xl font-bold">{keyResult.title}</h1>
-            <p className="text-gray-600">{keyResult.description}</p>
+            <h1 className="text-3xl font-bold text-gray-900">{keyResult.title}</h1>
+            <p className="text-gray-600 mt-1">{keyResult.description}</p>
           </div>
         </div>
-        <Badge className={getStatusColor(keyResult.status)}>
-          {getStatusText(keyResult.status)}
-        </Badge>
-      </div>
-
-      {/* Progress Overview */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Target className="w-5 h-5 mr-2" />
-            Progress Overview
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{keyResult.currentValue}</div>
-              <div className="text-sm text-gray-600">Nilai Saat Ini</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{keyResult.targetValue}</div>
-              <div className="text-sm text-gray-600">Target</div>
-            </div>
-            {keyResult.baseValue && (
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-600">{keyResult.baseValue}</div>
-                <div className="text-sm text-gray-600">Nilai Awal</div>
-              </div>
-            )}
-          </div>
-          <div className="space-y-4">
-            <div className="flex justify-between">
-              <span>Progress</span>
-              <span className="font-semibold">{progress.toFixed(1)}%</span>
-            </div>
-            <Progress value={progress} />
-            
-            {/* Progress Status with automatic tracking */}
-            <ProgressStatus
-              status={keyResult.status}
-              progressPercentage={progress}
-              timeProgressPercentage={75} // Simulated time progress - in real implementation would calculate from cycle dates
-              recommendation="Progress tracking membantu memantau capaian secara otomatis berdasarkan target dan waktu tersisa."
-              lastUpdated={keyResult.lastUpdated ? new Date(keyResult.lastUpdated).toISOString() : new Date().toISOString()}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Actions */}
-      <div className="flex space-x-4">
         <CheckInModal
           keyResultId={keyResult.id}
           keyResultTitle={keyResult.title}
@@ -272,156 +124,203 @@ export default function KeyResultDetail() {
           unit={keyResult.unit}
           keyResultType={keyResult.keyResultType}
         />
-
-        <Dialog open={initiativeModalOpen} onOpenChange={setInitiativeModalOpen}>
-          <DialogTrigger asChild>
-            <Button variant="outline">
-              <Plus className="w-4 h-4 mr-2" />
-              Tambah Inisiatif
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Tambah Inisiatif Baru</DialogTitle>
-              <DialogDescription>
-                Buat inisiatif baru untuk mendukung pencapaian key result ini
-              </DialogDescription>
-            </DialogHeader>
-            <Form {...initiativeForm}>
-              <form onSubmit={initiativeForm.handleSubmit(onInitiativeSubmit)} className="space-y-4">
-                <FormField
-                  control={initiativeForm.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Judul Inisiatif</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Masukkan judul inisiatif"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={initiativeForm.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Deskripsi</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Jelaskan inisiatif ini..."
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <DialogFooter>
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => setInitiativeModalOpen(false)}
-                  >
-                    Batal
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    disabled={createInitiativeMutation.isPending}
-                  >
-                    {createInitiativeMutation.isPending ? "Menyimpan..." : "Simpan Inisiatif"}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
       </div>
 
-      {/* Check-ins History */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <TrendingUp className="w-5 h-5 mr-2" />
-            Riwayat Check-in
-          </CardTitle>
-          <CardDescription>
-            Progress tracking otomatis dengan status berdasarkan pencapaian vs waktu tersisa
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {keyResult && keyResult.checkIns && keyResult.checkIns.length > 0 ? (
-            <div className="space-y-4">
-              {keyResult.checkIns.map((checkIn) => (
-                <div key={checkIn.id} className="border-l-4 border-blue-500 pl-4 py-2">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="font-semibold">Nilai: {checkIn.value}</div>
-                      {checkIn.notes && (
-                        <div className="text-gray-600 mt-1">{checkIn.notes}</div>
-                      )}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {checkIn.createdAt ? new Date(checkIn.createdAt).toLocaleDateString('id-ID') : '-'}
-                    </div>
-                  </div>
+      {/* Key Result Overview */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Info */}
+        <div className="lg:col-span-2 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5" />
+                Informasi Key Result
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Progress Bar */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm font-medium">Progress</span>
+                  <span className="text-sm text-gray-600">{progress.toFixed(1)}%</span>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-gray-500">
-              Belum ada check-in untuk key result ini
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                <Progress value={progress} className="h-3" />
+              </div>
 
-      {/* Initiatives */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Target className="w-5 h-5 mr-2" />
-            Inisiatif & Proyek
-          </CardTitle>
-          <CardDescription>
-            Proyek dan tindakan untuk mencapai key result ini
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {keyResult && keyResult.initiatives && keyResult.initiatives.length > 0 ? (
-            <div className="space-y-4">
-              {keyResult.initiatives.map((initiative) => (
-                <div key={initiative.id} className="border rounded-lg p-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-semibold">{initiative.title}</h3>
-                      {initiative.description && (
-                        <p className="text-gray-600 mt-1">{initiative.description}</p>
-                      )}
-                      <Badge className="mt-2" variant={initiative.status === 'completed' ? 'default' : 'secondary'}>
-                        {initiative.status === 'completed' ? 'Selesai' : 'Dalam Progress'}
-                      </Badge>
+              {/* Values */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {keyResult.baseValue && (
+                  <div className="text-center p-4 bg-gray-50 rounded-lg">
+                    <div className="text-2xl font-bold text-gray-700">
+                      {keyResult.baseValue}{getUnitDisplay(keyResult.unit)}
                     </div>
-                    {initiative.dueDate && (
-                      <div className="text-sm text-gray-500">
-                        Target: {new Date(initiative.dueDate).toLocaleDateString('id-ID')}
-                      </div>
-                    )}
+                    <div className="text-sm text-gray-600">Nilai Awal</div>
+                  </div>
+                )}
+                <div className="text-center p-4 bg-blue-50 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-700">
+                    {keyResult.currentValue}{getUnitDisplay(keyResult.unit)}
+                  </div>
+                  <div className="text-sm text-blue-600">Nilai Saat Ini</div>
+                </div>
+                <div className="text-center p-4 bg-green-50 rounded-lg">
+                  <div className="text-2xl font-bold text-green-700">
+                    {keyResult.targetValue}{getUnitDisplay(keyResult.unit)}
+                  </div>
+                  <div className="text-sm text-green-600">Target</div>
+                </div>
+              </div>
+
+              {/* Type & Status */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div>
+                    <span className="text-sm text-gray-600">Tipe:</span>
+                    <Badge variant="outline" className="ml-2">
+                      {getKeyResultTypeLabel(keyResult.keyResultType)}
+                    </Badge>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-600">Unit:</span>
+                    <Badge variant="outline" className="ml-2">
+                      {keyResult.unit}
+                    </Badge>
                   </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-gray-500">
-              Belum ada inisiatif untuk key result ini
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                <ProgressStatus 
+                  status={keyResult.status}
+                  progressPercentage={progress}
+                  timeProgressPercentage={50}
+                  recommendation=""
+                  lastUpdated={keyResult.lastUpdated ? format(new Date(keyResult.lastUpdated), "dd MMM yyyy") : undefined}
+                />
+              </div>
+
+              {/* Due Date */}
+              {keyResult.dueDate && (
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Clock className="h-4 w-4" />
+                  <span>Deadline: {format(new Date(keyResult.dueDate), "dd MMM yyyy")}</span>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Progress History */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Riwayat Progress
+              </CardTitle>
+              <CardDescription>
+                Histori check-in dan perubahan nilai
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {keyResult.progressHistory && keyResult.progressHistory.length > 0 ? (
+                <div className="space-y-4">
+                  {keyResult.progressHistory.map((entry, index) => (
+                    <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                          <TrendingUp className="h-4 w-4 text-blue-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium">
+                            {entry.value}{getUnitDisplay(keyResult.unit)}
+                          </div>
+                          {entry.notes && (
+                            <div className="text-sm text-gray-600">{entry.notes}</div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm text-gray-600">
+                          {format(new Date(entry.date), "dd MMM yyyy")}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {format(new Date(entry.date), "HH:mm")}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>Belum ada riwayat check-in</p>
+                  <p className="text-sm">Lakukan check-in pertama untuk melihat progress</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Quick Stats */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Statistik Cepat</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">Total Check-ins</span>
+                <span className="font-medium">
+                  {keyResult.progressHistory?.length || 0}
+                </span>
+              </div>
+              <Separator />
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">Progress</span>
+                <span className="font-medium">{progress.toFixed(1)}%</span>
+              </div>
+              <Separator />
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">Status</span>
+                <Badge variant={progress >= 100 ? "default" : progress >= 70 ? "secondary" : "destructive"}>
+                  {progress >= 100 ? "Selesai" : progress >= 70 ? "On Track" : "At Risk"}
+                </Badge>
+              </div>
+              {keyResult.confidence !== null && (
+                <>
+                  <Separator />
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Confidence</span>
+                    <span className="font-medium">{keyResult.confidence}/10</span>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Aksi</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <CheckInModal
+                keyResultId={keyResult.id}
+                keyResultTitle={keyResult.title}
+                currentValue={keyResult.currentValue}
+                targetValue={keyResult.targetValue}
+                unit={keyResult.unit}
+                keyResultType={keyResult.keyResultType}
+              />
+              <Button variant="outline" className="w-full">
+                <Calendar className="h-4 w-4 mr-2" />
+                Lihat Kalender
+              </Button>
+              <Button variant="outline" className="w-full">
+                <Users className="h-4 w-4 mr-2" />
+                Share Progress
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

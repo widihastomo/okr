@@ -499,6 +499,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get key result with details and progress history
+  app.get("/api/key-results/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const keyResult = await storage.getKeyResultWithDetails(id);
+      
+      if (!keyResult) {
+        return res.status(404).json({ message: "Key result not found" });
+      }
+      
+      res.json(keyResult);
+    } catch (error) {
+      console.error("Error fetching key result details:", error);
+      res.status(500).json({ message: "Failed to fetch key result details" });
+    }
+  });
+
   // Check-ins for progress tracking
   app.post("/api/key-results/:id/check-ins", async (req, res) => {
     try {
