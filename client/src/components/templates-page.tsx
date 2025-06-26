@@ -43,11 +43,21 @@ export default function TemplatesPage() {
   });
 
   const getTypeIcon = (type: string) => {
-    return type === "quarterly" ? Calendar : Target;
+    switch (type) {
+      case "monthly": return Calendar;
+      case "quarterly": return Target;
+      case "annual": return TrendingUp;
+      default: return Calendar;
+    }
   };
 
   const getTypeColor = (type: string) => {
-    return type === "quarterly" ? "bg-blue-100 text-blue-800" : "bg-purple-100 text-purple-800";
+    switch (type) {
+      case "monthly": return "bg-green-100 text-green-800";
+      case "quarterly": return "bg-blue-100 text-blue-800";
+      case "annual": return "bg-purple-100 text-purple-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
   };
 
   if (isLoading) {

@@ -31,7 +31,7 @@ const objectiveSchema = z.object({
 });
 
 const createTemplateFormSchema = insertTemplateSchema.extend({
-  type: z.enum(["company", "team", "individual"]),
+  type: z.enum(["monthly", "quarterly", "annual"]),
   objectives: z.array(objectiveSchema).min(1, "At least one objective is required"),
 });
 
@@ -51,7 +51,7 @@ export default function CreateTemplateModal({ open, onOpenChange, onSuccess }: C
     defaultValues: {
       name: "",
       description: "",
-      type: "team",
+      type: "monthly",
       isDefault: false,
       objectives: [{
         title: "",
@@ -152,9 +152,9 @@ export default function CreateTemplateModal({ open, onOpenChange, onSuccess }: C
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="company">Company</SelectItem>
-                        <SelectItem value="team">Team</SelectItem>
-                        <SelectItem value="individual">Individual</SelectItem>
+                        <SelectItem value="monthly">Monthly</SelectItem>
+                        <SelectItem value="quarterly">Quarterly</SelectItem>
+                        <SelectItem value="annual">Annual</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

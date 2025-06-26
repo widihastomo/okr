@@ -14,7 +14,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { insertCycleSchema } from "@shared/schema";
 
 const createCycleFormSchema = insertCycleSchema.extend({
-  type: z.enum(["quarterly", "annual"]),
+  type: z.enum(["monthly", "quarterly", "annual"]),
 });
 
 type CreateCycleFormData = z.infer<typeof createCycleFormSchema>;
@@ -33,7 +33,7 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
     defaultValues: {
       name: "",
       description: "",
-      type: "quarterly",
+      type: "monthly",
       startDate: "",
       endDate: "",
     },
@@ -65,11 +65,22 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
     mutation.mutate(data);
   };
 
-  const handleTypeChange = (type: "quarterly" | "annual") => {
+  const handleTypeChange = (type: "monthly" | "quarterly" | "annual") => {
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth();
     
-    if (type === "quarterly") {
+    if (type === "monthly") {
+      const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+      const monthStart = new Date(currentYear, currentMonth, 1);
+      const monthEnd = new Date(currentYear, currentMonth + 1, 0);
+      
+      form.setValue("name", `${monthNames[currentMonth]} ${currentYear}`);
+      form.setValue("startDate", monthStart.toISOString().split('T')[0]);
+      form.setValue("endDate", monthEnd.toISOString().split('T')[0]);
+    } else if (type === "quarterly") {
       const quarter = Math.floor(currentMonth / 3) + 1;
       const quarterStart = new Date(currentYear, (quarter - 1) * 3, 1);
       const quarterEnd = new Date(currentYear, quarter * 3, 0);
@@ -108,7 +119,7 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
                   <Select 
                     onValueChange={(value) => {
                       field.onChange(value);
-                      handleTypeChange(value as "quarterly" | "annual");
+                      handleTypeChange(value as "monthly" | "quarterly" | "annual");
                     }} 
                     defaultValue={field.value}
                   >
@@ -118,6 +129,7 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
+                      <SelectItem value="monthly">Monthly</SelectItem>
                       <SelectItem value="quarterly">Quarterly</SelectItem>
                       <SelectItem value="annual">Annual</SelectItem>
                     </SelectContent>

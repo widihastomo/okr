@@ -59,7 +59,7 @@ export class MemStorage implements IStorage {
     this.templates = new Map();
     this.objectives = new Map();
     this.keyResults = new Map();
-    this.currentCycleId = 1;
+    this.currentCycleId = 4;
     this.currentTemplateId = 1;
     this.currentObjectiveId = 1;
     this.currentKeyResultId = 1;
@@ -72,16 +72,26 @@ export class MemStorage implements IStorage {
     // Sample Cycles
     const cycle1: Cycle = {
       id: 1,
-      name: "Q1 2025",
-      type: "quarterly",
+      name: "January 2025",
+      type: "monthly",
       startDate: "2025-01-01",
-      endDate: "2025-03-31",
+      endDate: "2025-01-31",
       status: "active",
-      description: "First quarter of 2025 focused on growth and engagement"
+      description: "January monthly objectives for 2025"
     };
     
     const cycle2: Cycle = {
       id: 2,
+      name: "Q1 2025",
+      type: "quarterly",
+      startDate: "2025-01-01",
+      endDate: "2025-03-31",
+      status: "planning",
+      description: "First quarter of 2025 focused on growth and engagement"
+    };
+    
+    const cycle3: Cycle = {
+      id: 3,
       name: "Annual 2025",
       type: "annual",
       startDate: "2025-01-01",
@@ -92,6 +102,7 @@ export class MemStorage implements IStorage {
     
     this.cycles.set(1, cycle1);
     this.cycles.set(2, cycle2);
+    this.cycles.set(3, cycle3);
     
     // Sample Templates
     const template1: Template = {

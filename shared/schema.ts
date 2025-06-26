@@ -4,8 +4,8 @@ import { z } from "zod";
 
 export const cycles = pgTable("cycles", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull(), // e.g., "Q1 2025", "Annual 2025"
-  type: text("type").notNull(), // "quarterly", "annual"
+  name: text("name").notNull(), // e.g., "January 2025", "Q1 2025", "Annual 2025"
+  type: text("type").notNull(), // "monthly", "quarterly", "annual"
   startDate: text("start_date").notNull(),
   endDate: text("end_date").notNull(),
   status: text("status").notNull().default("planning"), // "planning", "active", "completed"
@@ -16,7 +16,7 @@ export const templates = pgTable("templates", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   description: text("description"),
-  type: text("type").notNull(), // "quarterly", "annual"
+  type: text("type").notNull(), // "monthly", "quarterly", "annual"
   isDefault: boolean("is_default").default(false),
   objectives: text("objectives").notNull(), // JSON string of objective templates
 });

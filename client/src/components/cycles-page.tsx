@@ -51,7 +51,12 @@ export default function CyclesPage() {
   };
 
   const getTypeIcon = (type: string) => {
-    return type === "quarterly" ? Calendar : Target;
+    switch (type) {
+      case "monthly": return Calendar;
+      case "quarterly": return Target;
+      case "annual": return TrendingUp;
+      default: return Calendar;
+    }
   };
 
   if (isLoading) {
