@@ -1,12 +1,15 @@
-import { Target, BarChart3, Users, Building, ChartLine, Settings, User } from "lucide-react";
+import { Target, BarChart3, Users, Building, ChartLine, Calendar, FileText, User, Settings } from "lucide-react";
+import { Link, useLocation } from "wouter";
 
 export default function Sidebar() {
+  const [location] = useLocation();
+  
   const navigation = [
-    { name: "Dashboard", icon: ChartLine, active: true },
-    { name: "My OKRs", icon: Target },
-    { name: "Team OKRs", icon: Users },
-    { name: "Company OKRs", icon: Building },
-    { name: "Analytics", icon: BarChart3 },
+    { name: "Dashboard", icon: ChartLine, href: "/", active: location === "/" },
+    { name: "Cycles", icon: Calendar, href: "/cycles", active: location === "/cycles" },
+    { name: "Templates", icon: FileText, href: "/templates", active: location === "/templates" },
+    { name: "My OKRs", icon: Target, href: "/my-okrs", active: location === "/my-okrs" },
+    { name: "Analytics", icon: BarChart3, href: "/analytics", active: location === "/analytics" },
   ];
 
   return (
@@ -26,9 +29,9 @@ export default function Sidebar() {
         {navigation.map((item) => {
           const Icon = item.icon;
           return (
-            <a
+            <Link
               key={item.name}
-              href="#"
+              href={item.href}
               className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
                 item.active
                   ? "bg-primary text-white"
@@ -37,7 +40,7 @@ export default function Sidebar() {
             >
               <Icon className="w-5 h-5" />
               <span className="font-medium">{item.name}</span>
-            </a>
+            </Link>
           );
         })}
       </nav>

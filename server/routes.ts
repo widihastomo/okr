@@ -1,10 +1,174 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertObjectiveSchema, insertKeyResultSchema, updateKeyResultProgressSchema } from "@shared/schema";
+import { 
+  insertCycleSchema, insertTemplateSchema, insertObjectiveSchema, insertKeyResultSchema, 
+  updateKeyResultProgressSchema, createOKRFromTemplateSchema 
+} from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Cycles endpoints
+  app.get("/api/cycles", async (req, res) => {
+    try {
+      const cycles = await storage.getCycles();
+      res.json(cycles);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch cycles" });
+    }
+  });
+
+  app.get("/api/cycles/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const cycle = await storage.getCycleWithOKRs(id);
+      
+      if (!cycle) {
+        return res.status(404).json({ message: "Cycle not found" });
+      }
+      
+      res.json(cycle);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch cycle" });
+    }
+  });
+
+  app.post("/api/cycles", async (req, res) => {
+    try {
+      const data = insertCycleSchema.parse(req.body);
+      const cycle = await storage.createCycle(data);
+      res.status(201).json(cycle);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create cycle" });
+    }
+  });
+
+  app.patch("/api/cycles/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const data = insertCycleSchema.partial().parse(req.body);
+      const updated = await storage.updateCycle(id, data);
+      
+      if (!updated) {
+        return res.status(404).json({ message: "Cycle not found" });
+      }
+      
+      res.json(updated);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update cycle" });
+    }
+  });
+
+  app.delete("/api/cycles/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await storage.deleteCycle(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Cycle not found" });
+      }
+      
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete cycle" });
+    }
+  });
+
+  // Templates endpoints
+  app.get("/api/templates", async (req, res) => {
+    try {
+      const templates = await storage.getTemplates();
+      res.json(templates);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch templates" });
+    }
+  });
+
+  app.get("/api/templates/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const template = await storage.getTemplate(id);
+      
+      if (!template) {
+        return res.status(404).json({ message: "Template not found" });
+      }
+      
+      res.json(template);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch template" });
+    }
+  });
+
+  app.post("/api/templates", async (req, res) => {
+    try {
+      const data = insertTemplateSchema.parse(req.body);
+      const template = await storage.createTemplate(data);
+      res.status(201).json(template);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create template" });
+    }
+  });
+
+  app.patch("/api/templates/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const data = insertTemplateSchema.partial().parse(req.body);
+      const updated = await storage.updateTemplate(id, data);
+      
+      if (!updated) {
+        return res.status(404).json({ message: "Template not found" });
+      }
+      
+      res.json(updated);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update template" });
+    }
+  });
+
+  app.delete("/api/templates/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await storage.deleteTemplate(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Template not found" });
+      }
+      
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete template" });
+    }
+  });
+
+  app.post("/api/templates/:id/create-okr", async (req, res) => {
+    try {
+      const templateId = parseInt(req.params.id);
+      const data = createOKRFromTemplateSchema.parse({
+        ...req.body,
+        templateId
+      });
+      const okrs = await storage.createOKRFromTemplate(data);
+      res.status(201).json(okrs);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create OKR from template" });
+    }
+  });
+
   // Get all OKRs with key results
   app.get("/api/okrs", async (req, res) => {
     try {
