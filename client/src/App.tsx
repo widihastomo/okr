@@ -3,26 +3,55 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useAuth } from "@/hooks/useAuth";
 import Dashboard from "@/pages/dashboard";
 import CyclesPage from "@/components/cycles-page";
 import TemplatesPage from "@/components/templates-page";
 import UsersPage from "@/components/users-page";
 import CompanyOKRsPage from "@/pages/company-okrs";
 import KeyResultDetail from "@/pages/key-result-detail";
+import Landing from "@/pages/landing";
+import Home from "@/pages/home";
 import NotFound from "@/pages/not-found";
+import Sidebar from "@/components/sidebar";
 
 function Router() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4">
+            <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          </div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Landing />;
+  }
+
   return (
-    <Switch>
-      <Route path="/" component={Dashboard} />
-      <Route path="/dashboard" component={Dashboard} />
-      <Route path="/company-okrs" component={CompanyOKRsPage} />
-      <Route path="/key-results/:id" component={KeyResultDetail} />
-      <Route path="/cycles" component={CyclesPage} />
-      <Route path="/templates" component={TemplatesPage} />
-      <Route path="/users" component={UsersPage} />
-      <Route component={NotFound} />
-    </Switch>
+    <div className="flex h-screen bg-gray-100">
+      <Sidebar />
+      <main className="flex-1 lg:ml-64">
+        <Switch>
+          <Route path="/" component={Dashboard} />
+          <Route path="/dashboard" component={Dashboard} />
+          <Route path="/home" component={Home} />
+          <Route path="/company-okrs" component={CompanyOKRsPage} />
+          <Route path="/key-results/:id" component={KeyResultDetail} />
+          <Route path="/cycles" component={CyclesPage} />
+          <Route path="/templates" component={TemplatesPage} />
+          <Route path="/users" component={UsersPage} />
+          <Route component={NotFound} />
+        </Switch>
+      </main>
+    </div>
   );
 }
 

@@ -7,8 +7,23 @@ import {
   updateKeyResultProgressSchema, createOKRFromTemplateSchema 
 } from "@shared/schema";
 import { z } from "zod";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup authentication
+  await setupAuth(app);
+
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
   // Cycles endpoints
   app.get("/api/cycles", async (req, res) => {
     try {
@@ -34,7 +49,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/cycles", async (req, res) => {
+  app.post("/api/cycles", isAuthenticated, async (req, res) => {
     try {
       const data = insertCycleSchema.parse(req.body);
       const cycle = await storage.createCycle(data);
@@ -47,7 +62,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/cycles/:id", async (req, res) => {
+  app.patch("/api/cycles/:id", isAuthenticated, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const data = insertCycleSchema.partial().parse(req.body);
@@ -66,7 +81,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/cycles/:id", async (req, res) => {
+  app.delete("/api/cycles/:id", isAuthenticated, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const deleted = await storage.deleteCycle(id);
@@ -106,7 +121,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/templates", async (req, res) => {
+  app.post("/api/templates", isAuthenticated, async (req, res) => {
     try {
       const data = insertTemplateSchema.parse(req.body);
       const template = await storage.createTemplate(data);
@@ -119,7 +134,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/templates/:id", async (req, res) => {
+  app.patch("/api/templates/:id", isAuthenticated, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const data = insertTemplateSchema.partial().parse(req.body);
@@ -138,7 +153,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/templates/:id", async (req, res) => {
+  app.delete("/api/templates/:id", isAuthenticated, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const deleted = await storage.deleteTemplate(id);
@@ -153,7 +168,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/templates/:id/create-okr", async (req, res) => {
+  app.post("/api/templates/:id/create-okr", isAuthenticated, async (req, res) => {
     try {
       const templateId = parseInt(req.params.id);
       const data = createOKRFromTemplateSchema.parse({
@@ -208,7 +223,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/users', async (req, res) => {
+  app.post('/api/users', isAuthenticated, async (req, res) => {
     try {
       const user = await storage.upsertUser(req.body);
       res.status(201).json(user);
