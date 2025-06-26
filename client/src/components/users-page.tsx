@@ -725,7 +725,7 @@ export default function UsersPage() {
                 </div>
               ) : (
                 <div className="divide-y">
-                  {teamMembers.map((member) => (
+                  {teamMembers.filter(member => member && member.user).map((member) => (
                     <div key={member.user.id} className="p-4 flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium">
@@ -749,11 +749,13 @@ export default function UsersPage() {
                         <Select 
                           value={member.role} 
                           onValueChange={(newRole) => {
-                            updateTeamMemberRoleMutation.mutate({
-                              teamId: selectedTeam!.id,
-                              userId: member.user.id,
-                              role: newRole
-                            });
+                            if (member.user?.id && selectedTeam?.id) {
+                              updateTeamMemberRoleMutation.mutate({
+                                teamId: selectedTeam.id,
+                                userId: member.user.id,
+                                role: newRole
+                              });
+                            }
                           }}
                         >
                           <SelectTrigger className="w-28">
@@ -774,10 +776,12 @@ export default function UsersPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => {
-                            removeTeamMemberMutation.mutate({
-                              teamId: selectedTeam!.id,
-                              userId: member.user.id
-                            });
+                            if (member.user?.id && selectedTeam?.id) {
+                              removeTeamMemberMutation.mutate({
+                                teamId: selectedTeam.id,
+                                userId: member.user.id
+                              });
+                            }
                           }}
                           disabled={removeTeamMemberMutation.isPending}
                         >
@@ -821,7 +825,7 @@ export default function UsersPage() {
                   </SelectTrigger>
                   <SelectContent>
                     {users
-                      .filter(user => !teamMembers.some((member) => member.user.id === user.id))
+                      .filter(user => !teamMembers.some((member) => member?.user?.id === user.id))
                       .map((user: User) => (
                         <SelectItem key={user.id} value={user.id}>
                           {user.firstName || user.lastName 
