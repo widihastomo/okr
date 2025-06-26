@@ -516,8 +516,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update key result with new current value and auto-calculate status
       await storage.updateKeyResultProgress({
         id: keyResultId,
-        currentValue: req.body.value,
-        updatedBy: checkInData.createdBy
+        currentValue: parseFloat(req.body.value)
       });
       
       res.status(201).json(checkIn);

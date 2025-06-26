@@ -8,6 +8,7 @@ import { Slider } from "@/components/ui/slider";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -126,6 +127,9 @@ export function CheckInModal({
             <Calendar className="h-5 w-5" />
             Update Progress
           </DialogTitle>
+          <DialogDescription>
+            Update nilai progress untuk key result ini dan tambahkan catatan jika diperlukan.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
