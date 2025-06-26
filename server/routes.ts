@@ -499,6 +499,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Check-ins for progress tracking
+  app.post("/api/key-results/:id/check-ins", async (req, res) => {
+    try {
+      const keyResultId = parseInt(req.params.id);
+      const checkInData = {
+        keyResultId,
+        value: req.body.value,
+        notes: req.body.notes || null,
+        confidence: req.body.confidence || 5,
+        createdBy: req.body.createdBy || 'user1'
+      };
+      
+      const checkIn = await storage.createCheckIn(checkInData);
+      
+      // Update key result with new current value and auto-calculate status
+      await storage.updateKeyResultProgress({
+        id: keyResultId,
+        currentValue: req.body.value,
+        updatedBy: checkInData.createdBy
+      });
+      
+      res.status(201).json(checkIn);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create check-in" });
+    }
+  });
+
+  app.get("/api/key-results/:id/check-ins", async (req, res) => {
+    try {
+      const keyResultId = parseInt(req.params.id);
+      const checkIns = await storage.getCheckInsByKeyResultId(keyResultId);
+      res.json(checkIns);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch check-ins" });
+    }
+  });
+
+  // Get key result details with progress history
+  app.get("/api/key-results/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const keyResult = await storage.getKeyResultWithDetails(id);
+      
+      if (!keyResult) {
+        return res.status(404).json({ message: "Key result not found" });
+      }
+      
+      res.json(keyResult);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch key result details" });
+    }
+  });
+
   // Delete OKR
   app.delete("/api/okrs/:id", async (req, res) => {
     try {

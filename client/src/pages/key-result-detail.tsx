@@ -13,10 +13,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
-import { ArrowLeft, Plus, TrendingUp, Calendar, Target, CheckCircle2, AlertCircle } from "lucide-react";
+import { ArrowLeft, Plus, TrendingUp, Calendar, Target, CheckCircle2, AlertCircle, History, Lightbulb } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { KeyResultWithDetails, InsertCheckIn, InsertInitiative } from "@shared/schema";
+import { CheckInModal } from "@/components/check-in-modal";
+import { ProgressStatus } from "@/components/progress-status";
 
 const checkInSchema = z.object({
   keyResultId: z.number(),
@@ -241,88 +243,35 @@ export default function KeyResultDetail() {
               </div>
             )}
           </div>
-          <div className="space-y-2">
+          <div className="space-y-4">
             <div className="flex justify-between">
               <span>Progress</span>
               <span className="font-semibold">{progress.toFixed(1)}%</span>
             </div>
             <Progress value={progress} />
+            
+            {/* Progress Status with automatic tracking */}
+            <ProgressStatus
+              status={keyResult.status}
+              progressPercentage={progress}
+              timeProgressPercentage={75} // Simulated time progress - in real implementation would calculate from cycle dates
+              recommendation="Progress tracking membantu memantau capaian secara otomatis berdasarkan target dan waktu tersisa."
+              lastUpdated={keyResult.lastUpdated ? new Date(keyResult.lastUpdated).toISOString() : new Date().toISOString()}
+            />
           </div>
         </CardContent>
       </Card>
 
       {/* Actions */}
       <div className="flex space-x-4">
-        <Dialog open={checkInModalOpen} onOpenChange={setCheckInModalOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <CheckCircle2 className="w-4 h-4 mr-2" />
-              Tambah Check-in
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Tambah Check-in Progress</DialogTitle>
-              <DialogDescription>
-                Update progress terbaru untuk key result ini
-              </DialogDescription>
-            </DialogHeader>
-            <Form {...checkInForm}>
-              <form onSubmit={checkInForm.handleSubmit(onCheckInSubmit)} className="space-y-4">
-                <FormField
-                  control={checkInForm.control}
-                  name="value"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nilai Progress</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          placeholder="Masukkan nilai progress"
-                          {...field}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={checkInForm.control}
-                  name="notes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Catatan (Opsional)</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Tambahkan catatan tentang progress ini..."
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <DialogFooter>
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => setCheckInModalOpen(false)}
-                  >
-                    Batal
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    disabled={createCheckInMutation.isPending}
-                  >
-                    {createCheckInMutation.isPending ? "Menyimpan..." : "Simpan Check-in"}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
+        <CheckInModal
+          keyResultId={keyResult.id}
+          keyResultTitle={keyResult.title}
+          currentValue={keyResult.currentValue}
+          targetValue={keyResult.targetValue}
+          unit={keyResult.unit}
+          keyResultType={keyResult.keyResultType}
+        />
 
         <Dialog open={initiativeModalOpen} onOpenChange={setInitiativeModalOpen}>
           <DialogTrigger asChild>
@@ -335,7 +284,7 @@ export default function KeyResultDetail() {
             <DialogHeader>
               <DialogTitle>Tambah Inisiatif Baru</DialogTitle>
               <DialogDescription>
-                Buat inisiatif atau proyek untuk mencapai key result ini
+                Buat inisiatif baru untuk mendukung pencapaian key result ini
               </DialogDescription>
             </DialogHeader>
             <Form {...initiativeForm}>
@@ -347,7 +296,10 @@ export default function KeyResultDetail() {
                     <FormItem>
                       <FormLabel>Judul Inisiatif</FormLabel>
                       <FormControl>
-                        <Input placeholder="Masukkan judul inisiatif" {...field} />
+                        <Input
+                          placeholder="Masukkan judul inisiatif"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -358,25 +310,12 @@ export default function KeyResultDetail() {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Deskripsi (Opsional)</FormLabel>
+                      <FormLabel>Deskripsi</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Jelaskan detail inisiatif ini..."
+                          placeholder="Jelaskan inisiatif ini..."
                           {...field}
                         />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={initiativeForm.control}
-                  name="dueDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tanggal Target (Opsional)</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -411,11 +350,11 @@ export default function KeyResultDetail() {
             Riwayat Check-in
           </CardTitle>
           <CardDescription>
-            Riwayat update progress untuk key result ini
+            Progress tracking otomatis dengan status berdasarkan pencapaian vs waktu tersisa
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {keyResult.checkIns && keyResult.checkIns.length > 0 ? (
+          {keyResult && keyResult.checkIns && keyResult.checkIns.length > 0 ? (
             <div className="space-y-4">
               {keyResult.checkIns.map((checkIn) => (
                 <div key={checkIn.id} className="border-l-4 border-blue-500 pl-4 py-2">
@@ -435,9 +374,7 @@ export default function KeyResultDetail() {
             </div>
           ) : (
             <div className="text-center py-8 text-gray-500">
-              <CheckCircle2 className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>Belum ada check-in untuk key result ini</p>
-              <p className="text-sm">Klik "Tambah Check-in" untuk mulai melacak progress</p>
+              Belum ada check-in untuk key result ini
             </div>
           )}
         </CardContent>
@@ -447,31 +384,32 @@ export default function KeyResultDetail() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
-            <Calendar className="w-5 h-5 mr-2" />
+            <Target className="w-5 h-5 mr-2" />
             Inisiatif & Proyek
           </CardTitle>
           <CardDescription>
-            Inisiatif dan proyek yang dilakukan untuk mencapai key result ini
+            Proyek dan tindakan untuk mencapai key result ini
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {keyResult.initiatives && keyResult.initiatives.length > 0 ? (
+          {keyResult && keyResult.initiatives && keyResult.initiatives.length > 0 ? (
             <div className="space-y-4">
               {keyResult.initiatives.map((initiative) => (
-                <div key={initiative.id} className="p-4 border rounded-lg">
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-semibold">{initiative.title}</h4>
-                    <Badge variant={initiative.status === "completed" ? "default" : "secondary"}>
-                      {getStatusText(initiative.status)}
-                    </Badge>
-                  </div>
-                  {initiative.description && (
-                    <p className="text-gray-600 mb-2">{initiative.description}</p>
-                  )}
-                  <div className="flex justify-between text-sm text-gray-500">
-                    <span>Dibuat: {initiative.createdAt ? new Date(initiative.createdAt).toLocaleDateString('id-ID') : '-'}</span>
+                <div key={initiative.id} className="border rounded-lg p-4">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-semibold">{initiative.title}</h3>
+                      {initiative.description && (
+                        <p className="text-gray-600 mt-1">{initiative.description}</p>
+                      )}
+                      <Badge className="mt-2" variant={initiative.status === 'completed' ? 'default' : 'secondary'}>
+                        {initiative.status === 'completed' ? 'Selesai' : 'Dalam Progress'}
+                      </Badge>
+                    </div>
                     {initiative.dueDate && (
-                      <span>Target: {new Date(initiative.dueDate).toLocaleDateString('id-ID')}</span>
+                      <div className="text-sm text-gray-500">
+                        Target: {new Date(initiative.dueDate).toLocaleDateString('id-ID')}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -479,9 +417,7 @@ export default function KeyResultDetail() {
             </div>
           ) : (
             <div className="text-center py-8 text-gray-500">
-              <AlertCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>Belum ada inisiatif untuk key result ini</p>
-              <p className="text-sm">Klik "Tambah Inisiatif" untuk mulai merencanakan</p>
+              Belum ada inisiatif untuk key result ini
             </div>
           )}
         </CardContent>

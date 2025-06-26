@@ -5,6 +5,8 @@ import { Progress } from "@/components/ui/progress";
 import { Calendar, User, Clock, Edit, MoreVertical } from "lucide-react";
 import type { OKRWithKeyResults, KeyResult } from "@shared/schema";
 import { Link } from "wouter";
+import { CheckInModal } from "./check-in-modal";
+import { SimpleProgressStatus } from "./progress-status";
 
 interface OKRCardProps {
   okr: OKRWithKeyResults;
@@ -128,38 +130,48 @@ export default function OKRCard({ okr, onEditProgress }: OKRCardProps) {
             };
             
             return (
-              <div key={kr.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Link 
-                      href={`/key-results/${kr.id}`}
-                      className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
+              <div key={kr.id} className="p-4 bg-gray-50 rounded-lg space-y-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Link 
+                        href={`/key-results/${kr.id}`}
+                        className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
+                      >
+                        {kr.title}
+                      </Link>
+                      <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
+                        {getKeyResultTypeLabel(kr.keyResultType)}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">{kr.description}</p>
+                    <div className="text-xs text-gray-500">
+                      {kr.currentValue} / {kr.targetValue} {kr.unit === "percentage" ? "%" : kr.unit === "currency" ? "Rp" : ""}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckInModal
+                      keyResultId={kr.id}
+                      keyResultTitle={kr.title}
+                      currentValue={kr.currentValue}
+                      targetValue={kr.targetValue}
+                      unit={kr.unit}
+                      keyResultType={kr.keyResultType}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onEditProgress(kr)}
+                      className="text-primary hover:text-blue-700"
                     >
-                      {kr.title}
-                    </Link>
-                    <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
-                      {getKeyResultTypeLabel(kr.keyResultType)}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-3">{kr.description}</p>
-                  <div className="flex items-center space-x-3">
-                    <Progress value={progress} className="flex-1" />
-                    <span className="text-sm font-medium text-gray-700">{Math.round(progress)}%</span>
+                      <Edit className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onEditProgress(kr)}
-                    className="text-primary hover:text-blue-700"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                  <Badge className={`${getStatusColor(kr.status)} text-white`}>
-                    {getStatusLabel(kr.status)}
-                  </Badge>
-                </div>
+                <SimpleProgressStatus
+                  status={kr.status}
+                  progressPercentage={progress}
+                />
               </div>
             );
           })}

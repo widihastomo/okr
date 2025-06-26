@@ -88,7 +88,10 @@ export const keyResults = pgTable("key_results", {
   baseValue: decimal("base_value", { precision: 10, scale: 2 }), // Starting point for calculations
   unit: text("unit").notNull().default("number"), // "number", "percentage", "currency"
   keyResultType: text("key_result_type").notNull().default("increase_to"), // "increase_to", "decrease_to", "achieve_or_not"
-  status: text("status").notNull().default("in_progress"), // "on_track", "at_risk", "completed", "in_progress"
+  status: text("status").notNull().default("in_progress"), // "on_track", "at_risk", "behind", "completed", "in_progress"
+  dueDate: timestamp("due_date"), // Target completion date
+  lastUpdated: timestamp("last_updated").defaultNow(),
+  confidence: integer("confidence").default(5), // 1-10 scale for confidence level
 });
 
 // Check-ins for tracking progress updates

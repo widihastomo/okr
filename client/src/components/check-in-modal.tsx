@@ -1,0 +1,208 @@
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Slider } from "@/components/ui/slider";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { Calendar, TrendingUp } from "lucide-react";
+
+interface CheckInModalProps {
+  keyResultId: number;
+  keyResultTitle: string;
+  currentValue: string;
+  targetValue: string;
+  unit: string;
+  keyResultType: string;
+}
+
+export function CheckInModal({ 
+  keyResultId, 
+  keyResultTitle, 
+  currentValue, 
+  targetValue, 
+  unit,
+  keyResultType 
+}: CheckInModalProps) {
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(currentValue);
+  const [notes, setNotes] = useState("");
+  const [confidence, setConfidence] = useState([5]);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const checkInMutation = useMutation({
+    mutationFn: async (data: { value: string; notes: string; confidence: number }) => {
+      return await apiRequest(`/api/key-results/${keyResultId}/check-ins`, "POST", data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Check-in berhasil",
+        description: "Progress telah diperbarui secara otomatis",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
+      queryClient.invalidateQueries({
+        queryKey: [`/api/key-results/${keyResultId}`],
+      });
+      setOpen(false);
+      setValue(currentValue);
+      setNotes("");
+      setConfidence([5]);
+    },
+    onError: () => {
+      toast({
+        title: "Gagal melakukan check-in",
+        description: "Terjadi kesalahan saat memperbarui progress",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    checkInMutation.mutate({
+      value,
+      notes,
+      confidence: confidence[0],
+    });
+  };
+
+  const getUnitDisplay = (unit: string) => {
+    switch (unit) {
+      case "percentage":
+        return "%";
+      case "currency":
+        return "Rp";
+      case "number":
+      default:
+        return "";
+    }
+  };
+
+  const getProgressHint = () => {
+    const current = parseFloat(value);
+    const target = parseFloat(targetValue);
+    const base = parseFloat(currentValue);
+    
+    if (keyResultType === "decrease_to") {
+      if (current < target) {
+        return "✅ Target tercapai!";
+      } else if (current < base) {
+        return "📈 Progress baik, terus turunkan";
+      } else {
+        return "⚠️ Perlu usaha lebih untuk menurunkan";
+      }
+    } else {
+      if (current >= target) {
+        return "✅ Target tercapai!";
+      } else if (current > base) {
+        return "📈 Progress baik, terus tingkatkan";
+      } else {
+        return "⚠️ Perlu usaha lebih untuk meningkatkan";
+      }
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" className="flex items-center gap-2">
+          <TrendingUp className="h-4 w-4" />
+          Check-in
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Calendar className="h-5 w-5" />
+            Update Progress
+          </DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label className="text-sm font-medium text-gray-700">
+              Key Result
+            </Label>
+            <p className="text-sm text-gray-600 mt-1">{keyResultTitle}</p>
+          </div>
+
+          <div>
+            <Label htmlFor="value" className="text-sm font-medium">
+              Nilai Saat Ini {getUnitDisplay(unit)}
+            </Label>
+            <Input
+              id="value"
+              type="number"
+              step="0.01"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              className="mt-1"
+              required
+            />
+            <div className="text-xs text-gray-500 mt-1">
+              Target: {targetValue} {getUnitDisplay(unit)}
+            </div>
+            <div className="text-xs mt-1 font-medium">
+              {getProgressHint()}
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="confidence" className="text-sm font-medium">
+              Tingkat Keyakinan: {confidence[0]}/10
+            </Label>
+            <Slider
+              id="confidence"
+              min={1}
+              max={10}
+              step={1}
+              value={confidence}
+              onValueChange={setConfidence}
+              className="mt-2"
+            />
+            <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <span>Tidak yakin</span>
+              <span>Sangat yakin</span>
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="notes" className="text-sm font-medium">
+              Catatan (opsional)
+            </Label>
+            <Textarea
+              id="notes"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Jelaskan progress, tantangan, atau rencana selanjutnya..."
+              className="mt-1"
+              rows={3}
+            />
+          </div>
+
+          <div className="flex justify-end space-x-2 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+            >
+              Batal
+            </Button>
+            <Button type="submit" disabled={checkInMutation.isPending}>
+              {checkInMutation.isPending ? "Menyimpan..." : "Simpan Check-in"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
