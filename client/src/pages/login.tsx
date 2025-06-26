@@ -46,10 +46,15 @@ export default function Login() {
         title: "Berhasil masuk",
         description: "Selamat datang kembali!",
       });
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-      window.location.href = "/";
+      // Small delay to ensure queries are invalidated
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 100);
     },
     onError: (error: any) => {
+      console.log("Login error:", error);
       toast({
         title: "Gagal masuk",
         description: error.message || "Email atau password salah",
@@ -80,6 +85,7 @@ export default function Login() {
   });
 
   const handleLogin = (data: LoginData) => {
+    console.log("Login attempt with data:", data);
     loginMutation.mutate(data);
   };
 
