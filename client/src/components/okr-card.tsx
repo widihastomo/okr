@@ -128,13 +128,15 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
                   <ChevronDown className="w-4 h-4" />
                 )}
               </Button>
-              <Link href={`/objective/${okr.id}`}>
-                <h3 className="text-xl font-bold hover:underline cursor-pointer">
-                  {okr.title}
-                </h3>
-              </Link>
+              <div className="flex items-center gap-3">
+                <Link href={`/objective/${okr.id}`}>
+                  <h3 className="text-xl font-bold hover:underline cursor-pointer">
+                    {okr.title}
+                  </h3>
+                </Link>
+                <p className="text-sm text-gray-600">{okr.description}</p>
+              </div>
             </div>
-            <p className="text-gray-600 mb-4">{okr.description}</p>
             
             <div className="flex items-center gap-4 text-sm text-gray-600">
               <span className="flex items-center gap-1">
