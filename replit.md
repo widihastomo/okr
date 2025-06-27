@@ -196,7 +196,9 @@ Changelog:
 - June 27, 2025. Streamlined OKR form layout and structure:
   * Consolidated owner type and user selection fields into Objective Information card
   * Removed separate Owner Information card to simplify form organization
+  * Repositioned cycle, owner type, and user fields in a horizontal 3-column layout
   * Improved form usability by grouping related fields in logical sections
+  * Enhanced space utilization and visual flow of the form interface
   * Maintained all functionality while reducing visual complexity
 ```
 

@@ -314,65 +314,36 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="objective.cycleId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Cycle</FormLabel>
-                      <Select 
-                        onValueChange={(value) => field.onChange(value === "none" ? undefined : value)} 
-                        value={field.value || "none"}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select cycle" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="none">No Cycle</SelectItem>
-                          {cycles?.map((cycle) => (
-                            <SelectItem key={cycle.id} value={cycle.id}>
-                              {cycle.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="objective.cycleId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Cycle</FormLabel>
+                        <Select 
+                          onValueChange={(value) => field.onChange(value === "none" ? undefined : value)} 
+                          value={field.value || "none"}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select cycle" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="none">No Cycle</SelectItem>
+                            {cycles?.map((cycle) => (
+                              <SelectItem key={cycle.id} value={cycle.id}>
+                                {cycle.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={form.control}
-                  name="objective.parentId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Parent Objective (Optional)</FormLabel>
-                      <Select 
-                        onValueChange={(value) => field.onChange(value === "none" ? undefined : value)} 
-                        value={field.value || "none"}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select parent objective" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="none">No Parent</SelectItem>
-                          {objectives?.filter(obj => !isEditMode || obj.id !== okr?.id).map((objective) => (
-                            <SelectItem key={objective.id} value={objective.id}>
-                              {objective.title}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="objective.ownerType"
@@ -427,6 +398,35 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                     )}
                   />
                 </div>
+
+                <FormField
+                  control={form.control}
+                  name="objective.parentId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Parent Objective (Optional)</FormLabel>
+                      <Select 
+                        onValueChange={(value) => field.onChange(value === "none" ? undefined : value)} 
+                        value={field.value || "none"}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select parent objective" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="none">No Parent</SelectItem>
+                          {objectives?.filter(obj => !isEditMode || obj.id !== okr?.id).map((objective) => (
+                            <SelectItem key={objective.id} value={objective.id}>
+                              {objective.title}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </CardContent>
             </Card>
 
