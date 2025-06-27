@@ -369,8 +369,16 @@ export default function KeyResultDetailPage() {
 
   // Helper function to get user name by ID
   const getUserName = (userId: string) => {
+    if (!userId || !users) return 'Unknown User';
     const user = users.find((u: any) => u.id === userId);
-    return user ? user.name : 'Unknown User';
+    return user?.name || 'Unknown User';
+  };
+
+  // Helper function to get user initials safely
+  const getUserInitials = (userId: string) => {
+    const userName = getUserName(userId);
+    if (!userName || userName === 'Unknown User') return 'U';
+    return userName.split(' ').map((n: string) => n[0]).join('').toUpperCase();
   };
 
   // Helper function to get tasks for a specific initiative
@@ -1357,7 +1365,7 @@ export default function KeyResultDetailPage() {
                     <div className="flex items-center gap-2 mt-1">
                       <Avatar className="h-6 w-6">
                         <AvatarFallback className="text-xs bg-blue-100 text-blue-600">
-                          {getUserName(selectedTask.assignedTo).split(' ').map(n => n[0]).join('')}
+                          {getUserInitials(selectedTask.assignedTo)}
                         </AvatarFallback>
                       </Avatar>
                       <span className="text-sm text-gray-900">{getUserName(selectedTask.assignedTo)}</span>
@@ -1471,7 +1479,7 @@ export default function KeyResultDetailPage() {
                       {showUserMentions && (
                         <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-md shadow-lg z-50 max-h-40 overflow-y-auto">
                           <div className="p-2 text-xs text-gray-500 border-b">Mention team members:</div>
-                          {usersQuery.data?.map((user: any) => (
+                          {users?.map((user: any) => (
                             <div
                               key={user.id}
                               className="p-2 hover:bg-gray-50 cursor-pointer flex items-center gap-2"
@@ -1484,7 +1492,7 @@ export default function KeyResultDetailPage() {
                             >
                               <Avatar className="h-6 w-6">
                                 <AvatarFallback className="text-xs bg-blue-100 text-blue-600">
-                                  {user.name.split(' ').map((n: string) => n[0]).join('')}
+                                  {user.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || 'U'}
                                 </AvatarFallback>
                               </Avatar>
                               <span className="text-sm text-gray-900">{user.name}</span>
