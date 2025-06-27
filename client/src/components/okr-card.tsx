@@ -9,7 +9,7 @@ import { Link } from "wouter";
 import { CheckInModal } from "./check-in-modal";
 import { SimpleProgressStatus } from "./progress-status";
 import { ObjectiveStatusBadge } from "./objective-status-badge";
-import { EditOKRButton } from "./edit-okr-modal";
+import { EditOKRButton } from "./okr-form-modal";
 
 interface OKRCardProps {
   okr: OKRWithKeyResults;

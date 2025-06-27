@@ -4,7 +4,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import StatsOverview from "@/components/stats-overview";
 import OKRCard from "@/components/okr-card";
-import CreateOKRModal from "@/components/create-okr-modal";
+import { CreateOKRButton } from "@/components/okr-form-modal";
 import EditProgressModal from "@/components/edit-progress-modal";
 import { KeyResultDetailModal } from "@/components/key-result-detail-modal";
 import { DeleteConfirmationModal } from "@/components/delete-confirmation-modal";
@@ -17,7 +17,7 @@ export default function Dashboard() {
   const { toast } = useToast();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [timeframeFilter, setTimeframeFilter] = useState<string>("all");
-  const [createModalOpen, setCreateModalOpen] = useState(false);
+
   const [editProgressModal, setEditProgressModal] = useState<{ open: boolean; keyResult?: KeyResult }>({
     open: false
   });
@@ -216,13 +216,7 @@ export default function Dashboard() {
               </Select>
             </div>
             
-            <Button 
-              onClick={() => setCreateModalOpen(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              New OKR
-            </Button>
+            <CreateOKRButton />
           </div>
         </div>
       </div>
@@ -276,11 +270,6 @@ export default function Dashboard() {
       </div>
 
       {/* Modals */}
-      <CreateOKRModal
-        open={createModalOpen}
-        onOpenChange={setCreateModalOpen}
-        onSuccess={refetch}
-      />
 
       <EditProgressModal
         open={editProgressModal.open}
