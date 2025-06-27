@@ -125,7 +125,7 @@ export default function GlobalHeader({ onMenuToggle }: GlobalHeaderProps) {
         {/* User Avatar Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="p-1 hover:bg-gray-100 rounded-full">
+            <Button variant="ghost" size="sm" className="p-1 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none rounded-full">
               <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                 <User className="h-4 w-4 text-blue-600" />
               </div>
