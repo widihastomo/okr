@@ -448,6 +448,11 @@ Changelog:
   * Integrated customizable color and stroke width options for visual consistency
   * Enhanced company OKR page with professional dashed lines and arrow markers
   * Improved visual hierarchy mapping between parent and child objectives
+- June 27, 2025. Removed OKR structure page from application:
+  * Deleted okr-structure.tsx page file and associated routing
+  * Removed navigation menu item from sidebar
+  * Cleaned up imports and references to the removed page
+  * Simplified navigation structure focusing on core OKR management features
 ```
 
 ## User Preferences

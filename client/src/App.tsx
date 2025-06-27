@@ -13,7 +13,6 @@ import CyclesPage from "@/components/cycles-page";
 import TemplatesPage from "@/components/templates-page";
 import UsersPage from "@/components/users-page";
 import CompanyOKRPage from "@/pages/company-okr";
-import OKRStructurePage from "@/pages/okr-structure";
 import KeyResultDetail from "@/pages/key-result-detail";
 import ObjectiveDetail from "@/pages/objective-detail";
 import ProjectDetail from "@/pages/project-detail";
@@ -79,7 +78,6 @@ function Router() {
             <Route path="/home" component={Home} />
             <Route path="/profile" component={Profile} />
             <Route path="/company-okr" component={CompanyOKRPage} />
-            <Route path="/okr-structure" component={OKRStructurePage} />
             <Route path="/key-results/:id" component={KeyResultDetail} />
             <Route path="/objectives/:id" component={ObjectiveDetail} />
             <Route path="/projects/:id" component={ProjectDetail} />

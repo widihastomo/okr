@@ -3,7 +3,6 @@ import { Link, useLocation } from "wouter";
 import { 
   LayoutDashboard, 
   Building2, 
-  GitBranch, 
   RotateCcw, 
   FileText, 
   Users, 
@@ -43,12 +42,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       path: "/company-okr",
       active: location === "/company-okr"
     },
-    {
-      label: "OKR Structure",
-      icon: GitBranch,
-      path: "/okr-structure",
-      active: location === "/okr-structure"
-    },
+
     {
       label: "Cycles",
       icon: RotateCcw,
