@@ -14,6 +14,12 @@ export function ObjectiveStatusBadge({ status, className }: ObjectiveStatusBadge
           color: 'bg-blue-500 text-white',
           icon: '🔵'
         };
+      case 'in_progress':
+        return {
+          label: 'In Progress',
+          color: 'bg-blue-600 text-white',
+          icon: '⏳'
+        };
       case 'on_track':
         return {
           label: 'On Track',

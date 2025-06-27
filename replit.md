@@ -236,6 +236,11 @@ Changelog:
   * Added required attribute to "Target" input field
   * Ensures essential fields are filled for proper progress calculation
   * Improves data quality and prevents invalid Key Results creation
+- June 27, 2025. Fixed objective status badge showing "Unknown" for in_progress status:
+  * Added missing "in_progress" case to ObjectiveStatusBadge component
+  * Configured proper label "In Progress" with blue badge styling and hourglass icon
+  * Resolved status display issue where objectives showed "Unknown" instead of proper status
+  * Enhanced status visibility and user experience in OKR cards
 ```
 
 ## User Preferences
