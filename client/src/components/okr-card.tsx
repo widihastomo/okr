@@ -134,7 +134,7 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
                     {okr.title}
                   </h3>
                 </Link>
-                <p className="text-sm text-gray-600">{okr.description}</p>
+                <p className="text-xs text-gray-600">{okr.description}</p>
               </div>
             </div>
             

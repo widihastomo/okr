@@ -255,7 +255,7 @@ Changelog:
 - June 27, 2025. Implemented collapsible objectives with optimized layout design:
   * Added expand/collapse functionality allowing users to show/hide Key Results sections
   * Positioned toggle button before objective title for clear visual hierarchy
-  * Aligned description text horizontally with objective title using smaller font size
+  * Aligned description text horizontally with objective title using smaller font size (text-xs)
   * Implemented state management with default expanded view for better usability
   * Enhanced navigation by allowing users to focus on specific objectives
   * Improved visual organization with clean chevron up/down icons and compact layout
