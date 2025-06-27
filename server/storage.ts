@@ -1,10 +1,11 @@
 import { 
   cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives, tasks,
+  initiativeMembers, initiativeDocuments,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
-  type CheckIn, type Initiative, type Task, type KeyResultWithDetails,
+  type CheckIn, type Initiative, type Task, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
   type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
   type InsertUser, type UpsertUser, type InsertTeam, type InsertTeamMember,
-  type InsertCheckIn, type InsertInitiative,
+  type InsertCheckIn, type InsertInitiative, type InsertInitiativeMember, type InsertInitiativeDocument, type InsertTask,
   type OKRWithKeyResults, type CycleWithOKRs, type UpdateKeyResultProgress, type CreateOKRFromTemplate 
 } from "@shared/schema";
 import { db } from "./db";
@@ -78,8 +79,22 @@ export interface IStorage {
   // Initiatives
   getInitiatives(): Promise<Initiative[]>;
   getInitiativesByKeyResultId(keyResultId: string): Promise<Initiative[]>;
+  getInitiativeWithDetails(id: string): Promise<any>;
   createInitiative(initiative: InsertInitiative): Promise<Initiative>;
   updateInitiative(id: string, initiative: Partial<InsertInitiative>): Promise<Initiative | undefined>;
+  
+  // Initiative Members
+  createInitiativeMember(member: InsertInitiativeMember): Promise<InitiativeMember>;
+  deleteInitiativeMember(id: string): Promise<boolean>;
+  
+  // Initiative Documents
+  createInitiativeDocument(document: InsertInitiativeDocument): Promise<InitiativeDocument>;
+  deleteInitiativeDocument(id: string): Promise<boolean>;
+  
+  // Tasks
+  createTask(task: InsertTask): Promise<Task>;
+  updateTask(id: string, task: Partial<InsertTask>): Promise<Task | undefined>;
+  deleteTask(id: string): Promise<boolean>;
   
   // Key Result with Details
   getKeyResultWithDetails(id: string): Promise<KeyResultWithDetails | undefined>;
@@ -731,6 +746,130 @@ export class DatabaseStorage implements IStorage {
         };
       })
     );
+  }
+  // Initiative with details (project management)
+  async getInitiativeWithDetails(id: string): Promise<any> {
+    const [initiative] = await db.select().from(initiatives).where(eq(initiatives.id, id));
+    if (!initiative) return undefined;
+
+    // Get PIC (Person in Charge)
+    let pic = null;
+    if (initiative.picId) {
+      const [picUser] = await db.select().from(users).where(eq(users.id, initiative.picId));
+      pic = picUser;
+    }
+
+    // Get members with user details
+    const members = await db
+      .select({
+        id: initiativeMembers.id,
+        role: initiativeMembers.role,
+        joinedAt: initiativeMembers.joinedAt,
+        user: {
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          email: users.email,
+        },
+      })
+      .from(initiativeMembers)
+      .leftJoin(users, eq(initiativeMembers.userId, users.id))
+      .where(eq(initiativeMembers.initiativeId, id));
+
+    // Get documents with uploader details
+    const documents = await db
+      .select({
+        id: initiativeDocuments.id,
+        title: initiativeDocuments.title,
+        description: initiativeDocuments.description,
+        fileUrl: initiativeDocuments.fileUrl,
+        fileName: initiativeDocuments.fileName,
+        fileSize: initiativeDocuments.fileSize,
+        fileType: initiativeDocuments.fileType,
+        category: initiativeDocuments.category,
+        uploadedAt: initiativeDocuments.uploadedAt,
+        uploadedBy: {
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          email: users.email,
+        },
+      })
+      .from(initiativeDocuments)
+      .leftJoin(users, eq(initiativeDocuments.uploadedBy, users.id))
+      .where(eq(initiativeDocuments.initiativeId, id));
+
+    // Get tasks with assigned user details
+    const tasksData = await db
+      .select({
+        id: tasks.id,
+        title: tasks.title,
+        description: tasks.description,
+        status: tasks.status,
+        priority: tasks.priority,
+        dueDate: tasks.dueDate,
+        completedAt: tasks.completedAt,
+        createdAt: tasks.createdAt,
+        assignedTo: {
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          email: users.email,
+        },
+      })
+      .from(tasks)
+      .leftJoin(users, eq(tasks.assignedTo, users.id))
+      .where(eq(tasks.initiativeId, id));
+
+    return {
+      ...initiative,
+      pic,
+      members,
+      documents,
+      tasks: tasksData,
+    };
+  }
+
+  // Initiative Members
+  async createInitiativeMember(memberData: InsertInitiativeMember): Promise<InitiativeMember> {
+    const [member] = await db.insert(initiativeMembers).values(memberData).returning();
+    return member;
+  }
+
+  async deleteInitiativeMember(id: string): Promise<boolean> {
+    const result = await db.delete(initiativeMembers).where(eq(initiativeMembers.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Initiative Documents
+  async createInitiativeDocument(documentData: InsertInitiativeDocument): Promise<InitiativeDocument> {
+    const [document] = await db.insert(initiativeDocuments).values(documentData).returning();
+    return document;
+  }
+
+  async deleteInitiativeDocument(id: string): Promise<boolean> {
+    const result = await db.delete(initiativeDocuments).where(eq(initiativeDocuments.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Tasks
+  async createTask(taskData: InsertTask): Promise<Task> {
+    const [task] = await db.insert(tasks).values(taskData).returning();
+    return task;
+  }
+
+  async updateTask(id: string, taskData: Partial<InsertTask>): Promise<Task | undefined> {
+    const [task] = await db
+      .update(tasks)
+      .set(taskData)
+      .where(eq(tasks.id, id))
+      .returning();
+    return task;
+  }
+
+  async deleteTask(id: string): Promise<boolean> {
+    const result = await db.delete(tasks).where(eq(tasks.id, id));
+    return result.rowCount > 0;
   }
 }
 

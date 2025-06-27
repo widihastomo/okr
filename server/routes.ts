@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { 
   insertCycleSchema, insertTemplateSchema, insertObjectiveSchema, insertKeyResultSchema, 
-  insertCheckInSchema, insertInitiativeSchema,
+  insertCheckInSchema, insertInitiativeSchema, insertInitiativeMemberSchema, insertInitiativeDocumentSchema, insertTaskSchema,
   updateKeyResultProgressSchema, createOKRFromTemplateSchema 
 } from "@shared/schema";
 import { z } from "zod";
@@ -1014,7 +1014,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Initiative routes
+  // Initiative/Project routes
   app.post("/api/initiatives", async (req, res) => {
     try {
       const result = insertInitiativeSchema.safeParse(req.body);
@@ -1027,6 +1027,150 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error creating initiative:", error);
       res.status(500).json({ message: "Failed to create initiative" });
+    }
+  });
+
+  app.get("/api/initiatives/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const initiative = await storage.getInitiativeWithDetails(id);
+      
+      if (!initiative) {
+        return res.status(404).json({ message: "Initiative not found" });
+      }
+      
+      res.json(initiative);
+    } catch (error) {
+      console.error("Error fetching initiative:", error);
+      res.status(500).json({ message: "Failed to fetch initiative" });
+    }
+  });
+
+  app.patch("/api/initiatives/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const updatedInitiative = await storage.updateInitiative(id, req.body);
+      
+      if (!updatedInitiative) {
+        return res.status(404).json({ message: "Initiative not found" });
+      }
+      
+      res.json(updatedInitiative);
+    } catch (error) {
+      console.error("Error updating initiative:", error);
+      res.status(500).json({ message: "Failed to update initiative" });
+    }
+  });
+
+  // Initiative member routes
+  app.post("/api/initiative-members", async (req, res) => {
+    try {
+      const result = insertInitiativeMemberSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid member data", errors: result.error.errors });
+      }
+
+      const member = await storage.createInitiativeMember(result.data);
+      res.status(201).json(member);
+    } catch (error) {
+      console.error("Error adding initiative member:", error);
+      res.status(500).json({ message: "Failed to add member" });
+    }
+  });
+
+  app.delete("/api/initiative-members/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const deleted = await storage.deleteInitiativeMember(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Member not found" });
+      }
+      
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error removing initiative member:", error);
+      res.status(500).json({ message: "Failed to remove member" });
+    }
+  });
+
+  // Initiative document routes
+  app.post("/api/initiative-documents", async (req, res) => {
+    try {
+      const result = insertInitiativeDocumentSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid document data", errors: result.error.errors });
+      }
+
+      const document = await storage.createInitiativeDocument(result.data);
+      res.status(201).json(document);
+    } catch (error) {
+      console.error("Error adding initiative document:", error);
+      res.status(500).json({ message: "Failed to add document" });
+    }
+  });
+
+  app.delete("/api/initiative-documents/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const deleted = await storage.deleteInitiativeDocument(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+      
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error removing initiative document:", error);
+      res.status(500).json({ message: "Failed to remove document" });
+    }
+  });
+
+  // Task routes
+  app.post("/api/tasks", async (req, res) => {
+    try {
+      const result = insertTaskSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid task data", errors: result.error.errors });
+      }
+
+      const task = await storage.createTask(result.data);
+      res.status(201).json(task);
+    } catch (error) {
+      console.error("Error creating task:", error);
+      res.status(500).json({ message: "Failed to create task" });
+    }
+  });
+
+  app.patch("/api/tasks/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const updatedTask = await storage.updateTask(id, req.body);
+      
+      if (!updatedTask) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      
+      res.json(updatedTask);
+    } catch (error) {
+      console.error("Error updating task:", error);
+      res.status(500).json({ message: "Failed to update task" });
+    }
+  });
+
+  app.delete("/api/tasks/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const deleted = await storage.deleteTask(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting task:", error);
+      res.status(500).json({ message: "Failed to delete task" });
     }
   });
 

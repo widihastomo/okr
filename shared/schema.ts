@@ -113,11 +113,42 @@ export const initiatives = pgTable("initiatives", {
   keyResultId: uuid("key_result_id").references(() => keyResults.id).notNull(),
   title: text("title").notNull(),
   description: text("description"),
-  status: text("status").notNull().default("not_started"), // "not_started", "in_progress", "completed", "on_hold"
-  priority: text("priority").notNull().default("medium"), // "low", "medium", "high"
+  objective: text("objective"), // Project objective/goal
+  status: text("status").notNull().default("not_started"), // "not_started", "in_progress", "completed", "on_hold", "cancelled"
+  priority: text("priority").notNull().default("medium"), // "low", "medium", "high", "critical"
+  picId: uuid("pic_id").references(() => users.id), // Person in Charge
+  startDate: timestamp("start_date"),
   dueDate: timestamp("due_date"),
+  completedAt: timestamp("completed_at"),
+  budget: decimal("budget", { precision: 15, scale: 2 }), // Project budget
+  progressPercentage: integer("progress_percentage").default(0), // 0-100%
   createdAt: timestamp("created_at").defaultNow(),
   createdBy: uuid("created_by").notNull(), // user ID
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Project team members
+export const initiativeMembers = pgTable("initiative_members", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  initiativeId: uuid("initiative_id").references(() => initiatives.id).notNull(),
+  userId: uuid("user_id").references(() => users.id).notNull(),
+  role: text("role").notNull().default("member"), // "member", "lead", "reviewer"
+  joinedAt: timestamp("joined_at").defaultNow(),
+});
+
+// Project documents
+export const initiativeDocuments = pgTable("initiative_documents", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  initiativeId: uuid("initiative_id").references(() => initiatives.id).notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  fileUrl: text("file_url"), // URL to document file
+  fileName: text("file_name"),
+  fileSize: integer("file_size"), // in bytes
+  fileType: text("file_type"), // "pdf", "doc", "xls", "ppt", etc.
+  category: text("category").notNull().default("general"), // "requirement", "design", "technical", "report", "general"
+  uploadedBy: uuid("uploaded_by").references(() => users.id).notNull(),
+  uploadedAt: timestamp("uploaded_at").defaultNow(),
 });
 
 // Tasks linked to initiatives
@@ -159,6 +190,17 @@ export const insertCheckInSchema = createInsertSchema(checkIns).omit({
 export const insertInitiativeSchema = createInsertSchema(initiatives).omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
+});
+
+export const insertInitiativeMemberSchema = createInsertSchema(initiativeMembers).omit({
+  id: true,
+  joinedAt: true,
+});
+
+export const insertInitiativeDocumentSchema = createInsertSchema(initiativeDocuments).omit({
+  id: true,
+  uploadedAt: true,
 });
 
 export const insertTaskSchema = createInsertSchema(tasks).omit({
@@ -184,9 +226,25 @@ export type InsertObjective = z.infer<typeof insertObjectiveSchema>;
 export type InsertKeyResult = z.infer<typeof insertKeyResultSchema>;
 export type InsertCheckIn = z.infer<typeof insertCheckInSchema>;
 export type InsertInitiative = z.infer<typeof insertInitiativeSchema>;
+export type InsertInitiativeMember = z.infer<typeof insertInitiativeMemberSchema>;
+export type InsertInitiativeDocument = z.infer<typeof insertInitiativeDocumentSchema>;
 export type InsertTask = z.infer<typeof insertTaskSchema>;
 export type UpdateKeyResultProgress = z.infer<typeof updateKeyResultProgressSchema>;
 export type CreateOKRFromTemplate = z.infer<typeof createOKRFromTemplateSchema>;
+
+// Select types
+export type Cycle = typeof cycles.$inferSelect;
+export type Template = typeof templates.$inferSelect;
+export type Objective = typeof objectives.$inferSelect;
+export type KeyResult = typeof keyResults.$inferSelect;
+export type CheckIn = typeof checkIns.$inferSelect;
+export type Initiative = typeof initiatives.$inferSelect;
+export type InitiativeMember = typeof initiativeMembers.$inferSelect;
+export type InitiativeDocument = typeof initiativeDocuments.$inferSelect;
+export type Task = typeof tasks.$inferSelect;
+export type User = typeof users.$inferSelect;
+export type Team = typeof teams.$inferSelect;
+export type TeamMember = typeof teamMembers.$inferSelect;
 
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({

@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useParams, useLocation } from "wouter";
+import { useParams, useLocation, Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -259,7 +259,11 @@ export default function KeyResultDetailPage() {
                       <TableRow key={initiative.id}>
                         <TableCell>
                           <div>
-                            <div className="font-medium">{initiative.title}</div>
+                            <Link href={`/projects/${initiative.id}`}>
+                              <div className="font-medium text-blue-600 hover:text-blue-800 cursor-pointer hover:underline">
+                                {initiative.title}
+                              </div>
+                            </Link>
                             {initiative.description && (
                               <div className="text-sm text-gray-600 mt-1">
                                 {initiative.description}
