@@ -800,12 +800,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const keyResultId = req.params.id;
       const currentUser = (req as any).user;
-      const { members, ...initiativeData } = req.body;
+      const { members, tasks, ...initiativeData } = req.body;
       
       const validatedData = insertInitiativeSchema.parse({
         ...initiativeData,
         keyResultId,
         createdBy: currentUser.id,
+        budget: initiativeData.budget ? initiativeData.budget.toString() : null,
         startDate: req.body.startDate ? new Date(req.body.startDate).toISOString() : null,
         dueDate: req.body.dueDate ? new Date(req.body.dueDate).toISOString() : null,
       });
@@ -820,6 +821,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
             userId,
             role: "member",
           });
+        }
+      }
+      
+      // Create tasks for the initiative if provided
+      if (tasks && Array.isArray(tasks) && tasks.length > 0) {
+        for (const taskData of tasks) {
+          const validatedTaskData = insertTaskSchema.parse({
+            ...taskData,
+            initiativeId: initiative.id,
+            createdBy: currentUser.id,
+            assignedTo: taskData.assignedTo === "none" || !taskData.assignedTo ? null : taskData.assignedTo,
+            dueDate: taskData.dueDate ? new Date(taskData.dueDate).toISOString() : null,
+          });
+          await storage.createTask(validatedTaskData);
         }
       }
       

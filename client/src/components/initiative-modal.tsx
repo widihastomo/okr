@@ -106,15 +106,26 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
 
   const createInitiativeMutation = useMutation({
     mutationFn: async (data: InitiativeFormData & { tasks: TaskFormData[] }) => {
-      const response = await apiRequest("/api/initiatives", {
+      const { tasks, ...initiativeData } = data;
+      const response = await fetch(`/api/key-results/${keyResultId}/initiatives`, {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          ...data,
-          keyResultId,
-          createdBy: "current-user", // This would come from auth context
+          ...initiativeData,
+          tasks: tasks,
+          startDate: initiativeData.startDate || null,
+          dueDate: initiativeData.dueDate || null,
         }),
       });
-      return response;
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Error: ${response.status}`);
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       toast({
