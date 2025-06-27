@@ -885,15 +885,6 @@ export default function KeyResultDetailPage() {
                   </CardDescription>
                 </div>
                 <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleUpdateProgress}
-                    className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                  >
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                    Update Progress
-                  </Button>
                   <InitiativeModal keyResultId={keyResult.id} onSuccess={handleInitiativeSuccess} />
                 </div>
               </div>
