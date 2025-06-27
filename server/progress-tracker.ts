@@ -1,10 +1,31 @@
 import type { KeyResult } from '@shared/schema';
 
 export interface ProgressStatus {
-  status: 'on_track' | 'at_risk' | 'behind' | 'completed';
+  status: 'on_track' | 'at_risk' | 'behind' | 'completed' | 'ahead';
   progressPercentage: number;
   timeProgressPercentage: number;
   recommendation: string;
+}
+
+function calculate_progress_status(progress: number, time_passed: number, total_time: number) {
+  const ideal_progress = (time_passed / total_time) * 100;
+  const gap = progress - ideal_progress;
+  
+  let status: string;
+  
+  if (progress >= 100) {
+    status = "Completed";
+  } else if (gap >= 0) {
+    status = "Ahead";
+  } else if (-0 <= gap && gap < 0) {
+    status = "On Track";
+  } else if (-20 <= gap && gap < -0) {
+    status = "At Risk";
+  } else {
+    status = "Behind";
+  }
+  
+  return { idealProgress: ideal_progress, gap: gap, status: status };
 }
 
 export function calculateProgressStatus(
@@ -35,28 +56,43 @@ export function calculateProgressStatus(
       break;
   }
   
-  // Calculate time progress percentage
+  // Calculate time progress using the provided formula
   const now = new Date();
   const totalTime = endDate.getTime() - startDate.getTime();
   const elapsedTime = now.getTime() - startDate.getTime();
-  const timeProgressPercentage = Math.max(0, Math.min(100, (elapsedTime / totalTime) * 100));
   
-  // Determine status based on ideal progress comparison
+  // Use the exact formula from the image
+  const statusResult = calculate_progress_status(progressPercentage, elapsedTime, totalTime);
+  const timeProgressPercentage = Math.round(statusResult.idealProgress);
+  
+  // Map status to our system values and set recommendations
   let status: ProgressStatus['status'];
   let recommendation: string;
   
-  if (progressPercentage >= 100) {
-    status = 'completed';
-    recommendation = 'Target tercapai 100%! Luar biasa!';
-  } else if (progressPercentage >= timeProgressPercentage) {
-    status = 'on_track';
-    recommendation = 'Progress sesuai atau lebih baik dari capaian ideal hari ini.';
-  } else if (progressPercentage >= timeProgressPercentage * 0.8) {
-    status = 'at_risk';
-    recommendation = 'Progress kurang dari 80% capaian ideal, perlu percepatan.';
-  } else {
-    status = 'behind';
-    recommendation = 'Progress jauh tertinggal dari capaian ideal, butuh tindakan segera.';
+  switch (statusResult.status) {
+    case "Completed":
+      status = 'completed';
+      recommendation = 'Target tercapai 100%! Luar biasa!';
+      break;
+    case "Ahead":
+      status = 'ahead';
+      recommendation = `Progress lebih cepat ${Math.round(statusResult.gap)}% dari jadwal ideal!`;
+      break;
+    case "On Track":
+      status = 'on_track';
+      recommendation = 'Progress sesuai dengan capaian ideal hari ini.';
+      break;
+    case "At Risk":
+      status = 'at_risk';
+      recommendation = `Progress tertinggal ${Math.round(Math.abs(statusResult.gap))}% dari ideal, perlu percepatan.`;
+      break;
+    case "Behind":
+      status = 'behind';
+      recommendation = `Progress tertinggal ${Math.round(Math.abs(statusResult.gap))}% dari ideal, butuh tindakan segera.`;
+      break;
+    default:
+      status = 'on_track';
+      recommendation = 'Progress dalam tahap normal.';
   }
   
   return {

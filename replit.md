@@ -148,6 +148,13 @@ Changelog:
   * Added visual legend explaining current progress vs ideal target relationship
   * Fixed threshold calculation to use live timeline data rather than stored values
   * Progress bars now accurately show where teams should be based on time elapsed
+- June 27, 2025. Implemented precise gap-based status calculation formula:
+  * Updated progress tracking to use exact formula: ideal_progress = (time_passed / total_time) * 100
+  * Implemented gap calculation: gap = progress - ideal_progress for accurate status determination
+  * Enhanced status logic: Completed (≥100%), Ahead (gap ≥0%), On Track (gap = 0%), At Risk (-20% ≤ gap < 0%), Behind (gap < -20%)
+  * Added "ahead" status support with blue visual indicators for teams exceeding timeline expectations
+  * Integrated precise gap percentages in recommendations for actionable insights
+  * Validated formula accuracy through comprehensive testing scenarios
 ```
 
 ## User Preferences
