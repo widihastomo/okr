@@ -485,8 +485,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Create OKR request received:", JSON.stringify(req.body, null, 2));
       
       const createOKRSchema = z.object({
-        objective: insertObjectiveSchema,
-        keyResults: z.array(insertKeyResultSchema.omit({ objectiveId: true }))
+        objective: insertObjectiveSchema.extend({
+          ownerId: z.union([z.number(), z.string().transform(val => parseInt(val))]),
+          teamId: z.union([z.number(), z.string().transform(val => parseInt(val)), z.undefined()]).optional(),
+          parentId: z.union([z.number(), z.string().transform(val => parseInt(val)), z.undefined()]).optional(),
+        }),
+        keyResults: z.array(insertKeyResultSchema.omit({ objectiveId: true }).extend({
+          assignedTo: z.union([z.number(), z.string().transform(val => parseInt(val)), z.undefined()]).optional(),
+        }))
       });
       
       const validatedData = createOKRSchema.parse(req.body);
