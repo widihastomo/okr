@@ -1479,7 +1479,7 @@ export default function KeyResultDetailPage() {
                       {showUserMentions && (
                         <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-md shadow-lg z-50 max-h-40 overflow-y-auto">
                           <div className="p-2 text-xs text-gray-500 border-b">Mention team members:</div>
-                          {users?.map((user: any) => (
+                          {users?.filter((user: any) => user.name).map((user: any) => (
                             <div
                               key={user.id}
                               className="p-2 hover:bg-gray-50 cursor-pointer flex items-center gap-2"
@@ -1492,7 +1492,7 @@ export default function KeyResultDetailPage() {
                             >
                               <Avatar className="h-6 w-6">
                                 <AvatarFallback className="text-xs bg-blue-100 text-blue-600">
-                                  {user.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || 'U'}
+                                  {user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
                                 </AvatarFallback>
                               </Avatar>
                               <span className="text-sm text-gray-900">{user.name}</span>
