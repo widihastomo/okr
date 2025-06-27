@@ -111,8 +111,77 @@ async function populateDatabase() {
       parentId: null
     };
 
-    await db.insert(objectives).values(sampleObjective).onConflictDoNothing();
-    console.log("✓ Created sample objective");
+    // Create multiple objectives with parent-child hierarchy
+    const objectives_data = [
+      // Parent objective (Company Level)
+      {
+        id: "7535cd7c-b351-4061-8a02-ef083b1e8c62",
+        title: "Improve System Performance",
+        description: "Enhance overall system performance and reliability",
+        cycleId: "6535cd7c-b351-4061-8a02-ef083b1e8c61",
+        owner: "Admin User",
+        ownerType: "user",
+        ownerId: "550e8400-e29b-41d4-a716-446655440001",
+        status: "in_progress",
+        teamId: "6535cd7c-b351-4061-8a02-ef083b1e8c60",
+        parentId: null
+      },
+      // Child objective (Department Level)
+      {
+        id: "7535cd7c-b351-4061-8a02-ef083b1e8c72",
+        title: "Optimize Backend Performance",
+        description: "Focus on backend API and database optimization",
+        cycleId: "6535cd7c-b351-4061-8a02-ef083b1e8c61",
+        owner: "Admin User",
+        ownerType: "user", 
+        ownerId: "550e8400-e29b-41d4-a716-446655440001",
+        status: "in_progress",
+        teamId: "6535cd7c-b351-4061-8a02-ef083b1e8c60",
+        parentId: "7535cd7c-b351-4061-8a02-ef083b1e8c62"
+      },
+      // Child objective (Department Level)
+      {
+        id: "7535cd7c-b351-4061-8a02-ef083b1e8c73",
+        title: "Improve Frontend Performance",
+        description: "Optimize frontend loading times and user experience",
+        cycleId: "6535cd7c-b351-4061-8a02-ef083b1e8c61",
+        owner: "Jane Smith",
+        ownerType: "user",
+        ownerId: "550e8400-e29b-41d4-a716-446655440002",
+        status: "on_track",
+        teamId: "6535cd7c-b351-4061-8a02-ef083b1e8c60",
+        parentId: "7535cd7c-b351-4061-8a02-ef083b1e8c62"
+      },
+      // Another top-level objective
+      {
+        id: "7535cd7c-b351-4061-8a02-ef083b1e8c74",
+        title: "Increase Customer Satisfaction",
+        description: "Improve overall customer experience and satisfaction scores",
+        cycleId: "6535cd7c-b351-4061-8a02-ef083b1e8c61",
+        owner: "Admin User",
+        ownerType: "user",
+        ownerId: "550e8400-e29b-41d4-a716-446655440001",
+        status: "not_started",
+        teamId: "6535cd7c-b351-4061-8a02-ef083b1e8c60",
+        parentId: null
+      },
+      // Child of customer satisfaction
+      {
+        id: "7535cd7c-b351-4061-8a02-ef083b1e8c75",
+        title: "Reduce Support Response Time",
+        description: "Decrease average customer support response time",
+        cycleId: "6535cd7c-b351-4061-8a02-ef083b1e8c61",
+        owner: "Jane Smith", 
+        ownerType: "user",
+        ownerId: "550e8400-e29b-41d4-a716-446655440002",
+        status: "in_progress",
+        teamId: "6535cd7c-b351-4061-8a02-ef083b1e8c60",
+        parentId: "7535cd7c-b351-4061-8a02-ef083b1e8c74"
+      }
+    ];
+
+    await db.insert(objectives).values(objectives_data).onConflictDoNothing();
+    console.log("✓ Created sample objectives with hierarchy");
 
     // Create sample key result
     const sampleKeyResult: InsertKeyResult = {
