@@ -547,7 +547,7 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
               <Button 
                 type="submit" 
                 disabled={createOKRMutation.isPending}
-                className="bg-primary hover:bg-blue-700"
+                className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
               >
                 {createOKRMutation.isPending ? "Creating..." : "Create OKR"}
               </Button>

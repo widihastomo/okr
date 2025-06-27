@@ -193,7 +193,7 @@ export default function CompanyOKRs({ onRefresh }: CompanyOKRsProps) {
           <h2 className="text-2xl font-bold text-gray-900">Company OKRs</h2>
           <p className="text-gray-600">Hierarchical view of company, team, and individual objectives</p>
         </div>
-        <Button onClick={() => setCreateModal(true)}>
+        <Button onClick={() => setCreateModal(true)} className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
           <Plus className="w-4 h-4 mr-2" />
           Create OKR
         </Button>

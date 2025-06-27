@@ -9,7 +9,7 @@ export default function Landing() {
       <div className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
               <Target className="w-6 h-6 text-white" />
             </div>
             <span className="text-2xl font-bold text-gray-900">OKR Manager</span>
@@ -17,7 +17,7 @@ export default function Landing() {
           <Button 
             onClick={() => window.location.href = '/api/login'}
             size="lg"
-            className="bg-primary hover:bg-primary/90"
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
           >
             Masuk
           </Button>
@@ -28,7 +28,7 @@ export default function Landing() {
       <div className="container mx-auto px-4 py-16 text-center">
         <h1 className="text-5xl font-bold text-gray-900 mb-6">
           Kelola Tujuan Tim dengan
-          <span className="text-primary block">Metodologi OKR</span>
+          <span className="text-blue-600 block">Metodologi OKR</span>
         </h1>
         <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
           Platform manajemen tujuan komprehensif yang menggunakan metodologi Objectives and Key Results (OKR) 
@@ -37,7 +37,7 @@ export default function Landing() {
         <Button 
           onClick={() => window.location.href = '/api/login'}
           size="lg"
-          className="bg-primary hover:bg-primary/90 text-lg px-8 py-3"
+          className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-lg px-8 py-3"
         >
           Mulai Sekarang
         </Button>
@@ -162,7 +162,7 @@ export default function Landing() {
                 </li>
               </ul>
             </div>
-            <div className="bg-gradient-to-br from-primary/10 to-primary/20 p-8 rounded-2xl">
+            <div className="bg-gradient-to-br from-blue-600/10 to-blue-600/20 p-8 rounded-2xl">
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Siap Mulai?</h3>
               <p className="text-gray-600 mb-6">
                 Bergabunglah dengan ribuan tim yang telah merasakan manfaat metodologi OKR 
@@ -171,7 +171,7 @@ export default function Landing() {
               <Button 
                 onClick={() => window.location.href = '/api/login'}
                 size="lg"
-                className="w-full bg-primary hover:bg-primary/90"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
               >
                 Mulai Gratis Sekarang
               </Button>
@@ -184,7 +184,7 @@ export default function Landing() {
       <div className="bg-gray-900 text-white py-8">
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center space-x-3 mb-4">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <Target className="w-4 h-4 text-white" />
             </div>
             <span className="text-xl font-bold">OKR Manager</span>

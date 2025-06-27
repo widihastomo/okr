@@ -80,7 +80,7 @@ export default function Dashboard() {
 
             <Button 
               onClick={() => setCreateModalOpen(true)}
-              className="bg-primary hover:bg-blue-700 text-white"
+              className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
             >
               <Plus className="w-4 h-4 mr-2" />
               New OKR
@@ -111,7 +111,7 @@ export default function Dashboard() {
                 : "Get started by creating your first objective and key results."
               }
             </p>
-            <Button onClick={() => setCreateModalOpen(true)} className="bg-primary hover:bg-blue-700">
+            <Button onClick={() => setCreateModalOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
               <Plus className="w-4 h-4 mr-2" />
               Create First OKR
             </Button>
