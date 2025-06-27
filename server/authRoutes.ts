@@ -7,6 +7,17 @@ export function setupEmailAuth(app: Express) {
   // Setup session middleware
   app.use(getSession());
 
+  // Health check endpoint for debugging auth issues
+  app.get('/api/debug/auth-status', (req, res) => {
+    res.json({
+      hasSession: !!req.session,
+      sessionId: req.session?.id,
+      userId: req.session?.userId,
+      nodeEnv: process.env.NODE_ENV,
+      timestamp: new Date().toISOString()
+    });
+  });
+
   // Register endpoint
   app.post('/api/auth/register', async (req, res) => {
     try {
@@ -30,8 +41,13 @@ export function setupEmailAuth(app: Express) {
   // Login endpoint
   app.post('/api/auth/login', async (req, res) => {
     try {
+      console.log('Login attempt received:', { email: req.body?.email });
+      
       const validatedData = loginSchema.parse(req.body);
+      console.log('Data validated successfully');
+      
       const user = await authenticateUser(validatedData);
+      console.log('Authentication result:', user ? 'Success' : 'Failed');
       
       if (!user) {
         return res.status(401).json({ message: "Email atau password salah" });
@@ -39,15 +55,17 @@ export function setupEmailAuth(app: Express) {
       
       // Create session
       req.session.userId = user.id;
+      console.log('Session created for user:', user.id);
       
       // Don't send password in response
       const { password, ...userWithoutPassword } = user;
       res.json(userWithoutPassword);
     } catch (error: any) {
+      console.error('Login error:', error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: error.errors[0].message });
       }
-      res.status(400).json({ message: "Gagal login" });
+      res.status(500).json({ message: "Gagal login: " + (error.message || "Server error") });
     }
   });
 

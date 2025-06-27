@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import session from "express-session";
 import type { Express, RequestHandler } from "express";
 import MemoryStore from "memorystore";
-import { storage } from "./storage_clean";
+import { storage } from "./storage";
 import type { User, LoginData, RegisterData } from "@shared/schema";
 
 const MemoryStoreSession = MemoryStore(session);
@@ -10,17 +10,22 @@ const MemoryStoreSession = MemoryStore(session);
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
   
+  // Use memory store for both development and production to avoid session issues
+  const store = new MemoryStoreSession({
+    checkPeriod: 86400000, // prune expired entries every 24h
+    ttl: sessionTtl,
+  });
+  
   return session({
-    secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",
-    store: new MemoryStoreSession({
-      checkPeriod: 86400000, // prune expired entries every 24h
-    }),
+    secret: process.env.SESSION_SECRET || "okr-management-secret-2025",
+    store,
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false, // Set to false to fix deployment issues
       maxAge: sessionTtl,
+      sameSite: "lax",
     },
   });
 }
@@ -56,17 +61,27 @@ export async function registerUser(userData: RegisterData): Promise<User> {
 }
 
 export async function authenticateUser(loginData: LoginData): Promise<User | null> {
-  const user = await storage.getUserByEmail(loginData.email);
-  if (!user) {
-    return null;
-  }
+  try {
+    console.log('Attempting authentication for:', loginData.email);
+    const user = await storage.getUserByEmail(loginData.email);
+    console.log('User lookup result:', user ? 'Found' : 'Not found');
+    
+    if (!user) {
+      return null;
+    }
 
-  const isValidPassword = await verifyPassword(loginData.password, user.password);
-  if (!isValidPassword) {
-    return null;
-  }
+    const isValidPassword = await verifyPassword(loginData.password, user.password);
+    console.log('Password verification:', isValidPassword ? 'Valid' : 'Invalid');
+    
+    if (!isValidPassword) {
+      return null;
+    }
 
-  return user;
+    return user;
+  } catch (error) {
+    console.error("Authentication error:", error);
+    throw new Error("Database connection failed during authentication");
+  }
 }
 
 export const requireAuth: RequestHandler = async (req, res, next) => {

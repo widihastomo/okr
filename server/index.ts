@@ -64,7 +64,24 @@ app.use((req, res, next) => {
   if (isDevelopment) {
     await setupVite(app, server);
   } else {
-    serveStatic(app);
+    // Custom static file serving for production to avoid API route conflicts
+    const path = await import("path");
+    const fs = await import("fs");
+    const distPath = path.resolve(import.meta.dirname, "public");
+    
+    if (fs.existsSync(distPath)) {
+      app.use(express.static(distPath));
+      
+      // Only serve index.html for non-API routes
+      app.use((req, res, next) => {
+        if (req.path.startsWith('/api/')) {
+          return next();
+        }
+        res.sendFile(path.resolve(distPath, "index.html"));
+      });
+    } else {
+      console.warn("Public directory not found, serving API only");
+    }
   }
 
   // ALWAYS serve the app on port 5000

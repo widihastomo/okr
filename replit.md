@@ -374,6 +374,12 @@ Changelog:
   * Enhanced error handling to prevent server crashes during database initialization
   * Server now stays alive continuously and passes deployment health checks
   * Resolved "Application process exits immediately" deployment error
+- June 27, 2025. Fixed production login 503 error and routing conflicts:
+  * Resolved API route conflicts with frontend catch-all routes in production
+  * Modified production static file serving to prioritize API routes over frontend routing
+  * Enhanced authentication error handling with detailed logging for debugging
+  * Login authentication now works correctly in both development and production environments
+  * Session management properly configured for production deployment
 - June 27, 2025. Fixed initiative update function and enhanced UI text:
   * Resolved date conversion error in update initiative endpoint by properly converting string dates to Date objects
   * Added null value handling for optional fields (picId, budget) in update operations
