@@ -191,8 +191,8 @@ export function SimpleProgressStatus({
   if (now > cycleEnd) {
     idealProgress = 100;
   }
-  // If current date is before cycle start, show 0%
-  else if (now < cycleStart) {
+  // If timeProgressPercentage is negative (before cycle start), show 0%
+  else if (timeProgressPercentage < 0) {
     idealProgress = 0;
   }
   // Otherwise use the server-calculated timeProgressPercentage
@@ -245,8 +245,10 @@ export function SimpleProgressStatus({
           <div className="w-0.5 h-3 bg-gray-400 opacity-70"></div>
           <span>
             {now > cycleEnd 
-              ? `Target capaian (${idealProgress}%)` 
-              : `Target ideal (${idealProgress}%)`
+              ? `Target capaian (100%)` 
+              : timeProgressPercentage < 0 
+                ? `Target ideal (0% - belum dimulai)`
+                : `Target ideal (${idealProgress}%)`
             }
           </span>
         </div>

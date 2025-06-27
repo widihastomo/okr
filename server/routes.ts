@@ -9,6 +9,7 @@ import {
 import { z } from "zod";
 import { setupEmailAuth } from "./authRoutes";
 import { requireAuth } from "./emailAuth";
+import { calculateProgressStatus } from "./progress-tracker";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
