@@ -1280,6 +1280,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create task for specific initiative
+  app.post("/api/initiatives/:initiativeId/tasks", async (req, res) => {
+    try {
+      const initiativeId = req.params.initiativeId;
+      const currentUser = (req as any).user;
+      
+      const taskData = {
+        ...req.body,
+        initiativeId,
+        createdBy: currentUser.id,
+        assignedTo: req.body.assignedTo === "unassigned" || !req.body.assignedTo ? null : req.body.assignedTo,
+        dueDate: req.body.dueDate ? new Date(req.body.dueDate) : null,
+      };
+
+      const result = insertTaskSchema.safeParse(taskData);
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid task data", errors: result.error.errors });
+      }
+
+      const task = await storage.createTask(result.data);
+      
+      // Update initiative progress after creating task
+      await storage.updateInitiativeProgress(initiativeId);
+      
+      res.status(201).json(task);
+    } catch (error) {
+      console.error("Error creating task:", error);
+      res.status(500).json({ message: "Failed to create task" });
+    }
+  });
+
   app.put("/api/tasks/:id", async (req, res) => {
     try {
       const id = req.params.id;
