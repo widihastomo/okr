@@ -313,3 +313,4 @@ Changelog:
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Storage changes: Never change storage system (memory/database) without explicit user confirmation.
