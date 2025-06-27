@@ -9,6 +9,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and } from "drizzle-orm";
+import { calculateProgressStatus } from "./progress-tracker";
 
 export interface IStorage {
   // Cycles
@@ -85,6 +86,62 @@ export interface IStorage {
   getOKRsWithKeyResults(): Promise<OKRWithKeyResults[]>;
   getOKRWithKeyResults(id: string): Promise<OKRWithKeyResults | undefined>;
   getOKRsWithFullHierarchy(cycleId?: string): Promise<any[]>;
+}
+
+// Helper function to calculate and update status automatically
+async function updateKeyResultWithAutoStatus(keyResult: KeyResult, cycleId: string): Promise<KeyResult> {
+  // Get cycle to determine dates
+  const [cycle] = await db.select().from(cycles).where(eq(cycles.id, cycleId));
+  
+  if (cycle && keyResult.dueDate) {
+    const startDate = new Date(cycle.startDate);
+    const endDate = keyResult.dueDate;
+    
+    const progressStatus = calculateProgressStatus(keyResult, startDate, endDate);
+    
+    // Update the key result with the calculated status
+    const [updatedKeyResult] = await db
+      .update(keyResults)
+      .set({ 
+        status: progressStatus.status,
+        lastUpdated: new Date()
+      })
+      .where(eq(keyResults.id, keyResult.id))
+      .returning();
+      
+    return updatedKeyResult || keyResult;
+  }
+  
+  return keyResult;
+}
+
+// Helper function to calculate objective status based on key results
+async function updateObjectiveWithAutoStatus(objectiveId: string): Promise<void> {
+  const keyResultsList = await db.select().from(keyResults).where(eq(keyResults.objectiveId, objectiveId));
+  
+  if (keyResultsList.length === 0) return;
+  
+  // Calculate overall status based on key results
+  const completedCount = keyResultsList.filter(kr => kr.status === 'completed').length;
+  const behindCount = keyResultsList.filter(kr => kr.status === 'behind').length;
+  const atRiskCount = keyResultsList.filter(kr => kr.status === 'at_risk').length;
+  
+  let objectiveStatus: string;
+  
+  if (completedCount === keyResultsList.length) {
+    objectiveStatus = 'completed';
+  } else if (behindCount > 0 || behindCount / keyResultsList.length > 0.3) {
+    objectiveStatus = 'behind';
+  } else if (atRiskCount > 0 || atRiskCount / keyResultsList.length > 0.5) {
+    objectiveStatus = 'at_risk';
+  } else {
+    objectiveStatus = 'on_track';
+  }
+  
+  await db
+    .update(objectives)
+    .set({ status: objectiveStatus })
+    .where(eq(objectives.id, objectiveId));
 }
 
 export class DatabaseStorage implements IStorage {
@@ -447,15 +504,35 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateKeyResultProgress(update: UpdateKeyResultProgress): Promise<KeyResult | undefined> {
-    const [keyResult] = await db
+    // First get the current key result to calculate auto status
+    const currentKeyResult = await this.getKeyResult(update.id);
+    if (!currentKeyResult) return undefined;
+
+    // Update the current value
+    const [updatedKeyResult] = await db
       .update(keyResults)
       .set({ 
         currentValue: update.currentValue.toString(),
-        status: update.status
+        lastUpdated: new Date()
       })
       .where(eq(keyResults.id, update.id))
       .returning();
-    return keyResult;
+
+    if (!updatedKeyResult) return undefined;
+
+    // Get the objective to find the cycle for date calculation
+    const objective = await this.getObjective(updatedKeyResult.objectiveId);
+    if (objective && objective.cycleId) {
+      // Auto-calculate and update status based on progress
+      const finalKeyResult = await updateKeyResultWithAutoStatus(updatedKeyResult, objective.cycleId);
+      
+      // Update the objective status based on its key results
+      await updateObjectiveWithAutoStatus(updatedKeyResult.objectiveId);
+      
+      return finalKeyResult;
+    }
+
+    return updatedKeyResult;
   }
 
   async deleteKeyResult(id: string): Promise<boolean> {

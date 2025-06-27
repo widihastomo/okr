@@ -641,6 +641,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update Key Result Progress with Auto Status Calculation
+  app.patch("/api/key-results/:id/progress", async (req, res) => {
+    try {
+      const keyResultId = req.params.id;
+      const { currentValue } = req.body;
+      
+      if (currentValue === undefined || currentValue === null) {
+        return res.status(400).json({ message: "Current value is required" });
+      }
+
+      const updatedKeyResult = await storage.updateKeyResultProgress({
+        id: keyResultId,
+        currentValue: parseFloat(currentValue)
+      });
+      
+      if (!updatedKeyResult) {
+        return res.status(404).json({ message: "Key result not found" });
+      }
+      
+      res.json(updatedKeyResult);
+    } catch (error) {
+      console.error("Error updating key result progress:", error);
+      res.status(500).json({ message: "Failed to update key result progress" });
+    }
+  });
+
+  // Bulk Update All Status Based on Progress
+  app.post("/api/update-all-status", async (req, res) => {
+    try {
+      // Import the progress tracker functions
+      const { calculateProgressStatus } = await import("./progress-tracker");
+      
+      // Get all key results and update their status
+      const keyResults = await storage.getKeyResults();
+      let updatedCount = 0;
+      
+      for (const keyResult of keyResults) {
+        // Get objective to find cycle
+        const objective = await storage.getObjective(keyResult.objectiveId);
+        if (objective && objective.cycleId) {
+          const cycle = await storage.getCycle(objective.cycleId);
+          if (cycle && keyResult.dueDate) {
+            const startDate = new Date(cycle.startDate);
+            const endDate = keyResult.dueDate;
+            
+            const progressStatus = calculateProgressStatus(keyResult, startDate, endDate);
+            
+            await storage.updateKeyResult(keyResult.id, {
+              status: progressStatus.status
+            });
+            updatedCount++;
+          }
+        }
+      }
+      
+      res.json({ 
+        message: `Updated status for ${updatedCount} key results`,
+        updatedCount 
+      });
+    } catch (error) {
+      console.error("Error updating all status:", error);
+      res.status(500).json({ message: "Failed to update all status" });
+    }
+  });
+
   app.get("/api/key-results/:id/check-ins", async (req, res) => {
     try {
       const keyResultId = req.params.id;

@@ -31,7 +31,7 @@ export const objectives = pgTable("objectives", {
   owner: text("owner").notNull(), // kept for backward compatibility
   ownerType: text("owner_type").notNull().default("user"), // "user" or "team"
   ownerId: uuid("owner_id").notNull(), // user ID or team ID
-  status: text("status").notNull().default("in_progress"), // "on_track", "at_risk", "completed", "in_progress"
+  status: text("status").notNull().default("on_track"), // "on_track", "at_risk", "behind", "completed"
   teamId: uuid("team_id").references(() => teams.id), // for team OKRs
   parentId: uuid("parent_id"), // self-reference for parent-child hierarchy
 });
@@ -90,7 +90,7 @@ export const keyResults = pgTable("key_results", {
   baseValue: decimal("base_value", { precision: 10, scale: 2 }), // Starting point for calculations
   unit: text("unit").notNull().default("number"), // "number", "percentage", "currency"
   keyResultType: text("key_result_type").notNull().default("increase_to"), // "increase_to", "decrease_to", "achieve_or_not"
-  status: text("status").notNull().default("in_progress"), // "on_track", "at_risk", "behind", "completed", "in_progress"
+  status: text("status").notNull().default("on_track"), // "on_track", "at_risk", "behind", "completed"
   dueDate: timestamp("due_date"), // Target completion date
   lastUpdated: timestamp("last_updated").defaultNow(),
   confidence: integer("confidence").default(5), // 1-10 scale for confidence level

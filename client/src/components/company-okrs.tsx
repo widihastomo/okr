@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Plus, ChevronDown, ChevronRight, Building2, Users, User, Target } from "lucide-react";
+import { Plus, ChevronDown, ChevronRight, Building2, Users, User, Target, RefreshCw } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import CreateOKRModal from "./create-okr-modal";
 import EditProgressModal from "./edit-progress-modal";
 import type { OKRWithKeyResults, KeyResult } from "@shared/schema";
@@ -16,14 +18,35 @@ interface CompanyOKRsProps {
 export default function CompanyOKRs({ onRefresh }: CompanyOKRsProps) {
   const [createModal, setCreateModal] = useState(false);
   const [editProgressModal, setEditProgressModal] = useState<{ open: boolean; keyResult?: KeyResult }>({ open: false });
-  const [expandedOKRs, setExpandedOKRs] = useState<Set<number>>(new Set());
+  const [expandedOKRs, setExpandedOKRs] = useState<Set<string>>(new Set());
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: okrs = [], isLoading } = useQuery<OKRWithKeyResults[]>({
     queryKey: ['/api/okrs']
   });
 
+  const updateAllStatusMutation = useMutation({
+    mutationFn: () => apiRequest('/api/update-all-status', { method: 'POST' }),
+    onSuccess: (data) => {
+      toast({
+        title: "Status Updated",
+        description: `Updated status for ${data.updatedCount} key results based on progress tracking`,
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
+      onRefresh();
+    },
+    onError: () => {
+      toast({
+        title: "Update Failed",
+        description: "Failed to update status calculations",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Build flexible hierarchy structure
-  const buildHierarchy = (parentId: number | null = null): (OKRWithKeyResults & { children: any[] })[] => {
+  const buildHierarchy = (parentId: string | null = null): (OKRWithKeyResults & { children: any[] })[] => {
     return okrs
       .filter(okr => okr.parentId === parentId)
       .map(okr => ({
@@ -34,11 +57,11 @@ export default function CompanyOKRs({ onRefresh }: CompanyOKRsProps) {
 
   const hierarchicalOKRs = buildHierarchy();
 
-  const getChildOKRs = (parentId: number) => {
+  const getChildOKRs = (parentId: string) => {
     return okrs.filter(okr => okr.parentId === parentId);
   };
 
-  const toggleExpanded = (okrId: number) => {
+  const toggleExpanded = (okrId: string) => {
     const newExpanded = new Set(expandedOKRs);
     if (newExpanded.has(okrId)) {
       newExpanded.delete(okrId);
@@ -50,10 +73,31 @@ export default function CompanyOKRs({ onRefresh }: CompanyOKRsProps) {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'on_track': return 'bg-green-100 text-green-800';
-      case 'at_risk': return 'bg-yellow-100 text-yellow-800';
-      case 'completed': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'completed':
+        return 'bg-green-500 text-white';
+      case 'on_track':
+        return 'bg-green-400 text-white';
+      case 'at_risk':
+        return 'bg-yellow-500 text-white';
+      case 'behind':
+        return 'bg-red-500 text-white';
+      default:
+        return 'bg-gray-400 text-white';
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return 'Completed';
+      case 'on_track':
+        return 'On Track';
+      case 'at_risk':
+        return 'At Risk';
+      case 'behind':
+        return 'Behind';
+      default:
+        return 'In Progress';
     }
   };
 
@@ -91,7 +135,7 @@ export default function CompanyOKRs({ onRefresh }: CompanyOKRsProps) {
                 {getLevelIcon(level)}
                 <CardTitle className="text-lg">{okr.title}</CardTitle>
                 <Badge className={getStatusColor(okr.status)}>
-                  {okr.status.replace('_', ' ')}
+                  {getStatusLabel(okr.status)}
                 </Badge>
               </div>
               <div className="text-sm text-gray-500">
@@ -114,7 +158,12 @@ export default function CompanyOKRs({ onRefresh }: CompanyOKRsProps) {
                 {okr.keyResults.map((kr) => (
                   <div key={kr.id} className="border rounded p-3 bg-gray-50">
                     <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-medium text-sm">{kr.title}</h4>
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-medium text-sm">{kr.title}</h4>
+                        <Badge className={getStatusColor(kr.status || 'in_progress')}>
+                          {getStatusLabel(kr.status || 'in_progress')}
+                        </Badge>
+                      </div>
                       <div className="flex space-x-1">
                         <Button
                           variant="ghost"
@@ -193,10 +242,21 @@ export default function CompanyOKRs({ onRefresh }: CompanyOKRsProps) {
           <h2 className="text-2xl font-bold text-gray-900">Company OKRs</h2>
           <p className="text-gray-600">Hierarchical view of company, team, and individual objectives</p>
         </div>
-        <Button onClick={() => setCreateModal(true)} className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-          <Plus className="w-4 h-4 mr-2" />
-          Create OKR
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => updateAllStatusMutation.mutate()}
+            disabled={updateAllStatusMutation.isPending}
+            className="border-blue-600 text-blue-600 hover:bg-blue-50"
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${updateAllStatusMutation.isPending ? 'animate-spin' : ''}`} />
+            Update Status
+          </Button>
+          <Button onClick={() => setCreateModal(true)} className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+            <Plus className="w-4 h-4 mr-2" />
+            Create OKR
+          </Button>
+        </div>
       </div>
 
       {hierarchicalOKRs.length === 0 ? (
