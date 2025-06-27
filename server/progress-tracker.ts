@@ -8,24 +8,41 @@ export interface ProgressStatus {
 }
 
 function calculate_progress_status(progress: number, time_passed: number, total_time: number) {
-  const ideal_progress = (time_passed / total_time) * 100;
-  const gap = progress - ideal_progress;
-  
-  let status: string;
-  
-  if (progress >= 100) {
-    status = "Completed";
-  } else if (gap >= 0) {
-    status = "Ahead";
-  } else if (-0 <= gap && gap < 0) {
-    status = "On Track";
-  } else if (-20 <= gap && gap < -0) {
-    status = "At Risk";
+  let idealProgress: number, gap: number, status: string;
+
+  if (time_passed >= total_time) {
+    // Lewat cycle
+    idealProgress = 100;
+    gap = progress - idealProgress;
+
+    if (progress >= 100) {
+      status = "completed";
+    } else {
+      status = "behind";
+    }
   } else {
-    status = "Behind";
+    // Dalam cycle
+    idealProgress = (time_passed / total_time) * 100;
+    gap = progress - idealProgress;
+
+    if (progress >= 100) {
+      status = "completed";
+    } else if (gap >= 5) {
+      status = "ahead";
+    } else if (gap >= -5 && gap < 5) {
+      status = "on_track";
+    } else if (gap >= -20 && gap < -5) {
+      status = "at_risk";
+    } else {
+      status = "behind";
+    }
   }
-  
-  return { idealProgress: ideal_progress, gap: gap, status: status };
+
+  return {
+    idealProgress: Number(idealProgress.toFixed(2)),
+    gap: Number(gap.toFixed(2)),
+    status: status
+  };
 }
 
 export function calculateProgressStatus(
@@ -61,42 +78,37 @@ export function calculateProgressStatus(
   const totalTime = endDate.getTime() - startDate.getTime();
   const elapsedTime = now.getTime() - startDate.getTime();
   
-  // Use the exact formula from the image
+  // Use the exact formula from the user
   const statusResult = calculate_progress_status(progressPercentage, elapsedTime, totalTime);
-  const timeProgressPercentage = Math.round(statusResult.idealProgress);
+  const timeProgressPercentage = statusResult.idealProgress;
   
-  // Map status to our system values and set recommendations
-  let status: ProgressStatus['status'];
+  // Generate recommendation based on status and gap
   let recommendation: string;
   
-  switch (statusResult.status) {
-    case "Completed":
-      status = 'completed';
-      recommendation = 'Target tercapai 100%! Luar biasa!';
-      break;
-    case "Ahead":
-      status = 'ahead';
-      recommendation = `Progress lebih cepat ${Math.round(statusResult.gap)}% dari jadwal ideal!`;
-      break;
-    case "On Track":
-      status = 'on_track';
-      recommendation = 'Progress sesuai dengan capaian ideal hari ini.';
-      break;
-    case "At Risk":
-      status = 'at_risk';
-      recommendation = `Progress tertinggal ${Math.round(Math.abs(statusResult.gap))}% dari ideal, perlu percepatan.`;
-      break;
-    case "Behind":
-      status = 'behind';
-      recommendation = `Progress tertinggal ${Math.round(Math.abs(statusResult.gap))}% dari ideal, butuh tindakan segera.`;
-      break;
-    default:
-      status = 'on_track';
-      recommendation = 'Progress dalam tahap normal.';
+  if (elapsedTime >= totalTime) {
+    // Cycle telah berakhir
+    if (progressPercentage >= 100) {
+      recommendation = 'Selamat! Key result telah selesai tepat waktu.';
+    } else {
+      recommendation = `Cycle telah berakhir namun progress baru ${progressPercentage.toFixed(1)}%. Perlu evaluasi dan perencanaan ulang.`;
+    }
+  } else {
+    // Masih dalam cycle
+    if (progressPercentage >= 100) {
+      recommendation = 'Selamat! Key result telah selesai sebelum deadline.';
+    } else if (statusResult.gap >= 5) {
+      recommendation = `Kerja bagus! Anda ${statusResult.gap.toFixed(1)}% lebih cepat dari target ideal.`;
+    } else if (statusResult.gap >= -5 && statusResult.gap < 5) {
+      recommendation = `Sesuai target. Gap: ${statusResult.gap.toFixed(1)}%. Pertahankan momentum ini.`;
+    } else if (statusResult.gap >= -20 && statusResult.gap < -5) {
+      recommendation = `Perlu perhatian. Anda ${Math.abs(statusResult.gap).toFixed(1)}% di bawah target ideal. Pertimbangkan tindakan korektif.`;
+    } else {
+      recommendation = `Tertinggal ${Math.abs(statusResult.gap).toFixed(1)}% dari target ideal. Butuh tindakan segera.`;
+    }
   }
   
   return {
-    status,
+    status: statusResult.status as ProgressStatus['status'],
     progressPercentage: Math.round(progressPercentage),
     timeProgressPercentage: Math.round(timeProgressPercentage),
     recommendation
