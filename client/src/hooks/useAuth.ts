@@ -1,18 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 
 export function useAuth() {
-  // Check if user is explicitly logged out
-  const isLoggedOut = localStorage.getItem('isLoggedOut') === 'true';
-  
-  const { data: user, isLoading } = useQuery({
+  const { data: user, isLoading, error } = useQuery({
     queryKey: ["/api/auth/me"],
     retry: false,
-    enabled: !isLoggedOut, // Don't fetch user data if logged out
   });
+
+  // If we get a 401 error, user is not authenticated
+  const isUnauthorized = error && (error as any).status === 401;
 
   return {
     user,
-    isLoading: isLoggedOut ? false : isLoading,
-    isAuthenticated: !isLoggedOut && !!user,
+    isLoading,
+    isAuthenticated: !!user && !isUnauthorized,
   };
 }

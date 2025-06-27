@@ -26,35 +26,27 @@ export function LogoutButton({
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      // Set logout flag in localStorage before API call
-      localStorage.setItem('isLoggedOut', 'true');
-      
       // Call logout API endpoint
-      const response = await fetch('/api/auth/logout', {
+      await fetch('/api/auth/logout', {
         method: 'POST',
         credentials: 'include'
       });
 
-      // Clear React Query cache
+      // Clear React Query cache to reset authentication state
       queryClient.clear();
       
       // Clear any client-side state
       localStorage.clear();
       sessionStorage.clear();
       
-      // Set logout flag again (after clear)
-      localStorage.setItem('isLoggedOut', 'true');
-      
-      // Force page reload to reset all state
+      // Force page reload to show login page
       window.location.reload();
     } catch (error) {
       console.error('Logout error:', error);
-      // Set logout flag and reload anyway
-      localStorage.setItem('isLoggedOut', 'true');
+      // Clear cache and reload anyway
       queryClient.clear();
       localStorage.clear();
       sessionStorage.clear();
-      localStorage.setItem('isLoggedOut', 'true');
       window.location.reload();
     }
   };

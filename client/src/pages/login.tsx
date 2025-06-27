@@ -42,6 +42,9 @@ export default function Login() {
       return apiRequest("POST", "/api/auth/login", data);
     },
     onSuccess: () => {
+      // Clear logout flag immediately on successful login
+      localStorage.removeItem('isLoggedOut');
+      
       toast({
         title: "Berhasil masuk",
         description: "Selamat datang kembali!",
@@ -70,6 +73,9 @@ export default function Login() {
       return apiRequest("POST", "/api/auth/register", data);
     },
     onSuccess: () => {
+      // Clear logout flag immediately on successful registration
+      localStorage.removeItem('isLoggedOut');
+      
       toast({
         title: "Berhasil mendaftar",
         description: "Akun Anda telah dibuat dan otomatis masuk",
