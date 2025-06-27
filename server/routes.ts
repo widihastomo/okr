@@ -482,15 +482,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create new OKR with key results
   app.post("/api/okrs", async (req, res) => {
     try {
+      console.log("Create OKR request received:", JSON.stringify(req.body, null, 2));
+      
       const createOKRSchema = z.object({
         objective: insertObjectiveSchema,
         keyResults: z.array(insertKeyResultSchema.omit({ objectiveId: true }))
       });
       
       const validatedData = createOKRSchema.parse(req.body);
+      console.log("Validated data:", JSON.stringify(validatedData, null, 2));
       
       // Create objective
       const objective = await storage.createObjective(validatedData.objective);
+      console.log("Created objective:", objective);
       
       // Create key results
       const keyResults = [];
@@ -501,15 +505,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
         keyResults.push(keyResult);
       }
+      console.log("Created key results:", keyResults);
       
       // Return complete OKR
       const createdOKR = await storage.getOKRWithKeyResults(objective.id);
+      console.log("Complete OKR:", createdOKR);
       res.status(201).json(createdOKR);
     } catch (error) {
+      console.error("Error creating OKR:", error);
       if (error instanceof z.ZodError) {
+        console.error("Validation errors:", error.errors);
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
-      res.status(500).json({ message: "Failed to create OKR" });
+      res.status(500).json({ message: "Failed to create OKR", error: error instanceof Error ? error.message : String(error) });
     }
   });
 

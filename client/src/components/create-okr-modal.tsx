@@ -110,14 +110,19 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
   }, [cycles, form]);
 
   React.useEffect(() => {
-    if (users.length > 0 && !form.getValues('objective.owner')) {
-      form.setValue('objective.owner', users[0].id);
+    if (users.length > 0 && !form.getValues('objective.ownerId')) {
+      const firstUser = users[0];
+      const ownerName = firstUser.firstName && firstUser.lastName 
+        ? `${firstUser.firstName} ${firstUser.lastName}` 
+        : firstUser.email || firstUser.id.toString();
+      form.setValue('objective.owner', ownerName);
+      form.setValue('objective.ownerId', firstUser.id.toString());
     }
   }, [users, form]);
 
   React.useEffect(() => {
     if (users.length > 0 && !form.getValues('keyResults.0.assignedTo')) {
-      form.setValue('keyResults.0.assignedTo', users[0].id);
+      form.setValue('keyResults.0.assignedTo', users[0].id.toString());
     }
   }, [users, form]);
 
@@ -158,11 +163,11 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
       const selectedTeam = teams.find(team => team.id.toString() === data.objective.ownerId);
       ownerName = selectedTeam ? selectedTeam.name : "";
     } else {
-      const selectedUser = users.find(user => user.id === data.objective.ownerId);
+      const selectedUser = users.find(user => user.id.toString() === data.objective.ownerId);
       ownerName = selectedUser 
         ? (selectedUser.firstName && selectedUser.lastName 
             ? `${selectedUser.firstName} ${selectedUser.lastName}` 
-            : selectedUser.email || selectedUser.id)
+            : selectedUser.email || selectedUser.id.toString())
         : "";
     }
     
@@ -325,10 +330,10 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
                                   <SelectItem value="no-users" disabled>Tidak ada user tersedia</SelectItem>
                                 ) : (
                                   users.map((user) => (
-                                    <SelectItem key={user.id} value={user.id}>
+                                    <SelectItem key={user.id.toString()} value={user.id.toString()}>
                                       {user.firstName && user.lastName 
                                         ? `${user.firstName} ${user.lastName}` 
-                                        : user.email || user.id}
+                                        : user.email || user.id.toString()}
                                     </SelectItem>
                                   ))
                                 )
