@@ -592,3 +592,5 @@ export class MemStorage implements IStorage {
     return Math.round(totalProgress / keyResults.length);
   }
 }
+
+export const storage = new MemStorage();

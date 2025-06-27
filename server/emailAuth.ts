@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import session from "express-session";
 import type { Express, RequestHandler } from "express";
 import MemoryStore from "memorystore";
-import { storage } from "./storage";
+import { storage } from "./storage_clean";
 import type { User, LoginData, RegisterData } from "@shared/schema";
 
 const MemoryStoreSession = MemoryStore(session);
