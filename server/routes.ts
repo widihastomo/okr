@@ -802,13 +802,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const currentUser = (req as any).user;
       const { members, tasks, ...initiativeData } = req.body;
       
+      console.log("Initiative creation request:", JSON.stringify(req.body, null, 2));
+      console.log("Current user:", currentUser);
+      console.log("Initiative data:", initiativeData);
+      
       const validatedData = insertInitiativeSchema.parse({
         ...initiativeData,
         keyResultId,
         createdBy: currentUser.id,
+        picId: initiativeData.picId || null,
         budget: initiativeData.budget ? initiativeData.budget.toString() : null,
-        startDate: req.body.startDate ? new Date(req.body.startDate).toISOString() : null,
-        dueDate: req.body.dueDate ? new Date(req.body.dueDate).toISOString() : null,
+        startDate: initiativeData.startDate ? new Date(initiativeData.startDate) : null,
+        dueDate: initiativeData.dueDate ? new Date(initiativeData.dueDate) : null,
       });
       
       const initiative = await storage.createInitiative(validatedData);
@@ -832,7 +837,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             initiativeId: initiative.id,
             createdBy: currentUser.id,
             assignedTo: taskData.assignedTo === "none" || !taskData.assignedTo ? null : taskData.assignedTo,
-            dueDate: taskData.dueDate ? new Date(taskData.dueDate).toISOString() : null,
+            dueDate: taskData.dueDate ? new Date(taskData.dueDate) : null,
           });
           await storage.createTask(validatedTaskData);
         }
