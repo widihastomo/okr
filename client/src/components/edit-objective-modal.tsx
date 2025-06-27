@@ -36,7 +36,6 @@ const editObjectiveSchema = z.object({
   title: z.string().min(1, "Judul objective harus diisi"),
   description: z.string().optional(),
   cycleId: z.string().min(1, "Cycle harus dipilih"),
-  timeframe: z.enum(["monthly", "quarterly", "annual"]),
   ownerType: z.enum(["individual", "team"]),
   ownerId: z.string().min(1, "Owner harus dipilih"),
   teamId: z.string().optional(),
@@ -73,7 +72,6 @@ export function EditObjectiveModal({ objective, trigger }: EditObjectiveModalPro
       title: objective.title,
       description: objective.description || "",
       cycleId: objective.cycleId || "",
-      timeframe: objective.timeframe as "monthly" | "quarterly" | "annual",
       ownerType: objective.ownerType as "individual" | "team",
       ownerId: objective.ownerId,
       teamId: objective.teamId || "",
@@ -161,55 +159,30 @@ export function EditObjectiveModal({ objective, trigger }: EditObjectiveModalPro
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="cycleId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Cycle *</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih cycle" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {cycles.map((cycle) => (
-                          <SelectItem key={cycle.id} value={cycle.id}>
-                            {cycle.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="timeframe"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Timeframe *</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih timeframe" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="monthly">Monthly</SelectItem>
-                        <SelectItem value="quarterly">Quarterly</SelectItem>
-                        <SelectItem value="annual">Annual</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="cycleId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Cycle *</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih cycle" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {cycles.map((cycle) => (
+                        <SelectItem key={cycle.id} value={cycle.id}>
+                          {cycle.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <div className="grid grid-cols-2 gap-4">
               <FormField
