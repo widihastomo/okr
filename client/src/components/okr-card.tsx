@@ -173,6 +173,12 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
                 })()}
                 <span className="text-lg font-semibold text-gray-900">{overallProgress.toFixed(1)}%</span>
               </div>
+              <div className="w-32 bg-gray-200 rounded-full h-2 mb-1">
+                <div 
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${Math.min(100, Math.max(0, overallProgress))}%` }}
+                ></div>
+              </div>
               <p className="text-sm text-gray-500">Overall Progress</p>
             </div>
             <EditOKRButton okr={okr} />
