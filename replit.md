@@ -367,6 +367,13 @@ Changelog:
   * Added real-time search filtering and selection counter display
   * Removed "Tujuan" (Objective) field from initiative forms and database schema
   * Streamlined initiative creation process by focusing on essential project information
+- June 27, 2025. Fixed initiative update function and enhanced UI text:
+  * Resolved date conversion error in update initiative endpoint by properly converting string dates to Date objects
+  * Added null value handling for optional fields (picId, budget) in update operations
+  * Fixed cache invalidation query keys for proper list refresh after create/update operations
+  * Updated button text to dynamically show "Update Initiative" when editing and "Buat Initiative" when creating
+  * Enhanced button loading states to handle both create and update mutation pending states
+  * All CRUD operations for initiatives now working correctly with proper error handling
 - June 27, 2025. Implemented comprehensive automatic progress calculation system for initiatives:
   * Added automatic progress calculation based on completed tasks vs total tasks ratio
   * Progress updates automatically when tasks are created, updated, or deleted

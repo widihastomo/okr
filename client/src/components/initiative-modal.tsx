@@ -804,10 +804,15 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
                 </Button>
                 <Button 
                   type="submit" 
-                  disabled={createInitiativeMutation.isPending}
+                  disabled={createInitiativeMutation.isPending || updateInitiativeMutation.isPending}
                   className="bg-blue-600 hover:bg-blue-700"
                 >
-                  {createInitiativeMutation.isPending ? "Menyimpan..." : "Buat Initiative"}
+                  {(createInitiativeMutation.isPending || updateInitiativeMutation.isPending) 
+                    ? "Menyimpan..." 
+                    : editingInitiative 
+                      ? "Update Initiative" 
+                      : "Buat Initiative"
+                  }
                 </Button>
               </div>
             </form>
