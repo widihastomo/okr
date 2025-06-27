@@ -379,7 +379,9 @@ export default function KeyResultDetailPage() {
   const getUserInitials = (userId: string) => {
     const userName = getUserName(userId);
     if (!userName || userName === 'Unknown User') return 'U';
-    return userName.split(' ').filter(n => n && n.length > 0).map((n: string) => n[0]).join('').toUpperCase();
+    const nameParts = userName.split(' ').filter(n => n && n.length > 0);
+    if (!nameParts || nameParts.length === 0) return 'U';
+    return nameParts.map((n: string) => n[0]).join('').toUpperCase();
   };
 
   // Helper function to get tasks for a specific initiative
@@ -475,7 +477,7 @@ export default function KeyResultDetailPage() {
     }
 
     // Add check-in data points if available
-    if (keyResult?.checkIns && keyResult.checkIns.length > 0) {
+    if (keyResult?.checkIns && Array.isArray(keyResult.checkIns) && keyResult.checkIns.length > 0) {
       // Sort check-ins by date
       const sortedCheckIns = [...keyResult.checkIns].sort((a, b) => 
         new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime()
@@ -485,6 +487,8 @@ export default function KeyResultDetailPage() {
       let lastProgress = 0;
       
       sortedCheckIns.forEach((checkIn) => {
+        if (!checkIn || !checkIn.value || !keyResult?.targetValue) return;
+        
         // Calculate actual progress
         const current = parseFloat(checkIn.value);
         const target = parseFloat(keyResult.targetValue);
@@ -1508,7 +1512,7 @@ export default function KeyResultDetailPage() {
                       {showUserMentions && (
                         <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-md shadow-lg z-50 max-h-40 overflow-y-auto">
                           <div className="p-2 text-xs text-gray-500 border-b">Mention team members:</div>
-                          {users?.filter((user: any) => user.name).map((user: any) => (
+                          {users?.filter((user: any) => user.firstName || user.lastName).map((user: any) => (
                             <div
                               key={user.id}
                               className="p-2 hover:bg-gray-50 cursor-pointer flex items-center gap-2"
