@@ -93,7 +93,6 @@ export const keyResults = pgTable("key_results", {
   dueDate: timestamp("due_date"), // Target completion date
   lastUpdated: timestamp("last_updated").defaultNow(),
   confidence: integer("confidence").default(5), // 1-10 scale for confidence level
-  assignedTo: uuid("assigned_to"), // user ID who is responsible for this key result
   timeProgressPercentage: integer("time_progress_percentage").default(0), // Ideal progress based on timeline
 });
 

@@ -37,7 +37,6 @@ const okrFormSchema = z.object({
     unit: z.string().default("number"),
     keyResultType: z.string().default("increase_to"),
     status: z.string().default("in_progress"),
-    assignedTo: z.string().optional(),
   })).min(1, "At least one key result is required"),
 });
 
@@ -84,7 +83,6 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
         unit: kr.unit,
         keyResultType: kr.keyResultType,
         status: kr.status,
-        assignedTo: kr.assignedTo || "",
       })),
     } : {
       objective: {
@@ -107,7 +105,6 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
         unit: "number",
         keyResultType: "increase_to",
         status: "in_progress",
-        assignedTo: "",
       }],
     },
   });
@@ -138,7 +135,6 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
             unit: kr.unit,
             keyResultType: kr.keyResultType,
             status: kr.status,
-            assignedTo: kr.assignedTo || "",
           })),
         });
       } else {
@@ -163,7 +159,6 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
             unit: "number",
             keyResultType: "increase_to",
             status: "in_progress",
-            assignedTo: "",
           }],
         });
       }
@@ -200,7 +195,6 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
         },
         keyResults: data.keyResults.map(kr => ({
           ...kr,
-          assignedTo: kr.assignedTo === "" || kr.assignedTo === "unassigned" ? null : kr.assignedTo,
         })),
       };
 
@@ -261,7 +255,6 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
       unit: "number",
       keyResultType: "increase_to",
       status: "in_progress",
-      assignedTo: "",
     });
   };
 

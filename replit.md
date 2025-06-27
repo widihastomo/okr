@@ -218,6 +218,13 @@ Changelog:
   * Implemented global event listener for keyboard shortcut functionality
   * Users can now quickly create OKRs without navigating to specific pages
   * Shortcut works consistently across dashboard, profile, users, and all other application pages
+- June 27, 2025. Completely removed "Assign to" field from Key Results system:
+  * Removed assignedTo column from key_results database table
+  * Updated database schema in shared/schema.ts to eliminate assignedTo field
+  * Cleaned up OKR form components to remove all assignedTo references
+  * Updated form validation schemas to exclude assignedTo field
+  * Simplified key results creation and editing by removing assignment functionality
+  * Maintained all other key result functionality while streamlining the interface
 ```
 
 ## User Preferences
