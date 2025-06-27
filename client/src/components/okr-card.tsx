@@ -17,6 +17,34 @@ interface OKRCardProps {
 }
 
 export default function OKRCard({ okr, onEditProgress, onKeyResultClick, cycleStartDate }: OKRCardProps) {
+  // Calculate days remaining based on key results due dates or cycle end date
+  const calculateDaysRemaining = () => {
+    const today = new Date();
+    
+    // Find the earliest due date among key results
+    const dueDates = okr.keyResults
+      .map(kr => kr.dueDate)
+      .filter(date => date !== null)
+      .map(date => new Date(date!));
+    
+    if (dueDates.length > 0) {
+      const earliestDueDate = new Date(Math.min(...dueDates.map(d => d.getTime())));
+      const diffTime = earliestDueDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays < 0) {
+        return `${Math.abs(diffDays)} days overdue`;
+      } else if (diffDays === 0) {
+        return "Due today";
+      } else {
+        return `${diffDays} days remaining`;
+      }
+    }
+    
+    // Fallback: if no due dates, return empty string
+    return "No due date set";
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
@@ -101,7 +129,7 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, cycleSt
               </span>
               <span className="flex items-center space-x-1">
                 <Clock className="w-4 h-4" />
-                <span>45 days remaining</span>
+                <span>{calculateDaysRemaining()}</span>
               </span>
             </div>
           </div>
