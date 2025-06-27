@@ -165,13 +165,16 @@ export default function CompanyOKRPage() {
                   variant="ghost"
                   size="sm"
                   onClick={() => toggleExpand(okr.id)}
-                  className="p-1 h-6 w-6"
+                  className="flex items-center gap-1 p-1 h-6 min-w-fit px-2"
                 >
                   {isExpanded ? (
                     <ChevronDown className="w-4 h-4 text-gray-500" />
                   ) : (
                     <ChevronRight className="w-4 h-4 text-gray-500" />
                   )}
+                  <span className="text-xs text-gray-500 font-medium">
+                    {children.length}
+                  </span>
                 </Button>
               )}
             </div>
