@@ -79,7 +79,11 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick }: OKRCa
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center space-x-3 mb-2">
-              <h3 className="text-lg font-semibold text-gray-900">{okr.title}</h3>
+              <Link href={`/objectives/${okr.id}`}>
+                <h3 className="text-lg font-semibold text-gray-900 hover:text-blue-600 hover:underline cursor-pointer">
+                  {okr.title}
+                </h3>
+              </Link>
               <Badge className={`${getStatusColor(okr.status)} text-white`}>
                 {getStatusLabel(okr.status)}
               </Badge>

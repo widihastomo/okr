@@ -11,6 +11,7 @@ import UsersPage from "@/components/users-page";
 import CompanyOKRsPage from "@/pages/company-okrs";
 import OKRStructurePage from "@/pages/okr-structure";
 import KeyResultDetail from "@/pages/key-result-detail";
+import ObjectiveDetail from "@/pages/objective-detail";
 import Landing from "@/pages/landing";
 import Login from "@/pages/login";
 import Home from "@/pages/home";
@@ -51,6 +52,7 @@ function Router() {
       <Route path="/company-okrs" component={CompanyOKRsPage} />
       <Route path="/okr-structure" component={OKRStructurePage} />
       <Route path="/key-results/:id" component={KeyResultDetail} />
+      <Route path="/objectives/:id" component={ObjectiveDetail} />
       <Route path="/cycles" component={CyclesPage} />
       <Route path="/templates" component={TemplatesPage} />
       <Route path="/users" component={UsersPage} />

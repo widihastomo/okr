@@ -414,6 +414,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get single OKR with key results by ID
+  app.get("/api/okrs/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const okr = await storage.getOKRWithKeyResults(id);
+      if (!okr) {
+        return res.status(404).json({ message: "OKR not found" });
+      }
+      res.json(okr);
+    } catch (error) {
+      console.error("Error fetching OKR:", error);
+      res.status(500).json({ message: "Failed to fetch OKR" });
+    }
+  });
+
   // Get all OKRs with key results
   app.get("/api/okrs", async (req, res) => {
     try {
