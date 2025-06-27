@@ -37,6 +37,8 @@ export default function Profile() {
       toast({
         title: "Profil Berhasil Diperbarui",
         description: "Perubahan profil Anda telah disimpan.",
+        variant: "default",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       setIsEditing(false);
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });

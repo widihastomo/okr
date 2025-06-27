@@ -229,6 +229,8 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
       toast({
         title: "Success",
         description: `OKR ${isEditMode ? 'updated' : 'created'} successfully`,
+        variant: "default",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });

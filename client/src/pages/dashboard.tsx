@@ -59,6 +59,8 @@ export default function Dashboard() {
       toast({
         title: "OKR berhasil dihapus",
         description: "Objective dan key results telah dihapus dari sistem.",
+        variant: "default",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
@@ -132,6 +134,8 @@ export default function Dashboard() {
       toast({
         title: "OKR berhasil diduplikasi",
         description: "OKR baru telah dibuat dengan progress direset ke 0.",
+        variant: "default",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
