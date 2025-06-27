@@ -70,7 +70,7 @@ function Router() {
             <Route path="/dashboard" component={Dashboard} />
             <Route path="/home" component={Home} />
             <Route path="/profile" component={Profile} />
-            <Route path="/company-okrs" component={CompanyOKRPage} />
+            <Route path="/company-okr" component={CompanyOKRPage} />
             <Route path="/okr-structure" component={OKRStructurePage} />
             <Route path="/key-results/:id" component={KeyResultDetail} />
             <Route path="/objectives/:id" component={ObjectiveDetail} />

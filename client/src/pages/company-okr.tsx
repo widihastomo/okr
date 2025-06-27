@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Target, Calendar, Users, TrendingUp } from "lucide-react";
+import { Plus, Target, Users, TrendingUp, ChevronDown, ChevronRight, Building2 } from "lucide-react";
 import { OKRWithKeyResults } from "@shared/schema";
 import { ObjectiveStatusBadge } from "@/components/objective-status-badge";
 import OKRFormModal from "@/components/okr-form-modal";
@@ -10,10 +10,12 @@ interface TreeNode {
   okr: OKRWithKeyResults;
   children: TreeNode[];
   level: number;
+  isExpanded: boolean;
 }
 
 export default function CompanyOKRPage() {
   const [isOKRModalOpen, setIsOKRModalOpen] = useState(false);
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
 
   const { data: okrs = [], isLoading } = useQuery({
     queryKey: ["/api/okrs"],
@@ -29,7 +31,8 @@ export default function CompanyOKRPage() {
       nodeMap.set(okr.id, {
         okr,
         children: [],
-        level: 0
+        level: 0,
+        isExpanded: expandedNodes.has(okr.id)
       });
     });
 
@@ -51,6 +54,25 @@ export default function CompanyOKRPage() {
 
   const treeData = buildTree(okrs);
 
+  const toggleExpand = (nodeId: string) => {
+    const newExpanded = new Set(expandedNodes);
+    if (newExpanded.has(nodeId)) {
+      newExpanded.delete(nodeId);
+    } else {
+      newExpanded.add(nodeId);
+    }
+    setExpandedNodes(newExpanded);
+  };
+
+  const expandAll = () => {
+    const allIds = new Set(okrs.map((okr: OKRWithKeyResults) => okr.id));
+    setExpandedNodes(allIds);
+  };
+
+  const collapseAll = () => {
+    setExpandedNodes(new Set());
+  };
+
   const getProgressColor = (progress: number) => {
     if (progress >= 90) return "bg-green-500";
     if (progress >= 70) return "bg-blue-500";
@@ -70,104 +92,116 @@ export default function CompanyOKRPage() {
     return colors[status as keyof typeof colors] || 'text-gray-500';
   };
 
-  const renderObjectiveCard = (node: TreeNode, hasChildren: boolean) => {
-    const { okr, level } = node;
+  const renderCompactCard = (node: TreeNode) => {
+    const { okr, level, children, isExpanded } = node;
     const progressColor = getProgressColor(okr.overallProgress);
+    const hasChildren = children.length > 0;
     
     return (
-      <div className={`relative ${level > 0 ? 'ml-8' : ''}`}>
+      <div className={`relative ${level > 0 ? 'ml-6' : ''}`}>
         {/* Connecting line for child nodes */}
         {level > 0 && (
           <>
-            <div className="absolute -left-6 top-6 w-4 h-px bg-gray-300"></div>
-            <div className="absolute -left-6 top-0 w-px h-6 bg-gray-300"></div>
+            <div className="absolute -left-4 top-4 w-3 h-px bg-gray-300"></div>
+            <div className="absolute -left-4 top-0 w-px h-4 bg-gray-300"></div>
           </>
         )}
         
-        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-4 shadow-sm hover:shadow-md transition-shadow">
-          {/* Header with department tag */}
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className={`w-12 h-12 rounded-full ${level === 0 ? 'bg-blue-100' : 'bg-purple-100'} flex items-center justify-center`}>
-                <Target className={`w-6 h-6 ${level === 0 ? 'text-blue-600' : 'text-purple-600'}`} />
+        <div className="bg-white rounded-lg border border-gray-200 p-4 mb-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer">
+          <div className="flex items-center justify-between">
+            {/* Left side - Icon, Title, Progress */}
+            <div className="flex items-center gap-3 flex-1">
+              {/* Expand/Collapse button */}
+              {hasChildren ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => toggleExpand(okr.id)}
+                  className="p-1 h-6 w-6"
+                >
+                  {isExpanded ? (
+                    <ChevronDown className="w-4 h-4 text-gray-500" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4 text-gray-500" />
+                  )}
+                </Button>
+              ) : (
+                <div className="w-6 h-6"></div>
+              )}
+              
+              {/* Icon */}
+              <div className={`w-8 h-8 rounded-full ${level === 0 ? 'bg-blue-100' : 'bg-purple-100'} flex items-center justify-center`}>
+                {level === 0 ? (
+                  <Building2 className="w-4 h-4 text-blue-600" />
+                ) : (
+                  <Target className="w-4 h-4 text-purple-600" />
+                )}
               </div>
-              <div>
+              
+              {/* Title and Meta */}
+              <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                    {okr.teamId ? 'Team' : 'Individual'}
+                  <h3 className="font-medium text-gray-900 text-sm truncate">{okr.title}</h3>
+                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full shrink-0">
+                    {level === 0 ? 'Company' : 'Department'}
                   </span>
-                  <span className="text-xs text-gray-500">•</span>
-                  <span className="text-xs text-gray-500">Q1 2025</span>
                 </div>
-                <h3 className="font-semibold text-gray-900 text-lg">{okr.title}</h3>
+                <div className="flex items-center gap-3 text-xs text-gray-500">
+                  <span>{okr.owner}</span>
+                  <span>•</span>
+                  <span>{okr.keyResults.length} KR</span>
+                  {hasChildren && (
+                    <>
+                      <span>•</span>
+                      <span>{children.length} sub-objectives</span>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
             
-            {/* Progress indicator */}
+            {/* Right side - Progress and Status */}
             <div className="flex items-center gap-3">
-              <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-white text-sm font-medium ${progressColor}`}>
-                <TrendingUp className="w-4 h-4" />
+              <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-white text-xs font-medium ${progressColor}`}>
+                <TrendingUp className="w-3 h-3" />
                 {okr.overallProgress.toFixed(0)}%
               </div>
               <ObjectiveStatusBadge status={okr.status} />
             </div>
           </div>
-
-          {/* Description */}
-          {okr.description && (
-            <p className="text-gray-600 text-sm mb-4">{okr.description}</p>
-          )}
-
-          {/* Key Results */}
-          <div className="space-y-3">
-            {okr.keyResults.map((kr) => (
-              <div key={kr.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <div className="w-8 h-8 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-medium text-gray-900 text-sm">{kr.title}</h4>
-                  <div className="flex items-center gap-4 mt-1">
-                    <span className="text-xs text-gray-600">
-                      {kr.unit === 'currency' ? `Rp ${parseFloat(kr.currentValue || '0').toLocaleString('id-ID')}` : kr.currentValue} / 
-                      {kr.unit === 'currency' ? ` Rp ${parseFloat(kr.targetValue).toLocaleString('id-ID')}` : ` ${kr.targetValue}`} {kr.unit !== 'currency' ? kr.unit : ''}
+          
+          {/* Key Results preview - only show if expanded or no children */}
+          {(isExpanded || !hasChildren) && okr.keyResults.length > 0 && (
+            <div className="mt-3 pt-3 border-t border-gray-100">
+              <div className="grid grid-cols-1 gap-2">
+                {okr.keyResults.slice(0, 3).map((kr) => (
+                  <div key={kr.id} className="flex items-center gap-2 text-xs">
+                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                    <span className="text-gray-700 truncate flex-1">{kr.title}</span>
+                    <span className="text-gray-500 shrink-0">
+                      {(kr as any).progress?.toFixed(0) || '0'}%
                     </span>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-gray-400" />
-                  <span className="text-xs text-gray-600">{(kr as any).progress?.toFixed(0) || '0'}%</span>
-                </div>
+                ))}
+                {okr.keyResults.length > 3 && (
+                  <div className="text-xs text-gray-500 ml-4">
+                    +{okr.keyResults.length - 3} more key results
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
-
-          {/* Owner info */}
-          <div className="flex items-center gap-2 mt-4 pt-3 border-t border-gray-100">
-            <Users className="w-4 h-4 text-gray-400" />
-            <span className="text-sm text-gray-600">{okr.owner}</span>
-          </div>
+            </div>
+          )}
         </div>
       </div>
     );
   };
 
   const renderTree = (nodes: TreeNode[]) => {
-    return nodes.map((node, index) => (
-      <div key={node.okr.id} className="relative">
-        {renderObjectiveCard(node, node.children.length > 0)}
-        {node.children.length > 0 && (
-          <div className="relative">
-            {/* Vertical connecting line for children */}
-            {node.children.length > 1 && (
-              <div 
-                className="absolute left-4 w-px bg-gray-300"
-                style={{ 
-                  top: '0px',
-                  height: `${(node.children.length - 1) * 200}px`
-                }}
-              ></div>
-            )}
+    return nodes.map((node) => (
+      <div key={node.okr.id}>
+        {renderCompactCard(node)}
+        {node.isExpanded && node.children.length > 0 && (
+          <div className="ml-2">
             {renderTree(node.children)}
           </div>
         )}
@@ -197,13 +231,32 @@ export default function CompanyOKRPage() {
             <p className="text-sm text-gray-600 mt-1">Hierarchical view of organizational objectives</p>
           </div>
           
-          <Button 
-            onClick={() => setIsOKRModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Buat OKR
-          </Button>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={expandAll}
+              >
+                Expand All
+              </Button>
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={collapseAll}
+              >
+                Collapse All
+              </Button>
+            </div>
+            
+            <Button 
+              onClick={() => setIsOKRModalOpen(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Buat OKR
+            </Button>
+          </div>
         </div>
       </div>
 
