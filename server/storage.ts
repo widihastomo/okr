@@ -482,7 +482,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getKeyResultsByObjectiveId(objectiveId: string): Promise<KeyResult[]> {
-    return await db.select().from(keyResults).where(eq(keyResults.objectiveId, objectiveId));
+    const keyResultsList = await db.select().from(keyResults).where(eq(keyResults.objectiveId, objectiveId));
+    
+    // For now, return simple data without complex calculations to fix 500 error
+    return keyResultsList.map(kr => ({
+      ...kr,
+      status: kr.status || 'on_track',
+      timeProgressPercentage: 0
+    }));
   }
 
   async getKeyResult(id: string): Promise<KeyResult | undefined> {

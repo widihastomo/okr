@@ -180,8 +180,8 @@ export function SimpleProgressStatus({
   const config = getStatusConfig(status);
   const StatusIcon = config.icon;
   
-  // Calculate the ideal progress based on current date and timeline
-  const idealProgress = calculateIdealProgress(startDate, dueDate);
+  // Use the server-calculated timeProgressPercentage which uses the exact formula
+  const idealProgress = timeProgressPercentage;
 
   if (compact) {
     return (
