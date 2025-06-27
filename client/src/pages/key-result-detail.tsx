@@ -397,9 +397,9 @@ export default function KeyResultDetailPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="w-full">
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6">
           {/* Key Result Overview */}
           <Card>
             <CardHeader>
@@ -803,10 +803,6 @@ export default function KeyResultDetailPage() {
               )}
             </CardContent>
           </Card>
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-6">
           {/* Progress History */}
           <Card>
             <CardHeader>
@@ -817,46 +813,36 @@ export default function KeyResultDetailPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {keyResult.checkIns && keyResult.checkIns.length > 0 ? (
-                keyResult.checkIns.map((checkIn, index) => (
-                  <div key={checkIn.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <p className="font-semibold text-blue-600">
-                          {formatValue(checkIn.value, keyResult.unit)}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {checkIn.createdAt ? format(new Date(checkIn.createdAt), "MMM dd") : "Unknown"}
-                        </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {keyResult.checkIns.map((checkIn) => (
+                    <div key={checkIn.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <p className="font-semibold text-blue-600">
+                            {formatValue(checkIn.value, keyResult.unit)}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {checkIn.createdAt ? format(new Date(checkIn.createdAt), "MMM dd") : "Unknown"}
+                          </p>
+                        </div>
+                        {checkIn.notes && (
+                          <p className="text-sm text-gray-600 mt-1 line-clamp-2">{checkIn.notes}</p>
+                        )}
+                        {checkIn.confidence && (
+                          <p className="text-xs text-gray-500 mt-1">Confidence: {checkIn.confidence}/10</p>
+                        )}
                       </div>
-                      {checkIn.notes && (
-                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">{checkIn.notes}</p>
-                      )}
-                      {checkIn.confidence && (
-                        <p className="text-xs text-gray-500 mt-1">Confidence: {checkIn.confidence}/10</p>
-                      )}
                     </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               ) : (
-                <div className="text-center py-4 text-gray-500">
-                  <BarChart3 className="h-8 w-8 mx-auto mb-2 text-gray-300" />
-                  <p className="text-sm">No check-ins yet</p>
+                <div className="text-center py-8 text-gray-500">
+                  <BarChart3 className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                  <p>No check-ins yet</p>
+                  <p className="text-sm">Add your first check-in to track progress over time.</p>
                 </div>
               )}
-            </CardContent>
-          </Card>
-
-          {/* Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Actions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full">
-                <Users className="h-4 w-4 mr-2" />
-                Share Progress
-              </Button>
             </CardContent>
           </Card>
         </div>
