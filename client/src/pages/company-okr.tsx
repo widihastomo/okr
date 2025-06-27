@@ -6,6 +6,7 @@ import { Plus, Target, Users, TrendingUp, ChevronDown, ChevronRight, Building2, 
 import { OKRWithKeyResults } from "@shared/schema";
 import { ObjectiveStatusBadge } from "@/components/objective-status-badge";
 import OKRFormModal from "@/components/okr-form-modal";
+import { ConnectorLine } from "@/components/connector-line";
 
 interface TreeNode {
   okr: OKRWithKeyResults;
@@ -152,9 +153,12 @@ export default function CompanyOKRPage() {
     return (
       <div className="flex items-center">
         {/* OKR Card */}
-        <div className={`bg-white rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md transition-all duration-200 ${
-          isRoot ? 'w-96' : 'w-80'
-        }`}>
+        <div 
+          id={`okr-card-${okr.id}`}
+          className={`bg-white rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md transition-all duration-200 ${
+            isRoot ? 'w-96' : 'w-80'
+          }`}
+        >
           {/* Objective Section */}
           <div className="flex items-start gap-3 mb-4">
             <div className={`w-8 h-8 rounded-full ${level === 0 ? 'bg-blue-100' : 'bg-purple-100'} flex items-center justify-center shrink-0`}>
@@ -231,40 +235,21 @@ export default function CompanyOKRPage() {
           )}
         </div>
         
-        {/* Connecting Line and Children */}
+        {/* Children Layout */}
         {hasChildren && isExpanded && (
-          <div className="relative">
+          <div className="relative ml-12 mt-6">
             {children.map((child, index) => (
-              <div key={child.okr.id} className="flex items-center mt-6 first:mt-0">
-                {/* Connection structure */}
-                <div className="relative flex items-center">
-                  {/* Main horizontal line from parent */}
-                  <div className="w-12 h-px bg-gray-300"></div>
-                  
-                  {/* T-junction for multiple children */}
-                  {children.length > 1 && (
-                    <>
-                      {/* Vertical line - only show on first child but extend through all */}
-                      {index === 0 && (
-                        <div 
-                          className="absolute w-px bg-gray-300"
-                          style={{
-                            left: '12px',
-                            top: '0px',
-                            height: `${(children.length - 1) * 200 + 100}px`
-                          }}
-                        />
-                      )}
-                      {/* Small horizontal connector to vertical line */}
-                      <div className="w-3 h-px bg-gray-300 -ml-px"></div>
-                    </>
-                  )}
-                </div>
+              <div key={child.okr.id} className={`${index > 0 ? 'mt-8' : ''}`}>
+                {/* Dynamic Connector Line */}
+                <ConnectorLine 
+                  fromId={`okr-card-${okr.id}`}
+                  toId={`okr-card-${child.okr.id}`}
+                  color="#D1D5DB"
+                  strokeWidth={1}
+                />
                 
                 {/* Child card */}
-                <div className="ml-3">
-                  {renderMindmapCard(child)}
-                </div>
+                {renderMindmapCard(child)}
               </div>
             ))}
           </div>

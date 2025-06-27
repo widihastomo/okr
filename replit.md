@@ -441,6 +441,13 @@ Changelog:
   * Added sorting functionality to display check-ins by latest update first
   * Check-ins now ordered by creation date in descending order for better user experience
   * Most recent progress updates appear at the top of the Progress History section
+- June 27, 2025. Created dynamic ConnectorLine component for OKR hierarchy visualization:
+  * Built reusable ConnectorLine React component with automatic positioning and responsive design
+  * Replaced static CSS-based connection lines with dynamic SVG lines that adjust to element positions
+  * Added scroll and resize event handling with MutationObserver for DOM changes
+  * Integrated customizable color and stroke width options for visual consistency
+  * Enhanced company OKR page with professional dashed lines and arrow markers
+  * Improved visual hierarchy mapping between parent and child objectives
 ```
 
 ## User Preferences
