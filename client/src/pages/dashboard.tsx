@@ -54,13 +54,38 @@ export default function Dashboard() {
     queryKey: ["/api/okrs"],
   });
 
+  // Helper function to check if a cycle is related to selected cycle
+  const isRelatedCycle = (okrCycleId: string, selectedCycleId: string) => {
+    if (selectedCycleId === 'all') return true;
+    if (okrCycleId === selectedCycleId) return true;
+    
+    // Find the selected cycle and OKR cycle
+    const selectedCycle = cycles.find(c => c.id === selectedCycleId);
+    const okrCycle = cycles.find(c => c.id === okrCycleId);
+    
+    if (!selectedCycle || !okrCycle) return false;
+    
+    // If selected cycle is quarterly, include monthly cycles within that quarter
+    if (selectedCycle.type === 'quarterly' && okrCycle.type === 'monthly') {
+      const selectedStart = new Date(selectedCycle.startDate);
+      const selectedEnd = new Date(selectedCycle.endDate);
+      const okrStart = new Date(okrCycle.startDate);
+      const okrEnd = new Date(okrCycle.endDate);
+      
+      // Check if monthly cycle falls within quarterly cycle period
+      return okrStart >= selectedStart && okrEnd <= selectedEnd;
+    }
+    
+    return false;
+  };
+
   // Client-side filtering for status and cycle
   const okrs = allOkrs.filter(okr => {
     // Status filter
     const statusMatch = statusFilter === 'all' || okr.status === statusFilter;
     
-    // Cycle filter
-    const cycleMatch = cycleFilter === 'all' || okr.cycleId === cycleFilter;
+    // Cycle filter with related cycle logic
+    const cycleMatch = isRelatedCycle(okr.cycleId, cycleFilter);
     
     return statusMatch && cycleMatch;
   });
