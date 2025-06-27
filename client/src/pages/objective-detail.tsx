@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -10,10 +11,12 @@ import { Link } from "wouter";
 import { CheckInModal } from "@/components/check-in-modal";
 import { SimpleProgressStatus } from "@/components/progress-status";
 import type { OKRWithKeyResults, KeyResult, Initiative } from "@shared/schema";
-import Sidebar from "@/components/sidebar";
 
 export default function ObjectiveDetail() {
   const { id } = useParams();
+  const [checkInModal, setCheckInModal] = useState<{ open: boolean; keyResult?: KeyResult }>({
+    open: false
+  });
   
   const { data: objective, isLoading } = useQuery<OKRWithKeyResults>({
     queryKey: [`/api/okrs/${id}`],
@@ -30,10 +33,10 @@ export default function ObjectiveDetail() {
       case "on_track":
         return "bg-green-500";
       case "at_risk":
-        return "bg-orange-500";
+        return "bg-yellow-500";
+      case "behind":
+        return "bg-red-500";
       case "completed":
-        return "bg-green-500";
-      case "in_progress":
         return "bg-blue-500";
       default:
         return "bg-gray-500";
@@ -46,10 +49,10 @@ export default function ObjectiveDetail() {
         return "On Track";
       case "at_risk":
         return "At Risk";
+      case "behind":
+        return "Behind";
       case "completed":
         return "Completed";
-      case "in_progress":
-        return "In Progress";
       default:
         return status;
     }
@@ -87,236 +90,223 @@ export default function ObjectiveDetail() {
     }
   };
 
+  const handleCheckIn = (keyResult: KeyResult) => {
+    setCheckInModal({ open: true, keyResult });
+  };
+
   if (isLoading) {
     return (
-      <div className="flex h-screen bg-gray-50">
-        <Sidebar />
-        <div className="flex-1 pt-16 lg:pt-0">
-          <div className="p-6">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <p className="text-center text-gray-500 mt-2">Loading objective...</p>
-          </div>
-        </div>
+      <div className="p-6">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+        <p className="text-center text-gray-500 mt-2">Loading objective...</p>
       </div>
     );
   }
 
   if (!objective) {
     return (
-      <div className="flex h-screen bg-gray-50">
-        <Sidebar />
-        <div className="flex-1 pt-16 lg:pt-0">
-          <div className="p-6">
-            <p className="text-center text-gray-500">Objective not found</p>
-          </div>
-        </div>
+      <div className="p-6">
+        <p className="text-center text-gray-500">Objective not found</p>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar />
-      
-      <div className="flex-1 flex flex-col overflow-hidden pt-16 lg:pt-0">
-        {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-4 lg:px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link href="/dashboard">
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Dashboard
-                </Button>
-              </Link>
-              <div>
-                <div className="flex items-center space-x-3 mb-1">
-                  <h1 className="text-xl lg:text-2xl font-semibold text-gray-900">{objective.title}</h1>
-                  <Badge className={`${getStatusColor(objective.status)} text-white`}>
-                    {getStatusLabel(objective.status)}
-                  </Badge>
-                </div>
-                <p className="text-gray-600 text-sm lg:text-base">{objective.description}</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm">
-                <Edit className="w-4 h-4 mr-2" />
-                Edit
+    <div className="p-6">
+      {/* Page Header */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Link href="/dashboard">
+              <Button variant="ghost" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Dashboard
               </Button>
+            </Link>
+            <div>
+              <div className="flex items-center space-x-3 mb-1">
+                <h1 className="text-xl lg:text-2xl font-semibold text-gray-900">{objective.title}</h1>
+                <Badge className={`${getStatusColor(objective.status)} text-white`}>
+                  {getStatusLabel(objective.status)}
+                </Badge>
+              </div>
+              <p className="text-gray-600">{objective.description}</p>
             </div>
           </div>
           
-          {/* Objective Info */}
-          <div className="flex items-center space-x-6 text-sm text-gray-500 mt-4">
-            <span className="flex items-center space-x-1">
-              <User className="w-4 h-4" />
-              <span>{objective.owner}</span>
-            </span>
-            <span className="flex items-center space-x-1">
-              <Calendar className="w-4 h-4" />
-              <span>{objective.timeframe}</span>
-            </span>
-            <span className="flex items-center space-x-1">
-              <Target className="w-4 h-4" />
-              <span>Overall Progress {objective.overallProgress}%</span>
-            </span>
+          <div className="flex items-center space-x-2">
+            <Button variant="outline" size="sm">
+              <Edit className="w-4 h-4 mr-2" />
+              Edit
+            </Button>
           </div>
-        </header>
-
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto p-6">
-          <Tabs defaultValue="progress" className="space-y-6">
-            <TabsList>
-              <TabsTrigger value="progress">Progress</TabsTrigger>
-              <TabsTrigger value="history">History</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="progress" className="space-y-6">
-              {/* Key Results Section */}
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="flex items-center space-x-2">
-                    <BarChart3 className="w-5 h-5" />
-                    <span>Key Results</span>
-                  </CardTitle>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-500">Overall Progress</span>
-                    <span className="font-semibold text-lg">{objective.overallProgress}%</span>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {objective.keyResults.map((kr, index) => {
-                    const progress = calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
-                    return (
-                      <div key={kr.id} className="p-4 bg-gray-50 rounded-lg space-y-3">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="font-medium text-gray-900">Key Result {index + 1}</span>
-                              <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
-                                {getKeyResultTypeLabel(kr.keyResultType)}
-                              </span>
-                            </div>
-                            <h3 className="font-medium text-gray-900 mb-1">{kr.title}</h3>
-                            <p className="text-sm text-gray-600 mb-2">{kr.description}</p>
-                            <div className="text-sm text-gray-500 mb-2">
-                              Current progress at {kr.currentValue}%, current progress at {progress.toFixed(0)}%
-                            </div>
-                            <div className="flex items-center space-x-4 text-xs text-gray-500">
-                              <span>7 days ago</span>
-                              <span className="flex items-center space-x-1">
-                                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                                <span>{progress.toFixed(0)}%</span>
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <CheckInModal
-                              keyResultId={kr.id}
-                              keyResultTitle={kr.title}
-                              currentValue={kr.currentValue}
-                              targetValue={kr.targetValue}
-                              unit={kr.unit}
-                              keyResultType={kr.keyResultType}
-                            />
-                          </div>
-                        </div>
-                        <SimpleProgressStatus
-                          status={kr.status}
-                          progressPercentage={progress}
-                        />
-                      </div>
-                    );
-                  })}
-                  
-                  <Button variant="outline" className="w-full mt-4">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Key Result
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Projects/Initiatives Section */}
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle>Projects</CardTitle>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-500">Overall Progress</span>
-                    <span className="font-semibold text-lg">{objective.overallProgress}%</span>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b text-left text-sm text-gray-500">
-                          <th className="pb-2">Project Name</th>
-                          <th className="pb-2">Relation</th>
-                          <th className="pb-2">Leader</th>
-                          <th className="pb-2">Deadline</th>
-                          <th className="pb-2">Progress</th>
-                          <th className="pb-2">Achievement</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {initiatives.length > 0 ? initiatives.map((initiative) => (
-                          <tr key={initiative.id} className="border-b">
-                            <td className="py-3 font-medium">{initiative.title}</td>
-                            <td className="py-3 text-sm text-gray-600">Key Result 1</td>
-                            <td className="py-3">
-                              <div className="flex items-center space-x-2">
-                                <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
-                                <span className="text-sm">Taufiq</span>
-                              </div>
-                            </td>
-                            <td className="py-3 text-sm text-red-500">5 Januari 2022</td>
-                            <td className="py-3">
-                              <div className="flex items-center space-x-2">
-                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                <span className="text-sm">20%</span>
-                              </div>
-                            </td>
-                            <td className="py-3">
-                              <div className="flex items-center space-x-2">
-                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                <span className="text-sm">20%</span>
-                              </div>
-                            </td>
-                          </tr>
-                        )) : (
-                          <tr>
-                            <td colSpan={6} className="py-8 text-center text-gray-500">
-                              <div className="flex flex-col items-center space-y-2">
-                                <p>No projects found</p>
-                                <Button variant="outline" size="sm">
-                                  <Plus className="w-4 h-4 mr-2" />
-                                  Add Project
-                                </Button>
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="history">
-              <Card>
-                <CardHeader>
-                  <CardTitle>History</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-500">History functionality will be implemented here.</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </main>
+        </div>
       </div>
+
+      {/* Objective Overview */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Calendar className="w-4 h-4 text-gray-500" />
+              <span className="text-sm text-gray-500">Period</span>
+            </div>
+            <p className="font-medium mt-1">{objective.timeframe}</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <User className="w-4 h-4 text-gray-500" />
+              <span className="text-sm text-gray-500">Owner</span>
+            </div>
+            <p className="font-medium mt-1">{objective.ownerId || "Unassigned"}</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Target className="w-4 h-4 text-gray-500" />
+              <span className="text-sm text-gray-500">Key Results</span>
+            </div>
+            <p className="font-medium mt-1">{objective.keyResults.length}</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <BarChart3 className="w-4 h-4 text-gray-500" />
+              <span className="text-sm text-gray-500">Overall Progress</span>
+            </div>
+            <p className="font-medium mt-1">{Math.round(objective.progress)}%</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Tabs */}
+      <Tabs defaultValue="progress" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="progress">Progress</TabsTrigger>
+          <TabsTrigger value="history">History</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="progress" className="space-y-6">
+          {/* Key Results */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Key Results</h2>
+              <Button size="sm">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Key Result
+              </Button>
+            </div>
+            
+            {objective.keyResults.map((keyResult) => {
+              const progress = calculateProgress(
+                keyResult.currentValue,
+                keyResult.targetValue,
+                keyResult.keyResultType,
+                keyResult.baseValue
+              );
+              
+              return (
+                <Card key={keyResult.id}>
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <h3 className="font-medium">{keyResult.title}</h3>
+                          <Badge variant="outline">
+                            {getKeyResultTypeLabel(keyResult.keyResultType)}
+                          </Badge>
+                        </div>
+                        {keyResult.description && (
+                          <p className="text-sm text-gray-600 mb-3">{keyResult.description}</p>
+                        )}
+                        
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span>Progress: {keyResult.currentValue} / {keyResult.targetValue} {keyResult.unit}</span>
+                            <span className="font-medium">{Math.round(progress)}%</span>
+                          </div>
+                          <Progress value={progress} className="h-2" />
+                        </div>
+                        
+                        <div className="mt-3">
+                          <SimpleProgressStatus 
+                            keyResult={keyResult}
+                            startDate={new Date(objective.createdAt || Date.now())}
+                            endDate={new Date(objective.createdAt || Date.now())}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="ml-4 flex flex-col space-y-2">
+                        <Button 
+                          size="sm" 
+                          onClick={() => handleCheckIn(keyResult)}
+                        >
+                          Check In
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <Edit className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+
+          {/* Initiatives */}
+          {initiatives.length > 0 && (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold">Initiatives</h2>
+              <div className="grid gap-4">
+                {initiatives.map((initiative) => (
+                  <Card key={initiative.id}>
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h3 className="font-medium">{initiative.title}</h3>
+                          {initiative.description && (
+                            <p className="text-sm text-gray-600 mt-1">{initiative.description}</p>
+                          )}
+                        </div>
+                        <Badge variant="outline">
+                          {initiative.status}
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="history" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Activity History</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-500 text-center py-8">No activity history available</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Check-in Modal */}
+      <CheckInModal
+        open={checkInModal.open}
+        onOpenChange={(open) => setCheckInModal({ open, keyResult: open ? checkInModal.keyResult : undefined })}
+        keyResult={checkInModal.keyResult}
+      />
     </div>
   );
 }

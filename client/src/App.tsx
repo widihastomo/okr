@@ -1,9 +1,12 @@
 import { Switch, Route } from "wouter";
+import { useState } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
+import GlobalHeader from "@/components/global-header";
+import Sidebar from "@/components/sidebar";
 import Dashboard from "@/pages/dashboard";
 import CyclesPage from "@/components/cycles-page";
 import TemplatesPage from "@/components/templates-page";
@@ -20,6 +23,7 @@ import NotFound from "@/pages/not-found";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   if (isLoading) {
     return (
@@ -44,20 +48,35 @@ function Router() {
   }
 
   return (
-    <Switch>
-      <Route path="/" component={Dashboard} />
-      <Route path="/dashboard" component={Dashboard} />
-      <Route path="/home" component={Home} />
-      <Route path="/profile" component={Profile} />
-      <Route path="/company-okrs" component={CompanyOKRsPage} />
-      <Route path="/okr-structure" component={OKRStructurePage} />
-      <Route path="/key-results/:id" component={KeyResultDetail} />
-      <Route path="/objectives/:id" component={ObjectiveDetail} />
-      <Route path="/cycles" component={CyclesPage} />
-      <Route path="/templates" component={TemplatesPage} />
-      <Route path="/users" component={UsersPage} />
-      <Route component={NotFound} />
-    </Switch>
+    <div className="min-h-screen bg-gray-50">
+      {/* Global Header */}
+      <GlobalHeader onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
+      
+      <div className="flex">
+        {/* Sidebar */}
+        <div className={`${sidebarOpen ? 'w-64' : 'w-0'} transition-all duration-300 overflow-hidden`}>
+          <Sidebar />
+        </div>
+        
+        {/* Main Content */}
+        <div className="flex-1 min-h-[calc(100vh-4rem)]">
+          <Switch>
+            <Route path="/" component={Dashboard} />
+            <Route path="/dashboard" component={Dashboard} />
+            <Route path="/home" component={Home} />
+            <Route path="/profile" component={Profile} />
+            <Route path="/company-okrs" component={CompanyOKRsPage} />
+            <Route path="/okr-structure" component={OKRStructurePage} />
+            <Route path="/key-results/:id" component={KeyResultDetail} />
+            <Route path="/objectives/:id" component={ObjectiveDetail} />
+            <Route path="/cycles" component={CyclesPage} />
+            <Route path="/templates" component={TemplatesPage} />
+            <Route path="/users" component={UsersPage} />
+            <Route component={NotFound} />
+          </Switch>
+        </div>
+      </div>
+    </div>
   );
 }
 
