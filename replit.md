@@ -420,6 +420,12 @@ Changelog:
   * Both Add Task and Edit Task modals now have identical field structure
   * Improved user experience with immediate data refresh after all task operations
   * Task assignment changes now persist correctly and update initiative progress automatically
+- June 27, 2025. Fixed task edit form to properly display current assigned user:
+  * Enhanced handleEditTask function to correctly handle both string and object assignedTo formats
+  * Updated Select components to use value prop instead of defaultValue for proper state reflection
+  * Edit Task modal now correctly shows currently assigned PIC when opened
+  * All form fields (status, priority, assignedTo) properly display existing task data
+  * Task editing functionality now matches create functionality with proper data population
 ```
 
 ## User Preferences

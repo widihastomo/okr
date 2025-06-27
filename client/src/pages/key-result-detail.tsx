@@ -254,12 +254,13 @@ export default function KeyResultDetailPage() {
 
   const handleEditTask = (task: any) => {
     setEditingTask(task);
+    const assignedValue = task.assignedTo ? (typeof task.assignedTo === 'string' ? task.assignedTo : task.assignedTo.id) : "unassigned";
     taskForm.reset({
       title: task.title || "",
       description: task.description || "",
       status: task.status || "not_started",
       priority: task.priority || "medium",
-      assignedTo: task.assignedTo?.id || "",
+      assignedTo: assignedValue,
       dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : "",
     });
     setEditTaskOpen(true);
@@ -1339,7 +1340,7 @@ export default function KeyResultDetailPage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select status" />
@@ -1364,7 +1365,7 @@ export default function KeyResultDetailPage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Priority</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select priority" />
@@ -1389,7 +1390,7 @@ export default function KeyResultDetailPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Assigned To</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select user" />
