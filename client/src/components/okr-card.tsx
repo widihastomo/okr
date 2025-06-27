@@ -115,11 +115,25 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
       <div className="bg-white text-gray-900 p-6 rounded-t-lg border-b">
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            <Link href={`/objective/${okr.id}`}>
-              <h3 className="text-xl font-bold mb-2 hover:underline cursor-pointer">
-                {okr.title}
-              </h3>
-            </Link>
+            <div className="flex items-center gap-2 mb-2">
+              <Link href={`/objective/${okr.id}`}>
+                <h3 className="text-xl font-bold hover:underline cursor-pointer">
+                  {okr.title}
+                </h3>
+              </Link>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="p-1 hover:bg-gray-100"
+              >
+                {isExpanded ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
             <p className="text-gray-600 mb-4">{okr.description}</p>
             
             <div className="flex items-center gap-4 text-sm text-gray-600">
@@ -140,18 +154,6 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
             </div>
           </div>
           <div className="flex items-start space-x-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="p-2 hover:bg-gray-100"
-            >
-              {isExpanded ? (
-                <ChevronUp className="w-4 h-4" />
-              ) : (
-                <ChevronDown className="w-4 h-4" />
-              )}
-            </Button>
             <div className="flex flex-col items-end">
               <div className="flex items-center gap-2 mb-2">
                 {(() => {
