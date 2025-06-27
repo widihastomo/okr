@@ -287,7 +287,7 @@ export default function KeyResultDetailPage() {
       
 
       {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center justify-between mb-6">
         <Button 
           variant="ghost" 
           size="sm" 
@@ -297,6 +297,21 @@ export default function KeyResultDetailPage() {
           <ArrowLeft className="h-4 w-4" />
           Back to Dashboard
         </Button>
+        
+        <div className="flex items-center gap-3">
+          <CheckInModal 
+            keyResultId={keyResult.id}
+            keyResultTitle={keyResult.title}
+            currentValue={keyResult.currentValue}
+            targetValue={keyResult.targetValue}
+            unit={keyResult.unit}
+            keyResultType={keyResult.keyResultType}
+          />
+          <Button variant="outline" size="sm">
+            <Edit className="h-4 w-4 mr-2" />
+            Edit Key Result
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -648,19 +663,7 @@ export default function KeyResultDetailPage() {
             <CardHeader>
               <CardTitle className="text-lg">Actions</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <CheckInModal 
-                keyResultId={keyResult.id}
-                keyResultTitle={keyResult.title}
-                currentValue={keyResult.currentValue}
-                targetValue={keyResult.targetValue}
-                unit={keyResult.unit}
-                keyResultType={keyResult.keyResultType}
-              />
-              <Button variant="outline" className="w-full">
-                <Edit className="h-4 w-4 mr-2" />
-                Edit Key Result
-              </Button>
+            <CardContent>
               <Button variant="outline" className="w-full">
                 <Users className="h-4 w-4 mr-2" />
                 Share Progress
