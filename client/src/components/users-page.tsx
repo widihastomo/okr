@@ -503,12 +503,12 @@ export default function UsersPage() {
           {editingUser && (
             <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>
               <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Edit User</DialogTitle>
-                      <DialogDescription>
-                        Update user information for {editingUser.firstName} {editingUser.lastName}
-                      </DialogDescription>
-                    </DialogHeader>
+                <DialogHeader>
+                  <DialogTitle>Edit User</DialogTitle>
+                  <DialogDescription>
+                    Update user information for {editingUser.firstName} {editingUser.lastName}
+                  </DialogDescription>
+                </DialogHeader>
                     <form onSubmit={(e) => {
                       e.preventDefault();
                       const formData = new FormData(e.currentTarget);
