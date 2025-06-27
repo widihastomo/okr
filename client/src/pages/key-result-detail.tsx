@@ -253,25 +253,23 @@ export default function KeyResultDetailPage() {
   };
 
   const handleTaskSubmit = (data: TaskFormData) => {
+    const processedData = {
+      ...data,
+      dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : undefined,
+      assignedTo: data.assignedTo === "unassigned" ? undefined : data.assignedTo || undefined,
+    };
+
     if (editingTask) {
       // Update existing task
       updateTaskMutation.mutate({
         taskId: editingTask.id,
-        taskData: {
-          ...data,
-          dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : undefined,
-          assignedTo: data.assignedTo || undefined,
-        }
+        taskData: processedData
       });
     } else if (addingTaskToInitiative) {
       // Create new task
       createTaskMutation.mutate({
         initiativeId: addingTaskToInitiative,
-        taskData: {
-          ...data,
-          dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : undefined,
-          assignedTo: data.assignedTo || undefined,
-        }
+        taskData: processedData
       });
     }
   };
@@ -1496,7 +1494,7 @@ export default function KeyResultDetailPage() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">Unassigned</SelectItem>
+                      <SelectItem value="unassigned">Unassigned</SelectItem>
                       {users?.map((user: any) => (
                         <SelectItem key={user.id} value={user.id}>
                           {user.name}
