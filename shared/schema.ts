@@ -100,7 +100,7 @@ export const keyResults = pgTable("key_results", {
 export const checkIns = pgTable("check_ins", {
   id: uuid("id").primaryKey().defaultRandom(),
   keyResultId: uuid("key_result_id").references(() => keyResults.id).notNull(),
-  value: decimal("value", { precision: 10, scale: 2 }).notNull(),
+  value: decimal("value", { precision: 15, scale: 2 }).notNull(),
   notes: text("notes"),
   confidence: integer("confidence").notNull().default(5), // 1-10 scale
   createdAt: timestamp("created_at").defaultNow(),

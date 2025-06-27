@@ -30,6 +30,12 @@ const parseNumberFromFormatted = (value: string): string => {
   // Remove thousand separators (dots) but keep decimal separator (comma)
   const cleanValue = value.replace(/\./g, '').replace(',', '.');
   const num = parseFloat(cleanValue);
+  
+  // Check for numeric overflow - limit to 999 billion
+  if (!isNaN(num) && num > 999999999999.99) {
+    return '999999999999.99';
+  }
+  
   return isNaN(num) ? '' : num.toString();
 };
 
@@ -54,6 +60,7 @@ export function CheckInModal({
   const [value, setValue] = useState(currentValue);
   const [notes, setNotes] = useState("");
   const [confidence, setConfidence] = useState([5]);
+  const [showNumberWarning, setShowNumberWarning] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -171,8 +178,18 @@ export function CheckInModal({
               type="text"
               value={formatNumberWithCommas(value)}
               onChange={(e) => {
-                const rawValue = parseNumberFromFormatted(e.target.value);
-                setValue(rawValue);
+                const inputValue = e.target.value;
+                const cleanValue = inputValue.replace(/\./g, '').replace(',', '.');
+                const num = parseFloat(cleanValue);
+                
+                if (!isNaN(num) && num > 999999999999.99) {
+                  setShowNumberWarning(true);
+                  setValue('999999999999.99');
+                } else {
+                  setShowNumberWarning(false);
+                  const rawValue = parseNumberFromFormatted(inputValue);
+                  setValue(rawValue);
+                }
               }}
               className="mt-1"
               required
@@ -182,6 +199,11 @@ export function CheckInModal({
                        unit === "percentage" ? `${formatNumberWithCommas(targetValue)}%` :
                        `${formatNumberWithCommas(targetValue)} ${getUnitDisplay(unit)}`}
             </div>
+            {showNumberWarning && (
+              <div className="text-xs text-orange-600 mt-1 font-medium">
+                ⚠️ Nilai maksimum adalah 999.999.999.999,99 - angka telah disesuaikan
+              </div>
+            )}
             <div className="text-xs mt-1 font-medium">
               {getProgressHint()}
             </div>
