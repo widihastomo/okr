@@ -89,8 +89,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       <div
         className={cn(
           "fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 transition-all duration-300 ease-in-out z-30",
-          isOpen ? "w-64" : "w-16",
-          "lg:relative lg:top-0 lg:h-[calc(100vh-4rem)] lg:translate-x-0"
+          // Mobile: completely hidden when closed, full width when open
+          isOpen ? "w-64 translate-x-0" : "w-0 -translate-x-full lg:translate-x-0",
+          // Desktop: always visible, width changes
+          "lg:relative lg:top-0 lg:h-[calc(100vh-4rem)] lg:w-64 lg:translate-x-0",
+          !isOpen && "lg:w-16"
         )}
       >
         <div className="flex flex-col h-full">
