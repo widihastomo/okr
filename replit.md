@@ -405,6 +405,15 @@ Changelog:
   * Added professional UI styling with proper avatars, spacing, and responsive design
   * Fixed user name safety with proper null checks to prevent "undefined" display issues
   * Enhanced task collaboration workspace with comprehensive project management features
+- June 27, 2025. Fixed task creation functionality and resolved data refresh issues:
+  * Created missing API endpoint `/api/initiatives/:initiativeId/tasks` for task creation
+  * Fixed authentication issue by adding proper development mode support for task creation
+  * Resolved user dropdown display problem - users now show with proper firstName/lastName structure
+  * Enhanced form validation to handle "unassigned" task assignment correctly
+  * Added proper date conversion and null handling for optional task fields
+  * Implemented enhanced cache invalidation with `refetchType: 'active'` for immediate UI refresh
+  * Fixed task list refresh issue - new tasks now appear immediately after creation
+  * Added automatic initiative progress recalculation when tasks are created or updated
 ```
 
 ## User Preferences

@@ -201,8 +201,19 @@ export default function KeyResultDetailPage() {
       }
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/key-results', keyResultId, 'initiatives'] });
+    onSuccess: async () => {
+      // Force refetch of initiatives data to show new task immediately
+      await queryClient.invalidateQueries({ 
+        queryKey: [`/api/key-results/${keyResultId}/initiatives`],
+        refetchType: 'active'
+      });
+      
+      // Also refresh the key result data
+      await queryClient.invalidateQueries({ 
+        queryKey: [`/api/key-results/${keyResultId}`],
+        refetchType: 'active'
+      });
+      
       toast({
         title: "Task berhasil dibuat",
         description: "Task baru telah ditambahkan ke initiative",
