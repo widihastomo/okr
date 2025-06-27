@@ -272,6 +272,9 @@ Changelog:
   * Fixed OKR save/update functionality by handling empty baseValue fields properly (convert to null)
   * Updated currency display format to show "Rp" prefix before numbers for Indonesian currency standard
   * Applied consistent "Rp 250.000.000" formatting across OKR cards and check-in modal displays
+  * Implemented automatic key result deletion during OKR editing process
+  * Added DELETE endpoint for individual key results (/api/key-results/:id)
+  * System now properly cleans up orphaned key results when removed from OKR forms
 ```
 
 ## User Preferences

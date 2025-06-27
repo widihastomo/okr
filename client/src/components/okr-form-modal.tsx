@@ -199,6 +199,32 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
         ownerName = user ? `${user.firstName} ${user.lastName}` : "";
       }
 
+      // If editing, identify key results that need to be deleted
+      let keyResultsToDelete: string[] = [];
+      if (isEditMode && okr) {
+        const originalKeyResultIds = okr.keyResults.map(kr => kr.id);
+        const currentKeyResultIds = data.keyResults
+          .filter(kr => kr.id) // Only existing key results have IDs
+          .map(kr => kr.id!);
+        
+        keyResultsToDelete = originalKeyResultIds.filter(
+          id => !currentKeyResultIds.includes(id)
+        );
+      }
+
+      // Delete removed key results first
+      if (keyResultsToDelete.length > 0) {
+        for (const keyResultId of keyResultsToDelete) {
+          const deleteResponse = await fetch(`/api/key-results/${keyResultId}`, {
+            method: "DELETE",
+          });
+          
+          if (!deleteResponse.ok) {
+            throw new Error(`Failed to delete key result ${keyResultId}`);
+          }
+        }
+      }
+
       // Prepare the payload with the calculated owner name
       const payload = {
         ...data,
