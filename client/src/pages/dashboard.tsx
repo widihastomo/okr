@@ -236,7 +236,7 @@ export default function Dashboard() {
             <CreateOKRButton />
           </div>
         ) : (
-          okrs.map((okr) => {
+          okrs.map((okr, index) => {
             // Find the cycle for this OKR to get start and end date
             const cycle = cycles.find(c => c.id === okr.cycleId);
             return (
@@ -250,6 +250,7 @@ export default function Dashboard() {
                 onDelete={handleDeleteOKR}
                 cycleStartDate={cycle?.startDate}
                 cycleEndDate={cycle?.endDate}
+                index={index}
               />
             );
           })

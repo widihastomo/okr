@@ -21,10 +21,11 @@ interface OKRCardProps {
   onDelete?: (okrId: string) => void;
   cycleStartDate?: string;
   cycleEndDate?: string;
+  index?: number;
 }
 
-export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDuplicate, onDelete, cycleStartDate, cycleEndDate }: OKRCardProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
+export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDuplicate, onDelete, cycleStartDate, cycleEndDate, index = 0 }: OKRCardProps) {
+  const [isExpanded, setIsExpanded] = useState(index === 0);
   
   const calculateProgress = (current: string, target: string, keyResultType: string, baseValue?: string | null): number => {
     const currentNum = parseFloat(current) || 0;

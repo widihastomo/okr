@@ -261,6 +261,7 @@ Changelog:
   * Enhanced navigation by allowing users to focus on specific objectives
   * Improved visual organization with clean chevron up/down icons and compact layout
   * Fixed timeframe references to display "Cycle-based" label consistently
+  * Set default state so only first OKR card is expanded, subsequent cards start collapsed
 - June 27, 2025. Fixed numeric overflow and enhanced number formatting:
   * Resolved database schema numeric field overflow by increasing precision from 10,2 to 15,2
   * Database now supports currency values up to 999,999,999,999.99 (999 billion)
