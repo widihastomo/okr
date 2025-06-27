@@ -532,7 +532,7 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
                 <div className="bg-white p-4 rounded-md border space-y-3">
                   <h4 className="text-sm font-medium text-gray-700">Tambah Task Baru</h4>
                   
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-3 gap-3">
                     <Input
                       placeholder="Judul task"
                       value={newTask.title}
@@ -543,12 +543,40 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
                       onValueChange={(value) => setNewTask({ ...newTask, priority: value as any })}
                     >
                       <SelectTrigger>
-                        <SelectValue />
+                        <SelectValue placeholder="Prioritas" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="low">Rendah</SelectItem>
                         <SelectItem value="medium">Sedang</SelectItem>
                         <SelectItem value="high">Tinggi</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select
+                      value={newTask.assignedTo || "none"}
+                      onValueChange={(value) => setNewTask({ ...newTask, assignedTo: value === "none" ? "" : value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih PIC" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Tidak ada</SelectItem>
+                        {(() => {
+                          // Get available PICs: initiative PIC + selected members
+                          const watchedValues = form.watch();
+                          const availablePics = users.filter(user => {
+                            // Include initiative PIC
+                            if (watchedValues.picId && user.id === watchedValues.picId) return true;
+                            // Include selected members
+                            if (watchedValues.members && watchedValues.members.includes(user.id)) return true;
+                            return false;
+                          });
+                          return availablePics.map(user => (
+                            <SelectItem key={user.id} value={user.id}>
+                              {`${user.firstName} ${user.lastName}`}
+                              {watchedValues.picId === user.id && " (PIC)"}
+                            </SelectItem>
+                          ));
+                        })()}
                       </SelectContent>
                     </Select>
                   </div>
@@ -585,7 +613,7 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
                     {tasks.map((task, index) => (
                       <div key={index} className="bg-white p-3 rounded-md border flex items-center justify-between">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <h5 className="font-medium text-sm">{task.title}</h5>
                             <span className={`px-2 py-1 rounded text-xs ${
                               task.priority === "high" ? "bg-red-100 text-red-700" :
@@ -594,6 +622,15 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
                             }`}>
                               {getPriorityLabel(task.priority)}
                             </span>
+                            {task.assignedTo && (() => {
+                              const assignedUser = users.find(u => u.id === task.assignedTo);
+                              return assignedUser ? (
+                                <span className="px-2 py-1 rounded text-xs bg-blue-100 text-blue-700 flex items-center gap-1">
+                                  <User className="h-3 w-3" />
+                                  {`${assignedUser.firstName} ${assignedUser.lastName}`}
+                                </span>
+                              ) : null;
+                            })()}
                           </div>
                           {task.description && (
                             <p className="text-sm text-gray-600 mt-1">{task.description}</p>

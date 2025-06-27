@@ -356,6 +356,9 @@ Changelog:
   * Task system includes title, description, priority, due dates, and deletion functionality
   * Form width increased to 800px providing adequate space for complex project planning
   * Sheet-based interface improves user experience with proper scrolling and organization
+  * Added intelligent PIC selection to tasks with filtered user options (initiative PIC + team members)
+  * Task assignment system ensures only relevant project participants can be assigned to tasks
+  * Enhanced task display with user badges showing assigned personnel for better accountability
 ```
 
 ## User Preferences
