@@ -29,6 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Area, AreaChart, ResponsiveContainer } from "recharts";
 
 export default function KeyResultDetailPage() {
   const params = useParams();
@@ -171,6 +172,61 @@ export default function KeyResultDetailPage() {
       queryKey: [`/api/key-results/${keyResultId}/initiatives`]
     });
   };
+
+  // Prepare chart data from check-ins
+  const prepareChartData = () => {
+    if (!keyResult?.checkIns || keyResult.checkIns.length === 0) {
+      // Return sample data structure if no check-ins exist
+      return [
+        { date: "01 Jan", actual: 0, ideal: 0 },
+        { date: "24 Jan", actual: 17.5, ideal: 25 },
+        { date: "16 Feb", actual: 50, ideal: 50 },
+        { date: "11 Mar", actual: 75, ideal: 75 },
+        { date: "31 Mar", actual: 95, ideal: 100 }
+      ];
+    }
+
+    // Use current quarter as default cycle dates
+    const startDate = new Date(2025, 0, 1); // Jan 1, 2025
+    const endDate = new Date(2025, 2, 31);   // Mar 31, 2025
+    const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    // Sort check-ins by date
+    const sortedCheckIns = [...keyResult.checkIns].sort((a, b) => 
+      new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime()
+    );
+
+    // Calculate progress for each check-in
+    return sortedCheckIns.map((checkIn, index) => {
+      // Calculate actual progress
+      const current = parseFloat(checkIn.value);
+      const target = parseFloat(keyResult.targetValue);
+      const base = parseFloat(keyResult.baseValue || "0");
+      
+      let actualProgress = 0;
+      if (keyResult.keyResultType === "increase_to") {
+        actualProgress = ((current - base) / (target - base)) * 100;
+      } else if (keyResult.keyResultType === "decrease_to") {
+        actualProgress = ((base - current) / (base - target)) * 100;
+      } else if (keyResult.keyResultType === "achieve_or_not") {
+        actualProgress = current >= target ? 100 : 0;
+      }
+
+      // Calculate ideal progress based on time
+      const checkInDate = new Date(checkIn.createdAt || Date.now());
+      const daysPassed = Math.ceil((checkInDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+      const idealProgress = Math.min((daysPassed / totalDays) * 100, 100);
+
+      return {
+        date: format(checkInDate, "dd MMM"),
+        actual: Math.max(0, Math.min(100, actualProgress)),
+        ideal: Math.max(0, Math.min(100, idealProgress)),
+        value: current
+      };
+    });
+  };
+
+  const chartData = keyResult ? prepareChartData() : [];
 
   const getUnitDisplay = (unit: string) => {
     switch (unit) {
@@ -398,6 +454,89 @@ export default function KeyResultDetailPage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Achievement Chart */}
+          {chartData.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Achievement
+                </CardTitle>
+                <CardDescription>
+                  Progress tracking over time compared to ideal timeline
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-80 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="actualGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="#10b981" stopOpacity={0.1}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <XAxis 
+                        dataKey="date" 
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fontSize: 12, fill: '#6b7280' }}
+                      />
+                      <YAxis 
+                        domain={[0, 100]}
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fontSize: 12, fill: '#6b7280' }}
+                        tickFormatter={(value) => `${value}%`}
+                      />
+                      <Tooltip 
+                        content={({ active, payload, label }) => {
+                          if (active && payload && payload.length) {
+                            return (
+                              <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+                                <p className="font-medium text-gray-900 mb-2">{label}</p>
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                    <span className="text-sm text-gray-600">Actual Progress:</span>
+                                    <span className="text-sm font-medium">{typeof payload[0]?.value === 'number' ? payload[0].value.toFixed(1) : '0.0'}%</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 border-2 border-gray-400 border-dashed rounded-full"></div>
+                                    <span className="text-sm text-gray-600">Ideal Progress:</span>
+                                    <span className="text-sm font-medium">{typeof payload[1]?.value === 'number' ? payload[1].value.toFixed(1) : '0.0'}%</span>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="actual"
+                        stroke="#10b981"
+                        strokeWidth={2}
+                        fill="url(#actualGradient)"
+                        dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="ideal"
+                        stroke="#9ca3af"
+                        strokeWidth={2}
+                        strokeDasharray="5 5"
+                        dot={false}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Initiatives Table */}
           <Card>
