@@ -521,7 +521,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                       )}
                     />
 
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <FormField
                         control={form.control}
                         name={`keyResults.${index}.baseValue`}
@@ -563,36 +563,6 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                                 type="number" 
                                 step="0.1" 
                                 placeholder="100" 
-                                {...field}
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  if (value === '') {
-                                    field.onChange('');
-                                    return;
-                                  }
-                                  const num = parseFloat(value);
-                                  if (!isNaN(num)) {
-                                    field.onChange((Math.round(num * 10) / 10).toString());
-                                  }
-                                }}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name={`keyResults.${index}.currentValue`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Current</FormLabel>
-                            <FormControl>
-                              <Input 
-                                type="number" 
-                                step="0.1" 
-                                placeholder="0" 
                                 {...field}
                                 onChange={(e) => {
                                   const value = e.target.value;
