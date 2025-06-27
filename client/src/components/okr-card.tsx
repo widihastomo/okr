@@ -108,7 +108,7 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
 
   return (
     <Card className="mb-6 shadow-lg border-0">
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-t-lg">
+      <div className="bg-white text-gray-900 p-6 rounded-t-lg border-b">
         <div className="flex justify-between items-start">
           <div className="flex-1">
             <Link href={`/objective/${okr.id}`}>
@@ -116,8 +116,8 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
                 {okr.title}
               </h3>
             </Link>
-            <p className="text-blue-100 mb-4">{okr.description}</p>
-            <div className="flex items-center gap-4 text-sm text-blue-100">
+            <p className="text-gray-600 mb-4">{okr.description}</p>
+            <div className="flex items-center gap-4 text-sm text-gray-600">
               <span className="flex items-center gap-1">
                 <User className="w-4 h-4" />
                 {okr.owner}
