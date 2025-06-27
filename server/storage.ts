@@ -637,8 +637,21 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(initiatives);
   }
 
-  async getInitiativesByKeyResultId(keyResultId: string): Promise<Initiative[]> {
-    return await db.select().from(initiatives).where(eq(initiatives.keyResultId, keyResultId));
+  async getInitiativesByKeyResultId(keyResultId: string): Promise<any[]> {
+    const initiativesList = await db.select().from(initiatives).where(eq(initiatives.keyResultId, keyResultId));
+    
+    // Get tasks for each initiative
+    const initiativesWithTasks = await Promise.all(
+      initiativesList.map(async (initiative) => {
+        const tasksList = await this.getTasksByInitiativeId(initiative.id);
+        return {
+          ...initiative,
+          tasks: tasksList,
+        };
+      })
+    );
+    
+    return initiativesWithTasks;
   }
 
   async createInitiative(initiativeData: InsertInitiative): Promise<Initiative> {
@@ -670,6 +683,11 @@ export class DatabaseStorage implements IStorage {
   async createInitiativeMember(memberData: InsertInitiativeMember): Promise<InitiativeMember> {
     const [member] = await db.insert(initiativeMembers).values(memberData).returning();
     return member;
+  }
+
+  async deleteInitiativeMember(id: string): Promise<boolean> {
+    const result = await db.delete(initiativeMembers).where(eq(initiativeMembers.id, id));
+    return result.rowCount > 0;
   }
 
   async getInitiativeMembers(initiativeId: string): Promise<(InitiativeMember & { user: User })[]> {
@@ -914,17 +932,6 @@ export class DatabaseStorage implements IStorage {
     };
   }
 
-  // Initiative Members
-  async createInitiativeMember(memberData: InsertInitiativeMember): Promise<InitiativeMember> {
-    const [member] = await db.insert(initiativeMembers).values(memberData).returning();
-    return member;
-  }
-
-  async deleteInitiativeMember(id: string): Promise<boolean> {
-    const result = await db.delete(initiativeMembers).where(eq(initiativeMembers.id, id));
-    return result.rowCount > 0;
-  }
-
   // Initiative Documents
   async createInitiativeDocument(documentData: InsertInitiativeDocument): Promise<InitiativeDocument> {
     const [document] = await db.insert(initiativeDocuments).values(documentData).returning();
@@ -935,8 +942,6 @@ export class DatabaseStorage implements IStorage {
     const result = await db.delete(initiativeDocuments).where(eq(initiativeDocuments.id, id));
     return result.rowCount > 0;
   }
-
-
 
   async deleteTask(id: string): Promise<boolean> {
     const result = await db.delete(tasks).where(eq(tasks.id, id));

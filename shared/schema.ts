@@ -231,7 +231,7 @@ export type InsertTask = z.infer<typeof insertTaskSchema>;
 export type UpdateKeyResultProgress = z.infer<typeof updateKeyResultProgressSchema>;
 export type CreateOKRFromTemplate = z.infer<typeof createOKRFromTemplateSchema>;
 
-// Select types
+// Primary type definitions - single source of truth
 export type Cycle = typeof cycles.$inferSelect;
 export type Template = typeof templates.$inferSelect;
 export type Objective = typeof objectives.$inferSelect;
@@ -348,24 +348,13 @@ export const insertTeamMemberSchema = createInsertSchema(teamMembers).omit({
   joinedAt: true,
 });
 
-// Types
-export type User = typeof users.$inferSelect;
-export type Team = typeof teams.$inferSelect;
-export type TeamMember = typeof teamMembers.$inferSelect;
+// Additional types for compatibility
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type UpsertUser = InsertUser & { id?: string };
 export type InsertTeam = z.infer<typeof insertTeamSchema>;
 export type InsertTeamMember = z.infer<typeof insertTeamMemberSchema>;
 export type LoginData = z.infer<typeof loginSchema>;
 export type RegisterData = z.infer<typeof registerSchema>;
-
-export type Cycle = typeof cycles.$inferSelect;
-export type Template = typeof templates.$inferSelect;
-export type Objective = typeof objectives.$inferSelect;
-export type KeyResult = typeof keyResults.$inferSelect;
-export type CheckIn = typeof checkIns.$inferSelect;
-export type Initiative = typeof initiatives.$inferSelect;
-export type Task = typeof tasks.$inferSelect;
 
 export type KeyResultWithDetails = KeyResult & {
   checkIns: CheckIn[];

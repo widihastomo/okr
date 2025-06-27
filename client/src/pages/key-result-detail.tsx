@@ -308,27 +308,9 @@ export default function KeyResultDetailPage() {
   // Helper function to get tasks for a specific initiative
   const getTasksForInitiative = (initiativeId: string) => {
     if (!expandedInitiatives.has(initiativeId)) return [];
-    // For now, return mock tasks until we implement the API endpoint
-    return [
-      {
-        id: `task-${initiativeId}-1`,
-        title: "Task 1",
-        description: "Sample task description",
-        priority: "high",
-        assignedTo: "John Doe",
-        dueDate: "2025-01-15",
-        status: taskStatuses[`task-${initiativeId}-1`] || "in_progress"
-      },
-      {
-        id: `task-${initiativeId}-2`,
-        title: "Task 2", 
-        description: "Another task description",
-        priority: "medium",
-        assignedTo: "Jane Smith",
-        dueDate: "2025-01-20",
-        status: taskStatuses[`task-${initiativeId}-2`] || "completed"
-      }
-    ];
+    // Get real tasks from initiative data
+    const initiative = initiatives?.find(init => init.id === initiativeId);
+    return initiative?.tasks || [];
   };
 
   // Helper function to get status badge variant and icon
