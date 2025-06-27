@@ -79,9 +79,9 @@ export function setupEmailAuth(app: Express) {
       // In development mode, return mock user without authentication
       if (process.env.NODE_ENV === 'development') {
         const mockUser = {
-          id: "dev-user-1",
-          email: "dev@example.com",
-          firstName: "Dev",
+          id: "550e8400-e29b-41d4-a716-446655440001",
+          email: "admin@example.com",
+          firstName: "Admin",
           lastName: "User",
           role: "admin",
           isActive: true,

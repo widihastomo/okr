@@ -800,29 +800,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const keyResultId = req.params.id;
       
-      const initiativeSchema = z.object({
-        title: z.string().min(1, "Title is required"),
-        description: z.string().optional(),
-        status: z.enum(["not_started", "in_progress", "completed", "on_hold"]).default("not_started"),
-        priority: z.enum(["low", "medium", "high"]).default("medium"),
-        dueDate: z.string().nullable().optional(),
-        createdBy: z.string(),
-      });
+      // Get current user ID from development mode
+      const currentUserId = process.env.NODE_ENV === 'development' 
+        ? "550e8400-e29b-41d4-a716-446655440001" 
+        : req.session?.userId;
       
-      const validatedData = initiativeSchema.parse({
+      if (!currentUserId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const validatedData = insertInitiativeSchema.parse({
         ...req.body,
         keyResultId,
+        createdBy: currentUserId,
+        dueDate: req.body.dueDate ? new Date(req.body.dueDate).toISOString() : null,
       });
       
-      const initiative = await storage.createInitiative({
-        keyResultId,
-        title: validatedData.title,
-        description: validatedData.description || null,
-        status: validatedData.status,
-        priority: validatedData.priority,
-        dueDate: validatedData.dueDate ? new Date(validatedData.dueDate) : null,
-        createdBy: validatedData.createdBy,
-      });
+      const initiative = await storage.createInitiative(validatedData);
       
       res.status(201).json(initiative);
     } catch (error) {
