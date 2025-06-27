@@ -205,7 +205,7 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button className="w-full bg-blue-600 hover:bg-blue-700">
+        <Button className="bg-blue-600 hover:bg-blue-700">
           <Plus className="h-4 w-4 mr-2" />
           Tambah Initiative
         </Button>
