@@ -284,19 +284,7 @@ export default function KeyResultDetailPage() {
 
   return (
     <div className="p-6">
-      {/* Breadcrumb */}
-      <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-4">
-        <Link href="/" className="flex items-center hover:text-gray-900 transition-colors">
-          <Home className="h-4 w-4 mr-1" />
-          Dashboard
-        </Link>
-        <ChevronRight className="h-4 w-4" />
-        <span className="text-gray-400">Key Results</span>
-        <ChevronRight className="h-4 w-4" />
-        <span className="text-gray-900 font-medium truncate max-w-xs">
-          {keyResult.title}
-        </span>
-      </nav>
+      
 
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
