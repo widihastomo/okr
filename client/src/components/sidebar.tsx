@@ -100,7 +100,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           {/* Navigation Menu */}
           <nav className={cn(
             "flex-1 py-4 space-y-1 transition-all duration-300",
-            isOpen ? "px-4" : "px-2"
+            isOpen ? "px-4" : "px-2 lg:px-2"
           )}>
             {menuItems.map((item) => {
               const isActive = location === item.path || 
@@ -112,7 +112,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   href={item.path}
                   className={cn(
                     "flex items-center rounded-lg text-sm font-medium transition-colors",
-                    isOpen ? "space-x-3 px-3 py-2" : "justify-center px-2 py-3",
+                    // Mobile: always full width when visible
+                    isOpen ? "space-x-3 px-3 py-2" : "hidden lg:flex lg:justify-center lg:px-2 lg:py-3",
                     isActive
                       ? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -130,7 +131,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           {/* User Profile Section */}
           <div className={cn(
             "py-4 border-t border-gray-200 transition-all duration-300",
-            isOpen ? "px-4" : "px-2"
+            isOpen ? "px-4" : "px-2 lg:px-2"
           )}>
             {isOpen ? (
               <div className="flex items-center space-x-3">
@@ -148,7 +149,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <Settings className="h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600" />
               </div>
             ) : (
-              <div className="flex justify-center">
+              <div className="hidden lg:flex lg:justify-center">
                 <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                   <User className="h-4 w-4 text-blue-600" />
                 </div>
