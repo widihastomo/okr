@@ -171,7 +171,18 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
                 })()}
                 <span className="text-lg font-semibold text-gray-900">{overallProgress.toFixed(1)}%</span>
               </div>
-              <div className="w-32 bg-gray-200 rounded-full h-2 mb-1 relative">
+              <div 
+                className="w-32 bg-gray-200 rounded-full h-2 mb-1 relative group cursor-pointer"
+                title={(() => {
+                  const now = new Date();
+                  const cycleStart = cycleStartDate ? new Date(cycleStartDate) : new Date();
+                  const cycleEnd = cycleEndDate ? new Date(cycleEndDate) : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
+                  const totalTime = cycleEnd.getTime() - cycleStart.getTime();
+                  const timePassed = Math.max(0, now.getTime() - cycleStart.getTime());
+                  const idealProgress = Math.min(100, (timePassed / totalTime) * 100);
+                  return `Progress: ${overallProgress.toFixed(1)}% | Target ideal: ${idealProgress.toFixed(1)}%`;
+                })()}
+              >
                 {(() => {
                   const getProgressBarColor = (status: string) => {
                     switch (status) {
@@ -203,11 +214,15 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
                       {/* Threshold indicator for ideal progress */}
                       {idealProgress > 0 && idealProgress < 100 && (
                         <div 
-                          className="absolute top-0 w-0.5 h-2 bg-gray-600 opacity-70"
+                          className="absolute top-0 w-0.5 h-2 bg-gray-600 opacity-70 hover:opacity-100 transition-opacity"
                           style={{ left: `${idealProgress}%` }}
-                          title={`Target progress: ${idealProgress.toFixed(1)}%`}
                         ></div>
                       )}
+                      {/* Enhanced tooltip on hover */}
+                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                        Progress: {overallProgress.toFixed(1)}% | Target ideal: {idealProgress.toFixed(1)}%
+                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
+                      </div>
                     </>
                   );
                 })()}

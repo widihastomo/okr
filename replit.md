@@ -246,7 +246,8 @@ Changelog:
   * Added visual progress bar with status-based colors (green, orange, red, blue, purple, yellow, gray)
   * Integrated threshold indicator showing ideal progress timeline based on cycle dates
   * Progress bar color dynamically matches objective status for consistent visual feedback
-  * Enhanced visual feedback with status labels, colored progress bar, ideal threshold, and percentage display
+  * Added interactive tooltip showing current progress vs ideal target percentage on hover
+  * Enhanced visual feedback with status labels, colored progress bar, ideal threshold, tooltip, and percentage display
   * Improved OKR card readability and status recognition at a glance
 ```
 
