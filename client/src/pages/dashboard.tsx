@@ -118,7 +118,7 @@ export default function Dashboard() {
           </div>
         ) : (
           okrs.map((okr) => {
-            // Find the cycle for this OKR to get start date
+            // Find the cycle for this OKR to get start and end date
             const cycle = cycles.find(c => c.id === okr.cycleId);
             return (
               <OKRCard
@@ -128,6 +128,7 @@ export default function Dashboard() {
                 onKeyResultClick={handleKeyResultClick}
                 onRefresh={refetch}
                 cycleStartDate={cycle?.startDate}
+                cycleEndDate={cycle?.endDate}
               />
             );
           })
