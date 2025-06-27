@@ -642,18 +642,20 @@ export class DatabaseStorage implements IStorage {
   async getInitiativesByKeyResultId(keyResultId: string): Promise<any[]> {
     const initiativesList = await db.select().from(initiatives).where(eq(initiatives.keyResultId, keyResultId));
     
-    // Get tasks for each initiative
-    const initiativesWithTasks = await Promise.all(
+    // Get tasks and members for each initiative
+    const initiativesWithDetails = await Promise.all(
       initiativesList.map(async (initiative) => {
         const tasksList = await this.getTasksByInitiativeId(initiative.id);
+        const membersList = await this.getInitiativeMembers(initiative.id);
         return {
           ...initiative,
           tasks: tasksList,
+          members: membersList,
         };
       })
     );
     
-    return initiativesWithTasks;
+    return initiativesWithDetails;
   }
 
   async createInitiative(initiativeData: InsertInitiative): Promise<Initiative> {

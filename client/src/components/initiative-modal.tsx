@@ -133,6 +133,16 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
   // Reset form when editing initiative changes
   useEffect(() => {
     if (editingInitiative && form) {
+      // Extract member IDs from the members array
+      const memberIds = editingInitiative.members?.map((m: any) => {
+        // Handle different member data structures
+        if (typeof m === 'string') return m;
+        if (m.userId) return m.userId;
+        if (m.user?.id) return m.user.id;
+        if (m.id && !m.initiativeId) return m.id; // Only use m.id if it's not the member record ID
+        return null;
+      }).filter(Boolean) || [];
+
       form.reset({
         title: editingInitiative.title || "",
         description: editingInitiative.description || "",
@@ -142,7 +152,7 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
         budget: editingInitiative.budget || "",
         startDate: editingInitiative.startDate ? new Date(editingInitiative.startDate).toISOString().split('T')[0] : "",
         dueDate: editingInitiative.dueDate ? new Date(editingInitiative.dueDate).toISOString().split('T')[0] : "",
-        members: editingInitiative.members?.map((m: any) => m.userId || m.user?.id || m.id) || [],
+        members: memberIds,
       });
     }
   }, [editingInitiative, form]);
