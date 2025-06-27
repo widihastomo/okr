@@ -7,6 +7,7 @@ import OKRCard from "@/components/okr-card";
 import CreateOKRModal from "@/components/create-okr-modal";
 import EditProgressModal from "@/components/edit-progress-modal";
 import { KeyResultDetailModal } from "@/components/key-result-detail-modal";
+import { DeleteConfirmationModal } from "@/components/delete-confirmation-modal";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
@@ -21,6 +22,13 @@ export default function Dashboard() {
     open: false
   });
   const [keyResultDetailModal, setKeyResultDetailModal] = useState<{ open: boolean; keyResultId?: string }>({
+    open: false
+  });
+  const [deleteConfirmModal, setDeleteConfirmModal] = useState<{ 
+    open: boolean; 
+    okrId?: string; 
+    okrTitle?: string; 
+  }>({
     open: false
   });
 
@@ -143,8 +151,18 @@ export default function Dashboard() {
   };
 
   const handleDeleteOKR = (okrId: string) => {
-    if (confirm("Apakah Anda yakin ingin menghapus OKR ini? Tindakan ini tidak dapat dibatalkan.")) {
-      deleteOKRMutation.mutate(okrId);
+    // Find the OKR to get its title for the confirmation modal
+    const okrToDelete = okrs.find(okr => okr.id === okrId);
+    setDeleteConfirmModal({ 
+      open: true, 
+      okrId, 
+      okrTitle: okrToDelete?.title || "OKR ini" 
+    });
+  };
+
+  const confirmDeleteOKR = () => {
+    if (deleteConfirmModal.okrId) {
+      deleteOKRMutation.mutate(deleteConfirmModal.okrId);
     }
   };
 
@@ -269,6 +287,16 @@ export default function Dashboard() {
           onClose={() => setKeyResultDetailModal({ open: false })}
         />
       )}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        open={deleteConfirmModal.open}
+        onOpenChange={(open) => setDeleteConfirmModal({ open })}
+        onConfirm={confirmDeleteOKR}
+        title="Hapus OKR"
+        itemName={deleteConfirmModal.okrTitle}
+        description={`Apakah Anda yakin ingin menghapus OKR "${deleteConfirmModal.okrTitle}"? Semua Key Results dan data terkait akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.`}
+      />
     </div>
   );
 }
