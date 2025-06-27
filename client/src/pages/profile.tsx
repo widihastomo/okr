@@ -297,31 +297,7 @@ export default function Profile() {
                   </CardContent>
                 </Card>
 
-                {/* Danger Zone */}
-                <Card className="mt-6 border-red-200">
-                  <CardHeader>
-                    <CardTitle className="text-red-700">Zona Berbahaya</CardTitle>
-                    <CardDescription>
-                      Tindakan yang tidak dapat dibatalkan
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between p-4 bg-red-50 rounded-lg">
-                      <div>
-                        <h4 className="font-medium text-red-900">Keluar dari Akun</h4>
-                        <p className="text-sm text-red-700">
-                          Anda akan keluar dan diarahkan ke halaman login
-                        </p>
-                      </div>
-                      <LogoutButton
-                        variant="destructive"
-                        size="sm"
-                      >
-                        Keluar Sekarang
-                      </LogoutButton>
-                    </div>
-                  </CardContent>
-                </Card>
+                
               </div>
             </div>
           </div>
