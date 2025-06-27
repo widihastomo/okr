@@ -228,9 +228,9 @@ export function SimpleProgressStatus({
           className="flex-1 relative group cursor-pointer"
           title={`Progress: ${progressPercentage.toFixed(1)}% | Target ideal: ${idealProgress.toFixed(1)}%`}
         >
-          <div className="w-full bg-gray-200 rounded-full h-2 relative">
+          <div className="w-full bg-gray-200 rounded-full h-4 relative">
             <div 
-              className={`h-2 transition-all duration-300 ${
+              className={`h-4 transition-all duration-300 ${
                 progressPercentage >= 100 ? 'rounded-full' : 'rounded-l-full'
               } ${(() => {
                 switch (status) {
@@ -246,7 +246,7 @@ export function SimpleProgressStatus({
             />
             {/* Threshold indicator for ideal progress */}
             <div 
-              className="absolute top-0 h-2 w-0.5 bg-gray-400 opacity-70 hover:opacity-100 transition-opacity"
+              className="absolute top-0 h-4 w-0.5 bg-gray-400 opacity-70 hover:opacity-100 transition-opacity"
               style={{ left: `${Math.min(idealProgress, 100)}%` }}
             />
           </div>
