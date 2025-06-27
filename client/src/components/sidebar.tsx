@@ -1,26 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "wouter";
-import { 
-  LayoutDashboard, 
-  Building2, 
-  GitBranch, 
-  RotateCcw, 
-  FileText, 
-  Users, 
-  Target, 
-  BarChart3,
-  User,
-  Settings,
-  X
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -28,61 +7,10 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
-  const [location] = useLocation();
 
-  const menuItems = [
-    {
-      label: "Dashboard",
-      icon: LayoutDashboard,
-      path: "/",
-      active: location === "/" || location === "/"
-    },
-    {
-      label: "Company OKRs",
-      icon: Building2,
-      path: "/company-okr",
-      active: location === "/company-okr"
-    },
-    {
-      label: "OKR Structure",
-      icon: GitBranch,
-      path: "/okr-structure",
-      active: location === "/okr-structure"
-    },
-    {
-      label: "Cycles",
-      icon: RotateCcw,
-      path: "/cycles",
-      active: location === "/cycles"
-    },
-    {
-      label: "Templates",
-      icon: FileText,
-      path: "/templates",
-      active: location === "/templates"
-    },
-    {
-      label: "Users",
-      icon: Users,
-      path: "/users",
-      active: location === "/users"
-    },
-    {
-      label: "My OKRs",
-      icon: Target,
-      path: "/my-okrs",
-      active: location === "/my-okrs"
-    },
-    {
-      label: "Analytics",
-      icon: BarChart3,
-      path: "/analytics",
-      active: location === "/analytics"
-    }
-  ];
+  
 
   return (
-    <TooltipProvider>
       {/* Mobile overlay */}
       {isOpen && (
         <div
@@ -114,62 +42,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             )}
           </div>
           
-          {/* Navigation Menu */}
-          <nav className={cn(
-            "flex-1 py-4 space-y-1 transition-all duration-300",
-            isOpen ? "px-4" : "px-2 lg:px-2"
-          )}>
-            {menuItems.map((item) => {
-              const isActive = location === item.path || 
-                (item.path !== "/" && location.startsWith(item.path));
-              
-              if (isOpen) {
-                return (
-                  <Link
-                    key={item.path}
-                    href={item.path}
-                    className={cn(
-                      "flex items-center rounded-lg text-sm font-medium transition-colors space-x-3 px-3 py-2",
-                      isActive
-                        ? "bg-blue-600 text-white"
-                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                    )}
-                    onClick={onClose}
-                  >
-                    <item.icon className="h-5 w-5 flex-shrink-0" />
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              }
-              
-              // Collapsed state with tooltip (desktop only)
-              return (
-                <Tooltip key={item.path}>
-                  <TooltipTrigger asChild>
-                    <Link
-                      href={item.path}
-                      className={cn(
-                        "hidden lg:flex lg:items-center lg:justify-center lg:rounded-lg lg:text-sm lg:font-medium lg:transition-colors lg:px-2 lg:py-3",
-                        isActive
-                          ? "bg-blue-600 text-white"
-                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                      )}
-                      onClick={onClose}
-                    >
-                      <item.icon className="h-5 w-5 flex-shrink-0" />
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent side="right" className="ml-2">
-                    <p>{item.label}</p>
-                  </TooltipContent>
-                </Tooltip>
-              );
-            })}
-          </nav>
+          
 
 
         </div>
       </div>
-    </TooltipProvider>
+    </div>
   );
 }
