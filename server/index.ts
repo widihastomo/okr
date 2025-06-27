@@ -39,14 +39,11 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Initialize database with sample data on startup
-  try {
-    await populateDatabase();
-    console.log("Database initialized successfully");
-  } catch (error) {
-    console.log("Database already populated or initialization failed:", error.message);
-  }
-  
+  // Add health check endpoint first
+  app.get('/health', (_req, res) => {
+    res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+
   const server = await registerRoutes(app);
   
   // Start automatic cycle status updates
@@ -78,7 +75,16 @@ app.use((req, res, next) => {
     port,
     host: "0.0.0.0",
     reusePort: true,
-  }, () => {
+  }, async () => {
     log(`serving on port ${port}`);
+    
+    // Initialize database with sample data AFTER server is running
+    // This ensures the server stays alive even if database initialization fails
+    try {
+      await populateDatabase();
+      console.log("Database initialized successfully");
+    } catch (error: any) {
+      console.log("Database already populated or initialization failed:", error?.message || error);
+    }
   });
 })();

@@ -367,6 +367,13 @@ Changelog:
   * Added real-time search filtering and selection counter display
   * Removed "Tujuan" (Objective) field from initiative forms and database schema
   * Streamlined initiative creation process by focusing on essential project information
+- June 27, 2025. Fixed deployment issues and server stability:
+  * Added health check endpoint (/health) responding with 200 status for deployment verification
+  * Moved database population to run after server startup to prevent process termination
+  * Fixed database schema issues by removing hardcoded IDs and using proper auto-generated UUIDs
+  * Enhanced error handling to prevent server crashes during database initialization
+  * Server now stays alive continuously and passes deployment health checks
+  * Resolved "Application process exits immediately" deployment error
 - June 27, 2025. Fixed initiative update function and enhanced UI text:
   * Resolved date conversion error in update initiative endpoint by properly converting string dates to Date objects
   * Added null value handling for optional fields (picId, budget) in update operations
