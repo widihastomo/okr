@@ -341,7 +341,7 @@ Changelog:
   * Enhanced initiative creation endpoint to handle PIC and member assignments
   * Fixed TypeScript errors and implemented proper user data typing
   * System now supports comprehensive project management with team collaboration
-  * Converted member selection to clean multi-select dropdown with filtered options and tag display
+  * Converted member selection to checkbox-based multi-select interface with scrollable list and selection counter
 ```
 
 ## User Preferences

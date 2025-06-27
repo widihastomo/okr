@@ -387,53 +387,39 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
                   </FormLabel>
                   <FormControl>
                     <div className="space-y-2">
-                      <Select
-                        onValueChange={(value) => {
-                          if (value && value !== "none" && !field.value?.includes(value)) {
-                            field.onChange([...(field.value || []), value]);
-                          }
-                        }}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih anggota tim" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">Pilih anggota</SelectItem>
-                          {users
-                            .filter(user => !field.value?.includes(user.id))
-                            .map((user) => (
-                              <SelectItem key={user.id} value={user.id}>
-                                {`${user.firstName} ${user.lastName}`}
-                              </SelectItem>
-                            ))}
-                        </SelectContent>
-                      </Select>
-                      
-                      {/* Selected Members Display */}
-                      {field.value && field.value.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {field.value.map((userId: string) => {
-                            const user = users.find(u => u.id === userId);
-                            return user ? (
-                              <div
-                                key={userId}
-                                className="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-sm"
+                      <div className="border rounded-md p-3 min-h-[2.5rem] bg-white">
+                        <div className="text-sm text-gray-600 mb-2">Pilih anggota tim:</div>
+                        <div className="space-y-2 max-h-32 overflow-y-auto">
+                          {users.map((user) => (
+                            <div key={user.id} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`member-${user.id}`}
+                                checked={field.value?.includes(user.id) || false}
+                                onCheckedChange={(checked: boolean) => {
+                                  if (checked) {
+                                    field.onChange([...(field.value || []), user.id]);
+                                  } else {
+                                    field.onChange(
+                                      field.value?.filter((id: string) => id !== user.id) || []
+                                    );
+                                  }
+                                }}
+                              />
+                              <label 
+                                htmlFor={`member-${user.id}`}
+                                className="text-sm font-normal cursor-pointer"
                               >
                                 {`${user.firstName} ${user.lastName}`}
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    field.onChange(
-                                      field.value?.filter((id: string) => id !== userId)
-                                    );
-                                  }}
-                                  className="ml-1 text-blue-600 hover:text-blue-800"
-                                >
-                                  ×
-                                </button>
-                              </div>
-                            ) : null;
-                          })}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Selected Members Count */}
+                      {field.value && field.value.length > 0 && (
+                        <div className="text-sm text-gray-600">
+                          {field.value.length} anggota terpilih
                         </div>
                       )}
                     </div>
