@@ -66,7 +66,6 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
       objective: {
         title: okr.title,
         description: okr.description || "",
-        timeframe: okr.timeframe,
         owner: okr.owner,
         ownerType: okr.ownerType as "user" | "team",
         ownerId: okr.ownerId,
@@ -147,7 +146,6 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
           objective: {
             title: "",
             description: "",
-            timeframe: "",
             owner: "",
             ownerType: "user",
             ownerId: "",
@@ -248,6 +246,8 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
   });
 
   const onSubmit = (data: OKRFormData) => {
+    console.log("Form submitted with data:", data);
+    console.log("Form errors:", form.formState.errors);
     mutation.mutate(data);
   };
 
@@ -647,7 +647,13 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                 Cancel
               </Button>
               <Button 
-                type="submit" 
+                type="button"
+                onClick={() => {
+                  console.log("Submit button clicked");
+                  console.log("Form valid:", form.formState.isValid);
+                  console.log("Form errors:", form.formState.errors);
+                  form.handleSubmit(onSubmit)();
+                }}
                 disabled={mutation.isPending}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
