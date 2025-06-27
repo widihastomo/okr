@@ -782,6 +782,91 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get initiatives for a key result
+  app.get("/api/key-results/:id/initiatives", async (req, res) => {
+    try {
+      const keyResultId = req.params.id;
+      const initiatives = await storage.getInitiativesByKeyResultId(keyResultId);
+      res.json(initiatives);
+    } catch (error) {
+      console.error("Error fetching initiatives:", error);
+      res.status(500).json({ message: "Failed to fetch initiatives" });
+    }
+  });
+
+  // Create initiative for a key result
+  app.post("/api/key-results/:id/initiatives", async (req, res) => {
+    try {
+      const keyResultId = req.params.id;
+      
+      const initiativeSchema = z.object({
+        title: z.string().min(1, "Title is required"),
+        description: z.string().optional(),
+        status: z.enum(["not_started", "in_progress", "completed", "on_hold"]).default("not_started"),
+        priority: z.enum(["low", "medium", "high"]).default("medium"),
+        dueDate: z.string().nullable().optional(),
+        createdBy: z.string(),
+      });
+      
+      const validatedData = initiativeSchema.parse({
+        ...req.body,
+        keyResultId,
+      });
+      
+      const initiative = await storage.createInitiative({
+        keyResultId,
+        title: validatedData.title,
+        description: validatedData.description || null,
+        status: validatedData.status,
+        priority: validatedData.priority,
+        dueDate: validatedData.dueDate ? new Date(validatedData.dueDate) : null,
+        createdBy: validatedData.createdBy,
+      });
+      
+      res.status(201).json(initiative);
+    } catch (error) {
+      console.error("Error creating initiative:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create initiative" });
+    }
+  });
+
+  // Update initiative
+  app.patch("/api/initiatives/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      
+      const updateSchema = z.object({
+        title: z.string().optional(),
+        description: z.string().optional(),
+        status: z.enum(["not_started", "in_progress", "completed", "on_hold"]).optional(),
+        priority: z.enum(["low", "medium", "high"]).optional(),
+        dueDate: z.string().nullable().optional(),
+      });
+      
+      const validatedData = updateSchema.parse(req.body);
+      const processedData = {
+        ...validatedData,
+        dueDate: validatedData.dueDate ? new Date(validatedData.dueDate) : null,
+      };
+      const updatedInitiative = await storage.updateInitiative(id, processedData);
+      
+      if (!updatedInitiative) {
+        return res.status(404).json({ message: "Initiative not found" });
+      }
+      
+      res.json(updatedInitiative);
+    } catch (error) {
+      console.error("Error updating initiative:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update initiative" });
+    }
+  });
+
   // Bulk Update All Status Based on Progress
   app.post("/api/update-all-status", async (req, res) => {
     try {

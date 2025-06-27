@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { X, Calendar, Target, TrendingUp, Users, Clock, BarChart3 } from "lucide-react";
 import { CheckInModal } from "@/components/check-in-modal";
+import InitiativeModal from "@/components/initiative-modal";
 import { ProgressStatus } from "@/components/progress-status";
 import { format } from "date-fns";
 import type { KeyResultWithDetails } from "@shared/schema";
@@ -17,10 +18,23 @@ interface KeyResultDetailModalProps {
 }
 
 export function KeyResultDetailModal({ keyResultId, isOpen, onClose }: KeyResultDetailModalProps) {
+  const queryClient = useQueryClient();
+  
   const { data: keyResult, isLoading } = useQuery<KeyResultWithDetails>({
     queryKey: [`/api/key-results/${keyResultId}`],
     enabled: !!keyResultId && isOpen,
   });
+
+  const { data: initiatives, isLoading: initiativesLoading } = useQuery<any[]>({
+    queryKey: [`/api/key-results/${keyResultId}/initiatives`],
+    enabled: !!keyResultId && isOpen,
+  });
+
+  const handleInitiativeSuccess = () => {
+    queryClient.invalidateQueries({
+      queryKey: [`/api/key-results/${keyResultId}/initiatives`]
+    });
+  };
 
   const getUnitDisplay = (unit: string) => {
     switch (unit) {
@@ -305,6 +319,76 @@ export function KeyResultDetailModal({ keyResultId, isOpen, onClose }: KeyResult
                             <span className="font-medium">{keyResult.confidence}/10</span>
                           </div>
                         </>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Initiatives */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <Target className="h-5 w-5" />
+                        Initiatives
+                      </CardTitle>
+                      <CardDescription>
+                        Strategic actions and projects to achieve this key result
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <InitiativeModal keyResultId={keyResult.id} onSuccess={handleInitiativeSuccess} />
+                      
+                      {initiativesLoading && (
+                        <div className="space-y-2">
+                          <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                          <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                        </div>
+                      )}
+                      
+                      {initiatives && initiatives.length > 0 ? (
+                        <div className="space-y-3">
+                          {initiatives.map((initiative: any) => (
+                            <div key={initiative.id} className="border rounded-lg p-3 bg-gray-50">
+                              <div className="flex items-start justify-between mb-2">
+                                <h4 className="font-medium text-sm">{initiative.title}</h4>
+                                <Badge 
+                                  variant={
+                                    initiative.status === 'completed' ? 'default' :
+                                    initiative.status === 'in_progress' ? 'secondary' :
+                                    initiative.status === 'on_hold' ? 'outline' : 'destructive'
+                                  }
+                                  className="text-xs"
+                                >
+                                  {initiative.status === 'not_started' && 'Not Started'}
+                                  {initiative.status === 'in_progress' && 'In Progress'}
+                                  {initiative.status === 'completed' && 'Completed'}
+                                  {initiative.status === 'on_hold' && 'On Hold'}
+                                </Badge>
+                              </div>
+                              {initiative.description && (
+                                <p className="text-xs text-gray-600 mb-2">{initiative.description}</p>
+                              )}
+                              <div className="flex items-center gap-4 text-xs text-gray-500">
+                                <span className="flex items-center gap-1">
+                                  Priority: <Badge variant="outline" className="text-xs px-1 py-0">
+                                    {initiative.priority}
+                                  </Badge>
+                                </span>
+                                {initiative.dueDate && (
+                                  <span className="flex items-center gap-1">
+                                    <Clock className="h-3 w-3" />
+                                    Due: {format(new Date(initiative.dueDate), 'MMM dd, yyyy')}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        !initiativesLoading && (
+                          <div className="text-center py-4 text-gray-500 text-sm">
+                            No initiatives created yet. Create your first initiative to drive progress on this key result.
+                          </div>
+                        )
                       )}
                     </CardContent>
                   </Card>
