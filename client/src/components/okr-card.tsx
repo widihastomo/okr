@@ -120,12 +120,12 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="p-2 hover:bg-blue-100 border border-gray-300 hover:border-blue-400 rounded-md transition-colors"
+                className="p-2 hover:bg-blue-100 rounded-md transition-colors"
               >
                 {isExpanded ? (
-                  <ChevronUp className="w-5 h-5 text-gray-600 hover:text-blue-600" />
+                  <ChevronUp className="w-6 h-6 text-gray-600 hover:text-blue-600" />
                 ) : (
-                  <ChevronDown className="w-5 h-5 text-gray-600 hover:text-blue-600" />
+                  <ChevronDown className="w-6 h-6 text-gray-600 hover:text-blue-600" />
                 )}
               </Button>
               <div className="flex items-center gap-3">
