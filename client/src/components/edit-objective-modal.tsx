@@ -74,7 +74,7 @@ export function EditObjectiveModal({ objective, trigger }: EditObjectiveModalPro
       cycleId: objective.cycleId || "",
       ownerType: objective.ownerType as "individual" | "team",
       ownerId: objective.ownerId,
-      teamId: objective.teamId || "",
+      teamId: objective.teamId || "none",
     },
   });
 
@@ -105,7 +105,12 @@ export function EditObjectiveModal({ objective, trigger }: EditObjectiveModalPro
   });
 
   const onSubmit = (data: EditObjectiveFormData) => {
-    updateMutation.mutate(data);
+    // Convert "none" to undefined for teamId
+    const submitData: EditObjectiveFormData = {
+      ...data,
+      teamId: data.teamId === "none" ? undefined : (data.teamId || undefined),
+    };
+    updateMutation.mutate(submitData);
   };
 
   const ownerType = form.watch("ownerType");
@@ -253,7 +258,7 @@ export function EditObjectiveModal({ objective, trigger }: EditObjectiveModalPro
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">Tidak ada team</SelectItem>
+                        <SelectItem value="none">Tidak ada team</SelectItem>
                         {teams.map((team) => (
                           <SelectItem key={team.id} value={team.id}>
                             {team.name}
