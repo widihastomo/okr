@@ -519,11 +519,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const createOKRSchema = z.object({
         objective: insertObjectiveSchema.extend({
           ownerId: z.string(), // Now expects UUID string
-          teamId: z.string().optional(),
-          parentId: z.string().optional(),
+          teamId: z.string().nullable().optional(),
+          parentId: z.string().nullable().optional(),
         }),
         keyResults: z.array(insertKeyResultSchema.omit({ objectiveId: true }).extend({
-          assignedTo: z.string().optional(),
+          assignedTo: z.string().nullable().optional(),
         }))
       });
       
