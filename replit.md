@@ -348,6 +348,14 @@ Changelog:
   * Added real-time search filtering and selection counter display
   * Removed "Tujuan" (Objective) field from initiative forms and database schema
   * Streamlined initiative creation process by focusing on essential project information
+- June 27, 2025. Implemented comprehensive initiative management with task integration:
+  * Converted initiative form to full-width sheet sliding from right side for better workspace
+  * Added integrated task management system within initiative creation process
+  * Users can now add, edit, and remove tasks directly while creating initiatives
+  * Enhanced form layout with sectioned design for initiative info and task management
+  * Task system includes title, description, priority, due dates, and deletion functionality
+  * Form width increased to 800px providing adequate space for complex project planning
+  * Sheet-based interface improves user experience with proper scrolling and organization
 ```
 
 ## User Preferences

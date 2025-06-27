@@ -3,17 +3,16 @@ import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Plus, Calendar, Flag, FileText, Users, User, Search, ChevronDown } from "lucide-react";
+import { Plus, Calendar, Flag, FileText, Users, User, Search, ChevronDown, X, CheckCircle, Clock, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import {
   Form,
   FormControl,
@@ -47,7 +46,17 @@ const initiativeSchema = z.object({
   members: z.array(z.string()).optional(),
 });
 
+const taskSchema = z.object({
+  title: z.string().min(1, "Task title is required"),
+  description: z.string().optional(),
+  status: z.enum(["pending", "in_progress", "completed", "cancelled"]).default("pending"),
+  priority: z.enum(["low", "medium", "high"]).default("medium"),
+  assignedTo: z.string().optional(),
+  dueDate: z.string().optional(),
+});
+
 type InitiativeFormData = z.infer<typeof initiativeSchema>;
+type TaskFormData = z.infer<typeof taskSchema>;
 
 interface InitiativeModalProps {
   keyResultId: string;
@@ -58,6 +67,15 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
   const [open, setOpen] = useState(false);
   const [memberDropdownOpen, setMemberDropdownOpen] = useState(false);
   const [memberSearchTerm, setMemberSearchTerm] = useState("");
+  const [tasks, setTasks] = useState<TaskFormData[]>([]);
+  const [newTask, setNewTask] = useState<TaskFormData>({
+    title: "",
+    description: "",
+    status: "pending",
+    priority: "medium",
+    assignedTo: "",
+    dueDate: "",
+  });
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -87,41 +105,40 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
   });
 
   const createInitiativeMutation = useMutation({
-    mutationFn: async (data: InitiativeFormData) => {
-      const payload = {
-        ...data,
-        keyResultId,
-        createdBy: "550e8400-e29b-41d4-a716-446655440001", // This should come from auth context
-        picId: data.picId === "none" ? null : data.picId,
-        budget: data.budget ? parseFloat(data.budget) : null,
-        startDate: data.startDate ? new Date(data.startDate).toISOString() : null,
-        dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : null,
-        progressPercentage: 0, // Start with 0% progress, will be calculated automatically
-      };
-      return await apiRequest("POST", `/api/key-results/${keyResultId}/initiatives`, payload);
+    mutationFn: async (data: InitiativeFormData & { tasks: TaskFormData[] }) => {
+      const response = await apiRequest("/api/initiatives", {
+        method: "POST",
+        body: JSON.stringify({
+          ...data,
+          keyResultId,
+          createdBy: "current-user", // This would come from auth context
+        }),
+      });
+      return response;
     },
     onSuccess: () => {
       toast({
         title: "Initiative berhasil dibuat",
-        description: "Initiative baru telah ditambahkan ke Key Result",
+        description: "Initiative baru telah ditambahkan ke key result",
         className: "border-green-200 bg-green-50 text-green-800",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/key-results", keyResultId] });
-      form.reset();
+      queryClient.invalidateQueries({ queryKey: ["/api/key-results", keyResultId, "initiatives"] });
       setOpen(false);
+      form.reset();
+      setTasks([]);
       onSuccess?.();
     },
     onError: (error: any) => {
       toast({
-        title: "Gagal membuat initiative",
-        description: error.message || "Terjadi kesalahan saat membuat initiative",
+        title: "Error",
+        description: error.message || "Gagal membuat initiative",
         variant: "destructive",
       });
     },
   });
 
-  const onSubmit = (data: InitiativeFormData) => {
-    createInitiativeMutation.mutate(data);
+  const handleSubmit = (data: InitiativeFormData) => {
+    createInitiativeMutation.mutate({ ...data, tasks });
   };
 
   const getStatusLabel = (status: string) => {
@@ -145,355 +162,485 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
     }
   };
 
+  const addTask = () => {
+    if (newTask.title.trim()) {
+      setTasks([...tasks, { ...newTask }]);
+      setNewTask({
+        title: "",
+        description: "",
+        status: "pending",
+        priority: "medium",
+        assignedTo: "",
+        dueDate: "",
+      });
+    }
+  };
+
+  const removeTask = (index: number) => {
+    setTasks(tasks.filter((_, i) => i !== index));
+  };
+
+  const getTaskStatusLabel = (status: string) => {
+    switch (status) {
+      case "pending": return "Menunggu";
+      case "in_progress": return "Sedang Berjalan";
+      case "completed": return "Selesai";
+      case "cancelled": return "Dibatalkan";
+      default: return status;
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
         <Button className="w-full bg-blue-600 hover:bg-blue-700">
           <Plus className="h-4 w-4 mr-2" />
           Tambah Initiative
         </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+      </SheetTrigger>
+      <SheetContent className="w-full sm:w-[800px] sm:max-w-[800px] overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
             Buat Initiative Baru
-          </DialogTitle>
-          <DialogDescription>
-            Tambahkan initiative untuk membantu mencapai Key Result ini
-          </DialogDescription>
-        </DialogHeader>
+          </SheetTitle>
+        </SheetHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Title */}
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Judul Initiative *</FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder="Masukkan judul initiative"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Description */}
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Deskripsi</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Jelaskan detail initiative ini"
-                      className="resize-none"
-                      rows={3}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Status and Priority Row */}
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+        <div className="mt-6 space-y-6">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+              {/* Initiative Information Section */}
+              <div className="bg-gray-50 p-4 rounded-lg space-y-4">
+                <h3 className="font-medium text-gray-900">Informasi Initiative</h3>
+                
+                {/* Title */}
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Judul Initiative</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="not_started">{getStatusLabel("not_started")}</SelectItem>
-                        <SelectItem value="in_progress">{getStatusLabel("in_progress")}</SelectItem>
-                        <SelectItem value="completed">{getStatusLabel("completed")}</SelectItem>
-                        <SelectItem value="on_hold">{getStatusLabel("on_hold")}</SelectItem>
-                        <SelectItem value="cancelled">{getStatusLabel("cancelled")}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="priority"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Prioritas</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih prioritas" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="low">
-                          <div className="flex items-center gap-2">
-                            <Flag className="h-4 w-4 text-gray-500" />
-                            {getPriorityLabel("low")}
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="medium">
-                          <div className="flex items-center gap-2">
-                            <Flag className="h-4 w-4 text-yellow-500" />
-                            {getPriorityLabel("medium")}
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="high">
-                          <div className="flex items-center gap-2">
-                            <Flag className="h-4 w-4 text-red-500" />
-                            {getPriorityLabel("high")}
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="critical">
-                          <div className="flex items-center gap-2">
-                            <Flag className="h-4 w-4 text-red-600" />
-                            {getPriorityLabel("critical")}
-                          </div>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* PIC and Budget Row */}
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="picId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <User className="h-4 w-4" />
-                      PIC (Penanggung Jawab)
-                    </FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih PIC" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="none">Tidak ada</SelectItem>
-                        {users.map((user: any) => (
-                          <SelectItem key={user.id} value={user.id}>
-                            {`${user.firstName} ${user.lastName}`}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="budget"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Budget (Rp)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="10000000"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Date Range */}
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="startDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tanggal Mulai</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="date"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="dueDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tenggat Waktu</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="date"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Members Selection */}
-            <FormField
-              control={form.control}
-              name="members"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    Anggota Tim
-                  </FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      {/* Dropdown Trigger */}
-                      <button
-                        type="button"
-                        onClick={() => setMemberDropdownOpen(!memberDropdownOpen)}
-                        className="w-full border rounded-md px-3 py-2 text-left bg-white flex items-center justify-between hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <span className="text-sm">
-                          {field.value && field.value.length > 0
-                            ? `${field.value.length} anggota terpilih`
-                            : "Pilih anggota tim"
-                          }
-                        </span>
-                        <ChevronDown className="h-4 w-4 text-gray-400" />
-                      </button>
-
-                      {/* Dropdown Content */}
-                      {memberDropdownOpen && (
-                        <div className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg">
-                          {/* Search Box */}
-                          <div className="p-3 border-b">
-                            <div className="relative">
-                              <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                              <input
-                                type="text"
-                                placeholder="Search"
-                                value={memberSearchTerm}
-                                onChange={(e) => setMemberSearchTerm(e.target.value)}
-                                className="w-full pl-10 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              />
-                            </div>
-                          </div>
-
-                          {/* Options List */}
-                          <div className="max-h-48 overflow-y-auto">
-                            {/* Select All Option */}
-                            <div className="flex items-center space-x-2 px-3 py-2 hover:bg-gray-50">
-                              <Checkbox
-                                id="select-all"
-                                checked={field.value?.length === filteredUsers.length && filteredUsers.length > 0}
-                                onCheckedChange={(checked: boolean) => {
-                                  if (checked) {
-                                    field.onChange(filteredUsers.map(user => user.id));
-                                  } else {
-                                    field.onChange([]);
-                                  }
-                                }}
-                              />
-                              <label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
-                                All
-                              </label>
-                            </div>
-
-                            {/* User Options */}
-                            {filteredUsers.map((user) => (
-                              <div key={user.id} className="flex items-center space-x-2 px-3 py-2 hover:bg-gray-50">
-                                <Checkbox
-                                  id={`member-${user.id}`}
-                                  checked={field.value?.includes(user.id) || false}
-                                  onCheckedChange={(checked: boolean) => {
-                                    if (checked) {
-                                      field.onChange([...(field.value || []), user.id]);
-                                    } else {
-                                      field.onChange(
-                                        field.value?.filter((id: string) => id !== user.id) || []
-                                      );
-                                    }
-                                  }}
-                                />
-                                <label 
-                                  htmlFor={`member-${user.id}`}
-                                  className="text-sm cursor-pointer flex-1"
-                                >
-                                  {`${user.firstName} ${user.lastName}`}
-                                </label>
-                              </div>
-                            ))}
-
-                            {filteredUsers.length === 0 && (
-                              <div className="px-3 py-2 text-sm text-gray-500">
-                                Tidak ada hasil ditemukan
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Click outside to close */}
-                      {memberDropdownOpen && (
-                        <div
-                          className="fixed inset-0 z-40"
-                          onClick={() => setMemberDropdownOpen(false)}
+                        <Input 
+                          placeholder="Masukkan judul initiative"
+                          {...field}
                         />
-                      )}
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            {/* Submit Button */}
-            <div className="flex justify-end gap-3">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => setOpen(false)}
-              >
-                Batal
-              </Button>
-              <Button 
-                type="submit" 
-                disabled={createInitiativeMutation.isPending}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                {createInitiativeMutation.isPending ? "Menyimpan..." : "Buat Initiative"}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+                {/* Description */}
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Deskripsi</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Deskripsi initiative"
+                          className="min-h-[80px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Status and Priority Row */}
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Status</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih status" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="not_started">{getStatusLabel("not_started")}</SelectItem>
+                            <SelectItem value="in_progress">{getStatusLabel("in_progress")}</SelectItem>
+                            <SelectItem value="completed">{getStatusLabel("completed")}</SelectItem>
+                            <SelectItem value="on_hold">{getStatusLabel("on_hold")}</SelectItem>
+                            <SelectItem value="cancelled">{getStatusLabel("cancelled")}</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="priority"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Prioritas</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih prioritas" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="low">
+                              <div className="flex items-center gap-2">
+                                <Flag className="h-4 w-4 text-gray-500" />
+                                {getPriorityLabel("low")}
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="medium">
+                              <div className="flex items-center gap-2">
+                                <Flag className="h-4 w-4 text-yellow-500" />
+                                {getPriorityLabel("medium")}
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="high">
+                              <div className="flex items-center gap-2">
+                                <Flag className="h-4 w-4 text-red-500" />
+                                {getPriorityLabel("high")}
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="critical">
+                              <div className="flex items-center gap-2">
+                                <Flag className="h-4 w-4 text-red-600" />
+                                {getPriorityLabel("critical")}
+                              </div>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* PIC and Budget Row */}
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="picId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <User className="h-4 w-4" />
+                          PIC (Penanggung Jawab)
+                        </FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih PIC" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="none">Tidak ada</SelectItem>
+                            {users.map((user: any) => (
+                              <SelectItem key={user.id} value={user.id}>
+                                {`${user.firstName} ${user.lastName}`}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="budget"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Budget (Rp)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="10000000"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Date Range */}
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="startDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tanggal Mulai</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="date"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="dueDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tenggat Waktu</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="date"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Members Selection */}
+                <FormField
+                  control={form.control}
+                  name="members"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <Users className="h-4 w-4" />
+                        Anggota Tim
+                      </FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          {/* Dropdown Trigger */}
+                          <button
+                            type="button"
+                            onClick={() => setMemberDropdownOpen(!memberDropdownOpen)}
+                            className="w-full border rounded-md px-3 py-2 text-left bg-white flex items-center justify-between hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          >
+                            <span className="text-sm">
+                              {field.value && field.value.length > 0
+                                ? `${field.value.length} anggota terpilih`
+                                : "Pilih anggota tim"
+                              }
+                            </span>
+                            <ChevronDown className="h-4 w-4 text-gray-400" />
+                          </button>
+
+                          {/* Dropdown Content */}
+                          {memberDropdownOpen && (
+                            <div className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg">
+                              {/* Search Box */}
+                              <div className="p-3 border-b">
+                                <div className="relative">
+                                  <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                  <input
+                                    type="text"
+                                    placeholder="Search"
+                                    value={memberSearchTerm}
+                                    onChange={(e) => setMemberSearchTerm(e.target.value)}
+                                    className="w-full pl-10 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Options List */}
+                              <div className="max-h-48 overflow-y-auto">
+                                {/* Select All Option */}
+                                <div className="flex items-center space-x-2 px-3 py-2 hover:bg-gray-50">
+                                  <Checkbox
+                                    id="select-all"
+                                    checked={field.value?.length === filteredUsers.length && filteredUsers.length > 0}
+                                    onCheckedChange={(checked: boolean) => {
+                                      if (checked) {
+                                        field.onChange(filteredUsers.map(user => user.id));
+                                      } else {
+                                        field.onChange([]);
+                                      }
+                                    }}
+                                  />
+                                  <label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
+                                    All
+                                  </label>
+                                </div>
+
+                                {/* User Options */}
+                                {filteredUsers.map((user) => (
+                                  <div key={user.id} className="flex items-center space-x-2 px-3 py-2 hover:bg-gray-50">
+                                    <Checkbox
+                                      id={`member-${user.id}`}
+                                      checked={field.value?.includes(user.id) || false}
+                                      onCheckedChange={(checked: boolean) => {
+                                        if (checked) {
+                                          field.onChange([...(field.value || []), user.id]);
+                                        } else {
+                                          field.onChange(
+                                            field.value?.filter((id: string) => id !== user.id) || []
+                                          );
+                                        }
+                                      }}
+                                    />
+                                    <label 
+                                      htmlFor={`member-${user.id}`}
+                                      className="text-sm cursor-pointer flex-1"
+                                    >
+                                      {`${user.firstName} ${user.lastName}`}
+                                    </label>
+                                  </div>
+                                ))}
+
+                                {filteredUsers.length === 0 && (
+                                  <div className="px-3 py-2 text-sm text-gray-500">
+                                    Tidak ada hasil ditemukan
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Click outside to close */}
+                          {memberDropdownOpen && (
+                            <div
+                              className="fixed inset-0 z-40"
+                              onClick={() => setMemberDropdownOpen(false)}
+                            />
+                          )}
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Task Management Section */}
+              <div className="bg-blue-50 p-4 rounded-lg space-y-4">
+                <h3 className="font-medium text-gray-900 flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5" />
+                  Manajemen Task
+                </h3>
+
+                {/* Add New Task */}
+                <div className="bg-white p-4 rounded-md border space-y-3">
+                  <h4 className="text-sm font-medium text-gray-700">Tambah Task Baru</h4>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <Input
+                      placeholder="Judul task"
+                      value={newTask.title}
+                      onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                    />
+                    <Select
+                      value={newTask.priority}
+                      onValueChange={(value) => setNewTask({ ...newTask, priority: value as any })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Rendah</SelectItem>
+                        <SelectItem value="medium">Sedang</SelectItem>
+                        <SelectItem value="high">Tinggi</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <Textarea
+                    placeholder="Deskripsi task (opsional)"
+                    value={newTask.description}
+                    onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                    className="min-h-[60px]"
+                  />
+
+                  <div className="flex gap-3">
+                    <Input
+                      type="date"
+                      value={newTask.dueDate}
+                      onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
+                    />
+                    <Button
+                      type="button"
+                      onClick={addTask}
+                      className="bg-blue-600 hover:bg-blue-700"
+                      disabled={!newTask.title.trim()}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Tambah Task
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Task List */}
+                {tasks.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium text-gray-700">Task List ({tasks.length})</h4>
+                    {tasks.map((task, index) => (
+                      <div key={index} className="bg-white p-3 rounded-md border flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <h5 className="font-medium text-sm">{task.title}</h5>
+                            <span className={`px-2 py-1 rounded text-xs ${
+                              task.priority === "high" ? "bg-red-100 text-red-700" :
+                              task.priority === "medium" ? "bg-yellow-100 text-yellow-700" :
+                              "bg-gray-100 text-gray-700"
+                            }`}>
+                              {getPriorityLabel(task.priority)}
+                            </span>
+                          </div>
+                          {task.description && (
+                            <p className="text-sm text-gray-600 mt-1">{task.description}</p>
+                          )}
+                          {task.dueDate && (
+                            <div className="flex items-center gap-1 mt-1 text-xs text-gray-500">
+                              <Clock className="h-3 w-3" />
+                              {new Date(task.dueDate).toLocaleDateString()}
+                            </div>
+                          )}
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeTask(index)}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Submit Button */}
+              <div className="flex justify-end gap-3 pt-4 border-t">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setOpen(false)}
+                >
+                  Batal
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={createInitiativeMutation.isPending}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  {createInitiativeMutation.isPending ? "Menyimpan..." : "Buat Initiative"}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }
