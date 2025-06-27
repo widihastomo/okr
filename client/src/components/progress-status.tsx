@@ -226,7 +226,7 @@ export function SimpleProgressStatus({
         </Badge>
         <div 
           className="flex-[3] relative group cursor-pointer"
-          title={`Progress: ${progressPercentage.toFixed(1)}% | Target ideal: ${idealProgress.toFixed(1)}%`}
+          title={`Progress: ${progressPercentage.toFixed(1)}% | Target ideal: ${Number(idealProgress).toFixed(1)}%`}
         >
           <div className="w-full bg-gray-200 rounded-full h-3 relative">
             <div 
@@ -252,7 +252,7 @@ export function SimpleProgressStatus({
           </div>
           {/* Enhanced tooltip on hover */}
           <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
-            Progress: {progressPercentage.toFixed(1)}% | Target ideal: {idealProgress.toFixed(1)}%
+            Progress: {progressPercentage.toFixed(1)}% | Target ideal: {Number(idealProgress).toFixed(1)}%
             <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
           </div>
         </div>
@@ -278,9 +278,9 @@ export function SimpleProgressStatus({
           <span>
             {now > cycleEnd 
               ? `Target capaian (100%)` 
-              : timeProgressPercentage < 0 
+              : Number(timeProgressPercentage) < 0 
                 ? `Target ideal (0% - belum dimulai)`
-                : `Target ideal (${idealProgress.toFixed(1)}%)`
+                : `Target ideal (${Number(idealProgress).toFixed(1)}%)`
             }
           </span>
         </div>
