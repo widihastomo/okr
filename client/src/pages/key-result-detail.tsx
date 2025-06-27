@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Calendar, Target, TrendingUp, Users, Clock, BarChart3, Edit, Trash2 } from "lucide-react";
+import { ArrowLeft, Calendar, Target, TrendingUp, Users, Clock, BarChart3, Edit, Trash2, ChevronRight, Home } from "lucide-react";
 import { CheckInModal } from "@/components/check-in-modal";
 import InitiativeModal from "@/components/initiative-modal";
 import { ProgressStatus } from "@/components/progress-status";
@@ -154,6 +154,20 @@ export default function KeyResultDetailPage() {
 
   return (
     <div className="p-6">
+      {/* Breadcrumb */}
+      <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-4">
+        <Link href="/" className="flex items-center hover:text-gray-900 transition-colors">
+          <Home className="h-4 w-4 mr-1" />
+          Dashboard
+        </Link>
+        <ChevronRight className="h-4 w-4" />
+        <span className="text-gray-400">Key Results</span>
+        <ChevronRight className="h-4 w-4" />
+        <span className="text-gray-900 font-medium truncate max-w-xs">
+          {keyResult.title}
+        </span>
+      </nav>
+
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <Button 
@@ -314,11 +328,11 @@ export default function KeyResultDetailPage() {
                           {formatValue(checkIn.value, keyResult.unit)}
                         </p>
                         <p className="text-xs text-gray-500">
-                          {checkIn.date ? format(new Date(checkIn.date), "MMM dd") : "Unknown"}
+                          {checkIn.createdAt ? format(new Date(checkIn.createdAt), "MMM dd") : "Unknown"}
                         </p>
                       </div>
-                      {checkIn.note && (
-                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">{checkIn.note}</p>
+                      {checkIn.notes && (
+                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">{checkIn.notes}</p>
                       )}
                       {checkIn.confidence && (
                         <p className="text-xs text-gray-500 mt-1">Confidence: {checkIn.confidence}/10</p>
@@ -364,7 +378,14 @@ export default function KeyResultDetailPage() {
               <CardTitle className="text-lg">Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <CheckInModal keyResultId={keyResult.id} />
+              <CheckInModal 
+                keyResultId={keyResult.id}
+                keyResultTitle={keyResult.title}
+                currentValue={keyResult.currentValue}
+                targetValue={keyResult.targetValue}
+                unit={keyResult.unit}
+                keyResultType={keyResult.keyResultType}
+              />
               <Button variant="outline" className="w-full">
                 <Edit className="h-4 w-4 mr-2" />
                 Edit Key Result
