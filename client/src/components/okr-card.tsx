@@ -176,6 +176,7 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick }: OKRCa
                 <SimpleProgressStatus
                   status={kr.status}
                   progressPercentage={progress}
+                  timeProgressPercentage={kr.timeProgressPercentage || 0}
                 />
               </div>
             );

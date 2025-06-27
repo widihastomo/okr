@@ -99,11 +99,12 @@ async function updateKeyResultWithAutoStatus(keyResult: KeyResult, cycleId: stri
     
     const progressStatus = calculateProgressStatus(keyResult, startDate, endDate);
     
-    // Update the key result with the calculated status
+    // Update the key result with the calculated status and time progress
     const [updatedKeyResult] = await db
       .update(keyResults)
       .set({ 
         status: progressStatus.status,
+        timeProgressPercentage: progressStatus.timeProgressPercentage,
         lastUpdated: new Date()
       })
       .where(eq(keyResults.id, keyResult.id))

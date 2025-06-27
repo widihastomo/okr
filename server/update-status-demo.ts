@@ -1,106 +1,64 @@
 import { db } from "./db";
-import { keyResults, objectives } from "@shared/schema";
+import { keyResults, objectives, cycles } from "@shared/schema";
 import { eq } from "drizzle-orm";
+import { calculateProgressStatus } from "./progress-tracker";
 
 async function updateStatusDemo() {
   try {
-    console.log("Creating additional sample data with different status values...");
+    console.log("=== Updating Status with Time Progress Demo ===");
     
-    // Get existing objective
-    const existingObjectives = await db.select().from(objectives);
-    if (existingObjectives.length === 0) {
-      console.log("No objectives found, cannot create sample data");
-      return false;
+    // Get all key results
+    const allKeyResults = await db.select().from(keyResults);
+    console.log(`Found ${allKeyResults.length} key results to update`);
+    
+    let updatedCount = 0;
+    
+    for (const kr of allKeyResults) {
+      console.log(`\n--- Processing: ${kr.title} ---`);
+      
+      // Get objective to find cycle
+      const [objective] = await db.select().from(objectives).where(eq(objectives.id, kr.objectiveId));
+      if (!objective || !objective.cycleId) {
+        console.log("❌ No objective or cycle found, skipping");
+        continue;
+      }
+      
+      // Get cycle for date calculation
+      const [cycle] = await db.select().from(cycles).where(eq(cycles.id, objective.cycleId));
+      if (!cycle || !kr.dueDate) {
+        console.log("❌ No cycle or due date found, skipping");
+        continue;
+      }
+      
+      console.log(`Cycle: ${cycle.name} (${cycle.startDate} to ${cycle.endDate})`);
+      console.log(`Key Result Due: ${kr.dueDate.toISOString().split('T')[0]}`);
+      
+      // Calculate status with time progress
+      const startDate = new Date(cycle.startDate);
+      const endDate = kr.dueDate;
+      const progressStatus = calculateProgressStatus(kr, startDate, endDate);
+      
+      console.log(`Current Status: ${kr.status} -> New Status: ${progressStatus.status}`);
+      console.log(`Progress: ${progressStatus.progressPercentage}%, Time Progress: ${progressStatus.timeProgressPercentage}%`);
+      console.log(`Recommendation: ${progressStatus.recommendation}`);
+      
+      // Update key result with status and time progress
+      await db
+        .update(keyResults)
+        .set({
+          status: progressStatus.status,
+          timeProgressPercentage: progressStatus.timeProgressPercentage
+        })
+        .where(eq(keyResults.id, kr.id));
+      
+      updatedCount++;
+      console.log("✅ Updated successfully");
     }
     
-    const objectiveId = existingObjectives[0].id;
-    console.log(`Using objective: ${existingObjectives[0].title}`);
-    
-    // Create multiple key results with different statuses and progress levels
-    const sampleKeyResults = [
-      {
-        id: "550e8400-e29b-41d4-a716-446655440101",
-        title: "Increase Monthly Revenue",
-        description: "Grow monthly recurring revenue to target level",
-        currentValue: "100000",
-        targetValue: "100000", 
-        baseValue: "80000",
-        unit: "currency",
-        keyResultType: "increase_to",
-        status: "completed",
-        objectiveId: objectiveId,
-        assignedUserId: "550e8400-e29b-41d4-a716-446655440001",
-        dueDate: new Date("2025-03-15")
-      },
-      {
-        id: "550e8400-e29b-41d4-a716-446655440102",
-        title: "Reduce Customer Churn Rate",
-        description: "Lower monthly churn rate to improve retention",
-        currentValue: "3.5",
-        targetValue: "2.0",
-        baseValue: "5.0", 
-        unit: "percentage",
-        keyResultType: "decrease_to",
-        status: "on_track",
-        objectiveId: objectiveId,
-        assignedUserId: "550e8400-e29b-41d4-a716-446655440001",
-        dueDate: new Date("2025-03-15")
-      },
-      {
-        id: "550e8400-e29b-41d4-a716-446655440103",
-        title: "Launch New Product Feature",
-        description: "Successfully launch the new analytics dashboard",
-        currentValue: "0",
-        targetValue: "1",
-        unit: "number",
-        keyResultType: "achieve_or_not",
-        status: "at_risk",
-        objectiveId: objectiveId,
-        assignedUserId: "550e8400-e29b-41d4-a716-446655440001", 
-        dueDate: new Date("2025-03-15")
-      },
-      {
-        id: "550e8400-e29b-41d4-a716-446655440104",
-        title: "Acquire New Customers",
-        description: "Onboard new enterprise customers this quarter",
-        currentValue: "15",
-        targetValue: "50",
-        baseValue: "10",
-        unit: "number", 
-        keyResultType: "increase_to",
-        status: "behind",
-        objectiveId: objectiveId,
-        assignedUserId: "550e8400-e29b-41d4-a716-446655440001",
-        dueDate: new Date("2025-03-15")
-      }
-    ];
-    
-    // Insert sample key results
-    for (const kr of sampleKeyResults) {
-      try {
-        await db.insert(keyResults).values(kr).onConflictDoUpdate({
-          target: keyResults.id,
-          set: {
-            title: kr.title,
-            description: kr.description,
-            currentValue: kr.currentValue,
-            targetValue: kr.targetValue,
-            baseValue: kr.baseValue,
-            unit: kr.unit,
-            keyResultType: kr.keyResultType,
-            status: kr.status
-          }
-        });
-        console.log(`Created/updated key result: ${kr.title} (${kr.status})`);
-      } catch (error) {
-        console.error(`Error creating key result ${kr.title}:`, error);
-      }
-    }
-    
-    console.log("Sample data creation completed!");
+    console.log(`\n=== Demo Complete: Updated ${updatedCount} key results ===`);
     return true;
   } catch (error) {
-    console.error("Error updating status demo:", error);
+    console.error("Demo error:", error);
     return false;
   }
 }

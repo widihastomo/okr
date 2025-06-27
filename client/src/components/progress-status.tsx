@@ -146,12 +146,14 @@ export function ProgressStatus({
 interface SimpleProgressStatusProps {
   status: string;
   progressPercentage: number;
+  timeProgressPercentage?: number;
   compact?: boolean;
 }
 
 export function SimpleProgressStatus({ 
   status, 
   progressPercentage, 
+  timeProgressPercentage = 0,
   compact = false 
 }: SimpleProgressStatusProps) {
   const config = getStatusConfig(status);
@@ -172,18 +174,37 @@ export function SimpleProgressStatus({
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <Badge 
-        variant="secondary" 
-        className={`${config.color} text-white border-0 flex items-center gap-1`}
-      >
-        <StatusIcon className="h-3 w-3" />
-        {config.label}
-      </Badge>
-      <div className="flex-1">
-        <Progress value={progressPercentage} className="h-2" />
+    <div>
+      <div className="flex items-center gap-3">
+        <Badge 
+          variant="secondary" 
+          className={`${config.color} text-white border-0 flex items-center gap-1`}
+        >
+          <StatusIcon className="h-3 w-3" />
+          {config.label}
+        </Badge>
+        <div className="flex-1 relative">
+          <Progress value={progressPercentage} className="h-2" />
+          {/* Threshold indicator for ideal progress */}
+          <div 
+            className="absolute top-0 h-2 w-0.5 bg-gray-400 opacity-70"
+            style={{ left: `${Math.min(timeProgressPercentage, 100)}%` }}
+            title={`Capaian ideal saat ini: ${timeProgressPercentage}%`}
+          />
+        </div>
+        <span className="text-sm font-medium">{progressPercentage}%</span>
       </div>
-      <span className="text-sm font-medium">{progressPercentage}%</span>
+      {/* Progress explanation */}
+      <div className="mt-2 text-xs text-gray-500 flex items-center gap-4">
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-1 bg-blue-500 rounded"></div>
+          <span>Progress saat ini</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="w-0.5 h-3 bg-gray-400 opacity-70"></div>
+          <span>Target ideal ({timeProgressPercentage}%)</span>
+        </div>
+      </div>
     </div>
   );
 }
