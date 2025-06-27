@@ -137,8 +137,8 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
               )}
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <div className="text-right mr-4">
+          <div className="flex items-start space-x-3">
+            <div className="flex flex-col items-end">
               <div className="flex items-center gap-2 mb-2">
                 {(() => {
                   const getProgressConfig = (status: string) => {
@@ -172,7 +172,7 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
                 <span className="text-lg font-semibold text-gray-900">{overallProgress.toFixed(1)}%</span>
               </div>
               <div 
-                className="w-32 bg-gray-200 rounded-full h-2 mb-1 relative group cursor-pointer"
+                className="w-40 bg-gray-200 rounded-full h-2 mb-1 relative group cursor-pointer"
                 title={(() => {
                   const now = new Date();
                   const cycleStart = cycleStartDate ? new Date(cycleStartDate) : new Date();
@@ -229,7 +229,7 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
                   );
                 })()}
               </div>
-              <p className="text-sm text-gray-500">Overall Progress</p>
+              <p className="text-sm text-gray-500 text-right">Overall Progress</p>
             </div>
             <EditOKRButton okr={okr} />
             <DropdownMenu>
