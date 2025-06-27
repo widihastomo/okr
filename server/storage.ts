@@ -93,6 +93,7 @@ export interface IStorage {
   deleteInitiativeDocument(id: string): Promise<boolean>;
   
   // Tasks
+  getTasks(): Promise<Task[]>;
   createTask(task: InsertTask): Promise<Task>;
   updateTask(id: string, task: Partial<InsertTask>): Promise<Task | undefined>;
   deleteTask(id: string): Promise<boolean>;
@@ -710,6 +711,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Tasks for automatic progress calculation
+  async getTasks(): Promise<Task[]> {
+    return await db.select().from(tasks);
+  }
+
   async getTasksByInitiativeId(initiativeId: string): Promise<Task[]> {
     return await db.select().from(tasks).where(eq(tasks.initiativeId, initiativeId));
   }

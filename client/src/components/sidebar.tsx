@@ -62,12 +62,6 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       active: location === "/users"
     },
     {
-      label: "My OKRs",
-      icon: Target,
-      path: "/my-okrs",
-      active: location === "/my-okrs"
-    },
-    {
       label: "Analytics",
       icon: BarChart3,
       path: "/analytics",

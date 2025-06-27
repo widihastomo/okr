@@ -21,6 +21,7 @@ import Login from "@/pages/login";
 import Home from "@/pages/home";
 import Profile from "@/pages/profile";
 import NotFound from "@/pages/not-found";
+import AnalyticsPage from "@/pages/analytics";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -84,6 +85,7 @@ function Router() {
             <Route path="/cycles" component={CyclesPage} />
             <Route path="/templates" component={TemplatesPage} />
             <Route path="/users" component={UsersPage} />
+            <Route path="/analytics" component={AnalyticsPage} />
             <Route component={NotFound} />
           </Switch>
         </div>
