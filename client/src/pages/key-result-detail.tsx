@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation, Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -438,7 +438,7 @@ export default function KeyResultDetailPage() {
 
   // Prepare chart data from check-ins with diagonal guideline
   const prepareChartData = () => {
-    // Get dates from objective's cycle - June 2025
+    // Get dates from objective's cycle
     let startDate = new Date(2025, 5, 1); // June 1, 2025 (month is 0-indexed)
     let endDate = new Date(2025, 5, 30);   // June 30, 2025
     
@@ -447,39 +447,31 @@ export default function KeyResultDetailPage() {
       endDate = new Date(objective.cycle.endDate);
     }
     
-    const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 
-    // Create data points
-    const chartData = [];
+    // Create data points with daily calculation
+    const chartData: Array<{
+      date: string;
+      actual: number | null;
+      ideal: number | null;
+      guideline: number;
+    }> = [];
     
-    // Add points for diagonal guideline
-    // Start point (0% at June 1)
-    chartData.push({
-      date: format(startDate, "d MMM"),
-      actual: null,
-      ideal: null,
-      guideline: 0
-    });
-
-    // Add some intermediate points for the diagonal line
-    for (let i = 1; i <= 3; i++) {
-      const fraction = i / 4;
-      const intermediateDate = new Date(startDate.getTime() + (fraction * totalDays * 24 * 60 * 60 * 1000));
+    // Generate daily data points for the entire period
+    for (let dayIndex = 0; dayIndex < totalDays; dayIndex++) {
+      const currentDate = new Date(startDate.getTime() + (dayIndex * 24 * 60 * 60 * 1000));
+      const progressPercentage = (dayIndex / (totalDays - 1)) * 100;
+      
+      // Only show dates at intervals for cleaner X-axis
+      const showDate = dayIndex === 0 || dayIndex === totalDays - 1 || dayIndex % 5 === 0;
+      
       chartData.push({
-        date: format(intermediateDate, "d MMM"),
+        date: format(currentDate, showDate ? "d MMM" : ""),
         actual: null,
         ideal: null,
-        guideline: fraction * 100
+        guideline: Math.round(progressPercentage * 10) / 10 // Round to 1 decimal
       });
     }
-
-    // End point (100% at June 30)
-    chartData.push({
-      date: format(endDate, "d MMM"),
-      actual: null,
-      ideal: null,
-      guideline: 100
-    });
 
     // Add check-in data points if available
     if (keyResult?.checkIns && keyResult.checkIns.length > 0) {
@@ -488,13 +480,9 @@ export default function KeyResultDetailPage() {
         new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime()
       );
 
-      let actualProgressData = [{
-        date: format(startDate, "d MMM"),
-        actual: 0,
-        ideal: 0,
-        guideline: 0
-      }];
-
+      // Start with 0% progress
+      let lastProgress = 0;
+      
       sortedCheckIns.forEach((checkIn) => {
         // Calculate actual progress
         const current = parseFloat(checkIn.value);
@@ -510,40 +498,47 @@ export default function KeyResultDetailPage() {
           actualProgress = current >= target ? 100 : 0;
         }
 
-        // Calculate ideal progress based on time
+        actualProgress = Math.max(0, Math.min(100, actualProgress));
+        
+        // Find the corresponding day in chartData
         const checkInDate = new Date(checkIn.createdAt || Date.now());
-        const daysPassed = Math.max(0, Math.ceil((checkInDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
-        const idealProgress = Math.min((daysPassed / totalDays) * 100, 100);
-
-        actualProgressData.push({
-          date: format(checkInDate, "d MMM"),
-          actual: Math.max(0, Math.min(100, actualProgress)),
-          ideal: Math.max(0, Math.min(100, idealProgress)),
-          guideline: null
-        });
-      });
-
-      // Merge actual progress data with guideline data
-      actualProgressData.forEach(point => {
-        const existingPoint = chartData.find(p => p.date === point.date);
-        if (existingPoint) {
-          existingPoint.actual = point.actual;
-          existingPoint.ideal = point.ideal;
-        } else {
-          chartData.push(point);
+        const daysPassed = Math.floor((checkInDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+        
+        if (daysPassed >= 0 && daysPassed < totalDays) {
+          // Update that specific day with actual progress
+          chartData[daysPassed].actual = Math.round(actualProgress * 10) / 10;
+          chartData[daysPassed].date = format(checkInDate, "d MMM"); // Ensure date is shown
+          
+          // Fill in the progress for days between check-ins
+          for (let i = Math.max(0, daysPassed - 1); i >= 0 && chartData[i].actual === null; i--) {
+            chartData[i].actual = lastProgress;
+          }
+          
+          lastProgress = actualProgress;
         }
       });
+      
+      // Fill remaining days with last known progress
+      for (let i = 0; i < totalDays; i++) {
+        if (chartData[i].actual === null && i > 0) {
+          chartData[i].actual = chartData[i - 1].actual;
+        }
+      }
+      
+      // Ensure first day starts at 0 if no check-in
+      if (chartData[0].actual === null) {
+        chartData[0].actual = 0;
+      }
     }
 
-    // Sort all data points by date
-    return chartData.sort((a, b) => {
-      const dateA = new Date(a.date + " 2025");
-      const dateB = new Date(b.date + " 2025");
-      return dateA.getTime() - dateB.getTime();
-    });
+    // Filter to show only points with dates for cleaner display
+    return chartData.filter(point => point.date !== "" || point.actual !== null);
   };
 
-  const chartData = keyResult ? prepareChartData() : [];
+  const chartData = useMemo(() => {
+    if (!keyResult || !objective) return [];
+    return prepareChartData();
+  }, [keyResult, objective]);
 
   const getUnitDisplay = (unit: string) => {
     switch (unit) {
@@ -803,7 +798,7 @@ export default function KeyResultDetailPage() {
                           axisLine={false}
                           tickLine={false}
                           tick={{ fontSize: 12, fill: '#6b7280' }}
-                          interval={0}
+                          interval="preserveStartEnd"
                           angle={-45}
                           textAnchor="end"
                           height={60}
@@ -854,6 +849,15 @@ export default function KeyResultDetailPage() {
                             return null;
                           }}
                         />
+                        <Line
+                          type="monotone"
+                          dataKey="guideline"
+                          stroke="#ef4444"
+                          strokeWidth={2}
+                          strokeDasharray="5 5"
+                          dot={false}
+                          connectNulls={true}
+                        />
                         <Area
                           type="monotone"
                           dataKey="actual"
@@ -861,22 +865,7 @@ export default function KeyResultDetailPage() {
                           strokeWidth={2}
                           fill="url(#actualGradient)"
                           dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
-                        />
-                        <Line
-                          type="monotone"
-                          dataKey="guideline"
-                          stroke="#6b7280"
-                          strokeWidth={2}
-                          strokeDasharray="8 4"
-                          dot={false}
-                        />
-                        <Line
-                          type="monotone"
-                          dataKey="ideal"
-                          stroke="#9ca3af"
-                          strokeWidth={1}
-                          strokeDasharray="3 3"
-                          dot={false}
+                          connectNulls={true}
                         />
                       </AreaChart>
                     </ResponsiveContainer>
