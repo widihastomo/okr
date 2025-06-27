@@ -894,6 +894,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = req.params.id;
       const updateData = req.body;
       
+      // Convert date strings to Date objects if present
+      if (updateData.startDate) {
+        updateData.startDate = new Date(updateData.startDate);
+      }
+      if (updateData.dueDate) {
+        updateData.dueDate = new Date(updateData.dueDate);
+      }
+      
+      // Handle null values for optional fields
+      if (updateData.picId === "none" || updateData.picId === "") {
+        updateData.picId = null;
+      }
+      if (updateData.budget === "") {
+        updateData.budget = null;
+      }
+      
       const updatedInitiative = await storage.updateInitiative(id, updateData);
       
       if (!updatedInitiative) {

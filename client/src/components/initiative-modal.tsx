@@ -195,7 +195,7 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
         description: "Initiative baru telah ditambahkan ke key result",
         className: "border-green-200 bg-green-50 text-green-800",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/key-results", keyResultId, "initiatives"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/key-results/${keyResultId}/initiatives`] });
       setOpen(false);
       form.reset();
       setTasks([]);
@@ -247,7 +247,7 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
         description: "Perubahan initiative telah disimpan",
         className: "border-green-200 bg-green-50 text-green-800",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/key-results", keyResultId, "initiatives"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/key-results/${keyResultId}/initiatives`] });
       setOpen(false);
       onClose?.();
     },
