@@ -990,7 +990,9 @@ export default function KeyResultDetailPage() {
               <CardContent>
                 {keyResult.checkIns && keyResult.checkIns.length > 0 ? (
                   <div className="space-y-3 max-h-80 overflow-y-auto">
-                    {keyResult.checkIns.map((checkIn) => (
+                    {keyResult.checkIns
+                      .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
+                      .map((checkIn) => (
                       <div key={checkIn.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
                         <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                         <div className="flex-1 min-w-0">
