@@ -4,6 +4,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -446,15 +447,35 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                     <div className="flex items-center justify-between">
                       <h4 className="font-medium">Key Result {index + 1}</h4>
                       {fields.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => remove(index)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Hapus Key Result</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Apakah Anda yakin ingin menghapus Key Result ini? Tindakan ini tidak dapat dibatalkan.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Batal</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => remove(index)}
+                                className="bg-red-600 hover:bg-red-700 text-white"
+                              >
+                                Hapus
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       )}
                     </div>
 

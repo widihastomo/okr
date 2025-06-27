@@ -225,6 +225,12 @@ Changelog:
   * Updated form validation schemas to exclude assignedTo field
   * Simplified key results creation and editing by removing assignment functionality
   * Maintained all other key result functionality while streamlining the interface
+- June 27, 2025. Added confirmation dialog for Key Result deletion:
+  * Implemented AlertDialog component for safe key result removal during OKR editing
+  * Added "Hapus Key Result" confirmation with "Apakah Anda yakin..." message
+  * Prevents accidental deletion of key results with explicit user confirmation
+  * Maintains consistent destructive action styling with red confirmation button
+  * Improves user experience by preventing data loss from misclicks
 ```
 
 ## User Preferences
