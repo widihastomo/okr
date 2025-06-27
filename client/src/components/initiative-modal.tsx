@@ -61,7 +61,7 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
   const queryClient = useQueryClient();
 
   // Fetch users for PIC and member selection
-  const { data: users = [] } = useQuery<Array<{id: string, fullName: string}>>({
+  const { data: users = [] } = useQuery<any[]>({
     queryKey: ["/api/users"],
   });
 
@@ -310,7 +310,7 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
                         <SelectItem value="none">Tidak ada</SelectItem>
                         {users.map((user: any) => (
                           <SelectItem key={user.id} value={user.id}>
-                            {user.fullName}
+                            {`${user.firstName} ${user.lastName}`}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -403,7 +403,7 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
                             .filter(user => !field.value?.includes(user.id))
                             .map((user) => (
                               <SelectItem key={user.id} value={user.id}>
-                                {user.fullName}
+                                {`${user.firstName} ${user.lastName}`}
                               </SelectItem>
                             ))}
                         </SelectContent>
@@ -419,7 +419,7 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
                                 key={userId}
                                 className="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-sm"
                               >
-                                {user.fullName}
+                                {`${user.firstName} ${user.lastName}`}
                                 <button
                                   type="button"
                                   onClick={() => {
