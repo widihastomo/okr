@@ -327,8 +327,32 @@ export default function KeyResultDetailPage() {
               <div className="mb-6">
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">{keyResult.title}</h1>
                 {keyResult.description && (
-                  <p className="text-gray-600">{keyResult.description}</p>
+                  <p className="text-gray-600 mb-3">{keyResult.description}</p>
                 )}
+                
+                {/* Key Result Details */}
+                <div className="flex flex-wrap gap-4 mt-3 text-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-gray-600">Type:</span>
+                    <Badge variant="outline" className="text-xs">
+                      {keyResult.keyResultType.replace('_', ' ')}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-gray-600">Unit:</span>
+                    <Badge variant="outline" className="text-xs">
+                      {keyResult.unit}
+                    </Badge>
+                  </div>
+                  {keyResult.lastUpdated && (
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-gray-600">Last Updated:</span>
+                      <span className="text-gray-500 text-xs">
+                        {format(new Date(keyResult.lastUpdated), "MMM dd, yyyy")}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="text-center p-3 bg-blue-50 rounded-lg">
@@ -626,29 +650,6 @@ export default function KeyResultDetailPage() {
                 <div className="text-center py-4 text-gray-500">
                   <BarChart3 className="h-8 w-8 mx-auto mb-2 text-gray-300" />
                   <p className="text-sm">No check-ins yet</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Key Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Key Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Type</p>
-                <p className="text-sm">{keyResult.keyResultType.replace('_', ' ')}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Unit</p>
-                <p className="text-sm">{keyResult.unit}</p>
-              </div>
-              {keyResult.lastUpdated && (
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Last Updated</p>
-                  <p className="text-sm">{format(new Date(keyResult.lastUpdated), "MMM dd, yyyy")}</p>
                 </div>
               )}
             </CardContent>
