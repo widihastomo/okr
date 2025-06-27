@@ -308,6 +308,12 @@ Changelog:
   * Improved user experience by automatically focusing on most relevant short-term objectives with related sub-periods
   * Fixed "All Cycles" selection issue - users can now manually select "Semua Cycle" without automatic override
   * Added state tracking to prevent automatic cycle selection from interfering with user manual selections
+- June 27, 2025. Fixed cycle filter and updated status filter to match objective statuses:
+  * Fixed "Semua Cycle" filter to properly display all OKR data regardless of cycle selection
+  * Added null handling for OKR cycleId values to prevent filtering issues
+  * Updated status filter dropdown to include all actual objective statuses from the system
+  * Status options now include: Not Started, On Track, At Risk, Behind, Paused, Canceled, Completed, Partially Achieved, Not Achieved, In Progress
+  * Changed filter labels to Indonesian ("Semua Status" instead of "All Status")
 ```
 
 ## User Preferences

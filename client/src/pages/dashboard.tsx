@@ -252,11 +252,17 @@ export default function Dashboard() {
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="all">Semua Status</SelectItem>
+                  <SelectItem value="not_started">Not Started</SelectItem>
                   <SelectItem value="on_track">On Track</SelectItem>
                   <SelectItem value="at_risk">At Risk</SelectItem>
                   <SelectItem value="behind">Behind</SelectItem>
+                  <SelectItem value="paused">Paused</SelectItem>
+                  <SelectItem value="canceled">Canceled</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="partially_achieved">Partially Achieved</SelectItem>
+                  <SelectItem value="not_achieved">Not Achieved</SelectItem>
+                  <SelectItem value="in_progress">In Progress</SelectItem>
                 </SelectContent>
               </Select>
               
