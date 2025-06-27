@@ -734,6 +734,5 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-// Use simple memory storage to resolve type conflicts
-import { SimpleMemStorage } from "./storage-simple";
-export const storage = new SimpleMemStorage();
+// Use database storage
+export const storage = new DatabaseStorage();
