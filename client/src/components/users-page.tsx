@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Users, Plus, Edit, Trash2, UserPlus, Shield, User as UserIcon, Search, UserCheck, UserX, MoreHorizontal } from "lucide-react";
-import Sidebar from "./sidebar";
+
 import { useToast } from "@/hooks/use-toast";
 
 type UserWithTeams = User & {
@@ -272,243 +272,237 @@ export default function UsersPage() {
 
   if (usersLoading) {
     return (
-      <div className="flex h-screen bg-gray-50">
-        <Sidebar isOpen={true} />
-        <div className="flex-1 p-6">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-            <div className="h-32 bg-gray-200 rounded-lg"></div>
-          </div>
+      <div className="p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-32 bg-gray-200 rounded-lg"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar isOpen={true} />
-      <div className="flex-1 overflow-auto">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
-              <p className="text-gray-600">Manage users and their permissions</p>
-            </div>
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
+          <p className="text-gray-600">Manage users and their permissions</p>
+        </div>
+      </div>
+
+      <Tabs defaultValue="users" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="users">Users</TabsTrigger>
+          <TabsTrigger value="teams">Teams</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="users" className="space-y-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Users ({filteredUsers.length})</h2>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="bg-blue-600 hover:bg-blue-700">
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Add User
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add New User</DialogTitle>
+                  <DialogDescription>
+                    Create a new user account
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  const formData = new FormData(e.currentTarget);
+                  createUserMutation.mutate({
+                    id: Math.random().toString(36).substr(2, 9),
+                    email: formData.get('email') as string,
+                    firstName: formData.get('firstName') as string,
+                    lastName: formData.get('lastName') as string,
+                    role: formData.get('role') as string,
+                  });
+                }}>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="email">Email</Label>
+                      <Input name="email" type="email" placeholder="Enter email" required />
+                    </div>
+                    <div>
+                      <Label htmlFor="firstName">First Name</Label>
+                      <Input name="firstName" placeholder="Enter first name" required />
+                    </div>
+                    <div>
+                      <Label htmlFor="lastName">Last Name</Label>
+                      <Input name="lastName" placeholder="Enter last name" required />
+                    </div>
+                    <div>
+                      <Label htmlFor="role">Role</Label>
+                      <Select name="role" required>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="member">Member</SelectItem>
+                          <SelectItem value="manager">Manager</SelectItem>
+                          <SelectItem value="admin">Admin</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-blue-600 hover:bg-blue-700"
+                      disabled={createUserMutation.isPending}
+                    >
+                      {createUserMutation.isPending ? "Creating..." : "Create User"}
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
 
-          <Tabs defaultValue="users" className="space-y-6">
-            <TabsList>
-              <TabsTrigger value="users">Users</TabsTrigger>
-              <TabsTrigger value="teams">Teams</TabsTrigger>
-            </TabsList>
+          {/* Search and Filter Controls */}
+          <div className="flex gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="Search users by name, email, or ID..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={roleFilter} onValueChange={setRoleFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter by role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Roles</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
+                <SelectItem value="manager">Manager</SelectItem>
+                <SelectItem value="member">Member</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-            <TabsContent value="users" className="space-y-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Users ({filteredUsers.length})</h2>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button className="bg-blue-600 hover:bg-blue-700">
-                      <UserPlus className="h-4 w-4 mr-2" />
-                      Add User
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Add New User</DialogTitle>
-                      <DialogDescription>
-                        Create a new user account
-                      </DialogDescription>
-                    </DialogHeader>
-                    <form onSubmit={(e) => {
-                      e.preventDefault();
-                      const formData = new FormData(e.currentTarget);
-                      createUserMutation.mutate({
-                        id: Math.random().toString(36).substr(2, 9),
-                        email: formData.get('email') as string,
-                        firstName: formData.get('firstName') as string,
-                        lastName: formData.get('lastName') as string,
-                        role: formData.get('role') as string,
-                      });
-                    }}>
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="email">Email</Label>
-                          <Input name="email" type="email" placeholder="Enter email" required />
-                        </div>
-                        <div>
-                          <Label htmlFor="firstName">First Name</Label>
-                          <Input name="firstName" placeholder="Enter first name" required />
-                        </div>
-                        <div>
-                          <Label htmlFor="lastName">Last Name</Label>
-                          <Input name="lastName" placeholder="Enter last name" required />
-                        </div>
-                        <div>
-                          <Label htmlFor="role">Role</Label>
-                          <Select name="role" required>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select role" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="member">Member</SelectItem>
-                              <SelectItem value="manager">Manager</SelectItem>
-                              <SelectItem value="admin">Admin</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <Button 
-                          type="submit" 
-                          className="w-full bg-blue-600 hover:bg-blue-700"
-                          disabled={createUserMutation.isPending}
-                        >
-                          {createUserMutation.isPending ? "Creating..." : "Create User"}
-                        </Button>
-                      </div>
-                    </form>
-                  </DialogContent>
-                </Dialog>
-              </div>
-
-              {/* Search and Filter Controls */}
-              <div className="flex gap-4 mb-6">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                  <Input
-                    placeholder="Search users by name, email, or ID..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-                <Select value={roleFilter} onValueChange={setRoleFilter}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Filter by role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Roles</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="manager">Manager</SelectItem>
-                    <SelectItem value="member">Member</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {usersLoading ? (
-                <div className="text-center py-8">
-                  <div className="text-gray-500">Loading users...</div>
-                </div>
-              ) : users.length === 0 ? (
-                <div className="text-center py-8">
-                  <div className="text-gray-500">No users found</div>
-                </div>
-              ) : (
-                <div className="bg-white rounded-lg border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>User</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Role</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredUsers.map((user: User) => {
-                        const RoleIcon = getRoleIcon(user.role);
-                        return (
-                          <TableRow key={user.id}>
-                            <TableCell>
-                              <div className="flex items-center space-x-3">
-                                <Avatar className="h-8 w-8">
-                                  <AvatarImage src={user.profileImageUrl || undefined} />
-                                  <AvatarFallback className="text-sm">
-                                    {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div>
-                                  <div className="font-medium text-gray-900">
-                                    {user.firstName} {user.lastName}
-                                  </div>
-                                  <div className="text-sm text-gray-500">
-                                    ID: {user.id.substring(0, 8)}...
-                                  </div>
-                                </div>
+          {usersLoading ? (
+            <div className="text-center py-8">
+              <div className="text-gray-500">Loading users...</div>
+            </div>
+          ) : users.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="text-gray-500">No users found</div>
+            </div>
+          ) : (
+            <div className="bg-white rounded-lg border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>User</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredUsers.map((user: User) => {
+                    const RoleIcon = getRoleIcon(user.role);
+                    return (
+                      <TableRow key={user.id}>
+                        <TableCell>
+                          <div className="flex items-center space-x-3">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={user.profileImageUrl || undefined} />
+                              <AvatarFallback className="text-sm">
+                                {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <div className="font-medium text-gray-900">
+                                {user.firstName} {user.lastName}
                               </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="text-sm text-gray-900">{user.email}</div>
-                            </TableCell>
-                            <TableCell>
-                              <Badge className={`${getRoleBadge(user.role)} flex items-center gap-1 w-fit`}>
-                                <RoleIcon className="h-3 w-3" />
-                                {user.role}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline" className="text-green-600 border-green-200">
-                                Active
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" className="h-8 w-8 p-0">
-                                    <span className="sr-only">Open menu</span>
-                                    <MoreHorizontal className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                  <DropdownMenuItem onClick={() => setEditingUser(user)}>
-                                    <Edit className="mr-2 h-4 w-4" />
-                                    Edit user
+                              <div className="text-sm text-gray-500">
+                                ID: {user.id.substring(0, 8)}...
+                              </div>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm text-gray-900">{user.email}</div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={`${getRoleBadge(user.role)} flex items-center gap-1 w-fit`}>
+                            <RoleIcon className="h-3 w-3" />
+                            {user.role}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="text-green-600 border-green-200">
+                            Active
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuItem onClick={() => setEditingUser(user)}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit user
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <DropdownMenuItem 
+                                    className="text-red-600"
+                                    onSelect={(e) => e.preventDefault()}
+                                  >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete user
                                   </DropdownMenuItem>
-                                  <DropdownMenuSeparator />
-                                  <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                      <DropdownMenuItem 
-                                        className="text-red-600"
-                                        onSelect={(e) => e.preventDefault()}
-                                      >
-                                        <Trash2 className="mr-2 h-4 w-4" />
-                                        Delete user
-                                      </DropdownMenuItem>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                      <AlertDialogHeader>
-                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                          This action cannot be undone. This will permanently delete the user 
-                                          "{user.firstName} {user.lastName}" and remove all associated data.
-                                        </AlertDialogDescription>
-                                      </AlertDialogHeader>
-                                      <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction
-                                          onClick={() => deleteUserMutation.mutate(user.id)}
-                                          className="bg-red-600 hover:bg-red-700"
-                                        >
-                                          Delete
-                                        </AlertDialogAction>
-                                      </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                  </AlertDialog>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      This action cannot be undone. This will permanently delete the user 
+                                      "{user.firstName} {user.lastName}" and remove all associated data.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => deleteUserMutation.mutate(user.id)}
+                                      className="bg-red-600 hover:bg-red-700"
+                                    >
+                                      Delete
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          )}
 
-              {/* Edit User Dialog */}
-              {editingUser && (
-                <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>
-                  <DialogContent>
+          {/* Edit User Dialog */}
+          {editingUser && (
+            <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>
+              <DialogContent>
                     <DialogHeader>
                       <DialogTitle>Edit User</DialogTitle>
                       <DialogDescription>
@@ -682,8 +676,6 @@ export default function UsersPage() {
               )}
             </TabsContent>
           </Tabs>
-        </div>
-      </div>
     </div>
   );
 }
