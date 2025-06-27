@@ -211,41 +211,40 @@ export default function CompanyOKRPage() {
         
         {/* Connecting Line and Children */}
         {hasChildren && isExpanded && (
-          <div className="flex items-start">
-            {/* Main horizontal connecting line from parent */}
-            <div className="w-8 h-px bg-gray-300 mt-[80px]"></div>
-            
-            {/* Children container with proper vertical alignment */}
-            <div className="flex flex-col">
-              {children.map((child, index) => (
-                <div key={child.okr.id} className="flex items-center mb-4 last:mb-0">
-                  {/* Vertical and horizontal connectors for multiple children */}
-                  {children.length > 1 ? (
-                    <div className="relative flex items-center">
-                      {/* Main vertical line - only render once for first child */}
+          <div className="ml-4">
+            {children.map((child, index) => (
+              <div key={child.okr.id} className="flex items-center mb-6 last:mb-0">
+                {/* Connection lines */}
+                <div className="flex items-center">
+                  {/* Horizontal line from parent */}
+                  <div className="w-8 h-px bg-gray-300"></div>
+                  
+                  {/* Vertical connector for multiple children */}
+                  {children.length > 1 && (
+                    <div className="relative">
+                      {/* Vertical line connecting all children */}
                       {index === 0 && (
                         <div 
                           className="absolute w-px bg-gray-300"
                           style={{
-                            left: '0px',
-                            top: '80px',
-                            height: `${(children.length - 1) * 184}px`
+                            left: '-4px',
+                            top: '0px',
+                            height: `${(children.length - 1) * 144 + 72}px`
                           }}
                         ></div>
                       )}
-                      {/* Horizontal branch to each child */}
+                      {/* Small horizontal branch */}
                       <div className="w-4 h-px bg-gray-300"></div>
                     </div>
-                  ) : (
-                    /* Single child - direct horizontal line */
-                    <div className="w-4 h-px bg-gray-300"></div>
                   )}
-                  
-                  {/* Child card */}
+                </div>
+                
+                {/* Child card */}
+                <div className="ml-2">
                   {renderMindmapCard(child)}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
