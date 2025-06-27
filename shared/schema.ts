@@ -31,7 +31,7 @@ export const objectives = pgTable("objectives", {
   owner: text("owner").notNull(), // kept for backward compatibility
   ownerType: text("owner_type").notNull().default("user"), // "user" or "team"
   ownerId: uuid("owner_id").notNull(), // user ID or team ID
-  status: text("status").notNull().default("on_track"), // "on_track", "at_risk", "behind", "completed"
+  status: text("status").notNull().default("not_started"), // "not_started", "on_track", "at_risk", "behind", "paused", "canceled", "completed", "partially_achieved", "not_achieved"
   teamId: uuid("team_id").references(() => teams.id), // for team OKRs
   parentId: uuid("parent_id"), // self-reference for parent-child hierarchy
 });

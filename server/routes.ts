@@ -10,6 +10,7 @@ import { z } from "zod";
 import { setupEmailAuth } from "./authRoutes";
 import { requireAuth } from "./emailAuth";
 import { calculateProgressStatus } from "./progress-tracker";
+import { updateObjectiveWithAutoStatus } from "./storage";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication

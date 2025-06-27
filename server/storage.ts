@@ -10,6 +10,7 @@ import {
 import { db } from "./db";
 import { eq, and } from "drizzle-orm";
 import { calculateProgressStatus } from "./progress-tracker";
+import { calculateObjectiveStatus } from "./objective-status-tracker";
 
 export interface IStorage {
   // Cycles
@@ -117,31 +118,21 @@ async function updateKeyResultWithAutoStatus(keyResult: KeyResult, cycleId: stri
 }
 
 // Helper function to calculate objective status based on key results
-async function updateObjectiveWithAutoStatus(objectiveId: string): Promise<void> {
-  const keyResultsList = await db.select().from(keyResults).where(eq(keyResults.objectiveId, objectiveId));
+export async function updateObjectiveWithAutoStatus(objectiveId: string): Promise<void> {
+  // Get objective with its key results and cycle
+  const [objective] = await db.select().from(objectives).where(eq(objectives.id, objectiveId));
+  if (!objective) return;
   
-  if (keyResultsList.length === 0) return;
+  const objectiveKeyResults = await db.select().from(keyResults).where(eq(keyResults.objectiveId, objectiveId));
+  const cycle = objective.cycleId ? await db.select().from(cycles).where(eq(cycles.id, objective.cycleId)).then(rows => rows[0]) : null;
   
-  // Calculate overall status based on key results
-  const completedCount = keyResultsList.filter(kr => kr.status === 'completed').length;
-  const behindCount = keyResultsList.filter(kr => kr.status === 'behind').length;
-  const atRiskCount = keyResultsList.filter(kr => kr.status === 'at_risk').length;
+  // Calculate new status
+  const statusResult = calculateObjectiveStatus(objective, objectiveKeyResults, cycle);
   
-  let objectiveStatus: string;
-  
-  if (completedCount === keyResultsList.length) {
-    objectiveStatus = 'completed';
-  } else if (behindCount > 0 || behindCount / keyResultsList.length > 0.3) {
-    objectiveStatus = 'behind';
-  } else if (atRiskCount > 0 || atRiskCount / keyResultsList.length > 0.5) {
-    objectiveStatus = 'at_risk';
-  } else {
-    objectiveStatus = 'on_track';
-  }
-  
+  // Update objective with new status
   await db
     .update(objectives)
-    .set({ status: objectiveStatus })
+    .set({ status: statusResult.status })
     .where(eq(objectives.id, objectiveId));
 }
 
