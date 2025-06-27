@@ -371,14 +371,15 @@ export default function KeyResultDetailPage() {
   const getUserName = (userId: string) => {
     if (!userId || !users) return 'Unknown User';
     const user = users.find((u: any) => u.id === userId);
-    return user?.name || 'Unknown User';
+    const fullName = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : '';
+    return fullName || user?.email || 'Unknown User';
   };
 
   // Helper function to get user initials safely
   const getUserInitials = (userId: string) => {
     const userName = getUserName(userId);
     if (!userName || userName === 'Unknown User') return 'U';
-    return userName.split(' ').map((n: string) => n[0]).join('').toUpperCase();
+    return userName.split(' ').filter(n => n && n.length > 0).map((n: string) => n[0]).join('').toUpperCase();
   };
 
   // Helper function to get tasks for a specific initiative
@@ -885,7 +886,9 @@ export default function KeyResultDetailPage() {
               <CardContent>
                 {keyResult.checkIns && keyResult.checkIns.length > 0 ? (
                   <div className="space-y-3 max-h-80 overflow-y-auto">
-                    {keyResult.checkIns.map((checkIn) => (
+                    {keyResult.checkIns.sort((a, b) => 
+                      new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+                    ).map((checkIn) => (
                       <div key={checkIn.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
                         <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                         <div className="flex-1 min-w-0">
@@ -1512,16 +1515,17 @@ export default function KeyResultDetailPage() {
                               onClick={() => {
                                 const beforeMention = commentText.substring(0, mentionPosition);
                                 const afterMention = commentText.substring(mentionPosition + 1);
-                                setCommentText(`${beforeMention}@${user.name} ${afterMention}`);
+                                const userName = getUserName(user.id);
+                                setCommentText(`${beforeMention}@${userName} ${afterMention}`);
                                 setShowUserMentions(false);
                               }}
                             >
                               <Avatar className="h-6 w-6">
                                 <AvatarFallback className="text-xs bg-blue-100 text-blue-600">
-                                  {user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
+                                  {getUserInitials(user.id)}
                                 </AvatarFallback>
                               </Avatar>
-                              <span className="text-sm text-gray-900">{user.name}</span>
+                              <span className="text-sm text-gray-900">{getUserName(user.id)}</span>
                             </div>
                           ))}
                         </div>
