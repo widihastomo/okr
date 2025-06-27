@@ -231,6 +231,11 @@ Changelog:
   * Prevents accidental deletion of key results with explicit user confirmation
   * Maintains consistent destructive action styling with red confirmation button
   * Improves user experience by preventing data loss from misclicks
+- June 27, 2025. Made base value and target fields required in Key Results:
+  * Added required attribute to "Nilai Awal" (Base Value) input field
+  * Added required attribute to "Target" input field
+  * Ensures essential fields are filled for proper progress calculation
+  * Improves data quality and prevents invalid Key Results creation
 ```
 
 ## User Preferences

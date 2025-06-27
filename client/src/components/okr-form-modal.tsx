@@ -547,6 +547,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                                 type="number" 
                                 step="0.1" 
                                 placeholder="0" 
+                                required
                                 {...field}
                                 onChange={(e) => {
                                   const value = e.target.value;
@@ -577,6 +578,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                                 type="number" 
                                 step="0.1" 
                                 placeholder="100" 
+                                required
                                 {...field}
                                 onChange={(e) => {
                                   const value = e.target.value;
