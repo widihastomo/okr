@@ -19,7 +19,7 @@ const okrFormSchema = z.object({
   objective: z.object({
     title: z.string().min(1, "Objective title is required"),
     description: z.string().optional(),
-    owner: z.string().min(1, "Owner is required"),
+    owner: z.string().optional(), // Made optional since it's calculated from ownerType and ownerId
     ownerType: z.enum(["user", "team"]).default("user"),
     ownerId: z.string().min(1, "Owner is required"),
     status: z.string().default("in_progress"),
@@ -527,7 +527,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                         name={`keyResults.${index}.baseValue`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Base (Optional)</FormLabel>
+                            <FormLabel>Nilai Awal</FormLabel>
                             <FormControl>
                               <Input 
                                 type="number" 
@@ -617,13 +617,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                 Cancel
               </Button>
               <Button 
-                type="button"
-                onClick={() => {
-                  console.log("Submit button clicked");
-                  console.log("Form valid:", form.formState.isValid);
-                  console.log("Form errors:", form.formState.errors);
-                  form.handleSubmit(onSubmit)();
-                }}
+                type="submit"
                 disabled={mutation.isPending}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
