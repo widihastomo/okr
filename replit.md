@@ -453,6 +453,13 @@ Changelog:
   * Removed navigation menu item from sidebar
   * Cleaned up imports and references to the removed page
   * Simplified navigation structure focusing on core OKR management features
+- June 27, 2025. Converted Users page to professional table layout:
+  * Replaced card-based layout with structured table format for better data presentation
+  * Added comprehensive table with columns: User, Email, Role, Status, Actions
+  * Implemented dropdown menu actions with edit and delete functionality
+  * Enhanced user display with avatars, shortened IDs, and role badges
+  * Added confirmation dialogs for destructive actions like user deletion
+  * Improved space utilization and data scanning efficiency for administrators
 ```
 
 ## User Preferences
