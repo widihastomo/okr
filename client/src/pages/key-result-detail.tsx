@@ -430,14 +430,16 @@ export default function KeyResultDetailPage() {
   const getUserName = (userId: string) => {
     if (!userId || !users) return 'Unknown User';
     const user = users.find((u: any) => u.id === userId);
-    return user?.name || 'Unknown User';
+    if (!user) return 'Unknown User';
+    return `${user.firstName} ${user.lastName}`;
   };
 
   // Helper function to get user initials safely
   const getUserInitials = (userId: string) => {
-    const userName = getUserName(userId);
-    if (!userName || userName === 'Unknown User') return 'U';
-    return userName.split(' ').map((n: string) => n[0]).join('').toUpperCase();
+    if (!userId || !users) return 'U';
+    const user = users.find((u: any) => u.id === userId);
+    if (!user) return 'U';
+    return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
   };
 
   // Helper function to get tasks for a specific initiative
@@ -1497,7 +1499,7 @@ export default function KeyResultDetailPage() {
                       <SelectItem value="unassigned">Unassigned</SelectItem>
                       {users?.map((user: any) => (
                         <SelectItem key={user.id} value={user.id}>
-                          {user.name}
+                          {user.firstName} {user.lastName}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -1705,23 +1707,24 @@ export default function KeyResultDetailPage() {
                       {showUserMentions && (
                         <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-md shadow-lg z-50 max-h-40 overflow-y-auto">
                           <div className="p-2 text-xs text-gray-500 border-b">Mention team members:</div>
-                          {users?.filter((user: any) => user.name).map((user: any) => (
+                          {users?.filter((user: any) => user.firstName && user.lastName).map((user: any) => (
                             <div
                               key={user.id}
                               className="p-2 hover:bg-gray-50 cursor-pointer flex items-center gap-2"
                               onClick={() => {
                                 const beforeMention = commentText.substring(0, mentionPosition);
                                 const afterMention = commentText.substring(mentionPosition + 1);
-                                setCommentText(`${beforeMention}@${user.name} ${afterMention}`);
+                                const fullName = `${user.firstName} ${user.lastName}`;
+                                setCommentText(`${beforeMention}@${fullName} ${afterMention}`);
                                 setShowUserMentions(false);
                               }}
                             >
                               <Avatar className="h-6 w-6">
                                 <AvatarFallback className="text-xs bg-blue-100 text-blue-600">
-                                  {user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
+                                  {`${user.firstName[0]}${user.lastName[0]}`.toUpperCase()}
                                 </AvatarFallback>
                               </Avatar>
-                              <span className="text-sm text-gray-900">{user.name}</span>
+                              <span className="text-sm text-gray-900">{user.firstName} {user.lastName}</span>
                             </div>
                           ))}
                         </div>
