@@ -279,6 +279,7 @@ Changelog:
   * Added automatic objective progress and status recalculation after key result changes
   * Removed timeframe display element from OKR cards for cleaner interface
   * Enhanced check-in success notifications with green styling for better user feedback
+  * Added hover tooltip to show full text of truncated check-in notes
 ```
 
 ## User Preferences

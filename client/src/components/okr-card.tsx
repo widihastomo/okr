@@ -351,7 +351,10 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
                         </span>
                       </div>
                       {kr.lastCheckIn.notes && (
-                        <div className="text-gray-400 italic text-xs max-w-xs truncate text-right">
+                        <div 
+                          className="text-gray-400 italic text-xs max-w-xs truncate text-right cursor-help"
+                          title={kr.lastCheckIn.notes}
+                        >
                           "{kr.lastCheckIn.notes}"
                         </div>
                       )}
