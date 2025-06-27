@@ -588,34 +588,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                       />
                     </div>
 
-                    <FormField
-                      control={form.control}
-                      name={`keyResults.${index}.assignedTo`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Assigned To (Optional)</FormLabel>
-                          <Select 
-                            onValueChange={(value) => field.onChange(value === "unassigned" ? "" : value)} 
-                            value={field.value || "unassigned"}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select assignee" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="unassigned">No Assignment</SelectItem>
-                              {users?.map((user) => (
-                                <SelectItem key={user.id} value={user.id}>
-                                  {user.firstName} {user.lastName} ({user.email})
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    
                   </div>
                 ))}
               </CardContent>
