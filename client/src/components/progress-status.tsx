@@ -180,8 +180,25 @@ export function SimpleProgressStatus({
   const config = getStatusConfig(status);
   const StatusIcon = config.icon;
   
-  // Use the server-calculated timeProgressPercentage which uses the exact formula
-  const idealProgress = timeProgressPercentage;
+  // Calculate ideal progress based on cycle dates
+  const now = new Date();
+  const cycleStart = new Date(startDate);
+  const cycleEnd = dueDate ? new Date(dueDate) : new Date();
+  
+  let idealProgress = timeProgressPercentage;
+  
+  // If current date is past the cycle end date, show target achievement (100%)
+  if (now > cycleEnd) {
+    idealProgress = 100;
+  }
+  // If current date is before cycle start, show 0%
+  else if (now < cycleStart) {
+    idealProgress = 0;
+  }
+  // Otherwise use the server-calculated timeProgressPercentage
+  else {
+    idealProgress = timeProgressPercentage;
+  }
 
   if (compact) {
     return (
@@ -226,7 +243,12 @@ export function SimpleProgressStatus({
         </div>
         <div className="flex items-center gap-1">
           <div className="w-0.5 h-3 bg-gray-400 opacity-70"></div>
-          <span>Target ideal ({idealProgress}%)</span>
+          <span>
+            {now > cycleEnd 
+              ? `Target capaian (${idealProgress}%)` 
+              : `Target ideal (${idealProgress}%)`
+            }
+          </span>
         </div>
       </div>
     </div>

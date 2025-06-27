@@ -13,9 +13,10 @@ interface OKRCardProps {
   onEditProgress: (keyResult: KeyResult) => void;
   onRefresh: () => void;
   onKeyResultClick: (keyResultId: string) => void;
+  cycleStartDate?: string;
 }
 
-export default function OKRCard({ okr, onEditProgress, onKeyResultClick }: OKRCardProps) {
+export default function OKRCard({ okr, onEditProgress, onKeyResultClick, cycleStartDate }: OKRCardProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
@@ -178,6 +179,7 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick }: OKRCa
                   progressPercentage={progress}
                   timeProgressPercentage={kr.timeProgressPercentage || 0}
                   dueDate={kr.dueDate ? (typeof kr.dueDate === 'string' ? kr.dueDate : kr.dueDate.toISOString()) : null}
+                  startDate={cycleStartDate}
                 />
               </div>
             );

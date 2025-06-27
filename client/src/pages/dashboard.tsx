@@ -117,15 +117,20 @@ export default function Dashboard() {
             </Button>
           </div>
         ) : (
-          okrs.map((okr) => (
-            <OKRCard
-              key={okr.id}
-              okr={okr}
-              onEditProgress={handleEditProgress}
-              onKeyResultClick={handleKeyResultClick}
-              onRefresh={refetch}
-            />
-          ))
+          okrs.map((okr) => {
+            // Find the cycle for this OKR to get start date
+            const cycle = cycles.find(c => c.id === okr.cycleId);
+            return (
+              <OKRCard
+                key={okr.id}
+                okr={okr}
+                onEditProgress={handleEditProgress}
+                onKeyResultClick={handleKeyResultClick}
+                onRefresh={refetch}
+                cycleStartDate={cycle?.startDate}
+              />
+            );
+          })
         )}
       </div>
 

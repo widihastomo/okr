@@ -484,12 +484,49 @@ export class DatabaseStorage implements IStorage {
   async getKeyResultsByObjectiveId(objectiveId: string): Promise<KeyResult[]> {
     const keyResultsList = await db.select().from(keyResults).where(eq(keyResults.objectiveId, objectiveId));
     
-    // For now, return simple data without complex calculations to fix 500 error
-    return keyResultsList.map(kr => ({
-      ...kr,
-      status: kr.status || 'on_track',
-      timeProgressPercentage: 0
-    }));
+    // Get the objective to find the cycle for date calculation
+    const objective = await this.getObjective(objectiveId);
+    if (!objective || !objective.cycleId) {
+      return keyResultsList.map(kr => ({
+        ...kr,
+        status: kr.status || 'on_track',
+        timeProgressPercentage: 0
+      }));
+    }
+    
+    // Get cycle information for date calculation
+    const cycle = await this.getCycle(objective.cycleId);
+    if (!cycle) {
+      return keyResultsList.map(kr => ({
+        ...kr,
+        status: kr.status || 'on_track',
+        timeProgressPercentage: 0
+      }));
+    }
+    
+    // Calculate status and timeProgressPercentage for each key result
+    return keyResultsList.map(kr => {
+      try {
+        const startDate = new Date(cycle.startDate);
+        const endDate = new Date(kr.dueDate || cycle.endDate);
+        
+        const progressStatus = calculateProgressStatus(kr, startDate, endDate);
+        
+        return {
+          ...kr,
+          status: progressStatus.status,
+          timeProgressPercentage: progressStatus.timeProgressPercentage
+        };
+      } catch (error) {
+        console.error('Error calculating progress status for key result:', kr.id, error);
+        // Return key result with default values if calculation fails
+        return {
+          ...kr,
+          status: kr.status || 'on_track',
+          timeProgressPercentage: 0
+        };
+      }
+    });
   }
 
   async getKeyResult(id: string): Promise<KeyResult | undefined> {
