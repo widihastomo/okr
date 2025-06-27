@@ -113,7 +113,6 @@ export const initiatives = pgTable("initiatives", {
   keyResultId: uuid("key_result_id").references(() => keyResults.id).notNull(),
   title: text("title").notNull(),
   description: text("description"),
-  objective: text("objective"), // Project objective/goal
   status: text("status").notNull().default("not_started"), // "not_started", "in_progress", "completed", "on_hold", "cancelled"
   priority: text("priority").notNull().default("medium"), // "low", "medium", "high", "critical"
   picId: uuid("pic_id").references(() => users.id), // Person in Charge

@@ -38,7 +38,6 @@ import { apiRequest } from "@/lib/queryClient";
 const initiativeSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  objective: z.string().optional(),
   status: z.enum(["not_started", "in_progress", "completed", "on_hold", "cancelled"]).default("not_started"),
   priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
   picId: z.string().optional(),
@@ -77,7 +76,6 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
     defaultValues: {
       title: "",
       description: "",
-      objective: "",
       status: "not_started",
       priority: "medium",
       picId: "",
@@ -198,24 +196,6 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
                       placeholder="Jelaskan detail initiative ini"
                       className="resize-none"
                       rows={3}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Objective */}
-            <FormField
-              control={form.control}
-              name="objective"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tujuan</FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder="Tujuan dari initiative ini"
                       {...field}
                     />
                   </FormControl>

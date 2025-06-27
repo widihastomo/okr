@@ -342,6 +342,12 @@ Changelog:
   * Fixed TypeScript errors and implemented proper user data typing
   * System now supports comprehensive project management with team collaboration
   * Converted member selection to checkbox-based multi-select interface with scrollable list and selection counter
+- June 27, 2025. Enhanced member selection with advanced multi-select dropdown interface:
+  * Created sophisticated dropdown component with search functionality and "Select All" option
+  * Implemented checkbox-based selection for intuitive multi-user assignment
+  * Added real-time search filtering and selection counter display
+  * Removed "Tujuan" (Objective) field from initiative forms and database schema
+  * Streamlined initiative creation process by focusing on essential project information
 ```
 
 ## User Preferences
