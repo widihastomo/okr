@@ -3,11 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Calendar, User, Clock, Edit, MoreVertical, Copy, Trash2 } from "lucide-react";
+import { Calendar, User, Clock, Edit, MoreVertical, Copy, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import type { OKRWithKeyResults, KeyResult } from "@shared/schema";
 import { Link } from "wouter";
 import { CheckInModal } from "./check-in-modal";
 import { SimpleProgressStatus } from "./progress-status";
+import { useState } from "react";
 
 import { EditOKRButton } from "./okr-form-modal";
 
@@ -23,6 +24,7 @@ interface OKRCardProps {
 }
 
 export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDuplicate, onDelete, cycleStartDate, cycleEndDate }: OKRCardProps) {
+  const [isExpanded, setIsExpanded] = useState(true);
   
   const calculateProgress = (current: string, target: string, keyResultType: string, baseValue?: string | null): number => {
     const currentNum = parseFloat(current) || 0;
@@ -127,7 +129,7 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
               </span>
               <span className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
-                {okr.timeframe}
+                Cycle-based
               </span>
               {daysRemaining !== null && (
                 <span className="flex items-center gap-1">
@@ -138,6 +140,18 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
             </div>
           </div>
           <div className="flex items-start space-x-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="p-2 hover:bg-gray-100"
+            >
+              {isExpanded ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
+            </Button>
             <div className="flex flex-col items-end">
               <div className="flex items-center gap-2 mb-2">
                 {(() => {
@@ -257,8 +271,9 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
       </div>
 
       {/* Key Results */}
-      <CardContent className="p-6">
-        <h4 className="text-sm font-semibold text-gray-700 mb-4">Key Results</h4>
+      {isExpanded && (
+        <CardContent className="p-6">
+          <h4 className="text-sm font-semibold text-gray-700 mb-4">Key Results</h4>
         <div className="space-y-4">
           {okr.keyResults.map((kr) => {
             const progress = calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
@@ -343,6 +358,7 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
           })}
         </div>
       </CardContent>
+      )}
     </Card>
   );
 }
