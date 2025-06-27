@@ -144,10 +144,7 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
                 <User className="w-4 h-4" />
                 {okr.owner}
               </span>
-              <span className="flex items-center gap-1">
-                <Calendar className="w-4 h-4" />
-                Cycle-based
-              </span>
+              
               {daysRemaining !== null && (
                 <span className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
