@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Calendar, Target, TrendingUp, Users, Clock, BarChart3, Edit, Trash2, ChevronRight, Home, ChevronDown, User } from "lucide-react";
+import { ArrowLeft, Calendar, Target, TrendingUp, Users, Clock, BarChart3, Edit, Trash2, ChevronRight, Home, ChevronDown, User, Check, CheckCircle2 } from "lucide-react";
 import { CheckInModal } from "@/components/check-in-modal";
 import InitiativeModal from "@/components/initiative-modal";
 import { ProgressStatus } from "@/components/progress-status";
@@ -21,6 +21,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 export default function KeyResultDetailPage() {
   const params = useParams();
@@ -28,6 +36,8 @@ export default function KeyResultDetailPage() {
   const keyResultId = params.id as string;
   const queryClient = useQueryClient();
   const [expandedInitiatives, setExpandedInitiatives] = useState<Set<string>>(new Set());
+  const [taskStatuses, setTaskStatuses] = useState<Record<string, string>>({});
+  const { toast } = useToast();
   
   // Helper function to toggle initiative expansion
   const toggleInitiativeExpansion = (initiativeId: string) => {
@@ -40,6 +50,43 @@ export default function KeyResultDetailPage() {
       }
       return newSet;
     });
+  };
+
+  // Function to update task status
+  const handleTaskStatusUpdate = async (taskId: string, newStatus: string) => {
+    try {
+      // Update local state immediately for better UX
+      setTaskStatuses(prev => ({
+        ...prev,
+        [taskId]: newStatus
+      }));
+
+      // Here we would call the API to update the task status
+      // For now, we'll show a success toast
+      toast({
+        title: "Status Updated",
+        description: `Task status berhasil diubah ke ${newStatus}`,
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({
+        queryKey: [`/api/key-results/${keyResultId}/initiatives`]
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Gagal mengubah status task",
+        variant: "destructive",
+      });
+      
+      // Revert local state on error
+      setTaskStatuses(prev => {
+        const updated = { ...prev };
+        delete updated[taskId];
+        return updated;
+      });
+    }
   };
   
   const { data: keyResult, isLoading } = useQuery<KeyResultWithDetails>({
@@ -64,7 +111,7 @@ export default function KeyResultDetailPage() {
         priority: "high",
         assignedTo: "John Doe",
         dueDate: "2025-01-15",
-        status: "in_progress"
+        status: taskStatuses[`task-${initiativeId}-1`] || "in_progress"
       },
       {
         id: `task-${initiativeId}-2`,
@@ -73,9 +120,50 @@ export default function KeyResultDetailPage() {
         priority: "medium",
         assignedTo: "Jane Smith",
         dueDate: "2025-01-20",
-        status: "completed"
+        status: taskStatuses[`task-${initiativeId}-2`] || "completed"
       }
     ];
+  };
+
+  // Helper function to get status badge variant and icon
+  const getStatusDisplay = (status: string) => {
+    switch (status) {
+      case "completed":
+        return {
+          variant: "default" as const,
+          label: "Selesai",
+          icon: <CheckCircle2 className="h-3 w-3" />,
+          color: "text-green-600"
+        };
+      case "in_progress":
+        return {
+          variant: "secondary" as const,
+          label: "Sedang Dikerjakan",
+          icon: <Clock className="h-3 w-3" />,
+          color: "text-blue-600"
+        };
+      case "pending":
+        return {
+          variant: "outline" as const,
+          label: "Pending",
+          icon: <Calendar className="h-3 w-3" />,
+          color: "text-yellow-600"
+        };
+      case "blocked":
+        return {
+          variant: "destructive" as const,
+          label: "Blocked",
+          icon: <Trash2 className="h-3 w-3" />,
+          color: "text-red-600"
+        };
+      default:
+        return {
+          variant: "outline" as const,
+          label: "Not Started",
+          icon: <Calendar className="h-3 w-3" />,
+          color: "text-gray-600"
+        };
+    }
   };
 
   const handleInitiativeSuccess = () => {
@@ -412,40 +500,68 @@ export default function KeyResultDetailPage() {
                                   </h4>
                                   {tasks && tasks.length > 0 ? (
                                     <div className="space-y-2">
-                                      {tasks.map((task: any) => (
-                                        <div key={task.id} className="bg-white p-3 rounded-lg border border-gray-200">
-                                          <div className="flex items-center justify-between">
-                                            <div className="flex-1">
-                                              <p className="font-medium text-sm">{task.title}</p>
-                                              {task.description && (
-                                                <p className="text-xs text-gray-600 mt-1">{task.description}</p>
-                                              )}
-                                            </div>
-                                            <div className="flex items-center gap-3">
-                                              <Badge variant={
-                                                task.priority === "critical" ? "destructive" :
-                                                task.priority === "high" ? "secondary" :
-                                                "outline"
-                                              } className="text-xs">
-                                                {task.priority}
-                                              </Badge>
-                                              {task.assignedTo && (
-                                                <div className="flex items-center gap-1">
-                                                  <User className="h-3 w-3 text-gray-500" />
-                                                  <span className="text-xs text-gray-600">{task.assignedTo}</span>
+                                      {tasks.map((task: any) => {
+                                        const statusDisplay = getStatusDisplay(task.status);
+                                        return (
+                                          <div key={task.id} className="bg-white p-3 rounded-lg border border-gray-200">
+                                            <div className="flex items-start justify-between gap-3">
+                                              <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                  <p className="font-medium text-sm">{task.title}</p>
+                                                  <div className="flex items-center gap-1">
+                                                    {statusDisplay.icon}
+                                                    <span className={`text-xs font-medium ${statusDisplay.color}`}>
+                                                      {statusDisplay.label}
+                                                    </span>
+                                                  </div>
                                                 </div>
-                                              )}
-                                              {task.dueDate && (
-                                                <span className={`text-xs ${
-                                                  new Date(task.dueDate) < new Date() ? 'text-red-600' : 'text-gray-600'
-                                                }`}>
-                                                  {format(new Date(task.dueDate), "MMM dd")}
-                                                </span>
-                                              )}
+                                                {task.description && (
+                                                  <p className="text-xs text-gray-600 mb-2">{task.description}</p>
+                                                )}
+                                                <div className="flex items-center gap-3 text-xs text-gray-500">
+                                                  {task.assignedTo && (
+                                                    <div className="flex items-center gap-1">
+                                                      <User className="h-3 w-3" />
+                                                      <span>{task.assignedTo}</span>
+                                                    </div>
+                                                  )}
+                                                  {task.dueDate && (
+                                                    <span className={
+                                                      new Date(task.dueDate) < new Date() ? 'text-red-600' : 'text-gray-600'
+                                                    }>
+                                                      {format(new Date(task.dueDate), "MMM dd")}
+                                                    </span>
+                                                  )}
+                                                </div>
+                                              </div>
+                                              <div className="flex items-center gap-2">
+                                                <Badge variant={
+                                                  task.priority === "critical" ? "destructive" :
+                                                  task.priority === "high" ? "secondary" :
+                                                  "outline"
+                                                } className="text-xs">
+                                                  {task.priority}
+                                                </Badge>
+                                                <Select
+                                                  value={task.status}
+                                                  onValueChange={(newStatus) => handleTaskStatusUpdate(task.id, newStatus)}
+                                                >
+                                                  <SelectTrigger className="w-32 h-8 text-xs">
+                                                    <SelectValue />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectItem value="not_started">Belum Dimulai</SelectItem>
+                                                    <SelectItem value="in_progress">Sedang Dikerjakan</SelectItem>
+                                                    <SelectItem value="pending">Pending</SelectItem>
+                                                    <SelectItem value="blocked">Blocked</SelectItem>
+                                                    <SelectItem value="completed">Selesai</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
                                             </div>
                                           </div>
-                                        </div>
-                                      ))}
+                                        );
+                                      })}
                                     </div>
                                   ) : (
                                     <p className="text-sm text-gray-500">No tasks available</p>
