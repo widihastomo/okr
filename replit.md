@@ -261,6 +261,13 @@ Changelog:
   * Enhanced navigation by allowing users to focus on specific objectives
   * Improved visual organization with clean chevron up/down icons and compact layout
   * Fixed timeframe references to display "Cycle-based" label consistently
+- June 27, 2025. Fixed numeric overflow and enhanced number formatting:
+  * Resolved database schema numeric field overflow by increasing precision from 10,2 to 15,2
+  * Database now supports currency values up to 999,999,999,999.99 (999 billion)
+  * Added thousand separators (Indonesian locale) to all numeric input fields for better readability
+  * Implemented consistent number formatting across OKR form modal and check-in modal
+  * Large currency values like 300,000,000 now display as formatted text inputs with commas
+  * Enhanced user experience with proper number parsing and display formatting
 ```
 
 ## User Preferences

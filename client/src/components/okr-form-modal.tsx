@@ -43,6 +43,22 @@ const okrFormSchema = z.object({
 
 type OKRFormData = z.infer<typeof okrFormSchema>;
 
+// Utility functions for number formatting
+const formatNumberWithCommas = (value: string | number): string => {
+  if (!value) return '';
+  const num = typeof value === 'string' ? parseFloat(value) : value;
+  if (isNaN(num)) return '';
+  return num.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+};
+
+const parseNumberFromFormatted = (value: string): string => {
+  if (!value) return '';
+  // Remove commas and parse
+  const cleanValue = value.replace(/[.,]/g, match => match === ',' ? '' : '.');
+  const num = parseFloat(cleanValue);
+  return isNaN(num) ? '' : num.toString();
+};
+
 interface OKRFormModalProps {
   okr?: OKRWithKeyResults; // undefined untuk create, object untuk edit
   open: boolean;
@@ -544,21 +560,14 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                             <FormLabel>Nilai Awal</FormLabel>
                             <FormControl>
                               <Input 
-                                type="number" 
-                                step="0.1" 
+                                type="text" 
                                 placeholder="0" 
                                 required
                                 {...field}
+                                value={formatNumberWithCommas(field.value || '0')}
                                 onChange={(e) => {
-                                  const value = e.target.value;
-                                  if (value === '') {
-                                    field.onChange('');
-                                    return;
-                                  }
-                                  const num = parseFloat(value);
-                                  if (!isNaN(num)) {
-                                    field.onChange((Math.round(num * 10) / 10).toString());
-                                  }
+                                  const rawValue = parseNumberFromFormatted(e.target.value);
+                                  field.onChange(rawValue);
                                 }}
                               />
                             </FormControl>
@@ -575,21 +584,14 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                             <FormLabel>Target</FormLabel>
                             <FormControl>
                               <Input 
-                                type="number" 
-                                step="0.1" 
+                                type="text" 
                                 placeholder="100" 
                                 required
                                 {...field}
+                                value={formatNumberWithCommas(field.value || '')}
                                 onChange={(e) => {
-                                  const value = e.target.value;
-                                  if (value === '') {
-                                    field.onChange('');
-                                    return;
-                                  }
-                                  const num = parseFloat(value);
-                                  if (!isNaN(num)) {
-                                    field.onChange((Math.round(num * 10) / 10).toString());
-                                  }
+                                  const rawValue = parseNumberFromFormatted(e.target.value);
+                                  field.onChange(rawValue);
                                 }}
                               />
                             </FormControl>

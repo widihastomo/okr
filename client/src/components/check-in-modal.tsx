@@ -17,6 +17,22 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Calendar, TrendingUp } from "lucide-react";
 
+// Utility functions for number formatting
+const formatNumberWithCommas = (value: string | number): string => {
+  if (!value) return '';
+  const num = typeof value === 'string' ? parseFloat(value) : value;
+  if (isNaN(num)) return '';
+  return num.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+};
+
+const parseNumberFromFormatted = (value: string): string => {
+  if (!value) return '';
+  // Remove commas and parse
+  const cleanValue = value.replace(/[.,]/g, match => match === ',' ? '' : '.');
+  const num = parseFloat(cleanValue);
+  return isNaN(num) ? '' : num.toString();
+};
+
 interface CheckInModalProps {
   keyResultId: string;
   keyResultTitle: string;
@@ -151,15 +167,17 @@ export function CheckInModal({
             </Label>
             <Input
               id="value"
-              type="number"
-              step="0.01"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
+              type="text"
+              value={formatNumberWithCommas(value)}
+              onChange={(e) => {
+                const rawValue = parseNumberFromFormatted(e.target.value);
+                setValue(rawValue);
+              }}
               className="mt-1"
               required
             />
             <div className="text-xs text-gray-500 mt-1">
-              Target: {targetValue} {getUnitDisplay(unit)}
+              Target: {formatNumberWithCommas(targetValue)} {getUnitDisplay(unit)}
             </div>
             <div className="text-xs mt-1 font-medium">
               {getProgressHint()}
