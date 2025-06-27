@@ -74,9 +74,30 @@ export function setupEmailAuth(app: Express) {
   });
 
   // Get current user endpoint (new endpoint)
-  app.get('/api/auth/me', requireAuth, async (req, res) => {
+  app.get('/api/auth/me', async (req, res) => {
     try {
-      const user = await getCurrentUser(req.session.userId!);
+      // In development mode, return mock user without authentication
+      if (process.env.NODE_ENV === 'development') {
+        const mockUser = {
+          id: "dev-user-1",
+          email: "dev@example.com",
+          firstName: "Dev",
+          lastName: "User",
+          role: "admin",
+          isActive: true,
+          profileImageUrl: null,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+        return res.json(mockUser);
+      }
+      
+      // Production mode requires authentication
+      if (!req.session?.userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const user = await getCurrentUser(req.session.userId);
       if (!user) {
         return res.status(401).json({ message: "Unauthorized" });
       }

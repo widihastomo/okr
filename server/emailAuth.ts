@@ -70,6 +70,24 @@ export async function authenticateUser(loginData: LoginData): Promise<User | nul
 }
 
 export const requireAuth: RequestHandler = async (req, res, next) => {
+  // Skip auth in development mode
+  if (process.env.NODE_ENV === 'development') {
+    // Create a mock user for development
+    const mockUser = {
+      id: "dev-user-1",
+      email: "dev@example.com",
+      firstName: "Dev",
+      lastName: "User",
+      role: "admin",
+      isActive: true,
+      profileImageUrl: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    (req as any).user = mockUser;
+    return next();
+  }
+  
   if (!req.session?.userId) {
     return res.status(401).json({ message: "Unauthorized" });
   }
