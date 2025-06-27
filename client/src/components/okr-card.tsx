@@ -16,7 +16,6 @@ interface OKRCardProps {
   okr: OKRWithKeyResults;
   onEditProgress: (keyResult: KeyResult) => void;
   onRefresh: () => void;
-  onKeyResultClick: (keyResultId: string) => void;
   onDuplicate?: (okr: OKRWithKeyResults) => void;
   onDelete?: (okrId: string) => void;
   cycleStartDate?: string;
@@ -24,7 +23,7 @@ interface OKRCardProps {
   index?: number;
 }
 
-export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDuplicate, onDelete, cycleStartDate, cycleEndDate, index = 0 }: OKRCardProps) {
+export default function OKRCard({ okr, onEditProgress, onDuplicate, onDelete, cycleStartDate, cycleEndDate, index = 0 }: OKRCardProps) {
   const [isExpanded, setIsExpanded] = useState(index === 0);
   
   const calculateProgress = (current: string, target: string, keyResultType: string, baseValue?: string | null): number => {
@@ -293,12 +292,12 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <button 
-                        onClick={() => onKeyResultClick(kr.id)}
+                      <Link 
+                        href={`/key-results/${kr.id}`}
                         className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer text-left"
                       >
                         {kr.title}
-                      </button>
+                      </Link>
                       <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
                         {getKeyResultTypeLabel(kr.keyResultType)}
                       </span>

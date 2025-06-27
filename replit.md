@@ -281,6 +281,14 @@ Changelog:
   * Enhanced check-in success notifications with green styling for better user feedback
   * Added custom CSS hover tooltip to show full text of truncated check-in notes with smooth animation and proper positioning
   * Fixed tooltip overflow issue for long messages by enabling text wrapping and adjusting width constraints
+- June 27, 2025. Converted key result detail modal to dedicated full page layout:
+  * Created new KeyResultDetailPage component with comprehensive grid layout
+  * Moved progress history to right sidebar for better visual hierarchy
+  * Implemented initiatives as main table area with status badges and action buttons
+  * Updated OKR cards to link directly to dedicated detail pages instead of opening modals
+  * Enhanced navigation with back button and breadcrumb-style header
+  * Improved responsive design with three-column layout for desktop and stacked layout for mobile
+  * Added proper date formatting and null-safe handling for all date fields
 ```
 
 ## User Preferences

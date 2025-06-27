@@ -6,7 +6,6 @@ import StatsOverview from "@/components/stats-overview";
 import OKRCard from "@/components/okr-card";
 import { CreateOKRButton } from "@/components/okr-form-modal";
 import EditProgressModal from "@/components/edit-progress-modal";
-import { KeyResultDetailModal } from "@/components/key-result-detail-modal";
 import { DeleteConfirmationModal } from "@/components/delete-confirmation-modal";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -20,9 +19,7 @@ export default function Dashboard() {
   const [editProgressModal, setEditProgressModal] = useState<{ open: boolean; keyResult?: KeyResult }>({
     open: false
   });
-  const [keyResultDetailModal, setKeyResultDetailModal] = useState<{ open: boolean; keyResultId?: string }>({
-    open: false
-  });
+
   const [deleteConfirmModal, setDeleteConfirmModal] = useState<{ 
     open: boolean; 
     okrId?: string; 
@@ -153,9 +150,7 @@ export default function Dashboard() {
     setEditProgressModal({ open: true, keyResult });
   };
 
-  const handleKeyResultClick = (keyResultId: string) => {
-    setKeyResultDetailModal({ open: true, keyResultId });
-  };
+  // Key result click now navigates to dedicated page via Link in OKRCard
 
   const handleDuplicateOKR = (okr: OKRWithKeyResults) => {
     duplicateOKRMutation.mutate(okr);
@@ -244,7 +239,7 @@ export default function Dashboard() {
                 key={okr.id}
                 okr={okr}
                 onEditProgress={handleEditProgress}
-                onKeyResultClick={handleKeyResultClick}
+
                 onRefresh={refetch}
                 onDuplicate={handleDuplicateOKR}
                 onDelete={handleDeleteOKR}
@@ -266,13 +261,7 @@ export default function Dashboard() {
         onSuccess={refetch}
       />
 
-      {keyResultDetailModal.keyResultId && (
-        <KeyResultDetailModal
-          keyResultId={keyResultDetailModal.keyResultId}
-          isOpen={keyResultDetailModal.open}
-          onClose={() => setKeyResultDetailModal({ open: false })}
-        />
-      )}
+
 
       {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal
