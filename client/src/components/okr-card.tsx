@@ -177,6 +177,7 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick }: OKRCa
                   status={kr.status}
                   progressPercentage={progress}
                   timeProgressPercentage={kr.timeProgressPercentage || 0}
+                  dueDate={kr.dueDate ? (typeof kr.dueDate === 'string' ? kr.dueDate : kr.dueDate.toISOString()) : null}
                 />
               </div>
             );

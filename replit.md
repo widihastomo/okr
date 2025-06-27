@@ -141,6 +141,13 @@ Changelog:
   * Enhanced frontend with status badges and visual indicators for Key Results
   * Implemented "Update Status" button for manual refresh of all status calculations
   * Status automatically updates when Key Result progress is modified via check-ins
+- June 27, 2025. Enhanced progress bars with threshold indicators:
+  * Added timeProgressPercentage field to database schema for storing ideal progress calculations
+  * Implemented real-time ideal progress calculation based on current date and Key Result timeline
+  * Enhanced progress bars with gray vertical threshold indicators showing ideal achievement levels
+  * Added visual legend explaining current progress vs ideal target relationship
+  * Fixed threshold calculation to use live timeline data rather than stored values
+  * Progress bars now accurately show where teams should be based on time elapsed
 ```
 
 ## User Preferences

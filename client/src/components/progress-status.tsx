@@ -148,16 +148,40 @@ interface SimpleProgressStatusProps {
   progressPercentage: number;
   timeProgressPercentage?: number;
   compact?: boolean;
+  dueDate?: string | null;
+  startDate?: string;
+}
+
+// Calculate ideal progress based on current date and timeline
+function calculateIdealProgress(startDate?: string, dueDate?: string | null): number {
+  if (!startDate || !dueDate) return 0;
+  
+  const now = new Date();
+  const start = new Date(startDate);
+  const end = new Date(dueDate);
+  
+  if (now <= start) return 0;
+  if (now >= end) return 100;
+  
+  const totalDuration = end.getTime() - start.getTime();
+  const elapsed = now.getTime() - start.getTime();
+  
+  return Math.round((elapsed / totalDuration) * 100);
 }
 
 export function SimpleProgressStatus({ 
   status, 
   progressPercentage, 
   timeProgressPercentage = 0,
-  compact = false 
+  compact = false,
+  dueDate,
+  startDate = "2025-07-01" // Q3 2025 start date
 }: SimpleProgressStatusProps) {
   const config = getStatusConfig(status);
   const StatusIcon = config.icon;
+  
+  // Calculate the ideal progress based on current date and timeline
+  const idealProgress = calculateIdealProgress(startDate, dueDate);
 
   if (compact) {
     return (
@@ -188,8 +212,8 @@ export function SimpleProgressStatus({
           {/* Threshold indicator for ideal progress */}
           <div 
             className="absolute top-0 h-2 w-0.5 bg-gray-400 opacity-70"
-            style={{ left: `${Math.min(timeProgressPercentage, 100)}%` }}
-            title={`Capaian ideal saat ini: ${timeProgressPercentage}%`}
+            style={{ left: `${Math.min(idealProgress, 100)}%` }}
+            title={`Capaian ideal saat ini: ${idealProgress}%`}
           />
         </div>
         <span className="text-sm font-medium">{progressPercentage}%</span>
@@ -202,7 +226,7 @@ export function SimpleProgressStatus({
         </div>
         <div className="flex items-center gap-1">
           <div className="w-0.5 h-3 bg-gray-400 opacity-70"></div>
-          <span>Target ideal ({timeProgressPercentage}%)</span>
+          <span>Target ideal ({idealProgress}%)</span>
         </div>
       </div>
     </div>
