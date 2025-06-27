@@ -167,41 +167,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             })}
           </nav>
 
-          {/* User Profile Section */}
-          <div className={cn(
-            "py-4 border-t border-gray-200 transition-all duration-300",
-            isOpen ? "px-4" : "px-2 lg:px-2"
-          )}>
-            {isOpen ? (
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <User className="h-4 w-4 text-blue-600" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    John Doe
-                  </p>
-                  <p className="text-xs text-gray-500 truncate">
-                    john@example.com
-                  </p>
-                </div>
-                <Settings className="h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600" />
-              </div>
-            ) : (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="hidden lg:flex lg:justify-center cursor-pointer">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <User className="h-4 w-4 text-blue-600" />
-                    </div>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="ml-2">
-                  <p>Profile</p>
-                </TooltipContent>
-              </Tooltip>
-            )}
-          </div>
+
         </div>
       </div>
     </TooltipProvider>

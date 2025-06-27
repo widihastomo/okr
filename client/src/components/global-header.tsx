@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Menu, Bell, Plus } from "lucide-react";
+import { Menu, Bell, Plus, Settings, User, LogOut } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import OKRFormModal from "./okr-form-modal";
+import { Link } from "wouter";
 
 interface GlobalHeaderProps {
   onMenuToggle?: () => void;
@@ -116,6 +118,34 @@ export default function GlobalHeader({ onMenuToggle }: GlobalHeaderProps) {
                 <p className="text-sm font-medium">Deadline key result mendekat</p>
                 <p className="text-xs text-gray-500">1 hari yang lalu</p>
               </div>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Settings Menu */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" className="p-2 hover:bg-gray-100">
+              <Settings className="h-5 w-5 text-gray-600" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuItem asChild>
+              <Link href="/profile" className="flex items-center space-x-2 cursor-pointer">
+                <User className="h-4 w-4" />
+                <span>Profile</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem 
+              className="flex items-center space-x-2 cursor-pointer text-red-600 hover:text-red-700"
+              onClick={() => {
+                fetch('/api/auth/logout', { method: 'POST' })
+                  .then(() => window.location.href = '/');
+              }}
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

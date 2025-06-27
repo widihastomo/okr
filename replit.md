@@ -314,6 +314,13 @@ Changelog:
   * Updated status filter dropdown to include all actual objective statuses from the system
   * Status options now include: Not Started, On Track, At Risk, Behind, Paused, Canceled, Completed, Partially Achieved, Not Achieved, In Progress
   * Changed filter labels to Indonesian ("Semua Status" instead of "All Status")
+- June 27, 2025. Relocated profile section to top right header as settings menu:
+  * Moved profile section from sidebar bottom to global header top right corner
+  * Transformed profile display into settings dropdown menu with gear icon
+  * Added Profile and Logout menu items with proper navigation and authentication
+  * Removed profile section entirely from sidebar to eliminate duplication
+  * Enhanced user experience with consistent header-based navigation pattern
+  * Settings menu includes profile access and secure logout functionality
 ```
 
 ## User Preferences
