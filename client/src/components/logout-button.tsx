@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface LogoutButtonProps {
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
@@ -20,6 +21,7 @@ export function LogoutButton({
 }: LogoutButtonProps) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -31,20 +33,25 @@ export function LogoutButton({
       });
 
       if (response.ok) {
+        // Clear React Query cache
+        queryClient.clear();
+        
         // Clear any client-side state
         localStorage.clear();
         sessionStorage.clear();
         
-        // Redirect to home page
-        window.location.href = '/';
+        // Force page reload to reset all state
+        window.location.reload();
       } else {
         throw new Error('Logout failed');
       }
     } catch (error) {
       console.error('Logout error:', error);
-      setIsLoggingOut(false);
-      // Fallback: still redirect to home page
-      window.location.href = '/';
+      // Clear cache and reload anyway
+      queryClient.clear();
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.reload();
     }
   };
 
