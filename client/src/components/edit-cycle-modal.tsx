@@ -31,11 +31,7 @@ export default function EditCycleModal({ cycle, open, onOpenChange }: EditCycleM
 
   const updateMutation = useMutation({
     mutationFn: (data: typeof formData) => 
-      apiRequest(`/api/cycles/${cycle?.id}`, {
-        method: "PATCH",
-        body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" }
-      }),
+      apiRequest("PATCH", `/api/cycles/${cycle?.id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/cycles"] });
       toast({

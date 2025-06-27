@@ -289,6 +289,15 @@ Changelog:
   * Enhanced navigation with back button and breadcrumb-style header
   * Improved responsive design with three-column layout for desktop and stacked layout for mobile
   * Added proper date formatting and null-safe handling for all date fields
+- June 27, 2025. Implemented comprehensive automatic cycle status update system:
+  * Created cycle-status-updater.ts with intelligent status calculation based on current date
+  * Added automatic status transitions: planning → active → completed based on start/end dates
+  * Integrated scheduled updates that run every 24 hours automatically on server startup
+  * Added manual "Update Status" button in cycles page header for immediate refresh
+  * System automatically detects and updates cycle statuses on server restart
+  * Complete table-based cycles management with full CRUD functionality (create, edit, delete)
+  * Fixed API request format errors in create-cycle-modal and edit-cycle-modal components
+  * Status update system successfully tested and working in production environment
 ```
 
 ## User Preferences

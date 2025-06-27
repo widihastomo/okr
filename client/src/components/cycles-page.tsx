@@ -50,7 +50,7 @@ export default function CyclesPage() {
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: () => apiRequest("/api/update-cycle-status", { method: "POST" }),
+    mutationFn: () => apiRequest("POST", "/api/update-cycle-status"),
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ["/api/cycles"] });
       toast({

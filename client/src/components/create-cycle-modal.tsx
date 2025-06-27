@@ -41,8 +41,7 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
 
   const mutation = useMutation({
     mutationFn: async (data: CreateCycleFormData) => {
-      const response = await apiRequest('POST', '/api/cycles', data);
-      return response.json();
+      return apiRequest('POST', '/api/cycles', data);
     },
     onSuccess: () => {
       toast({
