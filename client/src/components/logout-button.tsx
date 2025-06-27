@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { useState } from "react";
+import { useLocation } from "wouter";
 
 interface LogoutButtonProps {
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
@@ -18,19 +19,32 @@ export function LogoutButton({
   children = "Keluar"
 }: LogoutButtonProps) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [, setLocation] = useLocation();
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      // Clear any client-side state if needed
-      localStorage.clear();
-      sessionStorage.clear();
-      
-      // Redirect to logout endpoint
-      window.location.href = '/api/logout';
+      // Call logout API endpoint
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        // Clear any client-side state
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // Redirect to home page
+        window.location.href = '/';
+      } else {
+        throw new Error('Logout failed');
+      }
     } catch (error) {
       console.error('Logout error:', error);
       setIsLoggingOut(false);
+      // Fallback: still redirect to home page
+      window.location.href = '/';
     }
   };
 
