@@ -19,7 +19,6 @@ const okrFormSchema = z.object({
   objective: z.object({
     title: z.string().min(1, "Objective title is required"),
     description: z.string().optional(),
-    timeframe: z.string().min(1, "Timeframe is required"),
     owner: z.string().min(1, "Owner is required"),
     ownerType: z.enum(["user", "team"]).default("user"),
     ownerId: z.string().min(1, "Owner is required"),
@@ -92,7 +91,6 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
       objective: {
         title: "",
         description: "",
-        timeframe: "",
         owner: "",
         ownerType: "user",
         ownerId: "",
@@ -123,7 +121,6 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
           objective: {
             title: okr.title,
             description: okr.description || "",
-            timeframe: okr.timeframe,
             owner: okr.owner,
             ownerType: okr.ownerType as "user" | "team",
             ownerId: okr.ownerId,
@@ -317,50 +314,34 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                   )}
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="objective.timeframe"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Timeframe</FormLabel>
+                <FormField
+                  control={form.control}
+                  name="objective.cycleId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Cycle</FormLabel>
+                      <Select 
+                        onValueChange={(value) => field.onChange(value === "none" ? undefined : value)} 
+                        value={field.value || "none"}
+                      >
                         <FormControl>
-                          <Input placeholder="e.g., Q1 2025, January 2025" {...field} />
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select cycle" />
+                          </SelectTrigger>
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="objective.cycleId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Cycle</FormLabel>
-                        <Select 
-                          onValueChange={(value) => field.onChange(value === "none" ? undefined : value)} 
-                          value={field.value || "none"}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select cycle" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="none">No Cycle</SelectItem>
-                            {cycles?.map((cycle) => (
-                              <SelectItem key={cycle.id} value={cycle.id}>
-                                {cycle.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                        <SelectContent>
+                          <SelectItem value="none">No Cycle</SelectItem>
+                          {cycles?.map((cycle) => (
+                            <SelectItem key={cycle.id} value={cycle.id}>
+                              {cycle.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}

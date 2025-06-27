@@ -39,7 +39,7 @@ The system uses multiple interconnected entities:
 - **Team Members**: Junction table linking users to teams with specific roles
 - **Cycles**: Time-based containers (monthly, quarterly, annual) for organizing objectives
 - **Templates**: Reusable OKR structures for common objective patterns
-- **Objectives**: Contains title, description, timeframe, owner, and status
+- **Objectives**: Contains title, description, owner, and status
 - **Key Results**: Linked to objectives, tracks current/target values with units, key result types, and assigned users
 - **Types**: Support for various measurement units (number, percentage, currency)
 - **Key Result Types**: Three calculation methods for different goal types:
@@ -185,6 +185,14 @@ Changelog:
   * Replaced simple edit modal with full-featured form providing better user experience
   * Fixed SelectItem value prop error by using "none" instead of empty string for optional team field
   * Maintained consistency with existing form patterns and validation across the application
+- June 27, 2025. Completed comprehensive timeframe field removal from OKR system:
+  * Removed timeframe column from objectives table in PostgreSQL database schema
+  * Updated all form components to eliminate timeframe field from create and edit workflows
+  * Cleaned up API routes and server-side code to remove timeframe filtering and processing
+  * Updated dashboard component to remove timeframe-based filtering controls
+  * Simplified objective data model to focus on core fields: title, description, owner, and status
+  * Maintained data integrity while streamlining the OKR management interface
+  * All existing OKR functionality preserved without timeframe dependencies
 ```
 
 ## User Preferences

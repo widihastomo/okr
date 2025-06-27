@@ -458,9 +458,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         okrs = okrs.filter(okr => okr.status === status);
       }
       
-      if (timeframe && timeframe !== "all") {
-        okrs = okrs.filter(okr => okr.timeframe === timeframe);
-      }
+
       
       res.json(okrs);
     } catch (error) {

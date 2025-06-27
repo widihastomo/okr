@@ -16,7 +16,6 @@ import type { OKRWithKeyResults, KeyResult, Cycle } from "@shared/schema";
 export default function Dashboard() {
   const { toast } = useToast();
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [timeframeFilter, setTimeframeFilter] = useState<string>("all");
 
   const [editProgressModal, setEditProgressModal] = useState<{ open: boolean; keyResult?: KeyResult }>({
     open: false
@@ -33,7 +32,7 @@ export default function Dashboard() {
   });
 
   const { data: okrs = [], isLoading, refetch } = useQuery<OKRWithKeyResults[]>({
-    queryKey: ["/api/okrs", { status: statusFilter, timeframe: timeframeFilter }],
+    queryKey: ["/api/okrs", { status: statusFilter }],
   });
 
   const { data: cycles = [] } = useQuery<Cycle[]>({
@@ -85,7 +84,6 @@ export default function Dashboard() {
         body: JSON.stringify({
           title: `${okr.title} (Copy)`,
           description: okr.description,
-          timeframe: okr.timeframe,
           owner: okr.owner,
           ownerType: okr.ownerType,
           ownerId: okr.ownerId,
@@ -201,19 +199,7 @@ export default function Dashboard() {
                 </SelectContent>
               </Select>
               
-              <Select value={timeframeFilter} onValueChange={setTimeframeFilter}>
-                <SelectTrigger className="w-[140px]">
-                  <SelectValue placeholder="Period" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Periods</SelectItem>
-                  {cycles.map((cycle) => (
-                    <SelectItem key={cycle.id} value={cycle.name}>
-                      {cycle.name} ({cycle.type})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+
             </div>
             
             <CreateOKRButton />
@@ -238,15 +224,12 @@ export default function Dashboard() {
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">No OKRs found</h3>
             <p className="text-gray-500 mb-4">
-              {statusFilter !== "all" || timeframeFilter !== "all" 
+              {statusFilter !== "all" 
                 ? "No OKRs match your current filters. Try adjusting your search criteria."
                 : "Get started by creating your first objective and key results."
               }
             </p>
-            <Button onClick={() => setCreateModalOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-              <Plus className="w-4 h-4 mr-2" />
-              Create First OKR
-            </Button>
+            <CreateOKRButton />
           </div>
         ) : (
           okrs.map((okr) => {

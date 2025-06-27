@@ -135,14 +135,9 @@ export default function EditObjectiveFormModal({
         : "";
     }
 
-    // Find selected cycle for timeframe
-    const selectedCycle = cycles.find((cycle) => cycle.id === data.cycleId);
-    const timeframe = selectedCycle ? selectedCycle.name : data.timeframe;
-
     updateMutation.mutate({
       ...data,
       owner: ownerName,
-      timeframe: timeframe,
       teamId: data.teamId === "none" ? undefined : data.teamId,
       parentId: data.parentId === "none" ? undefined : data.parentId,
     });

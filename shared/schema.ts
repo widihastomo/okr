@@ -27,7 +27,6 @@ export const objectives = pgTable("objectives", {
   cycleId: uuid("cycle_id").references(() => cycles.id),
   title: text("title").notNull(),
   description: text("description"),
-  timeframe: text("timeframe").notNull(), // e.g., "Q4 2024"
   owner: text("owner").notNull(), // kept for backward compatibility
   ownerType: text("owner_type").notNull().default("user"), // "user" or "team"
   ownerId: uuid("owner_id").notNull(), // user ID or team ID
