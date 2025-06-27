@@ -1,18 +1,23 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Calendar, Users, Target, TrendingUp } from "lucide-react";
+import { Plus, Edit2, Trash2, Calendar, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import CreateCycleModal from "./create-cycle-modal";
+import EditCycleModal from "./edit-cycle-modal";
+import { DeleteConfirmationModal } from "./delete-confirmation-modal";
 import Sidebar from "./sidebar";
-import type { Cycle, CycleWithOKRs } from "@shared/schema";
+import type { Cycle } from "@shared/schema";
 
 export default function CyclesPage() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedCycle, setSelectedCycle] = useState<Cycle | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -22,20 +27,23 @@ export default function CyclesPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string) => {
       await apiRequest("DELETE", `/api/cycles/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/cycles"] });
       toast({
-        title: "Success",
-        description: "Cycle deleted successfully"
+        title: "Siklus dihapus",
+        description: "Siklus berhasil dihapus",
+        className: "border-green-200 bg-green-50 text-green-800"
       });
+      setDeleteModalOpen(false);
+      setSelectedCycle(null);
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to delete cycle",
+        description: "Gagal menghapus siklus",
         variant: "destructive"
       });
     }
@@ -50,28 +58,43 @@ export default function CyclesPage() {
     }
   };
 
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case "monthly": return Calendar;
-      case "quarterly": return Target;
-      case "annual": return TrendingUp;
-      default: return Calendar;
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "active": return "Aktif";
+      case "completed": return "Selesai";
+      case "planning": return "Perencanaan";
+      default: return status;
     }
+  };
+
+  const getTypeText = (type: string) => {
+    switch (type) {
+      case "monthly": return "Bulanan";
+      case "quarterly": return "Kuartalan";
+      case "annual": return "Tahunan";
+      default: return type;
+    }
+  };
+
+  const handleEdit = (cycle: Cycle) => {
+    setSelectedCycle(cycle);
+    setEditModalOpen(true);
+  };
+
+  const handleDelete = (cycle: Cycle) => {
+    setSelectedCycle(cycle);
+    setDeleteModalOpen(true);
   };
 
   if (isLoading) {
     return (
       <div className="flex h-screen bg-gray-50">
-        <Sidebar />
+        <Sidebar isOpen={false} />
         <div className="flex-1 overflow-auto pt-16 lg:pt-0">
           <div className="p-4 lg:p-6">
             <div className="animate-pulse space-y-4">
               <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="h-48 bg-gray-200 rounded-lg"></div>
-                ))}
-              </div>
+              <div className="h-96 bg-gray-200 rounded-lg"></div>
             </div>
           </div>
         </div>
@@ -81,98 +104,122 @@ export default function CyclesPage() {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <Sidebar />
+      <Sidebar isOpen={false} />
       <div className="flex-1 overflow-auto pt-16 lg:pt-0">
         <div className="p-4 lg:p-6 max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 lg:mb-8 space-y-4 sm:space-y-0">
             <div>
-              <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">OKR Cycles</h1>
-              <p className="text-gray-600 mt-2 text-sm lg:text-base">Manage quarterly and annual OKR cycles</p>
+              <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Siklus OKR</h1>
+              <p className="text-gray-600 mt-2 text-sm lg:text-base">Kelola siklus OKR bulanan, kuartalan, dan tahunan</p>
             </div>
-            <Button onClick={() => setCreateModalOpen(true)} className="bg-primary hover:bg-blue-700 w-full sm:w-auto">
+            <Button onClick={() => setCreateModalOpen(true)} className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
               <Plus className="w-4 h-4 mr-2" />
-              New Cycle
+              Tambah Siklus
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
-        {cycles.map((cycle) => {
-          const TypeIcon = getTypeIcon(cycle.type);
-          const startDate = new Date(cycle.startDate).toLocaleDateString();
-          const endDate = new Date(cycle.endDate).toLocaleDateString();
-          
-          return (
-            <Card key={cycle.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <TypeIcon className="w-5 h-5 text-primary" />
-                    <CardTitle className="text-lg">{cycle.name}</CardTitle>
-                  </div>
-                  <Badge className={getStatusColor(cycle.status)}>
-                    {cycle.status}
-                  </Badge>
-                </div>
-                <CardDescription className="text-sm">
-                  {cycle.description}
-                </CardDescription>
-              </CardHeader>
-              
-              <CardContent className="space-y-4">
-                <div className="text-sm text-gray-600">
-                  <div className="flex items-center justify-between">
-                    <span>Duration:</span>
-                    <span>{startDate} - {endDate}</span>
-                  </div>
-                  <div className="flex items-center justify-between mt-1">
-                    <span>Type:</span>
-                    <span className="capitalize">{cycle.type}</span>
-                  </div>
-                </div>
+          <div className="bg-white rounded-lg shadow border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nama Siklus</TableHead>
+                  <TableHead>Tipe</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Tanggal Mulai</TableHead>
+                  <TableHead>Tanggal Selesai</TableHead>
+                  <TableHead>Deskripsi</TableHead>
+                  <TableHead className="text-right">Aksi</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {cycles.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-12">
+                      <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">Belum ada siklus</h3>
+                      <p className="text-gray-500 mb-4">Buat siklus OKR pertama Anda untuk memulai</p>
+                      <Button onClick={() => setCreateModalOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Buat Siklus
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  cycles.map((cycle) => {
+                    const startDate = new Date(cycle.startDate).toLocaleDateString('id-ID');
+                    const endDate = new Date(cycle.endDate).toLocaleDateString('id-ID');
+                    
+                    return (
+                      <TableRow key={cycle.id} className="hover:bg-gray-50">
+                        <TableCell className="font-medium">{cycle.name}</TableCell>
+                        <TableCell>{getTypeText(cycle.type)}</TableCell>
+                        <TableCell>
+                          <Badge className={getStatusColor(cycle.status)}>
+                            {getStatusText(cycle.status)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{startDate}</TableCell>
+                        <TableCell>{endDate}</TableCell>
+                        <TableCell className="max-w-xs truncate" title={cycle.description || ""}>
+                          {cycle.description || "-"}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleEdit(cycle)}>
+                                <Edit2 className="mr-2 h-4 w-4" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleDelete(cycle)}
+                                className="text-red-600"
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Hapus
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </div>
 
-                <div className="flex items-center justify-between pt-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => window.location.href = `/cycles/${cycle.id}`}
-                  >
-                    View Details
-                  </Button>
-                  <Button 
-                    variant="destructive" 
-                    size="sm"
-                    onClick={() => deleteMutation.mutate(cycle.id)}
-                    disabled={deleteMutation.isPending}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+          <CreateCycleModal
+            open={createModalOpen}
+            onOpenChange={setCreateModalOpen}
+            onSuccess={() => {
+              setCreateModalOpen(false);
+              queryClient.invalidateQueries({ queryKey: ["/api/cycles"] });
+            }}
+          />
 
-      {cycles.length === 0 && (
-        <div className="text-center py-12">
-          <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No cycles yet</h3>
-          <p className="text-gray-500 mb-4">Create your first OKR cycle to get started</p>
-          <Button onClick={() => setCreateModalOpen(true)} className="bg-primary hover:bg-blue-700">
-            <Plus className="w-4 h-4 mr-2" />
-            Create Cycle
-          </Button>
-        </div>
-      )}
+          <EditCycleModal
+            cycle={selectedCycle}
+            open={editModalOpen}
+            onOpenChange={setEditModalOpen}
+          />
 
-      <CreateCycleModal
-        open={createModalOpen}
-        onOpenChange={setCreateModalOpen}
-        onSuccess={() => {
-          setCreateModalOpen(false);
-          queryClient.invalidateQueries({ queryKey: ["/api/cycles"] });
-        }}
-      />
+          <DeleteConfirmationModal
+            open={deleteModalOpen}
+            onOpenChange={setDeleteModalOpen}
+            onConfirm={() => {
+              if (selectedCycle) {
+                deleteMutation.mutate(selectedCycle.id);
+              }
+            }}
+            title="Hapus Siklus"
+            description={`Apakah Anda yakin ingin menghapus siklus "${selectedCycle?.name}"? Tindakan ini tidak dapat dibatalkan.`}
+            itemName={selectedCycle?.name}
+          />
         </div>
       </div>
     </div>
