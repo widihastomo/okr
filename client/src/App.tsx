@@ -7,7 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import GlobalHeader from "@/components/global-header";
 import Sidebar from "@/components/sidebar";
-import Dashboard from "@/pages/dashboard";
+import Dashboard from "@/pages/dashboard-new";
 import CyclesPage from "@/components/cycles-page";
 import TemplatesPage from "@/components/templates-page";
 import UsersPage from "@/components/users-page";
@@ -54,9 +54,7 @@ function Router() {
       
       <div className="flex">
         {/* Sidebar */}
-        <div className={`${sidebarOpen ? 'w-64' : 'w-0'} transition-all duration-300 overflow-hidden`}>
-          <Sidebar />
-        </div>
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         
         {/* Main Content */}
         <div className="flex-1 min-h-[calc(100vh-4rem)]">

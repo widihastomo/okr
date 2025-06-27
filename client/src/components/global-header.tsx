@@ -14,7 +14,7 @@ interface GlobalHeaderProps {
 }
 
 export default function GlobalHeader({ onMenuToggle }: GlobalHeaderProps) {
-  const [notificationCount] = useState(2);
+  const [notificationCount] = useState(1);
 
   const handleCreateOKR = () => {
     // Navigate to create OKR page or open modal
@@ -28,13 +28,30 @@ export default function GlobalHeader({ onMenuToggle }: GlobalHeaderProps) {
 
   return (
     <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-40">
-      {/* Left side - Menu toggle */}
-      <div className="flex items-center">
+      {/* Left side - Logo and Menu toggle */}
+      <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2">
+          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-sm">OK</span>
+          </div>
+          <span className="font-semibold text-gray-900 text-lg">OKR Manager</span>
+        </div>
+        
         <Button
           variant="ghost"
           size="sm"
           onClick={onMenuToggle}
-          className="p-2 hover:bg-gray-100"
+          className="p-2 hover:bg-gray-100 lg:hidden"
+        >
+          <Menu className="h-5 w-5 text-gray-600" />
+        </Button>
+        
+        {/* Desktop hamburger menu for sidebar toggle */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onMenuToggle}
+          className="p-2 hover:bg-gray-100 hidden lg:flex"
         >
           <Menu className="h-5 w-5 text-gray-600" />
         </Button>
