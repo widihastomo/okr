@@ -527,7 +527,23 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                           <FormItem>
                             <FormLabel>Base (Optional)</FormLabel>
                             <FormControl>
-                              <Input placeholder="0" {...field} />
+                              <Input 
+                                type="number" 
+                                step="0.1" 
+                                placeholder="0" 
+                                {...field}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (value === '') {
+                                    field.onChange('');
+                                    return;
+                                  }
+                                  const num = parseFloat(value);
+                                  if (!isNaN(num)) {
+                                    field.onChange(Math.round(num * 10) / 10);
+                                  }
+                                }}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -541,7 +557,23 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                           <FormItem>
                             <FormLabel>Target</FormLabel>
                             <FormControl>
-                              <Input placeholder="100" {...field} />
+                              <Input 
+                                type="number" 
+                                step="0.1" 
+                                placeholder="100" 
+                                {...field}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (value === '') {
+                                    field.onChange('');
+                                    return;
+                                  }
+                                  const num = parseFloat(value);
+                                  if (!isNaN(num)) {
+                                    field.onChange(Math.round(num * 10) / 10);
+                                  }
+                                }}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -555,7 +587,23 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                           <FormItem>
                             <FormLabel>Current</FormLabel>
                             <FormControl>
-                              <Input placeholder="0" {...field} />
+                              <Input 
+                                type="number" 
+                                step="0.1" 
+                                placeholder="0" 
+                                {...field}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (value === '') {
+                                    field.onChange('');
+                                    return;
+                                  }
+                                  const num = parseFloat(value);
+                                  if (!isNaN(num)) {
+                                    field.onChange(Math.round(num * 10) / 10);
+                                  }
+                                }}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -587,8 +635,6 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                         )}
                       />
                     </div>
-
-                    
                   </div>
                 ))}
               </CardContent>

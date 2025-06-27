@@ -200,6 +200,8 @@ Changelog:
   * Improved form usability by grouping related fields in logical sections
   * Enhanced space utilization and visual flow of the form interface
   * Reordered Key Result fields to logical sequence: Base → Target → Current → Unit
+  * Removed "Assigned To" field from Key Results to simplify form structure
+  * Enhanced number inputs with 1 decimal place precision control while supporting decimal values
   * Maintained all functionality while reducing visual complexity
 ```
 
