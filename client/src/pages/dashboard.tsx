@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -15,6 +15,7 @@ import type { OKRWithKeyResults, KeyResult, Cycle } from "@shared/schema";
 export default function Dashboard() {
   const { toast } = useToast();
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [cycleFilter, setCycleFilter] = useState<string>("all");
 
   const [editProgressModal, setEditProgressModal] = useState<{ open: boolean; keyResult?: KeyResult }>({
     open: false
@@ -28,12 +29,33 @@ export default function Dashboard() {
     open: false
   });
 
-  const { data: okrs = [], isLoading, refetch } = useQuery<OKRWithKeyResults[]>({
-    queryKey: ["/api/okrs", { status: statusFilter }],
-  });
-
   const { data: cycles = [] } = useQuery<Cycle[]>({
     queryKey: ['/api/cycles'],
+  });
+
+  // Set default cycle to active cycle when cycles are loaded
+  const activeCycle = cycles.find(cycle => cycle.status === 'active');
+  
+  // Initialize cycle filter with active cycle on first load
+  useEffect(() => {
+    if (activeCycle && cycleFilter === 'all') {
+      setCycleFilter(activeCycle.id);
+    }
+  }, [activeCycle, cycleFilter]);
+
+  const { data: allOkrs = [], isLoading, refetch } = useQuery<OKRWithKeyResults[]>({
+    queryKey: ["/api/okrs"],
+  });
+
+  // Client-side filtering for status and cycle
+  const okrs = allOkrs.filter(okr => {
+    // Status filter
+    const statusMatch = statusFilter === 'all' || okr.status === statusFilter;
+    
+    // Cycle filter
+    const cycleMatch = cycleFilter === 'all' || okr.cycleId === cycleFilter;
+    
+    return statusMatch && cycleMatch;
   });
 
   // Mutation for deleting OKR
@@ -198,6 +220,19 @@ export default function Dashboard() {
                 </SelectContent>
               </Select>
               
+              <Select value={cycleFilter} onValueChange={setCycleFilter}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Pilih Cycle" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Cycle</SelectItem>
+                  {cycles.map(cycle => (
+                    <SelectItem key={cycle.id} value={cycle.id}>
+                      {cycle.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
             </div>
             
