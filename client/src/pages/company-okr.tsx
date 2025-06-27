@@ -1,56 +1,47 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronDown, ChevronRight, Target, Users, Plus } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus, Target, Calendar, Users, TrendingUp } from "lucide-react";
+import { OKRWithKeyResults } from "@shared/schema";
 import { ObjectiveStatusBadge } from "@/components/objective-status-badge";
 import OKRFormModal from "@/components/okr-form-modal";
-import type { OKRWithKeyResults, Cycle } from "@shared/schema";
 
 interface TreeNode {
   okr: OKRWithKeyResults;
   children: TreeNode[];
-  isExpanded: boolean;
+  level: number;
 }
 
 export default function CompanyOKRPage() {
-  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
-  const [cycleFilter, setCycleFilter] = useState<string>("all");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isOKRModalOpen, setIsOKRModalOpen] = useState(false);
 
-  const { data: okrs = [], isLoading: okrsLoading } = useQuery<OKRWithKeyResults[]>({
-    queryKey: ["/api/okrs"]
+  const { data: okrs = [], isLoading } = useQuery({
+    queryKey: ["/api/okrs"],
   });
 
-  const { data: cycles = [] } = useQuery<Cycle[]>({
-    queryKey: ["/api/cycles"]
-  });
-
-  // Build tree structure based on parent_id
+  // Build tree structure
   const buildTree = (okrs: OKRWithKeyResults[]): TreeNode[] => {
     const nodeMap = new Map<string, TreeNode>();
     const rootNodes: TreeNode[] = [];
 
-    // First pass: create all nodes
+    // Create nodes for all OKRs
     okrs.forEach(okr => {
       nodeMap.set(okr.id, {
         okr,
         children: [],
-        isExpanded: expandedNodes.has(okr.id)
+        level: 0
       });
     });
 
-    // Second pass: build parent-child relationships
+    // Build parent-child relationships and assign levels
     okrs.forEach(okr => {
       const node = nodeMap.get(okr.id)!;
       
       if (okr.parentId && nodeMap.has(okr.parentId)) {
-        // Has parent - add to parent's children
-        const parentNode = nodeMap.get(okr.parentId)!;
-        parentNode.children.push(node);
+        const parent = nodeMap.get(okr.parentId)!;
+        parent.children.push(node);
+        node.level = parent.level + 1;
       } else {
-        // No parent or parent not found - add to root
         rootNodes.push(node);
       }
     });
@@ -58,204 +49,154 @@ export default function CompanyOKRPage() {
     return rootNodes;
   };
 
-  // Filter OKRs based on cycle and status
-  const filteredOKRs = okrs.filter(okr => {
-    const cycleMatch = cycleFilter === "all" || okr.cycleId === cycleFilter;
-    const statusMatch = statusFilter === "all" || okr.status === statusFilter;
-    return cycleMatch && statusMatch;
-  });
+  const treeData = buildTree(okrs);
 
-  const treeData = buildTree(filteredOKRs);
-
-  const toggleNode = (nodeId: string) => {
-    const newExpanded = new Set(expandedNodes);
-    if (newExpanded.has(nodeId)) {
-      newExpanded.delete(nodeId);
-    } else {
-      newExpanded.add(nodeId);
-    }
-    setExpandedNodes(newExpanded);
+  const getProgressColor = (progress: number) => {
+    if (progress >= 90) return "bg-green-500";
+    if (progress >= 70) return "bg-blue-500";
+    if (progress >= 50) return "bg-yellow-500";
+    return "bg-red-500";
   };
 
-  const expandAll = () => {
-    const allIds = new Set(okrs.map((okr: OKRWithKeyResults) => okr.id));
-    setExpandedNodes(allIds);
+  const getStatusColor = (status: string) => {
+    const colors = {
+      'on_track': 'text-green-600',
+      'at_risk': 'text-yellow-600',
+      'behind': 'text-red-600',
+      'completed': 'text-green-700',
+      'not_started': 'text-gray-500',
+      'in_progress': 'text-blue-600'
+    };
+    return colors[status as keyof typeof colors] || 'text-gray-500';
   };
 
-  const collapseAll = () => {
-    setExpandedNodes(new Set());
-  };
-
-  const renderTreeNode = (node: TreeNode, level: number = 0) => {
-    const { okr, children } = node;
-    const hasChildren = children.length > 0;
-    const isExpanded = expandedNodes.has(okr.id);
-    const paddingLeft = level * 24; // 24px per level
-
+  const renderObjectiveCard = (node: TreeNode, hasChildren: boolean) => {
+    const { okr, level } = node;
+    const progressColor = getProgressColor(okr.overallProgress);
+    
     return (
-      <div key={okr.id} className="border-l-2 border-gray-100">
-        {/* OKR Header */}
-        <div 
-          className="flex items-center gap-3 p-4 hover:bg-gray-50 border-b border-gray-100"
-          style={{ paddingLeft: `${paddingLeft + 16}px` }}
-        >
-          {/* Expand/Collapse Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-6 w-6 p-0 hover:bg-gray-200"
-            onClick={() => toggleNode(okr.id)}
-            disabled={!hasChildren}
-          >
-            {hasChildren ? (
-              isExpanded ? (
-                <ChevronDown className="h-4 w-4" />
-              ) : (
-                <ChevronRight className="h-4 w-4" />
-              )
-            ) : (
-              <div className="h-4 w-4" />
-            )}
-          </Button>
-
-          {/* OKR Icon */}
-          <div className="flex-shrink-0">
-            <Target className="h-5 w-5 text-blue-600" />
-          </div>
-
-          {/* OKR Content */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 mb-1">
-              <h3 className="font-medium text-gray-900 truncate">{okr.title}</h3>
-              <ObjectiveStatusBadge status={okr.status} />
+      <div className={`relative ${level > 0 ? 'ml-8' : ''}`}>
+        {/* Connecting line for child nodes */}
+        {level > 0 && (
+          <>
+            <div className="absolute -left-6 top-6 w-4 h-px bg-gray-300"></div>
+            <div className="absolute -left-6 top-0 w-px h-6 bg-gray-300"></div>
+          </>
+        )}
+        
+        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-4 shadow-sm hover:shadow-md transition-shadow">
+          {/* Header with department tag */}
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className={`w-12 h-12 rounded-full ${level === 0 ? 'bg-blue-100' : 'bg-purple-100'} flex items-center justify-center`}>
+                <Target className={`w-6 h-6 ${level === 0 ? 'text-blue-600' : 'text-purple-600'}`} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                    {okr.teamId ? 'Team' : 'Individual'}
+                  </span>
+                  <span className="text-xs text-gray-500">•</span>
+                  <span className="text-xs text-gray-500">Q1 2025</span>
+                </div>
+                <h3 className="font-semibold text-gray-900 text-lg">{okr.title}</h3>
+              </div>
             </div>
             
-            {okr.description && (
-              <p className="text-sm text-gray-600 truncate">{okr.description}</p>
-            )}
-
-            {/* Owner and Cycle Info */}
-            <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-              <div className="flex items-center gap-1">
-                <Users className="h-3 w-3" />
-                <span>{okr.owner}</span>
+            {/* Progress indicator */}
+            <div className="flex items-center gap-3">
+              <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-white text-sm font-medium ${progressColor}`}>
+                <TrendingUp className="w-4 h-4" />
+                {okr.overallProgress.toFixed(0)}%
               </div>
-              <span>Progress: {okr.overallProgress.toFixed(1)}%</span>
+              <ObjectiveStatusBadge status={okr.status} />
             </div>
+          </div>
 
-            {/* Key Results Summary */}
-            {okr.keyResults.length > 0 && (
-              <div className="mt-2">
-                <div className="text-xs text-gray-500 mb-1">
-                  {okr.keyResults.length} Key Result{okr.keyResults.length > 1 ? 's' : ''}
+          {/* Description */}
+          {okr.description && (
+            <p className="text-gray-600 text-sm mb-4">{okr.description}</p>
+          )}
+
+          {/* Key Results */}
+          <div className="space-y-3">
+            {okr.keyResults.map((kr) => (
+              <div key={kr.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <div className="w-8 h-8 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                  {okr.keyResults.map(kr => (
-                    <div key={kr.id} className="bg-gray-50 rounded px-2 py-1">
-                      <div className="text-xs font-medium text-gray-700 truncate">
-                        {kr.title}
-                      </div>
-                      <div className="flex items-center justify-between mt-1">
-                        <div className="text-xs text-gray-600">
-                          {kr.currentValue}/{kr.targetValue} {kr.unit}
-                        </div>
-                        <div className="text-xs font-medium text-blue-600">
-                          {(kr as any).progress?.toFixed(1) || '0.0'}%
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                <div className="flex-1">
+                  <h4 className="font-medium text-gray-900 text-sm">{kr.title}</h4>
+                  <div className="flex items-center gap-4 mt-1">
+                    <span className="text-xs text-gray-600">
+                      {kr.unit === 'currency' ? `Rp ${parseFloat(kr.currentValue || '0').toLocaleString('id-ID')}` : kr.currentValue} / 
+                      {kr.unit === 'currency' ? ` Rp ${parseFloat(kr.targetValue).toLocaleString('id-ID')}` : ` ${kr.targetValue}`} {kr.unit !== 'currency' ? kr.unit : ''}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-gray-400" />
+                  <span className="text-xs text-gray-600">{(kr as any).progress?.toFixed(0) || '0'}%</span>
                 </div>
               </div>
-            )}
+            ))}
+          </div>
+
+          {/* Owner info */}
+          <div className="flex items-center gap-2 mt-4 pt-3 border-t border-gray-100">
+            <Users className="w-4 h-4 text-gray-400" />
+            <span className="text-sm text-gray-600">{okr.owner}</span>
           </div>
         </div>
-
-        {/* Children */}
-        {hasChildren && isExpanded && (
-          <div className="border-l-2 border-blue-200 ml-6">
-            {children.map(child => renderTreeNode(child, level + 1))}
-          </div>
-        )}
       </div>
     );
   };
 
-  if (okrsLoading) {
+  const renderTree = (nodes: TreeNode[]) => {
+    return nodes.map((node, index) => (
+      <div key={node.okr.id} className="relative">
+        {renderObjectiveCard(node, node.children.length > 0)}
+        {node.children.length > 0 && (
+          <div className="relative">
+            {/* Vertical connecting line for children */}
+            {node.children.length > 1 && (
+              <div 
+                className="absolute left-4 w-px bg-gray-300"
+                style={{ 
+                  top: '0px',
+                  height: `${(node.children.length - 1) * 200}px`
+                }}
+              ></div>
+            )}
+            {renderTree(node.children)}
+          </div>
+        )}
+      </div>
+    ));
+  };
+
+  if (isLoading) {
     return (
       <div className="p-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-          <div className="space-y-3">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="h-20 bg-gray-200 rounded"></div>
-            ))}
-          </div>
+        <div className="animate-pulse space-y-4">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="bg-gray-200 h-32 rounded-lg"></div>
+          ))}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-        <div>
-          <h1 className="text-xl lg:text-2xl font-semibold text-gray-900">Company OKRs</h1>
-          <p className="text-gray-600 mt-1 text-sm lg:text-base">
-            Hierarchical view of all objectives and key results
-          </p>
-        </div>
-
-        {/* Controls */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="flex gap-3">
-            {/* Status Filter */}
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Status</SelectItem>
-                <SelectItem value="not_started">Not Started</SelectItem>
-                <SelectItem value="on_track">On Track</SelectItem>
-                <SelectItem value="at_risk">At Risk</SelectItem>
-                <SelectItem value="behind">Behind</SelectItem>
-                <SelectItem value="paused">Paused</SelectItem>
-                <SelectItem value="canceled">Canceled</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="partially_achieved">Partially Achieved</SelectItem>
-                <SelectItem value="not_achieved">Not Achieved</SelectItem>
-                <SelectItem value="in_progress">In Progress</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Cycle Filter */}
-            <Select value={cycleFilter} onValueChange={setCycleFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Pilih Cycle" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Cycle</SelectItem>
-                {cycles.map(cycle => (
-                  <SelectItem key={cycle.id} value={cycle.id}>
-                    {cycle.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* Expand/Collapse Controls */}
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={expandAll}>
-                Expand All
-              </Button>
-              <Button variant="outline" size="sm" onClick={collapseAll}>
-                Collapse All
-              </Button>
-            </div>
+      <div className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Company OKRs</h1>
+            <p className="text-sm text-gray-600 mt-1">Hierarchical view of organizational objectives</p>
           </div>
-
+          
           <Button 
             onClick={() => setIsOKRModalOpen(true)}
             className="bg-blue-600 hover:bg-blue-700 text-white"
@@ -266,17 +207,24 @@ export default function CompanyOKRPage() {
         </div>
       </div>
 
-      {/* Tree View */}
-      <div className="bg-white border border-gray-200 rounded-lg">
+      {/* Content */}
+      <div className="p-6">
         {treeData.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            <Target className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-            <p>Tidak ada OKR yang ditemukan</p>
-            <p className="text-sm mt-2">Coba ubah filter atau buat OKR baru</p>
+          <div className="text-center py-12">
+            <Target className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Belum ada OKR</h3>
+            <p className="text-gray-600 mb-4">Mulai dengan membuat objective pertama untuk perusahaan</p>
+            <Button 
+              onClick={() => setIsOKRModalOpen(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Buat OKR Pertama
+            </Button>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100">
-            {treeData.map(node => renderTreeNode(node))}
+          <div className="max-w-6xl mx-auto">
+            {renderTree(treeData)}
           </div>
         )}
       </div>
