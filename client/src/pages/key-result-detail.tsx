@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation, Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -371,17 +371,14 @@ export default function KeyResultDetailPage() {
   const getUserName = (userId: string) => {
     if (!userId || !users) return 'Unknown User';
     const user = users.find((u: any) => u.id === userId);
-    const fullName = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : '';
-    return fullName || user?.email || 'Unknown User';
+    return user?.name || 'Unknown User';
   };
 
   // Helper function to get user initials safely
   const getUserInitials = (userId: string) => {
     const userName = getUserName(userId);
     if (!userName || userName === 'Unknown User') return 'U';
-    const nameParts = userName.split(' ').filter(n => n && n.length > 0);
-    if (!nameParts || nameParts.length === 0) return 'U';
-    return nameParts.map((n: string) => n[0]).join('').toUpperCase();
+    return userName.split(' ').map((n: string) => n[0]).join('').toUpperCase();
   };
 
   // Helper function to get tasks for a specific initiative
@@ -442,108 +439,88 @@ export default function KeyResultDetailPage() {
   // Prepare chart data from check-ins with diagonal guideline
   const prepareChartData = () => {
     // Get dates from objective's cycle
-    let startDate = new Date(2025, 5, 1); // June 1, 2025 (month is 0-indexed)
-    let endDate = new Date(2025, 5, 30);   // June 30, 2025
+    let startDate = new Date(2025, 0, 1); // Default fallback
+    let endDate = new Date(2025, 2, 31);   // Default fallback
     
     if (objective && objective.cycle) {
       startDate = new Date(objective.cycle.startDate);
       endDate = new Date(objective.cycle.endDate);
     }
     
-    const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
 
-    // Create data points with daily calculation
-    const chartData: Array<{
-      date: string;
-      actual: number | null;
-      ideal: number | null;
-      guideline: number;
-    }> = [];
+    if (!keyResult?.checkIns || keyResult.checkIns.length === 0) {
+      // Return empty array if no check-ins exist
+      return [];
+    }
+
+    // Sort check-ins by date
+    const sortedCheckIns = [...keyResult.checkIns].sort((a, b) => 
+      new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime()
+    );
+
+    // Calculate progress for each check-in
+    const chartData = [];
     
-    // Generate daily data points for the entire period
-    for (let dayIndex = 0; dayIndex < totalDays; dayIndex++) {
-      const currentDate = new Date(startDate.getTime() + (dayIndex * 24 * 60 * 60 * 1000));
-      const progressPercentage = (dayIndex / (totalDays - 1)) * 100;
+    // Add start point (0% at start date)
+    chartData.push({
+      date: format(startDate, "dd MMM"),
+      actual: 0,
+      ideal: 0,
+      guideline: 0
+    });
+
+    sortedCheckIns.forEach((checkIn) => {
+      // Calculate actual progress
+      const current = parseFloat(checkIn.value);
+      const target = parseFloat(keyResult.targetValue);
+      const base = parseFloat(keyResult.baseValue || "0");
       
-      // Only show dates at intervals for cleaner X-axis
-      const showDate = dayIndex === 0 || dayIndex === totalDays - 1 || dayIndex % 5 === 0;
+      let actualProgress = 0;
+      if (keyResult.keyResultType === "increase_to") {
+        actualProgress = ((current - base) / (target - base)) * 100;
+      } else if (keyResult.keyResultType === "decrease_to") {
+        actualProgress = ((base - current) / (base - target)) * 100;
+      } else if (keyResult.keyResultType === "achieve_or_not") {
+        actualProgress = current >= target ? 100 : 0;
+      }
+
+      // Calculate ideal progress based on time
+      const checkInDate = new Date(checkIn.createdAt || Date.now());
+      const daysPassed = Math.max(0, Math.ceil((checkInDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
+      const idealProgress = Math.min((daysPassed / totalDays) * 100, 100);
       
+      // Calculate guideline progress (diagonal from 0% to 100%)
+      const guidelineProgress = Math.min((daysPassed / totalDays) * 100, 100);
+
       chartData.push({
-        date: format(currentDate, showDate ? "d MMM" : ""),
-        actual: null,
-        ideal: null,
-        guideline: Math.round(progressPercentage * 10) / 10 // Round to 1 decimal
+        date: format(checkInDate, "dd MMM"),
+        actual: Math.max(0, Math.min(100, actualProgress)),
+        ideal: Math.max(0, Math.min(100, idealProgress)),
+        guideline: guidelineProgress
       });
-    }
-
-    // Add check-in data points if available
-    if (keyResult?.checkIns && Array.isArray(keyResult.checkIns) && keyResult.checkIns.length > 0) {
-      // Sort check-ins by date
-      const sortedCheckIns = [...keyResult.checkIns].sort((a, b) => 
-        new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime()
-      );
-
-      // Start with 0% progress
-      let lastProgress = 0;
+    });
+    
+    // Add end point (100% at end date) if we have any check-ins
+    const lastCheckIn = sortedCheckIns[sortedCheckIns.length - 1];
+    if (lastCheckIn) {
+      const lastCheckInDate = new Date(lastCheckIn.createdAt || Date.now());
       
-      sortedCheckIns.forEach((checkIn) => {
-        if (!checkIn || !checkIn.value || !keyResult?.targetValue) return;
-        
-        // Calculate actual progress
-        const current = parseFloat(checkIn.value);
-        const target = parseFloat(keyResult.targetValue);
-        const base = parseFloat(keyResult.baseValue || "0");
-        
-        let actualProgress = 0;
-        if (keyResult.keyResultType === "increase_to") {
-          actualProgress = ((current - base) / (target - base)) * 100;
-        } else if (keyResult.keyResultType === "decrease_to") {
-          actualProgress = ((base - current) / (base - target)) * 100;
-        } else if (keyResult.keyResultType === "achieve_or_not") {
-          actualProgress = current >= target ? 100 : 0;
-        }
-
-        actualProgress = Math.max(0, Math.min(100, actualProgress));
-        
-        // Find the corresponding day in chartData
-        const checkInDate = new Date(checkIn.createdAt || Date.now());
-        const daysPassed = Math.floor((checkInDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-        
-        if (daysPassed >= 0 && daysPassed < totalDays) {
-          // Update that specific day with actual progress
-          chartData[daysPassed].actual = Math.round(actualProgress * 10) / 10;
-          chartData[daysPassed].date = format(checkInDate, "d MMM"); // Ensure date is shown
-          
-          // Fill in the progress for days between check-ins
-          for (let i = Math.max(0, daysPassed - 1); i >= 0 && chartData[i].actual === null; i--) {
-            chartData[i].actual = lastProgress;
-          }
-          
-          lastProgress = actualProgress;
-        }
-      });
-      
-      // Fill remaining days with last known progress
-      for (let i = 0; i < totalDays; i++) {
-        if (chartData[i].actual === null && i > 0) {
-          chartData[i].actual = chartData[i - 1].actual;
-        }
-      }
-      
-      // Ensure first day starts at 0 if no check-in
-      if (chartData[0].actual === null) {
-        chartData[0].actual = 0;
+      // Only add end point if last check-in is before end date
+      if (lastCheckInDate < endDate) {
+        chartData.push({
+          date: format(endDate, "dd MMM"),
+          actual: null, // Don't extend actual progress line
+          ideal: 100,
+          guideline: 100
+        });
       }
     }
 
-    // Filter to show only points with dates for cleaner display
-    return chartData.filter(point => point.date !== "" || point.actual !== null);
+    return chartData;
   };
 
-  const chartData = useMemo(() => {
-    if (!keyResult || !objective) return [];
-    return prepareChartData();
-  }, [keyResult, objective]);
+  const chartData = keyResult ? prepareChartData() : [];
 
   const getUnitDisplay = (unit: string) => {
     switch (unit) {
@@ -790,7 +767,7 @@ export default function KeyResultDetailPage() {
                 <CardContent>
                   <div className="h-80 w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 60 }}>
+                      <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                         <defs>
                           <linearGradient id="actualGradient" x1="0" y1="0" x2="0" y2="1">
                             <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
@@ -803,10 +780,6 @@ export default function KeyResultDetailPage() {
                           axisLine={false}
                           tickLine={false}
                           tick={{ fontSize: 12, fill: '#6b7280' }}
-                          interval="preserveStartEnd"
-                          angle={-45}
-                          textAnchor="end"
-                          height={60}
                         />
                         <YAxis 
                           domain={[0, 100]}
@@ -854,15 +827,6 @@ export default function KeyResultDetailPage() {
                             return null;
                           }}
                         />
-                        <Line
-                          type="monotone"
-                          dataKey="guideline"
-                          stroke="#ef4444"
-                          strokeWidth={2}
-                          strokeDasharray="5 5"
-                          dot={false}
-                          connectNulls={true}
-                        />
                         <Area
                           type="monotone"
                           dataKey="actual"
@@ -870,7 +834,22 @@ export default function KeyResultDetailPage() {
                           strokeWidth={2}
                           fill="url(#actualGradient)"
                           dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
-                          connectNulls={true}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="guideline"
+                          stroke="#6b7280"
+                          strokeWidth={2}
+                          strokeDasharray="8 4"
+                          dot={false}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="ideal"
+                          stroke="#9ca3af"
+                          strokeWidth={1}
+                          strokeDasharray="3 3"
+                          dot={false}
                         />
                       </AreaChart>
                     </ResponsiveContainer>
@@ -890,9 +869,7 @@ export default function KeyResultDetailPage() {
               <CardContent>
                 {keyResult.checkIns && keyResult.checkIns.length > 0 ? (
                   <div className="space-y-3 max-h-80 overflow-y-auto">
-                    {keyResult.checkIns.sort((a, b) => 
-                      new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
-                    ).map((checkIn) => (
+                    {keyResult.checkIns.map((checkIn) => (
                       <div key={checkIn.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
                         <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                         <div className="flex-1 min-w-0">
@@ -1512,24 +1489,23 @@ export default function KeyResultDetailPage() {
                       {showUserMentions && (
                         <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-md shadow-lg z-50 max-h-40 overflow-y-auto">
                           <div className="p-2 text-xs text-gray-500 border-b">Mention team members:</div>
-                          {users?.filter((user: any) => user.firstName || user.lastName).map((user: any) => (
+                          {users?.filter((user: any) => user.name).map((user: any) => (
                             <div
                               key={user.id}
                               className="p-2 hover:bg-gray-50 cursor-pointer flex items-center gap-2"
                               onClick={() => {
                                 const beforeMention = commentText.substring(0, mentionPosition);
                                 const afterMention = commentText.substring(mentionPosition + 1);
-                                const userName = getUserName(user.id);
-                                setCommentText(`${beforeMention}@${userName} ${afterMention}`);
+                                setCommentText(`${beforeMention}@${user.name} ${afterMention}`);
                                 setShowUserMentions(false);
                               }}
                             >
                               <Avatar className="h-6 w-6">
                                 <AvatarFallback className="text-xs bg-blue-100 text-blue-600">
-                                  {getUserInitials(user.id)}
+                                  {user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
                                 </AvatarFallback>
                               </Avatar>
-                              <span className="text-sm text-gray-900">{getUserName(user.id)}</span>
+                              <span className="text-sm text-gray-900">{user.name}</span>
                             </div>
                           ))}
                         </div>
