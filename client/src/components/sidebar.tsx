@@ -37,7 +37,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       path: "/",
       active: location === "/" || location === "/"
     },
-
+    {
+      label: "Company OKRs",
+      icon: Building2,
+      path: "/company-okr",
+      active: location === "/company-okr"
+    },
     {
       label: "OKR Structure",
       icon: GitBranch,

@@ -448,10 +448,6 @@ Changelog:
   * Integrated customizable color and stroke width options for visual consistency
   * Enhanced company OKR page with professional dashed lines and arrow markers
   * Improved visual hierarchy mapping between parent and child objectives
-- June 27, 2025. Removed Company OKRs feature from navigation:
-  * Removed "Company OKRs" menu item from sidebar navigation
-  * Cleaned up routing by removing /company-okr route from App component
-  * Streamlined navigation to focus on core OKR management features
 ```
 
 ## User Preferences
