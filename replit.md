@@ -161,8 +161,10 @@ Changelog:
   * Fixed duplicate OKR functionality to reset progress values and maintain data integrity
   * Added missing DELETE endpoint for objectives (/api/objectives/:id) on server
   * Improved Toast component error handling and formatting
-  * Applied 1 decimal place formatting for progress percentages display
+  * Applied 1 decimal place formatting for progress percentages display (.toFixed(1))
   * Enhanced user experience with proper error handling and feedback notifications
+  * Fixed progress calculation inconsistency between frontend and backend for "increase_to" type
+  * Unified progress calculation formula to use baseValue: (current - base) / (target - base) * 100
 ```
 
 ## User Preferences

@@ -75,28 +75,24 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
   };
 
   const calculateProgress = (current: string, target: string, keyResultType: string, baseValue?: string | null): number => {
-    const currentNum = parseFloat(current);
-    const targetNum = parseFloat(target);
-    
+    const currentNum = parseFloat(current) || 0;
+    const targetNum = parseFloat(target) || 0;
+    const baseNum = parseFloat(baseValue || "0") || 0;
+
     switch (keyResultType) {
       case "increase_to":
-        // Progress = (current / target) * 100, capped at 100%
-        if (targetNum === 0) return 0;
-        return Math.min(100, Math.max(0, (currentNum / targetNum) * 100));
-        
+        if (targetNum <= baseNum) return 0;
+        return Math.min(100, Math.max(0, ((currentNum - baseNum) / (targetNum - baseNum)) * 100));
+      
       case "decrease_to":
-        // Progress = ((Base Value - Current) / (Base Value - Target)) * 100%
-        const baseNum = baseValue && baseValue !== null ? parseFloat(baseValue) : targetNum * 2; // Default base value if not provided
-        if (baseNum <= targetNum) return currentNum <= targetNum ? 100 : 0; // Invalid base value case
-        const decreaseProgress = ((baseNum - currentNum) / (baseNum - targetNum)) * 100;
-        return Math.min(100, Math.max(0, decreaseProgress));
-        
+        if (baseNum <= targetNum) return 0;
+        return Math.min(100, Math.max(0, ((baseNum - currentNum) / (baseNum - targetNum)) * 100));
+      
       case "achieve_or_not":
-        // Binary: 100% if current >= target, 0% otherwise
         return currentNum >= targetNum ? 100 : 0;
-        
+      
       default:
-        return 0;
+        return Math.min(100, Math.max(0, (currentNum / targetNum) * 100));
     }
   };
 
