@@ -298,7 +298,8 @@ Changelog:
   * Implemented complete form reset functionality to prevent data persistence between sessions
   * Enhanced task form layout with full-width title field and optimized field arrangement
   * Added deadline field validation to restrict task dates within initiative timeframe
-  * Reorganized task form: Title (full-width) → Deadline/Priority/PIC (3-column) → Description
+  * Reorganized task form: Title (full-width) → Deadline/Priority/PIC (3-column) → Description → Add Button (full-width)
+  * Improved form UX with preselected placeholders showing default values and clearer field labels
 - June 27, 2025. Enhanced key result detail page with diagonal guideline and optimized layout:
   * Added diagonal guideline to Achievement chart based on cycle end date showing target progress timeline
   * Implemented 3-line chart visualization: actual progress (green area), ideal progress (dashed gray), target guideline (diagonal dashed)

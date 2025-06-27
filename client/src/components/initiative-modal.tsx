@@ -658,7 +658,7 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
                       onValueChange={(value) => setNewTask({ ...newTask, priority: value as any })}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Prioritas" />
+                        <SelectValue placeholder="Medium (Default)" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="low">Rendah</SelectItem>
@@ -671,10 +671,10 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
                       onValueChange={(value) => setNewTask({ ...newTask, assignedTo: value === "none" ? "" : value })}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Pilih PIC" />
+                        <SelectValue placeholder="Pilih PIC (Opsional)" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="none">Tidak ada</SelectItem>
+                        <SelectItem value="none">Tidak ada PIC</SelectItem>
                         {(() => {
                           // Get available PICs: initiative PIC + selected members
                           const watchedValues = form.watch();
