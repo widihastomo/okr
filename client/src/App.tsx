@@ -24,26 +24,7 @@ import NotFound from "@/pages/not-found";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  // Auto-close sidebar on mobile when screen size changes
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 1024) {
-        // Desktop: keep sidebar open
-        setSidebarOpen(true);
-      } else {
-        // Mobile: keep sidebar closed
-        setSidebarOpen(false);
-      }
-    };
-
-    // Set initial state
-    handleResize();
-    
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   if (isLoading) {
     return (
@@ -77,7 +58,10 @@ function Router() {
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         
         {/* Main Content */}
-        <div className="flex-1 min-h-[calc(100vh-4rem)]">
+        <div className={cn(
+          "flex-1 min-h-[calc(100vh-4rem)] transition-all duration-300",
+          sidebarOpen ? "lg:ml-64" : "lg:ml-16"
+        )}>
           <Switch>
             <Route path="/" component={Dashboard} />
             <Route path="/dashboard" component={Dashboard} />
