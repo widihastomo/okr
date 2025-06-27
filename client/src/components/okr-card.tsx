@@ -8,7 +8,7 @@ import type { OKRWithKeyResults, KeyResult } from "@shared/schema";
 import { Link } from "wouter";
 import { CheckInModal } from "./check-in-modal";
 import { SimpleProgressStatus } from "./progress-status";
-import { ObjectiveStatusBadge } from "./objective-status-badge";
+
 import { EditOKRButton } from "./okr-form-modal";
 
 interface OKRCardProps {
@@ -119,9 +119,7 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
               </h3>
             </Link>
             <p className="text-gray-600 mb-4">{okr.description}</p>
-            <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
-              <ObjectiveStatusBadge status={okr.status} />
-            </div>
+            
             <div className="flex items-center gap-4 text-sm text-gray-600">
               <span className="flex items-center gap-1">
                 <User className="w-4 h-4" />
