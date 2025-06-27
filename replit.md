@@ -193,6 +193,11 @@ Changelog:
   * Simplified objective data model to focus on core fields: title, description, owner, and status
   * Maintained data integrity while streamlining the OKR management interface
   * All existing OKR functionality preserved without timeframe dependencies
+- June 27, 2025. Streamlined OKR form layout and structure:
+  * Consolidated owner type and user selection fields into Objective Information card
+  * Removed separate Owner Information card to simplify form organization
+  * Improved form usability by grouping related fields in logical sections
+  * Maintained all functionality while reducing visual complexity
 ```
 
 ## User Preferences
