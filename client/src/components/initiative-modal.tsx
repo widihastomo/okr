@@ -379,42 +379,65 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
             <FormField
               control={form.control}
               name="members"
-              render={() => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-2">
                     <Users className="h-4 w-4" />
                     Anggota Tim
                   </FormLabel>
-                  <div className="space-y-2">
-                    {users.map((user: any) => (
-                      <FormField
-                        key={user.id}
-                        control={form.control}
-                        name="members"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(user.id)}
-                                onCheckedChange={(checked: boolean) => {
-                                  if (checked) {
-                                    field.onChange([...(field.value || []), user.id]);
-                                  } else {
+                  <FormControl>
+                    <div className="space-y-2">
+                      <Select
+                        onValueChange={(value) => {
+                          if (value && value !== "none" && !field.value?.includes(value)) {
+                            field.onChange([...(field.value || []), value]);
+                          }
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih anggota tim" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Pilih anggota</SelectItem>
+                          {users
+                            .filter(user => !field.value?.includes(user.id))
+                            .map((user) => (
+                              <SelectItem key={user.id} value={user.id}>
+                                {user.fullName}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                      
+                      {/* Selected Members Display */}
+                      {field.value && field.value.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {field.value.map((userId: string) => {
+                            const user = users.find(u => u.id === userId);
+                            return user ? (
+                              <div
+                                key={userId}
+                                className="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-sm"
+                              >
+                                {user.fullName}
+                                <button
+                                  type="button"
+                                  onClick={() => {
                                     field.onChange(
-                                      field.value?.filter((value: string) => value !== user.id)
+                                      field.value?.filter((id: string) => id !== userId)
                                     );
-                                  }
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="font-normal">
-                              {user.fullName}
-                            </FormLabel>
-                          </FormItem>
-                        )}
-                      />
-                    ))}
-                  </div>
+                                  }}
+                                  className="ml-1 text-blue-600 hover:text-blue-800"
+                                >
+                                  ×
+                                </button>
+                              </div>
+                            ) : null;
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

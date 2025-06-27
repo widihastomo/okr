@@ -334,13 +334,14 @@ Changelog:
   * Improved initiative modal with proper Indonesian labels and status management
 - June 27, 2025. Implemented PIC and member assignment with automatic progress calculation:
   * Added PIC (Person in Charge) selection field to initiative forms using user dropdown
-  * Implemented team member selection with checkbox interface for multi-user assignment
+  * Implemented multi-select dropdown interface for team member assignment with removable tags
   * Created initiative member storage methods with proper database relationships
   * Added automatic progress calculation based on completed tasks percentage
   * Progress updates automatically when tasks are created, updated, or completed
   * Enhanced initiative creation endpoint to handle PIC and member assignments
   * Fixed TypeScript errors and implemented proper user data typing
   * System now supports comprehensive project management with team collaboration
+  * Converted member selection to clean multi-select dropdown with filtered options and tag display
 ```
 
 ## User Preferences
