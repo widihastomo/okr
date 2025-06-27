@@ -8,7 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import GlobalHeader from "@/components/global-header";
 import Sidebar from "@/components/sidebar";
-import Dashboard from "@/pages/dashboard-new";
+import Dashboard from "@/pages/dashboard";
 import CyclesPage from "@/components/cycles-page";
 import TemplatesPage from "@/components/templates-page";
 import UsersPage from "@/components/users-page";

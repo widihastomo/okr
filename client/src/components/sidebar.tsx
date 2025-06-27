@@ -34,8 +34,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     {
       label: "Dashboard",
       icon: LayoutDashboard,
-      path: "/dashboard",
-      active: location === "/dashboard" || location === "/"
+      path: "/",
+      active: location === "/" || location === "/"
     },
     {
       label: "Company OKRs",
