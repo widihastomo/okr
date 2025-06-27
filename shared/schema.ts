@@ -84,9 +84,9 @@ export const keyResults = pgTable("key_results", {
   objectiveId: uuid("objective_id").notNull(),
   title: text("title").notNull(),
   description: text("description"),
-  currentValue: decimal("current_value", { precision: 10, scale: 2 }).notNull().default("0"),
-  targetValue: decimal("target_value", { precision: 10, scale: 2 }).notNull(),
-  baseValue: decimal("base_value", { precision: 10, scale: 2 }), // Starting point for calculations
+  currentValue: decimal("current_value", { precision: 15, scale: 2 }).notNull().default("0"),
+  targetValue: decimal("target_value", { precision: 15, scale: 2 }).notNull(),
+  baseValue: decimal("base_value", { precision: 15, scale: 2 }), // Starting point for calculations
   unit: text("unit").notNull().default("number"), // "number", "percentage", "currency"
   keyResultType: text("key_result_type").notNull().default("increase_to"), // "increase_to", "decrease_to", "achieve_or_not"
   status: text("status").notNull().default("on_track"), // "on_track", "at_risk", "behind", "completed"
