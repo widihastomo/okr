@@ -177,7 +177,9 @@ export function CheckInModal({
               required
             />
             <div className="text-xs text-gray-500 mt-1">
-              Target: {formatNumberWithCommas(targetValue)} {getUnitDisplay(unit)}
+              Target: {unit === "currency" ? `Rp ${formatNumberWithCommas(targetValue)}` : 
+                       unit === "percentage" ? `${formatNumberWithCommas(targetValue)}%` :
+                       `${formatNumberWithCommas(targetValue)} ${getUnitDisplay(unit)}`}
             </div>
             <div className="text-xs mt-1 font-medium">
               {getProgressHint()}

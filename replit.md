@@ -268,6 +268,9 @@ Changelog:
   * Implemented consistent number formatting across OKR form modal and check-in modal
   * Large currency values like 300,000,000 now display as formatted text inputs with commas
   * Enhanced user experience with proper number parsing and display formatting
+  * Fixed OKR save/update functionality by handling empty baseValue fields properly (convert to null)
+  * Updated currency display format to show "Rp" prefix before numbers for Indonesian currency standard
+  * Applied consistent "Rp 250.000.000" formatting across OKR cards and check-in modal displays
 ```
 
 ## User Preferences

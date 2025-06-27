@@ -307,7 +307,10 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
                     </div>
                     <p className="text-sm text-gray-600 mb-2">{kr.description}</p>
                     <div className="text-xs text-gray-500">
-                      {kr.currentValue} / {kr.targetValue} {kr.unit === "percentage" ? "%" : kr.unit === "currency" ? "Rp" : ""}
+                      {kr.unit === "currency" ? 
+                        `Rp ${parseFloat(kr.currentValue).toLocaleString('id-ID')} / Rp ${parseFloat(kr.targetValue).toLocaleString('id-ID')}` : 
+                       kr.unit === "percentage" ? `${kr.currentValue}% / ${kr.targetValue}%` :
+                       `${kr.currentValue} / ${kr.targetValue}`}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
