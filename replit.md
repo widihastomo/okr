@@ -165,6 +165,8 @@ Changelog:
   * Enhanced user experience with proper error handling and feedback notifications
   * Fixed progress calculation inconsistency between frontend and backend for "increase_to" type
   * Unified progress calculation formula to use baseValue: (current - base) / (target - base) * 100
+  * Implemented frontend overall progress calculation as average of key result progress values
+  * Ensured consistent progress calculation across all components using same formula
 ```
 
 ## User Preferences
