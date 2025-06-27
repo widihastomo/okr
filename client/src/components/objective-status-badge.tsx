@@ -81,7 +81,6 @@ export function ObjectiveStatusBadge({ status, className }: ObjectiveStatusBadge
         className
       )}
     >
-      <span className="text-xs">{config.icon}</span>
       {config.label}
     </span>
   );
