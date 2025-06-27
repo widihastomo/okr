@@ -247,6 +247,7 @@ Changelog:
   * Integrated threshold indicator showing ideal progress timeline based on cycle dates
   * Progress bar color dynamically matches objective status for consistent visual feedback
   * Added interactive tooltip showing current progress vs ideal target percentage on hover
+  * Extended tooltip functionality to Key Results progress bars for consistent user experience
   * Enhanced visual feedback with status labels, colored progress bar, ideal threshold, tooltip, and percentage display
   * Improved OKR card readability and status recognition at a glance
 ```
