@@ -1036,6 +1036,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Manual Initiative Progress Recalculation
+  app.post("/api/update-initiative-progress", async (req, res) => {
+    try {
+      const initiatives = await storage.getInitiatives();
+      let updatedCount = 0;
+
+      for (const initiative of initiatives) {
+        try {
+          await storage.updateInitiativeProgress(initiative.id);
+          updatedCount++;
+        } catch (error) {
+          console.error(`Error updating initiative ${initiative.id} progress:`, error);
+        }
+      }
+      
+      res.json({ 
+        message: `Berhasil memperbarui progress ${updatedCount} initiative`,
+        updatedInitiativesCount: updatedCount
+      });
+    } catch (error) {
+      console.error("Error updating initiative progress:", error);
+      res.status(500).json({ message: "Gagal memperbarui progress initiative" });
+    }
+  });
+
   app.get("/api/key-results/:id/check-ins", async (req, res) => {
     try {
       const keyResultId = req.params.id;

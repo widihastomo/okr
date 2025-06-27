@@ -96,6 +96,8 @@ export interface IStorage {
   createTask(task: InsertTask): Promise<Task>;
   updateTask(id: string, task: Partial<InsertTask>): Promise<Task | undefined>;
   deleteTask(id: string): Promise<boolean>;
+  getTasksByInitiativeId(initiativeId: string): Promise<Task[]>;
+  updateInitiativeProgress(initiativeId: string): Promise<void>;
   
   // Key Result with Details
   getKeyResultWithDetails(id: string): Promise<KeyResultWithDetails | undefined>;
@@ -944,7 +946,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteTask(id: string): Promise<boolean> {
+    // Get task before deletion to access initiativeId
+    const [task] = await db.select().from(tasks).where(eq(tasks.id, id));
+    
     const result = await db.delete(tasks).where(eq(tasks.id, id));
+    
+    if (result.rowCount > 0 && task) {
+      // Recalculate initiative progress after task deletion
+      await this.updateInitiativeProgress(task.initiativeId);
+    }
+    
     return result.rowCount > 0;
   }
 }

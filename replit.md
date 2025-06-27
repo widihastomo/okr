@@ -367,6 +367,13 @@ Changelog:
   * Added real-time search filtering and selection counter display
   * Removed "Tujuan" (Objective) field from initiative forms and database schema
   * Streamlined initiative creation process by focusing on essential project information
+- June 27, 2025. Implemented comprehensive automatic progress calculation system for initiatives:
+  * Added automatic progress calculation based on completed tasks vs total tasks ratio
+  * Progress updates automatically when tasks are created, updated, or deleted
+  * Created API endpoint /api/update-initiative-progress for manual progress recalculation
+  * Added "Update Progress" button in key result detail page for manual refresh
+  * System calculates progress as Math.round((completedTasks.length / allTasks.length) * 100)
+  * Progress recalculation maintains data integrity across all initiative operations
 - June 27, 2025. Implemented comprehensive initiative management with task integration:
   * Converted initiative form to full-width sheet sliding from right side for better workspace
   * Added integrated task management system within initiative creation process

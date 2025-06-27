@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Calendar, Target, TrendingUp, Users, Clock, BarChart3, Edit, Trash2, ChevronRight, Home, ChevronDown, User, Check, CheckCircle2, MoreHorizontal } from "lucide-react";
+import { ArrowLeft, Calendar, Target, TrendingUp, Users, Clock, BarChart3, Edit, Trash2, ChevronRight, Home, ChevronDown, User, Check, CheckCircle2, MoreHorizontal, RefreshCw } from "lucide-react";
 import { CheckInModal } from "@/components/check-in-modal";
 import InitiativeModal from "@/components/initiative-modal";
 import { ProgressStatus } from "@/components/progress-status";
@@ -250,6 +250,39 @@ export default function KeyResultDetailPage() {
       }
       return newSet;
     });
+  };
+
+  // Update progress mutation
+  const updateProgressMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/update-initiative-progress', {
+        method: 'POST',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update progress');
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/key-results', keyResultId, 'initiatives'] });
+      toast({
+        title: "Progress berhasil diperbarui",
+        description: `${data.updatedInitiativesCount} initiative telah diperbarui`,
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal memperbarui progress",
+        description: error.message || "Terjadi kesalahan saat memperbarui progress",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Handle manual progress update
+  const handleUpdateProgress = () => {
+    updateProgressMutation.mutate();
   };
 
   // Function to update task status
@@ -829,7 +862,18 @@ export default function KeyResultDetailPage() {
                     Strategic actions and projects to achieve this key result
                   </CardDescription>
                 </div>
-                <InitiativeModal keyResultId={keyResult.id} onSuccess={handleInitiativeSuccess} />
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleUpdateProgress}
+                    className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                  >
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Update Progress
+                  </Button>
+                  <InitiativeModal keyResultId={keyResult.id} onSuccess={handleInitiativeSuccess} />
+                </div>
               </div>
             </CardHeader>
             <CardContent>
