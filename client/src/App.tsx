@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import GlobalHeader from "@/components/global-header";
-import Sidebar from "@/components/sidebar";
+import ModernSidebar from "@/components/modern-sidebar";
 import Dashboard from "@/pages/dashboard";
 import CyclesPage from "@/components/cycles-page";
 import TemplatesPage from "@/components/templates-page";
@@ -55,7 +55,7 @@ function Router() {
       <div className="flex">
         {/* Sidebar */}
         <div className={`${sidebarOpen ? 'w-64' : 'w-0'} transition-all duration-300 overflow-hidden`}>
-          <Sidebar />
+          <ModernSidebar />
         </div>
         
         {/* Main Content */}
