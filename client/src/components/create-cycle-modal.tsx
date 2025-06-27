@@ -119,8 +119,7 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
                     onValueChange={(value) => {
                       field.onChange(value);
                       handleTypeChange(value as "monthly" | "quarterly" | "annual");
-                    }} 
-                    defaultValue={field.value}
+                    }}
                   >
                     <FormControl>
                       <SelectTrigger>
