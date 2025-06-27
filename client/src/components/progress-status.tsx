@@ -230,10 +230,10 @@ export function SimpleProgressStatus({
           <div 
             className="absolute top-0 h-2 w-0.5 bg-gray-400 opacity-70"
             style={{ left: `${Math.min(idealProgress, 100)}%` }}
-            title={`Capaian ideal saat ini: ${idealProgress}%`}
+            title={`Capaian ideal saat ini: ${idealProgress.toFixed(1)}%`}
           />
         </div>
-        <span className="text-sm font-medium">{progressPercentage}%</span>
+        <span className="text-sm font-medium">{progressPercentage.toFixed(1)}%</span>
       </div>
       {/* Progress explanation */}
       <div className="mt-2 text-xs text-gray-500 flex items-center gap-4">
@@ -248,7 +248,7 @@ export function SimpleProgressStatus({
               ? `Target capaian (100%)` 
               : timeProgressPercentage < 0 
                 ? `Target ideal (0% - belum dimulai)`
-                : `Target ideal (${idealProgress}%)`
+                : `Target ideal (${idealProgress.toFixed(1)}%)`
             }
           </span>
         </div>
