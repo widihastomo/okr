@@ -9,6 +9,7 @@ import { Link } from "wouter";
 import { CheckInModal } from "./check-in-modal";
 import { SimpleProgressStatus } from "./progress-status";
 import { ObjectiveStatusBadge } from "./objective-status-badge";
+import { EditObjectiveModal } from "./edit-objective-modal";
 
 interface OKRCardProps {
   okr: OKRWithKeyResults;
@@ -143,9 +144,7 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
               <p className="text-2xl font-semibold text-gray-900">{overallProgress.toFixed(1)}%</p>
               <p className="text-sm text-gray-500">Overall Progress</p>
             </div>
-            <Button variant="ghost" size="sm">
-              <Edit className="w-4 h-4" />
-            </Button>
+            <EditObjectiveModal objective={okr} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm">
