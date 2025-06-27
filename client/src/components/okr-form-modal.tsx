@@ -436,34 +436,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                   />
                 </div>
 
-                <FormField
-                  control={form.control}
-                  name="objective.teamId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Team (Optional)</FormLabel>
-                      <Select 
-                        onValueChange={(value) => field.onChange(value === "none" ? undefined : value)} 
-                        value={field.value || "none"}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select team" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="none">No Team</SelectItem>
-                          {teams?.map((team) => (
-                            <SelectItem key={team.id} value={team.id}>
-                              {team.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                
               </CardContent>
             </Card>
 
