@@ -66,7 +66,7 @@ interface InitiativeModalProps {
 }
 
 export default function InitiativeModal({ keyResultId, onSuccess, editingInitiative, onClose }: InitiativeModalProps) {
-  const [open, setOpen] = useState(!!editingInitiative);
+  const [open, setOpen] = useState(false);
   const [memberDropdownOpen, setMemberDropdownOpen] = useState(false);
   const [memberSearchTerm, setMemberSearchTerm] = useState("");
   const [tasks, setTasks] = useState<TaskFormData[]>([]);
@@ -89,13 +89,15 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
       if (editingInitiative.tasks) {
         setTasks(editingInitiative.tasks);
       }
+    } else {
+      setOpen(false);
     }
   }, [editingInitiative]);
 
   // Handle modal close
-  const handleClose = () => {
-    setOpen(false);
-    if (onClose) {
+  const handleClose = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen && onClose) {
       onClose();
     }
   };
@@ -169,6 +171,14 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
       setOpen(false);
       form.reset();
       setTasks([]);
+      setNewTask({
+        title: "",
+        description: "",
+        status: "pending",
+        priority: "medium",
+        assignedTo: "",
+        dueDate: "",
+      });
       onSuccess?.();
     },
     onError: (error: any) => {
@@ -281,14 +291,12 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
 
   return (
     <Sheet open={open} onOpenChange={handleClose}>
-      {!editingInitiative && (
-        <SheetTrigger asChild>
-          <Button className="bg-blue-600 hover:bg-blue-700">
-            <Plus className="h-4 w-4 mr-2" />
-            Tambah Initiative
-          </Button>
-        </SheetTrigger>
-      )}
+      <SheetTrigger asChild>
+        <Button className="bg-blue-600 hover:bg-blue-700">
+          <Plus className="h-4 w-4 mr-2" />
+          Tambah Initiative
+        </Button>
+      </SheetTrigger>
       <SheetContent className="w-full sm:w-[800px] sm:max-w-[800px] overflow-y-auto">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
