@@ -3,7 +3,7 @@ import {
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
   type CheckIn, type Initiative, type Task, type KeyResultWithDetails,
   type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
-  type InsertUser, type InsertTeam, type InsertTeamMember,
+  type InsertUser, type UpsertUser, type InsertTeam, type InsertTeamMember,
   type InsertCheckIn, type InsertInitiative,
   type OKRWithKeyResults, type CycleWithOKRs, type UpdateKeyResultProgress, type CreateOKRFromTemplate 
 } from "@shared/schema";
@@ -13,36 +13,36 @@ import { eq, and } from "drizzle-orm";
 export interface IStorage {
   // Cycles
   getCycles(): Promise<Cycle[]>;
-  getCycle(id: number): Promise<Cycle | undefined>;
+  getCycle(id: string): Promise<Cycle | undefined>;
   createCycle(cycle: InsertCycle): Promise<Cycle>;
-  updateCycle(id: number, cycle: Partial<InsertCycle>): Promise<Cycle | undefined>;
-  deleteCycle(id: number): Promise<boolean>;
-  getCycleWithOKRs(id: number): Promise<CycleWithOKRs | undefined>;
+  updateCycle(id: string, cycle: Partial<InsertCycle>): Promise<Cycle | undefined>;
+  deleteCycle(id: string): Promise<boolean>;
+  getCycleWithOKRs(id: string): Promise<CycleWithOKRs | undefined>;
   
   // Templates
   getTemplates(): Promise<Template[]>;
-  getTemplate(id: number): Promise<Template | undefined>;
+  getTemplate(id: string): Promise<Template | undefined>;
   createTemplate(template: InsertTemplate): Promise<Template>;
-  updateTemplate(id: number, template: Partial<InsertTemplate>): Promise<Template | undefined>;
-  deleteTemplate(id: number): Promise<boolean>;
+  updateTemplate(id: string, template: Partial<InsertTemplate>): Promise<Template | undefined>;
+  deleteTemplate(id: string): Promise<boolean>;
   createOKRFromTemplate(data: CreateOKRFromTemplate): Promise<OKRWithKeyResults[]>;
   
   // Objectives
   getObjectives(): Promise<Objective[]>;
-  getObjective(id: number): Promise<Objective | undefined>;
+  getObjective(id: string): Promise<Objective | undefined>;
   createObjective(objective: InsertObjective): Promise<Objective>;
-  updateObjective(id: number, objective: Partial<InsertObjective>): Promise<Objective | undefined>;
-  deleteObjective(id: number): Promise<boolean>;
-  getObjectivesByCycleId(cycleId: number): Promise<Objective[]>;
+  updateObjective(id: string, objective: Partial<InsertObjective>): Promise<Objective | undefined>;
+  deleteObjective(id: string): Promise<boolean>;
+  getObjectivesByCycleId(cycleId: string): Promise<Objective[]>;
   
   // Key Results
   getKeyResults(): Promise<KeyResult[]>;
-  getKeyResultsByObjectiveId(objectiveId: number): Promise<KeyResult[]>;
-  getKeyResult(id: number): Promise<KeyResult | undefined>;
+  getKeyResultsByObjectiveId(objectiveId: string): Promise<KeyResult[]>;
+  getKeyResult(id: string): Promise<KeyResult | undefined>;
   createKeyResult(keyResult: InsertKeyResult): Promise<KeyResult>;
-  updateKeyResult(id: number, keyResult: Partial<InsertKeyResult>): Promise<KeyResult | undefined>;
+  updateKeyResult(id: string, keyResult: Partial<InsertKeyResult>): Promise<KeyResult | undefined>;
   updateKeyResultProgress(update: UpdateKeyResultProgress): Promise<KeyResult | undefined>;
-  deleteKeyResult(id: number): Promise<boolean>;
+  deleteKeyResult(id: string): Promise<boolean>;
   
   // Users
   getUser(id: string): Promise<User | undefined>;
@@ -54,43 +54,43 @@ export interface IStorage {
   deleteUser(id: string): Promise<boolean>;
   
   // Teams
-  getTeam(id: number): Promise<Team | undefined>;
+  getTeam(id: string): Promise<Team | undefined>;
   getTeams(): Promise<Team[]>;
   createTeam(team: InsertTeam): Promise<Team>;
-  updateTeam(id: number, team: Partial<InsertTeam>): Promise<Team | undefined>;
-  deleteTeam(id: number): Promise<boolean>;
+  updateTeam(id: string, team: Partial<InsertTeam>): Promise<Team | undefined>;
+  deleteTeam(id: string): Promise<boolean>;
   
   // Team Members
-  getTeamMembers(teamId: number): Promise<(TeamMember & { user: User })[]>;
-  getUserTeams(userId: number): Promise<(TeamMember & { team: Team })[]>;
+  getTeamMembers(teamId: string): Promise<(TeamMember & { user: User })[]>;
+  getUserTeams(userId: string): Promise<(TeamMember & { team: Team })[]>;
   addTeamMember(teamMember: InsertTeamMember): Promise<TeamMember>;
-  removeTeamMember(teamId: number, userId: number): Promise<boolean>;
-  updateTeamMemberRole(teamId: number, userId: number, role: "admin" | "member"): Promise<TeamMember | undefined>;
+  removeTeamMember(teamId: string, userId: string): Promise<boolean>;
+  updateTeamMemberRole(teamId: string, userId: string, role: "admin" | "member"): Promise<TeamMember | undefined>;
 
   // Check-ins
   getCheckIns(): Promise<CheckIn[]>;
-  getCheckInsByKeyResultId(keyResultId: number): Promise<CheckIn[]>;
+  getCheckInsByKeyResultId(keyResultId: string): Promise<CheckIn[]>;
   createCheckIn(checkIn: InsertCheckIn): Promise<CheckIn>;
   
   // Initiatives
   getInitiatives(): Promise<Initiative[]>;
-  getInitiativesByKeyResultId(keyResultId: number): Promise<Initiative[]>;
+  getInitiativesByKeyResultId(keyResultId: string): Promise<Initiative[]>;
   createInitiative(initiative: InsertInitiative): Promise<Initiative>;
-  updateInitiative(id: number, initiative: Partial<InsertInitiative>): Promise<Initiative | undefined>;
+  updateInitiative(id: string, initiative: Partial<InsertInitiative>): Promise<Initiative | undefined>;
   
   // Key Result with Details
-  getKeyResultWithDetails(id: number): Promise<KeyResultWithDetails | undefined>;
+  getKeyResultWithDetails(id: string): Promise<KeyResultWithDetails | undefined>;
 
   // Combined
   getOKRsWithKeyResults(): Promise<OKRWithKeyResults[]>;
-  getOKRWithKeyResults(id: number): Promise<OKRWithKeyResults | undefined>;
-  getOKRsWithFullHierarchy(cycleId?: number): Promise<any[]>;
+  getOKRWithKeyResults(id: string): Promise<OKRWithKeyResults | undefined>;
+  getOKRsWithFullHierarchy(cycleId?: string): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
   // User operations
   async getUser(id: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, parseInt(id)));
+    const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
   }
 
@@ -104,48 +104,41 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(userData: InsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(userData)
-      .returning();
+    const [user] = await db.insert(users).values(userData).returning();
     return user;
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
-    if (userData.id) {
-      // Update existing user
-      const [user] = await db
-        .update(users)
-        .set({ ...userData, updatedAt: new Date() })
-        .where(eq(users.id, parseInt(userData.id)))
-        .returning();
-      return user;
-    } else {
-      // Create new user
-      const [user] = await db
-        .insert(users)
-        .values(userData)
-        .returning();
-      return user;
-    }
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return user;
   }
 
   async updateUser(id: string, userData: Partial<UpsertUser>): Promise<User | undefined> {
     const [user] = await db
       .update(users)
       .set({ ...userData, updatedAt: new Date() })
-      .where(eq(users.id, parseInt(id)))
+      .where(eq(users.id, id))
       .returning();
     return user;
   }
 
   async deleteUser(id: string): Promise<boolean> {
     const result = await db.delete(users).where(eq(users.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
-  // Team operations
-  async getTeam(id: number): Promise<Team | undefined> {
+  // Teams
+  async getTeam(id: string): Promise<Team | undefined> {
     const [team] = await db.select().from(teams).where(eq(teams.id, id));
     return team;
   }
@@ -159,7 +152,7 @@ export class DatabaseStorage implements IStorage {
     return team;
   }
 
-  async updateTeam(id: number, teamData: Partial<InsertTeam>): Promise<Team | undefined> {
+  async updateTeam(id: string, teamData: Partial<InsertTeam>): Promise<Team | undefined> {
     const [team] = await db
       .update(teams)
       .set({ ...teamData, updatedAt: new Date() })
@@ -168,79 +161,67 @@ export class DatabaseStorage implements IStorage {
     return team;
   }
 
-  async deleteTeam(id: number): Promise<boolean> {
+  async deleteTeam(id: string): Promise<boolean> {
     const result = await db.delete(teams).where(eq(teams.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
-  // Team member operations
-  async getTeamMembers(teamId: number): Promise<(TeamMember & { user: User })[]> {
-    const result = await db
-      .select({
-        // TeamMember fields
-        id: teamMembers.id,
-        teamId: teamMembers.teamId,
-        userId: teamMembers.userId,
-        role: teamMembers.role,
-        joinedAt: teamMembers.joinedAt,
-        // User fields
-        user: {
-          id: users.id,
-          email: users.email,
-          firstName: users.firstName,
-          lastName: users.lastName,
-          profileImageUrl: users.profileImageUrl,
-          createdAt: users.createdAt,
-          updatedAt: users.updatedAt,
-        }
-      })
+  // Team Members
+  async getTeamMembers(teamId: string): Promise<(TeamMember & { user: User })[]> {
+    return await db
+      .select()
       .from(teamMembers)
-      .innerJoin(users, eq(teamMembers.userId, users.id))
-      .where(eq(teamMembers.teamId, teamId));
-    
-    return result;
+      .leftJoin(users, eq(teamMembers.userId, users.id))
+      .where(eq(teamMembers.teamId, teamId))
+      .then((rows) =>
+        rows.map((row) => ({
+          ...row.team_members,
+          user: row.users!,
+        }))
+      );
   }
 
   async getUserTeams(userId: string): Promise<(TeamMember & { team: Team })[]> {
-    const result = await db
+    return await db
       .select()
       .from(teamMembers)
-      .innerJoin(teams, eq(teamMembers.teamId, teams.id))
-      .where(eq(teamMembers.userId, userId));
-    
-    return result.map(row => ({
-      ...row.team_members,
-      team: row.teams
-    }));
+      .leftJoin(teams, eq(teamMembers.teamId, teams.id))
+      .where(eq(teamMembers.userId, userId))
+      .then((rows) =>
+        rows.map((row) => ({
+          ...row.team_members,
+          team: row.teams!,
+        }))
+      );
   }
 
   async addTeamMember(teamMemberData: InsertTeamMember): Promise<TeamMember> {
-    const [teamMember] = await db.insert(teamMembers).values(teamMemberData).returning();
-    return teamMember;
+    const [member] = await db.insert(teamMembers).values(teamMemberData).returning();
+    return member;
   }
 
-  async removeTeamMember(teamId: number, userId: string): Promise<boolean> {
+  async removeTeamMember(teamId: string, userId: string): Promise<boolean> {
     const result = await db
       .delete(teamMembers)
       .where(and(eq(teamMembers.teamId, teamId), eq(teamMembers.userId, userId)));
-    return (result.rowCount || 0) > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
-  async updateTeamMemberRole(teamId: number, userId: string, role: "admin" | "member"): Promise<TeamMember | undefined> {
-    const [teamMember] = await db
+  async updateTeamMemberRole(teamId: string, userId: string, role: "admin" | "member"): Promise<TeamMember | undefined> {
+    const [member] = await db
       .update(teamMembers)
       .set({ role })
       .where(and(eq(teamMembers.teamId, teamId), eq(teamMembers.userId, userId)))
       .returning();
-    return teamMember;
+    return member;
   }
 
-  // Continue with existing OKR methods (will need to be adapted for database)
+  // Cycles
   async getCycles(): Promise<Cycle[]> {
     return await db.select().from(cycles);
   }
 
-  async getCycle(id: number): Promise<Cycle | undefined> {
+  async getCycle(id: string): Promise<Cycle | undefined> {
     const [cycle] = await db.select().from(cycles).where(eq(cycles.id, id));
     return cycle;
   }
@@ -250,7 +231,7 @@ export class DatabaseStorage implements IStorage {
     return cycle;
   }
 
-  async updateCycle(id: number, cycleData: Partial<InsertCycle>): Promise<Cycle | undefined> {
+  async updateCycle(id: string, cycleData: Partial<InsertCycle>): Promise<Cycle | undefined> {
     const [cycle] = await db
       .update(cycles)
       .set(cycleData)
@@ -259,28 +240,34 @@ export class DatabaseStorage implements IStorage {
     return cycle;
   }
 
-  async deleteCycle(id: number): Promise<boolean> {
+  async deleteCycle(id: string): Promise<boolean> {
     const result = await db.delete(cycles).where(eq(cycles.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
-  async getCycleWithOKRs(id: number): Promise<CycleWithOKRs | undefined> {
+  async getCycleWithOKRs(id: string): Promise<CycleWithOKRs | undefined> {
     const cycle = await this.getCycle(id);
     if (!cycle) return undefined;
 
-    const cycleObjectives = await db.select().from(objectives).where(eq(objectives.cycleId, id));
+    const cycleObjectives = await this.getObjectivesByCycleId(id);
     const objectivesWithKeyResults = await Promise.all(
-      cycleObjectives.map(async (obj) => {
-        const keyResults = await db.select().from(keyResults).where(eq(keyResults.objectiveId, obj.id));
-        const overallProgress = this.calculateOverallProgress(keyResults);
-        return { ...obj, keyResults, overallProgress };
+      cycleObjectives.map(async (objective) => {
+        const keyResultsList = await this.getKeyResultsByObjectiveId(objective.id);
+        const overallProgress = this.calculateOverallProgress(keyResultsList);
+        return {
+          ...objective,
+          keyResults: keyResultsList,
+          overallProgress,
+        };
       })
     );
 
     const totalObjectives = objectivesWithKeyResults.length;
-    const completedObjectives = objectivesWithKeyResults.filter(obj => obj.status === "completed").length;
+    const completedObjectives = objectivesWithKeyResults.filter(
+      (obj) => obj.overallProgress >= 100
+    ).length;
     const avgProgress = totalObjectives > 0 
-      ? objectivesWithKeyResults.reduce((sum, obj) => sum + obj.overallProgress, 0) / totalObjectives 
+      ? objectivesWithKeyResults.reduce((sum, obj) => sum + obj.overallProgress, 0) / totalObjectives
       : 0;
 
     return {
@@ -288,47 +275,48 @@ export class DatabaseStorage implements IStorage {
       objectives: objectivesWithKeyResults,
       totalObjectives,
       completedObjectives,
-      avgProgress
+      avgProgress,
     };
   }
 
   private calculateProgress(current: string, target: string, keyResultType: string, baseValue?: string | null): number {
-    const currentNum = parseFloat(current);
-    const targetNum = parseFloat(target);
-    const baseNum = baseValue ? parseFloat(baseValue) : 0;
+    const currentNum = parseFloat(current) || 0;
+    const targetNum = parseFloat(target) || 0;
+    const baseNum = parseFloat(baseValue || "0") || 0;
 
     switch (keyResultType) {
       case "increase_to":
-        if (baseValue) {
-          return Math.min(100, Math.max(0, ((currentNum - baseNum) / (targetNum - baseNum)) * 100));
-        }
-        return Math.min(100, (currentNum / targetNum) * 100);
+        if (targetNum <= baseNum) return 0;
+        return Math.min(100, Math.max(0, ((currentNum - baseNum) / (targetNum - baseNum)) * 100));
+      
       case "decrease_to":
-        if (baseValue) {
-          return Math.min(100, Math.max(0, ((baseNum - currentNum) / (baseNum - targetNum)) * 100));
-        }
-        return currentNum <= targetNum ? 100 : 0;
+        if (baseNum <= targetNum) return 0;
+        return Math.min(100, Math.max(0, ((baseNum - currentNum) / (baseNum - targetNum)) * 100));
+      
       case "achieve_or_not":
         return currentNum >= targetNum ? 100 : 0;
+      
       default:
-        return 0;
+        return Math.min(100, Math.max(0, (currentNum / targetNum) * 100));
     }
   }
 
   private calculateOverallProgress(keyResults: KeyResult[]): number {
     if (keyResults.length === 0) return 0;
+    
     const totalProgress = keyResults.reduce((sum, kr) => {
       return sum + this.calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
     }, 0);
+    
     return totalProgress / keyResults.length;
   }
 
-  // Continue implementing other methods for templates, objectives, key results...
+  // Templates
   async getTemplates(): Promise<Template[]> {
     return await db.select().from(templates);
   }
 
-  async getTemplate(id: number): Promise<Template | undefined> {
+  async getTemplate(id: string): Promise<Template | undefined> {
     const [template] = await db.select().from(templates).where(eq(templates.id, id));
     return template;
   }
@@ -338,7 +326,7 @@ export class DatabaseStorage implements IStorage {
     return template;
   }
 
-  async updateTemplate(id: number, templateData: Partial<InsertTemplate>): Promise<Template | undefined> {
+  async updateTemplate(id: string, templateData: Partial<InsertTemplate>): Promise<Template | undefined> {
     const [template] = await db
       .update(templates)
       .set(templateData)
@@ -347,60 +335,58 @@ export class DatabaseStorage implements IStorage {
     return template;
   }
 
-  async deleteTemplate(id: number): Promise<boolean> {
+  async deleteTemplate(id: string): Promise<boolean> {
     const result = await db.delete(templates).where(eq(templates.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   async createOKRFromTemplate(data: CreateOKRFromTemplate): Promise<OKRWithKeyResults[]> {
-    // Implementation for creating OKRs from templates
     const template = await this.getTemplate(data.templateId);
-    if (!template) throw new Error("Template not found");
+    if (!template) {
+      throw new Error("Template not found");
+    }
 
-    const templateObjectives = JSON.parse(template.objectives);
+    const templateData = JSON.parse(template.objectives) as any;
     const createdOKRs: OKRWithKeyResults[] = [];
 
-    for (const templateObj of templateObjectives) {
-      const [objective] = await db.insert(objectives).values({
+    for (const objData of templateData.objectives) {
+      // Create objective
+      const objective = await this.createObjective({
+        title: objData.title,
+        description: objData.description,
         cycleId: data.cycleId,
-        title: templateObj.title,
-        description: templateObj.description,
-        timeframe: templateObj.timeframe || "",
-        owner: templateObj.owner || "",
+        timeframe: objData.timeframe,
+        owner: objData.owner,
+        ownerType: objData.ownerType,
+        ownerId: objData.ownerId,
+        teamId: objData.teamId,
         status: "in_progress",
-        level: "individual",
-        teamId: null,
-        parentId: null
-      }).returning();
+      });
 
-      const keyResultsData = templateObj.keyResults.map((kr: any) => ({
-        objectiveId: objective.id,
-        title: kr.title,
-        description: kr.description || null,
-        currentValue: "0",
-        targetValue: kr.targetValue,
-        baseValue: kr.baseValue || null,
-        unit: kr.unit,
-        keyResultType: kr.type,
-        status: "in_progress",
-        assignedTo: null
-      }));
-
-      const createdKeyResults = await Promise.all(
-        keyResultsData.map(async (krData) => {
-          const [kr] = await db.insert(keyResults).values(krData).returning();
-          return kr;
+      // Create key results
+      const keyResultsPromises = objData.keyResults.map((krData: any) => 
+        this.createKeyResult({
+          ...krData,
+          objectiveId: objective.id,
+          status: "in_progress",
         })
       );
 
-      const overallProgress = this.calculateOverallProgress(createdKeyResults);
-      createdOKRs.push({ ...objective, keyResults: createdKeyResults, overallProgress });
+      const keyResultsList = await Promise.all(keyResultsPromises);
+      const overallProgress = this.calculateOverallProgress(keyResultsList);
+
+      createdOKRs.push({
+        ...objective,
+        keyResults: keyResultsList,
+        overallProgress,
+      });
     }
 
     return createdOKRs;
   }
 
-  async getObjectivesByCycleId(cycleId: number): Promise<Objective[]> {
+  // Objectives
+  async getObjectivesByCycleId(cycleId: string): Promise<Objective[]> {
     return await db.select().from(objectives).where(eq(objectives.cycleId, cycleId));
   }
 
@@ -408,7 +394,7 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(objectives);
   }
 
-  async getObjective(id: number): Promise<Objective | undefined> {
+  async getObjective(id: string): Promise<Objective | undefined> {
     const [objective] = await db.select().from(objectives).where(eq(objectives.id, id));
     return objective;
   }
@@ -418,7 +404,7 @@ export class DatabaseStorage implements IStorage {
     return objective;
   }
 
-  async updateObjective(id: number, objectiveData: Partial<InsertObjective>): Promise<Objective | undefined> {
+  async updateObjective(id: string, objectiveData: Partial<InsertObjective>): Promise<Objective | undefined> {
     const [objective] = await db
       .update(objectives)
       .set(objectiveData)
@@ -427,20 +413,21 @@ export class DatabaseStorage implements IStorage {
     return objective;
   }
 
-  async deleteObjective(id: number): Promise<boolean> {
+  async deleteObjective(id: string): Promise<boolean> {
     const result = await db.delete(objectives).where(eq(objectives.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
+  // Key Results
   async getKeyResults(): Promise<KeyResult[]> {
     return await db.select().from(keyResults);
   }
 
-  async getKeyResultsByObjectiveId(objectiveId: number): Promise<KeyResult[]> {
+  async getKeyResultsByObjectiveId(objectiveId: string): Promise<KeyResult[]> {
     return await db.select().from(keyResults).where(eq(keyResults.objectiveId, objectiveId));
   }
 
-  async getKeyResult(id: number): Promise<KeyResult | undefined> {
+  async getKeyResult(id: string): Promise<KeyResult | undefined> {
     const [keyResult] = await db.select().from(keyResults).where(eq(keyResults.id, id));
     return keyResult;
   }
@@ -450,7 +437,7 @@ export class DatabaseStorage implements IStorage {
     return keyResult;
   }
 
-  async updateKeyResult(id: number, keyResultData: Partial<InsertKeyResult>): Promise<KeyResult | undefined> {
+  async updateKeyResult(id: string, keyResultData: Partial<InsertKeyResult>): Promise<KeyResult | undefined> {
     const [keyResult] = await db
       .update(keyResults)
       .set(keyResultData)
@@ -462,7 +449,7 @@ export class DatabaseStorage implements IStorage {
   async updateKeyResultProgress(update: UpdateKeyResultProgress): Promise<KeyResult | undefined> {
     const [keyResult] = await db
       .update(keyResults)
-      .set({
+      .set({ 
         currentValue: update.currentValue.toString(),
         status: update.status
       })
@@ -471,55 +458,40 @@ export class DatabaseStorage implements IStorage {
     return keyResult;
   }
 
-  async deleteKeyResult(id: number): Promise<boolean> {
+  async deleteKeyResult(id: string): Promise<boolean> {
     const result = await db.delete(keyResults).where(eq(keyResults.id, id));
     return (result.rowCount ?? 0) > 0;
   }
 
   // Check-ins
   async getCheckIns(): Promise<CheckIn[]> {
-    return await db.select().from(checkIns).orderBy(checkIns.createdAt);
+    return await db.select().from(checkIns);
   }
 
-  async getCheckInsByKeyResultId(keyResultId: number): Promise<CheckIn[]> {
-    return await db.select().from(checkIns)
-      .where(eq(checkIns.keyResultId, keyResultId))
-      .orderBy(checkIns.createdAt);
+  async getCheckInsByKeyResultId(keyResultId: string): Promise<CheckIn[]> {
+    return await db.select().from(checkIns).where(eq(checkIns.keyResultId, keyResultId));
   }
 
   async createCheckIn(checkInData: InsertCheckIn): Promise<CheckIn> {
-    const [checkIn] = await db.insert(checkIns).values({
-      keyResultId: checkInData.keyResultId,
-      value: checkInData.value,
-      notes: checkInData.notes || null,
-      confidence: checkInData.confidence || 5,
-      createdBy: checkInData.createdBy || "user1",
-      createdAt: new Date(),
-    }).returning();
+    const [checkIn] = await db.insert(checkIns).values(checkInData).returning();
     return checkIn;
   }
 
   // Initiatives
   async getInitiatives(): Promise<Initiative[]> {
-    return await db.select().from(initiatives).orderBy(initiatives.createdAt);
+    return await db.select().from(initiatives);
   }
 
-  async getInitiativesByKeyResultId(keyResultId: number): Promise<Initiative[]> {
-    return await db.select().from(initiatives)
-      .where(eq(initiatives.keyResultId, keyResultId))
-      .orderBy(initiatives.createdAt);
+  async getInitiativesByKeyResultId(keyResultId: string): Promise<Initiative[]> {
+    return await db.select().from(initiatives).where(eq(initiatives.keyResultId, keyResultId));
   }
 
   async createInitiative(initiativeData: InsertInitiative): Promise<Initiative> {
-    const [initiative] = await db.insert(initiatives).values({
-      ...initiativeData,
-      createdBy: "current-user", // TODO: Replace with actual user ID from session
-      createdAt: new Date(),
-    }).returning();
+    const [initiative] = await db.insert(initiatives).values(initiativeData).returning();
     return initiative;
   }
 
-  async updateInitiative(id: number, initiativeData: Partial<InsertInitiative>): Promise<Initiative | undefined> {
+  async updateInitiative(id: string, initiativeData: Partial<InsertInitiative>): Promise<Initiative | undefined> {
     const [initiative] = await db
       .update(initiatives)
       .set(initiativeData)
@@ -529,118 +501,98 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Key Result with Details
-  async getKeyResultWithDetails(id: number): Promise<KeyResultWithDetails | undefined> {
+  async getKeyResultWithDetails(id: string): Promise<KeyResultWithDetails | undefined> {
     const keyResult = await this.getKeyResult(id);
     if (!keyResult) return undefined;
 
-    const keyResultCheckIns = await this.getCheckInsByKeyResultId(id);
-    const keyResultInitiatives = await this.getInitiativesByKeyResultId(id);
+    const [checkInsList, initiativesList] = await Promise.all([
+      this.getCheckInsByKeyResultId(id),
+      this.getInitiativesByKeyResultId(id),
+    ]);
 
-    // Generate progress history from check-ins
-    const progressHistory = keyResultCheckIns.map(checkIn => ({
-      date: checkIn.createdAt.toISOString().split('T')[0],
-      value: checkIn.value,
+    const progressHistory = checkInsList.map((checkIn) => ({
+      date: checkIn.createdAt?.toISOString().split('T')[0] || '',
+      value: parseFloat(checkIn.value),
       notes: checkIn.notes || undefined,
     }));
 
     return {
       ...keyResult,
-      checkIns: keyResultCheckIns,
-      initiatives: keyResultInitiatives,
+      checkIns: checkInsList,
+      initiatives: initiativesList,
       progressHistory,
     };
   }
 
+  // Combined operations
   async getOKRsWithKeyResults(): Promise<OKRWithKeyResults[]> {
-    const allObjectives = await db.select().from(objectives);
-    const okrsWithKeyResults = await Promise.all(
-      allObjectives.map(async (obj) => {
-        const objKeyResults = await db.select().from(keyResults).where(eq(keyResults.objectiveId, obj.id));
-        const overallProgress = this.calculateOverallProgress(objKeyResults);
-        return { ...obj, keyResults: objKeyResults, overallProgress };
+    const allObjectives = await this.getObjectives();
+    return await Promise.all(
+      allObjectives.map(async (objective) => {
+        const keyResultsList = await this.getKeyResultsByObjectiveId(objective.id);
+        const overallProgress = this.calculateOverallProgress(keyResultsList);
+        return {
+          ...objective,
+          keyResults: keyResultsList,
+          overallProgress,
+        };
       })
     );
-    return okrsWithKeyResults;
   }
 
-  async getOKRWithKeyResults(id: number): Promise<OKRWithKeyResults | undefined> {
+  async getOKRWithKeyResults(id: string): Promise<OKRWithKeyResults | undefined> {
     const objective = await this.getObjective(id);
     if (!objective) return undefined;
 
-    const objKeyResults = await this.getKeyResultsByObjectiveId(id);
-    const overallProgress = this.calculateOverallProgress(objKeyResults);
-    return { ...objective, keyResults: objKeyResults, overallProgress };
+    const keyResultsList = await this.getKeyResultsByObjectiveId(id);
+    const overallProgress = this.calculateOverallProgress(keyResultsList);
+
+    return {
+      ...objective,
+      keyResults: keyResultsList,
+      overallProgress,
+    };
   }
 
-  async getOKRsWithFullHierarchy(cycleId?: number): Promise<any[]> {
-    try {
-      // Get all objectives, optionally filtered by cycle
-      let allObjectives;
-      if (cycleId) {
-        allObjectives = await db.select().from(objectives).where(eq(objectives.cycleId, cycleId));
-      } else {
-        allObjectives = await db.select().from(objectives);
-      }
-
-      // Build full hierarchy for each objective
-      const hierarchyData = await Promise.all(
-        allObjectives.map(async (objective) => {
-          // Get key results for this objective
-          const objKeyResults = await db.select().from(keyResults).where(eq(keyResults.objectiveId, objective.id));
-          
-          // For each key result, get initiatives and tasks
-          const keyResultsWithInitiatives = await Promise.all(
-            objKeyResults.map(async (keyResult) => {
-              // Get initiatives for this key result
-              const keyResultInitiatives = await db.select().from(initiatives).where(eq(initiatives.keyResultId, keyResult.id));
-              
-              // For each initiative, get tasks
-              const initiativesWithTasks = await Promise.all(
-                keyResultInitiatives.map(async (initiative) => {
-                  const initiativeTasks = await db.select().from(tasks).where(eq(tasks.initiativeId, initiative.id));
-                  return {
-                    ...initiative,
-                    tasks: initiativeTasks
-                  };
-                })
-              );
-
-              // Calculate progress for key result
-              const progress = this.calculateProgress(
-                keyResult.currentValue, 
-                keyResult.targetValue, 
-                keyResult.keyResultType, 
-                keyResult.baseValue
-              );
-
-              return {
-                ...keyResult,
-                progress,
-                initiatives: initiativesWithTasks
-              };
-            })
-          );
-
-          // Calculate overall progress for objective
-          const overallProgress = this.calculateOverallProgress(objKeyResults);
-
-          return {
-            ...objective,
-            overallProgress,
-            keyResults: keyResultsWithInitiatives
-          };
-        })
-      );
-
-      return hierarchyData;
-    } catch (error) {
-      console.error("Error fetching OKRs with full hierarchy:", error);
-      throw error;
+  async getOKRsWithFullHierarchy(cycleId?: string): Promise<any[]> {
+    let objectivesList: Objective[];
+    
+    if (cycleId) {
+      objectivesList = await db.select().from(objectives).where(eq(objectives.cycleId, cycleId));
+    } else {
+      objectivesList = await db.select().from(objectives);
     }
+
+    return await Promise.all(
+      objectivesList.map(async (objective) => {
+        const keyResultsList = await this.getKeyResultsByObjectiveId(objective.id);
+        
+        const keyResultsWithDetails = await Promise.all(
+          keyResultsList.map(async (kr) => {
+            const [checkInsList, initiativesList] = await Promise.all([
+              this.getCheckInsByKeyResultId(kr.id),
+              this.getInitiativesByKeyResultId(kr.id),
+            ]);
+
+            return {
+              ...kr,
+              checkIns: checkInsList,
+              initiatives: initiativesList,
+              progress: this.calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue),
+            };
+          })
+        );
+
+        const overallProgress = this.calculateOverallProgress(keyResultsList);
+
+        return {
+          ...objective,
+          keyResults: keyResultsWithDetails,
+          overallProgress,
+        };
+      })
+    );
   }
 }
 
-// MemStorage moved to storage-memory.ts
-
-// DatabaseStorage akan diimport dari file ini
 export const storage = new DatabaseStorage();

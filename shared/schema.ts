@@ -1,10 +1,10 @@
-import { pgTable, text, serial, integer, decimal, timestamp, boolean, varchar, jsonb, index } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, decimal, timestamp, boolean, varchar, jsonb, index, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
 
 export const cycles = pgTable("cycles", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(), // e.g., "January 2025", "Q1 2025", "Annual 2025"
   type: text("type").notNull(), // "monthly", "quarterly", "annual"
   startDate: text("start_date").notNull(),
@@ -14,7 +14,7 @@ export const cycles = pgTable("cycles", {
 });
 
 export const templates = pgTable("templates", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   description: text("description"),
   type: text("type").notNull(), // "monthly", "quarterly", "annual"
@@ -23,17 +23,17 @@ export const templates = pgTable("templates", {
 });
 
 export const objectives = pgTable("objectives", {
-  id: serial("id").primaryKey(),
-  cycleId: integer("cycle_id").references(() => cycles.id),
+  id: uuid("id").primaryKey().defaultRandom(),
+  cycleId: uuid("cycle_id").references(() => cycles.id),
   title: text("title").notNull(),
   description: text("description"),
   timeframe: text("timeframe").notNull(), // e.g., "Q4 2024"
   owner: text("owner").notNull(), // kept for backward compatibility
   ownerType: text("owner_type").notNull().default("user"), // "user" or "team"
-  ownerId: integer("owner_id").notNull(), // user ID or team ID
+  ownerId: uuid("owner_id").notNull(), // user ID or team ID
   status: text("status").notNull().default("in_progress"), // "on_track", "at_risk", "completed", "in_progress"
-  teamId: integer("team_id").references(() => teams.id), // for team OKRs
-  parentId: integer("parent_id"), // self-reference for parent-child hierarchy
+  teamId: uuid("team_id").references(() => teams.id), // for team OKRs
+  parentId: uuid("parent_id"), // self-reference for parent-child hierarchy
 });
 
 // Session storage table for authentication
@@ -49,7 +49,7 @@ export const sessions = pgTable(
 
 // Users table with email/password authentication
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   email: varchar("email", { length: 255 }).unique().notNull(),
   password: varchar("password", { length: 255 }).notNull(),
   firstName: varchar("first_name", { length: 100 }),
@@ -63,26 +63,26 @@ export const users = pgTable("users", {
 
 // Teams table
 export const teams = pgTable("teams", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   description: text("description"),
-  ownerId: integer("owner_id").notNull(),
+  ownerId: uuid("owner_id").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Team members junction table
 export const teamMembers = pgTable("team_members", {
-  id: serial("id").primaryKey(),
-  teamId: integer("team_id").notNull(),
-  userId: integer("user_id").notNull(),
+  id: uuid("id").primaryKey().defaultRandom(),
+  teamId: uuid("team_id").notNull(),
+  userId: uuid("user_id").notNull(),
   role: text("role").notNull().default("member"), // "admin", "member"
   joinedAt: timestamp("joined_at").defaultNow(),
 });
 
 export const keyResults = pgTable("key_results", {
-  id: serial("id").primaryKey(),
-  objectiveId: integer("objective_id").notNull(),
+  id: uuid("id").primaryKey().defaultRandom(),
+  objectiveId: uuid("objective_id").notNull(),
   title: text("title").notNull(),
   description: text("description"),
   currentValue: decimal("current_value", { precision: 10, scale: 2 }).notNull().default("0"),
@@ -94,45 +94,46 @@ export const keyResults = pgTable("key_results", {
   dueDate: timestamp("due_date"), // Target completion date
   lastUpdated: timestamp("last_updated").defaultNow(),
   confidence: integer("confidence").default(5), // 1-10 scale for confidence level
+  assignedTo: uuid("assigned_to"), // user ID who is responsible for this key result
 });
 
 // Check-ins for tracking progress updates
 export const checkIns = pgTable("check_ins", {
-  id: serial("id").primaryKey(),
-  keyResultId: integer("key_result_id").references(() => keyResults.id).notNull(),
+  id: uuid("id").primaryKey().defaultRandom(),
+  keyResultId: uuid("key_result_id").references(() => keyResults.id).notNull(),
   value: decimal("value", { precision: 10, scale: 2 }).notNull(),
   notes: text("notes"),
   confidence: integer("confidence").notNull().default(5), // 1-10 scale
   createdAt: timestamp("created_at").defaultNow(),
-  createdBy: integer("created_by").notNull(), // user ID
+  createdBy: uuid("created_by").notNull(), // user ID
 });
 
 // Initiatives/Projects linked to key results
 export const initiatives = pgTable("initiatives", {
-  id: serial("id").primaryKey(),
-  keyResultId: integer("key_result_id").references(() => keyResults.id).notNull(),
+  id: uuid("id").primaryKey().defaultRandom(),
+  keyResultId: uuid("key_result_id").references(() => keyResults.id).notNull(),
   title: text("title").notNull(),
   description: text("description"),
   status: text("status").notNull().default("not_started"), // "not_started", "in_progress", "completed", "on_hold"
   priority: text("priority").notNull().default("medium"), // "low", "medium", "high"
   dueDate: timestamp("due_date"),
   createdAt: timestamp("created_at").defaultNow(),
-  createdBy: integer("created_by").notNull(), // user ID
+  createdBy: uuid("created_by").notNull(), // user ID
 });
 
 // Tasks linked to initiatives
 export const tasks = pgTable("tasks", {
-  id: serial("id").primaryKey(),
-  initiativeId: integer("initiative_id").references(() => initiatives.id).notNull(),
+  id: uuid("id").primaryKey().defaultRandom(),
+  initiativeId: uuid("initiative_id").references(() => initiatives.id).notNull(),
   title: text("title").notNull(),
   description: text("description"),
   status: text("status").notNull().default("pending"), // "pending", "in_progress", "completed", "cancelled"
   priority: text("priority").notNull().default("medium"), // "low", "medium", "high"
-  assignedTo: integer("assigned_to"), // user ID
+  assignedTo: uuid("assigned_to"), // user ID
   dueDate: timestamp("due_date"),
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow(),
-  createdBy: integer("created_by").notNull(), // user ID
+  createdBy: uuid("created_by").notNull(), // user ID
 });
 
 export const insertCycleSchema = createInsertSchema(cycles).omit({
@@ -168,14 +169,14 @@ export const insertTaskSchema = createInsertSchema(tasks).omit({
 });
 
 export const updateKeyResultProgressSchema = z.object({
-  id: z.number(),
+  id: z.string(),
   currentValue: z.number(),
   status: z.enum(["on_track", "at_risk", "completed", "in_progress"]).optional(),
 });
 
 export const createOKRFromTemplateSchema = z.object({
-  cycleId: z.number(),
-  templateId: z.number(),
+  cycleId: z.string(),
+  templateId: z.string(),
 });
 
 export type InsertCycle = z.infer<typeof insertCycleSchema>;

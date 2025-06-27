@@ -37,7 +37,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/cycles/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const cycle = await storage.getCycleWithOKRs(id);
       
       if (!cycle) {
@@ -65,7 +65,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch("/api/cycles/:id", requireAuth, async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const data = insertCycleSchema.partial().parse(req.body);
       const updated = await storage.updateCycle(id, data);
       
@@ -84,7 +84,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/cycles/:id", requireAuth, async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const deleted = await storage.deleteCycle(id);
       
       if (!deleted) {
@@ -109,7 +109,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/templates/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const template = await storage.getTemplate(id);
       
       if (!template) {
@@ -137,7 +137,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch("/api/templates/:id", requireAuth, async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const data = insertTemplateSchema.partial().parse(req.body);
       const updated = await storage.updateTemplate(id, data);
       
@@ -156,7 +156,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/templates/:id", requireAuth, async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const deleted = await storage.deleteTemplate(id);
       
       if (!deleted) {
@@ -171,7 +171,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/templates/:id/create-okr", requireAuth, async (req, res) => {
     try {
-      const templateId = parseInt(req.params.id);
+      const templateId = req.params.id;
       const data = createOKRFromTemplateSchema.parse({
         ...req.body,
         templateId
@@ -199,7 +199,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/objectives/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const objective = await storage.getObjective(id);
       
       if (!objective) {
@@ -299,7 +299,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/teams/:id', async (req, res) => {
     try {
-      const teamId = parseInt(req.params.id);
+      const teamId = req.params.id;
       const team = await storage.getTeam(teamId);
       if (!team) {
         return res.status(404).json({ message: "Team not found" });
@@ -323,7 +323,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put('/api/teams/:id', async (req, res) => {
     try {
-      const teamId = parseInt(req.params.id);
+      const teamId = req.params.id;
       const updatedTeam = await storage.updateTeam(teamId, req.body);
       if (!updatedTeam) {
         return res.status(404).json({ message: "Team not found" });
@@ -337,7 +337,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete('/api/teams/:id', async (req, res) => {
     try {
-      const teamId = parseInt(req.params.id);
+      const teamId = req.params.id;
       const deleted = await storage.deleteTeam(teamId);
       if (!deleted) {
         return res.status(404).json({ message: "Team not found" });
@@ -352,7 +352,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Team member endpoints
   app.get('/api/teams/:id/members', async (req, res) => {
     try {
-      const teamId = parseInt(req.params.id);
+      const teamId = req.params.id;
       const members = await storage.getTeamMembers(teamId);
       res.json(members);
     } catch (error) {
@@ -373,7 +373,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/teams/:id/members', async (req, res) => {
     try {
-      const teamId = parseInt(req.params.id);
+      const teamId = req.params.id;
       const memberData = { ...req.body, teamId };
       const newMember = await storage.addTeamMember(memberData);
       res.json(newMember);
@@ -385,7 +385,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete('/api/teams/:teamId/members/:userId', async (req, res) => {
     try {
-      const teamId = parseInt(req.params.teamId);
+      const teamId = req.params.teamId;
       const userId = req.params.userId;
       const removed = await storage.removeTeamMember(teamId, userId);
       if (!removed) {
@@ -400,7 +400,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put('/api/teams/:teamId/members/:userId/role', async (req, res) => {
     try {
-      const teamId = parseInt(req.params.teamId);
+      const teamId = req.params.teamId;
       const userId = req.params.userId;
       const { role } = req.body;
       const updatedMember = await storage.updateTeamMemberRole(teamId, userId, role);
@@ -439,7 +439,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/okrs-with-hierarchy", async (req, res) => {
     try {
       const { cycleId } = req.query;
-      const okrs = await storage.getOKRsWithFullHierarchy(cycleId ? parseInt(cycleId as string) : undefined);
+      const okrs = await storage.getOKRsWithFullHierarchy(cycleId as string | undefined);
       res.json(okrs);
     } catch (error) {
       console.error("Error fetching OKRs with hierarchy:", error);
@@ -466,7 +466,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get single OKR with key results
   app.get("/api/okrs/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const okr = await storage.getOKRWithKeyResults(id);
       
       if (!okr) {
@@ -486,12 +486,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const createOKRSchema = z.object({
         objective: insertObjectiveSchema.extend({
-          ownerId: z.union([z.number(), z.string().transform(val => parseInt(val))]),
-          teamId: z.union([z.number(), z.string().transform(val => parseInt(val)), z.undefined()]).optional(),
-          parentId: z.union([z.number(), z.string().transform(val => parseInt(val)), z.undefined()]).optional(),
+          ownerId: z.string(), // Now expects UUID string
+          teamId: z.string().optional(),
+          parentId: z.string().optional(),
         }),
         keyResults: z.array(insertKeyResultSchema.omit({ objectiveId: true }).extend({
-          assignedTo: z.union([z.number(), z.string().transform(val => parseInt(val)), z.undefined()]).optional(),
+          assignedTo: z.string().optional(),
         }))
       });
       
@@ -530,7 +530,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update objective
   app.patch("/api/objectives/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const updateData = insertObjectiveSchema.partial().parse(req.body);
       
       const updated = await storage.updateObjective(id, updateData);
@@ -550,7 +550,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update key result progress
   app.patch("/api/key-results/:id/progress", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const updateData = updateKeyResultProgressSchema.parse({
         ...req.body,
         id
@@ -573,7 +573,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get key result with details and progress history
   app.get("/api/key-results/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const keyResult = await storage.getKeyResultWithDetails(id);
       
       if (!keyResult) {
@@ -590,9 +590,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Check-ins for progress tracking
   app.post("/api/key-results/:id/check-ins", async (req, res) => {
     try {
-      const keyResultId = parseInt(req.params.id);
+      const keyResultId = req.params.id;
       
-      if (isNaN(keyResultId)) {
+      if (!keyResultId) {
         return res.status(400).json({ message: "Invalid key result ID" });
       }
 
@@ -628,7 +628,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/key-results/:id/check-ins", async (req, res) => {
     try {
-      const keyResultId = parseInt(req.params.id);
+      const keyResultId = req.params.id;
       const checkIns = await storage.getCheckInsByKeyResultId(keyResultId);
       res.json(checkIns);
     } catch (error) {
@@ -639,7 +639,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get key result details with progress history
   app.get("/api/key-results/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const keyResult = await storage.getKeyResultWithDetails(id);
       
       if (!keyResult) {
@@ -655,7 +655,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete OKR
   app.delete("/api/okrs/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const deleted = await storage.deleteObjective(id);
       
       if (!deleted) {
@@ -671,7 +671,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get key result details
   app.get("/api/key-results/:id/details", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const keyResult = await storage.getKeyResultWithDetails(id);
       
       if (!keyResult) {
