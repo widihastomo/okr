@@ -376,6 +376,8 @@ Changelog:
   * Progress recalculation maintains data integrity across all initiative operations
   * Fixed task status update to properly refresh task list and update initiative progress
   * Task status changes now persist correctly and trigger automatic progress recalculation
+  * Replaced UUID display with actual user names in task assignments for better readability
+  * Added user lookup functionality to display real names instead of technical identifiers
 - June 27, 2025. Implemented comprehensive initiative management with task integration:
   * Converted initiative form to full-width sheet sliding from right side for better workspace
   * Added integrated task management system within initiative creation process

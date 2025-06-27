@@ -349,6 +349,17 @@ export default function KeyResultDetailPage() {
     enabled: !!keyResult?.objectiveId,
   });
 
+  // Fetch users data for name lookup
+  const { data: users = [] } = useQuery<any[]>({
+    queryKey: ['/api/users'],
+  });
+
+  // Helper function to get user name by ID
+  const getUserName = (userId: string) => {
+    const user = users.find((u: any) => u.id === userId);
+    return user ? user.name : 'Unknown User';
+  };
+
   // Helper function to get tasks for a specific initiative
   const getTasksForInitiative = (initiativeId: string) => {
     if (!expandedInitiatives.has(initiativeId)) return [];
@@ -1054,7 +1065,7 @@ export default function KeyResultDetailPage() {
                                                   {task.assignedTo && (
                                                     <div className="flex items-center gap-1">
                                                       <User className="h-3 w-3" />
-                                                      <span>{task.assignedTo}</span>
+                                                      <span>{getUserName(task.assignedTo)}</span>
                                                     </div>
                                                   )}
                                                   {task.dueDate && (
