@@ -432,6 +432,11 @@ Changelog:
   * Integrated intelligent calculation using cycle start date and key result due date
   * Added hover tooltip displaying exact ideal progress percentage
   * Progress visualization now matches dashboard functionality with consistent calculation logic
+- June 27, 2025. Enhanced Progress History with user information display:
+  * Added "Updated by [User Name]" information to each check-in entry in Progress History
+  * Implemented user icon with name display for better accountability tracking
+  * Enhanced layout to show user info at bottom right of each check-in card
+  * Maintained existing design consistency while adding valuable context for progress updates
 ```
 
 ## User Preferences

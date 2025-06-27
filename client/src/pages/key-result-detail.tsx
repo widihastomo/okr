@@ -1005,9 +1005,17 @@ export default function KeyResultDetailPage() {
                           {checkIn.notes && (
                             <p className="text-sm text-gray-600 mt-1 line-clamp-2">{checkIn.notes}</p>
                           )}
-                          {checkIn.confidence && (
-                            <p className="text-xs text-gray-500 mt-1">Confidence: {checkIn.confidence}/10</p>
-                          )}
+                          <div className="flex items-center justify-between mt-2">
+                            {checkIn.confidence && (
+                              <p className="text-xs text-gray-500">Confidence: {checkIn.confidence}/10</p>
+                            )}
+                            {checkIn.createdBy && (
+                              <div className="flex items-center gap-1 text-xs text-gray-500">
+                                <User className="h-3 w-3" />
+                                <span>Updated by {getUserName(checkIn.createdBy)}</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}
