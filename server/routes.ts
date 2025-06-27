@@ -810,7 +810,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...initiativeData,
         keyResultId,
         createdBy: currentUser.id,
-        picId: initiativeData.picId || null,
+        picId: initiativeData.picId === "none" || !initiativeData.picId ? null : initiativeData.picId,
         budget: initiativeData.budget ? initiativeData.budget.toString() : null,
         startDate: initiativeData.startDate ? new Date(initiativeData.startDate) : null,
         dueDate: initiativeData.dueDate ? new Date(initiativeData.dueDate) : null,
@@ -847,6 +847,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error creating initiative:", error);
       if (error instanceof z.ZodError) {
+        console.error("Validation errors:", JSON.stringify(error.errors, null, 2));
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
       res.status(500).json({ message: "Failed to create initiative" });

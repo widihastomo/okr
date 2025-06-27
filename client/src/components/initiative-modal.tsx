@@ -114,7 +114,7 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
         },
         body: JSON.stringify({
           ...initiativeData,
-          picId: initiativeData.picId || null,
+          picId: initiativeData.picId === "none" || !initiativeData.picId ? null : initiativeData.picId,
           tasks: tasks,
           startDate: initiativeData.startDate || null,
           dueDate: initiativeData.dueDate || null,

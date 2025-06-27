@@ -74,7 +74,7 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
     // Create a mock user for development
     const mockUser = {
-      id: "dev-user-1",
+      id: "550e8400-e29b-41d4-a716-446655440001",
       email: "dev@example.com",
       firstName: "Dev",
       lastName: "User",
