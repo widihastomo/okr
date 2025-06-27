@@ -298,14 +298,14 @@ Changelog:
   * Complete table-based cycles management with full CRUD functionality (create, edit, delete)
   * Fixed API request format errors in create-cycle-modal and edit-cycle-modal components
   * Status update system successfully tested and working in production environment
-- June 27, 2025. Enhanced cycle filtering with intelligent default selection and hierarchical display:
+- June 27, 2025. Enhanced cycle filtering with hierarchical display and empty default selection:
   * Added cycle filter dropdown on dashboard next to status filter with Indonesian localization
   * Implemented client-side filtering for both status and cycle combinations
-  * Enhanced default cycle logic to select active cycle with longest duration when multiple active cycles exist
-  * Applied duration calculation (end date - start date) to determine optimal default selection
+  * Set cycle filter default to empty state requiring manual user selection
   * Implemented hierarchical cycle filtering: selecting quarterly cycles (Q2 2025) automatically includes related monthly cycles (Juni 2025)
   * Added date range overlap detection to show OKRs from monthly cycles within quarterly periods
-  * Improved user experience by automatically focusing on most relevant long-term objectives with related sub-periods
+  * Enhanced filtering logic to handle empty filter state and show all OKRs when no cycle is selected
+  * Improved user experience by allowing users to choose their own cycle focus without automatic defaults
 ```
 
 ## User Preferences

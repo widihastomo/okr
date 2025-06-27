@@ -15,7 +15,7 @@ import type { OKRWithKeyResults, KeyResult, Cycle } from "@shared/schema";
 export default function Dashboard() {
   const { toast } = useToast();
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [cycleFilter, setCycleFilter] = useState<string>("all");
+  const [cycleFilter, setCycleFilter] = useState<string>("");
 
   const [editProgressModal, setEditProgressModal] = useState<{ open: boolean; keyResult?: KeyResult }>({
     open: false
@@ -33,22 +33,7 @@ export default function Dashboard() {
     queryKey: ['/api/cycles'],
   });
 
-  // Set default cycle to active cycle with longest duration when cycles are loaded
-  const activeCycles = cycles.filter(cycle => cycle.status === 'active');
-  const defaultCycle = activeCycles.length > 0 
-    ? activeCycles.reduce((longest, current) => {
-        const longestDuration = new Date(longest.endDate).getTime() - new Date(longest.startDate).getTime();
-        const currentDuration = new Date(current.endDate).getTime() - new Date(current.startDate).getTime();
-        return currentDuration > longestDuration ? current : longest;
-      })
-    : null;
-  
-  // Initialize cycle filter with longest active cycle on first load
-  useEffect(() => {
-    if (defaultCycle && cycleFilter === 'all') {
-      setCycleFilter(defaultCycle.id);
-    }
-  }, [defaultCycle, cycleFilter]);
+  // No automatic cycle selection - user must choose manually
 
   const { data: allOkrs = [], isLoading, refetch } = useQuery<OKRWithKeyResults[]>({
     queryKey: ["/api/okrs"],
@@ -56,7 +41,7 @@ export default function Dashboard() {
 
   // Helper function to check if a cycle is related to selected cycle
   const isRelatedCycle = (okrCycleId: string, selectedCycleId: string) => {
-    if (selectedCycleId === 'all') return true;
+    if (selectedCycleId === '' || selectedCycleId === 'all') return true;
     if (okrCycleId === selectedCycleId) return true;
     
     // Find the selected cycle and OKR cycle
