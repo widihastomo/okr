@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ import {
   ChevronDown 
 } from "lucide-react";
 import { Link } from "wouter";
+import { useLocation } from "wouter";
 import type { OKRWithKeyResults } from "@shared/schema";
 import {
   Select,
@@ -34,6 +36,10 @@ interface DashboardStats {
 }
 
 export default function Dashboard() {
+  const [, setLocation] = useLocation();
+  const [statusFilter, setStatusFilter] = useState("all-status");
+  const [periodFilter, setPeriodFilter] = useState("all-periods");
+
   const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
     queryKey: ["/api/stats"],
   });
@@ -41,6 +47,32 @@ export default function Dashboard() {
   const { data: okrs = [], isLoading: okrsLoading } = useQuery<OKRWithKeyResults[]>({
     queryKey: ["/api/okrs"],
   });
+
+  // Filter OKRs based on selected filters
+  const filteredOKRs = okrs.filter(okr => {
+    if (statusFilter !== "all-status") {
+      // Add status filtering logic based on OKR progress
+      const progress = okr.overallProgress;
+      if (statusFilter === "completed" && progress < 100) return false;
+      if (statusFilter === "on_track" && (progress < 70 || progress >= 100)) return false;
+      if (statusFilter === "at_risk" && (progress < 30 || progress >= 70)) return false;
+      if (statusFilter === "behind" && progress >= 30) return false;
+    }
+    return true;
+  });
+
+  const handleEditOKR = (okrId: string) => {
+    setLocation(`/objectives/${okrId}`);
+  };
+
+  const handleMoreOptions = (okrId: string) => {
+    // You can implement a dropdown menu or modal here
+    console.log('More options for OKR:', okrId);
+  };
+
+  const handleNewOKR = () => {
+    setLocation('/okr-structure');
+  };
 
   if (statsLoading || okrsLoading) {
     return (
@@ -63,9 +95,9 @@ export default function Dashboard() {
             <p className="text-gray-600">Q4 2024 • Track your objectives and key results</p>
           </div>
           <div className="flex items-center space-x-3">
-            <Select defaultValue="all-status">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-40">
-                <SelectValue />
+                <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all-status">All Status</SelectItem>
@@ -76,9 +108,9 @@ export default function Dashboard() {
               </SelectContent>
             </Select>
             
-            <Select defaultValue="all-periods">
+            <Select value={periodFilter} onValueChange={setPeriodFilter}>
               <SelectTrigger className="w-40">
-                <SelectValue />
+                <SelectValue placeholder="Filter by period" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all-periods">All Periods</SelectItem>
@@ -89,12 +121,10 @@ export default function Dashboard() {
               </SelectContent>
             </Select>
             
-            <Link href="/okr-structure">
-              <Button className="bg-blue-600 hover:bg-blue-700">
-                <Plus className="w-4 h-4 mr-2" />
-                New OKR
-              </Button>
-            </Link>
+            <Button onClick={handleNewOKR} className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="w-4 h-4 mr-2" />
+              New OKR
+            </Button>
           </div>
         </div>
 
@@ -159,7 +189,7 @@ export default function Dashboard() {
 
         {/* OKRs List */}
         <div className="space-y-4">
-          {okrs.length === 0 ? (
+          {filteredOKRs.length === 0 ? (
             <Card className="bg-white">
               <CardContent className="p-8 text-center">
                 <Target className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -175,7 +205,7 @@ export default function Dashboard() {
             </Card>
           ) : (
             <div className="space-y-4">
-              {okrs.map((okr) => (
+              {filteredOKRs.map((okr) => (
                 <Card key={okr.id} className="bg-white hover:shadow-md transition-shadow">
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between mb-4">
@@ -222,10 +252,10 @@ export default function Dashboard() {
                           <p className="text-2xl font-bold text-gray-900">{Math.round(okr.overallProgress)}%</p>
                           <p className="text-sm text-gray-500">Overall Progress</p>
                         </div>
-                        <Button variant="ghost" size="sm">
+                        <Button variant="ghost" size="sm" onClick={() => handleEditOKR(okr.id)}>
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm">
+                        <Button variant="ghost" size="sm" onClick={() => handleMoreOptions(okr.id)}>
                           <MoreHorizontal className="w-4 h-4" />
                         </Button>
                       </div>
