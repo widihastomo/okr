@@ -33,15 +33,22 @@ export default function Dashboard() {
     queryKey: ['/api/cycles'],
   });
 
-  // Set default cycle to active cycle when cycles are loaded
-  const activeCycle = cycles.find(cycle => cycle.status === 'active');
+  // Set default cycle to active cycle with longest duration when cycles are loaded
+  const activeCycles = cycles.filter(cycle => cycle.status === 'active');
+  const defaultCycle = activeCycles.length > 0 
+    ? activeCycles.reduce((longest, current) => {
+        const longestDuration = new Date(longest.endDate).getTime() - new Date(longest.startDate).getTime();
+        const currentDuration = new Date(current.endDate).getTime() - new Date(current.startDate).getTime();
+        return currentDuration > longestDuration ? current : longest;
+      })
+    : null;
   
-  // Initialize cycle filter with active cycle on first load
+  // Initialize cycle filter with longest active cycle on first load
   useEffect(() => {
-    if (activeCycle && cycleFilter === 'all') {
-      setCycleFilter(activeCycle.id);
+    if (defaultCycle && cycleFilter === 'all') {
+      setCycleFilter(defaultCycle.id);
     }
-  }, [activeCycle, cycleFilter]);
+  }, [defaultCycle, cycleFilter]);
 
   const { data: allOkrs = [], isLoading, refetch } = useQuery<OKRWithKeyResults[]>({
     queryKey: ["/api/okrs"],

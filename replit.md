@@ -298,6 +298,12 @@ Changelog:
   * Complete table-based cycles management with full CRUD functionality (create, edit, delete)
   * Fixed API request format errors in create-cycle-modal and edit-cycle-modal components
   * Status update system successfully tested and working in production environment
+- June 27, 2025. Enhanced cycle filtering with intelligent default selection:
+  * Added cycle filter dropdown on dashboard next to status filter with Indonesian localization
+  * Implemented client-side filtering for both status and cycle combinations
+  * Enhanced default cycle logic to select active cycle with longest duration when multiple active cycles exist
+  * Applied duration calculation (end date - start date) to determine optimal default selection
+  * Improved user experience by automatically focusing on most relevant long-term objectives
 ```
 
 ## User Preferences
