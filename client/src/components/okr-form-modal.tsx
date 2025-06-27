@@ -228,60 +228,31 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                   )}
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="objective.timeframe"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Timeframe</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select timeframe" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="Q1 2024">Q1 2024</SelectItem>
-                            <SelectItem value="Q2 2024">Q2 2024</SelectItem>
-                            <SelectItem value="Q3 2024">Q3 2024</SelectItem>
-                            <SelectItem value="Q4 2024">Q4 2024</SelectItem>
-                            <SelectItem value="H1 2024">H1 2024</SelectItem>
-                            <SelectItem value="H2 2024">H2 2024</SelectItem>
-                            <SelectItem value="2024">2024</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="objective.cycleId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Cycle</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select cycle" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="none">No Cycle</SelectItem>
-                            {cycles?.map((cycle) => (
-                              <SelectItem key={cycle.id} value={cycle.id}>
-                                {cycle.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                <FormField
+                  control={form.control}
+                  name="objective.cycleId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Cycle</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select cycle" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="none">No Cycle</SelectItem>
+                          {cycles?.map((cycle) => (
+                            <SelectItem key={cycle.id} value={cycle.id}>
+                              {cycle.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </CardContent>
             </Card>
 
