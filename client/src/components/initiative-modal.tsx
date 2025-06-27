@@ -81,27 +81,6 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Handle modal state for editing
-  useEffect(() => {
-    if (editingInitiative) {
-      setOpen(true);
-      // Initialize tasks if editing
-      if (editingInitiative.tasks) {
-        setTasks(editingInitiative.tasks);
-      }
-    } else {
-      setOpen(false);
-    }
-  }, [editingInitiative]);
-
-  // Handle modal close
-  const handleClose = (isOpen: boolean) => {
-    setOpen(isOpen);
-    if (!isOpen && onClose) {
-      onClose();
-    }
-  };
-
   // Fetch users for PIC and member selection
   const { data: users = [] } = useQuery<any[]>({
     queryKey: ["/api/users"],
@@ -123,7 +102,7 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
       budget: editingInitiative.budget || "",
       startDate: editingInitiative.startDate ? new Date(editingInitiative.startDate).toISOString().split('T')[0] : "",
       dueDate: editingInitiative.dueDate ? new Date(editingInitiative.dueDate).toISOString().split('T')[0] : "",
-      members: editingInitiative.members?.map((m: any) => m.userId) || [],
+      members: editingInitiative.members?.map((m: any) => m.userId || m.user?.id || m.id) || [],
     } : {
       title: "",
       description: "",
@@ -136,6 +115,45 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
       members: [],
     },
   });
+
+  // Handle modal state for editing
+  useEffect(() => {
+    if (editingInitiative) {
+      setOpen(true);
+      // Initialize tasks if editing
+      if (editingInitiative.tasks) {
+        setTasks(editingInitiative.tasks);
+      }
+    } else {
+      setOpen(false);
+      setTasks([]);
+    }
+  }, [editingInitiative]);
+
+  // Reset form when editing initiative changes
+  useEffect(() => {
+    if (editingInitiative && form) {
+      form.reset({
+        title: editingInitiative.title || "",
+        description: editingInitiative.description || "",
+        status: editingInitiative.status || "not_started",
+        priority: editingInitiative.priority || "medium",
+        picId: editingInitiative.picId || "",
+        budget: editingInitiative.budget || "",
+        startDate: editingInitiative.startDate ? new Date(editingInitiative.startDate).toISOString().split('T')[0] : "",
+        dueDate: editingInitiative.dueDate ? new Date(editingInitiative.dueDate).toISOString().split('T')[0] : "",
+        members: editingInitiative.members?.map((m: any) => m.userId || m.user?.id || m.id) || [],
+      });
+    }
+  }, [editingInitiative, form]);
+
+  // Handle modal close
+  const handleClose = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen && onClose) {
+      onClose();
+    }
+  };
 
   const createInitiativeMutation = useMutation({
     mutationFn: async (data: InitiativeFormData & { tasks: TaskFormData[] }) => {
