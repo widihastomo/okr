@@ -24,6 +24,7 @@ const createOKRSchema = z.object({
     ownerType: z.enum(["user", "team"]).default("user"),
     ownerId: z.string().min(1, "Owner is required"),
     status: z.string().default("in_progress"),
+    cycleId: z.string().optional(),
     teamId: z.number().optional(),
     parentId: z.number().optional(),
   }),
@@ -85,6 +86,7 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
         ownerType: "user" as const,
         ownerId: "",
         status: "in_progress",
+        cycleId: undefined,
         teamId: undefined,
         parentId: undefined,
       },
@@ -106,6 +108,7 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
   React.useEffect(() => {
     if (cycles.length > 0 && !form.getValues('objective.timeframe')) {
       form.setValue('objective.timeframe', cycles[0].name);
+      form.setValue('objective.cycleId', cycles[0].id);
     }
   }, [cycles, form]);
 
@@ -250,7 +253,17 @@ export default function CreateOKRModal({ open, onOpenChange, onSuccess }: Create
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Time Period</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select 
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            // Also set the cycleId when timeframe changes
+                            const selectedCycle = cycles.find(cycle => cycle.name === value);
+                            if (selectedCycle) {
+                              form.setValue('objective.cycleId', selectedCycle.id);
+                            }
+                          }} 
+                          defaultValue={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select timeframe" />
