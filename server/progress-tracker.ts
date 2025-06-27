@@ -1,7 +1,7 @@
 import type { KeyResult } from '@shared/schema';
 
 export interface ProgressStatus {
-  status: 'on_track' | 'at_risk' | 'behind' | 'completed' | 'ahead';
+  status: 'on_track' | 'at_risk' | 'behind' | 'completed';
   progressPercentage: number;
   timeProgressPercentage: number;
   recommendation: string;
@@ -41,25 +41,22 @@ export function calculateProgressStatus(
   const elapsedTime = now.getTime() - startDate.getTime();
   const timeProgressPercentage = Math.max(0, Math.min(100, (elapsedTime / totalTime) * 100));
   
-  // Determine status and recommendation
+  // Determine status based on ideal progress comparison
   let status: ProgressStatus['status'];
   let recommendation: string;
   
   if (progressPercentage >= 100) {
     status = 'completed';
-    recommendation = 'Target achieved! Consider setting a stretch goal.';
-  } else if (progressPercentage > timeProgressPercentage + 10) {
-    status = 'ahead';
-    recommendation = 'Excellent progress! You are ahead of schedule.';
-  } else if (progressPercentage >= timeProgressPercentage - 5) {
+    recommendation = 'Target tercapai 100%! Luar biasa!';
+  } else if (progressPercentage >= timeProgressPercentage) {
     status = 'on_track';
-    recommendation = 'Good progress. Continue current pace to meet target.';
-  } else if (progressPercentage >= timeProgressPercentage - 20) {
+    recommendation = 'Progress sesuai atau lebih baik dari capaian ideal hari ini.';
+  } else if (progressPercentage >= timeProgressPercentage * 0.8) {
     status = 'at_risk';
-    recommendation = 'Progress is slightly behind. Consider increasing efforts or adjusting target.';
+    recommendation = 'Progress kurang dari 80% capaian ideal, perlu percepatan.';
   } else {
     status = 'behind';
-    recommendation = 'Significant action needed. Review strategy and consider escalation.';
+    recommendation = 'Progress jauh tertinggal dari capaian ideal, butuh tindakan segera.';
   }
   
   return {
