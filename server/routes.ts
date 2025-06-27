@@ -214,6 +214,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/objectives/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const deleted = await storage.deleteObjective(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Objective not found" });
+      }
+      
+      res.json({ message: "Objective deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting objective:", error);
+      res.status(500).json({ message: "Failed to delete objective" });
+    }
+  });
+
   // User management endpoints
   app.get('/api/users', async (req, res) => {
     try {
