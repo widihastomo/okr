@@ -11,7 +11,7 @@ import { format } from "date-fns";
 import type { KeyResultWithDetails } from "@shared/schema";
 
 interface KeyResultDetailModalProps {
-  keyResultId: number;
+  keyResultId: string;
   isOpen: boolean;
   onClose: () => void;
 }

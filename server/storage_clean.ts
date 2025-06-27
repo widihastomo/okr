@@ -557,14 +557,3 @@ export class DatabaseStorage implements IStorage {
 
 import { MemStorage } from "./storage-memory";
 export const storage = new MemStorage();
-      id: "user1",
-    if (!objective) return undefined;
-    
-    const keyResults = await this.getKeyResultsByObjectiveId(id);
-    const overallProgress = this.calculateOverallProgress(keyResults);
-    return { ...objective, keyResults, overallProgress };
-  }
-}
-
-import { MemStorage } from "./storage-memory";
-export const storage = new MemStorage();

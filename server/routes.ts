@@ -605,7 +605,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         value: req.body.value,
         notes: req.body.notes || null,
         confidence: req.body.confidence || 5,
-        createdBy: req.body.createdBy || 'user1'
+        createdBy: req.body.createdBy || '550e8400-e29b-41d4-a716-446655440001'
       };
       
       const checkIn = await storage.createCheckIn(checkInData);

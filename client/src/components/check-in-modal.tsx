@@ -18,7 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Calendar, TrendingUp } from "lucide-react";
 
 interface CheckInModalProps {
-  keyResultId: number;
+  keyResultId: string;
   keyResultTitle: string;
   currentValue: string;
   targetValue: string;

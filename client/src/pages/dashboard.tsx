@@ -18,7 +18,7 @@ export default function Dashboard() {
   const [editProgressModal, setEditProgressModal] = useState<{ open: boolean; keyResult?: KeyResult }>({
     open: false
   });
-  const [keyResultDetailModal, setKeyResultDetailModal] = useState<{ open: boolean; keyResultId?: number }>({
+  const [keyResultDetailModal, setKeyResultDetailModal] = useState<{ open: boolean; keyResultId?: string }>({
     open: false
   });
 
@@ -34,7 +34,7 @@ export default function Dashboard() {
     setEditProgressModal({ open: true, keyResult });
   };
 
-  const handleKeyResultClick = (keyResultId: number) => {
+  const handleKeyResultClick = (keyResultId: string) => {
     setKeyResultDetailModal({ open: true, keyResultId });
   };
 

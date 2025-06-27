@@ -12,7 +12,7 @@ interface OKRCardProps {
   okr: OKRWithKeyResults;
   onEditProgress: (keyResult: KeyResult) => void;
   onRefresh: () => void;
-  onKeyResultClick: (keyResultId: number) => void;
+  onKeyResultClick: (keyResultId: string) => void;
 }
 
 export default function OKRCard({ okr, onEditProgress, onKeyResultClick }: OKRCardProps) {
