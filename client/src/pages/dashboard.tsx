@@ -184,7 +184,7 @@ export default function Dashboard() {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
           <div>
             <h1 className="text-xl lg:text-2xl font-semibold text-gray-900">OKR Dashboard</h1>
-            <p className="text-gray-600 mt-1 text-sm lg:text-base">Q4 2024 • Track your objectives and key results</p>
+            <p className="text-gray-600 mt-1 text-sm lg:text-base">Track your objectives and key results</p>
           </div>
           
           {/* Filter Controls */}

@@ -542,7 +542,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                                   }
                                   const num = parseFloat(value);
                                   if (!isNaN(num)) {
-                                    field.onChange(Math.round(num * 10) / 10);
+                                    field.onChange((Math.round(num * 10) / 10).toString());
                                   }
                                 }}
                               />
@@ -572,7 +572,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                                   }
                                   const num = parseFloat(value);
                                   if (!isNaN(num)) {
-                                    field.onChange(Math.round(num * 10) / 10);
+                                    field.onChange((Math.round(num * 10) / 10).toString());
                                   }
                                 }}
                               />
@@ -602,7 +602,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                                   }
                                   const num = parseFloat(value);
                                   if (!isNaN(num)) {
-                                    field.onChange(Math.round(num * 10) / 10);
+                                    field.onChange((Math.round(num * 10) / 10).toString());
                                   }
                                 }}
                               />
