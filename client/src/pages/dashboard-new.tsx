@@ -44,7 +44,7 @@ export default function Dashboard() {
 
   if (statsLoading || okrsLoading) {
     return (
-      <div className="lg:ml-64 min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50">
         <div className="p-6">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
           <p className="text-center text-gray-500 mt-2">Loading dashboard...</p>
@@ -54,7 +54,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="lg:ml-64 min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
       <div className="p-6 space-y-6">
         {/* Page Header */}
         <div className="flex items-center justify-between">
@@ -105,7 +105,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Total OKRs</p>
-                  <p className="text-3xl font-bold text-gray-900">1</p>
+                  <p className="text-3xl font-bold text-gray-900">{stats?.totalOKRs || 0}</p>
                 </div>
                 <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                   <Target className="w-6 h-6 text-blue-600" />
@@ -119,7 +119,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">On Track</p>
-                  <p className="text-3xl font-bold text-gray-900">0</p>
+                  <p className="text-3xl font-bold text-gray-900">{stats?.onTrack || 0}</p>
                 </div>
                 <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                   <CheckCircle className="w-6 h-6 text-green-600" />
@@ -133,7 +133,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">At Risk</p>
-                  <p className="text-3xl font-bold text-gray-900">0</p>
+                  <p className="text-3xl font-bold text-gray-900">{stats?.atRisk || 0}</p>
                 </div>
                 <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
                   <AlertTriangle className="w-6 h-6 text-yellow-600" />
@@ -147,7 +147,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Avg Progress</p>
-                  <p className="text-3xl font-bold text-gray-900">60%</p>
+                  <p className="text-3xl font-bold text-gray-900">{stats?.avgProgress || 0}%</p>
                 </div>
                 <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
                   <TrendingUp className="w-6 h-6 text-purple-600" />
@@ -186,8 +186,18 @@ export default function Dashboard() {
                               {okr.title}
                             </h3>
                           </Link>
-                          <Badge className="bg-blue-600 text-white px-2 py-1 text-xs rounded">
-                            In Progress
+                          <Badge className={`px-2 py-1 text-xs rounded ${
+                            okr.status === 'on_track' ? 'bg-green-100 text-green-800' :
+                            okr.status === 'at_risk' ? 'bg-yellow-100 text-yellow-800' :
+                            okr.status === 'completed' ? 'bg-blue-100 text-blue-800' :
+                            okr.status === 'behind' ? 'bg-red-100 text-red-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {okr.status === 'on_track' ? 'On Track' :
+                             okr.status === 'at_risk' ? 'At Risk' :
+                             okr.status === 'completed' ? 'Completed' :
+                             okr.status === 'behind' ? 'Behind' :
+                             'In Progress'}
                           </Badge>
                         </div>
                         <p className="text-gray-600 mb-3">{okr.description}</p>
@@ -209,7 +219,7 @@ export default function Dashboard() {
                       
                       <div className="flex items-center space-x-4">
                         <div className="text-right">
-                          <p className="text-2xl font-bold text-gray-900">59.595959595959%</p>
+                          <p className="text-2xl font-bold text-gray-900">{Math.round(okr.overallProgress)}%</p>
                           <p className="text-sm text-gray-500">Overall Progress</p>
                         </div>
                         <Button variant="ghost" size="sm">
@@ -225,7 +235,32 @@ export default function Dashboard() {
                     <div className="space-y-4">
                       <h4 className="font-medium text-gray-900">Key Results</h4>
                       {okr.keyResults.slice(0, 3).map((kr) => {
-                        const progress = 60; // Static untuk demo sesuai gambar
+                        // Calculate dynamic progress based on key result data
+                        const calculateProgress = (current: string, target: string, krType: string, baseValue?: string) => {
+                          const currentNum = parseFloat(current);
+                          const targetNum = parseFloat(target);
+                          const baseNum = baseValue ? parseFloat(baseValue) : 0;
+                          
+                          if (krType === 'increase_to') {
+                            return Math.min(100, Math.max(0, ((currentNum - baseNum) / (targetNum - baseNum)) * 100));
+                          } else if (krType === 'decrease_to') {
+                            return Math.min(100, Math.max(0, ((baseNum - currentNum) / (baseNum - targetNum)) * 100));
+                          } else if (krType === 'achieve_or_not') {
+                            return currentNum >= targetNum ? 100 : 0;
+                          }
+                          return 0;
+                        };
+                        
+                        const progress = calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue ?? undefined);
+                        
+                        const getKRTypeDisplay = (type: string) => {
+                          switch (type) {
+                            case 'increase_to': return '↗ Increase to';
+                            case 'decrease_to': return '↘ Decrease to';
+                            case 'achieve_or_not': return '✓ Achieve';
+                            default: return type;
+                          }
+                        };
                         
                         return (
                           <div key={kr.id} className="space-y-2">
@@ -234,20 +269,23 @@ export default function Dashboard() {
                                 <div className="flex items-center space-x-2 mb-1">
                                   <span className="text-gray-900 font-medium">{kr.title}</span>
                                   <Badge variant="outline" className="text-xs">
-                                    ↗ Increase to
+                                    {getKRTypeDisplay(kr.keyResultType)}
                                   </Badge>
                                 </div>
                                 <div className="text-sm text-gray-600 mb-2">
                                   {kr.description}
                                 </div>
                                 <div className="text-sm text-gray-600 mb-2">
-                                  60.00 / 100.00
+                                  {kr.currentValue} / {kr.targetValue} {kr.unit}
                                 </div>
                                 <div className="flex items-center space-x-2">
                                   <Badge variant="outline" className="text-xs bg-gray-100">
-                                    Dalam Progress
+                                    {kr.status === 'not_started' ? 'Belum Dimulai' : 
+                                     kr.status === 'in_progress' ? 'Dalam Progress' : 
+                                     kr.status === 'completed' ? 'Selesai' : 
+                                     kr.status === 'at_risk' ? 'Berisiko' : kr.status}
                                   </Badge>
-                                  <Progress value={60} className="flex-1 h-2" />
+                                  <Progress value={progress} className="flex-1 h-2" />
                                   <span className="text-sm font-medium">60%</span>
                                 </div>
                               </div>
