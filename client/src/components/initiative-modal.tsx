@@ -650,7 +650,21 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
                     className="w-full"
                   />
                   
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-3 gap-3">
+                    <Input
+                      type="date"
+                      placeholder="Tanggal deadline"
+                      value={newTask.dueDate}
+                      onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
+                      min={(() => {
+                        const watchedValues = form.watch();
+                        return watchedValues.startDate || undefined;
+                      })()}
+                      max={(() => {
+                        const watchedValues = form.watch();
+                        return watchedValues.dueDate || undefined;
+                      })()}
+                    />
                     <Select
                       value={newTask.priority}
                       onValueChange={(value) => setNewTask({ ...newTask, priority: value as any })}
@@ -699,12 +713,6 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
                     value={newTask.description}
                     onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
                     className="min-h-[60px]"
-                  />
-
-                  <Input
-                    type="date"
-                    value={newTask.dueDate}
-                    onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
                   />
                 </div>
 
