@@ -622,10 +622,22 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
 
               {/* Task Management Section */}
               <div className="bg-blue-50 p-4 rounded-lg space-y-4">
-                <h3 className="font-medium text-gray-900 flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5" />
-                  Manajemen Task
-                </h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium text-gray-900 flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5" />
+                    Manajemen Task
+                  </h3>
+                  <Button
+                    type="button"
+                    onClick={addTask}
+                    className="bg-blue-600 hover:bg-blue-700"
+                    disabled={!newTask.title.trim()}
+                    size="sm"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Tambah Task
+                  </Button>
+                </div>
 
                 {/* Add New Task */}
                 <div className="bg-white p-4 rounded-md border space-y-3">
@@ -687,22 +699,11 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
                     className="min-h-[60px]"
                   />
 
-                  <div className="flex gap-3">
-                    <Input
-                      type="date"
-                      value={newTask.dueDate}
-                      onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
-                    />
-                    <Button
-                      type="button"
-                      onClick={addTask}
-                      className="bg-blue-600 hover:bg-blue-700"
-                      disabled={!newTask.title.trim()}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Tambah Task
-                    </Button>
-                  </div>
+                  <Input
+                    type="date"
+                    value={newTask.dueDate}
+                    onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
+                  />
                 </div>
 
                 {/* Task List */}

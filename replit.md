@@ -289,6 +289,13 @@ Changelog:
   * Enhanced navigation with back button and breadcrumb-style header
   * Improved responsive design with three-column layout for desktop and stacked layout for mobile
   * Added proper date formatting and null-safe handling for all date fields
+- June 27, 2025. Fixed initiative management system and improved task UI layout:
+  * Resolved "Tambah Initiative" button clickability issue by removing conditional rendering
+  * Fixed task management data corruption with proper UUID handling instead of mock data
+  * Updated storage methods to include real database task data in initiative display
+  * Enhanced initiative deletion with proper cache invalidation for automatic list refresh
+  * Repositioned "Tambah Task" button to right side of "Manajemen Task" header for better UX
+  * Implemented complete form reset functionality to prevent data persistence between sessions
 - June 27, 2025. Enhanced key result detail page with diagonal guideline and optimized layout:
   * Added diagonal guideline to Achievement chart based on cycle end date showing target progress timeline
   * Implemented 3-line chart visualization: actual progress (green area), ideal progress (dashed gray), target guideline (diagonal dashed)
