@@ -43,9 +43,18 @@ export default function Dashboard() {
   // Mutation for deleting OKR
   const deleteOKRMutation = useMutation({
     mutationFn: async (okrId: string) => {
-      await apiRequest(`/api/objectives/${okrId}`, {
+      const response = await fetch(`/api/objectives/${okrId}`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete OKR');
+      }
+
+      return response.json();
     },
     onSuccess: () => {
       toast({
