@@ -426,6 +426,12 @@ Changelog:
   * Edit Task modal now correctly shows currently assigned PIC when opened
   * All form fields (status, priority, assignedTo) properly display existing task data
   * Task editing functionality now matches create functionality with proper data population
+- June 27, 2025. Added ideal progress threshold indicator to Key Result detail page:
+  * Implemented vertical gray threshold line showing ideal progress based on time elapsed
+  * Added progress legend with visual indicators for current progress vs ideal target
+  * Integrated intelligent calculation using cycle start date and key result due date
+  * Added hover tooltip displaying exact ideal progress percentage
+  * Progress visualization now matches dashboard functionality with consistent calculation logic
 ```
 
 ## User Preferences

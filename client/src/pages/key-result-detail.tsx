@@ -439,6 +439,12 @@ export default function KeyResultDetailPage() {
     enabled: !!keyResult?.objectiveId,
   });
 
+  // Get cycle data for progress calculations
+  const { data: cycle } = useQuery<any>({
+    queryKey: [`/api/cycles/${objective?.cycleId}`],
+    enabled: !!objective?.cycleId,
+  });
+
   // Fetch users data for name lookup
   const { data: users = [] } = useQuery<any[]>({
     queryKey: ['/api/users'],
@@ -819,7 +825,43 @@ export default function KeyResultDetailPage() {
                   <span className="text-sm font-medium">Progress</span>
                   <span className="text-sm text-gray-600">{progress.toFixed(1)}%</span>
                 </div>
-                <Progress value={Math.min(progress, 100)} className="h-3" />
+                <div className="relative">
+                  <Progress value={Math.min(progress, 100)} className="h-3" />
+                  {/* Ideal Progress Threshold Indicator */}
+                  {(() => {
+                    if (!cycle || !keyResult.dueDate) return null;
+                    
+                    const now = new Date();
+                    const cycleStart = new Date(cycle.startDate);
+                    const keyResultEnd = new Date(keyResult.dueDate);
+                    
+                    if (now < cycleStart) return null;
+                    
+                    const totalDuration = keyResultEnd.getTime() - cycleStart.getTime();
+                    const elapsed = now.getTime() - cycleStart.getTime();
+                    const idealProgress = Math.min((elapsed / totalDuration) * 100, 100);
+                    
+                    if (idealProgress <= 0 || idealProgress >= 100) return null;
+                    
+                    return (
+                      <div 
+                        className="absolute top-0 bottom-0 w-0.5 bg-gray-600 z-10"
+                        style={{ left: `${idealProgress}%` }}
+                        title={`Ideal progress: ${idealProgress.toFixed(1)}%`}
+                      />
+                    );
+                  })()}
+                </div>
+                <div className="flex items-center gap-4 text-xs text-gray-500">
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 bg-blue-600 rounded"></div>
+                    <span>Current Progress</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-0.5 h-3 bg-gray-600"></div>
+                    <span>Ideal Target</span>
+                  </div>
+                </div>
               </div>
 
               <div className="flex justify-between items-center">
