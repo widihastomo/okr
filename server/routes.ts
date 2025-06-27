@@ -623,6 +623,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Recalculate objective progress and status after key results changes
+      await updateObjectiveWithAutoStatus(id);
+      
       // Return complete updated OKR
       const updatedOKR = await storage.getOKRWithKeyResults(id);
       console.log("Updated OKR:", updatedOKR);
