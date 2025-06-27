@@ -8,7 +8,7 @@ import {
   type OKRWithKeyResults, type CycleWithOKRs, type UpdateKeyResultProgress, type CreateOKRFromTemplate 
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { calculateProgressStatus } from "./progress-tracker";
 import { calculateObjectiveStatus } from "./objective-status-tracker";
 
@@ -45,6 +45,7 @@ export interface IStorage {
   updateKeyResult(id: string, keyResult: Partial<InsertKeyResult>): Promise<KeyResult | undefined>;
   updateKeyResultProgress(update: UpdateKeyResultProgress): Promise<KeyResult | undefined>;
   deleteKeyResult(id: string): Promise<boolean>;
+  getLastCheckInForKeyResult(keyResultId: string): Promise<CheckIn | null>;
   
   // Users
   getUser(id: string): Promise<User | undefined>;
@@ -478,46 +479,58 @@ export class DatabaseStorage implements IStorage {
     // Get the objective to find the cycle for date calculation
     const objective = await this.getObjective(objectiveId);
     if (!objective || !objective.cycleId) {
-      return keyResultsList.map(kr => ({
-        ...kr,
-        status: kr.status || 'on_track',
-        timeProgressPercentage: 0
+      return await Promise.all(keyResultsList.map(async kr => {
+        const lastCheckIn = await this.getLastCheckInForKeyResult(kr.id);
+        return {
+          ...kr,
+          status: kr.status || 'on_track',
+          timeProgressPercentage: 0,
+          lastCheckIn
+        };
       }));
     }
     
     // Get cycle information for date calculation
     const cycle = await this.getCycle(objective.cycleId);
     if (!cycle) {
-      return keyResultsList.map(kr => ({
-        ...kr,
-        status: kr.status || 'on_track',
-        timeProgressPercentage: 0
+      return await Promise.all(keyResultsList.map(async kr => {
+        const lastCheckIn = await this.getLastCheckInForKeyResult(kr.id);
+        return {
+          ...kr,
+          status: kr.status || 'on_track',
+          timeProgressPercentage: 0,
+          lastCheckIn
+        };
       }));
     }
     
-    // Calculate status and timeProgressPercentage for each key result
-    return keyResultsList.map(kr => {
+    // Calculate status and timeProgressPercentage for each key result and get last check-in
+    return await Promise.all(keyResultsList.map(async kr => {
       try {
         const startDate = new Date(cycle.startDate);
         const endDate = new Date(kr.dueDate || cycle.endDate);
         
         const progressStatus = calculateProgressStatus(kr, startDate, endDate);
+        const lastCheckIn = await this.getLastCheckInForKeyResult(kr.id);
         
         return {
           ...kr,
           status: progressStatus.status,
-          timeProgressPercentage: progressStatus.timeProgressPercentage
+          timeProgressPercentage: progressStatus.timeProgressPercentage,
+          lastCheckIn
         };
       } catch (error) {
         console.error('Error calculating progress status for key result:', kr.id, error);
+        const lastCheckIn = await this.getLastCheckInForKeyResult(kr.id);
         // Return key result with default values if calculation fails
         return {
           ...kr,
           status: kr.status || 'on_track',
-          timeProgressPercentage: 0
+          timeProgressPercentage: 0,
+          lastCheckIn
         };
       }
-    });
+    }));
   }
 
   async getKeyResult(id: string): Promise<KeyResult | undefined> {
@@ -583,6 +596,16 @@ export class DatabaseStorage implements IStorage {
 
   async getCheckInsByKeyResultId(keyResultId: string): Promise<CheckIn[]> {
     return await db.select().from(checkIns).where(eq(checkIns.keyResultId, keyResultId));
+  }
+
+  async getLastCheckInForKeyResult(keyResultId: string): Promise<CheckIn | null> {
+    const [lastCheckIn] = await db
+      .select()
+      .from(checkIns)
+      .where(eq(checkIns.keyResultId, keyResultId))
+      .orderBy(desc(checkIns.createdAt))
+      .limit(1);
+    return lastCheckIn || null;
   }
 
   async createCheckIn(checkInData: InsertCheckIn): Promise<CheckIn> {

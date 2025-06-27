@@ -287,8 +287,29 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 mb-2">{kr.description}</p>
-                    <div className="text-xs text-gray-500">
-                      {kr.currentValue} / {kr.targetValue} {kr.unit === "percentage" ? "%" : kr.unit === "currency" ? "Rp" : ""}
+                    <div className="text-xs text-gray-500 space-y-1">
+                      <div>
+                        {kr.currentValue} / {kr.targetValue} {kr.unit === "percentage" ? "%" : kr.unit === "currency" ? "Rp" : ""}
+                      </div>
+                      {kr.lastCheckIn && (
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1">
+                            <span className="text-gray-400">Terakhir update:</span>
+                            <span className="text-gray-600">
+                              {kr.lastCheckIn.createdAt && new Date(kr.lastCheckIn.createdAt).toLocaleDateString('id-ID', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric'
+                              })}
+                            </span>
+                          </div>
+                          {kr.lastCheckIn.notes && (
+                            <div className="text-gray-400 italic text-xs max-w-xs truncate">
+                              "{kr.lastCheckIn.notes}"
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">

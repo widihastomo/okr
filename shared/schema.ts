@@ -316,8 +316,12 @@ export type KeyResultWithDetails = KeyResult & {
   progressHistory: { date: string; value: number; notes?: string }[];
 };
 
+export type KeyResultWithLastCheckIn = KeyResult & {
+  lastCheckIn?: CheckIn | null;
+};
+
 export type OKRWithKeyResults = Objective & {
-  keyResults: KeyResult[];
+  keyResults: KeyResultWithLastCheckIn[];
   overallProgress: number;
 };
 
