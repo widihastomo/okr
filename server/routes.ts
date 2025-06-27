@@ -888,6 +888,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update initiative
+  app.put("/api/initiatives/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const updateData = req.body;
+      
+      const updatedInitiative = await storage.updateInitiative(id, updateData);
+      
+      if (!updatedInitiative) {
+        return res.status(404).json({ message: "Initiative not found" });
+      }
+      
+      res.json(updatedInitiative);
+    } catch (error) {
+      console.error("Error updating initiative:", error);
+      res.status(500).json({ message: "Failed to update initiative" });
+    }
+  });
+
   // Delete initiative
   app.delete("/api/initiatives/:id", async (req, res) => {
     try {

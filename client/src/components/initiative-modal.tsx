@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -61,10 +61,12 @@ type TaskFormData = z.infer<typeof taskSchema>;
 interface InitiativeModalProps {
   keyResultId: string;
   onSuccess?: () => void;
+  editingInitiative?: any;
+  onClose?: () => void;
 }
 
-export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeModalProps) {
-  const [open, setOpen] = useState(false);
+export default function InitiativeModal({ keyResultId, onSuccess, editingInitiative, onClose }: InitiativeModalProps) {
+  const [open, setOpen] = useState(!!editingInitiative);
   const [memberDropdownOpen, setMemberDropdownOpen] = useState(false);
   const [memberSearchTerm, setMemberSearchTerm] = useState("");
   const [tasks, setTasks] = useState<TaskFormData[]>([]);
@@ -79,6 +81,25 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Handle modal state for editing
+  useEffect(() => {
+    if (editingInitiative) {
+      setOpen(true);
+      // Initialize tasks if editing
+      if (editingInitiative.tasks) {
+        setTasks(editingInitiative.tasks);
+      }
+    }
+  }, [editingInitiative]);
+
+  // Handle modal close
+  const handleClose = () => {
+    setOpen(false);
+    if (onClose) {
+      onClose();
+    }
+  };
+
   // Fetch users for PIC and member selection
   const { data: users = [] } = useQuery<any[]>({
     queryKey: ["/api/users"],
@@ -91,7 +112,17 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
 
   const form = useForm<InitiativeFormData>({
     resolver: zodResolver(initiativeSchema),
-    defaultValues: {
+    defaultValues: editingInitiative ? {
+      title: editingInitiative.title || "",
+      description: editingInitiative.description || "",
+      status: editingInitiative.status || "not_started",
+      priority: editingInitiative.priority || "medium",
+      picId: editingInitiative.picId || "",
+      budget: editingInitiative.budget || "",
+      startDate: editingInitiative.startDate ? new Date(editingInitiative.startDate).toISOString().split('T')[0] : "",
+      dueDate: editingInitiative.dueDate ? new Date(editingInitiative.dueDate).toISOString().split('T')[0] : "",
+      members: editingInitiative.members?.map((m: any) => m.userId) || [],
+    } : {
       title: "",
       description: "",
       status: "not_started",
@@ -149,8 +180,54 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
     },
   });
 
+  const updateInitiativeMutation = useMutation({
+    mutationFn: async (data: InitiativeFormData & { tasks: TaskFormData[] }) => {
+      const { tasks, ...initiativeData } = data;
+      const response = await fetch(`/api/initiatives/${editingInitiative.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...initiativeData,
+          picId: initiativeData.picId === "none" || !initiativeData.picId ? null : initiativeData.picId,
+          startDate: initiativeData.startDate || null,
+          dueDate: initiativeData.dueDate || null,
+        }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Error: ${response.status}`);
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Initiative berhasil diupdate",
+        description: "Perubahan initiative telah disimpan",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/key-results", keyResultId, "initiatives"] });
+      setOpen(false);
+      onClose?.();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal mengupdate initiative",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleSubmit = (data: InitiativeFormData) => {
-    createInitiativeMutation.mutate({ ...data, tasks });
+    if (editingInitiative) {
+      updateInitiativeMutation.mutate({ ...data, tasks });
+    } else {
+      createInitiativeMutation.mutate({ ...data, tasks });
+    }
   };
 
   const getStatusLabel = (status: string) => {
@@ -203,18 +280,20 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
   };
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Button className="bg-blue-600 hover:bg-blue-700">
-          <Plus className="h-4 w-4 mr-2" />
-          Tambah Initiative
-        </Button>
-      </SheetTrigger>
+    <Sheet open={open} onOpenChange={handleClose}>
+      {!editingInitiative && (
+        <SheetTrigger asChild>
+          <Button className="bg-blue-600 hover:bg-blue-700">
+            <Plus className="h-4 w-4 mr-2" />
+            Tambah Initiative
+          </Button>
+        </SheetTrigger>
+      )}
       <SheetContent className="w-full sm:w-[800px] sm:max-w-[800px] overflow-y-auto">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Buat Initiative Baru
+            {editingInitiative ? 'Edit Initiative' : 'Buat Initiative Baru'}
           </SheetTitle>
         </SheetHeader>
 
