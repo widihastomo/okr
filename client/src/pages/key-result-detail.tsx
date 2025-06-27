@@ -357,7 +357,7 @@ export default function KeyResultDetailPage() {
   });
 
   // Get objective data to access cycle information
-  const { data: objective } = useQuery({
+  const { data: objective } = useQuery<any>({
     queryKey: [`/api/objectives/${keyResult?.objectiveId}`],
     enabled: !!keyResult?.objectiveId,
   });
@@ -438,32 +438,20 @@ export default function KeyResultDetailPage() {
 
   // Prepare chart data from check-ins with diagonal guideline
   const prepareChartData = () => {
-    // Use default cycle dates for now - in production this would come from the cycle data
-    const startDate = new Date(2025, 0, 1); // Jan 1, 2025
-    const endDate = new Date(2025, 2, 31);   // Mar 31, 2025
+    // Get dates from objective's cycle
+    let startDate = new Date(2025, 0, 1); // Default fallback
+    let endDate = new Date(2025, 2, 31);   // Default fallback
+    
+    if (objective && objective.cycle) {
+      startDate = new Date(objective.cycle.startDate);
+      endDate = new Date(objective.cycle.endDate);
+    }
+    
     const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
 
-    // Create diagonal guideline data points (from 0% to 100% across cycle period)
-    const guidelinePoints = [];
-    const numPoints = 5; // Number of points for the diagonal line
-    
-    for (let i = 0; i <= numPoints; i++) {
-      const progress = (i / numPoints) * 100;
-      const dayOffset = (i / numPoints) * totalDays;
-      const pointDate = new Date(startDate.getTime() + dayOffset * 24 * 60 * 60 * 1000);
-      
-      guidelinePoints.push({
-        date: format(pointDate, "dd MMM"),
-        actual: null, // No actual data for guideline points
-        ideal: progress,
-        guideline: progress, // Diagonal guideline value
-        value: null
-      });
-    }
-
     if (!keyResult?.checkIns || keyResult.checkIns.length === 0) {
-      // Return only guideline points if no check-ins exist
-      return guidelinePoints;
+      // Return empty array if no check-ins exist
+      return [];
     }
 
     // Sort check-ins by date
@@ -472,7 +460,17 @@ export default function KeyResultDetailPage() {
     );
 
     // Calculate progress for each check-in
-    const checkInData = sortedCheckIns.map((checkIn) => {
+    const chartData = [];
+    
+    // Add start point (0% at start date)
+    chartData.push({
+      date: format(startDate, "dd MMM"),
+      actual: 0,
+      ideal: 0,
+      guideline: 0
+    });
+
+    sortedCheckIns.forEach((checkIn) => {
       // Calculate actual progress
       const current = parseFloat(checkIn.value);
       const target = parseFloat(keyResult.targetValue);
@@ -489,25 +487,37 @@ export default function KeyResultDetailPage() {
 
       // Calculate ideal progress based on time
       const checkInDate = new Date(checkIn.createdAt || Date.now());
-      const daysPassed = Math.ceil((checkInDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+      const daysPassed = Math.max(0, Math.ceil((checkInDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
       const idealProgress = Math.min((daysPassed / totalDays) * 100, 100);
+      
+      // Calculate guideline progress (diagonal from 0% to 100%)
+      const guidelineProgress = Math.min((daysPassed / totalDays) * 100, 100);
 
-      return {
+      chartData.push({
         date: format(checkInDate, "dd MMM"),
         actual: Math.max(0, Math.min(100, actualProgress)),
         ideal: Math.max(0, Math.min(100, idealProgress)),
-        guideline: idealProgress, // Add guideline value for consistency
-        value: current
-      };
+        guideline: guidelineProgress
+      });
     });
+    
+    // Add end point (100% at end date) if we have any check-ins
+    const lastCheckIn = sortedCheckIns[sortedCheckIns.length - 1];
+    if (lastCheckIn) {
+      const lastCheckInDate = new Date(lastCheckIn.createdAt || Date.now());
+      
+      // Only add end point if last check-in is before end date
+      if (lastCheckInDate < endDate) {
+        chartData.push({
+          date: format(endDate, "dd MMM"),
+          actual: null, // Don't extend actual progress line
+          ideal: 100,
+          guideline: 100
+        });
+      }
+    }
 
-    // Combine and sort all data points by date
-    const allData = [...guidelinePoints, ...checkInData];
-    return allData.sort((a, b) => {
-      const dateA = new Date(a.date + " 2025");
-      const dateB = new Date(b.date + " 2025");
-      return dateA.getTime() - dateB.getTime();
-    });
+    return chartData;
   };
 
   const chartData = keyResult ? prepareChartData() : [];
