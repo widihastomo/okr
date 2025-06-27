@@ -414,6 +414,12 @@ Changelog:
   * Implemented enhanced cache invalidation with `refetchType: 'active'` for immediate UI refresh
   * Fixed task list refresh issue - new tasks now appear immediately after creation
   * Added automatic initiative progress recalculation when tasks are created or updated
+- June 27, 2025. Enhanced task editing with PIC field and improved cache management:
+  * Added missing PIC (Person in Charge) field to Edit Task modal for consistent functionality
+  * Applied enhanced cache invalidation to all task operations (create, update, delete)
+  * Both Add Task and Edit Task modals now have identical field structure
+  * Improved user experience with immediate data refresh after all task operations
+  * Task assignment changes now persist correctly and update initiative progress automatically
 ```
 
 ## User Preferences

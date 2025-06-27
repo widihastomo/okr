@@ -139,8 +139,11 @@ export default function KeyResultDetailPage() {
       }
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/key-results', keyResultId, 'initiatives'] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ 
+        queryKey: [`/api/key-results/${keyResultId}/initiatives`],
+        refetchType: 'active'
+      });
       toast({
         title: "Task berhasil diupdate",
         description: "Perubahan task telah disimpan",
@@ -169,8 +172,11 @@ export default function KeyResultDetailPage() {
       }
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/key-results', keyResultId, 'initiatives'] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ 
+        queryKey: [`/api/key-results/${keyResultId}/initiatives`],
+        refetchType: 'active'
+      });
       toast({
         title: "Task berhasil dihapus",
         description: "Task telah dihapus dari initiative",
@@ -1376,6 +1382,32 @@ export default function KeyResultDetailPage() {
                 )}
               />
             </div>
+
+            <FormField
+              control={taskForm.control}
+              name="assignedTo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Assigned To</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select user" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="unassigned">Unassigned</SelectItem>
+                      {users?.map((user: any) => (
+                        <SelectItem key={user.id} value={user.id}>
+                          {user.firstName} {user.lastName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={taskForm.control}
