@@ -53,6 +53,14 @@ export function setupEmailAuth(app: Express) {
 
   // Logout endpoint (POST)
   app.post('/api/auth/logout', (req, res) => {
+    // In development mode, just set loggedOut flag
+    if (process.env.NODE_ENV === 'development') {
+      req.session.loggedOut = true;
+      res.clearCookie('connect.sid');
+      return res.json({ message: "Berhasil logout" });
+    }
+    
+    // Production mode - destroy session completely
     req.session.destroy((err) => {
       if (err) {
         return res.status(500).json({ message: "Gagal logout" });
@@ -64,6 +72,14 @@ export function setupEmailAuth(app: Express) {
 
   // Logout endpoint (GET) - for simple redirect logout
   app.get('/api/logout', (req, res) => {
+    // In development mode, just set loggedOut flag
+    if (process.env.NODE_ENV === 'development') {
+      req.session.loggedOut = true;
+      res.clearCookie('connect.sid');
+      return res.redirect('/');
+    }
+    
+    // Production mode - destroy session completely
     req.session.destroy((err) => {
       if (err) {
         console.error('Logout error:', err);
@@ -76,8 +92,13 @@ export function setupEmailAuth(app: Express) {
   // Get current user endpoint (new endpoint)
   app.get('/api/auth/me', async (req, res) => {
     try {
-      // In development mode, return mock user without authentication
+      // In development mode, check if user is logged out via session
       if (process.env.NODE_ENV === 'development') {
+        // If session was explicitly destroyed (logout), return unauthorized
+        if (req.session?.loggedOut === true) {
+          return res.status(401).json({ message: "Unauthorized" });
+        }
+        
         const mockUser = {
           id: "550e8400-e29b-41d4-a716-446655440001",
           email: "admin@example.com",

@@ -27,6 +27,13 @@ function Router() {
   const { isAuthenticated, isLoading } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Clear logout flag on app start if user is authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      localStorage.removeItem('isLoggedOut');
+    }
+  }, [isAuthenticated]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
