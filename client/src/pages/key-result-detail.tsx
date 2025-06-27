@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Calendar, Target, TrendingUp, Users, Clock, BarChart3, Edit, Trash2, ChevronRight, Home, ChevronDown, User, Check, CheckCircle2, MoreHorizontal, RefreshCw } from "lucide-react";
+import { ArrowLeft, Calendar, Target, TrendingUp, Users, Clock, BarChart3, Edit, Trash2, ChevronRight, Home, ChevronDown, User, Check, CheckCircle2, MoreHorizontal, RefreshCw, MessageSquare, Paperclip, Send, AtSign } from "lucide-react";
 import { CheckInModal } from "@/components/check-in-modal";
 import InitiativeModal from "@/components/initiative-modal";
 import { ProgressStatus } from "@/components/progress-status";
@@ -54,6 +54,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
   Form,
   FormControl,
   FormField,
@@ -69,6 +76,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Area, AreaChart, ResponsiveContainer } from "recharts";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 // Task schema for editing
 const taskSchema = z.object({
@@ -95,6 +104,10 @@ export default function KeyResultDetailPage() {
   // State for task editing
   const [editingTask, setEditingTask] = useState<any>(null);
   const [editTaskOpen, setEditTaskOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<any>(null);
+  const [commentText, setCommentText] = useState("");
+  const [showUserMentions, setShowUserMentions] = useState(false);
+  const [mentionPosition, setMentionPosition] = useState(0);
 
   // Task form for editing
   const taskForm = useForm<TaskFormData>({
@@ -1041,7 +1054,12 @@ export default function KeyResultDetailPage() {
                                             <div className="flex items-start justify-between gap-3">
                                               <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 mb-2">
-                                                  <p className="font-medium text-sm">{task.title}</p>
+                                                  <p 
+                                                    className="font-medium text-sm text-blue-600 hover:text-blue-800 cursor-pointer hover:underline"
+                                                    onClick={() => setSelectedTask(task)}
+                                                  >
+                                                    {task.title}
+                                                  </p>
                                                   <div className="flex items-center gap-1">
                                                     {statusDisplay.icon}
                                                     <span className={`text-xs font-medium ${statusDisplay.color}`}>
@@ -1285,6 +1303,281 @@ export default function KeyResultDetailPage() {
         </Form>
       </DialogContent>
     </Dialog>
+
+    {/* Comprehensive Task Detail Modal */}
+    <Sheet open={!!selectedTask} onOpenChange={() => setSelectedTask(null)}>
+      <SheetContent className="w-[800px] sm:max-w-[800px] overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle className="text-xl font-bold">
+            {selectedTask?.title}
+          </SheetTitle>
+          <SheetDescription className="text-gray-600">
+            Task Details & Discussion
+          </SheetDescription>
+        </SheetHeader>
+
+        {selectedTask && (
+          <div className="mt-6 space-y-6">
+            {/* Task Information Card */}
+            <div className="bg-white border rounded-lg p-4 space-y-4">
+              <h3 className="font-semibold text-gray-900 mb-3">Task Information</h3>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-700">Status</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    {(() => {
+                      const statusDisplay = getStatusDisplay(selectedTask.status);
+                      return (
+                        <>
+                          {statusDisplay.icon}
+                          <span className={`text-sm font-medium ${statusDisplay.color}`}>
+                            {statusDisplay.label}
+                          </span>
+                        </>
+                      );
+                    })()}
+                  </div>
+                </div>
+                
+                <div>
+                  <p className="text-sm font-medium text-gray-700">Priority</p>
+                  <Badge variant={
+                    selectedTask.priority === "critical" ? "destructive" :
+                    selectedTask.priority === "high" ? "secondary" :
+                    "outline"
+                  } className="mt-1">
+                    {selectedTask.priority}
+                  </Badge>
+                </div>
+                
+                {selectedTask.assignedTo && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Assigned To</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Avatar className="h-6 w-6">
+                        <AvatarFallback className="text-xs bg-blue-100 text-blue-600">
+                          {getUserName(selectedTask.assignedTo).split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm text-gray-900">{getUserName(selectedTask.assignedTo)}</span>
+                    </div>
+                  </div>
+                )}
+                
+                {selectedTask.dueDate && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Due Date</p>
+                    <div className="flex items-center gap-1 mt-1">
+                      <Calendar className="h-4 w-4 text-gray-400" />
+                      <span className={`text-sm ${
+                        new Date(selectedTask.dueDate) < new Date() ? 'text-red-600' : 'text-gray-900'
+                      }`}>
+                        {format(new Date(selectedTask.dueDate), "MMM dd, yyyy")}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {selectedTask.description && (
+                <div>
+                  <p className="text-sm font-medium text-gray-700 mb-2">Description</p>
+                  <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
+                    {selectedTask.description}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Comments Section */}
+            <div className="bg-white border rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-4">
+                <MessageSquare className="h-5 w-5 text-gray-600" />
+                <h3 className="font-semibold text-gray-900">Comments & Discussion</h3>
+              </div>
+
+              {/* Sample Comments */}
+              <div className="space-y-4 mb-6">
+                <div className="flex gap-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="bg-blue-100 text-blue-600 text-xs">
+                      AD
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-sm font-medium text-gray-900">Admin User</span>
+                        <span className="text-xs text-gray-500">2 hours ago</span>
+                      </div>
+                      <p className="text-sm text-gray-700">
+                        Great progress on this task! The implementation looks solid. Let me know if you need any help with the final testing phase.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="bg-green-100 text-green-600 text-xs">
+                      JD
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-sm font-medium text-gray-900">John Doe</span>
+                        <span className="text-xs text-gray-500">1 hour ago</span>
+                      </div>
+                      <p className="text-sm text-gray-700">
+                        Thanks <span className="text-blue-600 font-medium">@Admin User</span>! I've completed the core functionality. Just need to run the integration tests and we should be good to go.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Comment Input */}
+              <div className="border-t pt-4">
+                <div className="flex gap-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="bg-blue-100 text-blue-600 text-xs">
+                      YOU
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <div className="relative">
+                      <Textarea
+                        placeholder="Add a comment... Use @ to mention team members"
+                        value={commentText}
+                        onChange={(e) => {
+                          setCommentText(e.target.value);
+                          // Check for @ mentions
+                          const cursorPosition = e.target.selectionStart;
+                          const text = e.target.value;
+                          const lastAtIndex = text.lastIndexOf('@', cursorPosition);
+                          if (lastAtIndex !== -1 && lastAtIndex === cursorPosition - 1) {
+                            setShowUserMentions(true);
+                            setMentionPosition(lastAtIndex);
+                          } else {
+                            setShowUserMentions(false);
+                          }
+                        }}
+                        className="min-h-[80px] resize-none"
+                      />
+                      
+                      {/* User Mentions Dropdown */}
+                      {showUserMentions && (
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-md shadow-lg z-50 max-h-40 overflow-y-auto">
+                          <div className="p-2 text-xs text-gray-500 border-b">Mention team members:</div>
+                          {usersQuery.data?.map((user: any) => (
+                            <div
+                              key={user.id}
+                              className="p-2 hover:bg-gray-50 cursor-pointer flex items-center gap-2"
+                              onClick={() => {
+                                const beforeMention = commentText.substring(0, mentionPosition);
+                                const afterMention = commentText.substring(mentionPosition + 1);
+                                setCommentText(`${beforeMention}@${user.name} ${afterMention}`);
+                                setShowUserMentions(false);
+                              }}
+                            >
+                              <Avatar className="h-6 w-6">
+                                <AvatarFallback className="text-xs bg-blue-100 text-blue-600">
+                                  {user.name.split(' ').map((n: string) => n[0]).join('')}
+                                </AvatarFallback>
+                              </Avatar>
+                              <span className="text-sm text-gray-900">{user.name}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="flex items-center justify-between mt-3">
+                      <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="sm" className="text-gray-500">
+                          <Paperclip className="h-4 w-4 mr-1" />
+                          Attach File
+                        </Button>
+                        <Button variant="ghost" size="sm" className="text-gray-500">
+                          <AtSign className="h-4 w-4 mr-1" />
+                          Mention
+                        </Button>
+                      </div>
+                      <Button 
+                        size="sm" 
+                        disabled={!commentText.trim()}
+                        onClick={() => {
+                          // Here you would handle comment submission
+                          console.log('Comment:', commentText);
+                          setCommentText("");
+                          toast({
+                            title: "Comment added",
+                            description: "Your comment has been posted successfully.",
+                            className: "border-green-200 bg-green-50 text-green-800",
+                          });
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        <Send className="h-4 w-4 mr-1" />
+                        Send
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Attachments Section */}
+            <div className="bg-white border rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-4">
+                <Paperclip className="h-5 w-5 text-gray-600" />
+                <h3 className="font-semibold text-gray-900">Attachments</h3>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center gap-3 p-2 bg-gray-50 rounded-md">
+                  <div className="p-2 bg-blue-100 rounded">
+                    <Paperclip className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">task-requirements.pdf</p>
+                    <p className="text-xs text-gray-500">2.3 MB • Uploaded 2 hours ago</p>
+                  </div>
+                  <Button variant="ghost" size="sm">
+                    Download
+                  </Button>
+                </div>
+                
+                <div className="flex items-center gap-3 p-2 bg-gray-50 rounded-md">
+                  <div className="p-2 bg-green-100 rounded">
+                    <Paperclip className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">mockup-design.png</p>
+                    <p className="text-xs text-gray-500">1.8 MB • Uploaded 1 day ago</p>
+                  </div>
+                  <Button variant="ghost" size="sm">
+                    Download
+                  </Button>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-4 border-t">
+                <div className="flex items-center gap-2">
+                  <Input type="file" className="flex-1" />
+                  <Button variant="outline" size="sm">
+                    <Paperclip className="h-4 w-4 mr-1" />
+                    Upload
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </SheetContent>
+    </Sheet>
     </>
   );
 }
