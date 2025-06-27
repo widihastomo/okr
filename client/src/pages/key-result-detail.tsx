@@ -227,7 +227,7 @@ export default function KeyResultDetailPage() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/key-results', keyResultId, 'initiatives'] });
+      queryClient.invalidateQueries({ queryKey: [`/api/key-results/${keyResultId}/initiatives`] });
       toast({
         title: "Initiative berhasil dihapus",
         className: "border-green-200 bg-green-50 text-green-800",
