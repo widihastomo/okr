@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation, Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Area, AreaChart, ResponsiveContainer } from "recharts";
 
 export default function KeyResultDetailPage() {
@@ -39,6 +51,44 @@ export default function KeyResultDetailPage() {
   const [expandedInitiatives, setExpandedInitiatives] = useState<Set<string>>(new Set());
   const [taskStatuses, setTaskStatuses] = useState<Record<string, string>>({});
   const { toast } = useToast();
+  const [editingInitiative, setEditingInitiative] = useState<any>(null);
+  
+  // Delete initiative mutation
+  const deleteInitiativeMutation = useMutation({
+    mutationFn: async (initiativeId: string) => {
+      const response = await fetch(`/api/initiatives/${initiativeId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete initiative');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/key-results', keyResultId, 'initiatives'] });
+      toast({
+        title: "Initiative berhasil dihapus",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal menghapus initiative",
+        description: error.message || "Terjadi kesalahan saat menghapus initiative",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Handle delete initiative
+  const handleDeleteInitiative = (initiativeId: string) => {
+    deleteInitiativeMutation.mutate(initiativeId);
+  };
+
+  // Handle edit initiative
+  const handleEditInitiative = (initiative: any) => {
+    setEditingInitiative(initiative);
+  };
   
   // Helper function to toggle initiative expansion
   const toggleInitiativeExpansion = (initiativeId: string) => {
@@ -366,6 +416,7 @@ export default function KeyResultDetailPage() {
   };
 
   return (
+    <>
     <div className="p-6">
       
 
@@ -748,12 +799,38 @@ export default function KeyResultDetailPage() {
                             </TableCell>
                             <TableCell>
                               <div className="flex gap-2">
-                                <Button variant="ghost" size="sm">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={() => handleEditInitiative(initiative)}
+                                >
                                   <Edit className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="sm">
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button variant="ghost" size="sm">
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Hapus Initiative</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Apakah Anda yakin ingin menghapus initiative "{initiative.title}"? 
+                                        Tindakan ini tidak dapat dibatalkan.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Batal</AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() => handleDeleteInitiative(initiative.id)}
+                                        className="bg-red-600 hover:bg-red-700"
+                                      >
+                                        Hapus
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
                               </div>
                             </TableCell>
                           </TableRow>
@@ -856,5 +933,8 @@ export default function KeyResultDetailPage() {
         </div>
       </div>
     </div>
+    
+    {/* Edit Initiative Modal - Removed for now to fix syntax */}
+    </>
   );
 }

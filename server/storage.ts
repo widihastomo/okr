@@ -82,6 +82,7 @@ export interface IStorage {
   getInitiativeWithDetails(id: string): Promise<any>;
   createInitiative(initiative: InsertInitiative): Promise<Initiative>;
   updateInitiative(id: string, initiative: Partial<InsertInitiative>): Promise<Initiative | undefined>;
+  deleteInitiative(id: string): Promise<boolean>;
   
   // Initiative Members
   createInitiativeMember(member: InsertInitiativeMember): Promise<InitiativeMember>;
@@ -652,6 +653,17 @@ export class DatabaseStorage implements IStorage {
       .where(eq(initiatives.id, id))
       .returning();
     return initiative;
+  }
+
+  async deleteInitiative(id: string): Promise<boolean> {
+    // First delete related records
+    await db.delete(tasks).where(eq(tasks.initiativeId, id));
+    await db.delete(initiativeMembers).where(eq(initiativeMembers.initiativeId, id));
+    await db.delete(initiativeDocuments).where(eq(initiativeDocuments.initiativeId, id));
+    
+    // Then delete the initiative
+    const result = await db.delete(initiatives).where(eq(initiatives.id, id));
+    return result.rowCount > 0;
   }
 
   // Initiative Members

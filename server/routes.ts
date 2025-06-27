@@ -888,6 +888,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete initiative
+  app.delete("/api/initiatives/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const deleted = await storage.deleteInitiative(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Initiative not found" });
+      }
+      
+      res.status(200).json({ message: "Initiative deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting initiative:", error);
+      res.status(500).json({ message: "Failed to delete initiative" });
+    }
+  });
+
   // Bulk Update All Status Based on Progress
   app.post("/api/update-all-status", async (req, res) => {
     try {
