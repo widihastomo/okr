@@ -116,11 +116,6 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
         <div className="flex justify-between items-start">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <Link href={`/objective/${okr.id}`}>
-                <h3 className="text-xl font-bold hover:underline cursor-pointer">
-                  {okr.title}
-                </h3>
-              </Link>
               <Button
                 variant="ghost"
                 size="sm"
@@ -133,6 +128,11 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
                   <ChevronDown className="w-4 h-4" />
                 )}
               </Button>
+              <Link href={`/objective/${okr.id}`}>
+                <h3 className="text-xl font-bold hover:underline cursor-pointer">
+                  {okr.title}
+                </h3>
+              </Link>
             </div>
             <p className="text-gray-600 mb-4">{okr.description}</p>
             

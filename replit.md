@@ -252,9 +252,9 @@ Changelog:
   * Applied dynamic status-based colors to Key Results progress bars and legend indicators
   * Enhanced visual feedback with status labels, colored progress bar, ideal threshold, tooltip, and percentage display
   * Improved OKR card readability and status recognition at a glance
-- June 27, 2025. Implemented collapsible objectives with improved button positioning:
+- June 27, 2025. Implemented collapsible objectives with optimized button positioning:
   * Added expand/collapse functionality allowing users to show/hide Key Results sections
-  * Positioned toggle button directly next to objective title for intuitive access
+  * Positioned toggle button before objective title for clear visual hierarchy
   * Implemented state management with default expanded view for better usability
   * Enhanced navigation by allowing users to focus on specific objectives
   * Improved visual organization with clean chevron up/down icons
