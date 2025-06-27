@@ -208,7 +208,9 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
                   return (
                     <>
                       <div 
-                        className={`${getProgressBarColor(okr.status)} h-2 rounded-full transition-all duration-300`}
+                        className={`${getProgressBarColor(okr.status)} h-2 transition-all duration-300 ${
+                          overallProgress >= 100 ? 'rounded-full' : 'rounded-l-full'
+                        }`}
                         style={{ width: `${Math.min(100, Math.max(0, overallProgress))}%` }}
                       ></div>
                       {/* Threshold indicator for ideal progress */}

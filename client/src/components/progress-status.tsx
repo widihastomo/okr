@@ -228,12 +228,19 @@ export function SimpleProgressStatus({
           className="flex-1 relative group cursor-pointer"
           title={`Progress: ${progressPercentage.toFixed(1)}% | Target ideal: ${idealProgress.toFixed(1)}%`}
         >
-          <Progress value={progressPercentage} className="h-2" />
-          {/* Threshold indicator for ideal progress */}
-          <div 
-            className="absolute top-0 h-2 w-0.5 bg-gray-400 opacity-70 hover:opacity-100 transition-opacity"
-            style={{ left: `${Math.min(idealProgress, 100)}%` }}
-          />
+          <div className="w-full bg-gray-200 rounded-full h-2 relative">
+            <div 
+              className={`h-2 bg-blue-500 transition-all duration-300 ${
+                progressPercentage >= 100 ? 'rounded-full' : 'rounded-l-full'
+              }`}
+              style={{ width: `${Math.min(100, Math.max(0, progressPercentage))}%` }}
+            />
+            {/* Threshold indicator for ideal progress */}
+            <div 
+              className="absolute top-0 h-2 w-0.5 bg-gray-400 opacity-70 hover:opacity-100 transition-opacity"
+              style={{ left: `${Math.min(idealProgress, 100)}%` }}
+            />
+          </div>
           {/* Enhanced tooltip on hover */}
           <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
             Progress: {progressPercentage.toFixed(1)}% | Target ideal: {idealProgress.toFixed(1)}%
