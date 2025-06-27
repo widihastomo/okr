@@ -122,6 +122,28 @@ export default function CompanyOKRPage() {
     return colors[status as keyof typeof colors] || 'text-gray-500';
   };
 
+  const calculateKeyResultProgress = (kr: any): number => {
+    const currentNum = parseFloat(kr.currentValue) || 0;
+    const targetNum = parseFloat(kr.targetValue) || 0;
+    const baseNum = parseFloat(kr.baseValue || "0") || 0;
+
+    switch (kr.keyResultType) {
+      case "increase_to":
+        if (targetNum <= baseNum) return 0;
+        return Math.min(100, Math.max(0, ((currentNum - baseNum) / (targetNum - baseNum)) * 100));
+      
+      case "decrease_to":
+        if (baseNum <= targetNum) return 0;
+        return Math.min(100, Math.max(0, ((baseNum - currentNum) / (baseNum - targetNum)) * 100));
+      
+      case "achieve_or_not":
+        return currentNum >= targetNum ? 100 : 0;
+      
+      default:
+        return Math.min(100, Math.max(0, (currentNum / targetNum) * 100));
+    }
+  };
+
   const renderMindmapCard = (node: TreeNode, isRoot = false) => {
     const { okr, level, children, isExpanded } = node;
     const progressColor = getProgressColor(okr.overallProgress);
@@ -200,7 +222,7 @@ export default function CompanyOKRPage() {
                       </span>
                     </div>
                     <span className="text-sm font-medium text-gray-900">
-                      {((kr as any).progress || 0).toFixed(0)}%
+                      {calculateKeyResultProgress(kr).toFixed(0)}%
                     </span>
                   </div>
                 </div>
