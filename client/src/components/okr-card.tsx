@@ -171,11 +171,46 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
                 })()}
                 <span className="text-lg font-semibold text-gray-900">{overallProgress.toFixed(1)}%</span>
               </div>
-              <div className="w-32 bg-gray-200 rounded-full h-2 mb-1">
-                <div 
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${Math.min(100, Math.max(0, overallProgress))}%` }}
-                ></div>
+              <div className="w-32 bg-gray-200 rounded-full h-2 mb-1 relative">
+                {(() => {
+                  const getProgressBarColor = (status: string) => {
+                    switch (status) {
+                      case 'on_track': return 'bg-green-500';
+                      case 'at_risk': return 'bg-orange-500';
+                      case 'behind': return 'bg-red-500';
+                      case 'completed': return 'bg-purple-500';
+                      case 'in_progress': return 'bg-blue-500';
+                      case 'not_started': return 'bg-gray-400';
+                      case 'paused': return 'bg-yellow-500';
+                      default: return 'bg-gray-400';
+                    }
+                  };
+                  
+                  // Calculate ideal progress based on time passed
+                  const now = new Date();
+                  const cycleStart = cycleStartDate ? new Date(cycleStartDate) : new Date();
+                  const cycleEnd = cycleEndDate ? new Date(cycleEndDate) : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
+                  const totalTime = cycleEnd.getTime() - cycleStart.getTime();
+                  const timePassed = Math.max(0, now.getTime() - cycleStart.getTime());
+                  const idealProgress = Math.min(100, (timePassed / totalTime) * 100);
+                  
+                  return (
+                    <>
+                      <div 
+                        className={`${getProgressBarColor(okr.status)} h-2 rounded-full transition-all duration-300`}
+                        style={{ width: `${Math.min(100, Math.max(0, overallProgress))}%` }}
+                      ></div>
+                      {/* Threshold indicator for ideal progress */}
+                      {idealProgress > 0 && idealProgress < 100 && (
+                        <div 
+                          className="absolute top-0 w-0.5 h-2 bg-gray-600 opacity-70"
+                          style={{ left: `${idealProgress}%` }}
+                          title={`Target progress: ${idealProgress.toFixed(1)}%`}
+                        ></div>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
               <p className="text-sm text-gray-500">Overall Progress</p>
             </div>

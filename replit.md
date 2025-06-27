@@ -243,9 +243,10 @@ Changelog:
   * Enhanced status visibility and user experience in OKR cards
 - June 27, 2025. Added dynamic progress indicator to OKR card headers:
   * Implemented colored status badge with dot indicator next to overall progress percentage
-  * Added visual progress bar showing completion percentage with smooth animations
-  * Dynamic color coding based on objective status (green for on track, red for behind, etc.)
-  * Enhanced visual feedback with status labels, progress bar, and percentage display
+  * Added visual progress bar with status-based colors (green, orange, red, blue, purple, yellow, gray)
+  * Integrated threshold indicator showing ideal progress timeline based on cycle dates
+  * Progress bar color dynamically matches objective status for consistent visual feedback
+  * Enhanced visual feedback with status labels, colored progress bar, ideal threshold, and percentage display
   * Improved OKR card readability and status recognition at a glance
 ```
 
