@@ -38,7 +38,7 @@ const okrFormSchema = z.object({
     unit: z.string().default("number"),
     keyResultType: z.string().default("increase_to"),
     status: z.string().default("in_progress"),
-    assignedTo: z.string().optional(),
+    assignedTo: z.string().default("unassigned"),
   })).min(1, "At least one key result is required"),
 });
 
@@ -86,7 +86,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
         unit: kr.unit,
         keyResultType: kr.keyResultType,
         status: kr.status,
-        assignedTo: kr.assignedTo || "",
+        assignedTo: kr.assignedTo || "unassigned",
       })),
     } : {
       objective: {
@@ -110,7 +110,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
         unit: "number",
         keyResultType: "increase_to",
         status: "in_progress",
-        assignedTo: "",
+        assignedTo: "unassigned",
       }],
     },
   });
@@ -173,7 +173,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
       unit: "number",
       keyResultType: "increase_to",
       status: "in_progress",
-      assignedTo: "",
+      assignedTo: "unassigned",
     });
   };
 
@@ -562,7 +562,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="">No Assignment</SelectItem>
+                              <SelectItem value="unassigned">No Assignment</SelectItem>
                               {users?.map((user) => (
                                 <SelectItem key={user.id} value={user.id}>
                                   {user.firstName} {user.lastName} ({user.email})
