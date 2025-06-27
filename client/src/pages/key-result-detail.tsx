@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Calendar, Target, TrendingUp, Users, Clock, BarChart3, Edit, Trash2, ChevronRight, Home, ChevronDown, User, Check, CheckCircle2, MoreHorizontal, RefreshCw, MessageSquare, Paperclip, Send, AtSign } from "lucide-react";
+import { ArrowLeft, Calendar, Target, TrendingUp, Users, Clock, BarChart3, Edit, Trash2, ChevronRight, Home, ChevronDown, User, Check, CheckCircle2, MoreHorizontal, RefreshCw, MessageSquare, Paperclip, Send, AtSign, Plus } from "lucide-react";
 import { CheckInModal } from "@/components/check-in-modal";
 import InitiativeModal from "@/components/initiative-modal";
 import { ProgressStatus } from "@/components/progress-status";
@@ -108,8 +108,10 @@ export default function KeyResultDetailPage() {
   const [commentText, setCommentText] = useState("");
   const [showUserMentions, setShowUserMentions] = useState(false);
   const [mentionPosition, setMentionPosition] = useState(0);
+  const [addingTaskToInitiative, setAddingTaskToInitiative] = useState<string | null>(null);
+  const [addTaskOpen, setAddTaskOpen] = useState(false);
 
-  // Task form for editing
+  // Task form for editing/adding
   const taskForm = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
@@ -184,7 +186,55 @@ export default function KeyResultDetailPage() {
     },
   });
 
-  // Handler functions for task edit/delete
+  // Create task mutation
+  const createTaskMutation = useMutation({
+    mutationFn: async (data: { initiativeId: string; taskData: TaskFormData }) => {
+      const response = await fetch(`/api/initiatives/${data.initiativeId}/tasks`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data.taskData),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to create task');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/key-results', keyResultId, 'initiatives'] });
+      toast({
+        title: "Task berhasil dibuat",
+        description: "Task baru telah ditambahkan ke initiative",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+      setAddTaskOpen(false);
+      setAddingTaskToInitiative(null);
+      taskForm.reset();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal membuat task",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Handler functions for task edit/delete/add
+  const handleAddTask = (initiativeId: string) => {
+    setAddingTaskToInitiative(initiativeId);
+    taskForm.reset({
+      title: "",
+      description: "",
+      status: "not_started",
+      priority: "medium",
+      assignedTo: "",
+      dueDate: "",
+    });
+    setAddTaskOpen(true);
+  };
+
   const handleEditTask = (task: any) => {
     setEditingTask(task);
     taskForm.reset({
@@ -204,8 +254,19 @@ export default function KeyResultDetailPage() {
 
   const handleTaskSubmit = (data: TaskFormData) => {
     if (editingTask) {
+      // Update existing task
       updateTaskMutation.mutate({
         taskId: editingTask.id,
+        taskData: {
+          ...data,
+          dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : undefined,
+          assignedTo: data.assignedTo || undefined,
+        }
+      });
+    } else if (addingTaskToInitiative) {
+      // Create new task
+      createTaskMutation.mutate({
+        initiativeId: addingTaskToInitiative,
         taskData: {
           ...data,
           dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : undefined,
@@ -1059,10 +1120,20 @@ export default function KeyResultDetailPage() {
                             <TableRow key={`${initiative.id}-tasks`}>
                               <TableCell colSpan={6} className="p-0">
                                 <div className="bg-gray-50 p-4 border-l-4 border-blue-500">
-                                  <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
-                                    <User className="h-4 w-4" />
-                                    Tasks ({tasks?.length || 0})
-                                  </h4>
+                                  <div className="flex items-center justify-between mb-3">
+                                    <h4 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
+                                      <User className="h-4 w-4" />
+                                      Tasks ({tasks?.length || 0})
+                                    </h4>
+                                    <Button
+                                      size="sm"
+                                      onClick={() => handleAddTask(initiative.id)}
+                                      className="bg-blue-600 hover:bg-blue-700 text-xs h-7 px-3"
+                                    >
+                                      <Plus className="h-3 w-3 mr-1" />
+                                      Tambah Task
+                                    </Button>
+                                  </div>
                                   {tasks && tasks.length > 0 ? (
                                     <div className="space-y-2">
                                       {tasks.map((task: any) => {
@@ -1315,6 +1386,153 @@ export default function KeyResultDetailPage() {
               </Button>
               <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
                 Update Task
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+
+    {/* Add Task Modal */}
+    <Dialog open={addTaskOpen} onOpenChange={setAddTaskOpen}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Tambah Task Baru</DialogTitle>
+          <DialogDescription>
+            Buat task baru untuk initiative ini.
+          </DialogDescription>
+        </DialogHeader>
+        <Form {...taskForm}>
+          <form onSubmit={taskForm.handleSubmit(handleTaskSubmit)} className="space-y-4">
+            <FormField
+              control={taskForm.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Task title" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={taskForm.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Task description" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={taskForm.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="not_started">Belum Dimulai</SelectItem>
+                        <SelectItem value="in_progress">Sedang Dikerjakan</SelectItem>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="blocked">Blocked</SelectItem>
+                        <SelectItem value="completed">Selesai</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={taskForm.control}
+                name="priority"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Priority</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select priority" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="critical">Critical</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={taskForm.control}
+              name="assignedTo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Assigned To</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select user" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="">Unassigned</SelectItem>
+                      {users?.map((user: any) => (
+                        <SelectItem key={user.id} value={user.id}>
+                          {user.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={taskForm.control}
+              name="dueDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Due Date</FormLabel>
+                  <FormControl>
+                    <Input type="date" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setAddTaskOpen(false)}>
+                Cancel
+              </Button>
+              <Button 
+                type="submit" 
+                className="bg-blue-600 hover:bg-blue-700"
+                disabled={createTaskMutation.isPending}
+              >
+                {createTaskMutation.isPending ? "Creating..." : "Buat Task"}
               </Button>
             </DialogFooter>
           </form>
