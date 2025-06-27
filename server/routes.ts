@@ -561,6 +561,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update complete OKR (objective + key results)
+  app.patch("/api/okrs/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      console.log("Update OKR request received:", JSON.stringify(req.body, null, 2));
+      
+      const updateOKRSchema = z.object({
+        objective: insertObjectiveSchema.partial().extend({
+          ownerId: z.string().optional(),
+          teamId: z.string().nullable().optional(),
+          parentId: z.string().nullable().optional(),
+        }),
+        keyResults: z.array(insertKeyResultSchema.partial().extend({
+          id: z.string().optional(),
+          assignedTo: z.string().optional(),
+        }))
+      });
+      
+      const validatedData = updateOKRSchema.parse(req.body);
+      console.log("Validated update data:", JSON.stringify(validatedData, null, 2));
+      
+      // Convert teamId to string if provided
+      const objectiveUpdate = {
+        ...validatedData.objective,
+        teamId: validatedData.objective.teamId ? validatedData.objective.teamId.toString() : undefined,
+        parentId: validatedData.objective.parentId ? validatedData.objective.parentId.toString() : undefined
+      };
+
+      // Update objective
+      const updatedObjective = await storage.updateObjective(id, objectiveUpdate);
+      if (!updatedObjective) {
+        return res.status(404).json({ message: "OKR not found" });
+      }
+      
+      // Update or create key results
+      const keyResults = [];
+      for (const krData of validatedData.keyResults) {
+        if (krData.id) {
+          // Update existing key result
+          const updated = await storage.updateKeyResult(krData.id, krData);
+          if (updated) keyResults.push(updated);
+        } else {
+          // Create new key result - ensure required fields are present
+          if (krData.title && krData.targetValue) {
+            const created = await storage.createKeyResult({
+              ...krData,
+              objectiveId: id,
+              title: krData.title,
+              targetValue: krData.targetValue
+            });
+            keyResults.push(created);
+          }
+        }
+      }
+      
+      // Return complete updated OKR
+      const updatedOKR = await storage.getOKRWithKeyResults(id);
+      console.log("Updated OKR:", updatedOKR);
+      res.json(updatedOKR);
+    } catch (error) {
+      console.error("Error updating OKR:", error);
+      if (error instanceof z.ZodError) {
+        console.error("Validation errors:", error.errors);
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update OKR", error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
   // Update objective
   app.patch("/api/objectives/:id", async (req, res) => {
     try {
