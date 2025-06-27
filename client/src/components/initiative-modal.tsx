@@ -37,8 +37,12 @@ import { apiRequest } from "@/lib/queryClient";
 const initiativeSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  status: z.enum(["not_started", "in_progress", "completed", "on_hold"]).default("not_started"),
-  priority: z.enum(["low", "medium", "high"]).default("medium"),
+  objective: z.string().optional(),
+  status: z.enum(["not_started", "in_progress", "completed", "on_hold", "cancelled"]).default("not_started"),
+  priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
+  progressPercentage: z.number().min(0).max(100).default(0),
+  budget: z.string().optional(),
+  startDate: z.string().optional(),
   dueDate: z.string().optional(),
 });
 
@@ -59,8 +63,12 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
     defaultValues: {
       title: "",
       description: "",
+      objective: "",
       status: "not_started",
       priority: "medium",
+      progressPercentage: 0,
+      budget: "",
+      startDate: "",
       dueDate: "",
     },
   });
@@ -70,7 +78,9 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
       const payload = {
         ...data,
         keyResultId,
-        createdBy: "dev-user-1", // This should come from auth context
+        createdBy: "550e8400-e29b-41d4-a716-446655440001", // This should come from auth context
+        budget: data.budget ? parseFloat(data.budget) : null,
+        startDate: data.startDate ? new Date(data.startDate).toISOString() : null,
         dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : null,
       };
       return await apiRequest("POST", `/api/key-results/${keyResultId}/initiatives`, payload);
@@ -105,6 +115,7 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
       case "in_progress": return "Sedang Berjalan";
       case "completed": return "Selesai";
       case "on_hold": return "Ditahan";
+      case "cancelled": return "Dibatalkan";
       default: return status;
     }
   };
@@ -114,6 +125,7 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
       case "low": return "Rendah";
       case "medium": return "Sedang";
       case "high": return "Tinggi";
+      case "critical": return "Kritis";
       default: return priority;
     }
   };
@@ -177,6 +189,24 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
               )}
             />
 
+            {/* Objective */}
+            <FormField
+              control={form.control}
+              name="objective"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tujuan</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="Tujuan dari initiative ini"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             {/* Status and Priority Row */}
             <div className="grid grid-cols-2 gap-4">
               <FormField
@@ -196,6 +226,7 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
                         <SelectItem value="in_progress">{getStatusLabel("in_progress")}</SelectItem>
                         <SelectItem value="completed">{getStatusLabel("completed")}</SelectItem>
                         <SelectItem value="on_hold">{getStatusLabel("on_hold")}</SelectItem>
+                        <SelectItem value="cancelled">{getStatusLabel("cancelled")}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -234,6 +265,12 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
                             {getPriorityLabel("high")}
                           </div>
                         </SelectItem>
+                        <SelectItem value="critical">
+                          <div className="flex items-center gap-2">
+                            <Flag className="h-4 w-4 text-red-600" />
+                            {getPriorityLabel("critical")}
+                          </div>
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -242,26 +279,83 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
               />
             </div>
 
-            {/* Due Date */}
-            <FormField
-              control={form.control}
-              name="dueDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    Tenggat Waktu
-                  </FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="date"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Progress and Budget Row */}
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="progressPercentage"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Progress (%)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number"
+                        min="0"
+                        max="100"
+                        placeholder="0"
+                        {...field}
+                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="budget"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Budget (Rp)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="10000000"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Date Range */}
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="startDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tanggal Mulai</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="date"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="dueDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tenggat Waktu</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="date"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             {/* Submit Button */}
             <div className="flex justify-end gap-3">

@@ -267,20 +267,66 @@ export default function KeyResultDetailPage() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Title</TableHead>
-                      <TableHead>Description</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead>Priority</TableHead>
+                      <TableHead>Progress</TableHead>
+                      <TableHead>Due Date</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {initiatives.map((initiative) => (
                       <TableRow key={initiative.id}>
-                        <TableCell className="font-medium">{initiative.title}</TableCell>
-                        <TableCell>{initiative.description}</TableCell>
+                        <TableCell className="font-medium">
+                          <div>
+                            <p className="font-semibold">{initiative.title}</p>
+                            {initiative.description && (
+                              <p className="text-sm text-gray-600 mt-1">{initiative.description}</p>
+                            )}
+                          </div>
+                        </TableCell>
                         <TableCell>
-                          <Badge variant={initiative.status === "completed" ? "default" : "secondary"}>
-                            {initiative.status}
+                          <Badge variant={
+                            initiative.status === "completed" ? "default" : 
+                            initiative.status === "in_progress" ? "secondary" :
+                            initiative.status === "on_hold" ? "destructive" :
+                            "outline"
+                          }>
+                            {initiative.status?.replace('_', ' ')}
                           </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={
+                            initiative.priority === "critical" ? "destructive" :
+                            initiative.priority === "high" ? "secondary" :
+                            "outline"
+                          }>
+                            {initiative.priority}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <div className="w-16 bg-gray-200 rounded-full h-2">
+                              <div 
+                                className="bg-blue-600 h-2 rounded-full" 
+                                style={{ width: `${initiative.progressPercentage || 0}%` }}
+                              ></div>
+                            </div>
+                            <span className="text-sm text-gray-600">
+                              {initiative.progressPercentage || 0}%
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {initiative.dueDate ? (
+                            <span className={`text-sm ${
+                              new Date(initiative.dueDate) < new Date() ? 'text-red-600' : 'text-gray-600'
+                            }`}>
+                              {format(new Date(initiative.dueDate), "MMM dd, yyyy")}
+                            </span>
+                          ) : (
+                            <span className="text-sm text-gray-400">No due date</span>
+                          )}
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">

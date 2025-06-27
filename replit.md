@@ -322,6 +322,16 @@ Changelog:
   * Removed profile section entirely from sidebar to eliminate duplication
   * Enhanced user experience with consistent header-based navigation pattern
   * Avatar menu includes profile access and secure logout functionality
+- June 27, 2025. Fixed sidebar duplication issue and enhanced initiative management:
+  * Removed duplicate sidebar from key result detail page layout
+  * Page now uses standard app navigation structure with single sidebar
+  * Added comprehensive breadcrumb navigation: Dashboard > Key Results > [Key Result Title]
+  * Updated initiatives structure to match complete database schema
+  * Enhanced initiatives table with status, priority, progress tracking, and due dates
+  * Added comprehensive initiative creation form with all database fields
+  * Included objective, budget, start/end dates, progress percentage, and critical priority level
+  * Fixed TypeScript errors and property mismatches in check-in data handling
+  * Improved initiative modal with proper Indonesian labels and status management
 ```
 
 ## User Preferences
