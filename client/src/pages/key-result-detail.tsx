@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, useLocation, Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Calendar, Target, TrendingUp, Users, Clock, BarChart3, Edit, Trash2, ChevronRight, Home } from "lucide-react";
+import { ArrowLeft, Calendar, Target, TrendingUp, Users, Clock, BarChart3, Edit, Trash2, ChevronRight, Home, ChevronDown, User } from "lucide-react";
 import { CheckInModal } from "@/components/check-in-modal";
 import InitiativeModal from "@/components/initiative-modal";
 import { ProgressStatus } from "@/components/progress-status";
@@ -19,12 +20,27 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 export default function KeyResultDetailPage() {
   const params = useParams();
   const [, setLocation] = useLocation();
   const keyResultId = params.id as string;
   const queryClient = useQueryClient();
+  const [expandedInitiatives, setExpandedInitiatives] = useState<Set<string>>(new Set());
+  
+  // Helper function to toggle initiative expansion
+  const toggleInitiativeExpansion = (initiativeId: string) => {
+    setExpandedInitiatives(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(initiativeId)) {
+        newSet.delete(initiativeId);
+      } else {
+        newSet.add(initiativeId);
+      }
+      return newSet;
+    });
+  };
   
   const { data: keyResult, isLoading } = useQuery<KeyResultWithDetails>({
     queryKey: [`/api/key-results/${keyResultId}`],
@@ -35,6 +51,32 @@ export default function KeyResultDetailPage() {
     queryKey: [`/api/key-results/${keyResultId}/initiatives`],
     enabled: !!keyResultId,
   });
+
+  // Helper function to get tasks for a specific initiative
+  const getTasksForInitiative = (initiativeId: string) => {
+    if (!expandedInitiatives.has(initiativeId)) return [];
+    // For now, return mock tasks until we implement the API endpoint
+    return [
+      {
+        id: `task-${initiativeId}-1`,
+        title: "Task 1",
+        description: "Sample task description",
+        priority: "high",
+        assignedTo: "John Doe",
+        dueDate: "2025-01-15",
+        status: "in_progress"
+      },
+      {
+        id: `task-${initiativeId}-2`,
+        title: "Task 2", 
+        description: "Another task description",
+        priority: "medium",
+        assignedTo: "Jane Smith",
+        dueDate: "2025-01-20",
+        status: "completed"
+      }
+    ];
+  };
 
   const handleInitiativeSuccess = () => {
     queryClient.invalidateQueries({
@@ -275,71 +317,146 @@ export default function KeyResultDetailPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {initiatives.map((initiative) => (
-                      <TableRow key={initiative.id}>
-                        <TableCell className="font-medium">
-                          <div>
-                            <p className="font-semibold">{initiative.title}</p>
-                            {initiative.description && (
-                              <p className="text-sm text-gray-600 mt-1">{initiative.description}</p>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={
-                            initiative.status === "completed" ? "default" : 
-                            initiative.status === "in_progress" ? "secondary" :
-                            initiative.status === "on_hold" ? "destructive" :
-                            "outline"
-                          }>
-                            {initiative.status?.replace('_', ' ')}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={
-                            initiative.priority === "critical" ? "destructive" :
-                            initiative.priority === "high" ? "secondary" :
-                            "outline"
-                          }>
-                            {initiative.priority}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <div className="w-16 bg-gray-200 rounded-full h-2">
-                              <div 
-                                className="bg-blue-600 h-2 rounded-full" 
-                                style={{ width: `${initiative.progressPercentage || 0}%` }}
-                              ></div>
-                            </div>
-                            <span className="text-sm text-gray-600">
-                              {initiative.progressPercentage || 0}%
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {initiative.dueDate ? (
-                            <span className={`text-sm ${
-                              new Date(initiative.dueDate) < new Date() ? 'text-red-600' : 'text-gray-600'
-                            }`}>
-                              {format(new Date(initiative.dueDate), "MMM dd, yyyy")}
-                            </span>
-                          ) : (
-                            <span className="text-sm text-gray-400">No due date</span>
+                    {initiatives.map((initiative) => {
+                      const isExpanded = expandedInitiatives.has(initiative.id);
+                      const tasks = getTasksForInitiative(initiative.id);
+
+                      return (
+                        <>
+                          <TableRow key={initiative.id}>
+                            <TableCell className="font-medium">
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => toggleInitiativeExpansion(initiative.id)}
+                                  className="h-6 w-6 p-0"
+                                >
+                                  {isExpanded ? (
+                                    <ChevronDown className="h-4 w-4" />
+                                  ) : (
+                                    <ChevronRight className="h-4 w-4" />
+                                  )}
+                                </Button>
+                                <div>
+                                  <p className="font-semibold">{initiative.title}</p>
+                                  {initiative.description && (
+                                    <p className="text-sm text-gray-600 mt-1">{initiative.description}</p>
+                                  )}
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={
+                                initiative.status === "completed" ? "default" : 
+                                initiative.status === "in_progress" ? "secondary" :
+                                initiative.status === "on_hold" ? "destructive" :
+                                "outline"
+                              }>
+                                {initiative.status?.replace('_', ' ')}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={
+                                initiative.priority === "critical" ? "destructive" :
+                                initiative.priority === "high" ? "secondary" :
+                                "outline"
+                              }>
+                                {initiative.priority}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <div className="w-16 bg-gray-200 rounded-full h-2">
+                                  <div 
+                                    className="bg-blue-600 h-2 rounded-full" 
+                                    style={{ width: `${initiative.progressPercentage || 0}%` }}
+                                  ></div>
+                                </div>
+                                <span className="text-sm text-gray-600">
+                                  {initiative.progressPercentage || 0}%
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {initiative.dueDate ? (
+                                <span className={`text-sm ${
+                                  new Date(initiative.dueDate) < new Date() ? 'text-red-600' : 'text-gray-600'
+                                }`}>
+                                  {format(new Date(initiative.dueDate), "MMM dd, yyyy")}
+                                </span>
+                              ) : (
+                                <span className="text-sm text-gray-400">No due date</span>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-2">
+                                <Button variant="ghost" size="sm">
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="sm">
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                          
+                          {/* Expandable Tasks Section */}
+                          {isExpanded && (
+                            <TableRow key={`${initiative.id}-tasks`}>
+                              <TableCell colSpan={6} className="p-0">
+                                <div className="bg-gray-50 p-4 border-l-4 border-blue-500">
+                                  <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                                    <User className="h-4 w-4" />
+                                    Tasks ({tasks?.length || 0})
+                                  </h4>
+                                  {tasks && tasks.length > 0 ? (
+                                    <div className="space-y-2">
+                                      {tasks.map((task: any) => (
+                                        <div key={task.id} className="bg-white p-3 rounded-lg border border-gray-200">
+                                          <div className="flex items-center justify-between">
+                                            <div className="flex-1">
+                                              <p className="font-medium text-sm">{task.title}</p>
+                                              {task.description && (
+                                                <p className="text-xs text-gray-600 mt-1">{task.description}</p>
+                                              )}
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                              <Badge variant={
+                                                task.priority === "critical" ? "destructive" :
+                                                task.priority === "high" ? "secondary" :
+                                                "outline"
+                                              } className="text-xs">
+                                                {task.priority}
+                                              </Badge>
+                                              {task.assignedTo && (
+                                                <div className="flex items-center gap-1">
+                                                  <User className="h-3 w-3 text-gray-500" />
+                                                  <span className="text-xs text-gray-600">{task.assignedTo}</span>
+                                                </div>
+                                              )}
+                                              {task.dueDate && (
+                                                <span className={`text-xs ${
+                                                  new Date(task.dueDate) < new Date() ? 'text-red-600' : 'text-gray-600'
+                                                }`}>
+                                                  {format(new Date(task.dueDate), "MMM dd")}
+                                                </span>
+                                              )}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <p className="text-sm text-gray-500">No tasks available</p>
+                                  )}
+                                </div>
+                              </TableCell>
+                            </TableRow>
                           )}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button variant="ghost" size="sm">
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                        </>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               ) : (
