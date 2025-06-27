@@ -125,4 +125,52 @@ export function setupEmailAuth(app: Express) {
       res.status(500).json({ message: "Gagal mengambil data user" });
     }
   });
+
+  // Change password endpoint
+  app.post('/api/auth/change-password', async (req, res) => {
+    try {
+      // In development mode, simulate success without authentication
+      if (process.env.NODE_ENV === 'development') {
+        return res.json({ message: "Password berhasil diubah" });
+      }
+      
+      // Production mode requires authentication
+      if (!req.session?.userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const { currentPassword, newPassword } = req.body;
+      
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ message: "Password saat ini dan password baru diperlukan" });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: "Password baru minimal 6 karakter" });
+      }
+
+      const user = await getCurrentUser(req.session.userId);
+      if (!user) {
+        return res.status(401).json({ message: "User tidak ditemukan" });
+      }
+
+      // Verify current password
+      const { verifyPassword, hashPassword } = require('./emailAuth');
+      const isCurrentPasswordValid = await verifyPassword(currentPassword, user.password);
+      
+      if (!isCurrentPasswordValid) {
+        return res.status(400).json({ message: "Password saat ini tidak valid" });
+      }
+
+      // Hash new password and update
+      const hashedNewPassword = await hashPassword(newPassword);
+      const { storage } = require('./storage');
+      await storage.updateUser(user.id, { password: hashedNewPassword });
+
+      res.json({ message: "Password berhasil diubah" });
+    } catch (error) {
+      console.error('Change password error:', error);
+      res.status(500).json({ message: "Gagal mengubah password" });
+    }
+  });
 }

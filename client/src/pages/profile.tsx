@@ -28,6 +28,12 @@ export default function Profile() {
     role: (user as any)?.role || "member"
   });
 
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: ""
+  });
+
   const updateProfileMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await apiRequest("PATCH", `/api/users/${(user as any)?.id}`, data);
@@ -55,6 +61,60 @@ export default function Profile() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateProfileMutation.mutate(formData);
+  };
+
+  const changePasswordMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest("POST", `/api/auth/change-password`, data);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Password Berhasil Diubah",
+        description: "Password Anda telah berhasil diperbarui.",
+        variant: "default",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: ""
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Gagal Mengubah Password",
+        description: "Password saat ini tidak valid atau terjadi kesalahan.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handlePasswordChange = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast({
+        title: "Password Tidak Cocok",
+        description: "Password baru dan konfirmasi password tidak sama.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      toast({
+        title: "Password Terlalu Pendek",
+        description: "Password baru minimal harus 6 karakter.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    changePasswordMutation.mutate({
+      currentPassword: passwordData.currentPassword,
+      newPassword: passwordData.newPassword
+    });
   };
 
 
@@ -297,7 +357,61 @@ export default function Profile() {
                   </CardContent>
                 </Card>
 
-                
+                {/* Change Password */}
+                <Card className="mt-6">
+                  <CardHeader>
+                    <CardTitle>Ganti Password</CardTitle>
+                    <CardDescription>
+                      Perbarui password untuk keamanan akun Anda
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <form onSubmit={handlePasswordChange} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="currentPassword">Password Saat Ini</Label>
+                        <Input
+                          id="currentPassword"
+                          type="password"
+                          placeholder="Masukkan password saat ini"
+                          value={passwordData.currentPassword}
+                          onChange={(e) => setPasswordData(prev => ({...prev, currentPassword: e.target.value}))}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="newPassword">Password Baru</Label>
+                        <Input
+                          id="newPassword"
+                          type="password"
+                          placeholder="Masukkan password baru"
+                          value={passwordData.newPassword}
+                          onChange={(e) => setPasswordData(prev => ({...prev, newPassword: e.target.value}))}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="confirmPassword">Konfirmasi Password Baru</Label>
+                        <Input
+                          id="confirmPassword"
+                          type="password"
+                          placeholder="Konfirmasi password baru"
+                          value={passwordData.confirmPassword}
+                          onChange={(e) => setPasswordData(prev => ({...prev, confirmPassword: e.target.value}))}
+                          required
+                        />
+                      </div>
+                      <div className="flex justify-end">
+                        <Button 
+                          type="submit" 
+                          className="bg-blue-600 hover:bg-blue-700"
+                          disabled={changePasswordMutation.isPending}
+                        >
+                          {changePasswordMutation.isPending ? "Memperbarui..." : "Perbarui Password"}
+                        </Button>
+                      </div>
+                    </form>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </div>
