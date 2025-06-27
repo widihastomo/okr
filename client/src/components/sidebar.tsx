@@ -15,6 +15,12 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -76,7 +82,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   ];
 
   return (
-    <>
+    <TooltipProvider>
       {/* Mobile overlay */}
       {isOpen && (
         <div
@@ -106,24 +112,46 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               const isActive = location === item.path || 
                 (item.path !== "/" && location.startsWith(item.path));
               
+              if (isOpen) {
+                return (
+                  <Link
+                    key={item.path}
+                    href={item.path}
+                    className={cn(
+                      "flex items-center rounded-lg text-sm font-medium transition-colors space-x-3 px-3 py-2",
+                      isActive
+                        ? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    )}
+                    onClick={onClose}
+                  >
+                    <item.icon className="h-5 w-5 flex-shrink-0" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              }
+              
+              // Collapsed state with tooltip (desktop only)
               return (
-                <Link
-                  key={item.path}
-                  href={item.path}
-                  className={cn(
-                    "flex items-center rounded-lg text-sm font-medium transition-colors",
-                    // Mobile: always full width when visible
-                    isOpen ? "space-x-3 px-3 py-2" : "hidden lg:flex lg:justify-center lg:px-2 lg:py-3",
-                    isActive
-                      ? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                  )}
-                  title={!isOpen ? item.label : undefined}
-                  onClick={onClose}
-                >
-                  <item.icon className="h-5 w-5 flex-shrink-0" />
-                  {isOpen && <span>{item.label}</span>}
-                </Link>
+                <Tooltip key={item.path}>
+                  <TooltipTrigger asChild>
+                    <Link
+                      href={item.path}
+                      className={cn(
+                        "hidden lg:flex lg:items-center lg:justify-center lg:rounded-lg lg:text-sm lg:font-medium lg:transition-colors lg:px-2 lg:py-3",
+                        isActive
+                          ? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
+                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      )}
+                      onClick={onClose}
+                    >
+                      <item.icon className="h-5 w-5 flex-shrink-0" />
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="ml-2">
+                    <p>{item.label}</p>
+                  </TooltipContent>
+                </Tooltip>
               );
             })}
           </nav>
@@ -149,15 +177,22 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <Settings className="h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600" />
               </div>
             ) : (
-              <div className="hidden lg:flex lg:justify-center">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <User className="h-4 w-4 text-blue-600" />
-                </div>
-              </div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="hidden lg:flex lg:justify-center cursor-pointer">
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                      <User className="h-4 w-4 text-blue-600" />
+                    </div>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="ml-2">
+                  <p>Profile</p>
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
         </div>
       </div>
-    </>
+    </TooltipProvider>
   );
 }
