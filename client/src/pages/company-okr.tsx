@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Target, Users, TrendingUp, ChevronDown, ChevronRight, Building2, Filter } from "lucide-react";
@@ -18,6 +18,7 @@ export default function CompanyOKRPage() {
   const [isOKRModalOpen, setIsOKRModalOpen] = useState(false);
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const [selectedCycle, setSelectedCycle] = useState<string>('all');
+  const [hasAutoSelected, setHasAutoSelected] = useState(false);
 
   const { data: okrs = [], isLoading } = useQuery({
     queryKey: ["/api/okrs"],
@@ -26,6 +27,24 @@ export default function CompanyOKRPage() {
   const { data: cycles = [] } = useQuery({
     queryKey: ["/api/cycles"],
   });
+
+  // Set default cycle to active cycle with shortest duration when cycles are loaded
+  const activeCycles = (cycles as any[]).filter(cycle => cycle.status === 'active');
+  const defaultCycle = activeCycles.length > 0 
+    ? activeCycles.reduce((shortest, current) => {
+        const shortestDuration = new Date(shortest.endDate).getTime() - new Date(shortest.startDate).getTime();
+        const currentDuration = new Date(current.endDate).getTime() - new Date(current.startDate).getTime();
+        return currentDuration < shortestDuration ? current : shortest;
+      })
+    : null;
+  
+  // Initialize cycle filter with shortest active cycle on first load only
+  useEffect(() => {
+    if (defaultCycle && selectedCycle === 'all' && cycles.length > 0 && !hasAutoSelected) {
+      setSelectedCycle(defaultCycle.id);
+      setHasAutoSelected(true);
+    }
+  }, [defaultCycle?.id, hasAutoSelected]);
 
   // Filter OKRs by selected cycle
   const filteredOKRs = selectedCycle === 'all' 
