@@ -2,7 +2,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Calendar, User, Clock, Edit, MoreVertical } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Calendar, User, Clock, Edit, MoreVertical, Copy, Trash2 } from "lucide-react";
 import type { OKRWithKeyResults, KeyResult } from "@shared/schema";
 import { Link } from "wouter";
 import { CheckInModal } from "./check-in-modal";
@@ -13,11 +14,13 @@ interface OKRCardProps {
   onEditProgress: (keyResult: KeyResult) => void;
   onRefresh: () => void;
   onKeyResultClick: (keyResultId: string) => void;
+  onDuplicate?: (okr: OKRWithKeyResults) => void;
+  onDelete?: (okrId: string) => void;
   cycleStartDate?: string;
   cycleEndDate?: string;
 }
 
-export default function OKRCard({ okr, onEditProgress, onKeyResultClick, cycleStartDate, cycleEndDate }: OKRCardProps) {
+export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDuplicate, onDelete, cycleStartDate, cycleEndDate }: OKRCardProps) {
   // Calculate days remaining based on cycle end date
   const calculateDaysRemaining = () => {
     const today = new Date();
@@ -137,9 +140,26 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, cycleSt
             <Button variant="ghost" size="sm">
               <Edit className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="sm">
-              <MoreVertical className="w-4 h-4" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => onDuplicate?.(okr)}>
+                  <Copy className="w-4 h-4 mr-2" />
+                  Duplikat
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => onDelete?.(okr.id)}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Hapus
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>

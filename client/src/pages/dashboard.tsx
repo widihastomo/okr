@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import StatsOverview from "@/components/stats-overview";
 import OKRCard from "@/components/okr-card";
 import CreateOKRModal from "@/components/create-okr-modal";
@@ -11,6 +13,7 @@ import { Plus } from "lucide-react";
 import type { OKRWithKeyResults, KeyResult, Cycle } from "@shared/schema";
 
 export default function Dashboard() {
+  const { toast } = useToast();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [timeframeFilter, setTimeframeFilter] = useState<string>("all");
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -29,12 +32,120 @@ export default function Dashboard() {
     queryKey: ['/api/cycles'],
   });
 
+  // Mutation for deleting OKR
+  const deleteOKRMutation = useMutation({
+    mutationFn: async (okrId: string) => {
+      await apiRequest(`/api/objectives/${okrId}`, {
+        method: 'DELETE',
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "OKR berhasil dihapus",
+        description: "Objective dan key results telah dihapus dari sistem.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Gagal menghapus OKR",
+        description: error.message || "Terjadi kesalahan saat menghapus OKR.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation for duplicating OKR
+  const duplicateOKRMutation = useMutation({
+    mutationFn: async (okr: OKRWithKeyResults) => {
+      // Create new objective
+      const response = await fetch('/api/objectives', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: `${okr.title} (Copy)`,
+          description: okr.description,
+          timeframe: okr.timeframe,
+          owner: okr.owner,
+          ownerType: okr.ownerType,
+          ownerId: okr.ownerId,
+          status: "in_progress",
+          cycleId: okr.cycleId,
+          teamId: okr.teamId,
+          parentId: okr.parentId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create objective');
+      }
+
+      const newObjective = await response.json();
+
+      // Create key results for the new objective
+      for (const kr of okr.keyResults) {
+        const krResponse = await fetch('/api/key-results', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            title: kr.title,
+            description: kr.description,
+            currentValue: "0", // Reset progress
+            targetValue: kr.targetValue,
+            baseValue: kr.baseValue,
+            unit: kr.unit,
+            keyResultType: kr.keyResultType,
+            status: "in_progress",
+            objectiveId: newObjective.id,
+            dueDate: kr.dueDate,
+          }),
+        });
+
+        if (!krResponse.ok) {
+          throw new Error('Failed to create key result');
+        }
+      }
+
+      return newObjective;
+    },
+    onSuccess: () => {
+      toast({
+        title: "OKR berhasil diduplikasi",
+        description: "OKR baru telah dibuat dengan progress direset ke 0.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Gagal menduplikasi OKR",
+        description: error.message || "Terjadi kesalahan saat menduplikasi OKR.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleEditProgress = (keyResult: KeyResult) => {
     setEditProgressModal({ open: true, keyResult });
   };
 
   const handleKeyResultClick = (keyResultId: string) => {
     setKeyResultDetailModal({ open: true, keyResultId });
+  };
+
+  const handleDuplicateOKR = (okr: OKRWithKeyResults) => {
+    duplicateOKRMutation.mutate(okr);
+  };
+
+  const handleDeleteOKR = (okrId: string) => {
+    if (confirm("Apakah Anda yakin ingin menghapus OKR ini? Tindakan ini tidak dapat dibatalkan.")) {
+      deleteOKRMutation.mutate(okrId);
+    }
   };
 
   return (
@@ -127,6 +238,8 @@ export default function Dashboard() {
                 onEditProgress={handleEditProgress}
                 onKeyResultClick={handleKeyResultClick}
                 onRefresh={refetch}
+                onDuplicate={handleDuplicateOKR}
+                onDelete={handleDeleteOKR}
                 cycleStartDate={cycle?.startDate}
                 cycleEndDate={cycle?.endDate}
               />
