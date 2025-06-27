@@ -57,8 +57,14 @@ export default function Dashboard() {
   });
 
   // Helper function to check if a cycle is related to selected cycle
-  const isRelatedCycle = (okrCycleId: string, selectedCycleId: string) => {
+  const isRelatedCycle = (okrCycleId: string | null, selectedCycleId: string) => {
+    // Always return true for "all cycles" filter
     if (selectedCycleId === 'all') return true;
+    
+    // Handle null cycleId (OKRs without cycles)
+    if (!okrCycleId) return selectedCycleId === 'all';
+    
+    // Direct match
     if (okrCycleId === selectedCycleId) return true;
     
     // Find the selected cycle and OKR cycle
