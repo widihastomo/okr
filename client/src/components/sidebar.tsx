@@ -94,7 +94,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Sidebar */}
       <div
         className={cn(
-          "fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 transition-all duration-300 ease-in-out z-30",
+          "fixed left-0 top-0 h-screen bg-white border-r border-gray-200 transition-all duration-300 ease-in-out z-40",
           // Mobile: completely hidden when closed, full width when open
           isOpen ? "w-64 translate-x-0" : "w-0 -translate-x-full lg:translate-x-0",
           // Desktop: always visible, width changes
@@ -103,6 +103,17 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         )}
       >
         <div className="flex flex-col h-full">
+          {/* Header spacer */}
+          <div className="h-16 flex items-center justify-center border-b border-gray-200">
+            {isOpen ? (
+              <div className="text-sm font-medium text-gray-600">OKR Manager</div>
+            ) : (
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-xs">OK</span>
+              </div>
+            )}
+          </div>
+          
           {/* Navigation Menu */}
           <nav className={cn(
             "flex-1 py-4 space-y-1 transition-all duration-300",
