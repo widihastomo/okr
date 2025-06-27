@@ -34,13 +34,13 @@ export default function Dashboard() {
     queryKey: ['/api/cycles'],
   });
 
-  // Set default cycle to active cycle with longest duration when cycles are loaded
+  // Set default cycle to active cycle with shortest duration when cycles are loaded
   const activeCycles = cycles.filter(cycle => cycle.status === 'active');
   const defaultCycle = activeCycles.length > 0 
-    ? activeCycles.reduce((longest, current) => {
-        const longestDuration = new Date(longest.endDate).getTime() - new Date(longest.startDate).getTime();
+    ? activeCycles.reduce((shortest, current) => {
+        const shortestDuration = new Date(shortest.endDate).getTime() - new Date(shortest.startDate).getTime();
         const currentDuration = new Date(current.endDate).getTime() - new Date(current.startDate).getTime();
-        return currentDuration > longestDuration ? current : longest;
+        return currentDuration < shortestDuration ? current : shortest;
       })
     : null;
   
