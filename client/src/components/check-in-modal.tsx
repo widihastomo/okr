@@ -70,6 +70,7 @@ export function CheckInModal({
       toast({
         title: "Check-in berhasil",
         description: "Progress telah diperbarui secara otomatis",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
       queryClient.invalidateQueries({

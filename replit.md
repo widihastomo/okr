@@ -275,6 +275,10 @@ Changelog:
   * Implemented automatic key result deletion during OKR editing process
   * Added DELETE endpoint for individual key results (/api/key-results/:id)
   * System now properly cleans up orphaned key results when removed from OKR forms
+  * Fixed foreign key constraint errors by deleting related check-ins before key result deletion
+  * Added automatic objective progress and status recalculation after key result changes
+  * Removed timeframe display element from OKR cards for cleaner interface
+  * Enhanced check-in success notifications with green styling for better user feedback
 ```
 
 ## User Preferences
