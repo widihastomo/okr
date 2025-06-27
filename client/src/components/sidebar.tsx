@@ -40,8 +40,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     {
       label: "Company OKRs",
       icon: Building2,
-      path: "/company-okrs",
-      active: location === "/company-okrs"
+      path: "/company-okr",
+      active: location === "/company-okr"
     },
     {
       label: "OKR Structure",

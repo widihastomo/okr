@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Target, Users, TrendingUp, ChevronDown, ChevronRight, Building2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus, Target, Users, TrendingUp, ChevronDown, ChevronRight, Building2, Filter } from "lucide-react";
 import { OKRWithKeyResults } from "@shared/schema";
 import { ObjectiveStatusBadge } from "@/components/objective-status-badge";
 import OKRFormModal from "@/components/okr-form-modal";
@@ -16,10 +17,20 @@ interface TreeNode {
 export default function CompanyOKRPage() {
   const [isOKRModalOpen, setIsOKRModalOpen] = useState(false);
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+  const [selectedCycle, setSelectedCycle] = useState<string>('all');
 
   const { data: okrs = [], isLoading } = useQuery({
     queryKey: ["/api/okrs"],
   });
+
+  const { data: cycles = [] } = useQuery({
+    queryKey: ["/api/cycles"],
+  });
+
+  // Filter OKRs by selected cycle
+  const filteredOKRs = selectedCycle === 'all' 
+    ? okrs 
+    : okrs.filter((okr: any) => okr.cycleId === selectedCycle);
 
   // Build tree structure
   const buildTree = (okrs: OKRWithKeyResults[]): TreeNode[] => {
@@ -52,7 +63,7 @@ export default function CompanyOKRPage() {
     return rootNodes;
   };
 
-  const treeData = buildTree(okrs);
+  const treeData = buildTree(filteredOKRs);
 
   const toggleExpand = (nodeId: string) => {
     const newExpanded = new Set(expandedNodes);
@@ -251,6 +262,24 @@ export default function CompanyOKRPage() {
           </div>
           
           <div className="flex items-center gap-3">
+            {/* Cycle Filter */}
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-gray-500" />
+              <Select value={selectedCycle} onValueChange={setSelectedCycle}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Pilih Cycle" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Cycle</SelectItem>
+                  {(cycles as any[]).map((cycle) => (
+                    <SelectItem key={cycle.id} value={cycle.id}>
+                      {cycle.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="flex items-center gap-2">
               <Button 
                 variant="outline"
