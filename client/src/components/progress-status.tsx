@@ -225,7 +225,7 @@ export function SimpleProgressStatus({
           {config.label}
         </Badge>
         <div 
-          className="flex-1 relative group cursor-pointer"
+          className="flex-[3] relative group cursor-pointer"
           title={`Progress: ${progressPercentage.toFixed(1)}% | Target ideal: ${idealProgress.toFixed(1)}%`}
         >
           <div className="w-full bg-gray-200 rounded-full h-3 relative">
