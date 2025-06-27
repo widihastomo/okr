@@ -3,7 +3,7 @@ import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Plus, Calendar, Flag, FileText, Users, User } from "lucide-react";
+import { Plus, Calendar, Flag, FileText, Users, User, Search, ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -57,6 +57,8 @@ interface InitiativeModalProps {
 
 export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeModalProps) {
   const [open, setOpen] = useState(false);
+  const [memberDropdownOpen, setMemberDropdownOpen] = useState(false);
+  const [memberSearchTerm, setMemberSearchTerm] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -64,6 +66,11 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
   const { data: users = [] } = useQuery<any[]>({
     queryKey: ["/api/users"],
   });
+
+  // Filter users based on search term
+  const filteredUsers = users.filter(user => 
+    `${user.firstName} ${user.lastName}`.toLowerCase().includes(memberSearchTerm.toLowerCase())
+  );
 
   const form = useForm<InitiativeFormData>({
     resolver: zodResolver(initiativeSchema),
@@ -386,41 +393,99 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
                     Anggota Tim
                   </FormLabel>
                   <FormControl>
-                    <div className="space-y-2">
-                      <div className="border rounded-md p-3 min-h-[2.5rem] bg-white">
-                        <div className="text-sm text-gray-600 mb-2">Pilih anggota tim:</div>
-                        <div className="space-y-2 max-h-32 overflow-y-auto">
-                          {users.map((user) => (
-                            <div key={user.id} className="flex items-center space-x-2">
+                    <div className="relative">
+                      {/* Dropdown Trigger */}
+                      <button
+                        type="button"
+                        onClick={() => setMemberDropdownOpen(!memberDropdownOpen)}
+                        className="w-full border rounded-md px-3 py-2 text-left bg-white flex items-center justify-between hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <span className="text-sm">
+                          {field.value && field.value.length > 0
+                            ? `${field.value.length} anggota terpilih`
+                            : "Pilih anggota tim"
+                          }
+                        </span>
+                        <ChevronDown className="h-4 w-4 text-gray-400" />
+                      </button>
+
+                      {/* Dropdown Content */}
+                      {memberDropdownOpen && (
+                        <div className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg">
+                          {/* Search Box */}
+                          <div className="p-3 border-b">
+                            <div className="relative">
+                              <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                              <input
+                                type="text"
+                                placeholder="Search"
+                                value={memberSearchTerm}
+                                onChange={(e) => setMemberSearchTerm(e.target.value)}
+                                className="w-full pl-10 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Options List */}
+                          <div className="max-h-48 overflow-y-auto">
+                            {/* Select All Option */}
+                            <div className="flex items-center space-x-2 px-3 py-2 hover:bg-gray-50">
                               <Checkbox
-                                id={`member-${user.id}`}
-                                checked={field.value?.includes(user.id) || false}
+                                id="select-all"
+                                checked={field.value?.length === filteredUsers.length && filteredUsers.length > 0}
                                 onCheckedChange={(checked: boolean) => {
                                   if (checked) {
-                                    field.onChange([...(field.value || []), user.id]);
+                                    field.onChange(filteredUsers.map(user => user.id));
                                   } else {
-                                    field.onChange(
-                                      field.value?.filter((id: string) => id !== user.id) || []
-                                    );
+                                    field.onChange([]);
                                   }
                                 }}
                               />
-                              <label 
-                                htmlFor={`member-${user.id}`}
-                                className="text-sm font-normal cursor-pointer"
-                              >
-                                {`${user.firstName} ${user.lastName}`}
+                              <label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
+                                All
                               </label>
                             </div>
-                          ))}
+
+                            {/* User Options */}
+                            {filteredUsers.map((user) => (
+                              <div key={user.id} className="flex items-center space-x-2 px-3 py-2 hover:bg-gray-50">
+                                <Checkbox
+                                  id={`member-${user.id}`}
+                                  checked={field.value?.includes(user.id) || false}
+                                  onCheckedChange={(checked: boolean) => {
+                                    if (checked) {
+                                      field.onChange([...(field.value || []), user.id]);
+                                    } else {
+                                      field.onChange(
+                                        field.value?.filter((id: string) => id !== user.id) || []
+                                      );
+                                    }
+                                  }}
+                                />
+                                <label 
+                                  htmlFor={`member-${user.id}`}
+                                  className="text-sm cursor-pointer flex-1"
+                                >
+                                  {`${user.firstName} ${user.lastName}`}
+                                </label>
+                              </div>
+                            ))}
+
+                            {filteredUsers.length === 0 && (
+                              <div className="px-3 py-2 text-sm text-gray-500">
+                                Tidak ada hasil ditemukan
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                      
-                      {/* Selected Members Count */}
-                      {field.value && field.value.length > 0 && (
-                        <div className="text-sm text-gray-600">
-                          {field.value.length} anggota terpilih
-                        </div>
+                      )}
+
+                      {/* Click outside to close */}
+                      {memberDropdownOpen && (
+                        <div
+                          className="fixed inset-0 z-40"
+                          onClick={() => setMemberDropdownOpen(false)}
+                        />
                       )}
                     </div>
                   </FormControl>
