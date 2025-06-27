@@ -104,14 +104,7 @@ export default function CompanyOKRPage() {
           isRoot ? 'w-80' : 'w-72'
         }`}>
           <div className="flex items-start gap-3">
-            {/* Department/Company Tag */}
-            <div className={`w-10 h-10 rounded-full ${level === 0 ? 'bg-blue-100' : 'bg-purple-100'} flex items-center justify-center shrink-0`}>
-              {level === 0 ? (
-                <Building2 className="w-5 h-5 text-blue-600" />
-              ) : (
-                <Target className="w-5 h-5 text-purple-600" />
-              )}
-            </div>
+            
             
             {/* Content */}
             <div className="flex-1 min-w-0">
