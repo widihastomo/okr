@@ -141,7 +141,38 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
           </div>
           <div className="flex items-center space-x-2">
             <div className="text-right mr-4">
-              <p className="text-2xl font-semibold text-gray-900">{overallProgress.toFixed(1)}%</p>
+              <div className="flex items-center gap-2 mb-2">
+                {(() => {
+                  const getProgressConfig = (status: string) => {
+                    switch (status) {
+                      case 'on_track':
+                        return { bgColor: 'bg-green-100', textColor: 'text-green-800', dotColor: 'bg-green-500', label: 'On track' };
+                      case 'at_risk':
+                        return { bgColor: 'bg-orange-100', textColor: 'text-orange-800', dotColor: 'bg-orange-500', label: 'At risk' };
+                      case 'behind':
+                        return { bgColor: 'bg-red-100', textColor: 'text-red-800', dotColor: 'bg-red-500', label: 'Behind' };
+                      case 'completed':
+                        return { bgColor: 'bg-purple-100', textColor: 'text-purple-800', dotColor: 'bg-purple-500', label: 'Completed' };
+                      case 'in_progress':
+                        return { bgColor: 'bg-blue-100', textColor: 'text-blue-800', dotColor: 'bg-blue-500', label: 'In progress' };
+                      case 'not_started':
+                        return { bgColor: 'bg-gray-100', textColor: 'text-gray-800', dotColor: 'bg-gray-500', label: 'Not started' };
+                      case 'paused':
+                        return { bgColor: 'bg-yellow-100', textColor: 'text-yellow-800', dotColor: 'bg-yellow-500', label: 'Paused' };
+                      default:
+                        return { bgColor: 'bg-gray-100', textColor: 'text-gray-800', dotColor: 'bg-gray-500', label: 'Unknown' };
+                    }
+                  };
+                  const config = getProgressConfig(okr.status);
+                  return (
+                    <div className={`flex items-center gap-2 px-3 py-1 ${config.bgColor} ${config.textColor} rounded-full text-sm font-medium`}>
+                      <div className={`w-2 h-2 ${config.dotColor} rounded-full`}></div>
+                      {config.label}
+                    </div>
+                  );
+                })()}
+                <span className="text-lg font-semibold text-gray-900">{overallProgress.toFixed(1)}%</span>
+              </div>
               <p className="text-sm text-gray-500">Overall Progress</p>
             </div>
             <EditOKRButton okr={okr} />

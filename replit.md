@@ -241,6 +241,11 @@ Changelog:
   * Configured proper label "In Progress" with blue badge styling and hourglass icon
   * Resolved status display issue where objectives showed "Unknown" instead of proper status
   * Enhanced status visibility and user experience in OKR cards
+- June 27, 2025. Added dynamic progress indicator to OKR card headers:
+  * Implemented colored status badge with dot indicator next to overall progress percentage
+  * Dynamic color coding based on objective status (green for on track, red for behind, etc.)
+  * Enhanced visual feedback with status labels and progress percentage display
+  * Improved OKR card readability and status recognition at a glance
 ```
 
 ## User Preferences
