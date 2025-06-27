@@ -351,11 +351,17 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
                         </span>
                       </div>
                       {kr.lastCheckIn.notes && (
-                        <div 
-                          className="text-gray-400 italic text-xs max-w-xs truncate text-right cursor-help"
-                          title={kr.lastCheckIn.notes}
-                        >
-                          "{kr.lastCheckIn.notes}"
+                        <div className="relative group">
+                          <div 
+                            className="text-gray-400 italic text-xs max-w-xs truncate text-right cursor-help"
+                          >
+                            "{kr.lastCheckIn.notes}"
+                          </div>
+                          {/* Custom tooltip */}
+                          <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-20 max-w-xs">
+                            {kr.lastCheckIn.notes}
+                            <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
+                          </div>
                         </div>
                       )}
                     </div>
