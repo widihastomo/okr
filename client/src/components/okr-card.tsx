@@ -18,31 +18,31 @@ interface OKRCardProps {
 export default function OKRCard({ okr, onEditProgress, onKeyResultClick }: OKRCardProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "on_track":
-        return "bg-green-500";
-      case "at_risk":
-        return "bg-orange-500";
-      case "completed":
-        return "bg-green-500";
-      case "in_progress":
-        return "bg-blue-500";
+      case 'completed':
+        return 'bg-green-500';
+      case 'on_track':
+        return 'bg-green-400';
+      case 'at_risk':
+        return 'bg-yellow-500';
+      case 'behind':
+        return 'bg-red-500';
       default:
-        return "bg-gray-500";
+        return 'bg-gray-400';
     }
   };
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case "on_track":
-        return "On Track";
-      case "at_risk":
-        return "At Risk";
-      case "completed":
-        return "Completed";
-      case "in_progress":
-        return "In Progress";
+      case 'completed':
+        return 'Completed';
+      case 'on_track':
+        return 'On Track';
+      case 'at_risk':
+        return 'At Risk';
+      case 'behind':
+        return 'Behind';
       default:
-        return status;
+        return 'In Progress';
     }
   };
 
