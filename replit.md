@@ -374,6 +374,8 @@ Changelog:
   * Added "Update Progress" button in key result detail page for manual refresh
   * System calculates progress as Math.round((completedTasks.length / allTasks.length) * 100)
   * Progress recalculation maintains data integrity across all initiative operations
+  * Fixed task status update to properly refresh task list and update initiative progress
+  * Task status changes now persist correctly and trigger automatic progress recalculation
 - June 27, 2025. Implemented comprehensive initiative management with task integration:
   * Converted initiative form to full-width sheet sliding from right side for better workspace
   * Added integrated task management system within initiative creation process

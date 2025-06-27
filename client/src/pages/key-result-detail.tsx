@@ -294,16 +294,27 @@ export default function KeyResultDetailPage() {
         [taskId]: newStatus
       }));
 
-      // Here we would call the API to update the task status
-      // For now, we'll show a success toast
+      // Make API call to update task status
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update task status');
+      }
+
       toast({
-        title: "Status Updated",
+        title: "Status berhasil diperbarui",
         description: `Task status berhasil diubah ke ${newStatus}`,
         className: "border-green-200 bg-green-50 text-green-800",
       });
 
-      // Invalidate queries to refresh data
-      queryClient.invalidateQueries({
+      // Invalidate queries to refresh data including nested tasks
+      await queryClient.invalidateQueries({
         queryKey: [`/api/key-results/${keyResultId}/initiatives`]
       });
     } catch (error) {
@@ -1064,7 +1075,7 @@ export default function KeyResultDetailPage() {
                                                   {task.priority}
                                                 </Badge>
                                                 <Select
-                                                  value={task.status}
+                                                  value={taskStatuses[task.id] || task.status}
                                                   onValueChange={(newStatus) => handleTaskStatusUpdate(task.id, newStatus)}
                                                 >
                                                   <SelectTrigger className="w-32 h-8 text-xs">

@@ -1264,7 +1264,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/tasks/:id", async (req, res) => {
+  app.put("/api/tasks/:id", async (req, res) => {
     try {
       const id = req.params.id;
       const updatedTask = await storage.updateTask(id, req.body);
