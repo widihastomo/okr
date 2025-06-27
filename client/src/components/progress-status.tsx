@@ -230,9 +230,18 @@ export function SimpleProgressStatus({
         >
           <div className="w-full bg-gray-200 rounded-full h-2 relative">
             <div 
-              className={`h-2 bg-blue-500 transition-all duration-300 ${
+              className={`h-2 transition-all duration-300 ${
                 progressPercentage >= 100 ? 'rounded-full' : 'rounded-l-full'
-              }`}
+              } ${(() => {
+                switch (status) {
+                  case 'completed': return 'bg-green-500';
+                  case 'ahead': return 'bg-blue-500';
+                  case 'on_track': return 'bg-green-400';
+                  case 'at_risk': return 'bg-yellow-500';
+                  case 'behind': return 'bg-red-500';
+                  default: return 'bg-gray-400';
+                }
+              })()}`}
               style={{ width: `${Math.min(100, Math.max(0, progressPercentage))}%` }}
             />
             {/* Threshold indicator for ideal progress */}
@@ -252,7 +261,16 @@ export function SimpleProgressStatus({
       {/* Progress explanation */}
       <div className="mt-2 text-xs text-gray-500 flex items-center gap-4">
         <div className="flex items-center gap-1">
-          <div className="w-3 h-1 bg-blue-500 rounded"></div>
+          <div className={`w-3 h-1 rounded ${(() => {
+            switch (status) {
+              case 'completed': return 'bg-green-500';
+              case 'ahead': return 'bg-blue-500';
+              case 'on_track': return 'bg-green-400';
+              case 'at_risk': return 'bg-yellow-500';
+              case 'behind': return 'bg-red-500';
+              default: return 'bg-gray-400';
+            }
+          })()}`}></div>
           <span>Progress saat ini</span>
         </div>
         <div className="flex items-center gap-1">

@@ -249,6 +249,7 @@ Changelog:
   * Added interactive tooltip showing current progress vs ideal target percentage on hover
   * Extended tooltip functionality to Key Results progress bars for consistent user experience
   * Enhanced progress bar styling: rounded corners only on left side until 100% completion
+  * Applied dynamic status-based colors to Key Results progress bars and legend indicators
   * Enhanced visual feedback with status labels, colored progress bar, ideal threshold, tooltip, and percentage display
   * Improved OKR card readability and status recognition at a glance
 ```
