@@ -483,10 +483,10 @@ export default function KeyResultDetailPage() {
           </Card>
 
           {/* Achievement Chart and Progress History */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Achievement Chart */}
             {chartData.length > 0 && (
-              <Card>
+              <Card className="lg:col-span-8">
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     <TrendingUp className="h-5 w-5" />
@@ -591,7 +591,7 @@ export default function KeyResultDetailPage() {
             )}
 
             {/* Progress History */}
-            <Card>
+            <Card className="lg:col-span-4">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <TrendingUp className="h-5 w-5" />
