@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Menu, Bell, Plus } from "lucide-react";
@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import OKRFormModal from "./okr-form-modal";
 
 interface GlobalHeaderProps {
   onMenuToggle?: () => void;
@@ -15,16 +16,31 @@ interface GlobalHeaderProps {
 
 export default function GlobalHeader({ onMenuToggle }: GlobalHeaderProps) {
   const [notificationCount] = useState(1);
+  const [isOKRModalOpen, setIsOKRModalOpen] = useState(false);
 
   const handleCreateOKR = () => {
-    // Navigate to create OKR page or open modal
-    window.location.href = "/okr-structure";
+    setIsOKRModalOpen(true);
   };
 
   const handleCreateProject = () => {
     // Navigate to create project page or open modal
     console.log("Create project clicked");
   };
+
+  // Global keyboard shortcut for creating OKR (Ctrl+K or Cmd+K)
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+        event.preventDefault();
+        setIsOKRModalOpen(true);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   return (
     <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between fixed top-0 left-0 right-0 z-50">
@@ -56,9 +72,11 @@ export default function GlobalHeader({ onMenuToggle }: GlobalHeaderProps) {
         <Button
           onClick={handleCreateOKR}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
+          title="Buat OKR (Ctrl+K)"
         >
           <Plus className="h-4 w-4" />
           <span>Buat OKR</span>
+          <span className="text-xs opacity-75 ml-2 hidden md:inline">Ctrl+K</span>
         </Button>
 
         {/* Create Project Button */}
@@ -102,6 +120,12 @@ export default function GlobalHeader({ onMenuToggle }: GlobalHeaderProps) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      {/* Global OKR Creation Modal */}
+      <OKRFormModal 
+        open={isOKRModalOpen} 
+        onOpenChange={setIsOKRModalOpen} 
+      />
     </header>
   );
 }

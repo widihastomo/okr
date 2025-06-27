@@ -211,6 +211,13 @@ Changelog:
   * Applied success styling to authentication notifications (login, register)
   * Updated profile management notifications with proper success indicators
   * Maintained destructive styling for error notifications while enhancing positive feedback
+- June 27, 2025. Added global OKR creation shortcut accessible from all pages:
+  * Integrated OKR form modal directly into global header component
+  * Added keyboard shortcut (Ctrl+K or Cmd+K) to open OKR creation form from any page
+  * Enhanced "Buat OKR" button with visual shortcut indicator (Ctrl+K shown on desktop)
+  * Implemented global event listener for keyboard shortcut functionality
+  * Users can now quickly create OKRs without navigating to specific pages
+  * Shortcut works consistently across dashboard, profile, users, and all other application pages
 ```
 
 ## User Preferences
