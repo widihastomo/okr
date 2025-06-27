@@ -537,10 +537,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create key results
       const keyResults = [];
       for (const krData of validatedData.keyResults) {
-        const keyResult = await storage.createKeyResult({
+        // Handle empty baseValue - convert empty string to null for database
+        const processedKrData = {
           ...krData,
-          objectiveId: objective.id
-        });
+          objectiveId: objective.id,
+          baseValue: krData.baseValue === "" ? null : krData.baseValue
+        };
+        const keyResult = await storage.createKeyResult(processedKrData);
         keyResults.push(keyResult);
       }
       console.log("Created key results:", keyResults);
@@ -596,15 +599,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update or create key results
       const keyResults = [];
       for (const krData of validatedData.keyResults) {
+        // Handle empty baseValue - convert empty string to null for database
+        const processedKrData = {
+          ...krData,
+          baseValue: krData.baseValue === "" ? null : krData.baseValue
+        };
+        
         if (krData.id) {
           // Update existing key result
-          const updated = await storage.updateKeyResult(krData.id, krData);
+          const updated = await storage.updateKeyResult(krData.id, processedKrData);
           if (updated) keyResults.push(updated);
         } else {
           // Create new key result - ensure required fields are present
           if (krData.title && krData.targetValue) {
             const created = await storage.createKeyResult({
-              ...krData,
+              ...processedKrData,
               objectiveId: id,
               title: krData.title,
               targetValue: krData.targetValue
