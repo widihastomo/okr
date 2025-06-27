@@ -92,121 +92,126 @@ export default function CompanyOKRPage() {
     return colors[status as keyof typeof colors] || 'text-gray-500';
   };
 
-  const renderCompactCard = (node: TreeNode) => {
+  const renderMindmapCard = (node: TreeNode, isRoot = false) => {
     const { okr, level, children, isExpanded } = node;
     const progressColor = getProgressColor(okr.overallProgress);
     const hasChildren = children.length > 0;
     
     return (
-      <div className={`relative ${level > 0 ? 'ml-6' : ''}`}>
-        {/* Connecting line for child nodes */}
-        {level > 0 && (
-          <>
-            <div className="absolute -left-4 top-4 w-3 h-px bg-gray-300"></div>
-            <div className="absolute -left-4 top-0 w-px h-4 bg-gray-300"></div>
-          </>
-        )}
-        
-        <div className="bg-white rounded-lg border border-gray-200 p-4 mb-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer">
-          <div className="flex items-center justify-between">
-            {/* Left side - Icon, Title, Progress */}
-            <div className="flex items-center gap-3 flex-1">
-              {/* Expand/Collapse button */}
-              {hasChildren ? (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => toggleExpand(okr.id)}
-                  className="p-1 h-6 w-6"
-                >
-                  {isExpanded ? (
-                    <ChevronDown className="w-4 h-4 text-gray-500" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4 text-gray-500" />
-                  )}
-                </Button>
+      <div className="flex items-center">
+        {/* OKR Card */}
+        <div className={`bg-white rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md transition-all duration-200 ${
+          isRoot ? 'w-80' : 'w-72'
+        }`}>
+          <div className="flex items-start gap-3">
+            {/* Department/Company Tag */}
+            <div className={`w-10 h-10 rounded-full ${level === 0 ? 'bg-blue-100' : 'bg-purple-100'} flex items-center justify-center shrink-0`}>
+              {level === 0 ? (
+                <Building2 className="w-5 h-5 text-blue-600" />
               ) : (
-                <div className="w-6 h-6"></div>
+                <Target className="w-5 h-5 text-purple-600" />
               )}
-              
-              {/* Icon */}
-              <div className={`w-8 h-8 rounded-full ${level === 0 ? 'bg-blue-100' : 'bg-purple-100'} flex items-center justify-center`}>
-                {level === 0 ? (
-                  <Building2 className="w-4 h-4 text-blue-600" />
-                ) : (
-                  <Target className="w-4 h-4 text-purple-600" />
-                )}
-              </div>
-              
-              {/* Title and Meta */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-medium text-gray-900 text-sm truncate">{okr.title}</h3>
-                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full shrink-0">
-                    {level === 0 ? 'Company' : 'Department'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 text-xs text-gray-500">
-                  <span>{okr.owner}</span>
-                  <span>•</span>
-                  <span>{okr.keyResults.length} KR</span>
-                  {hasChildren && (
-                    <>
-                      <span>•</span>
-                      <span>{children.length} sub-objectives</span>
-                    </>
-                  )}
-                </div>
-              </div>
             </div>
             
-            {/* Right side - Progress and Status */}
-            <div className="flex items-center gap-3">
-              <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-white text-xs font-medium ${progressColor}`}>
-                <TrendingUp className="w-3 h-3" />
-                {okr.overallProgress.toFixed(0)}%
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              {/* Header */}
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                  {level === 0 ? 'Company' : 'Department'}
+                </span>
+                <span className="text-xs text-gray-500">{okr.owner}</span>
               </div>
-              <ObjectiveStatusBadge status={okr.status} />
-            </div>
-          </div>
-          
-          {/* Key Results preview - only show if expanded or no children */}
-          {(isExpanded || !hasChildren) && okr.keyResults.length > 0 && (
-            <div className="mt-3 pt-3 border-t border-gray-100">
-              <div className="grid grid-cols-1 gap-2">
-                {okr.keyResults.slice(0, 3).map((kr) => (
-                  <div key={kr.id} className="flex items-center gap-2 text-xs">
-                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                    <span className="text-gray-700 truncate flex-1">{kr.title}</span>
-                    <span className="text-gray-500 shrink-0">
-                      {(kr as any).progress?.toFixed(0) || '0'}%
-                    </span>
+              
+              {/* Title */}
+              <h3 className="font-semibold text-gray-900 text-sm mb-2 leading-tight">{okr.title}</h3>
+              
+              {/* Progress and Status */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-white text-xs font-medium ${progressColor}`}>
+                    <TrendingUp className="w-3 h-3" />
+                    {okr.overallProgress.toFixed(0)}%
                   </div>
-                ))}
-                {okr.keyResults.length > 3 && (
-                  <div className="text-xs text-gray-500 ml-4">
-                    +{okr.keyResults.length - 3} more key results
-                  </div>
+                  <ObjectiveStatusBadge status={okr.status} />
+                </div>
+                
+                {/* Expand/Collapse for children */}
+                {hasChildren && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => toggleExpand(okr.id)}
+                    className="p-1 h-6 w-6"
+                  >
+                    {isExpanded ? (
+                      <ChevronDown className="w-4 h-4 text-gray-500" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4 text-gray-500" />
+                    )}
+                  </Button>
                 )}
               </div>
+              
+              {/* Key Results count */}
+              <div className="mt-2 text-xs text-gray-500">
+                {okr.keyResults.length} Key Results
+                {hasChildren && ` • ${children.length} Sub-objectives`}
+              </div>
             </div>
-          )}
+          </div>
         </div>
+        
+        {/* Connecting Line and Children */}
+        {hasChildren && isExpanded && (
+          <div className="flex items-center">
+            {/* Horizontal connecting line */}
+            <div className="w-8 h-px bg-gray-300"></div>
+            
+            {/* Children container */}
+            <div className="flex flex-col gap-4">
+              {children.map((child, index) => (
+                <div key={child.okr.id} className="flex items-center">
+                  {/* Vertical line connector for multiple children */}
+                  {children.length > 1 && (
+                    <div className="relative">
+                      {/* Main vertical line */}
+                      {index === 0 && (
+                        <div 
+                          className="absolute w-px bg-gray-300"
+                          style={{
+                            left: '0px',
+                            top: '20px',
+                            height: `${(children.length - 1) * 96 + 40}px`
+                          }}
+                        ></div>
+                      )}
+                      {/* Horizontal branch */}
+                      <div className="w-4 h-px bg-gray-300"></div>
+                    </div>
+                  )}
+                  
+                  {/* Child card */}
+                  {renderMindmapCard(child)}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     );
   };
 
   const renderTree = (nodes: TreeNode[]) => {
-    return nodes.map((node) => (
-      <div key={node.okr.id}>
-        {renderCompactCard(node)}
-        {node.isExpanded && node.children.length > 0 && (
-          <div className="ml-2">
-            {renderTree(node.children)}
+    return (
+      <div className="flex flex-col gap-8">
+        {nodes.map((node) => (
+          <div key={node.okr.id} className="flex justify-start">
+            {renderMindmapCard(node, true)}
           </div>
-        )}
+        ))}
       </div>
-    ));
+    );
   };
 
   if (isLoading) {
@@ -261,7 +266,7 @@ export default function CompanyOKRPage() {
       </div>
 
       {/* Content */}
-      <div className="p-6">
+      <div className="p-6 overflow-x-auto overflow-y-hidden min-h-[calc(100vh-12rem)]">
         {treeData.length === 0 ? (
           <div className="text-center py-12">
             <Target className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -276,7 +281,7 @@ export default function CompanyOKRPage() {
             </Button>
           </div>
         ) : (
-          <div className="max-w-6xl mx-auto">
+          <div className="min-w-max py-8">
             {renderTree(treeData)}
           </div>
         )}
