@@ -585,6 +585,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteKeyResult(id: string): Promise<boolean> {
+    // First delete all related check-ins to avoid foreign key constraint errors
+    await db.delete(checkIns).where(eq(checkIns.keyResultId, id));
+    
+    // Then delete the key result
     const result = await db.delete(keyResults).where(eq(keyResults.id, id));
     return (result.rowCount ?? 0) > 0;
   }
