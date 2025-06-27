@@ -689,15 +689,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Bulk Update All Status Based on Progress
   app.post("/api/update-all-status", async (req, res) => {
     try {
-      // Import the progress tracker functions
-      const { calculateProgressStatus } = await import("./progress-tracker");
-      
       // Get all key results and update their status
       const keyResults = await storage.getKeyResults();
-      let updatedCount = 0;
+      const objectives = await storage.getObjectives();
+      let updatedKeyResultsCount = 0;
+      let updatedObjectivesCount = 0;
       
+      // Update key results status
       for (const keyResult of keyResults) {
-        // Get objective to find cycle
         const objective = await storage.getObjective(keyResult.objectiveId);
         if (objective && objective.cycleId) {
           const cycle = await storage.getCycle(objective.cycleId);
@@ -710,14 +709,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
             await storage.updateKeyResult(keyResult.id, {
               status: progressStatus.status
             });
-            updatedCount++;
+            updatedKeyResultsCount++;
           }
         }
       }
       
+      // Update objectives status
+      for (const objective of objectives) {
+        try {
+          await updateObjectiveWithAutoStatus(objective.id);
+          updatedObjectivesCount++;
+        } catch (error) {
+          console.error(`Error updating objective ${objective.id}:`, error);
+        }
+      }
+      
       res.json({ 
-        message: `Updated status for ${updatedCount} key results`,
-        updatedCount 
+        message: `Updated status for ${updatedKeyResultsCount} key results and ${updatedObjectivesCount} objectives`,
+        updatedKeyResultsCount,
+        updatedObjectivesCount
       });
     } catch (error) {
       console.error("Error updating all status:", error);
