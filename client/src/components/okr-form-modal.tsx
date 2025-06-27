@@ -200,7 +200,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
         },
         keyResults: data.keyResults.map(kr => ({
           ...kr,
-          assignedTo: kr.assignedTo === "" ? null : kr.assignedTo,
+          assignedTo: kr.assignedTo === "" || kr.assignedTo === "unassigned" ? null : kr.assignedTo,
         })),
       };
 
@@ -261,7 +261,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
       unit: "number",
       keyResultType: "increase_to",
       status: "in_progress",
-      assignedTo: "unassigned",
+      assignedTo: "",
     });
   };
 
