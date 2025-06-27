@@ -16,6 +16,7 @@ export default function Dashboard() {
   const { toast } = useToast();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [cycleFilter, setCycleFilter] = useState<string>("all");
+  const [hasAutoSelected, setHasAutoSelected] = useState<boolean>(false);
 
   const [editProgressModal, setEditProgressModal] = useState<{ open: boolean; keyResult?: KeyResult }>({
     open: false
@@ -43,12 +44,13 @@ export default function Dashboard() {
       })
     : null;
   
-  // Initialize cycle filter with longest active cycle on first load
+  // Initialize cycle filter with longest active cycle on first load only
   useEffect(() => {
-    if (defaultCycle && cycleFilter === 'all') {
+    if (defaultCycle && cycleFilter === 'all' && cycles.length > 0 && !hasAutoSelected) {
       setCycleFilter(defaultCycle.id);
+      setHasAutoSelected(true);
     }
-  }, [defaultCycle, cycleFilter]);
+  }, [defaultCycle?.id, hasAutoSelected]); // Only auto-select once
 
   const { data: allOkrs = [], isLoading, refetch } = useQuery<OKRWithKeyResults[]>({
     queryKey: ["/api/okrs"],
@@ -252,7 +254,10 @@ export default function Dashboard() {
                 </SelectContent>
               </Select>
               
-              <Select value={cycleFilter} onValueChange={setCycleFilter}>
+              <Select value={cycleFilter} onValueChange={(value) => {
+                setCycleFilter(value);
+                setHasAutoSelected(true); // Prevent auto-selection after manual selection
+              }}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Pilih Cycle" />
                 </SelectTrigger>
