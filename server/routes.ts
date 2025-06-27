@@ -930,6 +930,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = req.params.id;
       const updateData = req.body;
       
+      // Handle date conversion properly
+      if (updateData.dueDate) {
+        updateData.dueDate = new Date(updateData.dueDate);
+      }
+      
       const updatedTask = await storage.updateTask(id, updateData);
       
       if (!updatedTask) {

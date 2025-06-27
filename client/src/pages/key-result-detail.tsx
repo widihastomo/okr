@@ -195,7 +195,7 @@ export default function KeyResultDetailPage() {
         taskId: editingTask.id,
         taskData: {
           ...data,
-          dueDate: data.dueDate || undefined,
+          dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : undefined,
           assignedTo: data.assignedTo || undefined,
         }
       });
