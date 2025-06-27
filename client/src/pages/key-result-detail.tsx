@@ -100,6 +100,12 @@ export default function KeyResultDetailPage() {
     enabled: !!keyResultId,
   });
 
+  // Get objective data to access cycle information
+  const { data: objective } = useQuery({
+    queryKey: [`/api/objectives/${keyResult?.objectiveId}`],
+    enabled: !!keyResult?.objectiveId,
+  });
+
   // Helper function to get tasks for a specific initiative
   const getTasksForInitiative = (initiativeId: string) => {
     if (!expandedInitiatives.has(initiativeId)) return [];
@@ -173,23 +179,35 @@ export default function KeyResultDetailPage() {
     });
   };
 
-  // Prepare chart data from check-ins
+  // Prepare chart data from check-ins with diagonal guideline
   const prepareChartData = () => {
-    if (!keyResult?.checkIns || keyResult.checkIns.length === 0) {
-      // Return sample data structure if no check-ins exist
-      return [
-        { date: "01 Jan", actual: 0, ideal: 0 },
-        { date: "24 Jan", actual: 17.5, ideal: 25 },
-        { date: "16 Feb", actual: 50, ideal: 50 },
-        { date: "11 Mar", actual: 75, ideal: 75 },
-        { date: "31 Mar", actual: 95, ideal: 100 }
-      ];
-    }
-
-    // Use current quarter as default cycle dates
+    // Use default cycle dates for now - in production this would come from the cycle data
     const startDate = new Date(2025, 0, 1); // Jan 1, 2025
     const endDate = new Date(2025, 2, 31);   // Mar 31, 2025
     const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    // Create diagonal guideline data points (from 0% to 100% across cycle period)
+    const guidelinePoints = [];
+    const numPoints = 5; // Number of points for the diagonal line
+    
+    for (let i = 0; i <= numPoints; i++) {
+      const progress = (i / numPoints) * 100;
+      const dayOffset = (i / numPoints) * totalDays;
+      const pointDate = new Date(startDate.getTime() + dayOffset * 24 * 60 * 60 * 1000);
+      
+      guidelinePoints.push({
+        date: format(pointDate, "dd MMM"),
+        actual: null, // No actual data for guideline points
+        ideal: progress,
+        guideline: progress, // Diagonal guideline value
+        value: null
+      });
+    }
+
+    if (!keyResult?.checkIns || keyResult.checkIns.length === 0) {
+      // Return only guideline points if no check-ins exist
+      return guidelinePoints;
+    }
 
     // Sort check-ins by date
     const sortedCheckIns = [...keyResult.checkIns].sort((a, b) => 
@@ -197,7 +215,7 @@ export default function KeyResultDetailPage() {
     );
 
     // Calculate progress for each check-in
-    return sortedCheckIns.map((checkIn, index) => {
+    const checkInData = sortedCheckIns.map((checkIn) => {
       // Calculate actual progress
       const current = parseFloat(checkIn.value);
       const target = parseFloat(keyResult.targetValue);
@@ -221,8 +239,17 @@ export default function KeyResultDetailPage() {
         date: format(checkInDate, "dd MMM"),
         actual: Math.max(0, Math.min(100, actualProgress)),
         ideal: Math.max(0, Math.min(100, idealProgress)),
+        guideline: idealProgress, // Add guideline value for consistency
         value: current
       };
+    });
+
+    // Combine and sort all data points by date
+    const allData = [...guidelinePoints, ...checkInData];
+    return allData.sort((a, b) => {
+      const dateA = new Date(a.date + " 2025");
+      const dateB = new Date(b.date + " 2025");
+      return dateA.getTime() - dateB.getTime();
     });
   };
 
@@ -494,20 +521,35 @@ export default function KeyResultDetailPage() {
                       <Tooltip 
                         content={({ active, payload, label }) => {
                           if (active && payload && payload.length) {
+                            const actualData = payload.find(p => p.dataKey === 'actual');
+                            const idealData = payload.find(p => p.dataKey === 'ideal');
+                            const guidelineData = payload.find(p => p.dataKey === 'guideline');
+                            
                             return (
                               <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
                                 <p className="font-medium text-gray-900 mb-2">{label}</p>
                                 <div className="space-y-1">
-                                  <div className="flex items-center gap-2">
-                                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                                    <span className="text-sm text-gray-600">Actual Progress:</span>
-                                    <span className="text-sm font-medium">{typeof payload[0]?.value === 'number' ? payload[0].value.toFixed(1) : '0.0'}%</span>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <div className="w-3 h-3 border-2 border-gray-400 border-dashed rounded-full"></div>
-                                    <span className="text-sm text-gray-600">Ideal Progress:</span>
-                                    <span className="text-sm font-medium">{typeof payload[1]?.value === 'number' ? payload[1].value.toFixed(1) : '0.0'}%</span>
-                                  </div>
+                                  {actualData && actualData.value && (
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                      <span className="text-sm text-gray-600">Actual Progress:</span>
+                                      <span className="text-sm font-medium">{Number(actualData.value).toFixed(1)}%</span>
+                                    </div>
+                                  )}
+                                  {guidelineData && guidelineData.value && (
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-3 h-3 border-2 border-gray-600 border-dashed rounded-full"></div>
+                                      <span className="text-sm text-gray-600">Target Guideline:</span>
+                                      <span className="text-sm font-medium">{Number(guidelineData.value).toFixed(1)}%</span>
+                                    </div>
+                                  )}
+                                  {idealData && idealData.value && (
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-3 h-3 border-2 border-gray-400 border-dashed rounded-full"></div>
+                                      <span className="text-sm text-gray-600">Current Ideal:</span>
+                                      <span className="text-sm font-medium">{Number(idealData.value).toFixed(1)}%</span>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             );
@@ -525,10 +567,18 @@ export default function KeyResultDetailPage() {
                       />
                       <Line
                         type="monotone"
+                        dataKey="guideline"
+                        stroke="#6b7280"
+                        strokeWidth={2}
+                        strokeDasharray="8 4"
+                        dot={false}
+                      />
+                      <Line
+                        type="monotone"
                         dataKey="ideal"
                         stroke="#9ca3af"
-                        strokeWidth={2}
-                        strokeDasharray="5 5"
+                        strokeWidth={1}
+                        strokeDasharray="3 3"
                         dot={false}
                       />
                     </AreaChart>
