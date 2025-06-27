@@ -654,6 +654,78 @@ export class DatabaseStorage implements IStorage {
     return initiative;
   }
 
+  // Initiative Members
+  async createInitiativeMember(memberData: InsertInitiativeMember): Promise<InitiativeMember> {
+    const [member] = await db.insert(initiativeMembers).values(memberData).returning();
+    return member;
+  }
+
+  async getInitiativeMembers(initiativeId: string): Promise<(InitiativeMember & { user: User })[]> {
+    return await db
+      .select({
+        id: initiativeMembers.id,
+        initiativeId: initiativeMembers.initiativeId,
+        userId: initiativeMembers.userId,
+        role: initiativeMembers.role,
+        joinedAt: initiativeMembers.joinedAt,
+        user: users,
+      })
+      .from(initiativeMembers)
+      .innerJoin(users, eq(initiativeMembers.userId, users.id))
+      .where(eq(initiativeMembers.initiativeId, initiativeId));
+  }
+
+  // Tasks for automatic progress calculation
+  async getTasksByInitiativeId(initiativeId: string): Promise<Task[]> {
+    return await db.select().from(tasks).where(eq(tasks.initiativeId, initiativeId));
+  }
+
+  async createTask(taskData: InsertTask): Promise<Task> {
+    const [task] = await db.insert(tasks).values(taskData).returning();
+    
+    // Recalculate initiative progress after task creation
+    await this.updateInitiativeProgress(taskData.initiativeId);
+    
+    return task;
+  }
+
+  async updateTask(id: string, taskData: Partial<InsertTask>): Promise<Task | undefined> {
+    const [task] = await db
+      .update(tasks)
+      .set(taskData)
+      .where(eq(tasks.id, id))
+      .returning();
+
+    if (task) {
+      // Recalculate initiative progress after task update
+      await this.updateInitiativeProgress(task.initiativeId);
+    }
+
+    return task;
+  }
+
+  // Automatic progress calculation based on completed tasks
+  async updateInitiativeProgress(initiativeId: string): Promise<void> {
+    const allTasks = await this.getTasksByInitiativeId(initiativeId);
+    
+    if (allTasks.length === 0) {
+      // No tasks, keep progress at 0
+      await db
+        .update(initiatives)
+        .set({ progressPercentage: 0 })
+        .where(eq(initiatives.id, initiativeId));
+      return;
+    }
+
+    const completedTasks = allTasks.filter(task => task.status === "completed");
+    const progressPercentage = Math.round((completedTasks.length / allTasks.length) * 100);
+
+    await db
+      .update(initiatives)
+      .set({ progressPercentage })
+      .where(eq(initiatives.id, initiativeId));
+  }
+
   // Key Result with Details
   async getKeyResultWithDetails(id: string): Promise<KeyResultWithDetails | undefined> {
     const keyResult = await this.getKeyResult(id);
@@ -852,20 +924,7 @@ export class DatabaseStorage implements IStorage {
     return result.rowCount > 0;
   }
 
-  // Tasks
-  async createTask(taskData: InsertTask): Promise<Task> {
-    const [task] = await db.insert(tasks).values(taskData).returning();
-    return task;
-  }
 
-  async updateTask(id: string, taskData: Partial<InsertTask>): Promise<Task | undefined> {
-    const [task] = await db
-      .update(tasks)
-      .set(taskData)
-      .where(eq(tasks.id, id))
-      .returning();
-    return task;
-  }
 
   async deleteTask(id: string): Promise<boolean> {
     const result = await db.delete(tasks).where(eq(tasks.id, id));

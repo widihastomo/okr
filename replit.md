@@ -332,6 +332,15 @@ Changelog:
   * Included objective, budget, start/end dates, progress percentage, and critical priority level
   * Fixed TypeScript errors and property mismatches in check-in data handling
   * Improved initiative modal with proper Indonesian labels and status management
+- June 27, 2025. Implemented PIC and member assignment with automatic progress calculation:
+  * Added PIC (Person in Charge) selection field to initiative forms using user dropdown
+  * Implemented team member selection with checkbox interface for multi-user assignment
+  * Created initiative member storage methods with proper database relationships
+  * Added automatic progress calculation based on completed tasks percentage
+  * Progress updates automatically when tasks are created, updated, or completed
+  * Enhanced initiative creation endpoint to handle PIC and member assignments
+  * Fixed TypeScript errors and implemented proper user data typing
+  * System now supports comprehensive project management with team collaboration
 ```
 
 ## User Preferences

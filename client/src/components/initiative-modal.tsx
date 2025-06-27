@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Plus, Calendar, Flag, FileText } from "lucide-react";
+import { Plus, Calendar, Flag, FileText, Users, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -40,10 +41,11 @@ const initiativeSchema = z.object({
   objective: z.string().optional(),
   status: z.enum(["not_started", "in_progress", "completed", "on_hold", "cancelled"]).default("not_started"),
   priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
-  progressPercentage: z.number().min(0).max(100).default(0),
+  picId: z.string().optional(),
   budget: z.string().optional(),
   startDate: z.string().optional(),
   dueDate: z.string().optional(),
+  members: z.array(z.string()).optional(),
 });
 
 type InitiativeFormData = z.infer<typeof initiativeSchema>;
@@ -58,6 +60,11 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Fetch users for PIC and member selection
+  const { data: users = [] } = useQuery<Array<{id: string, fullName: string}>>({
+    queryKey: ["/api/users"],
+  });
+
   const form = useForm<InitiativeFormData>({
     resolver: zodResolver(initiativeSchema),
     defaultValues: {
@@ -66,10 +73,11 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
       objective: "",
       status: "not_started",
       priority: "medium",
-      progressPercentage: 0,
+      picId: "",
       budget: "",
       startDate: "",
       dueDate: "",
+      members: [],
     },
   });
 
@@ -79,9 +87,11 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
         ...data,
         keyResultId,
         createdBy: "550e8400-e29b-41d4-a716-446655440001", // This should come from auth context
+        picId: data.picId === "none" ? null : data.picId,
         budget: data.budget ? parseFloat(data.budget) : null,
         startDate: data.startDate ? new Date(data.startDate).toISOString() : null,
         dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : null,
+        progressPercentage: 0, // Start with 0% progress, will be calculated automatically
       };
       return await apiRequest("POST", `/api/key-results/${keyResultId}/initiatives`, payload);
     },
@@ -279,24 +289,32 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
               />
             </div>
 
-            {/* Progress and Budget Row */}
+            {/* PIC and Budget Row */}
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="progressPercentage"
+                name="picId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Progress (%)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number"
-                        min="0"
-                        max="100"
-                        placeholder="0"
-                        {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                      />
-                    </FormControl>
+                    <FormLabel className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      PIC (Penanggung Jawab)
+                    </FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih PIC" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="none">Tidak ada</SelectItem>
+                        {users.map((user: any) => (
+                          <SelectItem key={user.id} value={user.id}>
+                            {user.fullName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -356,6 +374,51 @@ export default function InitiativeModal({ keyResultId, onSuccess }: InitiativeMo
                 )}
               />
             </div>
+
+            {/* Members Selection */}
+            <FormField
+              control={form.control}
+              name="members"
+              render={() => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    Anggota Tim
+                  </FormLabel>
+                  <div className="space-y-2">
+                    {users.map((user: any) => (
+                      <FormField
+                        key={user.id}
+                        control={form.control}
+                        name="members"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value?.includes(user.id)}
+                                onCheckedChange={(checked: boolean) => {
+                                  if (checked) {
+                                    field.onChange([...(field.value || []), user.id]);
+                                  } else {
+                                    field.onChange(
+                                      field.value?.filter((value: string) => value !== user.id)
+                                    );
+                                  }
+                                }}
+                              />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              {user.fullName}
+                            </FormLabel>
+                          </FormItem>
+                        )}
+                      />
+                    ))}
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Submit Button */}
             <div className="flex justify-end gap-3">

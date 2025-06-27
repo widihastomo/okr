@@ -800,15 +800,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const keyResultId = req.params.id;
       const currentUser = (req as any).user;
+      const { members, ...initiativeData } = req.body;
       
       const validatedData = insertInitiativeSchema.parse({
-        ...req.body,
+        ...initiativeData,
         keyResultId,
         createdBy: currentUser.id,
+        startDate: req.body.startDate ? new Date(req.body.startDate).toISOString() : null,
         dueDate: req.body.dueDate ? new Date(req.body.dueDate).toISOString() : null,
       });
       
       const initiative = await storage.createInitiative(validatedData);
+      
+      // Add members to the initiative if provided
+      if (members && Array.isArray(members) && members.length > 0) {
+        for (const userId of members) {
+          await storage.createInitiativeMember({
+            initiativeId: initiative.id,
+            userId,
+            role: "member",
+          });
+        }
+      }
       
       res.status(201).json(initiative);
     } catch (error) {
