@@ -573,7 +573,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }),
         keyResults: z.array(insertKeyResultSchema.partial().extend({
           id: z.string().optional(),
-          assignedTo: z.string().optional(),
+          assignedTo: z.string().nullable().optional(),
         }))
       });
       
