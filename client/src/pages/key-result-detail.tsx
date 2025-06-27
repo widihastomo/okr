@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Calendar, Target, TrendingUp, Users, Clock, BarChart3, Edit, Trash2, ChevronRight, Home, ChevronDown, User, Check, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Calendar, Target, TrendingUp, Users, Clock, BarChart3, Edit, Trash2, ChevronRight, Home, ChevronDown, User, Check, CheckCircle2, MoreHorizontal } from "lucide-react";
 import { CheckInModal } from "@/components/check-in-modal";
 import InitiativeModal from "@/components/initiative-modal";
 import { ProgressStatus } from "@/components/progress-status";
@@ -39,9 +39,48 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Area, AreaChart, ResponsiveContainer } from "recharts";
+
+// Task schema for editing
+const taskSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().optional(),
+  status: z.enum(["not_started", "in_progress", "pending", "blocked", "completed"]).default("not_started"),
+  priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
+  assignedTo: z.string().optional(),
+  dueDate: z.string().optional(),
+});
+
+type TaskFormData = z.infer<typeof taskSchema>;
 
 export default function KeyResultDetailPage() {
   const params = useParams();
@@ -52,6 +91,116 @@ export default function KeyResultDetailPage() {
   const [taskStatuses, setTaskStatuses] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const [editingInitiative, setEditingInitiative] = useState<any>(null);
+  
+  // State for task editing
+  const [editingTask, setEditingTask] = useState<any>(null);
+  const [editTaskOpen, setEditTaskOpen] = useState(false);
+
+  // Task form for editing
+  const taskForm = useForm<TaskFormData>({
+    resolver: zodResolver(taskSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      status: "not_started",
+      priority: "medium",
+      assignedTo: "",
+      dueDate: "",
+    },
+  });
+
+  // Update task mutation
+  const updateTaskMutation = useMutation({
+    mutationFn: async (data: { taskId: string; taskData: Partial<TaskFormData> }) => {
+      const response = await fetch(`/api/tasks/${data.taskId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data.taskData),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update task');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/key-results', keyResultId, 'initiatives'] });
+      toast({
+        title: "Task berhasil diupdate",
+        description: "Perubahan task telah disimpan",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+      setEditTaskOpen(false);
+      setEditingTask(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal mengupdate task",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete task mutation
+  const deleteTaskMutation = useMutation({
+    mutationFn: async (taskId: string) => {
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete task');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/key-results', keyResultId, 'initiatives'] });
+      toast({
+        title: "Task berhasil dihapus",
+        description: "Task telah dihapus dari initiative",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal menghapus task",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Handler functions for task edit/delete
+  const handleEditTask = (task: any) => {
+    setEditingTask(task);
+    taskForm.reset({
+      title: task.title || "",
+      description: task.description || "",
+      status: task.status || "not_started",
+      priority: task.priority || "medium",
+      assignedTo: task.assignedTo?.id || "",
+      dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : "",
+    });
+    setEditTaskOpen(true);
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    deleteTaskMutation.mutate(taskId);
+  };
+
+  const handleTaskSubmit = (data: TaskFormData) => {
+    if (editingTask) {
+      updateTaskMutation.mutate({
+        taskId: editingTask.id,
+        taskData: {
+          ...data,
+          dueDate: data.dueDate || undefined,
+          assignedTo: data.assignedTo || undefined,
+        }
+      });
+    }
+  };
   
   // Delete initiative mutation
   const deleteInitiativeMutation = useMutation({
@@ -903,6 +1052,44 @@ export default function KeyResultDetailPage() {
                                                     <SelectItem value="completed">Selesai</SelectItem>
                                                   </SelectContent>
                                                 </Select>
+                                                <DropdownMenu>
+                                                  <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                                      <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                  </DropdownMenuTrigger>
+                                                  <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem onClick={() => handleEditTask(task)}>
+                                                      <Edit className="h-4 w-4 mr-2" />
+                                                      Edit Task
+                                                    </DropdownMenuItem>
+                                                    <AlertDialog>
+                                                      <AlertDialogTrigger asChild>
+                                                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                                          <Trash2 className="h-4 w-4 mr-2" />
+                                                          Delete Task
+                                                        </DropdownMenuItem>
+                                                      </AlertDialogTrigger>
+                                                      <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                          <AlertDialogTitle>Hapus Task</AlertDialogTitle>
+                                                          <AlertDialogDescription>
+                                                            Apakah Anda yakin ingin menghapus task "{task.title}"? Tindakan ini tidak dapat dibatalkan.
+                                                          </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                          <AlertDialogCancel>Batal</AlertDialogCancel>
+                                                          <AlertDialogAction
+                                                            onClick={() => handleDeleteTask(task.id)}
+                                                            className="bg-red-600 hover:bg-red-700"
+                                                          >
+                                                            Hapus
+                                                          </AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                      </AlertDialogContent>
+                                                    </AlertDialog>
+                                                  </DropdownMenuContent>
+                                                </DropdownMenu>
                                               </div>
                                             </div>
                                           </div>
@@ -942,6 +1129,123 @@ export default function KeyResultDetailPage() {
         onClose={() => setEditingInitiative(null)}
       />
     )}
+
+    {/* Edit Task Modal */}
+    <Dialog open={editTaskOpen} onOpenChange={setEditTaskOpen}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Edit Task</DialogTitle>
+          <DialogDescription>
+            Update the task details below.
+          </DialogDescription>
+        </DialogHeader>
+        <Form {...taskForm}>
+          <form onSubmit={taskForm.handleSubmit(handleTaskSubmit)} className="space-y-4">
+            <FormField
+              control={taskForm.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Task title" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={taskForm.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Task description" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={taskForm.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="not_started">Belum Dimulai</SelectItem>
+                        <SelectItem value="in_progress">Sedang Dikerjakan</SelectItem>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="blocked">Blocked</SelectItem>
+                        <SelectItem value="completed">Selesai</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={taskForm.control}
+                name="priority"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Priority</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select priority" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="critical">Critical</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={taskForm.control}
+              name="dueDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Due Date</FormLabel>
+                  <FormControl>
+                    <Input type="date" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setEditTaskOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                Update Task
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
     </>
   );
 }

@@ -924,6 +924,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update task
+  app.put("/api/tasks/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const updateData = req.body;
+      
+      const updatedTask = await storage.updateTask(id, updateData);
+      
+      if (!updatedTask) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      
+      res.json(updatedTask);
+    } catch (error) {
+      console.error("Error updating task:", error);
+      res.status(500).json({ message: "Failed to update task" });
+    }
+  });
+
+  // Delete task
+  app.delete("/api/tasks/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const deleted = await storage.deleteTask(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      
+      res.status(200).json({ message: "Task deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting task:", error);
+      res.status(500).json({ message: "Failed to delete task" });
+    }
+  });
+
   // Bulk Update All Status Based on Progress
   app.post("/api/update-all-status", async (req, res) => {
     try {
