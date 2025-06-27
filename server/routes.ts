@@ -795,24 +795,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create initiative for a key result
-  app.post("/api/key-results/:id/initiatives", async (req, res) => {
+  // Create initiative for a key result (requires authentication)
+  app.post("/api/key-results/:id/initiatives", requireAuth, async (req, res) => {
     try {
       const keyResultId = req.params.id;
-      
-      // Get current user ID from development mode
-      const currentUserId = process.env.NODE_ENV === 'development' 
-        ? "550e8400-e29b-41d4-a716-446655440001" 
-        : req.session?.userId;
-      
-      if (!currentUserId) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+      const currentUser = (req as any).user;
       
       const validatedData = insertInitiativeSchema.parse({
         ...req.body,
         keyResultId,
-        createdBy: currentUserId,
+        createdBy: currentUser.id,
         dueDate: req.body.dueDate ? new Date(req.body.dueDate).toISOString() : null,
       });
       

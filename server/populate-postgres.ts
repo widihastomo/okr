@@ -14,7 +14,7 @@ async function populateDatabase() {
       {
         id: "550e8400-e29b-41d4-a716-446655440001",
         email: "admin@example.com",
-        password: "$2a$10$example.hash.for.password123", // hashed "password123"
+        password: "$2b$12$rPhsoxHWgBdabXYp36hfA.E4x03qNvol91BAizDZV1YL1VQhe5Zc.", // hashed "password123"
         firstName: "Admin",
         lastName: "User",
         role: "admin",
@@ -25,7 +25,7 @@ async function populateDatabase() {
       {
         id: "550e8400-e29b-41d4-a716-446655440002", 
         email: "manager@example.com",
-        password: "$2a$10$example.hash.for.password123",
+        password: "$2b$12$rPhsoxHWgBdabXYp36hfA.E4x03qNvol91BAizDZV1YL1VQhe5Zc.", // hashed "password123"
         firstName: "Manager",
         lastName: "User",
         role: "manager",
@@ -36,7 +36,7 @@ async function populateDatabase() {
       {
         id: "550e8400-e29b-41d4-a716-446655440003",
         email: "dev@example.com",
-        password: "$2a$10$example.hash.for.password123", 
+        password: "$2b$12$rPhsoxHWgBdabXYp36hfA.E4x03qNvol91BAizDZV1YL1VQhe5Zc.", // hashed "password123"
         firstName: "Developer",
         lastName: "User",
         role: "member",
