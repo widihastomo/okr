@@ -522,10 +522,10 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                       <FormField
                         control={form.control}
-                        name={`keyResults.${index}.currentValue`}
+                        name={`keyResults.${index}.baseValue`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Current</FormLabel>
+                            <FormLabel>Base (Optional)</FormLabel>
                             <FormControl>
                               <Input placeholder="0" {...field} />
                             </FormControl>
@@ -550,10 +550,10 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
 
                       <FormField
                         control={form.control}
-                        name={`keyResults.${index}.baseValue`}
+                        name={`keyResults.${index}.currentValue`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Base (Optional)</FormLabel>
+                            <FormLabel>Current</FormLabel>
                             <FormControl>
                               <Input placeholder="0" {...field} />
                             </FormControl>

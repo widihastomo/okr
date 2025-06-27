@@ -199,6 +199,7 @@ Changelog:
   * Repositioned cycle, owner type, and user fields in a horizontal 3-column layout
   * Improved form usability by grouping related fields in logical sections
   * Enhanced space utilization and visual flow of the form interface
+  * Reordered Key Result fields to logical sequence: Base → Target → Current → Unit
   * Maintained all functionality while reducing visual complexity
 ```
 
