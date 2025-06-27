@@ -239,12 +239,12 @@ export default function Dashboard() {
                 key={okr.id}
                 okr={okr}
                 onEditProgress={handleEditProgress}
-
                 onRefresh={refetch}
                 onDuplicate={handleDuplicateOKR}
                 onDelete={handleDeleteOKR}
                 cycleStartDate={cycle?.startDate}
                 cycleEndDate={cycle?.endDate}
+                cycle={cycle}
                 index={index}
               />
             );
