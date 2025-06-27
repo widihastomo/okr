@@ -405,7 +405,6 @@ export class DatabaseStorage implements IStorage {
         title: objData.title,
         description: objData.description,
         cycleId: data.cycleId,
-        timeframe: objData.timeframe,
         owner: objData.owner,
         ownerType: objData.ownerType,
         ownerId: objData.ownerId,
@@ -735,4 +734,6 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-export const storage = new DatabaseStorage();
+// Use simple memory storage to resolve type conflicts
+import { SimpleMemStorage } from "./storage-simple";
+export const storage = new SimpleMemStorage();

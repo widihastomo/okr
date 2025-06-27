@@ -192,12 +192,12 @@ export function SimpleProgressStatus({
     idealProgress = 100;
   }
   // If timeProgressPercentage is negative (before cycle start), show 0%
-  else if (timeProgressPercentage < 0) {
+  else if (Number(timeProgressPercentage) < 0) {
     idealProgress = 0;
   }
   // Otherwise use the server-calculated timeProgressPercentage
   else {
-    idealProgress = timeProgressPercentage;
+    idealProgress = Number(timeProgressPercentage) || 0;
   }
 
   if (compact) {

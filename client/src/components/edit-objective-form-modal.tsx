@@ -87,7 +87,6 @@ export default function EditObjectiveFormModal({
     defaultValues: {
       title: objective.title,
       description: objective.description || "",
-      timeframe: objective.timeframe,
       owner: objective.owner,
       ownerType: objective.ownerType as "user" | "team",
       ownerId: objective.ownerId,
