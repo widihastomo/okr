@@ -643,12 +643,14 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
                 <div className="bg-white p-4 rounded-md border space-y-3">
                   <h4 className="text-sm font-medium text-gray-700">Tambah Task Baru</h4>
                   
-                  <div className="grid grid-cols-3 gap-3">
-                    <Input
-                      placeholder="Judul task"
-                      value={newTask.title}
-                      onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-                    />
+                  <Input
+                    placeholder="Judul task"
+                    value={newTask.title}
+                    onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                    className="w-full"
+                  />
+                  
+                  <div className="grid grid-cols-2 gap-3">
                     <Select
                       value={newTask.priority}
                       onValueChange={(value) => setNewTask({ ...newTask, priority: value as any })}
