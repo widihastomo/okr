@@ -155,6 +155,14 @@ Changelog:
   * Added "ahead" status support with blue visual indicators for teams exceeding timeline expectations
   * Integrated precise gap percentages in recommendations for actionable insights
   * Validated formula accuracy through comprehensive testing scenarios
+- June 27, 2025. Implemented comprehensive OKR management features:
+  * Added dropdown menu with duplicate and delete functionality to OKR cards
+  * Created custom DeleteConfirmationModal component for safe deletion confirmation
+  * Fixed duplicate OKR functionality to reset progress values and maintain data integrity
+  * Added missing DELETE endpoint for objectives (/api/objectives/:id) on server
+  * Improved Toast component error handling and formatting
+  * Applied 1 decimal place formatting for progress percentages display
+  * Enhanced user experience with proper error handling and feedback notifications
 ```
 
 ## User Preferences

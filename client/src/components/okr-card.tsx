@@ -134,7 +134,7 @@ export default function OKRCard({ okr, onEditProgress, onKeyResultClick, onDupli
           </div>
           <div className="flex items-center space-x-2">
             <div className="text-right mr-4">
-              <p className="text-2xl font-semibold text-gray-900">{okr.overallProgress}%</p>
+              <p className="text-2xl font-semibold text-gray-900">{okr.overallProgress.toFixed(1)}%</p>
               <p className="text-sm text-gray-500">Overall Progress</p>
             </div>
             <Button variant="ghost" size="sm">
