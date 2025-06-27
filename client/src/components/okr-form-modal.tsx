@@ -318,22 +318,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="objective.owner"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Owner Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter owner name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
+                <FormField
                     control={form.control}
                     name="objective.teamId"
                     render={({ field }) => (
