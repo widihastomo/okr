@@ -27,8 +27,8 @@ const formatNumberWithCommas = (value: string | number): string => {
 
 const parseNumberFromFormatted = (value: string): string => {
   if (!value) return '';
-  // Remove commas and parse
-  const cleanValue = value.replace(/[.,]/g, match => match === ',' ? '' : '.');
+  // Remove thousand separators (dots) but keep decimal separator (comma)
+  const cleanValue = value.replace(/\./g, '').replace(',', '.');
   const num = parseFloat(cleanValue);
   return isNaN(num) ? '' : num.toString();
 };
