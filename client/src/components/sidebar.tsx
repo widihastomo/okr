@@ -98,7 +98,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           // Mobile: completely hidden when closed, full width when open
           isOpen ? "w-64 translate-x-0" : "w-0 -translate-x-full lg:translate-x-0",
           // Desktop: always visible, width changes
-          "lg:relative lg:top-0 lg:h-[calc(100vh-4rem)] lg:w-64 lg:translate-x-0",
+          "lg:fixed lg:left-0 lg:top-0 lg:h-screen lg:w-64 lg:translate-x-0",
           !isOpen && "lg:w-16"
         )}
       >

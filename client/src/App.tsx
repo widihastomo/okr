@@ -53,7 +53,7 @@ function Router() {
       {/* Global Header */}
       <GlobalHeader onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
       
-      <div className="flex">
+      <div className="flex pt-16">
         {/* Sidebar */}
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         

@@ -27,7 +27,7 @@ export default function GlobalHeader({ onMenuToggle }: GlobalHeaderProps) {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-40">
+    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between fixed top-0 left-0 right-0 z-50">
       {/* Left side - Menu toggle and Logo */}
       <div className="flex items-center space-x-3">
         {/* Hamburger menu button - always visible */}
