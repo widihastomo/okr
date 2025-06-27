@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Edit2, Trash2, Calendar, MoreHorizontal } from "lucide-react";
+import { Plus, Edit2, Trash2, Calendar, MoreHorizontal, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -47,6 +47,25 @@ export default function CyclesPage() {
         variant: "destructive"
       });
     }
+  });
+
+  const updateStatusMutation = useMutation({
+    mutationFn: () => apiRequest("/api/update-cycle-status", { method: "POST" }),
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/cycles"] });
+      toast({
+        title: "Status siklus diperbarui",
+        description: data.message,
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal memperbarui status",
+        description: error.message || "Terjadi kesalahan saat memperbarui status siklus",
+        variant: "destructive",
+      });
+    },
   });
 
   const getStatusColor = (status: string) => {
@@ -112,10 +131,21 @@ export default function CyclesPage() {
               <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Siklus OKR</h1>
               <p className="text-gray-600 mt-2 text-sm lg:text-base">Kelola siklus OKR bulanan, kuartalan, dan tahunan</p>
             </div>
-            <Button onClick={() => setCreateModalOpen(true)} className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
-              <Plus className="w-4 h-4 mr-2" />
-              Tambah Siklus
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <Button 
+                onClick={() => updateStatusMutation.mutate()}
+                disabled={updateStatusMutation.isPending}
+                variant="outline"
+                className="border-blue-600 text-blue-600 hover:bg-blue-50 w-full sm:w-auto"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${updateStatusMutation.isPending ? 'animate-spin' : ''}`} />
+                Update Status
+              </Button>
+              <Button onClick={() => setCreateModalOpen(true)} className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
+                <Plus className="w-4 h-4 mr-2" />
+                Tambah Siklus
+              </Button>
+            </div>
           </div>
 
           <div className="bg-white rounded-lg shadow border">

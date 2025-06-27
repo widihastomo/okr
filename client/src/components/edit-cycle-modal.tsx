@@ -1,28 +1,14 @@
-import { useEffect } from "react";
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Cycle } from "@shared/schema";
-
-const editCycleSchema = z.object({
-  name: z.string().min(1, "Nama siklus wajib diisi"),
-  description: z.string().optional(),
-  type: z.enum(["monthly", "quarterly", "annual"]),
-  startDate: z.string().min(1, "Tanggal mulai wajib diisi"),
-  endDate: z.string().min(1, "Tanggal selesai wajib diisi"),
-  status: z.enum(["planning", "active", "completed"])
-});
-
-type EditCycleFormData = z.infer<typeof editCycleSchema>;
 
 interface EditCycleModalProps {
   cycle: Cycle | null;
@@ -31,197 +17,165 @@ interface EditCycleModalProps {
 }
 
 export default function EditCycleModal({ cycle, open, onOpenChange }: EditCycleModalProps) {
+  const [formData, setFormData] = useState({
+    name: cycle?.name || "",
+    type: cycle?.type || "quarterly",
+    startDate: cycle?.startDate || "",
+    endDate: cycle?.endDate || "",
+    status: cycle?.status || "planning",
+    description: cycle?.description || "",
+  });
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const form = useForm<EditCycleFormData>({
-    resolver: zodResolver(editCycleSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-      type: "quarterly",
-      startDate: "",
-      endDate: "",
-      status: "planning"
-    }
-  });
-
-  const editMutation = useMutation({
-    mutationFn: async (data: EditCycleFormData) => {
-      if (!cycle) throw new Error("No cycle selected");
-      const response = await apiRequest("PATCH", `/api/cycles/${cycle.id}`, data);
-      return response.json();
-    },
+  const updateMutation = useMutation({
+    mutationFn: (data: typeof formData) => 
+      apiRequest(`/api/cycles/${cycle?.id}`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" }
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/cycles"] });
       toast({
-        title: "Siklus diperbarui",
-        description: "Siklus berhasil diperbarui",
-        className: "border-green-200 bg-green-50 text-green-800"
+        title: "Siklus berhasil diperbarui",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       onOpenChange(false);
-      form.reset();
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
       toast({
-        title: "Error",
-        description: "Gagal memperbarui siklus",
-        variant: "destructive"
+        title: "Gagal memperbarui siklus",
+        description: error.message || "Terjadi kesalahan saat memperbarui siklus",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateMutation.mutate(formData);
+  };
+
+  // Update form data when cycle changes
+  useState(() => {
+    if (cycle) {
+      setFormData({
+        name: cycle.name,
+        type: cycle.type,
+        startDate: cycle.startDate,
+        endDate: cycle.endDate,
+        status: cycle.status,
+        description: cycle.description || "",
       });
     }
   });
 
-  const onSubmit = (data: EditCycleFormData) => {
-    editMutation.mutate(data);
-  };
-
-  // Reset form when cycle changes
-  useEffect(() => {
-    if (cycle && open) {
-      form.reset({
-        name: cycle.name,
-        description: cycle.description || "",
-        type: cycle.type as "monthly" | "quarterly" | "annual",
-        startDate: cycle.startDate,
-        endDate: cycle.endDate,
-        status: cycle.status as "planning" | "active" | "completed"
-      });
-    }
-  }, [cycle, open, form]);
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Edit Siklus</DialogTitle>
         </DialogHeader>
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nama Siklus</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Masukkan nama siklus" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Nama Siklus</Label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="Masukkan nama siklus"
+              required
             />
+          </div>
 
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Deskripsi</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="Masukkan deskripsi siklus" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+          <div className="space-y-2">
+            <Label htmlFor="type">Tipe Siklus</Label>
+            <Select
+              value={formData.type}
+              onValueChange={(value) => setFormData({ ...formData, type: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Pilih tipe siklus" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="monthly">Bulanan</SelectItem>
+                <SelectItem value="quarterly">Kuartalan</SelectItem>
+                <SelectItem value="annual">Tahunan</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="startDate">Tanggal Mulai</Label>
+              <Input
+                id="startDate"
+                type="date"
+                value={formData.startDate}
+                onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="endDate">Tanggal Selesai</Label>
+              <Input
+                id="endDate"
+                type="date"
+                value={formData.endDate}
+                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="status">Status</Label>
+            <Select
+              value={formData.status}
+              onValueChange={(value) => setFormData({ ...formData, status: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Pilih status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="planning">Perencanaan</SelectItem>
+                <SelectItem value="active">Aktif</SelectItem>
+                <SelectItem value="completed">Selesai</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Deskripsi</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Masukkan deskripsi siklus (opsional)"
+              rows={3}
             />
+          </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tipe Siklus</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih tipe" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="monthly">Bulanan</SelectItem>
-                        <SelectItem value="quarterly">Kuartalan</SelectItem>
-                        <SelectItem value="annual">Tahunan</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="planning">Perencanaan</SelectItem>
-                        <SelectItem value="active">Aktif</SelectItem>
-                        <SelectItem value="completed">Selesai</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="startDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tanggal Mulai</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="endDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tanggal Selesai</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="flex justify-end space-x-2 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-              >
-                Batal
-              </Button>
-              <Button
-                type="submit"
-                disabled={editMutation.isPending}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                {editMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
-              </Button>
-            </div>
-          </form>
-        </Form>
+          <div className="flex justify-end space-x-2 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={updateMutation.isPending}
+            >
+              Batal
+            </Button>
+            <Button
+              type="submit"
+              disabled={updateMutation.isPending}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {updateMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );

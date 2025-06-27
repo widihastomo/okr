@@ -11,6 +11,7 @@ import { setupEmailAuth } from "./authRoutes";
 import { requireAuth } from "./emailAuth";
 import { calculateProgressStatus } from "./progress-tracker";
 import { updateObjectiveWithAutoStatus } from "./storage";
+import { updateCycleStatuses } from "./cycle-status-updater";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
@@ -913,6 +914,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating all status:", error);
       res.status(500).json({ message: "Failed to update all status" });
+    }
+  });
+
+  // Manual Cycle Status Update
+  app.post("/api/update-cycle-status", async (req, res) => {
+    try {
+      const updates = await updateCycleStatuses();
+      
+      if (updates.length === 0) {
+        res.json({ 
+          message: "Semua siklus sudah memiliki status yang sesuai", 
+          updates: [] 
+        });
+      } else {
+        res.json({ 
+          message: `Berhasil memperbarui status ${updates.length} siklus`, 
+          updates: updates 
+        });
+      }
+    } catch (error) {
+      console.error("Error updating cycle statuses:", error);
+      res.status(500).json({ message: "Gagal memperbarui status siklus" });
     }
   });
 
