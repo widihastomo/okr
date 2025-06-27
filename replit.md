@@ -289,6 +289,14 @@ Changelog:
   * Enhanced navigation with back button and breadcrumb-style header
   * Improved responsive design with three-column layout for desktop and stacked layout for mobile
   * Added proper date formatting and null-safe handling for all date fields
+- June 27, 2025. Enhanced key result detail page with diagonal guideline and optimized layout:
+  * Added diagonal guideline to Achievement chart based on cycle end date showing target progress timeline
+  * Implemented 3-line chart visualization: actual progress (green area), ideal progress (dashed gray), target guideline (diagonal dashed)
+  * Enhanced tooltip to display all three progress metrics with proper visual indicators
+  * Converted page to full-width layout removing sidebar constraints
+  * Repositioned Progress History alongside Achievement chart in 2-column responsive grid
+  * Added scrollable Progress History with consistent height matching chart visualization
+  * Optimized space utilization for better data presentation and user experience
 - June 27, 2025. Implemented comprehensive automatic cycle status update system:
   * Created cycle-status-updater.ts with intelligent status calculation based on current date
   * Added automatic status transitions: planning → active → completed based on start/end dates

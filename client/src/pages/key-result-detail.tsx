@@ -482,111 +482,157 @@ export default function KeyResultDetailPage() {
             </CardContent>
           </Card>
 
-          {/* Achievement Chart */}
-          {chartData.length > 0 && (
+          {/* Achievement Chart and Progress History */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Achievement Chart */}
+            {chartData.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5" />
+                    Achievement
+                  </CardTitle>
+                  <CardDescription>
+                    Progress tracking over time compared to ideal timeline
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-80 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id="actualGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="#10b981" stopOpacity={0.1}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                        <XAxis 
+                          dataKey="date" 
+                          axisLine={false}
+                          tickLine={false}
+                          tick={{ fontSize: 12, fill: '#6b7280' }}
+                        />
+                        <YAxis 
+                          domain={[0, 100]}
+                          axisLine={false}
+                          tickLine={false}
+                          tick={{ fontSize: 12, fill: '#6b7280' }}
+                          tickFormatter={(value) => `${value}%`}
+                        />
+                        <Tooltip 
+                          content={({ active, payload, label }) => {
+                            if (active && payload && payload.length) {
+                              const actualData = payload.find(p => p.dataKey === 'actual');
+                              const idealData = payload.find(p => p.dataKey === 'ideal');
+                              const guidelineData = payload.find(p => p.dataKey === 'guideline');
+                              
+                              return (
+                                <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+                                  <p className="font-medium text-gray-900 mb-2">{label}</p>
+                                  <div className="space-y-1">
+                                    {actualData && actualData.value && (
+                                      <div className="flex items-center gap-2">
+                                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                        <span className="text-sm text-gray-600">Actual Progress:</span>
+                                        <span className="text-sm font-medium">{Number(actualData.value).toFixed(1)}%</span>
+                                      </div>
+                                    )}
+                                    {guidelineData && guidelineData.value && (
+                                      <div className="flex items-center gap-2">
+                                        <div className="w-3 h-3 border-2 border-gray-600 border-dashed rounded-full"></div>
+                                        <span className="text-sm text-gray-600">Target Guideline:</span>
+                                        <span className="text-sm font-medium">{Number(guidelineData.value).toFixed(1)}%</span>
+                                      </div>
+                                    )}
+                                    {idealData && idealData.value && (
+                                      <div className="flex items-center gap-2">
+                                        <div className="w-3 h-3 border-2 border-gray-400 border-dashed rounded-full"></div>
+                                        <span className="text-sm text-gray-600">Current Ideal:</span>
+                                        <span className="text-sm font-medium">{Number(idealData.value).toFixed(1)}%</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            }
+                            return null;
+                          }}
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="actual"
+                          stroke="#10b981"
+                          strokeWidth={2}
+                          fill="url(#actualGradient)"
+                          dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="guideline"
+                          stroke="#6b7280"
+                          strokeWidth={2}
+                          strokeDasharray="8 4"
+                          dot={false}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="ideal"
+                          stroke="#9ca3af"
+                          strokeWidth={1}
+                          strokeDasharray="3 3"
+                          dot={false}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Progress History */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <TrendingUp className="h-5 w-5" />
-                  Achievement
+                  Progress History
                 </CardTitle>
-                <CardDescription>
-                  Progress tracking over time compared to ideal timeline
-                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-80 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                      <defs>
-                        <linearGradient id="actualGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="#10b981" stopOpacity={0.1}/>
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                      <XAxis 
-                        dataKey="date" 
-                        axisLine={false}
-                        tickLine={false}
-                        tick={{ fontSize: 12, fill: '#6b7280' }}
-                      />
-                      <YAxis 
-                        domain={[0, 100]}
-                        axisLine={false}
-                        tickLine={false}
-                        tick={{ fontSize: 12, fill: '#6b7280' }}
-                        tickFormatter={(value) => `${value}%`}
-                      />
-                      <Tooltip 
-                        content={({ active, payload, label }) => {
-                          if (active && payload && payload.length) {
-                            const actualData = payload.find(p => p.dataKey === 'actual');
-                            const idealData = payload.find(p => p.dataKey === 'ideal');
-                            const guidelineData = payload.find(p => p.dataKey === 'guideline');
-                            
-                            return (
-                              <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-                                <p className="font-medium text-gray-900 mb-2">{label}</p>
-                                <div className="space-y-1">
-                                  {actualData && actualData.value && (
-                                    <div className="flex items-center gap-2">
-                                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                                      <span className="text-sm text-gray-600">Actual Progress:</span>
-                                      <span className="text-sm font-medium">{Number(actualData.value).toFixed(1)}%</span>
-                                    </div>
-                                  )}
-                                  {guidelineData && guidelineData.value && (
-                                    <div className="flex items-center gap-2">
-                                      <div className="w-3 h-3 border-2 border-gray-600 border-dashed rounded-full"></div>
-                                      <span className="text-sm text-gray-600">Target Guideline:</span>
-                                      <span className="text-sm font-medium">{Number(guidelineData.value).toFixed(1)}%</span>
-                                    </div>
-                                  )}
-                                  {idealData && idealData.value && (
-                                    <div className="flex items-center gap-2">
-                                      <div className="w-3 h-3 border-2 border-gray-400 border-dashed rounded-full"></div>
-                                      <span className="text-sm text-gray-600">Current Ideal:</span>
-                                      <span className="text-sm font-medium">{Number(idealData.value).toFixed(1)}%</span>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          }
-                          return null;
-                        }}
-                      />
-                      <Area
-                        type="monotone"
-                        dataKey="actual"
-                        stroke="#10b981"
-                        strokeWidth={2}
-                        fill="url(#actualGradient)"
-                        dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="guideline"
-                        stroke="#6b7280"
-                        strokeWidth={2}
-                        strokeDasharray="8 4"
-                        dot={false}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="ideal"
-                        stroke="#9ca3af"
-                        strokeWidth={1}
-                        strokeDasharray="3 3"
-                        dot={false}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
+                {keyResult.checkIns && keyResult.checkIns.length > 0 ? (
+                  <div className="space-y-3 max-h-80 overflow-y-auto">
+                    {keyResult.checkIns.map((checkIn) => (
+                      <div key={checkIn.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <p className="font-semibold text-blue-600">
+                              {formatValue(checkIn.value, keyResult.unit)}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {checkIn.createdAt ? format(new Date(checkIn.createdAt), "MMM dd") : "Unknown"}
+                            </p>
+                          </div>
+                          {checkIn.notes && (
+                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">{checkIn.notes}</p>
+                          )}
+                          {checkIn.confidence && (
+                            <p className="text-xs text-gray-500 mt-1">Confidence: {checkIn.confidence}/10</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <BarChart3 className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                    <p>No check-ins yet</p>
+                    <p className="text-sm">Add your first check-in to track progress over time.</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
-          )}
+          </div>
 
           {/* Initiatives Table */}
           <Card>
@@ -799,48 +845,6 @@ export default function KeyResultDetailPage() {
                   <Target className="h-12 w-12 mx-auto mb-4 text-gray-300" />
                   <p>No initiatives yet</p>
                   <p className="text-sm">Create your first initiative to start working towards this key result.</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-          {/* Progress History */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Progress History
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {keyResult.checkIns && keyResult.checkIns.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {keyResult.checkIns.map((checkIn) => (
-                    <div key={checkIn.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <p className="font-semibold text-blue-600">
-                            {formatValue(checkIn.value, keyResult.unit)}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {checkIn.createdAt ? format(new Date(checkIn.createdAt), "MMM dd") : "Unknown"}
-                          </p>
-                        </div>
-                        {checkIn.notes && (
-                          <p className="text-sm text-gray-600 mt-1 line-clamp-2">{checkIn.notes}</p>
-                        )}
-                        {checkIn.confidence && (
-                          <p className="text-xs text-gray-500 mt-1">Confidence: {checkIn.confidence}/10</p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <BarChart3 className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                  <p>No check-ins yet</p>
-                  <p className="text-sm">Add your first check-in to track progress over time.</p>
                 </div>
               )}
             </CardContent>
