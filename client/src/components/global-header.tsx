@@ -122,11 +122,13 @@ export default function GlobalHeader({ onMenuToggle }: GlobalHeaderProps) {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Settings Menu */}
+        {/* User Avatar Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="p-2 hover:bg-gray-100">
-              <Settings className="h-5 w-5 text-gray-600" />
+            <Button variant="ghost" size="sm" className="p-1 hover:bg-gray-100 rounded-full">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <User className="h-4 w-4 text-blue-600" />
+              </div>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
