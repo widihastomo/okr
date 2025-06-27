@@ -233,36 +233,36 @@ export default function CompanyOKRPage() {
         
         {/* Connecting Line and Children */}
         {hasChildren && isExpanded && (
-          <div className="ml-4">
+          <div className="relative">
             {children.map((child, index) => (
-              <div key={child.okr.id} className="flex items-center mb-6 last:mb-0">
-                {/* Connection lines */}
-                <div className="flex items-center">
-                  {/* Horizontal line from parent */}
-                  <div className="w-8 h-px bg-gray-300"></div>
+              <div key={child.okr.id} className="flex items-center mt-6 first:mt-0">
+                {/* Connection structure */}
+                <div className="relative flex items-center">
+                  {/* Main horizontal line from parent */}
+                  <div className="w-12 h-px bg-gray-300"></div>
                   
-                  {/* Vertical connector for multiple children */}
+                  {/* T-junction for multiple children */}
                   {children.length > 1 && (
-                    <div className="relative">
-                      {/* Vertical line connecting all children */}
+                    <>
+                      {/* Vertical line - only show on first child but extend through all */}
                       {index === 0 && (
                         <div 
                           className="absolute w-px bg-gray-300"
                           style={{
-                            left: '-4px',
+                            left: '12px',
                             top: '0px',
-                            height: `${(children.length - 1) * 144 + 72}px`
+                            height: `${(children.length - 1) * 200 + 100}px`
                           }}
-                        ></div>
+                        />
                       )}
-                      {/* Small horizontal branch */}
-                      <div className="w-4 h-px bg-gray-300"></div>
-                    </div>
+                      {/* Small horizontal connector to vertical line */}
+                      <div className="w-3 h-px bg-gray-300 -ml-px"></div>
+                    </>
                   )}
                 </div>
                 
                 {/* Child card */}
-                <div className="ml-2">
+                <div className="ml-3">
                   {renderMindmapCard(child)}
                 </div>
               </div>
