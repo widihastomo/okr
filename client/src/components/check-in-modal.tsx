@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +40,11 @@ export function CheckInModal({
   const [confidence, setConfidence] = useState([5]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Sync local value state with updated currentValue prop
+  useEffect(() => {
+    setValue(currentValue);
+  }, [currentValue]);
 
   const checkInMutation = useMutation({
     mutationFn: async (data: { value: string; notes: string; confidence: number }) => {
