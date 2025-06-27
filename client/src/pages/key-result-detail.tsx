@@ -692,7 +692,11 @@ export default function KeyResultDetailPage() {
                                   )}
                                 </Button>
                                 <div>
-                                  <p className="font-semibold">{initiative.title}</p>
+                                  <Link href={`/initiatives/${initiative.id}`}>
+                                    <p className="font-semibold text-blue-600 hover:text-blue-800 cursor-pointer hover:underline">
+                                      {initiative.title}
+                                    </p>
+                                  </Link>
                                   {initiative.description && (
                                     <p className="text-sm text-gray-600 mt-1">{initiative.description}</p>
                                   )}
