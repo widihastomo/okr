@@ -374,6 +374,13 @@ Changelog:
   * Updated button text to dynamically show "Update Initiative" when editing and "Buat Initiative" when creating
   * Enhanced button loading states to handle both create and update mutation pending states
   * All CRUD operations for initiatives now working correctly with proper error handling
+- June 27, 2025. Fixed achievement chart to properly display cycle timeline:
+  * Updated chart to use actual objective cycle dates (June 1-30, 2025) instead of hardcoded values
+  * Implemented diagonal guideline from 0% at cycle start to 100% at cycle end
+  * Added proper X-axis date formatting with rotated labels for better readability
+  * Chart now shows: actual progress (green area), ideal progress line, and diagonal target guideline
+  * Enhanced chart margins to accommodate rotated date labels
+  * Chart automatically adjusts to the objective's cycle timeline for accurate progress visualization
 - June 27, 2025. Implemented comprehensive automatic progress calculation system for initiatives:
   * Added automatic progress calculation based on completed tasks vs total tasks ratio
   * Progress updates automatically when tasks are created, updated, or deleted
