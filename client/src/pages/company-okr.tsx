@@ -101,58 +101,79 @@ export default function CompanyOKRPage() {
       <div className="flex items-center">
         {/* OKR Card */}
         <div className={`bg-white rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md transition-all duration-200 ${
-          isRoot ? 'w-80' : 'w-72'
+          isRoot ? 'w-96' : 'w-80'
         }`}>
-          <div className="flex items-start gap-3">
+          {/* Objective Section */}
+          <div className="flex items-start gap-3 mb-4">
+            <div className={`w-8 h-8 rounded-full ${level === 0 ? 'bg-blue-100' : 'bg-purple-100'} flex items-center justify-center shrink-0`}>
+              {level === 0 ? (
+                <Building2 className="w-4 h-4 text-blue-600" />
+              ) : (
+                <Target className="w-4 h-4 text-purple-600" />
+              )}
+            </div>
             
-            
-            {/* Content */}
             <div className="flex-1 min-w-0">
-              {/* Header */}
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                  {level === 0 ? 'Company' : 'Department'}
-                </span>
-                <span className="text-xs text-gray-500">{okr.owner}</span>
-              </div>
-              
-              {/* Title */}
-              <h3 className="font-semibold text-gray-900 text-sm mb-2 leading-tight">{okr.title}</h3>
-              
-              {/* Progress and Status */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-white text-xs font-medium ${progressColor}`}>
-                    <TrendingUp className="w-3 h-3" />
-                    {okr.overallProgress.toFixed(0)}%
-                  </div>
-                  <ObjectiveStatusBadge status={okr.status} />
-                </div>
-                
-                {/* Expand/Collapse for children */}
-                {hasChildren && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => toggleExpand(okr.id)}
-                    className="p-1 h-6 w-6"
-                  >
-                    {isExpanded ? (
-                      <ChevronDown className="w-4 h-4 text-gray-500" />
-                    ) : (
-                      <ChevronRight className="w-4 h-4 text-gray-500" />
-                    )}
-                  </Button>
-                )}
-              </div>
-              
-              {/* Key Results count */}
-              <div className="mt-2 text-xs text-gray-500">
-                {okr.keyResults.length} Key Results
-                {hasChildren && ` • ${children.length} Sub-objectives`}
+              <h3 className="font-semibold text-gray-900 text-sm mb-1 leading-tight">{okr.title}</h3>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500">Q2 2024</span>
               </div>
             </div>
+            
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                <span className="text-xs font-medium text-gray-600">
+                  {okr.owner ? okr.owner.charAt(0).toUpperCase() : 'U'}
+                </span>
+              </div>
+              <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-white text-xs font-medium ${progressColor}`}>
+                {okr.overallProgress.toFixed(0)}%
+              </div>
+              {/* Expand/Collapse for children */}
+              {hasChildren && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => toggleExpand(okr.id)}
+                  className="p-1 h-6 w-6"
+                >
+                  {isExpanded ? (
+                    <ChevronDown className="w-4 h-4 text-gray-500" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4 text-gray-500" />
+                  )}
+                </Button>
+              )}
+            </div>
           </div>
+          
+          {/* Key Results Section */}
+          {okr.keyResults.length > 0 && (
+            <div className="space-y-2 border-t border-gray-100 pt-3">
+              {okr.keyResults.map((kr, index) => (
+                <div key={kr.id} className="flex items-center gap-3 py-2">
+                  <div className="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
+                    <Target className="w-3 h-3 text-purple-600" />
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm text-gray-900">{kr.title}</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
+                      <span className="text-xs font-medium text-gray-600">
+                        {okr.owner ? okr.owner.charAt(0).toUpperCase() : 'U'}
+                      </span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">
+                      {((kr as any).progress || 0).toFixed(0)}%
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
         
         {/* Connecting Line and Children */}
@@ -175,7 +196,7 @@ export default function CompanyOKRPage() {
                           style={{
                             left: '0px',
                             top: '20px',
-                            height: `${(children.length - 1) * 96 + 40}px`
+                            height: `${(children.length - 1) * 160 + 40}px`
                           }}
                         ></div>
                       )}
