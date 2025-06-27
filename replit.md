@@ -280,6 +280,7 @@ Changelog:
   * Removed timeframe display element from OKR cards for cleaner interface
   * Enhanced check-in success notifications with green styling for better user feedback
   * Added custom CSS hover tooltip to show full text of truncated check-in notes with smooth animation and proper positioning
+  * Fixed tooltip overflow issue for long messages by enabling text wrapping and adjusting width constraints
 ```
 
 ## User Preferences
