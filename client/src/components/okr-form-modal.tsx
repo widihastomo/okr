@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,9 +24,9 @@ const okrFormSchema = z.object({
     ownerType: z.enum(["user", "team"]).default("user"),
     ownerId: z.string().min(1, "Owner is required"),
     status: z.string().default("in_progress"),
-    cycleId: z.string().optional(),
-    teamId: z.string().optional(),
-    parentId: z.string().optional(),
+    cycleId: z.string().optional().nullable(),
+    teamId: z.string().optional().nullable(),
+    parentId: z.string().optional().nullable(),
   }),
   keyResults: z.array(z.object({
     id: z.string().optional(),
@@ -38,7 +38,7 @@ const okrFormSchema = z.object({
     unit: z.string().default("number"),
     keyResultType: z.string().default("increase_to"),
     status: z.string().default("in_progress"),
-    assignedTo: z.string().default("unassigned"),
+    assignedTo: z.string().optional(),
   })).min(1, "At least one key result is required"),
 });
 
@@ -72,9 +72,9 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
         ownerType: okr.ownerType as "user" | "team",
         ownerId: okr.ownerId,
         status: okr.status,
-        cycleId: okr.cycleId || undefined,
-        teamId: okr.teamId || undefined,
-        parentId: okr.parentId || undefined,
+        cycleId: okr.cycleId === null ? undefined : okr.cycleId,
+        teamId: okr.teamId === null ? undefined : okr.teamId,
+        parentId: okr.parentId === null ? undefined : okr.parentId,
       },
       keyResults: okr.keyResults.map(kr => ({
         id: kr.id,
@@ -86,7 +86,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
         unit: kr.unit,
         keyResultType: kr.keyResultType,
         status: kr.status,
-        assignedTo: kr.assignedTo || "unassigned",
+        assignedTo: kr.assignedTo || "",
       })),
     } : {
       objective: {
@@ -110,10 +110,70 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
         unit: "number",
         keyResultType: "increase_to",
         status: "in_progress",
-        assignedTo: "unassigned",
+        assignedTo: "",
       }],
     },
   });
+
+  // Reset form when okr prop changes or dialog opens
+  useEffect(() => {
+    if (open) {
+      if (isEditMode && okr) {
+        form.reset({
+          objective: {
+            title: okr.title,
+            description: okr.description || "",
+            timeframe: okr.timeframe,
+            owner: okr.owner,
+            ownerType: okr.ownerType as "user" | "team",
+            ownerId: okr.ownerId,
+            status: okr.status,
+            cycleId: okr.cycleId === null ? undefined : okr.cycleId,
+            teamId: okr.teamId === null ? undefined : okr.teamId,
+            parentId: okr.parentId === null ? undefined : okr.parentId,
+          },
+          keyResults: okr.keyResults.map(kr => ({
+            id: kr.id,
+            title: kr.title,
+            description: kr.description || "",
+            currentValue: kr.currentValue,
+            targetValue: kr.targetValue,
+            baseValue: kr.baseValue || "",
+            unit: kr.unit,
+            keyResultType: kr.keyResultType,
+            status: kr.status,
+            assignedTo: kr.assignedTo || "",
+          })),
+        });
+      } else {
+        form.reset({
+          objective: {
+            title: "",
+            description: "",
+            timeframe: "",
+            owner: "",
+            ownerType: "user",
+            ownerId: "",
+            status: "in_progress",
+            cycleId: undefined,
+            teamId: undefined,
+            parentId: undefined,
+          },
+          keyResults: [{
+            title: "",
+            description: "",
+            currentValue: "0",
+            targetValue: "",
+            baseValue: "",
+            unit: "number",
+            keyResultType: "increase_to",
+            status: "in_progress",
+            assignedTo: "",
+          }],
+        });
+      }
+    }
+  }, [open, okr, isEditMode, form]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -122,20 +182,48 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
 
   const mutation = useMutation({
     mutationFn: async (data: OKRFormData) => {
+      // Calculate the owner display name based on owner type and ID
+      let ownerName = "";
+      if (data.objective.ownerType === "team" && data.objective.ownerId) {
+        const team = teams?.find(t => t.id === data.objective.ownerId);
+        ownerName = team?.name || "";
+      } else if (data.objective.ownerType === "user" && data.objective.ownerId) {
+        const user = users?.find(u => u.id === data.objective.ownerId);
+        ownerName = user ? `${user.firstName} ${user.lastName}` : "";
+      }
+
+      // Prepare the payload with the calculated owner name
+      const payload = {
+        ...data,
+        objective: {
+          ...data.objective,
+          owner: ownerName,
+          // Convert "none" values back to null for the database
+          cycleId: data.objective.cycleId === undefined ? null : data.objective.cycleId,
+          teamId: data.objective.teamId === undefined ? null : data.objective.teamId,
+          parentId: data.objective.parentId === undefined ? null : data.objective.parentId,
+        },
+        keyResults: data.keyResults.map(kr => ({
+          ...kr,
+          assignedTo: kr.assignedTo === "" ? null : kr.assignedTo,
+        })),
+      };
+
       const response = isEditMode
         ? await fetch(`/api/okrs/${okr.id}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
+            body: JSON.stringify(payload),
           })
         : await fetch("/api/okrs", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
+            body: JSON.stringify(payload),
           });
 
       if (!response.ok) {
-        throw new Error(`Failed to ${isEditMode ? 'update' : 'create'} OKR`);
+        const errorData = await response.text();
+        throw new Error(`Failed to ${isEditMode ? 'update' : 'create'} OKR: ${errorData}`);
       }
 
       return await response.json();
@@ -147,6 +235,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
       });
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
       onOpenChange(false);
       form.reset();
     },
@@ -228,23 +317,71 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                   )}
                 />
 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="objective.timeframe"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Timeframe</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., Q1 2025, January 2025" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="objective.cycleId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Cycle</FormLabel>
+                        <Select 
+                          onValueChange={(value) => field.onChange(value === "none" ? undefined : value)} 
+                          value={field.value || "none"}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select cycle" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="none">No Cycle</SelectItem>
+                            {cycles?.map((cycle) => (
+                              <SelectItem key={cycle.id} value={cycle.id}>
+                                {cycle.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
                 <FormField
                   control={form.control}
-                  name="objective.cycleId"
+                  name="objective.parentId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Cycle</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormLabel>Parent Objective (Optional)</FormLabel>
+                      <Select 
+                        onValueChange={(value) => field.onChange(value === "none" ? undefined : value)} 
+                        value={field.value || "none"}
+                      >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select cycle" />
+                            <SelectValue placeholder="Select parent objective" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="none">No Cycle</SelectItem>
-                          {cycles?.map((cycle) => (
-                            <SelectItem key={cycle.id} value={cycle.id}>
-                              {cycle.name}
+                          <SelectItem value="none">No Parent</SelectItem>
+                          {objectives?.filter(obj => !isEditMode || obj.id !== okr?.id).map((objective) => (
+                            <SelectItem key={objective.id} value={objective.id}>
+                              {objective.title}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -324,7 +461,10 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Team (Optional)</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select 
+                        onValueChange={(value) => field.onChange(value === "none" ? undefined : value)} 
+                        value={field.value || "none"}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select team" />
@@ -510,7 +650,10 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Assigned To (Optional)</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select 
+                            onValueChange={(value) => field.onChange(value === "unassigned" ? "" : value)} 
+                            value={field.value || "unassigned"}
+                          >
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Select assignee" />

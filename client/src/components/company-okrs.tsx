@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Plus, ChevronDown, ChevronRight, Building2, Users, User, Target, RefreshCw } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import CreateOKRModal from "./create-okr-modal";
+import { CreateOKRButton } from "./okr-form-modal";
 import EditProgressModal from "./edit-progress-modal";
 import type { OKRWithKeyResults, KeyResult } from "@shared/schema";
 
@@ -16,7 +16,6 @@ interface CompanyOKRsProps {
 }
 
 export default function CompanyOKRs({ onRefresh }: CompanyOKRsProps) {
-  const [createModal, setCreateModal] = useState(false);
   const [editProgressModal, setEditProgressModal] = useState<{ open: boolean; keyResult?: KeyResult }>({ open: false });
   const [expandedOKRs, setExpandedOKRs] = useState<Set<string>>(new Set());
   const { toast } = useToast();
@@ -252,10 +251,7 @@ export default function CompanyOKRs({ onRefresh }: CompanyOKRsProps) {
             <RefreshCw className={`w-4 h-4 mr-2 ${updateAllStatusMutation.isPending ? 'animate-spin' : ''}`} />
             Update Status
           </Button>
-          <Button onClick={() => setCreateModal(true)} className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-            <Plus className="w-4 h-4 mr-2" />
-            Create OKR
-          </Button>
+          <CreateOKRButton />
         </div>
       </div>
 
@@ -267,10 +263,7 @@ export default function CompanyOKRs({ onRefresh }: CompanyOKRsProps) {
             <p className="text-gray-500 text-center mb-4">
               Start by creating your first objective to track progress
             </p>
-            <Button onClick={() => setCreateModal(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Create First OKR
-            </Button>
+            <CreateOKRButton />
           </CardContent>
         </Card>
       ) : (
@@ -279,14 +272,7 @@ export default function CompanyOKRs({ onRefresh }: CompanyOKRsProps) {
         </div>
       )}
 
-      <CreateOKRModal
-        open={createModal}
-        onOpenChange={setCreateModal}
-        onSuccess={() => {
-          setCreateModal(false);
-          onRefresh();
-        }}
-      />
+
 
       <EditProgressModal
         open={editProgressModal.open}
