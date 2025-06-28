@@ -996,21 +996,7 @@ export default function UsersPage() {
                             })()}
                           </div>
                           
-                          {/* Manage Button */}
-                          <div className="pt-2">
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              className="w-full"
-                              onClick={() => {
-                                setSelectedTeam(team);
-                                setTeamMembersDialog(true);
-                              }}
-                            >
-                              <Users className="h-4 w-4 mr-2" />
-                              Manage Members
-                            </Button>
-                          </div>
+                          
                         </div>
                       </CardContent>
                     </Card>
