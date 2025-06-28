@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Users, Plus, Edit, Trash2, UserPlus, Shield, User as UserIcon, Search, UserCheck, UserX, MoreHorizontal } from "lucide-react";
+import { Users, Plus, Edit, Trash2, UserPlus, Shield, User as UserIcon, Search, UserCheck, UserX, MoreHorizontal, MoreVertical } from "lucide-react";
 
 import { useToast } from "@/hooks/use-toast";
 
@@ -32,6 +32,11 @@ export default function UsersPage() {
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [teamMembersDialog, setTeamMembersDialog] = useState(false);
   const [addMemberDialog, setAddMemberDialog] = useState(false);
+  const [editTeamDialog, setEditTeamDialog] = useState(false);
+  const [createTeamDialog, setCreateTeamDialog] = useState(false);
+  const [teamToDelete, setTeamToDelete] = useState<Team | null>(null);
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [editFormMembers, setEditFormMembers] = useState<string[]>([]);
 
   const { data: users = [], isLoading: usersLoading } = useQuery<User[]>({
     queryKey: ["/api/users"],
@@ -154,18 +159,32 @@ export default function UsersPage() {
   });
 
   const createTeamMutation = useMutation({
-    mutationFn: async (data: { name: string; description: string; ownerId: string }) => {
+    mutationFn: async (data: { name: string; description: string; ownerId: string; members: string[] }) => {
       const response = await fetch("/api/teams", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ name: data.name, description: data.description, ownerId: data.ownerId }),
       });
       if (!response.ok) throw new Error('Failed to create team');
-      return response.json();
+      const team = await response.json();
+      
+      // Add members to the team
+      if (data.members.length > 0) {
+        await Promise.all(data.members.map(userId => 
+          fetch(`/api/teams/${team.id}/members`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId, role: "member" }),
+          })
+        ));
+      }
+      
+      return team;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/teams"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/team-members"] });
+      setSelectedMembers([]);
       toast({
         title: "Success",
         description: "Team created successfully",
@@ -177,6 +196,65 @@ export default function UsersPage() {
       toast({
         title: "Error",
         description: "Failed to create team",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update team mutation
+  const updateTeamMutation = useMutation({
+    mutationFn: async (data: { teamId: string; name: string; description: string; members: string[] }) => {
+      const response = await fetch(`/api/teams/${data.teamId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: data.name, description: data.description }),
+      });
+      if (!response.ok) throw new Error('Failed to update team');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/teams"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/team-members"] });
+      setEditTeamDialog(false);
+      setSelectedTeam(null);
+      toast({
+        title: "Success",
+        description: "Team updated successfully",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete team mutation
+  const deleteTeamMutation = useMutation({
+    mutationFn: async (teamId: string) => {
+      const response = await fetch(`/api/teams/${teamId}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) throw new Error('Failed to delete team');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/teams"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/team-members"] });
+      setTeamToDelete(null);
+      toast({
+        title: "Success",
+        description: "Team deleted successfully",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
         variant: "destructive",
       });
     },
@@ -610,6 +688,7 @@ export default function UsersPage() {
                         name: formData.get('name') as string,
                         description: formData.get('description') as string,
                         ownerId: formData.get('ownerId') as string,
+                        members: selectedMembers,
                       });
                     }}>
                       <div className="space-y-4">
@@ -636,6 +715,36 @@ export default function UsersPage() {
                             </SelectContent>
                           </Select>
                         </div>
+                        <div>
+                          <Label htmlFor="members">Team Members</Label>
+                          <div className="space-y-2">
+                            <div className="max-h-40 overflow-y-auto border rounded p-2">
+                              {users.map((user: User) => (
+                                <label key={user.id} className="flex items-center space-x-2 p-1 hover:bg-gray-50 rounded">
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedMembers.includes(user.id)}
+                                    onChange={(e) => {
+                                      if (e.target.checked) {
+                                        setSelectedMembers([...selectedMembers, user.id]);
+                                      } else {
+                                        setSelectedMembers(selectedMembers.filter(id => id !== user.id));
+                                      }
+                                    }}
+                                    className="rounded"
+                                  />
+                                  <Avatar className="h-6 w-6">
+                                    <AvatarFallback className="bg-gray-600 text-white text-xs">
+                                      {user.firstName?.[0]}{user.lastName?.[0]}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <span className="text-sm">{user.firstName} {user.lastName}</span>
+                                </label>
+                              ))}
+                            </div>
+                            <p className="text-xs text-gray-500">Selected: {selectedMembers.length} members</p>
+                          </div>
+                        </div>
                         <Button 
                           type="submit" 
                           className="w-full bg-blue-600 hover:bg-blue-700"
@@ -648,6 +757,99 @@ export default function UsersPage() {
                   </DialogContent>
                 </Dialog>
               </div>
+
+              {/* Edit Team Dialog */}
+              <Dialog open={editTeamDialog} onOpenChange={setEditTeamDialog}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Edit Team</DialogTitle>
+                    <DialogDescription>
+                      Update team information and manage members
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={(e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.currentTarget);
+                    if (selectedTeam) {
+                      updateTeamMutation.mutate({
+                        teamId: selectedTeam.id,
+                        name: formData.get('name') as string,
+                        description: formData.get('description') as string,
+                        members: editFormMembers,
+                      });
+                    }
+                  }}>
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="name">Team Name</Label>
+                        <Input name="name" defaultValue={selectedTeam?.name} placeholder="Enter team name" required />
+                      </div>
+                      <div>
+                        <Label htmlFor="description">Description</Label>
+                        <Input name="description" defaultValue={selectedTeam?.description || ""} placeholder="Enter team description" />
+                      </div>
+                      <div>
+                        <Label htmlFor="members">Team Members</Label>
+                        <div className="space-y-2">
+                          <div className="max-h-40 overflow-y-auto border rounded p-2">
+                            {users.map((user: User) => (
+                              <label key={user.id} className="flex items-center space-x-2 p-1 hover:bg-gray-50 rounded">
+                                <input
+                                  type="checkbox"
+                                  checked={editFormMembers.includes(user.id)}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      setEditFormMembers([...editFormMembers, user.id]);
+                                    } else {
+                                      setEditFormMembers(editFormMembers.filter(id => id !== user.id));
+                                    }
+                                  }}
+                                  className="rounded"
+                                />
+                                <Avatar className="h-6 w-6">
+                                  <AvatarFallback className="bg-gray-600 text-white text-xs">
+                                    {user.firstName?.[0]}{user.lastName?.[0]}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <span className="text-sm">{user.firstName} {user.lastName}</span>
+                              </label>
+                            ))}
+                          </div>
+                          <p className="text-xs text-gray-500">Selected: {editFormMembers.length} members</p>
+                        </div>
+                      </div>
+                      <Button 
+                        type="submit" 
+                        className="w-full bg-blue-600 hover:bg-blue-700"
+                        disabled={updateTeamMutation.isPending}
+                      >
+                        {updateTeamMutation.isPending ? "Updating..." : "Update Team"}
+                      </Button>
+                    </div>
+                  </form>
+                </DialogContent>
+              </Dialog>
+
+              {/* Delete Team Confirmation */}
+              <AlertDialog open={!!teamToDelete} onOpenChange={() => setTeamToDelete(null)}>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete the team "{teamToDelete?.name}" and remove all associated data.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => teamToDelete && deleteTeamMutation.mutate(teamToDelete.id)}
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      Delete Team
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
 
               {teamsLoading ? (
                 <div className="text-center py-8">
@@ -662,8 +864,44 @@ export default function UsersPage() {
                   {teams.map((team: Team) => (
                     <Card key={team.id} className="hover:shadow-md transition-shadow">
                       <CardHeader>
-                        <CardTitle>{team.name}</CardTitle>
-                        <CardDescription>{team.description}</CardDescription>
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <CardTitle>{team.name}</CardTitle>
+                            <CardDescription>{team.description}</CardDescription>
+                          </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem 
+                                onClick={() => {
+                                  setSelectedTeam(team);
+                                  // Get current team members
+                                  const currentMembers = allTeamMembers
+                                    .filter(member => member.teamId === team.id)
+                                    .map(member => member.userId);
+                                  setEditFormMembers(currentMembers);
+                                  setEditTeamDialog(true);
+                                }}
+                              >
+                                <Edit className="h-4 w-4 mr-2" />
+                                Edit Team
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => setTeamToDelete(team)}
+                                className="text-red-600"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete Team
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-4">
