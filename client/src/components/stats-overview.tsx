@@ -1,19 +1,49 @@
-import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
-import { Target, CheckCircle, AlertTriangle, TrendingUp } from "lucide-react";
+import { Target, CheckCircle, AlertTriangle, TrendingUp, Clock, Trophy } from "lucide-react";
+import type { OKRWithKeyResults } from "@shared/schema";
 
-interface Stats {
-  totalOKRs: number;
-  onTrack: number;
-  atRisk: number;
-  completed: number;
-  avgProgress: number;
+interface StatsOverviewProps {
+  okrs: OKRWithKeyResults[];
+  isLoading?: boolean;
 }
 
-export default function StatsOverview() {
-  const { data: stats, isLoading } = useQuery<Stats>({
-    queryKey: ["/api/stats"],
-  });
+export default function StatsOverview({ okrs, isLoading }: StatsOverviewProps) {
+  // Calculate stats from filtered OKR data
+  const calculateStats = () => {
+    if (!okrs || okrs.length === 0) {
+      return {
+        totalOKRs: 0,
+        onTrack: 0,
+        atRisk: 0,
+        completed: 0,
+        behind: 0,
+        avgProgress: 0
+      };
+    }
+
+    const totalOKRs = okrs.length;
+    const onTrack = okrs.filter(okr => okr.status === 'on_track').length;
+    const atRisk = okrs.filter(okr => okr.status === 'at_risk').length;
+    const completed = okrs.filter(okr => okr.status === 'completed').length;
+    const behind = okrs.filter(okr => okr.status === 'behind').length;
+    const inProgress = okrs.filter(okr => okr.status === 'in_progress').length;
+    
+    // Calculate average progress
+    const totalProgress = okrs.reduce((sum, okr) => sum + (okr.overallProgress || 0), 0);
+    const avgProgress = totalOKRs > 0 ? Math.round(totalProgress / totalOKRs) : 0;
+
+    return {
+      totalOKRs,
+      onTrack,
+      atRisk,
+      completed,
+      behind,
+      inProgress,
+      avgProgress
+    };
+  };
+
+  const stats = calculateStats();
 
   if (isLoading) {
     return (
@@ -32,28 +62,28 @@ export default function StatsOverview() {
   const statCards = [
     {
       title: "Total OKRs",
-      value: stats?.totalOKRs || 0,
+      value: stats.totalOKRs,
       icon: Target,
       iconBg: "bg-blue-100",
-      iconColor: "text-primary"
+      iconColor: "text-blue-600"
     },
     {
-      title: "On Track",
-      value: stats?.onTrack || 0,
-      icon: CheckCircle,
+      title: "Completed",
+      value: stats.completed,
+      icon: Trophy,
       iconBg: "bg-green-100",
       iconColor: "text-green-600"
     },
     {
-      title: "At Risk",
-      value: stats?.atRisk || 0,
-      icon: AlertTriangle,
-      iconBg: "bg-orange-100",
-      iconColor: "text-orange-600"
+      title: "Behind",
+      value: stats.behind,
+      icon: Clock,
+      iconBg: "bg-red-100",
+      iconColor: "text-red-600"
     },
     {
       title: "Avg Progress",
-      value: `${stats?.avgProgress || 0}%`,
+      value: `${stats.avgProgress}%`,
       icon: TrendingUp,
       iconBg: "bg-purple-100",
       iconColor: "text-purple-600"

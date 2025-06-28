@@ -291,7 +291,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Overview */}
-      <StatsOverview />
+      <StatsOverview okrs={okrs} isLoading={isLoading} />
       
       {/* OKR List */}
       <div className="space-y-6 mt-6">
