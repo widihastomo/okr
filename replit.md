@@ -456,6 +456,18 @@ Changelog:
   * Fixed static file serving configuration to properly route root URL to web application
   * Maintained health check endpoint (/health) for deployment verification while allowing web app on root
   * Root URL now correctly displays OKR Management System interface instead of JSON response
+- June 28, 2025. Enhanced stats overview to follow filter selection:
+  * Modified StatsOverview component to accept filtered OKR data as props instead of fetching global stats
+  * Statistics now calculate dynamically based on currently filtered data (status and cycle filters)
+  * Updated dashboard to pass filtered OKR array to StatsOverview component
+  * Changed stat cards to show Total OKRs, Completed, Behind, and Average Progress for better insights
+  * Stats now update in real-time when users change status or cycle filters
+- June 28, 2025. Fixed port configuration for deployment readiness:
+  * Updated server to use environment PORT variable with fallback to 5000 for development
+  * Added comprehensive logging for deployment debugging (environment, host, port information)
+  * Enhanced deployment test script with detailed configuration verification
+  * Verified all deployment endpoints working correctly with proper port binding to 0.0.0.0
+  * Created deployment configuration documentation with troubleshooting guide
 - June 27, 2025. Added ideal progress threshold indicator to Key Result detail page:
   * Implemented vertical gray threshold line showing ideal progress based on time elapsed
   * Added progress legend with visual indicators for current progress vs ideal target

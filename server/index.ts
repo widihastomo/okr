@@ -49,10 +49,9 @@ process.on('unhandledRejection', (reason, promise) => {
   // Don't exit the process, just log the error
 });
 
-// ALWAYS serve the app on port 5000
-// this serves both the API and the client.
-// It is the only port that is not firewalled.
-const port = 5000;
+// Use environment PORT variable for deployment, fallback to 5000 for development
+// In production, Replit sets the PORT environment variable automatically
+const port = parseInt(process.env.PORT || "5000", 10);
 
 (async () => {
   // Add immediate-response health check endpoint for deployment verification
@@ -122,6 +121,11 @@ const port = 5000;
     host: "0.0.0.0",
     reusePort: true,
   }, () => {
+    console.log(`✅ Server started successfully`);
+    console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🚀 Server listening on host: 0.0.0.0`);
+    console.log(`📡 Port: ${port}`);
+    console.log(`🔗 Health check: http://localhost:${port}/health`);
     log(`serving on port ${port}`);
   });
 
