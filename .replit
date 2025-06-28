@@ -7,7 +7,7 @@ channel = "stable-24_05"
 
 [deployment]
 deploymentTarget = "gce"
-build = ["node", "build-simple.js"]
+build = ["node", "build.js"]
 run = ["sh", "-c", "NODE_ENV=production node dist/index.js"]
 
 [[ports]]
