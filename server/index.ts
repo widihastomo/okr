@@ -92,22 +92,26 @@ const config = getConfig();
     console.log('✅ Database connected');
     console.log('✅ Routes registered');
     console.log(`✅ Static files: ${fs.existsSync(distPath) ? 'Available' : 'Fallback mode'}`);
+    console.log(`📁 Static path: ${distPath}`);
     
     if (fs.existsSync(distPath)) {
       // Serve static files with proper caching headers
       app.use(express.static(distPath, {
         maxAge: '1d',
         etag: true,
-        lastModified: true
+        lastModified: true,
+        index: ['index.html']
       }));
       
       // Enhanced SPA handler with proper error handling
       app.get('*', (req, res, next) => {
+        // Skip API routes and health check
         if (req.path.startsWith('/api/') || req.path === '/health') {
           return next();
         }
         
         const indexPath = path.resolve(distPath, "index.html");
+        
         if (fs.existsSync(indexPath)) {
           res.sendFile(indexPath);
         } else {

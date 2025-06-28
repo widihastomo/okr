@@ -13,6 +13,16 @@ try {
   mkdirSync('dist', { recursive: true });
   mkdirSync('dist/public', { recursive: true });
 
+  console.log('⚡ Building frontend assets...');
+  
+  // Frontend build with Vite
+  try {
+    execSync('npx vite build', { stdio: 'inherit' });
+    console.log('✅ Frontend build successful');
+  } catch (error) {
+    console.log('⚠️ Frontend build failed, creating fallback...');
+  }
+
   console.log('⚡ Creating server bundle...');
   
   // Primary build attempt with ESBuild
