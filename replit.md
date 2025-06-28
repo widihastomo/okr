@@ -447,6 +447,8 @@ Changelog:
   * Enhanced production static file serving to avoid conflicts with health check endpoints
   * Prevented application process from exiting after database initialization completes
   * Server now maintains continuous uptime and passes deployment health checks successfully
+  * Reorganized server startup sequence to prioritize health endpoints before expensive operations
+  * Fixed port forwarding issues by ensuring server listens on 0.0.0.0:5000 before database operations
 - June 27, 2025. Added ideal progress threshold indicator to Key Result detail page:
   * Implemented vertical gray threshold line showing ideal progress based on time elapsed
   * Added progress legend with visual indicators for current progress vs ideal target
