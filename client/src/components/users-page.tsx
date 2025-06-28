@@ -651,7 +651,6 @@ export default function UsersPage() {
                       <CardHeader>
                         <CardTitle className="flex items-center justify-between">
                           {team.name}
-                          <Badge variant="outline">{team.id}</Badge>
                         </CardTitle>
                         <CardDescription>{team.description}</CardDescription>
                       </CardHeader>
