@@ -112,6 +112,7 @@ export default function KeyResultDetailPage() {
   const [addingTaskToInitiative, setAddingTaskToInitiative] = useState<string | null>(null);
   const [addTaskOpen, setAddTaskOpen] = useState(false);
   const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set());
+  const [hoveredConfidence, setHoveredConfidence] = useState<string | null>(null);
 
   // Task form for editing/adding
   const taskForm = useForm<TaskFormData>({
@@ -1021,7 +1022,7 @@ export default function KeyResultDetailPage() {
               </CardHeader>
               <CardContent>
                 {keyResult.checkIns && keyResult.checkIns.length > 0 ? (
-                  <div className="space-y-3 max-h-80 overflow-y-auto overflow-x-visible">
+                  <div className="space-y-3 max-h-80 overflow-y-auto" style={{ overflow: 'visible' }}>
                     {keyResult.checkIns
                       .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
                       .map((checkIn) => (
@@ -1057,12 +1058,9 @@ export default function KeyResultDetailPage() {
                             {checkIn.confidence && (
                               <div className="flex items-center gap-2">
                                 <div 
-                                  className="flex items-center gap-1 cursor-help"
-                                  title={`${getConfidenceDisplay(checkIn.confidence).label} (${checkIn.confidence}/10) - ${
-                                    checkIn.confidence >= 8 ? 'Sangat yakin target tercapai' :
-                                    checkIn.confidence >= 6 ? 'Cukup optimis dengan progress' :
-                                    'Butuh perhatian lebih untuk mencapai target'
-                                  }`}
+                                  className="flex items-center gap-1 cursor-help relative"
+                                  onMouseEnter={() => setHoveredConfidence(checkIn.id)}
+                                  onMouseLeave={() => setHoveredConfidence(null)}
                                 >
                                   <div className="w-16 bg-gray-200 rounded-full h-2">
                                     <div 
@@ -1073,6 +1071,23 @@ export default function KeyResultDetailPage() {
                                   <span className="text-xs text-gray-600 font-medium">
                                     {checkIn.confidence}/10
                                   </span>
+                                  
+                                  {/* State-based tooltip */}
+                                  {hoveredConfidence === checkIn.id && (
+                                    <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg whitespace-nowrap z-50">
+                                      <div className="text-center">
+                                        <div className="font-medium text-white">Tingkat Kepercayaan</div>
+                                        <div className="text-gray-300">{getConfidenceDisplay(checkIn.confidence).label} ({checkIn.confidence}/10)</div>
+                                        <div className="text-xs text-gray-400 mt-1">
+                                          {checkIn.confidence >= 8 ? 'Sangat yakin target tercapai' :
+                                           checkIn.confidence >= 6 ? 'Cukup optimis dengan progress' :
+                                           'Butuh perhatian lebih untuk mencapai target'}
+                                        </div>
+                                      </div>
+                                      {/* Arrow pointing down */}
+                                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             )}
