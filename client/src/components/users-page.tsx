@@ -74,7 +74,7 @@ export default function UsersPage() {
   });
 
   const createUserMutation = useMutation({
-    mutationFn: async (data: { id: string; email: string; firstName: string; lastName: string; role: string; password: string }) => {
+    mutationFn: async (data: { email: string; firstName: string; lastName: string; role: string; password: string }) => {
       const response = await fetch("/api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
