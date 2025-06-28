@@ -1012,9 +1012,11 @@ export default function KeyResultDetailPage() {
                               <p className="text-xs text-gray-500">Confidence: {checkIn.confidence}/10</p>
                             )}
                             {checkIn.createdBy && (
-                              <div className="flex items-center gap-1 text-xs text-gray-500">
-                                <User className="h-3 w-3" />
-                                <span>Updated by {getUserName(checkIn.createdBy)}</span>
+                              <div className="flex items-center gap-2 text-xs text-gray-500">
+                                <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                                  {getUserName(checkIn.createdBy).charAt(0).toUpperCase()}
+                                </div>
+                                <span>{getUserName(checkIn.createdBy)}</span>
                               </div>
                             )}
                           </div>
@@ -1231,8 +1233,10 @@ export default function KeyResultDetailPage() {
                                                 )}
                                                 <div className="flex items-center gap-3 text-xs text-gray-500">
                                                   {task.assignedTo && (
-                                                    <div className="flex items-center gap-1">
-                                                      <User className="h-3 w-3" />
+                                                    <div className="flex items-center gap-2">
+                                                      <div className="w-4 h-4 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                                                        {getUserName(task.assignedTo).charAt(0).toUpperCase()}
+                                                      </div>
                                                       <span>{getUserName(task.assignedTo)}</span>
                                                     </div>
                                                   )}

@@ -447,8 +447,9 @@ Changelog:
   * Progress visualization now matches dashboard functionality with consistent calculation logic
 - June 27, 2025. Enhanced Progress History with user information display:
   * Added "Updated by [User Name]" information to each check-in entry in Progress History
-  * Implemented user icon with name display for better accountability tracking
+  * Implemented user avatar with circular blue background showing user initials and name
   * Enhanced layout to show user info at bottom right of each check-in card
+  * Applied consistent avatar design to task assignments with blue circular avatars
   * Maintained existing design consistency while adding valuable context for progress updates
 - June 27, 2025. Implemented chronological sorting for Progress History:
   * Added sorting functionality to display check-ins by latest update first
