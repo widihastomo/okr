@@ -466,7 +466,6 @@ export default function UsersPage() {
                   e.preventDefault();
                   const formData = new FormData(e.currentTarget);
                   const userData = {
-                    id: Math.random().toString(36).substr(2, 9),
                     email: formData.get('email') as string,
                     firstName: formData.get('firstName') as string,
                     lastName: formData.get('lastName') as string,
