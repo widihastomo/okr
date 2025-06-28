@@ -41,10 +41,23 @@ export default function UsersPage() {
     queryKey: ["/api/teams"],
   });
 
-  // Fetch team members for selected team
+  // Fetch team members for selected team (for modal)
   const { data: teamMembers = [], isLoading: teamMembersLoading } = useQuery<Array<TeamMember & { user: User }>>({
     queryKey: ["/api/teams", selectedTeam?.id, "members"],
     enabled: !!selectedTeam,
+  });
+
+  // Fetch all team members for all teams (for card display)
+  const { data: allTeamMembers = [] } = useQuery<Array<TeamMember & { user: User }>>({
+    queryKey: ["/api/team-members"],
+    queryFn: async () => {
+      const memberPromises = teams.map(team => 
+        fetch(`/api/teams/${team.id}/members`).then(res => res.json())
+      );
+      const results = await Promise.all(memberPromises);
+      return results.flat();
+    },
+    enabled: teams.length > 0,
   });
 
   const createUserMutation = useMutation({
@@ -649,24 +662,79 @@ export default function UsersPage() {
                   {teams.map((team: Team) => (
                     <Card key={team.id} className="hover:shadow-md transition-shadow">
                       <CardHeader>
-                        <CardTitle className="flex items-center justify-between">
-                          {team.name}
-                        </CardTitle>
+                        <CardTitle>{team.name}</CardTitle>
                         <CardDescription>{team.description}</CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <div className="flex justify-between">
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => {
-                              setSelectedTeam(team);
-                              setTeamMembersDialog(true);
-                            }}
-                          >
-                            <Users className="h-4 w-4 mr-2" />
-                            Manage Members
-                          </Button>
+                        <div className="space-y-4">
+                          {/* Owner Information */}
+                          <div>
+                            {(() => {
+                              const owner = users.find(user => user.id === team.ownerId);
+                              return (
+                                <>
+                                  <p className="text-sm font-medium text-gray-600 mb-2">Owner</p>
+                                  <div className="flex items-center space-x-2">
+                                    <Avatar className="h-8 w-8">
+                                      <AvatarImage src={owner?.profileImageUrl || undefined} />
+                                      <AvatarFallback className="bg-blue-600 text-white text-xs">
+                                        {owner?.firstName?.[0]}{owner?.lastName?.[0]}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                      <p className="text-sm font-medium">
+                                        {owner?.firstName} {owner?.lastName}
+                                      </p>
+                                      <p className="text-xs text-gray-500">{owner?.email}</p>
+                                    </div>
+                                  </div>
+                                </>
+                              );
+                            })()}
+                          </div>
+                          
+                          {/* Team Members */}
+                          <div>
+                            {(() => {
+                              const currentTeamMembers = allTeamMembers.filter(member => member.teamId === team.id);
+                              return (
+                                <>
+                                  <p className="text-sm font-medium text-gray-600 mb-2">Members ({currentTeamMembers.length || 0})</p>
+                                  <div className="flex -space-x-2 overflow-hidden">
+                                    {currentTeamMembers.slice(0, 5).map((member) => (
+                                      <Avatar key={member.id} className="h-8 w-8 border-2 border-white">
+                                        <AvatarImage src={member.user?.profileImageUrl || undefined} />
+                                        <AvatarFallback className="bg-gray-600 text-white text-xs">
+                                          {member.user?.firstName?.[0]}{member.user?.lastName?.[0]}
+                                        </AvatarFallback>
+                                      </Avatar>
+                                    ))}
+                                    {currentTeamMembers.length > 5 && (
+                                      <div className="h-8 w-8 bg-gray-100 border-2 border-white rounded-full flex items-center justify-center">
+                                        <span className="text-xs text-gray-600">+{currentTeamMembers.length - 5}</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                </>
+                              );
+                            })()}
+                          </div>
+                          
+                          {/* Manage Button */}
+                          <div className="pt-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="w-full"
+                              onClick={() => {
+                                setSelectedTeam(team);
+                                setTeamMembersDialog(true);
+                              }}
+                            >
+                              <Users className="h-4 w-4 mr-2" />
+                              Manage Members
+                            </Button>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
