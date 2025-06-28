@@ -457,11 +457,12 @@ Changelog:
   * Created visual confidence level display with colored progress bars and labels
   * Added confidence badges with color-coded backgrounds (green/yellow/red) and descriptive labels
   * Enhanced user experience with better readability and visual feedback for confidence levels
-- June 28, 2025. Added confidence level hover tooltips with explanations:
-  * Implemented hover tooltips on confidence progress bars showing detailed explanations in Indonesian
-  * Tooltips display confidence level, score, and contextual advice based on confidence value
-  * Used native browser title attribute for reliable cross-browser compatibility
-  * Enhanced user understanding of confidence levels with actionable insights
+- June 28, 2025. Enhanced confidence level display with direct text explanations:
+  * Replaced problematic hover tooltips with permanent text display below progress bars
+  * Shows confidence level label and detailed explanations in Indonesian for all check-ins
+  * Displays contextual advice based on confidence value (high/medium/low)
+  * Improved accessibility and mobile compatibility by removing hover dependencies
+  * Enhanced user understanding with always-visible confidence level information
 - June 27, 2025. Implemented chronological sorting for Progress History:
   * Added sorting functionality to display check-ins by latest update first
   * Check-ins now ordered by creation date in descending order for better user experience
