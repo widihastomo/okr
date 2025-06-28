@@ -1,16 +1,19 @@
 #!/usr/bin/env node
 
 // Standalone deployment build - fixes crash loop
-import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
+import { existsSync, mkdirSync, writeFileSync, readFileSync, readdirSync } from 'fs';
 import { execSync } from 'child_process';
 
 console.log('🚀 Creating standalone deployment...');
+console.log('📍 Working directory:', process.cwd());
 
 try {
   // Clean build directory
-  execSync('rm -rf dist', { stdio: 'inherit' });
+  console.log('🧹 Cleaning previous build...');
+  execSync('rm -rf dist', { stdio: 'pipe' });
   mkdirSync('dist', { recursive: true });
   mkdirSync('dist/public', { recursive: true });
+  console.log('✅ Build directories created');
 
   // Create standalone server that uses tsx directly
   console.log('⚡ Creating server launcher...');
@@ -128,14 +131,25 @@ process.on('SIGINT', () => {
 
   writeFileSync('dist/public/index.html', html);
 
-  // Verify files created
+  // Verify files created with detailed logging
   const requiredFiles = ['dist/index.cjs', 'dist/public/index.html'];
+  console.log('🔍 Verifying build output...');
+  
   for (const file of requiredFiles) {
     if (!existsSync(file)) {
       throw new Error(`Missing file: ${file}`);
     }
+    console.log(`✅ ${file} created successfully`);
   }
 
+  // List all created files
+  const distContents = readdirSync('dist');
+  const publicContents = readdirSync('dist/public');
+  
+  console.log('📁 Build verification:');
+  console.log(`   dist/ contains: ${distContents.join(', ')}`);
+  console.log(`   dist/public/ contains: ${publicContents.join(', ')}`);
+  
   console.log('✅ Standalone build completed');
   console.log('✅ Server launcher: dist/index.cjs');
   console.log('✅ Frontend: dist/public/index.html');

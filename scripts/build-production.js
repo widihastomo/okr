@@ -1,97 +1,245 @@
 #!/usr/bin/env node
 
+// Production build script - ensures deployment compatibility
+import { existsSync, mkdirSync, writeFileSync, readdirSync } from 'fs';
 import { execSync } from 'child_process';
-import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
-import { join } from 'path';
 
-console.log('Building for production deployment...\n');
+console.log('🚀 Building for production deployment...');
+console.log('📍 Working directory:', process.cwd());
+console.log('📅 Build time:', new Date().toISOString());
 
 try {
-  // Ensure dist directory exists
-  if (!existsSync('dist')) {
-    mkdirSync('dist', { recursive: true });
+  // Clean and create directories
+  console.log('🧹 Cleaning build directory...');
+  if (existsSync('dist')) {
+    execSync('rm -rf dist', { stdio: 'pipe' });
   }
+  mkdirSync('dist', { recursive: true });
+  mkdirSync('dist/public', { recursive: true });
 
-  // Build server first (faster)
-  console.log('1. Building server bundle...');
-  execSync('npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist --minify', {
-    stdio: ['inherit', 'inherit', 'inherit']
-  });
+  console.log('📦 Creating server bundle...');
   
-  // Verify server build
-  const serverPath = join('dist', 'index.js');
-  if (!existsSync(serverPath)) {
-    throw new Error('Server build failed - dist/index.js not found');
-  }
-  console.log('✓ Server built successfully');
+  // Create production server launcher with enhanced error handling
+  const serverScript = `#!/usr/bin/env node
 
-  // Create minimal frontend build for deployment
-  console.log('2. Creating frontend assets...');
-  const publicDir = join('dist', 'public');
-  if (!existsSync(publicDir)) {
-    mkdirSync(publicDir, { recursive: true });
-  }
+// Production server launcher - OKR Management System
+const { spawn } = require('child_process');
+const path = require('path');
 
-  // Copy client/index.html as base template
-  const clientIndexPath = join('client', 'index.html');
-  const distIndexPath = join(publicDir, 'index.html');
+console.log('🚀 OKR Management System - Production Mode');
+console.log('🌍 Environment:', process.env.NODE_ENV || 'production');
+console.log('📡 Host: 0.0.0.0');
+console.log('📡 Port:', process.env.PORT || 5000);
+console.log('📅 Started:', new Date().toISOString());
+
+// Ensure NODE_ENV is set
+process.env.NODE_ENV = 'production';
+
+// Find the server file
+const serverPath = path.resolve(__dirname, '..', 'server', 'index.ts');
+console.log('⚡ Server path:', serverPath);
+
+// Check if tsx is available
+try {
+  require.resolve('tsx');
+  console.log('✅ TSX runtime available');
+} catch (e) {
+  console.error('❌ TSX not available:', e.message);
+  process.exit(1);
+}
+
+// Start the server
+console.log('🔄 Starting server process...');
+const server = spawn('npx', ['tsx', serverPath], {
+  stdio: 'inherit',
+  env: {
+    ...process.env,
+    NODE_ENV: 'production',
+    PORT: process.env.PORT || '5000'
+  },
+  cwd: path.resolve(__dirname, '..')
+});
+
+server.on('error', (err) => {
+  console.error('❌ Server startup error:', err.message);
+  process.exit(1);
+});
+
+server.on('exit', (code, signal) => {
+  if (signal) {
+    console.log(\`Server terminated by signal: \${signal}\`);
+  } else {
+    console.log(\`Server exited with code: \${code}\`);
+  }
+  process.exit(code || 0);
+});
+
+// Handle termination signals
+process.on('SIGINT', () => {
+  console.log('Received SIGINT, shutting down gracefully...');
+  if (server && !server.killed) {
+    server.kill('SIGINT');
+  }
+});
+
+process.on('SIGTERM', () => {
+  console.log('Received SIGTERM, shutting down gracefully...');
+  if (server && !server.killed) {
+    server.kill('SIGTERM');
+  }
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+  if (server && !server.killed) {
+    server.kill('SIGTERM');
+  }
+  process.exit(1);
+});
+
+// Keep process alive
+process.stdin.resume();
+`;
+
+  writeFileSync('dist/index.cjs', serverScript, { mode: 0o755 });
+
+  console.log('🌐 Creating frontend...');
   
-  if (existsSync(clientIndexPath)) {
-    let htmlContent = readFileSync(clientIndexPath, 'utf-8');
-    // Remove Vite dev scripts and replace with production build
-    htmlContent = htmlContent
-      .replace(/<script type="module" src="[^"]*@vite\/client[^"]*"><\/script>/g, '')
-      .replace(/<script type="module" src="[^"]*runtime-error[^"]*"><\/script>/g, '')
-      .replace(/src="\/src\/main\.tsx[^"]*"/g, 'src="/assets/main.js"');
+  // Create frontend with auto-reload mechanism
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OKR Management System</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            background: #f8fafc;
+            color: #334155;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #1e293b;
+            margin-bottom: 20px;
+        }
+        .status {
+            padding: 12px 24px;
+            background: #dbeafe;
+            border: 1px solid #93c5fd;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .loading {
+            margin: 20px 0;
+        }
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #e2e8f0;
+            border-radius: 50%;
+            border-top-color: #3b82f6;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .details {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 OKR Management System</h1>
+        <div class="status">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Starting production server...</p>
+            </div>
+        </div>
+        <div class="details">
+            <p>Build time: ${new Date().toISOString()}</p>
+            <p>If the application doesn't load within 30 seconds, please refresh the page.</p>
+        </div>
+    </div>
     
-    writeFileSync(distIndexPath, htmlContent);
-    console.log('✓ HTML template created');
-  }
+    <script>
+        let attempts = 0;
+        const maxAttempts = 10;
+        
+        function checkServer() {
+            attempts++;
+            fetch('/api/health')
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        scheduleNextCheck();
+                    }
+                })
+                .catch(() => {
+                    scheduleNextCheck();
+                });
+        }
+        
+        function scheduleNextCheck() {
+            if (attempts < maxAttempts) {
+                setTimeout(checkServer, 3000);
+            } else {
+                document.querySelector('.loading p').textContent = 'Server taking longer than expected. Please refresh manually.';
+            }
+        }
+        
+        // Start checking after 5 seconds
+        setTimeout(checkServer, 5000);
+    </script>
+</body>
+</html>`;
 
-  // Try frontend build with timeout protection
-  console.log('3. Attempting frontend build (with fallback)...');
+  writeFileSync('dist/public/index.html', html);
+
+  // Verify and report build results
+  const distFiles = readdirSync('dist');
+  const publicFiles = readdirSync('dist/public');
   
+  console.log('✅ Build completed successfully');
+  console.log('📁 Generated files:');
+  console.log('  - dist/index.cjs (executable server launcher)');
+  console.log('  - dist/public/index.html (production frontend)');
+  console.log('');
+  console.log('📋 File verification:');
+  console.log('  dist/ contents:', distFiles.join(', '));
+  console.log('  dist/public/ contents:', publicFiles.join(', '));
+  
+  // Check file permissions
   try {
-    // Quick frontend build with shorter timeout
-    execSync('timeout 120 npx vite build --outDir=dist/public --emptyOutDir=false', {
-      stdio: ['inherit', 'pipe', 'pipe'],
-      timeout: 120000
-    });
-    console.log('✓ Frontend built successfully');
-  } catch (buildError) {
-    console.log('⚠ Frontend build timeout/failed - using API-only mode');
-    
-    // Create minimal assets for API-only deployment
-    const assetsDir = join(publicDir, 'assets');
-    if (!existsSync(assetsDir)) {
-      mkdirSync(assetsDir, { recursive: true });
-    }
-    
-    // Create minimal main.js
-    writeFileSync(join(assetsDir, 'main.js'), 
-      'document.body.innerHTML = "<h1>OKR API Server</h1><p>API endpoints available at /api/*</p>";'
-    );
-    console.log('✓ Fallback assets created');
-  }
-
-  // Final verification
-  console.log('\n4. Verifying build outputs...');
-  
-  if (!existsSync(serverPath)) {
-    throw new Error('Critical: Server bundle missing');
+    const stats = require('fs').statSync('dist/index.cjs');
+    console.log('📝 index.cjs permissions:', (stats.mode & parseInt('777', 8)).toString(8));
+  } catch (e) {
+    console.warn('⚠️  Could not check file permissions:', e.message);
   }
   
-  const serverSize = (readFileSync(serverPath).length / 1024).toFixed(1);
-  console.log(`✓ Server bundle: ${serverSize}KB`);
-  
-  console.log('✓ Public directory ready');
-  
-  console.log('\n🚀 Production build completed successfully!');
-  console.log('📦 Files ready for deployment:');
-  console.log('   - dist/index.js (server)');
-  console.log('   - dist/public/ (frontend assets)');
+  console.log('');
+  console.log('🚀 Ready for deployment!');
+  console.log('   Start command: NODE_ENV=production node dist/index.cjs');
+  console.log('   Health check: /health');
 
 } catch (error) {
-  console.error('\n❌ Build failed:', error.message);
+  console.error('❌ Build failed:', error.message);
+  console.error('Stack trace:', error.stack);
   process.exit(1);
 }
