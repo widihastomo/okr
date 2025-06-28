@@ -25,12 +25,43 @@ try {
 
   console.log('⚡ Creating server bundle...');
   
-  // Primary build attempt with ESBuild
+  // Primary build attempt with TSX launcher (avoids require issues)
   try {
-    execSync('npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist --minify', {
-      stdio: 'inherit'
-    });
-    console.log('✅ ESBuild successful');
+    // Create TSX-based launcher for deployment compatibility
+    const launcher = `#!/usr/bin/env node
+
+import { spawn } from 'child_process';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const serverPath = resolve(__dirname, '..', 'server', 'index.ts');
+
+console.log('🚀 OKR Management Server');
+console.log('📍 Server:', serverPath);
+console.log('🌍 Environment:', process.env.NODE_ENV || 'production');
+
+const server = spawn('npx', ['tsx', serverPath], {
+  stdio: 'inherit',
+  env: {
+    ...process.env,
+    NODE_ENV: process.env.NODE_ENV || 'production'
+  }
+});
+
+server.on('error', (err) => {
+  console.error('Server error:', err);
+  process.exit(1);
+});
+
+server.on('close', (code) => {
+  process.exit(code);
+});
+`;
+
+    writeFileSync('dist/index.js', launcher);
+    console.log('✅ TSX launcher created');
   } catch (error) {
     console.log('⚠️ ESBuild failed, creating direct launcher...');
     

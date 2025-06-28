@@ -30,10 +30,13 @@
 ### Build Commands
 
 ```bash
-# Fast build (recommended untuk deployment)
+# Fixed build (resolves require errors) - RECOMMENDED
+node build-fixed.js
+
+# Fast build (alternative)
 node build-fast.js
 
-# Traditional build (bisa timeout)
+# Traditional build (may timeout)
 node build.js
 
 # Test deployment
@@ -82,15 +85,20 @@ dist/
 
 ### Known Issues & Solutions
 
-1. **Vite Build Timeout**
-   - **Problem**: terlalu banyak Lucide React icons
-   - **Solution**: menggunakan build-fast.js yang skip Vite
+1. **"require is not defined" Error**
+   - **Problem**: ES modules conflict dengan CommonJS dependencies
+   - **Solution**: menggunakan TSX launcher instead of ESBuild bundle
+   - **Fix**: build-fixed.js creates launcher yang compatible dengan semua modules
 
-2. **Missing Index.html**
+2. **Vite Build Timeout**
+   - **Problem**: terlalu banyak Lucide React icons (1400+)
+   - **Solution**: skip Vite build, gunakan fallback HTML
+
+3. **Missing Index.html**
    - **Problem**: static files tidak ter-generate
    - **Solution**: fallback HTML dengan essential functionality
 
-3. **API Routes Conflict**
+4. **API Routes Conflict**
    - **Problem**: SPA routing mengambil alih API routes
    - **Solution**: proper route precedence dengan express middleware
 

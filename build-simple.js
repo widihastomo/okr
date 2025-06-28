@@ -24,7 +24,7 @@ try {
   // Build server bundle - critical for deployment
   console.log('⚡ Creating server bundle...');
   try {
-    execSync('npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist --minify', {
+    execSync('npx esbuild server/index.ts --platform=node --packages=external --bundle --format=cjs --outdir=dist --minify --target=node18', {
       stdio: 'inherit',
       cwd: rootDir
     });
