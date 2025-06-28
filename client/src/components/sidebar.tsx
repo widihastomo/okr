@@ -10,7 +10,8 @@ import {
   BarChart3,
   User,
   Settings,
-  X
+  X,
+  UsersRound
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -60,6 +61,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       icon: Users,
       path: "/users",
       active: location === "/users"
+    },
+    {
+      label: "Teams",
+      icon: UsersRound,
+      path: "/teams",
+      active: location === "/teams"
     },
     {
       label: "Analytics",
