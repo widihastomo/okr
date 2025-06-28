@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-// Unified build script for production deployment
+// Enhanced build script for production deployment with timeout protection
 import { execSync } from 'child_process';
-import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
+import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
 console.log('🚀 Building for production deployment...');
@@ -25,28 +25,22 @@ export function buildForProduction() {
     if (!existsSync('dist/index.js')) {
       throw new Error('Critical: Server bundle dist/index.js was not created');
     }
+    console.log('✓ Server bundle created successfully');
 
-    // 3. Build frontend with Vite (with timeout protection)
-    console.log('3. Attempting frontend build (with timeout protection)...');
+    // 3. Attempt frontend build with timeout protection
+    console.log('3. Attempting frontend build with timeout protection...');
     
     try {
-      // Quick frontend build with shorter timeout
-      execSync('timeout 120 npx vite build --outDir=dist/public --emptyOutDir=false', {
-        stdio: ['inherit', 'pipe', 'pipe'],
-        timeout: 120000
+      execSync('timeout 300s npx vite build --outDir=dist/public --emptyOutDir=false', {
+        stdio: 'inherit',
+        timeout: 300000
       });
-      console.log('✓ Frontend built successfully');
-    } catch (buildError) {
-      console.log('⚠ Frontend build timeout/failed - using fallback mode');
+      console.log('✓ Frontend build completed');
+    } catch (viteError) {
+      console.log('⚠ Frontend build timed out, using fallback assets');
       
-      // 4. Create fallback assets if frontend fails
-      const assetsDir = join('dist/public', 'assets');
-      if (!existsSync(assetsDir)) {
-        mkdirSync(assetsDir, { recursive: true });
-      }
-      
-      // Create minimal index.html
-      const fallbackHtml = `<!DOCTYPE html>
+      // Create minimal frontend assets
+      const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -74,50 +68,38 @@ export function buildForProduction() {
 </body>
 </html>`;
       
-      writeFileSync('dist/public/index.html', fallbackHtml);
-      
-      // Create minimal main.js
-      writeFileSync(join(assetsDir, 'main.js'), 
-        'console.log("OKR Management System - API only mode");'
-      );
+      writeFileSync('dist/public/index.html', html);
       console.log('✓ Fallback assets created');
     }
 
-    // 5. Verify all required files exist
-    console.log('4. Verifying build outputs...');
+    // 4. Verify all required files exist
+    console.log('4. Verifying deployment files...');
     
-    const requiredFiles = [
-      'dist/index.js',
-      'dist/public/index.html'
+    const deploymentFiles = [
+      { path: 'dist/index.js', description: 'Server bundle' },
+      { path: 'dist/public/index.html', description: 'Frontend entry point' }
     ];
-    
-    let allFilesExist = true;
-    requiredFiles.forEach(file => {
-      if (!existsSync(file)) {
-        console.error(`❌ Missing required file: ${file}`);
-        allFilesExist = false;
-      } else {
-        console.log(`✅ ${file}: EXISTS`);
+
+    for (const file of deploymentFiles) {
+      if (!existsSync(file.path)) {
+        throw new Error(`Critical: ${file.description} missing at ${file.path}`);
       }
-    });
-    
-    if (!allFilesExist) {
-      throw new Error('Build verification failed - missing required files');
+      console.log(`✓ ${file.description} verified`);
     }
-    
-    const serverSize = (readFileSync('dist/index.js').length / 1024).toFixed(1);
-    console.log(`✓ Server bundle: ${serverSize}KB`);
-    
-    console.log('\n🎉 Production build completed successfully!');
-    console.log('📦 Files ready for deployment:');
-    console.log('   - dist/index.js (server)');
-    console.log('   - dist/public/ (frontend assets)');
+
+    // 5. Display build summary
+    const stats = execSync('ls -lh dist/index.js', { encoding: 'utf-8' });
+    console.log('\n✅ Build completed successfully');
+    console.log('✓ Created:', stats.trim());
+    console.log('✓ Created: dist/public/index.html');
+    console.log('✓ All deployment files verified');
     
     return true;
     
   } catch (error) {
     console.error('\n❌ Build failed:', error.message);
-    return false;
+    console.error('Error details:', error);
+    process.exit(1);
   }
 }
 
