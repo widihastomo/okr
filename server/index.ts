@@ -60,10 +60,7 @@ const port = 5000;
     res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
-  // Add root endpoint that responds quickly for health checks
-  app.get('/', (_req, res) => {
-    res.status(200).json({ status: 'ok', app: 'OKR Management System', timestamp: new Date().toISOString() });
-  });
+  // Root endpoint will be handled by Vite (development) or static files (production)
 
   const server = await registerRoutes(app);
   
@@ -93,10 +90,10 @@ const port = 5000;
     if (fs.existsSync(distPath)) {
       app.use(express.static(distPath));
       
-      // Serve index.html for non-API routes (skip health check and root endpoint)
+      // Serve index.html for non-API routes (skip health check only)
       app.use((req, res, next) => {
-        // Skip API routes, health check endpoint, and root endpoint
-        if (req.path.startsWith('/api/') || req.path === '/health' || req.path === '/') {
+        // Skip API routes and health check endpoint
+        if (req.path.startsWith('/api/') || req.path === '/health') {
           return next();
         }
         res.sendFile(path.resolve(distPath, "index.html"));

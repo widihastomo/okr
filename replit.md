@@ -451,6 +451,11 @@ Changelog:
   * Fixed port forwarding issues by ensuring server listens on 0.0.0.0:5000 before database operations
   * Added process.stdin.resume() to keep the process alive and prevent premature exit
   * Enhanced error handling for database operations to prevent server crashes during initialization
+- June 28, 2025. Fixed root endpoint routing to properly serve web application:
+  * Removed JSON response from root endpoint (/) that was preventing application from loading
+  * Fixed static file serving configuration to properly route root URL to web application
+  * Maintained health check endpoint (/health) for deployment verification while allowing web app on root
+  * Root URL now correctly displays OKR Management System interface instead of JSON response
 - June 27, 2025. Added ideal progress threshold indicator to Key Result detail page:
   * Implemented vertical gray threshold line showing ideal progress based on time elapsed
   * Added progress legend with visual indicators for current progress vs ideal target
