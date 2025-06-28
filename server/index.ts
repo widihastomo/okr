@@ -209,6 +209,13 @@ const config = getConfig();
     console.log(`🚀 Server listening on host: 0.0.0.0`);
     console.log(`📡 Port: ${config.port}`);
     console.log(`🔗 Health check: http://localhost:${config.port}/health`);
+    
+    // Additional access information for troubleshooting
+    if (process.env.REPLIT_DOMAINS) {
+      console.log(`🌍 External URL: https://${process.env.REPLIT_DOMAINS.split(',')[0]}`);
+    }
+    console.log(`📋 Server ready for connections on all interfaces (0.0.0.0:${config.port})`);
+    
     log(`serving on port ${config.port}`);
     
     // Safe database initialization after server is running
