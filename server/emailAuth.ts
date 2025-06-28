@@ -37,9 +37,9 @@ export function getSession() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: isProduction, // Dynamic based on environment
+      secure: false, // Set to false for Replit compatibility
       maxAge: sessionTtl,
-      sameSite: isProduction ? "strict" : "lax",
+      sameSite: "lax", // Use lax for better compatibility
     },
   });
 }
