@@ -35,7 +35,7 @@ Buat file `.env` di root project:
 ```env
 NODE_ENV=development
 DATABASE_URL=postgresql://okr_user:okr_password@localhost:5432/okr_management
-PORT=5000
+PORT=3000
 SESSION_SECRET=your-secret-key-here
 ```
 
@@ -59,7 +59,7 @@ npm start
 
 ## Access Application
 
-- **URL:** http://localhost:5000
+- **URL:** http://localhost:3000
 - **Default Admin Login:**
   - Email: `admin@example.com`
   - Password: `password123`
@@ -76,9 +76,9 @@ npm start
 - Test koneksi: `psql -h localhost -U okr_user -d okr_management`
 - Periksa firewall tidak memblokir port 5432
 
-### Port 5000 Already in Use
-- Ubah PORT di file .env ke port lain (contoh: 3000)
-- Atau stop aplikasi yang menggunakan port 5000
+### Port Already in Use
+- Default port sekarang 3000, jika masih conflict ubah PORT di file .env ke port lain (contoh: 8000)
+- Atau stop aplikasi yang menggunakan port tersebut
 
 ### Permission Denied
 ```bash

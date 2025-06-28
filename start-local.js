@@ -25,7 +25,7 @@ if (missing.length > 0) {
   console.log('\n📝 Create a .env file with:');
   console.log('DATABASE_URL=postgresql://username:password@localhost:5432/okr_management');
   console.log('NODE_ENV=development');
-  console.log('PORT=5000');
+  console.log('PORT=3000');
   process.exit(1);
 }
 
@@ -33,7 +33,7 @@ if (missing.length > 0) {
 console.log('🚀 Starting OKR Management System...');
 console.log('📋 Configuration:');
 console.log(`   NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
-console.log(`   PORT: ${process.env.PORT || '5000'}`);
+console.log(`   PORT: ${process.env.PORT || '3000'}`);
 console.log(`   DATABASE: ${process.env.DATABASE_URL ? '✅ Set' : '❌ Missing'}`);
 
 // Start the application
@@ -41,7 +41,8 @@ const server = spawn('npx', ['tsx', 'server/index.ts'], {
   stdio: 'inherit',
   env: {
     ...process.env,
-    NODE_ENV: process.env.NODE_ENV || 'development'
+    NODE_ENV: process.env.NODE_ENV || 'development',
+    PORT: process.env.PORT || '3000'
   }
 });
 
