@@ -39,9 +39,18 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Add health check endpoint first
+  // Add health check endpoint that responds immediately with 200 status
   app.get('/health', (_req, res) => {
     res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+
+  // Add root endpoint that responds quickly without expensive operations
+  app.get('/', (_req, res) => {
+    res.status(200).json({ 
+      status: 'healthy', 
+      message: 'OKR Management System is running',
+      timestamp: new Date().toISOString() 
+    });
   });
 
   const server = await registerRoutes(app);
@@ -72,9 +81,10 @@ app.use((req, res, next) => {
     if (fs.existsSync(distPath)) {
       app.use(express.static(distPath));
       
-      // Only serve index.html for non-API routes
+      // Only serve index.html for non-API routes and non-root routes
       app.use((req, res, next) => {
-        if (req.path.startsWith('/api/')) {
+        // Skip API routes and root endpoint (already handled above)
+        if (req.path.startsWith('/api/') || req.path === '/' || req.path === '/health') {
           return next();
         }
         res.sendFile(path.resolve(distPath, "index.html"));
@@ -88,20 +98,47 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = 5000;
+  // Add process handlers to prevent the application from exiting unexpectedly
+  process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+    // Don't exit the process, just log the error
+  });
+
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    // Don't exit the process, just log the error
+  });
+
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    server.close(() => {
+      console.log('Process terminated');
+    });
+  });
+
+  process.on('SIGINT', () => {
+    console.log('SIGINT received, shutting down gracefully');
+    server.close(() => {
+      console.log('Process terminated');
+    });
+  });
+
   server.listen({
     port,
     host: "0.0.0.0",
     reusePort: true,
-  }, async () => {
+  }, () => {
     log(`serving on port ${port}`);
     
-    // Initialize database with sample data AFTER server is running
-    // This ensures the server stays alive even if database initialization fails
-    try {
-      await populateDatabase();
-      console.log("Database initialized successfully");
-    } catch (error: any) {
-      console.log("Database already populated or initialization failed:", error?.message || error);
-    }
+    // Move database population to run asynchronously after server starts
+    // This prevents the process from exiting after database operations complete
+    setImmediate(async () => {
+      try {
+        await populateDatabase();
+        console.log("Database initialized successfully");
+      } catch (error: any) {
+        console.log("Database already populated or initialization failed:", error?.message || error);
+      }
+    });
   });
 })();

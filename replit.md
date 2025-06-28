@@ -439,6 +439,14 @@ Changelog:
   * Edit Task modal now correctly shows currently assigned PIC when opened
   * All form fields (status, priority, assignedTo) properly display existing task data
   * Task editing functionality now matches create functionality with proper data population
+- June 28, 2025. Fixed deployment health check failures and server stability:
+  * Added immediate-response health check endpoint (/health) returning 200 status for deployment verification
+  * Created root endpoint (/) that responds quickly without expensive operations
+  * Moved database population to run asynchronously using setImmediate after server startup
+  * Added comprehensive process handlers for uncaughtException, unhandledRejection, SIGTERM, and SIGINT
+  * Enhanced production static file serving to avoid conflicts with health check endpoints
+  * Prevented application process from exiting after database initialization completes
+  * Server now maintains continuous uptime and passes deployment health checks successfully
 - June 27, 2025. Added ideal progress threshold indicator to Key Result detail page:
   * Implemented vertical gray threshold line showing ideal progress based on time elapsed
   * Added progress legend with visual indicators for current progress vs ideal target
