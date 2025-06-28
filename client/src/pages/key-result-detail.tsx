@@ -1022,7 +1022,7 @@ export default function KeyResultDetailPage() {
               </CardHeader>
               <CardContent>
                 {keyResult.checkIns && keyResult.checkIns.length > 0 ? (
-                  <div className="space-y-3 max-h-80 overflow-y-auto" style={{ overflow: 'visible' }}>
+                  <div className="space-y-3 max-h-80 overflow-y-auto">
                     {keyResult.checkIns
                       .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
                       .map((checkIn) => (
