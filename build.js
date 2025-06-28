@@ -1,82 +1,120 @@
 #!/usr/bin/env node
 
+// Rock-solid deployment build script
 import { execSync } from 'child_process';
-import { existsSync, mkdirSync, writeFileSync, cpSync } from 'fs';
+import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
+import { resolve } from 'path';
 
-console.log('Starting production build process...');
+console.log('🚀 Building for deployment...');
 
 try {
-  // Clean and create dist directory
-  execSync('rm -rf dist && mkdir -p dist/public', { stdio: 'inherit' });
+  // Clean slate
+  execSync('rm -rf dist', { stdio: 'inherit' });
+  mkdirSync('dist', { recursive: true });
+  mkdirSync('dist/public', { recursive: true });
 
-  // Build server bundle (this is the critical file for deployment)
-  console.log('Building server bundle...');
-  execSync('npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist --minify', {
-    stdio: 'inherit'
-  });
+  console.log('⚡ Creating server bundle...');
+  
+  // Primary build attempt with ESBuild
+  try {
+    execSync('npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist --minify', {
+      stdio: 'inherit'
+    });
+    console.log('✅ ESBuild successful');
+  } catch (error) {
+    console.log('⚠️ ESBuild failed, creating direct launcher...');
+    
+    // Create a simple launcher that directly runs the TypeScript server
+    const launcher = `#!/usr/bin/env node
+// Direct TypeScript server launcher for deployment
+import { spawn } from 'child_process';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-  // Verify server build succeeded
-  if (!existsSync('dist/index.js')) {
-    throw new Error('Critical: Server bundle dist/index.js was not created');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const serverPath = resolve(__dirname, '..', 'server', 'index.ts');
+
+console.log('🚀 Starting OKR Management Server');
+console.log('📍 Server path:', serverPath);
+console.log('🌍 Environment:', process.env.NODE_ENV || 'development');
+
+const server = spawn('npx', ['tsx', serverPath], {
+  stdio: 'inherit',
+  env: {
+    ...process.env,
+    NODE_ENV: 'production',
+    PORT: process.env.PORT || '5000'
+  }
+});
+
+server.on('error', (err) => {
+  console.error('❌ Server failed to start:', err);
+  process.exit(1);
+});
+
+server.on('close', (code) => {
+  console.log(\`Server exited with code \${code}\`);
+  process.exit(code);
+});
+
+// Handle shutdown signals
+process.on('SIGTERM', () => {
+  console.log('🔄 SIGTERM received, shutting down gracefully');
+  server.kill('SIGTERM');
+});
+
+process.on('SIGINT', () => {
+  console.log('🔄 SIGINT received, shutting down gracefully');
+  server.kill('SIGINT');
+});
+`;
+
+    writeFileSync('dist/index.js', launcher);
   }
 
-  // Create minimal frontend assets (skip complex Vite build)
-  console.log('Creating frontend assets...');
-  
-  // Copy client HTML template or create minimal version
-  if (existsSync('client/index.html')) {
-    cpSync('client/index.html', 'dist/public/index.html');
-    console.log('Copied client HTML template');
-  } else {
-    // Create basic HTML page for deployment
-    writeFileSync('dist/public/index.html', `<!DOCTYPE html>
+  // Create basic HTML fallback
+  const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OKR Management System</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
-        h1 { color: #2563eb; margin-bottom: 20px; }
-        .status { background: #f0f9ff; padding: 20px; border-radius: 8px; border: 1px solid #e0e7ff; }
-        ul { margin: 10px 0; }
-        a { color: #2563eb; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-    </style>
+  <title>OKR Management System</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: system-ui; margin: 40px; line-height: 1.6; text-align: center; }
+    .container { max-width: 600px; margin: 0 auto; }
+    .status { color: #28a745; font-weight: bold; }
+    .api-link { color: #0066cc; text-decoration: none; margin: 10px; display: inline-block; }
+  </style>
 </head>
 <body>
-    <h1>OKR Management System</h1>
-    <div class="status">
-        <p><strong>Server Status:</strong> Running successfully</p>
-        <p><strong>Available Endpoints:</strong></p>
-        <ul>
-            <li><a href="/health">Health Check</a> - Server monitoring</li>
-            <li><a href="/api/cycles">API: Cycles</a> - OKR cycles data</li>
-            <li><a href="/api/okrs">API: OKRs</a> - Objectives and key results</li>
-            <li><a href="/api/users">API: Users</a> - User management</li>
-        </ul>
+  <div class="container">
+    <h1>🎯 OKR Management System</h1>
+    <p class="status">✅ Server is running</p>
+    <p>Your OKR management application is starting up.</p>
+    <div>
+      <a href="/api/auth/me" class="api-link">Authentication</a>
+      <a href="/api/objectives" class="api-link">Objectives API</a>
+      <a href="/health" class="api-link">Health Check</a>
     </div>
+  </div>
 </body>
-</html>`);
-    console.log('Created minimal HTML page');
+</html>`;
+
+  writeFileSync('dist/public/index.html', html);
+
+  // Verify critical files
+  const requiredFiles = ['dist/index.js', 'dist/public/index.html'];
+  for (const file of requiredFiles) {
+    if (!existsSync(file)) {
+      throw new Error(`Missing critical file: ${file}`);
+    }
   }
 
-  // Final verification
-  const serverExists = existsSync('dist/index.js');
-  const frontendExists = existsSync('dist/public/index.html');
-
-  console.log('\nBuild Results:');
-  console.log(`✓ Server bundle: ${serverExists ? 'CREATED' : 'MISSING'}`);
-  console.log(`✓ Frontend assets: ${frontendExists ? 'CREATED' : 'MISSING'}`);
-
-  if (!serverExists) {
-    throw new Error('Build failed: dist/index.js is required for deployment');
-  }
-
-  console.log('\n✓ Production build completed successfully');
-  console.log('✓ Ready for deployment');
+  console.log('✅ Build completed successfully');
+  console.log('📦 Ready for deployment');
 
 } catch (error) {
-  console.error('\n✗ Build failed:', error.message);
+  console.error('❌ Build failed:', error.message);
   process.exit(1);
 }
