@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { scheduleCycleStatusUpdates } from "./cycle-status-updater";
 import { populateDatabase } from "./populate-postgres";
+import { testDatabaseConnection } from "./db";
 
 const app = express();
 app.use(express.json());
@@ -66,12 +67,14 @@ const port = parseInt(process.env.PORT || "5000", 10);
   // Start automatic cycle status updates
   scheduleCycleStatusUpdates();
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
-
+    
+    console.error(`Error ${status} on ${req.method} ${req.path}:`, err);
+    
     res.status(status).json({ message });
-    throw err;
+    // Don't throw the error again to prevent server crashes
   });
 
   // importantly only setup vite in development and after
@@ -132,14 +135,21 @@ const port = parseInt(process.env.PORT || "5000", 10);
   // Move database population to run asynchronously after server is listening
   // This ensures the server responds to health checks immediately
   setImmediate(async () => {
-    console.log("Populating PostgreSQL database with sample data...");
-    try {
-      await populateDatabase();
-      console.log("Database initialized successfully");
-    } catch (error: any) {
-      console.log("Database already populated, skipping initialization");
-      // Don't let database errors crash the server
-      console.error("Database initialization error:", error?.message || error);
+    console.log("Testing database connection...");
+    const dbConnected = await testDatabaseConnection();
+    
+    if (dbConnected) {
+      console.log("Populating PostgreSQL database with sample data...");
+      try {
+        await populateDatabase();
+        console.log("Database initialized successfully");
+      } catch (error: any) {
+        console.log("Database already populated, skipping initialization");
+        // Don't let database errors crash the server
+        console.error("Database initialization error:", error?.message || error);
+      }
+    } else {
+      console.error("Database connection failed - server will continue without database");
     }
   });
 

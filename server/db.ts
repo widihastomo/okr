@@ -8,6 +8,19 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-// Use HTTP connection for better reliability
+// Use HTTP connection for better reliability with error handling
 const sql = neon(process.env.DATABASE_URL);
+
 export const db = drizzle(sql, { schema });
+
+// Test database connection
+export async function testDatabaseConnection() {
+  try {
+    await sql`SELECT 1`;
+    console.log("✅ Database connection successful");
+    return true;
+  } catch (error) {
+    console.error("❌ Database connection failed:", error);
+    return false;
+  }
+}
