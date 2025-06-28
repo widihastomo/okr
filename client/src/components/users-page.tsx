@@ -914,8 +914,6 @@ export default function UsersPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuSeparator />
                               <DropdownMenuItem 
                                 onClick={() => {
                                   setSelectedTeam(team);
