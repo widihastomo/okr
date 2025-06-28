@@ -203,13 +203,35 @@ export default function UsersPage() {
 
   // Update team mutation
   const updateTeamMutation = useMutation({
-    mutationFn: async (data: { teamId: string; name: string; description: string; members: string[] }) => {
+    mutationFn: async (data: { teamId: string; name: string; description: string; ownerId: string; members: string[] }) => {
       const response = await fetch(`/api/teams/${data.teamId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: data.name, description: data.description }),
+        body: JSON.stringify({ name: data.name, description: data.description, ownerId: data.ownerId }),
       });
       if (!response.ok) throw new Error('Failed to update team');
+      
+      // Update team members by removing all current members and adding new ones
+      const currentMembers = allTeamMembers.filter(member => member.teamId === data.teamId);
+      
+      // Remove current members
+      await Promise.all(currentMembers.map(member =>
+        fetch(`/api/teams/${data.teamId}/members/${member.userId}`, {
+          method: "DELETE",
+        })
+      ));
+      
+      // Add new members
+      if (data.members.length > 0) {
+        await Promise.all(data.members.map(userId =>
+          fetch(`/api/teams/${data.teamId}/members`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId, role: "member" }),
+          })
+        ));
+      }
+      
       return response.json();
     },
     onSuccess: () => {
@@ -775,6 +797,7 @@ export default function UsersPage() {
                         teamId: selectedTeam.id,
                         name: formData.get('name') as string,
                         description: formData.get('description') as string,
+                        ownerId: formData.get('ownerId') as string,
                         members: editFormMembers,
                       });
                     }
@@ -787,6 +810,21 @@ export default function UsersPage() {
                       <div>
                         <Label htmlFor="description">Description</Label>
                         <Input name="description" defaultValue={selectedTeam?.description || ""} placeholder="Enter team description" />
+                      </div>
+                      <div>
+                        <Label htmlFor="ownerId">Team Owner</Label>
+                        <Select name="ownerId" defaultValue={selectedTeam?.ownerId} required>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select team owner" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {users.map((user: User) => (
+                              <SelectItem key={user.id} value={user.id}>
+                                {user.firstName} {user.lastName}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div>
                         <Label htmlFor="members">Team Members</Label>

@@ -491,6 +491,13 @@ Changelog:
   * Enhanced data retrieval with proper TypeScript typing and null-safe handling
   * Removed Teams page, navigation menu, and route per user requirements
   * Retained improved storage layer fixes that benefit overall system stability
+- June 28, 2025. Enhanced Users page with comprehensive team management:
+  * Added action buttons (3-dot menu) to team cards with edit and delete functionality
+  * Created comprehensive team forms with member management using checkbox selection
+  * Integrated owner and member information display with avatars in team cards
+  * Added Edit Team dialog with owner selection field and member management
+  * Implemented delete confirmation dialog for team removal
+  * Enhanced team creation and editing with automatic member assignment
 - June 27, 2025. Added ideal progress threshold indicator to Key Result detail page:
   * Implemented vertical gray threshold line showing ideal progress based on time elapsed
   * Added progress legend with visual indicators for current progress vs ideal target
