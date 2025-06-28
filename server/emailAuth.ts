@@ -1,20 +1,34 @@
 import bcrypt from "bcryptjs";
 import session from "express-session";
 import type { Express, RequestHandler } from "express";
+import ConnectPgSimple from "connect-pg-simple";
 import MemoryStore from "memorystore";
 import { storage } from "./storage";
 import type { User, LoginData, RegisterData } from "@shared/schema";
 
+const PgSession = ConnectPgSimple(session);
 const MemoryStoreSession = MemoryStore(session);
 
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
+  const isProduction = process.env.NODE_ENV === 'production';
   
-  // Use memory store for both development and production to avoid session issues
-  const store = new MemoryStoreSession({
-    checkPeriod: 86400000, // prune expired entries every 24h
-    ttl: sessionTtl,
-  });
+  let store;
+  
+  if (isProduction && process.env.DATABASE_URL) {
+    // Use PostgreSQL session storage for production
+    store = new PgSession({
+      conString: process.env.DATABASE_URL,
+      tableName: 'sessions',
+      createTableIfMissing: true,
+    });
+  } else {
+    // Use memory store for development
+    store = new MemoryStoreSession({
+      checkPeriod: 86400000, // prune expired entries every 24h
+      ttl: sessionTtl,
+    });
+  }
   
   return session({
     secret: process.env.SESSION_SECRET || "okr-management-secret-2025",
@@ -23,9 +37,9 @@ export function getSession() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: false, // Set to false to fix deployment issues
+      secure: isProduction, // Dynamic based on environment
       maxAge: sessionTtl,
-      sameSite: "lax",
+      sameSite: isProduction ? "strict" : "lax",
     },
   });
 }
@@ -125,5 +139,6 @@ export async function getCurrentUser(userId: string): Promise<User | null> {
 declare module "express-session" {
   interface SessionData {
     userId: string;
+    loggedOut?: boolean;
   }
 }
