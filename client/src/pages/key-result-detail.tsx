@@ -1055,7 +1055,10 @@ export default function KeyResultDetailPage() {
                           <div className="flex items-center justify-between mt-2">
                             {checkIn.confidence && (
                               <div className="flex items-center gap-2">
-                                <div className="flex items-center gap-1">
+                                <div 
+                                  className="flex items-center gap-1 group relative cursor-help"
+                                  title={`Tingkat Kepercayaan: ${getConfidenceDisplay(checkIn.confidence).label} (${checkIn.confidence}/10)`}
+                                >
                                   <div className="w-16 bg-gray-200 rounded-full h-2">
                                     <div 
                                       className={`h-2 rounded-full ${getConfidenceDisplay(checkIn.confidence).color}`}
@@ -1065,6 +1068,21 @@ export default function KeyResultDetailPage() {
                                   <span className="text-xs text-gray-600 font-medium">
                                     {checkIn.confidence}/10
                                   </span>
+                                  
+                                  {/* Custom hover tooltip */}
+                                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 pointer-events-none">
+                                    <div className="text-center">
+                                      <div className="font-medium">Tingkat Kepercayaan</div>
+                                      <div className="text-gray-300">{getConfidenceDisplay(checkIn.confidence).label} ({checkIn.confidence}/10)</div>
+                                      <div className="text-xs text-gray-400 mt-1">
+                                        {checkIn.confidence >= 8 ? 'Sangat yakin target tercapai' :
+                                         checkIn.confidence >= 6 ? 'Cukup optimis dengan progress' :
+                                         'Butuh perhatian lebih untuk mencapai target'}
+                                      </div>
+                                    </div>
+                                    {/* Tooltip arrow */}
+                                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
+                                  </div>
                                 </div>
                               </div>
                             )}
