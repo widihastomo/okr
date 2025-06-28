@@ -529,6 +529,12 @@ Changelog:
   * Displays contextual advice based on confidence value (high/medium/low)
   * Improved accessibility and mobile compatibility by removing hover dependencies
   * Enhanced user understanding with always-visible confidence level information
+- June 28, 2025. Added show/hide password functionality to user creation form:
+  * Implemented password visibility toggle with Eye/EyeOff icons from Lucide React
+  * Added dynamic input type switching between password and text modes
+  * Enhanced form usability with proper button positioning and hover states
+  * Improved user experience for password field management during user creation
+  * Maintained secure password handling with proper input field padding and styling
 - June 27, 2025. Implemented chronological sorting for Progress History:
   * Added sorting functionality to display check-ins by latest update first
   * Check-ins now ordered by creation date in descending order for better user experience
