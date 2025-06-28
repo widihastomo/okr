@@ -464,13 +464,13 @@ export default function TeamsPage() {
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
                               <span className="text-xs font-medium text-blue-600">
-                                {member.user.firstName?.charAt(0)}{member.user.lastName?.charAt(0)}
+                                {member.user?.firstName?.charAt(0) || 'U'}{member.user?.lastName?.charAt(0) || 'U'}
                               </span>
                             </div>
-                            <span>{member.user.firstName} {member.user.lastName}</span>
+                            <span>{member.user?.firstName || 'Unknown'} {member.user?.lastName || 'User'}</span>
                           </div>
                         </TableCell>
-                        <TableCell>{member.user.email}</TableCell>
+                        <TableCell>{member.user?.email || 'No email'}</TableCell>
                         <TableCell>
                           <Select
                             value={member.role}
