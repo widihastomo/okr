@@ -60,7 +60,10 @@ const port = 5000;
     res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
-  // Root endpoint will be handled by the frontend app or static files
+  // Add root endpoint that responds quickly for health checks
+  app.get('/', (_req, res) => {
+    res.status(200).json({ status: 'ok', app: 'OKR Management System', timestamp: new Date().toISOString() });
+  });
 
   const server = await registerRoutes(app);
   
@@ -90,10 +93,10 @@ const port = 5000;
     if (fs.existsSync(distPath)) {
       app.use(express.static(distPath));
       
-      // Serve index.html for non-API routes (skip health check only)
+      // Serve index.html for non-API routes (skip health check and root endpoint)
       app.use((req, res, next) => {
-        // Skip API routes and health check endpoint
-        if (req.path.startsWith('/api/') || req.path === '/health') {
+        // Skip API routes, health check endpoint, and root endpoint
+        if (req.path.startsWith('/api/') || req.path === '/health' || req.path === '/') {
           return next();
         }
         res.sendFile(path.resolve(distPath, "index.html"));
@@ -123,17 +126,22 @@ const port = 5000;
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
-    
-    // Move database population to run asynchronously using setImmediate after server startup
-    // This prevents the application process from exiting after database initialization completes
-    setImmediate(async () => {
-      console.log("Populating PostgreSQL database with sample data...");
-      try {
-        await populateDatabase();
-        console.log("Database initialized successfully");
-      } catch (error: any) {
-        console.log("Database already populated, skipping initialization");
-      }
-    });
   });
+
+  // Move database population to run asynchronously after server is listening
+  // This ensures the server responds to health checks immediately
+  setImmediate(async () => {
+    console.log("Populating PostgreSQL database with sample data...");
+    try {
+      await populateDatabase();
+      console.log("Database initialized successfully");
+    } catch (error: any) {
+      console.log("Database already populated, skipping initialization");
+      // Don't let database errors crash the server
+      console.error("Database initialization error:", error?.message || error);
+    }
+  });
+
+  // Keep the process alive by preventing exit
+  process.stdin.resume();
 })();
