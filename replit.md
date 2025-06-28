@@ -451,6 +451,12 @@ Changelog:
   * Enhanced layout to show user info at bottom right of each check-in card
   * Applied consistent avatar design to task assignments with blue circular avatars
   * Maintained existing design consistency while adding valuable context for progress updates
+- June 27, 2025. Enhanced check-in notes and confidence level visualization:
+  * Added "View More/View Less" functionality for check-in notes longer than 100 characters
+  * Implemented interactive note expansion to show full text when needed
+  * Created visual confidence level display with colored progress bars and labels
+  * Added confidence badges with color-coded backgrounds (green/yellow/red) and descriptive labels
+  * Enhanced user experience with better readability and visual feedback for confidence levels
 - June 27, 2025. Implemented chronological sorting for Progress History:
   * Added sorting functionality to display check-ins by latest update first
   * Check-ins now ordered by creation date in descending order for better user experience

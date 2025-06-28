@@ -110,6 +110,7 @@ export default function KeyResultDetailPage() {
   const [mentionPosition, setMentionPosition] = useState(0);
   const [addingTaskToInitiative, setAddingTaskToInitiative] = useState<string | null>(null);
   const [addTaskOpen, setAddTaskOpen] = useState(false);
+  const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set());
 
   // Task form for editing/adding
   const taskForm = useForm<TaskFormData>({
@@ -340,6 +341,36 @@ export default function KeyResultDetailPage() {
       }
       return newSet;
     });
+  };
+
+  // Helper function to toggle note expansion
+  const toggleNoteExpansion = (checkInId: string) => {
+    setExpandedNotes(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(checkInId)) {
+        newSet.delete(checkInId);
+      } else {
+        newSet.add(checkInId);
+      }
+      return newSet;
+    });
+  };
+
+  // Helper function to get confidence level display
+  const getConfidenceDisplay = (confidence: number) => {
+    const percentage = (confidence / 10) * 100;
+    let color = "bg-red-500";
+    let label = "Rendah";
+    
+    if (confidence >= 8) {
+      color = "bg-green-500";
+      label = "Tinggi";
+    } else if (confidence >= 6) {
+      color = "bg-yellow-500";
+      label = "Sedang";
+    }
+    
+    return { percentage, color, label };
   };
 
   // Update progress mutation
@@ -1005,11 +1036,44 @@ export default function KeyResultDetailPage() {
                             </p>
                           </div>
                           {checkIn.notes && (
-                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">{checkIn.notes}</p>
+                            <div className="mt-1">
+                              <p className={`text-sm text-gray-600 ${
+                                expandedNotes.has(checkIn.id) ? '' : 'line-clamp-2'
+                              }`}>
+                                {checkIn.notes}
+                              </p>
+                              {checkIn.notes.length > 100 && (
+                                <button
+                                  onClick={() => toggleNoteExpansion(checkIn.id)}
+                                  className="text-xs text-blue-600 hover:text-blue-800 mt-1 font-medium"
+                                >
+                                  {expandedNotes.has(checkIn.id) ? 'View Less' : 'View More'}
+                                </button>
+                              )}
+                            </div>
                           )}
                           <div className="flex items-center justify-between mt-2">
                             {checkIn.confidence && (
-                              <p className="text-xs text-gray-500">Confidence: {checkIn.confidence}/10</p>
+                              <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1">
+                                  <div className="w-16 bg-gray-200 rounded-full h-2">
+                                    <div 
+                                      className={`h-2 rounded-full ${getConfidenceDisplay(checkIn.confidence).color}`}
+                                      style={{ width: `${getConfidenceDisplay(checkIn.confidence).percentage}%` }}
+                                    ></div>
+                                  </div>
+                                  <span className="text-xs text-gray-600 font-medium">
+                                    {checkIn.confidence}/10
+                                  </span>
+                                </div>
+                                <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                                  checkIn.confidence >= 8 ? 'bg-green-100 text-green-700' :
+                                  checkIn.confidence >= 6 ? 'bg-yellow-100 text-yellow-700' :
+                                  'bg-red-100 text-red-700'
+                                }`}>
+                                  {getConfidenceDisplay(checkIn.confidence).label}
+                                </span>
+                              </div>
                             )}
                             {checkIn.createdBy && (
                               <div className="flex items-center gap-2 text-xs text-gray-500">
