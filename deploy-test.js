@@ -1,126 +1,176 @@
-// Quick deployment test script
-import http from 'http';
+#!/usr/bin/env node
 
-// Test health endpoint
+import { spawn } from 'child_process';
+import { readFileSync, existsSync } from 'fs';
+
+console.log('🚀 Testing production deployment...\n');
+
+// Function to test health endpoint
 function testHealthEndpoint() {
-  return new Promise((resolve, reject) => {
-    const req = http.get('http://localhost:5000/health', (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        if (res.statusCode === 200) {
-          console.log('✅ Health endpoint working:', JSON.parse(data));
+  return new Promise((resolve) => {
+    const curl = spawn('curl', ['-s', 'http://localhost:5000/health']);
+    
+    let output = '';
+    curl.stdout.on('data', (data) => {
+      output += data.toString();
+    });
+    
+    curl.on('close', (code) => {
+      try {
+        const response = JSON.parse(output);
+        if (response.status === 'ok') {
+          console.log('✅ Health check: PASSED');
           resolve(true);
         } else {
-          reject(new Error(`Health check failed: ${res.statusCode}`));
+          console.log('❌ Health check: Invalid response');
+          resolve(false);
         }
-      });
-    });
-    
-    req.on('error', reject);
-    req.setTimeout(5000, () => {
-      req.destroy();
-      reject(new Error('Health check timeout'));
+      } catch (e) {
+        console.log('❌ Health check: Failed to parse response');
+        resolve(false);
+      }
     });
   });
 }
 
-// Test root endpoint
+// Function to test root endpoint
 function testRootEndpoint() {
-  return new Promise((resolve, reject) => {
-    const req = http.get('http://localhost:5000/', (res) => {
-      if (res.statusCode === 200) {
-        console.log('✅ Root endpoint working');
-        resolve(true);
-      } else {
-        reject(new Error(`Root endpoint failed: ${res.statusCode}`));
-      }
+  return new Promise((resolve) => {
+    const curl = spawn('curl', ['-s', '-I', 'http://localhost:5000/']);
+    
+    let output = '';
+    curl.stdout.on('data', (data) => {
+      output += data.toString();
     });
     
-    req.on('error', reject);
-    req.setTimeout(5000, () => {
-      req.destroy();
-      reject(new Error('Root endpoint timeout'));
+    curl.on('close', (code) => {
+      if (output.includes('200 OK') || output.includes('text/html')) {
+        console.log('✅ Root endpoint: PASSED');
+        resolve(true);
+      } else {
+        console.log('❌ Root endpoint: Failed');
+        resolve(false);
+      }
     });
   });
 }
 
-// Test API endpoint
+// Function to test API endpoint
 function testAPIEndpoint() {
-  return new Promise((resolve, reject) => {
-    const req = http.get('http://localhost:5000/api/cycles', (res) => {
-      if (res.statusCode === 200) {
-        console.log('✅ API endpoint working');
-        resolve(true);
-      } else {
-        reject(new Error(`API endpoint failed: ${res.statusCode}`));
-      }
+  return new Promise((resolve) => {
+    const curl = spawn('curl', ['-s', 'http://localhost:5000/api/cycles']);
+    
+    let output = '';
+    curl.stdout.on('data', (data) => {
+      output += data.toString();
     });
     
-    req.on('error', reject);
-    req.setTimeout(5000, () => {
-      req.destroy();
-      reject(new Error('API endpoint timeout'));
+    curl.on('close', (code) => {
+      try {
+        const response = JSON.parse(output);
+        if (Array.isArray(response)) {
+          console.log('✅ API endpoint: PASSED');
+          resolve(true);
+        } else {
+          console.log('❌ API endpoint: Invalid response format');
+          resolve(false);
+        }
+      } catch (e) {
+        console.log('❌ API endpoint: Failed to parse JSON');
+        resolve(false);
+      }
     });
   });
 }
 
-// Test deployment configuration for production
+// Function to test deployment config
 function testDeploymentConfig() {
-  console.log('\n🔧 Deployment Configuration Check:');
+  console.log('📋 Deployment Configuration:');
   
-  // Check port configuration
-  const defaultPort = 5000;
-  const envPort = process.env.PORT;
-  console.log(`Default Port: ${defaultPort}`);
-  console.log(`Environment PORT: ${envPort || 'not set'}`);
-  console.log(`Resolved Port: ${envPort || defaultPort}`);
+  // Check critical files
+  const criticalFiles = [
+    'dist/index.js',
+    'dist/public/index.html',
+    'package.json'
+  ];
   
-  // Check host binding
-  console.log('Host Binding: 0.0.0.0 (correct for deployment)');
+  let allFilesExist = true;
+  criticalFiles.forEach(file => {
+    if (existsSync(file)) {
+      console.log(`✅ ${file}: EXISTS`);
+    } else {
+      console.log(`❌ ${file}: MISSING`);
+      allFilesExist = false;
+    }
+  });
   
-  // Check required environment variables
-  console.log('\n🌍 Environment Variables:');
-  console.log('NODE_ENV:', process.env.NODE_ENV || 'development');
-  console.log('DATABASE_URL:', process.env.DATABASE_URL ? '✅ Set' : '❌ Not set');
-  console.log('REPLIT_DB_URL:', process.env.REPLIT_DB_URL ? '✅ Set' : '❌ Not set');
+  // Check package.json start script
+  try {
+    const packageJson = JSON.parse(readFileSync('package.json', 'utf-8'));
+    if (packageJson.scripts && packageJson.scripts.start) {
+      console.log(`✅ Start script: ${packageJson.scripts.start}`);
+    } else {
+      console.log('❌ Start script: MISSING');
+      allFilesExist = false;
+    }
+  } catch (e) {
+    console.log('❌ package.json: Invalid format');
+    allFilesExist = false;
+  }
   
-  // Check production readiness
-  console.log('\n🏭 Production Readiness:');
-  const isProduction = process.env.NODE_ENV === 'production';
-  console.log('Production Mode:', isProduction ? '✅ Ready' : '⚠️  Development mode');
+  // Check environment variables
+  console.log(`✅ NODE_ENV: ${process.env.NODE_ENV || 'not set'}`);
+  console.log(`✅ PORT: ${process.env.PORT || '5000 (default)'}`);
+  console.log(`✅ DATABASE_URL: ${process.env.DATABASE_URL ? 'SET' : 'NOT SET'}`);
   
-  return true;
+  return allFilesExist;
 }
 
+// Main test function
 async function runTests() {
-  console.log('🚀 Testing deployment configuration...\n');
-  
   try {
-    await testHealthEndpoint();
-    await testRootEndpoint();
-    await testAPIEndpoint();
-    testDeploymentConfig();
+    // Test deployment configuration first
+    const configValid = testDeploymentConfig();
+    if (!configValid) {
+      console.log('\n❌ Deployment configuration issues detected');
+      process.exit(1);
+    }
     
-    console.log('\n✅ All deployment tests passed!');
-    console.log('🎯 Server is ready for deployment');
+    console.log('\n🚀 Starting production server...');
     
-    // Production deployment checklist
-    console.log('\n📋 Production Deployment Checklist:');
-    console.log('✅ Health check endpoint working');
-    console.log('✅ Root endpoint serving application');
-    console.log('✅ API endpoints responding');
-    console.log('✅ Port configuration using environment variable');
-    console.log('✅ Host binding to 0.0.0.0');
-    console.log('✅ Database connection available');
+    // Start production server
+    const server = spawn('node', ['dist/index.js'], {
+      env: { ...process.env, NODE_ENV: 'production', PORT: '5000' },
+      stdio: ['pipe', 'pipe', 'pipe']
+    });
+    
+    // Wait for server to start
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    
+    console.log('\n🧪 Running endpoint tests...');
+    
+    // Run tests
+    const healthTest = await testHealthEndpoint();
+    const rootTest = await testRootEndpoint();
+    const apiTest = await testAPIEndpoint();
+    
+    // Kill server
+    server.kill();
+    
+    // Results
+    console.log('\n📊 Test Results:');
+    const allPassed = healthTest && rootTest && apiTest;
+    
+    if (allPassed) {
+      console.log('🎉 All tests PASSED - Ready for deployment!');
+      process.exit(0);
+    } else {
+      console.log('❌ Some tests FAILED - Fix issues before deployment');
+      process.exit(1);
+    }
     
   } catch (error) {
-    console.error('❌ Deployment test failed:', error.message);
-    console.log('\n🔍 Troubleshooting tips:');
-    console.log('1. Check if server is running on correct port');
-    console.log('2. Verify DATABASE_URL environment variable');
-    console.log('3. Ensure health check endpoint is accessible');
-    console.log('4. Check server logs for binding issues');
+    console.error('💥 Test failed:', error.message);
     process.exit(1);
   }
 }

@@ -1,78 +1,98 @@
-# Deployment Configuration Guide
+# Deployment Guide
 
-## ✅ Deployment Status: READY
+## Quick Deployment
 
-All deployment fixes have been successfully applied and tested. The application is ready for production deployment.
+### 1. Build for Production
+```bash
+node build-simple.js
+```
 
-## 🔧 Applied Fixes
+### 2. Test Deployment
+```bash
+node deploy-test.js
+```
 
-### Health Check Endpoints
-- `/health` - Returns immediate 200 status for deployment verification
-- `/` - Root endpoint responds quickly for health checks
-- Both endpoints avoid expensive operations and respond within milliseconds
+### 3. Deploy
+Click the "Deploy" button in Replit or use:
+```bash
+npm start
+```
 
-### Server Stability
-- Asynchronous database initialization using `setImmediate()`
-- Server listens on port 5000 immediately before database operations
-- Comprehensive error handlers for `uncaughtException` and `unhandledRejection`
-- Graceful shutdown handlers for `SIGTERM` and `SIGINT`
-- Process keep-alive mechanism with `process.stdin.resume()`
+## Deployment Configuration
 
-### Production Configuration
-- Server binds to `0.0.0.0:5000` for proper port forwarding
-- Static file serving optimized to avoid API route conflicts
-- Production routing separates health checks from frontend routing
+### Required Files
+- `dist/index.js` - Production server bundle
+- `dist/public/index.html` - Frontend assets
+- `package.json` - Start script configuration
 
-## 📊 Test Results
+### Environment Variables
+- `NODE_ENV=production` - Enables production mode
+- `PORT` - Server port (defaults to 5000)
+- `DATABASE_URL` - PostgreSQL connection string
 
-All deployment tests passed successfully:
-- ✅ Health endpoint: 200 OK with immediate response
-- ✅ Root endpoint: Working correctly
-- ✅ API endpoints: Responding normally
-- ✅ Database: Connected and initialized
-- ✅ Environment: Properly configured
+### Start Script
+```json
+{
+  "scripts": {
+    "start": "NODE_ENV=production node dist/index.js"
+  }
+}
+```
 
-## 🚀 Deployment Instructions
+## Deployment Features
 
-1. **Build Process**:
-   ```bash
-   npm run build
-   ```
-   - Builds frontend assets to `dist/public/`
-   - Bundles server code to `dist/index.js`
+### Health Check Endpoint
+- **URL**: `/health`
+- **Response**: `{"status":"ok","timestamp":"2025-06-28T02:13:06.520Z"}`
+- **Purpose**: Deployment verification and monitoring
 
-2. **Production Start**:
-   ```bash
-   npm run start
-   ```
-   - Runs the bundled server in production mode
-   - Serves static files and API endpoints
+### Root Endpoint
+- **URL**: `/`
+- **Response**: Serves the web application
+- **Fallback**: Basic HTML page with API links
 
-3. **Environment Variables**:
-   - `DATABASE_URL`: PostgreSQL connection string (required)
-   - `NODE_ENV`: Set to "production"
-   - `PORT`: Defaults to 5000
+### API Endpoints
+- **Base URL**: `/api/*`
+- **Authentication**: Session-based with PostgreSQL storage
+- **Data Format**: JSON responses
 
-## ⚡ Performance Optimizations
+## Build Process
 
-- Health checks respond in < 5ms
-- Database operations run asynchronously after server startup
-- Static file serving optimized for production
-- Process handlers prevent unexpected exits
+### Server Build
+- Uses ESBuild for fast TypeScript compilation
+- Bundles server code into single `dist/index.js` file
+- Minified and optimized for production
 
-## 🔒 Security Features
+### Frontend Build
+- Fallback mode for deployment compatibility
+- Handles build timeouts gracefully
+- Creates minimal assets when full build fails
 
-- Environment-based configuration
-- Secure session management with PostgreSQL storage
-- Protected API routes with authentication middleware
-- Proper error handling without sensitive data exposure
+## Troubleshooting
 
-## 📝 Replit Configuration
+### Build Issues
+If frontend build times out:
+```bash
+# Use fallback build mode
+node build-simple.js
+```
 
-The `.replit` file is properly configured with:
-- `deploymentTarget = "autoscale"`
-- Build command: `npm run build`
-- Start command: `npm run start`
-- Port mapping: 5000 → 80
+### Server Issues
+Check server logs for:
+- Database connection errors
+- Port binding issues
+- Authentication problems
 
-Your application is now ready for deployment on Replit's autoscale infrastructure.
+### Health Check Failures
+Verify:
+- Server is running on correct port
+- `/health` endpoint returns JSON with `"status":"ok"`
+- No blocking database operations
+
+## Production Optimizations
+
+- Asynchronous database initialization
+- Process stability handlers for graceful shutdowns
+- Optimized static file serving
+- Efficient port binding to `0.0.0.0`
+- Proper error handling and logging
