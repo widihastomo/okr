@@ -44,15 +44,6 @@ app.use((req, res, next) => {
     res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
-  // Add root endpoint that responds quickly without expensive operations
-  app.get('/', (_req, res) => {
-    res.status(200).json({ 
-      status: 'healthy', 
-      message: 'OKR Management System is running',
-      timestamp: new Date().toISOString() 
-    });
-  });
-
   const server = await registerRoutes(app);
   
   // Start automatic cycle status updates
@@ -81,10 +72,10 @@ app.use((req, res, next) => {
     if (fs.existsSync(distPath)) {
       app.use(express.static(distPath));
       
-      // Only serve index.html for non-API routes and non-root routes
+      // Serve index.html for non-API routes (including root)
       app.use((req, res, next) => {
-        // Skip API routes and root endpoint (already handled above)
-        if (req.path.startsWith('/api/') || req.path === '/' || req.path === '/health') {
+        // Skip API routes and health check endpoint
+        if (req.path.startsWith('/api/') || req.path === '/health') {
           return next();
         }
         res.sendFile(path.resolve(distPath, "index.html"));
