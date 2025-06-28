@@ -8,7 +8,7 @@ import {
 } from "@shared/schema";
 import { z } from "zod";
 import { setupEmailAuth } from "./authRoutes";
-import { requireAuth } from "./emailAuth";
+import { requireAuth, hashPassword } from "./emailAuth";
 import { calculateProgressStatus } from "./progress-tracker";
 import { updateObjectiveWithAutoStatus } from "./storage";
 import { updateCycleStatuses } from "./cycle-status-updater";
@@ -245,7 +245,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/users', requireAuth, async (req, res) => {
     try {
-      const user = await storage.upsertUser(req.body);
+      // Hash the password before storing
+      const { password, ...userData } = req.body;
+      const hashedPassword = await hashPassword(password);
+      
+      const user = await storage.upsertUser({
+        ...userData,
+        password: hashedPassword
+      });
       res.status(201).json(user);
     } catch (error) {
       console.error("Error creating user:", error);

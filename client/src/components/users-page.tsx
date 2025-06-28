@@ -66,7 +66,7 @@ export default function UsersPage() {
   });
 
   const createUserMutation = useMutation({
-    mutationFn: async (data: { id: string; email: string; firstName: string; lastName: string; role: string }) => {
+    mutationFn: async (data: { id: string; email: string; firstName: string; lastName: string; role: string; password: string }) => {
       const response = await fetch("/api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -429,13 +429,15 @@ export default function UsersPage() {
                 <form onSubmit={(e) => {
                   e.preventDefault();
                   const formData = new FormData(e.currentTarget);
-                  createUserMutation.mutate({
+                  const userData = {
                     id: Math.random().toString(36).substr(2, 9),
                     email: formData.get('email') as string,
                     firstName: formData.get('firstName') as string,
                     lastName: formData.get('lastName') as string,
                     role: formData.get('role') as string,
-                  });
+                    password: formData.get('password') as string,
+                  };
+                  createUserMutation.mutate(userData);
                 }}>
                   <div className="space-y-4">
                     <div>
@@ -449,6 +451,10 @@ export default function UsersPage() {
                     <div>
                       <Label htmlFor="lastName">Last Name</Label>
                       <Input name="lastName" placeholder="Enter last name" required />
+                    </div>
+                    <div>
+                      <Label htmlFor="password">Default Password</Label>
+                      <Input name="password" type="password" placeholder="Enter default password" required />
                     </div>
                     <div>
                       <Label htmlFor="role">Role</Label>
