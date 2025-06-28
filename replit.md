@@ -535,6 +535,12 @@ Changelog:
   * Enhanced form usability with proper button positioning and hover states
   * Improved user experience for password field management during user creation
   * Maintained secure password handling with proper input field padding and styling
+- June 28, 2025. Implemented admin-only password editing functionality:
+  * Added "Change Password" option to user dropdown menu with Key icon (admin users only)
+  * Created dedicated password change dialog with show/hide password toggle
+  * Implemented secure password update endpoint with proper hashing
+  * Added role-based access control - only admin users can change other users' passwords
+  * Enhanced user management security with proper authentication and validation
 - June 27, 2025. Implemented chronological sorting for Progress History:
   * Added sorting functionality to display check-ins by latest update first
   * Check-ins now ordered by creation date in descending order for better user experience

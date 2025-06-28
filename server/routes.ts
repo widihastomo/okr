@@ -299,6 +299,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put('/api/users/:id/password', requireAuth, async (req, res) => {
+    try {
+      const { password } = req.body;
+      const hashedPassword = await hashPassword(password);
+      
+      const updatedUser = await storage.updateUser(req.params.id, { password: hashedPassword });
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json({ message: "Password updated successfully" });
+    } catch (error) {
+      console.error("Error updating password:", error);
+      res.status(500).json({ message: "Failed to update password" });
+    }
+  });
+
   app.delete('/api/users/:id', async (req, res) => {
     try {
       const deleted = await storage.deleteUser(req.params.id);

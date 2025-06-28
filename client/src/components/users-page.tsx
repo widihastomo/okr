@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Users, Plus, Edit, Trash2, UserPlus, Shield, User as UserIcon, Search, UserCheck, UserX, MoreHorizontal, MoreVertical, Eye, EyeOff } from "lucide-react";
+import { Users, Plus, Edit, Trash2, UserPlus, Shield, User as UserIcon, Search, UserCheck, UserX, MoreHorizontal, MoreVertical, Eye, EyeOff, Key } from "lucide-react";
 
 import { useToast } from "@/hooks/use-toast";
 
@@ -30,6 +30,8 @@ export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [editingPassword, setEditingPassword] = useState<User | null>(null);
+  const [showNewPassword, setShowNewPassword] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [teamMembersDialog, setTeamMembersDialog] = useState(false);
   const [addMemberDialog, setAddMemberDialog] = useState(false);
@@ -41,6 +43,11 @@ export default function UsersPage() {
 
   const { data: users = [], isLoading: usersLoading } = useQuery<User[]>({
     queryKey: ["/api/users"],
+  });
+
+  // Get current user to check admin status
+  const { data: currentUser } = useQuery<User>({
+    queryKey: ["/api/auth/me"],
   });
 
   const { data: teams = [], isLoading: teamsLoading } = useQuery<Team[]>({
@@ -141,6 +148,34 @@ export default function UsersPage() {
       toast({
         title: "Error",
         description: "Failed to delete user",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const changePasswordMutation = useMutation({
+    mutationFn: async (data: { id: string; password: string }) => {
+      const response = await fetch(`/api/users/${data.id}/password`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: data.password }),
+      });
+      if (!response.ok) throw new Error('Failed to change password');
+      return response.json();
+    },
+    onSuccess: () => {
+      setEditingPassword(null);
+      setShowNewPassword(false);
+      toast({
+        title: "Success",
+        description: "Password changed successfully",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
         variant: "destructive",
       });
     },
@@ -599,6 +634,12 @@ export default function UsersPage() {
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit user
                               </DropdownMenuItem>
+                              {currentUser?.role === 'admin' && (
+                                <DropdownMenuItem onClick={() => setEditingPassword(user)}>
+                                  <Key className="mr-2 h-4 w-4" />
+                                  Change Password
+                                </DropdownMenuItem>
+                              )}
                               <DropdownMenuSeparator />
                               <AlertDialog>
                                 <AlertDialogTrigger asChild>
@@ -638,6 +679,66 @@ export default function UsersPage() {
                 </TableBody>
               </Table>
             </div>
+          )}
+
+          {/* Change Password Dialog */}
+          {editingPassword && (
+            <Dialog open={!!editingPassword} onOpenChange={() => {
+              setEditingPassword(null);
+              setShowNewPassword(false);
+            }}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Change Password</DialogTitle>
+                  <DialogDescription>
+                    Set a new password for {editingPassword.firstName} {editingPassword.lastName}
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  const formData = new FormData(e.currentTarget);
+                  changePasswordMutation.mutate({
+                    id: editingPassword.id,
+                    password: formData.get('password') as string,
+                  });
+                }}>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="password">New Password</Label>
+                      <div className="relative">
+                        <Input 
+                          name="password" 
+                          type={showNewPassword ? "text" : "password"} 
+                          placeholder="Enter new password" 
+                          required 
+                          className="pr-10"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                        >
+                          {showNewPassword ? (
+                            <EyeOff className="h-4 w-4 text-gray-400" />
+                          ) : (
+                            <Eye className="h-4 w-4 text-gray-400" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-blue-600 hover:bg-blue-700"
+                      disabled={changePasswordMutation.isPending}
+                    >
+                      {changePasswordMutation.isPending ? "Changing..." : "Change Password"}
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
           )}
 
           {/* Edit User Dialog */}
