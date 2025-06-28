@@ -541,6 +541,12 @@ Changelog:
   * Implemented secure password update endpoint with proper hashing
   * Added role-based access control - only admin users can change other users' passwords
   * Enhanced user management security with proper authentication and validation
+- June 28, 2025. Fixed authentication session persistence issue:
+  * Removed development mode overrides that prevented proper session maintenance
+  * Fixed authentication flow to properly maintain sessions between login and subsequent requests
+  * Resolved 401 errors after successful login by ensuring consistent session handling
+  * Updated logout endpoints to use proper session destruction across all environments
+  * Authentication system now works reliably in both development and production
 - June 27, 2025. Implemented chronological sorting for Progress History:
   * Added sorting functionality to display check-ins by latest update first
   * Check-ins now ordered by creation date in descending order for better user experience
