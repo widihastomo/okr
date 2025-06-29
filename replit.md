@@ -178,12 +178,13 @@ Changelog:
   * Pre-fills all current initiative data (title, description, status, priority, PIC, budget, dates, members)
   * Automatic cache invalidation refreshes page data after successful updates
   * Seamless integration with existing modal system for consistent user experience
-- June 29, 2025. Implemented automatic initiative member cleanup on task updates:
-  * Added logic to remove members when they no longer have assigned tasks
-  * Checks previous task assignee when task is reassigned or unassigned
-  * Preserves PIC status - never removes initiative owners
-  * Only removes members who have zero remaining tasks in the initiative
-  * Enhanced member management with automatic cleanup functionality
+- June 29, 2025. Implemented comprehensive member validation system for initiative editing:
+  * Added validation to prevent removing members who still have assigned tasks
+  * System displays detailed error messages showing member names and task counts
+  * Error message: "Tidak dapat menghapus member karena masih memiliki task yang ditugaskan"
+  * Fixed button text to dynamically show "Update Initiative" when editing vs "Buat Initiative" when creating
+  * Enhanced member removal validation with proper error handling and user feedback
+  * Member updates now work with complete validation and proper cache invalidation
 - June 29, 2025. Improved initiative detail page layout and organization:
   * Removed redundant h1 "Initiative Details" heading from page header
   * Moved status Badge component from header to Overview section next to title

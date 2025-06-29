@@ -593,7 +593,7 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
                 >
                   {(createInitiativeMutation.isPending || updateInitiativeMutation.isPending) 
                     ? "Menyimpan..." 
-                    : editingInitiative 
+                    : actualEditingInitiative 
                       ? "Update Initiative" 
                       : "Buat Initiative"
                   }
