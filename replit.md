@@ -96,6 +96,16 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- June 29, 2025. Created comprehensive initiative detail page with task management:
+  * Built dedicated initiative detail page showing full initiative information
+  * Added progress tracking with visual progress bar and task completion statistics
+  * Implemented inline task management with add, edit, delete, and status update functionality
+  * Created TaskModal component for task creation and editing with proper form validation
+  * Added team member display showing PIC and all assigned members with avatars
+  * Enhanced navigation with clickable initiative titles linking to detail pages
+  * Integrated budget display, timeline tracking, and priority indicators
+  * Added recent activity placeholder for future enhancement
+  * Task assignment limited to initiative PIC and team members for proper access control
 - June 29, 2025. Enhanced dashboard with comprehensive query string tracking and objective-based filtering:
   * Added URL query string tracking for dashboard tabs (e.g., /dashboard?tab=initiatives)
   * Added URL query string tracking for all filters: status, cycle, and user filters

@@ -370,9 +370,11 @@ export default function Initiatives({ userFilter, filteredKeyResultIds }: Initia
                   </DropdownMenu>
                 </div>
                 <CardTitle className="text-lg">
-                  <span className="hover:text-blue-600 cursor-pointer">
-                    {initiative.title}
-                  </span>
+                  <Link href={`/initiatives/${initiative.id}`}>
+                    <span className="hover:text-blue-600 cursor-pointer">
+                      {initiative.title}
+                    </span>
+                  </Link>
                 </CardTitle>
                 {initiative.description && (
                   <CardDescription className="line-clamp-2">
