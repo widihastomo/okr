@@ -1705,8 +1705,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         initiativeId: req.body.initiativeId || null,
       };
 
+      console.log("Creating task with data:", taskData);
+
       const result = insertTaskSchema.safeParse(taskData);
       if (!result.success) {
+        console.error("Task validation failed:", {
+          data: taskData,
+          errors: result.error.errors
+        });
         return res.status(400).json({ message: "Invalid task data", errors: result.error.errors });
       }
 

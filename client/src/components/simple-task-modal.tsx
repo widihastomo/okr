@@ -61,9 +61,9 @@ export default function SimpleTaskModal({ open, onClose, task, onSuccess }: Simp
         description: task.description || "",
         status: task.status || "not_started",
         priority: task.priority || "medium",
-        assignedTo: task.assignedTo || "",
+        assignedTo: task.assignedTo || "unassigned",
         dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : "",
-        initiativeId: task.initiativeId || ""
+        initiativeId: task.initiativeId || "no-initiative"
       });
     } else {
       setFormData({
@@ -71,9 +71,9 @@ export default function SimpleTaskModal({ open, onClose, task, onSuccess }: Simp
         description: "",
         status: "not_started",
         priority: "medium",
-        assignedTo: userId || "",
+        assignedTo: userId || "unassigned",
         dueDate: "",
-        initiativeId: ""
+        initiativeId: "no-initiative"
       });
     }
   }, [task, userId]);
@@ -85,7 +85,11 @@ export default function SimpleTaskModal({ open, onClose, task, onSuccess }: Simp
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      if (!response.ok) throw new Error("Failed to create task");
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Task creation error:", error);
+        throw new Error(error.message || "Failed to create task");
+      }
       return response.json();
     },
     onSuccess: () => {
@@ -127,6 +131,8 @@ export default function SimpleTaskModal({ open, onClose, task, onSuccess }: Simp
       dueDate: formData.dueDate || null,
       initiativeId: formData.initiativeId === "no-initiative" ? null : formData.initiativeId || null,
     };
+
+    console.log("Submitting task data:", dataToSubmit);
 
     if (task) {
       updateMutation.mutate(dataToSubmit);

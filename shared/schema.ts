@@ -168,7 +168,7 @@ export const initiativeNotes = pgTable("initiative_notes", {
 // Tasks linked to initiatives
 export const tasks = pgTable("tasks", {
   id: uuid("id").primaryKey().defaultRandom(),
-  initiativeId: uuid("initiative_id").references(() => initiatives.id).notNull(),
+  initiativeId: uuid("initiative_id").references(() => initiatives.id), // Made nullable for standalone tasks
   title: text("title").notNull(),
   description: text("description"),
   status: text("status").notNull().default("not_started"), // "not_started", "in_progress", "completed", "cancelled"
@@ -212,15 +212,15 @@ export const insertInitiativeMemberSchema = createInsertSchema(initiativeMembers
   joinedAt: true,
 });
 
-export const insertInitiativeDocumentSchema = createInsertSchema(initiativeDocuments).omit({
-  id: true,
-  uploadedAt: true,
-});
-
 export const insertTaskSchema = createInsertSchema(tasks).omit({
   id: true,
   createdAt: true,
   completedAt: true,
+});
+
+export const insertInitiativeDocumentSchema = createInsertSchema(initiativeDocuments).omit({
+  id: true,
+  uploadedAt: true,
 });
 
 export const insertInitiativeNoteSchema = createInsertSchema(initiativeNotes).omit({
