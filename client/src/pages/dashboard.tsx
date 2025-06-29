@@ -49,21 +49,87 @@ export default function Dashboard() {
     queryKey: ['/api/users'],
   });
 
-  // Initialize tab from URL query parameter
+  // Initialize tab and filters from URL query parameters
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
+    
+    // Initialize tab
     const tabParam = urlParams.get('tab');
     if (tabParam && ['objectives', 'initiatives', 'my-tasks'].includes(tabParam)) {
       setActiveTab(tabParam);
     }
+    
+    // Initialize filters
+    const statusParam = urlParams.get('status');
+    if (statusParam) {
+      setStatusFilter(statusParam);
+    }
+    
+    const cycleParam = urlParams.get('cycle');
+    if (cycleParam) {
+      setCycleFilter(cycleParam);
+      setHasAutoSelected(true); // Prevent auto-selection when loading from URL
+    }
+    
+    const userParam = urlParams.get('user');
+    if (userParam) {
+      setUserFilter(userParam);
+    }
   }, []);
+
+  // Update URL when tab or filters change
+  const updateURL = (updates: { tab?: string; status?: string; cycle?: string; user?: string }) => {
+    const url = new URL(window.location.href);
+    
+    if (updates.tab !== undefined) url.searchParams.set('tab', updates.tab);
+    if (updates.status !== undefined) {
+      if (updates.status === 'all') {
+        url.searchParams.delete('status');
+      } else {
+        url.searchParams.set('status', updates.status);
+      }
+    }
+    if (updates.cycle !== undefined) {
+      if (updates.cycle === 'all') {
+        url.searchParams.delete('cycle');
+      } else {
+        url.searchParams.set('cycle', updates.cycle);
+      }
+    }
+    if (updates.user !== undefined) {
+      if (updates.user === 'all' || updates.user === '') {
+        url.searchParams.delete('user');
+      } else {
+        url.searchParams.set('user', updates.user);
+      }
+    }
+    
+    window.history.replaceState({}, '', url.toString());
+  };
 
   // Update URL when tab changes
   const handleTabChange = (newTab: string) => {
     setActiveTab(newTab);
-    const url = new URL(window.location.href);
-    url.searchParams.set('tab', newTab);
-    window.history.replaceState({}, '', url.toString());
+    updateURL({ tab: newTab });
+  };
+
+  // Update URL when status filter changes
+  const handleStatusFilterChange = (newStatus: string) => {
+    setStatusFilter(newStatus);
+    updateURL({ status: newStatus });
+  };
+
+  // Update URL when cycle filter changes
+  const handleCycleFilterChange = (newCycle: string) => {
+    setCycleFilter(newCycle);
+    setHasAutoSelected(true);
+    updateURL({ cycle: newCycle });
+  };
+
+  // Update URL when user filter changes
+  const handleUserFilterChange = (newUser: string) => {
+    setUserFilter(newUser);
+    updateURL({ user: newUser });
   };
 
   // Set default cycle to active cycle with shortest duration when cycles are loaded
@@ -313,7 +379,7 @@ export default function Dashboard() {
           {/* Filter Controls */}
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex gap-3">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
                 <SelectTrigger className="w-[140px]">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
@@ -332,10 +398,7 @@ export default function Dashboard() {
                 </SelectContent>
               </Select>
               
-              <Select value={cycleFilter} onValueChange={(value) => {
-                setCycleFilter(value);
-                setHasAutoSelected(true); // Prevent auto-selection after manual selection
-              }}>
+              <Select value={cycleFilter} onValueChange={handleCycleFilterChange}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Pilih Cycle" />
                 </SelectTrigger>
@@ -349,7 +412,7 @@ export default function Dashboard() {
                 </SelectContent>
               </Select>
 
-              <Select value={userFilter} onValueChange={setUserFilter}>
+              <Select value={userFilter} onValueChange={handleUserFilterChange}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Pilih User" />
                 </SelectTrigger>
