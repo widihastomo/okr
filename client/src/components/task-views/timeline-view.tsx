@@ -185,9 +185,7 @@ export default function TimelineView({ tasks, onEditTask, onDeleteTask, userId }
                           </h4>
                         </Link>
                         
-                        {task.description && (
-                          <p className="text-sm text-gray-600 mb-2 line-clamp-2">{task.description}</p>
-                        )}
+                        
                         
                         <div className="flex items-center gap-3 text-xs text-gray-500">
                           {task.dueDate && (
