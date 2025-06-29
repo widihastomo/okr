@@ -15,6 +15,7 @@ export function useTaskNotifications() {
   const { data: rawTasks = [] } = useQuery({
     queryKey: [`/api/users/${userId}/tasks`],
     enabled: !!userId,
+    staleTime: 0, // Always refetch to ensure we get latest tasks
   });
 
   const tasks = Array.isArray(rawTasks) ? rawTasks as Task[] : [];
@@ -34,7 +35,9 @@ export function useTaskNotifications() {
     dueDate.setHours(0, 0, 0, 0);
     
     // Include overdue tasks (due before today) and tasks due today
-    return dueDate < tomorrow;
+    const isUrgent = dueDate <= today;
+    
+    return isUrgent;
   }).length;
 
   return {

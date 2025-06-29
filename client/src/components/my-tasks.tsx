@@ -21,6 +21,7 @@ export default function MyTasks() {
   const { data: tasks = [], isLoading } = useQuery({
     queryKey: [`/api/users/${userId}/tasks`],
     enabled: !!userId,
+    staleTime: 0, // Always refetch to ensure we get latest tasks
   });
 
   // Filter tasks
