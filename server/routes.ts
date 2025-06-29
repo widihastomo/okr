@@ -1690,24 +1690,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       const currentUserId = req.session.userId;
 
+      // Validate and prepare task data
       const taskData = {
         title: req.body.title,
-        description: req.body.description,
-        status: req.body.status,
-        priority: req.body.priority,
+        description: req.body.description || "",
+        status: req.body.status || "not_started",
+        priority: req.body.priority || "medium",
         createdBy: currentUserId,
-        assignedTo: req.body.assignedTo || null,
+        assignedTo: req.body.assignedTo === "unassigned" ? null : req.body.assignedTo,
         dueDate: req.body.dueDate ? new Date(req.body.dueDate) : null,
-        initiativeId: req.body.initiativeId || null,
+        initiativeId: req.body.initiativeId === "no-initiative" ? null : req.body.initiativeId,
       };
 
-      console.log("Creating task with data:", taskData);
+      console.log("Creating task with data:", {
+        ...taskData,
+        dueDate: taskData.dueDate?.toISOString(),
+        currentUserId
+      });
 
       const result = insertTaskSchema.safeParse(taskData);
       if (!result.success) {
         console.error("Task validation failed:", {
           data: taskData,
-          errors: result.error.errors
+          errors: result.error.errors,
+          sessionUserId: req.session?.userId,
+          currentUserId
         });
         return res.status(400).json({ message: "Invalid task data", errors: result.error.errors });
       }
