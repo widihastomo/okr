@@ -1004,6 +1004,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update task status (PATCH for partial updates)
+  app.patch("/api/tasks/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const { status } = req.body;
+      
+      if (!status) {
+        return res.status(400).json({ message: "Status is required" });
+      }
+      
+      const updatedTask = await storage.updateTask(id, { status });
+      
+      if (!updatedTask) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      
+      // Auto-update initiative progress when task status changes
+      if (updatedTask.initiativeId) {
+        try {
+          await storage.updateInitiativeProgress(updatedTask.initiativeId);
+        } catch (error) {
+          console.error("Error updating initiative progress:", error);
+        }
+      }
+      
+      res.json(updatedTask);
+    } catch (error) {
+      console.error("Error updating task status:", error);
+      res.status(500).json({ message: "Failed to update task status" });
+    }
+  });
+
   // Delete task
   app.delete("/api/tasks/:id", async (req, res) => {
     try {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,14 +8,52 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar, CheckCircle2, Circle, CheckSquare } from "lucide-react";
 import { format } from "date-fns";
 import { useAuth } from "@/hooks/useAuth";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 export default function MyTasks() {
   const { user } = useAuth();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   // Type guard to check if user has id property
   const userId = user && typeof user === 'object' && 'id' in user ? (user as any).id : null;
+
+  // Mutation for updating task status
+  const updateTaskStatusMutation = useMutation({
+    mutationFn: async ({ taskId, status }: { taskId: string; status: string }) => {
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update task status');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
+      toast({
+        title: "Status Updated",
+        description: "Task status has been updated successfully.",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update task status.",
+        variant: "destructive",
+      });
+    },
+  });
 
   // Fetch tasks assigned to current user
   const { data: rawTasks = [], isLoading } = useQuery({
@@ -155,12 +193,23 @@ export default function MyTasks() {
                         )}
                         
                         <div className="flex items-center gap-4 mt-3">
-                          <Badge 
-                            variant="outline" 
-                            className={getPriorityColor(task.priority)}
-                          >
-                            {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
-                          </Badge>
+                          {/* Status dropdown */}
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-500">Status:</span>
+                            <Select
+                              value={task.status}
+                              onValueChange={(value) => updateTaskStatusMutation.mutate({ taskId: task.id, status: value })}
+                            >
+                              <SelectTrigger className="w-32 h-8">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="todo">To Do</SelectItem>
+                                <SelectItem value="in_progress">In Progress</SelectItem>
+                                <SelectItem value="completed">Completed</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
                           
                           {task.dueDate && (
                             <div className="flex items-center gap-1 text-sm text-gray-500">
@@ -171,15 +220,24 @@ export default function MyTasks() {
                         </div>
                       </div>
                       
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          window.location.href = `/key-results/${task.initiative?.keyResultId}`;
-                        }}
-                      >
-                        View Details
-                      </Button>
+                      <div className="flex flex-col items-end gap-2">
+                        <Badge 
+                          variant="outline" 
+                          className={getPriorityColor(task.priority)}
+                        >
+                          {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
+                        </Badge>
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            window.location.href = `/key-results/${task.initiative?.keyResultId}`;
+                          }}
+                        >
+                          View Details
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
