@@ -38,6 +38,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
@@ -96,6 +97,9 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
   const { data: notes = [], isLoading } = useQuery({
     queryKey: [`/api/initiatives/${initiativeId}/notes`],
   });
+
+  // Type the notes data properly
+  const typedNotes = Array.isArray(notes) ? notes : [];
 
   // Create note mutation
   const createNoteMutation = useMutation({
@@ -263,13 +267,13 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
           </Button>
         </CardHeader>
         <CardContent>
-          {notes.length === 0 ? (
+          {typedNotes.length === 0 ? (
             <p className="text-center text-gray-500 py-8">
               Belum ada catatan. Tambahkan catatan pertama untuk memulai.
             </p>
           ) : (
             <div className="space-y-4">
-              {notes.map((note: any) => {
+              {typedNotes.map((note: any) => {
                 const config = noteTypeConfig[note.type as keyof typeof noteTypeConfig];
                 const Icon = config.icon;
                 const isExpanded = expandedNotes.has(note.id);
@@ -380,6 +384,9 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
             <DialogTitle>
               {editingNote ? "Edit Catatan" : "Tambah Catatan Baru"}
             </DialogTitle>
+            <DialogDescription>
+              {editingNote ? "Perbarui informasi catatan initiative." : "Tambahkan catatan baru untuk initiative ini."}
+            </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4">
