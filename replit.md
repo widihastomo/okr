@@ -122,6 +122,8 @@ Changelog:
   * Added achievement categories overview with color-coded activity types
   * Enhanced user understanding with clear examples and visual indicators for each point source
   * Point breakdown: Check-ins (10 pts), Initiatives (25 pts), Objectives (50 pts), Collaboration (5-15 pts)
+  * Made point calculation section collapsible with expand/collapse functionality using chevron icons
+  * Added smooth hover transitions and proper visual hierarchy for better user experience
 - June 29, 2025. Completely removed task management functionality from initiative system:
   * Eliminated all task-related code from initiative creation and editing forms
   * Removed TaskModal component and all task CRUD operations from initiative detail page
