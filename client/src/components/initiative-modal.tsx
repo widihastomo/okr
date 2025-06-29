@@ -7,12 +7,12 @@ import { Plus, Calendar, Flag, FileText, Users, User, Search, ChevronDown, X } f
 
 import { Button } from "@/components/ui/button";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -256,14 +256,14 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
   };
 
   return (
-    <Sheet open={open} onOpenChange={handleClose}>
-      <SheetContent className="w-full sm:w-[800px] sm:max-w-[800px] overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
             {editingInitiative ? 'Edit Initiative' : 'Buat Initiative Baru'}
-          </SheetTitle>
-        </SheetHeader>
+          </DialogTitle>
+        </DialogHeader>
 
         <div className="mt-6 space-y-6">
           <Form {...form}>
@@ -575,7 +575,7 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
             </form>
           </Form>
         </div>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 }

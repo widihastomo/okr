@@ -124,6 +124,11 @@ Changelog:
   * Point breakdown: Check-ins (10 pts), Initiatives (25 pts), Objectives (50 pts), Collaboration (5-15 pts)
   * Made point calculation section collapsible with expand/collapse functionality using chevron icons
   * Added smooth hover transitions and proper visual hierarchy for better user experience
+- June 29, 2025. Changed initiative form from sheet to regular dialog modal:
+  * Converted initiative form from sliding sheet (800px wide) to standard dialog modal
+  * Updated to use Dialog, DialogContent, DialogHeader, and DialogTitle components
+  * Maintained all functionality while providing more standard modal interface
+  * Improved user experience with centered modal presentation instead of side sheet
 - June 29, 2025. Completely removed task management functionality from initiative system:
   * Eliminated all task-related code from initiative creation and editing forms
   * Removed TaskModal component and all task CRUD operations from initiative detail page
