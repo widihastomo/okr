@@ -155,9 +155,7 @@ export default function KanbanView({ tasks, onEditTask, onDeleteTask, userId }: 
                     </DropdownMenu>
                   </div>
 
-                  {task.description && (
-                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">{task.description}</p>
-                  )}
+                  
 
                   <div className="flex items-center justify-between mb-3">
                     <Badge className={`${getTaskPriorityColor(task.priority)} text-xs px-2 py-1`}>
