@@ -64,9 +64,10 @@ interface InitiativeModalProps {
   editingInitiative?: any;
   initiative?: any;
   onClose?: () => void;
+  open?: boolean;
 }
 
-export default function InitiativeModal({ keyResultId, onSuccess, editingInitiative, initiative, onClose }: InitiativeModalProps) {
+export default function InitiativeModal({ keyResultId, onSuccess, editingInitiative, initiative, onClose, open: externalOpen }: InitiativeModalProps) {
   const actualEditingInitiative = initiative || editingInitiative;
   const [open, setOpen] = useState(false);
   const [memberDropdownOpen, setMemberDropdownOpen] = useState(false);
@@ -120,7 +121,10 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
 
   // Handle modal state for editing
   useEffect(() => {
-    if (actualEditingInitiative) {
+    if (externalOpen !== undefined) {
+      // If external open prop is provided, use it
+      setOpen(externalOpen);
+    } else if (actualEditingInitiative) {
       setOpen(true);
       // Initialize tasks if editing
       if (actualEditingInitiative.tasks) {
@@ -133,7 +137,7 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
       setOpen(false);
       setTasks([]);
     }
-  }, [actualEditingInitiative, onClose]);
+  }, [actualEditingInitiative, onClose, externalOpen]);
 
   // Reset form when editing initiative changes
   useEffect(() => {
@@ -324,12 +328,6 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
 
   return (
     <Sheet open={open} onOpenChange={handleClose}>
-      <SheetTrigger asChild>
-        <Button className="bg-blue-600 hover:bg-blue-700">
-          <Plus className="h-4 w-4 mr-2" />
-          Tambah Initiative
-        </Button>
-      </SheetTrigger>
       <SheetContent className="w-full sm:w-[800px] sm:max-w-[800px] overflow-y-auto">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
