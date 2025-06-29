@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Calendar, User, Users, Clock, Edit, MoreVertical, Copy, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import type { OKRWithKeyResults, KeyResult } from "@shared/schema";
@@ -140,11 +141,18 @@ export default function OKRCard({ okr, onEditProgress, onDuplicate, onDelete, cy
             </div>
             
             <div className="flex items-center gap-4 text-sm text-gray-600">
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-2">
                 {okr.ownerType === 'team' ? (
-                  <Users className="w-4 h-4" />
+                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Users className="w-3 h-3 text-blue-600" />
+                  </div>
                 ) : (
-                  <User className="w-4 h-4" />
+                  <Avatar className="w-6 h-6">
+                    <AvatarImage src="" alt={okr.owner} />
+                    <AvatarFallback className="text-xs bg-blue-600 text-white">
+                      {okr.owner.split(' ').map(n => n[0]).join('').toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                 )}
                 {okr.owner}
               </span>
