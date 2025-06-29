@@ -24,11 +24,14 @@ try {
 // Production server for deployment
 const { spawn } = require('child_process');
 const path = require('path');
+const fs = require('fs');
 
 console.log('🚀 OKR Management System - Production');
 console.log('🌍 Environment:', process.env.NODE_ENV || 'production');
 console.log('📡 Host: 0.0.0.0');
 console.log('📡 Port:', process.env.PORT || 5000);
+console.log('📍 Working directory:', process.cwd());
+console.log('📍 Server path will be:', path.resolve(__dirname, '..', 'server', 'index.ts'));
 
 // Ensure production environment
 process.env.NODE_ENV = 'production';
@@ -37,6 +40,12 @@ process.env.NODE_ENV = 'production';
 const serverPath = path.resolve(__dirname, '..', 'server', 'index.ts');
 
 console.log('⚡ Starting server at:', serverPath);
+
+// Verify server file exists
+if (!fs.existsSync(serverPath)) {
+  console.error('❌ Server file not found:', serverPath);
+  process.exit(1);
+}
 
 const server = spawn('npx', ['tsx', serverPath], {
   stdio: 'inherit',
