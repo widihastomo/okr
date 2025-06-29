@@ -28,13 +28,18 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
 
 
   // Fetch key results to show context
-  const { data: keyResults = [] } = useQuery<KeyResult[]>({
+  const { data: keyResults = [], isLoading: keyResultsLoading } = useQuery<KeyResult[]>({
     queryKey: ['/api/key-results'],
   });
 
   // Fetch initiative members data
   const { data: initiativeMembers = [] } = useQuery<any[]>({
     queryKey: ['/api/initiative-members'],
+  });
+
+  // Fetch users data to show PIC names
+  const { data: users = [] } = useQuery<User[]>({
+    queryKey: ['/api/users'],
   });
 
   // Filter initiatives based on status, priority, and user
@@ -64,7 +69,14 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
   const getKeyResultTitle = (keyResultId: string) => {
     if (!keyResultId) return "No Key Result";
     const keyResult = keyResults.find(kr => kr.id === keyResultId);
-    return keyResult?.title || "Key Result Not Found";
+    return keyResult?.title || (keyResultsLoading ? "Loading..." : "Key Result Not Found");
+  };
+
+  // Helper function to get user name
+  const getUserName = (userId: string | null) => {
+    if (!userId) return "Unassigned";
+    const user = users.find(u => u.id === userId);
+    return user ? `${user.firstName} ${user.lastName}` : "Unknown User";
   };
 
   // Helper function to get status color
@@ -226,8 +238,7 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
                     <Users className="w-4 h-4 text-gray-500" />
                     <span className="text-gray-600">PIC:</span>
                     <span className="font-medium truncate">
-                      {/* Will be populated with user data */}
-                      Assigned User
+                      {getUserName(initiative.picId)}
                     </span>
                   </div>
                 )}

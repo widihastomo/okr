@@ -724,6 +724,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all key results
+  app.get("/api/key-results", async (req, res) => {
+    try {
+      const keyResults = await storage.getKeyResults();
+      res.json(keyResults);
+    } catch (error) {
+      console.error("Error fetching key results:", error);
+      res.status(500).json({ message: "Failed to fetch key results" });
+    }
+  });
+
   // Get key result with details and progress history
   app.get("/api/key-results/:id", async (req, res) => {
     try {
