@@ -185,32 +185,32 @@ export default function InitiativeDetailPage() {
                 )}
               </div>
               
-              {/* Initiative Details Grid */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-500 mb-1">Status</p>
-                  <Badge className={`${getStatusColor(initiativeData.status)} border-0 py-0`}>
+              {/* Initiative Details Row */}
+              <div className="flex flex-wrap items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-1.5">
+                  <Flag className="h-3 w-3 text-gray-600" />
+                  <Badge className={`${getStatusColor(initiativeData.status)} border-0 py-0 text-xs`}>
                     {getStatusLabel(initiativeData.status)}
                   </Badge>
                 </div>
                 
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-500 mb-1">Priority</p>
-                  <Badge className={`${getPriorityColor(initiativeData.priority)} border-0 py-0`}>
+                <div className="flex items-center gap-1.5">
+                  <Target className="h-3 w-3 text-gray-600" />
+                  <Badge className={`${getPriorityColor(initiativeData.priority)} border-0 py-0 text-xs`}>
                     {getPriorityLabel(initiativeData.priority)}
                   </Badge>
                 </div>
                 
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-500 mb-1">Budget</p>
-                  <p className="text-sm font-semibold text-gray-900">{formatCurrency(initiativeData.budget)}</p>
+                <div className="flex items-center gap-1.5">
+                  <DollarSign className="h-3 w-3 text-gray-600" />
+                  <span className="text-sm font-semibold text-gray-900">{formatCurrency(initiativeData.budget)}</span>
                 </div>
                 
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-500 mb-1">Timeline</p>
-                  <p className="text-sm font-semibold text-gray-900">
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="h-3 w-3 text-gray-600" />
+                  <span className="text-sm font-semibold text-gray-900">
                     {formatDate(initiativeData.startDate)} - {formatDate(initiativeData.dueDate)}
-                  </p>
+                  </span>
                 </div>
               </div>
 
