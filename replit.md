@@ -96,6 +96,11 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- June 29, 2025. Removed user filtering restrictions for task assignment:
+  * Removed initiative owner and member filtering from task modal
+  * All system users now available for task assignment regardless of initiative membership
+  * Maintains automatic member addition when users are assigned to tasks
+  * Simplifies task assignment workflow while preserving data integrity
 - June 29, 2025. Implemented automatic initiative member addition for task assignments:
   * Added functionality to automatically add assigned users as initiative members
   * Enhanced task creation and update endpoints to check existing membership before adding

@@ -57,19 +57,8 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
   const picId = initiativeData.picId;
   const initiativeMembers = initiativeData.members || [];
 
-  // Filter available users based on initiative PIC and members
-  const availableUsers = Array.isArray(usersData) ? 
-    usersData.filter((user: any) => {
-      // Include PIC if exists
-      if (picId && picId === user.id) return true;
-      // Include all initiative members (check both userId and user.id patterns)
-      if (Array.isArray(initiativeMembers) && initiativeMembers.some((m: any) => 
-        m.userId === user.id || m.user?.id === user.id
-      )) return true;
-      // If no PIC is set, include all users for flexibility
-      if (!picId) return true;
-      return false;
-    }) : [];
+  // Show all users for task assignment
+  const availableUsers = Array.isArray(usersData) ? usersData : [];
 
   useEffect(() => {
     if (task && !isAdding) {
