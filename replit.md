@@ -116,6 +116,12 @@ Changelog:
   * Achievements page includes three tabs: Progress (user stats), Achievements (badges), and Leaderboard
   * Fixed leaderboard database query to use correct column names (first_name, last_name)
   * Maintained all gamification functionality while improving navigation and user experience
+- June 29, 2025. Added comprehensive point calculation information to achievements page:
+  * Added detailed point system explanation showing how users earn points for different activities
+  * Included level progression formula (Level 1→2: 100 points, Level 3+: +50 points per level)
+  * Added achievement categories overview with color-coded activity types
+  * Enhanced user understanding with clear examples and visual indicators for each point source
+  * Point breakdown: Check-ins (10 pts), Initiatives (25 pts), Objectives (50 pts), Collaboration (5-15 pts)
 - June 29, 2025. Completely removed task management functionality from initiative system:
   * Eliminated all task-related code from initiative creation and editing forms
   * Removed TaskModal component and all task CRUD operations from initiative detail page

@@ -26,6 +26,58 @@ export default function AchievementsPage() {
           <p className="text-gray-600 mt-2">
             Track your progress, unlock achievements, and compete with your team
           </p>
+          
+          {/* Point Calculation Info */}
+          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <h3 className="font-semibold text-blue-900 mb-3">Sistem Poin & Level:</h3>
+            <div className="space-y-4">
+              {/* Point Activities */}
+              <div>
+                <h4 className="font-medium text-blue-900 mb-2">Aktivitas yang Memberikan Poin:</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-blue-800">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>Update Key Result (Check-in): <strong>10 poin</strong></span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span>Membuat Initiative: <strong>25 poin</strong></span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                    <span>Menyelesaikan Objective: <strong>50 poin</strong></span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                    <span>Kolaborasi dalam Tim: <strong>5-15 poin</strong></span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Level System */}
+              <div>
+                <h4 className="font-medium text-blue-900 mb-2">Sistem Level:</h4>
+                <div className="text-sm text-blue-800 space-y-1">
+                  <div>• Level 1 → Level 2: <strong>100 poin</strong></div>
+                  <div>• Level 3 dan seterusnya: <strong>+50 poin per level</strong></div>
+                  <div className="text-xs text-blue-600 mt-2">
+                    Contoh: Level 3 (150 poin), Level 4 (200 poin), Level 5 (250 poin)
+                  </div>
+                </div>
+              </div>
+
+              {/* Achievements */}
+              <div>
+                <h4 className="font-medium text-blue-900 mb-2">Achievement Categories:</h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs text-blue-700">
+                  <div className="bg-white px-2 py-1 rounded">Progress</div>
+                  <div className="bg-white px-2 py-1 rounded">Streak</div>
+                  <div className="bg-white px-2 py-1 rounded">Milestone</div>
+                  <div className="bg-white px-2 py-1 rounded">Collaboration</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
