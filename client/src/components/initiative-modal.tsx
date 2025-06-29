@@ -62,10 +62,12 @@ interface InitiativeModalProps {
   keyResultId: string;
   onSuccess?: () => void;
   editingInitiative?: any;
+  initiative?: any;
   onClose?: () => void;
 }
 
-export default function InitiativeModal({ keyResultId, onSuccess, editingInitiative, onClose }: InitiativeModalProps) {
+export default function InitiativeModal({ keyResultId, onSuccess, editingInitiative, initiative, onClose }: InitiativeModalProps) {
+  const actualEditingInitiative = initiative || editingInitiative;
   const [open, setOpen] = useState(false);
   const [memberDropdownOpen, setMemberDropdownOpen] = useState(false);
   const [memberSearchTerm, setMemberSearchTerm] = useState("");
@@ -93,16 +95,16 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
 
   const form = useForm<InitiativeFormData>({
     resolver: zodResolver(initiativeSchema),
-    defaultValues: editingInitiative ? {
-      title: editingInitiative.title || "",
-      description: editingInitiative.description || "",
-      status: editingInitiative.status || "not_started",
-      priority: editingInitiative.priority || "medium",
-      picId: editingInitiative.picId || "",
-      budget: editingInitiative.budget || "",
-      startDate: editingInitiative.startDate ? new Date(editingInitiative.startDate).toISOString().split('T')[0] : "",
-      dueDate: editingInitiative.dueDate ? new Date(editingInitiative.dueDate).toISOString().split('T')[0] : "",
-      members: editingInitiative.members?.map((m: any) => m.userId || m.user?.id || m.id) || [],
+    defaultValues: actualEditingInitiative ? {
+      title: actualEditingInitiative.title || "",
+      description: actualEditingInitiative.description || "",
+      status: actualEditingInitiative.status || "not_started",
+      priority: actualEditingInitiative.priority || "medium",
+      picId: actualEditingInitiative.picId || "",
+      budget: actualEditingInitiative.budget || "",
+      startDate: actualEditingInitiative.startDate ? new Date(actualEditingInitiative.startDate).toISOString().split('T')[0] : "",
+      dueDate: actualEditingInitiative.dueDate ? new Date(actualEditingInitiative.dueDate).toISOString().split('T')[0] : "",
+      members: actualEditingInitiative.members?.map((m: any) => m.userId || m.user?.id || m.id) || [],
     } : {
       title: "",
       description: "",
@@ -118,17 +120,20 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
 
   // Handle modal state for editing
   useEffect(() => {
-    if (editingInitiative) {
+    if (actualEditingInitiative) {
       setOpen(true);
       // Initialize tasks if editing
-      if (editingInitiative.tasks) {
-        setTasks(editingInitiative.tasks);
+      if (actualEditingInitiative.tasks) {
+        setTasks(actualEditingInitiative.tasks);
       }
+    } else if (onClose) {
+      // If we have onClose prop, we're being controlled externally
+      setOpen(true);
     } else {
       setOpen(false);
       setTasks([]);
     }
-  }, [editingInitiative]);
+  }, [actualEditingInitiative, onClose]);
 
   // Reset form when editing initiative changes
   useEffect(() => {
@@ -221,7 +226,7 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
   const updateInitiativeMutation = useMutation({
     mutationFn: async (data: InitiativeFormData & { tasks: TaskFormData[] }) => {
       const { tasks, ...initiativeData } = data;
-      const response = await fetch(`/api/initiatives/${editingInitiative.id}`, {
+      const response = await fetch(`/api/initiatives/${actualEditingInitiative.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -261,7 +266,7 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
   });
 
   const handleSubmit = (data: InitiativeFormData) => {
-    if (editingInitiative) {
+    if (actualEditingInitiative) {
       updateInitiativeMutation.mutate({ ...data, tasks });
     } else {
       createInitiativeMutation.mutate({ ...data, tasks });

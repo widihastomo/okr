@@ -115,6 +115,11 @@ Changelog:
   * Fixed initiatives display issue by adding missing GET /api/initiatives and /api/initiative-members endpoints
   * Resolved TypeScript errors and verified all 4 initiatives properly returned from API
   * Initiative filtering by user (PIC or member) works correctly with proper API data
+  * Added dropdown menu with edit and delete functionality to initiative cards
+  * Implemented three-dot menu in top right corner of each initiative card
+  * Edit function opens the existing InitiativeModal in edit mode with pre-filled data
+  * Delete function shows confirmation dialog before removing initiative
+  * Both actions properly invalidate cache and refresh the initiatives list
 - June 29, 2025. Added Initiatives tab to dashboard navigation:
   * Created new Initiatives component displaying all initiatives in card grid layout
   * Added tab between Objectives and My Tasks showing initiative cards with status, priority, progress

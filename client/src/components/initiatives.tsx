@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import {
   Card,
   CardContent,
@@ -31,11 +31,24 @@ import {
   TrendingUp,
   Users,
   Plus,
+  MoreVertical,
+  Edit,
+  Trash2,
 } from "lucide-react";
 import { format } from "date-fns";
 import { Link } from "wouter";
+import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
 import InitiativeModal from "@/components/initiative-modal";
+import { DeleteConfirmationModal } from "@/components/delete-confirmation-modal";
 import type { Initiative, KeyResult, User } from "@shared/schema";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface InitiativesProps {
   userFilter?: string;
@@ -46,11 +59,14 @@ export default function Initiatives({ userFilter, filteredKeyResultIds }: Initia
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingInitiative, setEditingInitiative] = useState<Initiative | null>(null);
+  const [deletingInitiative, setDeletingInitiative] = useState<Initiative | null>(null);
   const [selectedInitiativeMembers, setSelectedInitiativeMembers] = useState<{
     initiativeId: string;
     initiativeTitle: string;
     members: any[];
   } | null>(null);
+  const { toast } = useToast();
 
   // Fetch all initiatives
   const { data: initiatives = [], isLoading } = useQuery<Initiative[]>({
@@ -72,6 +88,30 @@ export default function Initiatives({ userFilter, filteredKeyResultIds }: Initia
   // Fetch users data to show PIC names
   const { data: users = [] } = useQuery<User[]>({
     queryKey: ["/api/users"],
+  });
+
+  // Delete initiative mutation
+  const deleteInitiativeMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiRequest(`/api/initiatives/${id}`, "DELETE");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/initiatives"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/initiative-members"] });
+      toast({
+        title: "Initiative deleted",
+        description: "The initiative has been deleted successfully.",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+      setDeletingInitiative(null);
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete initiative. Please try again.",
+        variant: "destructive",
+      });
+    },
   });
 
   // Filter initiatives based on status, priority, and user
@@ -288,18 +328,46 @@ export default function Initiatives({ userFilter, filteredKeyResultIds }: Initia
             >
               <CardHeader>
                 <div className="flex justify-between items-start mb-2">
-                  <Badge
-                    className={getStatusColor(initiative.status || "pending")}
-                  >
-                    {initiative.status?.replace("_", " ") || "pending"}
-                  </Badge>
-                  <Badge
-                    className={getPriorityColor(
-                      initiative.priority || "medium",
-                    )}
-                  >
-                    {initiative.priority || "medium"}
-                  </Badge>
+                  <div className="flex gap-2">
+                    <Badge
+                      className={getStatusColor(initiative.status || "pending")}
+                    >
+                      {initiative.status?.replace("_", " ") || "pending"}
+                    </Badge>
+                    <Badge
+                      className={getPriorityColor(
+                        initiative.priority || "medium",
+                      )}
+                    >
+                      {initiative.priority || "medium"}
+                    </Badge>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 p-0"
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={() => setEditingInitiative(initiative)}
+                      >
+                        <Edit className="mr-2 h-4 w-4" />
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => setDeletingInitiative(initiative)}
+                        className="text-red-600"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
                 <CardTitle className="text-lg">
                   <span className="hover:text-blue-600 cursor-pointer">
@@ -448,6 +516,29 @@ export default function Initiatives({ userFilter, filteredKeyResultIds }: Initia
           keyResultId=""
           onClose={() => setShowCreateModal(false)}
           onSuccess={() => setShowCreateModal(false)}
+        />
+      )}
+
+      {/* Edit Initiative Modal */}
+      {editingInitiative && (
+        <InitiativeModal
+          keyResultId={editingInitiative.keyResultId || ""}
+          initiative={editingInitiative}
+          onClose={() => setEditingInitiative(null)}
+          onSuccess={() => setEditingInitiative(null)}
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deletingInitiative && (
+        <DeleteConfirmationModal
+          open={true}
+          onOpenChange={() => setDeletingInitiative(null)}
+          onConfirm={() => {
+            deleteInitiativeMutation.mutate(deletingInitiative.id);
+          }}
+          title="Delete Initiative"
+          description={`Are you sure you want to delete "${deletingInitiative.title}"? This action cannot be undone.`}
         />
       )}
 
