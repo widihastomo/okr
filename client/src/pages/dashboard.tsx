@@ -12,12 +12,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Target, CheckSquare } from "lucide-react";
 import MyTasks from "@/components/my-tasks";
-import type { OKRWithKeyResults, KeyResult, Cycle } from "@shared/schema";
+import { useAuth } from "@/hooks/useAuth";
+import type { OKRWithKeyResults, KeyResult, Cycle, User } from "@shared/schema";
 
 export default function Dashboard() {
   const { toast } = useToast();
+  const { user: currentUser } = useAuth();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [cycleFilter, setCycleFilter] = useState<string>("all");
+  const [userFilter, setUserFilter] = useState<string>("");
   const [hasAutoSelected, setHasAutoSelected] = useState<boolean>(false);
 
   const [editProgressModal, setEditProgressModal] = useState<{ open: boolean; keyResult?: KeyResult }>({
@@ -34,6 +37,10 @@ export default function Dashboard() {
 
   const { data: cycles = [] } = useQuery<Cycle[]>({
     queryKey: ['/api/cycles'],
+  });
+
+  const { data: users = [] } = useQuery<User[]>({
+    queryKey: ['/api/users'],
   });
 
   // Set default cycle to active cycle with shortest duration when cycles are loaded
@@ -53,6 +60,13 @@ export default function Dashboard() {
       setHasAutoSelected(true);
     }
   }, [defaultCycle?.id, hasAutoSelected]); // Only auto-select once
+
+  // Set default user filter to current user
+  useEffect(() => {
+    if (currentUser && !userFilter && typeof currentUser === 'object' && 'id' in currentUser) {
+      setUserFilter((currentUser as any).id);
+    }
+  }, [currentUser, userFilter]);
 
   const { data: allOkrs = [], isLoading, refetch } = useQuery<OKRWithKeyResults[]>({
     queryKey: ["/api/okrs"],
@@ -89,7 +103,12 @@ export default function Dashboard() {
     return false;
   };
 
-  // Client-side filtering for status and cycle
+  // Fetch teams data for user filtering
+  const { data: teams = [] } = useQuery<any[]>({
+    queryKey: ['/api/teams'],
+  });
+
+  // Client-side filtering for status, cycle, and user
   const okrs = allOkrs.filter(okr => {
     // Status filter
     const statusMatch = statusFilter === 'all' || okr.status === statusFilter;
@@ -97,7 +116,29 @@ export default function Dashboard() {
     // Cycle filter with related cycle logic
     const cycleMatch = isRelatedCycle(okr.cycleId, cycleFilter);
     
-    return statusMatch && cycleMatch;
+    // User filter - show OKRs where:
+    // 1. The user is the owner of the objective
+    // 2. The user is a member/owner of the team that owns the objective
+    let userMatch = true;
+    if (userFilter && userFilter !== 'all') {
+      // Check if user is the direct owner
+      if (okr.ownerId === userFilter) {
+        userMatch = true;
+      } else if (okr.teamId) {
+        // Check if user is a member or owner of the team
+        const team = teams.find((t: any) => t.id === okr.teamId);
+        if (team) {
+          userMatch = team.ownerId === userFilter || 
+                     (team.members && team.members.some((m: any) => m.userId === userFilter));
+        } else {
+          userMatch = false;
+        }
+      } else {
+        userMatch = false;
+      }
+    }
+    
+    return statusMatch && cycleMatch && userMatch;
   });
 
   // Mutation for deleting OKR
@@ -280,6 +321,20 @@ export default function Dashboard() {
                   {cycles.map(cycle => (
                     <SelectItem key={cycle.id} value={cycle.id}>
                       {cycle.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={userFilter} onValueChange={setUserFilter}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Pilih User" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua User</SelectItem>
+                  {users.map(user => (
+                    <SelectItem key={user.id} value={user.id}>
+                      {user.firstName} {user.lastName}
                     </SelectItem>
                   ))}
                 </SelectContent>

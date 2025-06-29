@@ -537,6 +537,13 @@ Changelog:
   * Created reliable build process using simplified ESBuild approach to avoid Vite timeouts
   * Added comprehensive logging for production debugging and error tracking
   * All deployment tests passing - application ready for production deployment
+- June 29, 2025. Added user filter functionality to dashboard:
+  * Implemented user filter dropdown that defaults to currently logged-in user
+  * Filter shows OKRs where selected user is either the direct owner or member/owner of the owning team
+  * Added team data fetching to support filtering by team membership
+  * Filter options include "Semua User" (All Users) and individual user selection
+  * Enhanced OKR filtering logic to check both direct ownership and team membership
+  * User filter works in combination with existing status and cycle filters
 - June 28, 2025. Resolved proxy connection error and enhanced server stability:
   * Fixed "dial tcp 127.0.0.1:5000: connect: connection refused" error preventing frontend-backend communication
   * Enhanced server configuration with proper 0.0.0.0 host binding for external access
