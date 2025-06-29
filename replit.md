@@ -104,8 +104,9 @@ Changelog:
   * Tab and filter changes automatically update URL for bookmark and sharing support
   * Browser navigation preserves complete dashboard state across page loads
   * Initiatives and My Tasks tabs now filter data based on visible objectives after filtering
-  * Initiatives only show those linked to key results from filtered objectives
-  * My Tasks only show tasks from initiatives that belong to filtered objectives' key results
+  * Initiatives show those linked to filtered objectives PLUS any where user is PIC or member
+  * My Tasks show tasks from filtered objectives PLUS any tasks assigned to the current user
+  * Users always maintain visibility of their own initiatives and tasks regardless of filters
   * Enhanced initiatives with member display using overlapping circular avatars (up to 3 shown, "+X" for overflow)
   * Implemented clickable member avatars that open dialog showing all members with name and email
   * Added hyperlink functionality from initiative cards to key result detail pages

@@ -99,9 +99,23 @@ export default function Initiatives({ userFilter, filteredKeyResultIds }: Initia
     }
 
     // Key Result filter - only show initiatives linked to filtered key results
+    // BUT always show if user is PIC or member
     let keyResultMatch = true;
     if (filteredKeyResultIds && filteredKeyResultIds.length > 0) {
       keyResultMatch = filteredKeyResultIds.includes(initiative.keyResultId);
+      
+      // Override filter if user is PIC or member
+      if (userFilter && userFilter !== 'all' && userFilter !== '') {
+        const isPIC = initiative.picId === userFilter;
+        const members = initiativeMembers.filter(
+          (m: any) => m.initiativeId === initiative.id,
+        );
+        const isMember = members.some((m: any) => m.userId === userFilter);
+        
+        if (isPIC || isMember) {
+          keyResultMatch = true; // Always show if user is involved
+        }
+      }
     }
 
     return statusMatch && priorityMatch && userMatch && keyResultMatch;

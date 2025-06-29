@@ -80,6 +80,7 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
       const priorityMatch = priorityFilter === "all" || task.priority === priorityFilter;
       
       // Key Result filter - only show tasks from initiatives linked to filtered key results
+      // BUT always show if task is assigned to current user
       let keyResultMatch = true;
       if (filteredKeyResultIds && filteredKeyResultIds.length > 0) {
         // Find the initiative for this task
@@ -88,6 +89,11 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
           keyResultMatch = filteredKeyResultIds.includes(taskInitiative.keyResultId);
         } else {
           keyResultMatch = false;
+        }
+        
+        // Override filter if task is assigned to current user
+        if (task.assignedTo === userId) {
+          keyResultMatch = true; // Always show user's own tasks
         }
       }
       
