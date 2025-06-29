@@ -151,12 +151,12 @@ export default function Dashboard() {
     }
   }, [defaultCycle?.id, hasAutoSelected]); // Only auto-select once
 
-  // Set default user filter to current user
+  // Set default user filter to current user on first load
   useEffect(() => {
-    if (currentUser && !userFilter && typeof currentUser === 'object' && 'id' in currentUser) {
+    if (currentUser && userFilter === '' && typeof currentUser === 'object' && 'id' in currentUser) {
       setUserFilter((currentUser as any).id);
     }
-  }, [currentUser, userFilter]);
+  }, [currentUser]);
 
   const { data: allOkrs = [], isLoading, refetch } = useQuery<OKRWithKeyResults[]>({
     queryKey: ["/api/okrs"],
@@ -210,7 +210,9 @@ export default function Dashboard() {
     // 1. The user is the owner of the objective
     // 2. The user is a member/owner of the team that owns the objective
     let userMatch = true;
-    if (userFilter && userFilter !== 'all') {
+    if (userFilter && userFilter !== 'all' && userFilter !== '') {
+      userMatch = false; // Start with false and set to true if conditions are met
+      
       // Check if user is the direct owner
       if (okr.ownerId === userFilter) {
         userMatch = true;
@@ -220,11 +222,7 @@ export default function Dashboard() {
         if (team) {
           userMatch = team.ownerId === userFilter || 
                      (team.members && team.members.some((m: any) => m.userId === userFilter));
-        } else {
-          userMatch = false;
         }
-      } else {
-        userMatch = false;
       }
     }
     
