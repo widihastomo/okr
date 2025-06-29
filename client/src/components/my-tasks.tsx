@@ -27,6 +27,86 @@ interface MyTasksProps {
   filteredKeyResultIds?: string[];
 }
 
+// Helper functions for task health score calculation
+const calculateTaskHealthScore = (task: any): number => {
+  let score = 100;
+  
+  // Status impact (40%)
+  if (task.status === 'completed') return 100;
+  if (task.status === 'cancelled') return 0;
+  if (task.status === 'not_started') score -= 20;
+  if (task.status === 'in_progress') score -= 10;
+  
+  // Due date impact (40%)
+  if (task.dueDate) {
+    const daysUntilDue = Math.floor((new Date(task.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+    if (daysUntilDue < 0) score -= 40; // Overdue
+    else if (daysUntilDue === 0) score -= 30; // Due today
+    else if (daysUntilDue <= 3) score -= 20; // Due soon
+    else if (daysUntilDue <= 7) score -= 10; // Due this week
+  }
+  
+  // Priority impact (20%)
+  if (task.priority === 'high' && task.status !== 'completed') score -= 20;
+  else if (task.priority === 'medium' && task.status !== 'completed') score -= 10;
+  
+  return Math.max(0, Math.min(100, score));
+};
+
+const getTaskHealthLabel = (score: number): string => {
+  if (score >= 80) return 'Healthy';
+  if (score >= 60) return 'At Risk';
+  if (score >= 40) return 'Warning';
+  return 'Critical';
+};
+
+const getTaskStatusLabel = (status: string): string => {
+  switch (status) {
+    case 'not_started': return 'Belum Dimulai';
+    case 'in_progress': return 'Sedang Dikerjakan';
+    case 'completed': return 'Selesai';
+    case 'cancelled': return 'Dibatalkan';
+    default: return status;
+  }
+};
+
+const getTaskStatusColor = (status: string): string => {
+  switch (status) {
+    case 'not_started': return 'bg-gray-100 text-gray-700 border-gray-300';
+    case 'in_progress': return 'bg-blue-100 text-blue-700 border-blue-300';
+    case 'completed': return 'bg-green-100 text-green-700 border-green-300';
+    case 'cancelled': return 'bg-red-100 text-red-700 border-red-300';
+    default: return 'bg-gray-100 text-gray-700 border-gray-300';
+  }
+};
+
+const getTaskPriorityLabel = (priority: string): string => {
+  switch (priority) {
+    case 'high': return 'Tinggi';
+    case 'medium': return 'Sedang';
+    case 'low': return 'Rendah';
+    default: return priority;
+  }
+};
+
+const getTaskPriorityColor = (priority: string): string => {
+  switch (priority) {
+    case 'high': return 'bg-red-100 text-red-700 border-red-300';
+    case 'medium': return 'bg-yellow-100 text-yellow-700 border-yellow-300';
+    case 'low': return 'bg-green-100 text-green-700 border-green-300';
+    default: return 'bg-gray-100 text-gray-700 border-gray-300';
+  }
+};
+
+const formatDate = (date: string | Date | null): string => {
+  if (!date) return '';
+  try {
+    return format(new Date(date), "d MMM yyyy");
+  } catch (error) {
+    return '';
+  }
+};
+
 export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
   const { user } = useAuth();
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -126,32 +206,9 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
       return dateA.getTime() - dateB.getTime();
     });
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return "bg-red-100 text-red-700 border-red-200";
-      case "medium":
-        return "bg-yellow-100 text-yellow-700 border-yellow-200";
-      case "low":
-        return "bg-green-100 text-green-700 border-green-200";
-      default:
-        return "bg-gray-100 text-gray-700 border-gray-200";
-    }
-  };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "completed":
-        return <CheckCircle2 className="w-5 h-5 text-green-600" />;
-      case "in_progress":
-        return <Circle className="w-5 h-5 text-blue-600" />;
-      case "cancelled":
-        return <Circle className="w-5 h-5 text-red-600" />;
-      case "not_started":
-      default:
-        return <Circle className="w-5 h-5 text-gray-400" />;
-    }
-  };
+
+
 
   if (isLoading) {
     return (
