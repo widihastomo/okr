@@ -54,13 +54,13 @@ export default function QuickActionFAB() {
   const { user } = useAuth();
 
   // Fetch initiatives for dropdown
-  const { data: initiatives = [] } = useQuery({
+  const { data: initiatives = [] } = useQuery<any[]>({
     queryKey: ["/api/initiatives"],
     enabled: showTaskModal,
   });
 
   // Fetch users for assignment
-  const { data: users = [] } = useQuery({
+  const { data: users = [] } = useQuery<any[]>({
     queryKey: ["/api/users"],
     enabled: showTaskModal,
   });
@@ -122,7 +122,14 @@ export default function QuickActionFAB() {
   });
 
   const handleTaskSubmit = (data: TaskFormData) => {
-    createTaskMutation.mutate(data);
+    // Ensure no empty string values are sent
+    const sanitizedData = {
+      ...data,
+      assignedTo: data.assignedTo === "unassigned" ? undefined : data.assignedTo,
+      dueDate: data.dueDate || undefined,
+      description: data.description || "",
+    };
+    createTaskMutation.mutate(sanitizedData);
   };
 
   const handleOKRModalChange = (open: boolean) => {
@@ -212,18 +219,27 @@ export default function QuickActionFAB() {
                         <Target className="h-4 w-4" />
                         <span>Initiative</span>
                       </FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        value={field.value || undefined}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Pilih initiative" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {(initiatives as any[]).map((initiative: any) => (
-                            <SelectItem key={initiative.id} value={initiative.id}>
-                              {initiative.title}
-                            </SelectItem>
-                          ))}
+                          {initiatives && initiatives.length > 0 ? (
+                            initiatives.filter((initiative: any) => initiative && initiative.id).map((initiative: any) => (
+                              <SelectItem key={initiative.id} value={initiative.id}>
+                                {initiative.title || "Untitled Initiative"}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <div className="py-2 px-3 text-sm text-muted-foreground">
+                              Tidak ada initiative tersedia
+                            </div>
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -258,7 +274,11 @@ export default function QuickActionFAB() {
                           <span>Deadline</span>
                         </FormLabel>
                         <FormControl>
-                          <Input type="date" {...field} />
+                          <Input 
+                            type="date" 
+                            {...field} 
+                            value={field.value || ""} 
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -301,7 +321,7 @@ export default function QuickActionFAB() {
                           <User className="h-4 w-4" />
                           <span>PIC</span>
                         </FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value || "unassigned"}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue />
@@ -309,7 +329,7 @@ export default function QuickActionFAB() {
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="unassigned">Belum Ditugaskan</SelectItem>
-                            {(users as any[]).map((user: any) => (
+                            {users.filter((user: any) => user && user.id).map((user: any) => (
                               <SelectItem key={user.id} value={user.id}>
                                 {user.firstName} {user.lastName}
                               </SelectItem>
