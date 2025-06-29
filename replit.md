@@ -96,11 +96,16 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
-- June 29, 2025. Fixed URL routing and task creation issues:
-  * Fixed initiative detail page Key Result links to use correct plural URL (/key-results/ instead of /key-result/)
+- June 29, 2025. Completed customizable task view modes with sorting functionality:
+  * Implemented three task view modes: Kanban, List, and Timeline views for better task visualization
+  * Added task sorting in List view by due date (earliest first) with secondary priority sorting
+  * Created TaskViewSelector component for switching between different display modes
+  * Enhanced task management with streamlined UI by removing description elements from task cards
+  * Fixed URL routing for initiative detail page Key Result links to use correct plural URL (/key-results/ instead of /key-result/)
   * Fixed standalone task creation authentication by updating POST /api/tasks endpoint to use session-based auth
   * Resolved 400 error in task creation by aligning authentication pattern with other working endpoints
-  * Standalone task modal now works properly for creating tasks from My Tasks page
+  * Task notification badge shows count of overdue and due-today tasks for better urgency awareness
+  * All task view modes work consistently with edit, delete, and status update functionality
 - June 29, 2025. Fixed critical deployment build failures and created comprehensive build system:
   * Resolved "Cannot find module '/dist/index.js'" error by creating reliable ESBuild-based compilation
   * Created build-final.js script that generates 96KB server bundle and production frontend consistently
