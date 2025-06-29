@@ -50,20 +50,48 @@ export default function InitiativeDetailPage() {
     enabled: !!id,
   });
 
+  // Fetch related initiatives from the same key result
+  const { data: relatedInitiatives } = useQuery({
+    queryKey: ['/api/initiatives'],
+    enabled: !!initiative,
+    select: (data: any[]) => {
+      const initiativeData = initiative as any;
+      const keyResult = initiativeData?.keyResult;
+      return data?.filter(init => 
+        init.keyResultId === keyResult?.id && init.id !== id
+      ) || [];
+    },
+  });
+
+  // Task mutation
+  const deleteTaskMutation = useMutation({
+    mutationFn: async (taskId: string) => {
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('Failed to delete task');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/tasks`] });
+      toast({
+        title: "Task berhasil dihapus",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Gagal menghapus task",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Extract data from the comprehensive initiative object with proper typing
   const initiativeData = initiative as any;
   const members = initiativeData?.members || [];
   const pic = initiativeData?.pic;
   const keyResult = initiativeData?.keyResult;
-
-  // Fetch related initiatives from the same key result
-  const { data: relatedInitiatives } = useQuery({
-    queryKey: ['/api/initiatives'],
-    enabled: !!keyResult?.id,
-    select: (data: any[]) => data.filter(init => 
-      init.keyResultId === keyResult?.id && init.id !== id
-    ),
-  });
 
   if (initiativeLoading) {
     return (
@@ -220,30 +248,6 @@ export default function InitiativeDetailPage() {
         return "Tidak Diketahui";
     }
   };
-
-  // Task mutations
-  const deleteTaskMutation = useMutation({
-    mutationFn: async (taskId: string) => {
-      const response = await fetch(`/api/tasks/${taskId}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) throw new Error('Failed to delete task');
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/tasks`] });
-      toast({
-        title: "Task berhasil dihapus",
-        className: "border-green-200 bg-green-50 text-green-800",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Gagal menghapus task",
-        variant: "destructive",
-      });
-    },
-  });
 
   // Task handlers
   const handleEditTask = (task: any) => {
