@@ -230,7 +230,14 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
         description: "Perubahan initiative telah disimpan",
         className: "border-green-200 bg-green-50 text-green-800",
       });
+      // Invalidate all related queries to refresh the data
       queryClient.invalidateQueries({ queryKey: [`/api/key-results/${keyResultId}/initiatives`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/initiatives'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/initiative-members'] });
+      if (actualEditingInitiative) {
+        queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${actualEditingInitiative.id}`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${actualEditingInitiative.id}/tasks`] });
+      }
       setOpen(false);
       onClose?.();
     },
