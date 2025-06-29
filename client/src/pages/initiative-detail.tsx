@@ -174,8 +174,7 @@ export default function InitiativeDetailPage() {
           Kembali ke Initiatives
         </Link>
         
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Initiative Details</h1>
+        <div className="flex justify-end">
           <Badge className={getStatusColor(initiativeData.status)}>
             {getStatusLabel(initiativeData.status)}
           </Badge>

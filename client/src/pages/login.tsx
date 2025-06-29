@@ -1,9 +1,20 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema, registerSchema, type LoginData, type RegisterData } from "@shared/schema";
+import {
+  loginSchema,
+  registerSchema,
+  type LoginData,
+  type RegisterData,
+} from "@shared/schema";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -43,8 +54,8 @@ export default function Login() {
     },
     onSuccess: () => {
       // Clear logout flag immediately on successful login
-      localStorage.removeItem('isLoggedOut');
-      
+      localStorage.removeItem("isLoggedOut");
+
       toast({
         title: "Berhasil masuk",
         description: "Selamat datang kembali!",
@@ -74,8 +85,8 @@ export default function Login() {
     },
     onSuccess: () => {
       // Clear logout flag immediately on successful registration
-      localStorage.removeItem('isLoggedOut');
-      
+      localStorage.removeItem("isLoggedOut");
+
       toast({
         title: "Berhasil mendaftar",
         description: "Akun Anda telah dibuat dan otomatis masuk",
@@ -120,17 +131,19 @@ export default function Login() {
                 {isRegister ? "Buat Akun Baru" : "Masuk ke Akun Anda"}
               </CardTitle>
               <CardDescription className="text-gray-600 mt-2">
-                {isRegister 
+                {isRegister
                   ? "Daftar untuk mulai mengelola OKR tim Anda"
-                  : "Kelola tujuan dan pencapaian tim dengan mudah"
-                }
+                  : "Kelola tujuan dan pencapaian tim dengan mudah"}
               </CardDescription>
             </div>
           </CardHeader>
 
           <CardContent className="space-y-6">
             {isRegister ? (
-              <form onSubmit={registerForm.handleSubmit(handleRegister)} className="space-y-4">
+              <form
+                onSubmit={registerForm.handleSubmit(handleRegister)}
+                className="space-y-4"
+              >
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="firstName">Nama Depan</Label>
@@ -194,7 +207,11 @@ export default function Login() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      {showPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
                     </button>
                   </div>
                   {registerForm.formState.errors.password && (
@@ -209,11 +226,16 @@ export default function Login() {
                   className="w-full h-11 bg-indigo-600 hover:bg-indigo-700"
                   disabled={registerMutation.isPending}
                 >
-                  {registerMutation.isPending ? "Mendaftar..." : "Daftar Sekarang"}
+                  {registerMutation.isPending
+                    ? "Mendaftar..."
+                    : "Daftar Sekarang"}
                 </Button>
               </form>
             ) : (
-              <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
+              <form
+                onSubmit={loginForm.handleSubmit(handleLogin)}
+                className="space-y-4"
+              >
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <div className="relative">
@@ -249,7 +271,11 @@ export default function Login() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      {showPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
                     </button>
                   </div>
                   {loginForm.formState.errors.password && (
@@ -274,11 +300,15 @@ export default function Login() {
             {/* Demo Accounts Section */}
             {!isRegister && (
               <div className="bg-blue-50 rounded-lg p-4 space-y-3">
-                <h3 className="text-sm font-medium text-blue-900">Akun Demo untuk Testing:</h3>
+                <h3 className="text-sm font-medium text-blue-900">
+                  Akun Demo untuk Testing:
+                </h3>
                 <div className="space-y-2 text-xs">
                   <div className="flex justify-between items-center bg-white p-2 rounded border">
                     <div>
-                      <div className="font-medium text-gray-900">Admin User</div>
+                      <div className="font-medium text-gray-900">
+                        Admin User
+                      </div>
                       <div className="text-gray-600">admin@example.com</div>
                     </div>
                     <Button
@@ -286,7 +316,7 @@ export default function Login() {
                       variant="outline"
                       onClick={() => {
                         loginForm.setValue("email", "admin@example.com");
-                        loginForm.setValue("password", "123456");
+                        loginForm.setValue("password", "password123");
                       }}
                       className="text-xs"
                     >
@@ -295,7 +325,9 @@ export default function Login() {
                   </div>
                   <div className="flex justify-between items-center bg-white p-2 rounded border">
                     <div>
-                      <div className="font-medium text-gray-900">Manager User</div>
+                      <div className="font-medium text-gray-900">
+                        Manager User
+                      </div>
                       <div className="text-gray-600">manager@example.com</div>
                     </div>
                     <Button
@@ -303,7 +335,7 @@ export default function Login() {
                       variant="outline"
                       onClick={() => {
                         loginForm.setValue("email", "manager@example.com");
-                        loginForm.setValue("password", "123456");
+                        loginForm.setValue("password", "password123");
                       }}
                       className="text-xs"
                     >
@@ -312,7 +344,9 @@ export default function Login() {
                   </div>
                   <div className="flex justify-between items-center bg-white p-2 rounded border">
                     <div>
-                      <div className="font-medium text-gray-900">Member User</div>
+                      <div className="font-medium text-gray-900">
+                        Member User
+                      </div>
                       <div className="text-gray-600">john@example.com</div>
                     </div>
                     <Button
@@ -320,7 +354,7 @@ export default function Login() {
                       variant="outline"
                       onClick={() => {
                         loginForm.setValue("email", "john@example.com");
-                        loginForm.setValue("password", "123456");
+                        loginForm.setValue("password", "password123");
                       }}
                       className="text-xs"
                     >
@@ -329,7 +363,10 @@ export default function Login() {
                   </div>
                 </div>
                 <p className="text-xs text-blue-700 mt-2">
-                  Semua akun demo menggunakan password: <span className="font-mono bg-blue-100 px-1 rounded">123456</span>
+                  Semua akun demo menggunakan password:{" "}
+                  <span className="font-mono bg-blue-100 px-1 rounded">
+                    password123
+                  </span>
                 </p>
               </div>
             )}
