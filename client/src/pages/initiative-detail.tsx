@@ -172,7 +172,8 @@ export default function InitiativeDetailPage() {
           {/* Initiative Overview */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Target className="h-5 w-5" />
                 Initiative Overview
               </CardTitle>
             </CardHeader>
