@@ -333,9 +333,25 @@ export default function InitiativeDetailPage() {
               </div>
 
               {/* Simple Progress */}
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span className="text-sm font-medium text-gray-700">Overall Progress</span>
-                <span className="text-lg font-bold text-blue-600">{calculateProgress()}%</span>
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-700">Overall Progress</span>
+                  <span className={`text-lg font-bold ${
+                    calculateProgress() === 100 ? 'text-green-600' : 
+                    calculateProgress() >= 75 ? 'text-blue-600' : 
+                    calculateProgress() >= 50 ? 'text-yellow-600' : 
+                    'text-orange-600'
+                  }`}>{calculateProgress()}%</span>
+                </div>
+                <div className="relative">
+                  <Progress value={calculateProgress()} className="h-3" />
+                  <div className={`absolute inset-0 h-3 rounded-full ${
+                    calculateProgress() === 100 ? 'bg-green-500' : 
+                    calculateProgress() >= 75 ? 'bg-blue-500' : 
+                    calculateProgress() >= 50 ? 'bg-yellow-500' : 
+                    'bg-orange-500'
+                  }`} style={{ width: `${calculateProgress()}%` }} />
+                </div>
               </div>
 
               {/* Key Result Information - Simplified */}
