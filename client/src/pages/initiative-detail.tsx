@@ -188,140 +188,54 @@ export default function InitiativeDetailPage() {
               
               {/* Initiative Details Row */}
               <div className="flex flex-wrap items-center gap-4 p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center gap-1.5">
-                  <Flag className="h-3 w-3 text-gray-600" title="Status Initiative" />
+                <div className="flex items-center gap-1.5" title="Status Initiative">
+                  <Flag className="h-3 w-3 text-gray-600" />
                   <Badge className={`${getStatusColor(initiativeData.status)} border-0 py-0 text-xs`}>
                     {getStatusLabel(initiativeData.status)}
                   </Badge>
                 </div>
                 
-                <div className="flex items-center gap-1.5">
-                  <Target className="h-3 w-3 text-gray-600" title="Priority Initiative" />
+                <div className="flex items-center gap-1.5" title="Priority Initiative">
+                  <Target className="h-3 w-3 text-gray-600" />
                   <Badge className={`${getPriorityColor(initiativeData.priority)} border-0 py-0 text-xs`}>
                     {getPriorityLabel(initiativeData.priority)}
                   </Badge>
                 </div>
                 
-                <div className="flex items-center gap-1.5">
-                  <DollarSign className="h-3 w-3 text-gray-600" title="Budget yang Dialokasikan" />
+                <div className="flex items-center gap-1.5" title="Budget yang Dialokasikan">
+                  <DollarSign className="h-3 w-3 text-gray-600" />
                   <span className="text-sm font-semibold text-gray-900">{formatCurrency(initiativeData.budget)}</span>
                 </div>
                 
-                <div className="flex items-center gap-1.5">
-                  <Calendar className="h-3 w-3 text-gray-600" title="Timeline Initiative" />
+                <div className="flex items-center gap-1.5" title="Timeline Initiative">
+                  <Calendar className="h-3 w-3 text-gray-600" />
                   <span className="text-sm font-semibold text-gray-900">
                     {formatDate(initiativeData.startDate)} - {formatDate(initiativeData.dueDate)}
                   </span>
                 </div>
               </div>
 
-              {/* Progress Section */}
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-lg">
-                <h3 className="font-semibold text-gray-900 mb-3 text-sm">Progress Overview</h3>
-                <div className="space-y-3">
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm font-medium text-gray-700">Overall Progress</span>
-                      <span className="text-xl font-bold text-blue-600">{calculateProgress()}%</span>
-                    </div>
-                    <Progress value={calculateProgress()} className="h-2 bg-blue-100" />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-white/70 backdrop-blur rounded-lg p-3">
-                      <span className="text-xs font-medium text-gray-600 block mb-1">Budget Allocated</span>
-                      <p className="text-sm font-bold text-gray-900">{formatCurrency(initiativeData.budget)}</p>
-                    </div>
-                    
-                    <div className="bg-white/70 backdrop-blur rounded-lg p-3">
-                      <span className="text-xs font-medium text-gray-600 block mb-1">Days Remaining</span>
-                      <p className="text-sm font-bold text-gray-900">
-                        {initiativeData.dueDate ? 
-                          Math.max(0, Math.ceil((new Date(initiativeData.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))) 
-                          : '-'
-                        } days
-                      </p>
-                    </div>
-                  </div>
-                </div>
+              {/* Simple Progress */}
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <span className="text-sm font-medium text-gray-700">Overall Progress</span>
+                <span className="text-lg font-bold text-blue-600">{calculateProgress()}%</span>
               </div>
 
-              {/* Key Result Information inside Overview */}
+              {/* Key Result Information - Simplified */}
               {keyResult && (
-                <div className="border border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-3 rounded-lg">
-                  <div className="flex items-start justify-between mb-2">
-                    <span className="text-sm font-semibold text-blue-900">Key Result Terkait</span>
-                    <Link href={`/key-result/${keyResult.id}`} className="text-blue-600 hover:text-blue-800 text-xs">
-                      →
+                <div className="border border-blue-200 bg-blue-50 p-3 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <Link href={`/key-result/${keyResult.id}`}>
+                      <span className="text-sm font-semibold text-blue-900 hover:text-blue-700">
+                        Key Result: {keyResult.title}
+                      </span>
                     </Link>
-                  </div>
-                  
-                  <Link href={`/key-result/${keyResult.id}`}>
-                    <h4 className="text-sm font-semibold text-blue-900 hover:text-blue-700 transition-colors mb-1">
-                      {keyResult.title}
-                    </h4>
-                  </Link>
-                  
-                  {keyResult.description && (
-                    <p className="text-xs text-blue-700 mb-2 line-clamp-2">
-                      {keyResult.description}
-                    </p>
-                  )}
-                  
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-white/50 backdrop-blur rounded p-2">
-                      <p className="text-xs text-blue-600">Progress</p>
-                      <div className="flex items-center gap-1">
-                        <Progress value={keyResult.progress || 0} className="h-1.5 bg-blue-100 flex-1" />
-                        <span className="text-xs font-bold text-blue-900">{(keyResult.progress || 0).toFixed(1)}%</span>
-                      </div>
-                    </div>
-                    <div className="bg-white/50 backdrop-blur rounded p-2">
-                      <p className="text-xs text-blue-600">Target</p>
-                      <p className="text-xs font-bold text-blue-900">
-                        {keyResult.targetValue ? 
-                          new Intl.NumberFormat('id-ID').format(parseFloat(keyResult.targetValue)) : 
-                          '0'
-                        } {keyResult.unit || ''}
-                      </p>
-                    </div>
+                    <span className="text-xs font-bold text-blue-900">{(keyResult.progress || 0).toFixed(1)}%</span>
                   </div>
                 </div>
               )}
 
-              {/* Related Initiatives */}
-              {relatedInitiatives && relatedInitiatives.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-900 mb-3">Initiative Terkait</h3>
-                  <div className="grid gap-2">
-                    {relatedInitiatives.map((relInit: any) => (
-                      <Link key={relInit.id} href={`/initiative/${relInit.id}`}>
-                        <div className="group border border-gray-200 rounded-lg p-3 hover:border-blue-300 hover:bg-blue-50/50 transition-all cursor-pointer">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="flex-1">
-                              <h4 className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-1">
-                                {relInit.title}
-                              </h4>
-                              <div className="flex flex-wrap items-center gap-2 text-xs">
-                                <span className="text-gray-600">
-                                  {relInit.pic?.firstName} {relInit.pic?.lastName}
-                                </span>
-                                <Badge className={`${getStatusColor(relInit.status)} text-xs py-0`}>
-                                  {getStatusLabel(relInit.status)}
-                                </Badge>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <div className="text-lg font-bold text-gray-900">{relInit.progress || 0}%</div>
-                              <div className="text-xs text-gray-500">Progress</div>
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
+
             </CardContent>
           </Card>
 
