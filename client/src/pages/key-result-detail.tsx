@@ -759,11 +759,11 @@ export default function KeyResultDetailPage() {
         <Button 
           variant="ghost" 
           size="sm" 
-          onClick={() => setLocation("/")}
+          onClick={() => window.history.back()}
           className="flex items-center gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Dashboard
+          Back
         </Button>
         
         <div className="flex items-center gap-3">
