@@ -206,95 +206,179 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
-          {filteredTasks.map((task: any) => (
-            <Card key={task.id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-4">
-                <div className="flex items-start gap-4">
-                  <div className="mt-1">{getStatusIcon(task.status)}</div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <Link href={`/tasks/${task.id}`}>
-                          <h3 className="font-medium text-gray-900 line-clamp-2 hover:text-blue-600 cursor-pointer">
-                            {task.title}
-                          </h3>
-                        </Link>
-                        
-                        {task.description && (
-                          <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                            {task.description}
-                          </p>
-                        )}
-                        
-                        {/* Context information */}
-                        {task.initiative && (
-                          <div className="mt-2 text-xs text-gray-500">
-                            <span className="font-medium">Initiative:</span> {task.initiative.title}
-                            {task.initiative.keyResult && (
-                              <>
-                                <span className="mx-1">•</span>
-                                <span className="font-medium">KR:</span> {task.initiative.keyResult.title}
-                              </>
-                            )}
-                          </div>
-                        )}
-                        
-                        <div className="flex items-center gap-4 mt-3">
-                          {/* Status dropdown */}
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-500">Status:</span>
-                            <Select
-                              value={task.status}
-                              onValueChange={(value) => updateTaskStatusMutation.mutate({ taskId: task.id, status: value })}
-                            >
-                              <SelectTrigger className="w-32 h-8">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="not_started">Belum Dimulai</SelectItem>
-                                <SelectItem value="in_progress">Sedang Dikerjakan</SelectItem>
-                                <SelectItem value="completed">Selesai</SelectItem>
-                                <SelectItem value="cancelled">Dibatalkan</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          
-                          {task.dueDate && (
-                            <div className="flex items-center gap-1 text-sm text-gray-500">
-                              <Calendar className="w-4 h-4" />
-                              <span>{format(new Date(task.dueDate), "MMM d, yyyy")}</span>
+        <Card>
+          <CardContent className="p-0">
+            <div className="divide-y divide-gray-200">
+              {filteredTasks.map((task: any) => (
+                <div key={task.id} className="flex items-center justify-between p-3 hover:bg-gray-50 transition-colors group">
+                  <div className="flex items-center gap-3 flex-1">
+                    {/* Task Health Score Dot */}
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className={`w-2 h-2 rounded-full cursor-help ${
+                            calculateTaskHealthScore(task) >= 80 ? 'bg-green-500' :
+                            calculateTaskHealthScore(task) >= 60 ? 'bg-yellow-500' :
+                            calculateTaskHealthScore(task) >= 40 ? 'bg-orange-500' :
+                            'bg-red-500'
+                          }`} />
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <div className="space-y-2 text-xs">
+                            <div className="font-medium">Task Health Score: {getTaskHealthLabel(calculateTaskHealthScore(task))} ({calculateTaskHealthScore(task)}%)</div>
+                            <div className="space-y-1 text-gray-600">
+                              <div>• Status: {getTaskStatusLabel(task.status)}</div>
+                              <div>• Priority: {getTaskPriorityLabel(task.priority)}</div>
+                              <div>• Due Date: {formatDate(task.dueDate)}</div>
+                              {(() => {
+                                const daysUntilDue = Math.floor((new Date(task.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                                if (daysUntilDue < 0) return <div className="text-red-600">• Overdue by {Math.abs(daysUntilDue)} days</div>;
+                                if (daysUntilDue === 0) return <div className="text-orange-600">• Due today</div>;
+                                if (daysUntilDue <= 3) return <div className="text-yellow-600">• Due in {daysUntilDue} days</div>;
+                                return <div>• Due in {daysUntilDue} days</div>;
+                              })()}
                             </div>
-                          )}
-                        </div>
-                      </div>
+                          </div>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
+                    {/* Task Title and Info */}
+                    <div className="flex-1">
+                      <Link href={`/tasks/${task.id}`}>
+                        <span className="font-medium text-gray-900 cursor-pointer hover:text-blue-600 transition-colors">
+                          {task.title}
+                        </span>
+                      </Link>
                       
-                      <div className="flex flex-col items-end gap-2">
-                        <Badge 
-                          variant="outline" 
-                          className={getPriorityColor(task.priority)}
-                        >
-                          {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
-                        </Badge>
-                        
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            window.location.href = `/key-results/${task.initiative?.keyResultId}`;
-                          }}
-                        >
-                          View Details
-                        </Button>
+                      {/* Due Date and User Info */}
+                      <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                        {task.dueDate && (
+                          <div className="flex items-center gap-1">
+                            <Calendar className={`h-3 w-3 ${
+                              new Date(task.dueDate) < new Date() ? 'text-red-600' : ''
+                            }`} />
+                            <span className={
+                              new Date(task.dueDate) < new Date() ? 'text-red-600 font-medium' : ''
+                            }>{formatDate(task.dueDate)}</span>
+                          </div>
+                        )}
+                        {task.assignedUser && (
+                          <div className="flex items-center gap-1">
+                            <User className="h-3 w-3" />
+                            <span>{task.assignedUser.firstName} {task.assignedUser.lastName}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
+
+                  <div className="flex items-center gap-2">
+                    {/* Status Badge */}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button 
+                          className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
+                        >
+                          {getTaskStatusLabel(task.status)}
+                          <ChevronDown className="h-3 w-3" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() => updateTaskStatusMutation.mutate({ taskId: task.id, status: 'not_started' })}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2">
+                            {task.status === 'not_started' && <Check className="h-3 w-3" />}
+                            <span>Belum Dimulai</span>
+                          </div>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => updateTaskStatusMutation.mutate({ taskId: task.id, status: 'in_progress' })}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2">
+                            {task.status === 'in_progress' && <Check className="h-3 w-3" />}
+                            <span>Sedang Dikerjakan</span>
+                          </div>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => updateTaskStatusMutation.mutate({ taskId: task.id, status: 'completed' })}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2">
+                            {task.status === 'completed' && <Check className="h-3 w-3" />}
+                            <span>Selesai</span>
+                          </div>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => updateTaskStatusMutation.mutate({ taskId: task.id, status: 'cancelled' })}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2">
+                            {task.status === 'cancelled' && <Check className="h-3 w-3" />}
+                            <span>Dibatalkan</span>
+                          </div>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    {/* Priority Badge */}
+                    <Badge className={`${getTaskPriorityColor(task.priority)} text-xs px-2 py-1`}>
+                      {getTaskPriorityLabel(task.priority)}
+                    </Badge>
+
+                    {/* Assigned User Avatar */}
+                    {task.assignedTo && task.assignedUser && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white cursor-help">
+                              {task.assignedUser.firstName?.charAt(0)}{task.assignedUser.lastName?.charAt(0)}
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <div className="text-xs">
+                              {task.assignedUser.firstName} {task.assignedUser.lastName}
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
+
+                    {/* Action Menu */}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0"
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                          <Link href={`/tasks/${task.id}`}>
+                            View Task Details
+                          </Link>
+                        </DropdownMenuItem>
+                        {task.initiative && (
+                          <DropdownMenuItem asChild>
+                            <Link href={`/initiatives/${task.initiative.id}`}>
+                              View Initiative
+                            </Link>
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
