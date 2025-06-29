@@ -107,6 +107,12 @@ Changelog:
   * Moved status Badge component from header to Overview section next to title
   * Enhanced visual hierarchy with status badge positioned alongside initiative title
   * Improved contextual relevance of status information within overview card
+- June 29, 2025. Enhanced initiative detail page with comprehensive key result information:
+  * Added detailed "Key Result Terkait" section with visual card layout
+  * Displays key result title, description, progress percentage, current and target values
+  * Implemented automatic progress calculation with proper Indonesian number formatting
+  * Created clickable link navigation to related key result detail page
+  * Enhanced visual design with blue-themed card for better information prominence
 - June 29, 2025. Improved task modal layout with consistent 2-column design:
   * Fixed spacing and alignment of PIC and due date fields
   * Implemented grid layout for better space utilization

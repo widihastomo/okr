@@ -334,16 +334,48 @@ export default function InitiativeDetailPage() {
 
               <Separator />
 
-              {/* Key Result Link */}
+              {/* Key Result Information */}
               {initiativeData.keyResult && (
                 <div>
-                  <p className="text-sm text-gray-600 mb-2">Key Result</p>
-                  <Link
-                    href={`/key-result/${initiativeData.keyResultId}`}
-                    className="text-blue-600 hover:text-blue-700 hover:underline"
-                  >
-                    {initiativeData.keyResult.title}
-                  </Link>
+                  <p className="text-sm text-gray-600 mb-3">Key Result Terkait</p>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <Link
+                          href={`/key-result/${initiativeData.keyResultId}`}
+                          className="text-blue-600 hover:text-blue-700 hover:underline font-medium"
+                        >
+                          {initiativeData.keyResult.title}
+                        </Link>
+                        {initiativeData.keyResult.description && (
+                          <p className="text-sm text-gray-600 mt-1">
+                            {initiativeData.keyResult.description}
+                          </p>
+                        )}
+                        <div className="flex items-center gap-4 mt-3 text-sm">
+                          <div className="flex items-center gap-1">
+                            <span className="text-gray-500">Progress:</span>
+                            <span className="font-medium">
+                              {Math.round(((Number(initiativeData.keyResult.currentValue) - Number(initiativeData.keyResult.baseValue || 0)) / 
+                                (Number(initiativeData.keyResult.targetValue) - Number(initiativeData.keyResult.baseValue || 0))) * 100) || 0}%
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <span className="text-gray-500">Current:</span>
+                            <span className="font-medium">
+                              {Number(initiativeData.keyResult.currentValue).toLocaleString('id-ID')} {initiativeData.keyResult.unit}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <span className="text-gray-500">Target:</span>
+                            <span className="font-medium">
+                              {Number(initiativeData.keyResult.targetValue).toLocaleString('id-ID')} {initiativeData.keyResult.unit}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </CardContent>
