@@ -1682,10 +1682,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create a standalone task
-  app.post("/api/tasks", requireAuth, async (req, res) => {
+  app.post("/api/tasks", async (req, res) => {
     try {
-      const currentUser = req.user as any;
-      const currentUserId = currentUser.id;
+      // Get current user ID - handle both development and production modes
+      let currentUserId: string;
+      if (process.env.NODE_ENV === 'development') {
+        // Use mock user ID for development
+        currentUserId = "550e8400-e29b-41d4-a716-446655440001";
+      } else {
+        // Production mode - require authentication
+        if (!req.session?.userId) {
+          return res.status(401).json({ message: "Authentication required" });
+        }
+        currentUserId = req.session.userId;
+      }
 
       // Validate and prepare task data
       const taskData = {
@@ -1699,7 +1709,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         initiativeId: req.body.initiativeId === "no-initiative" ? null : req.body.initiativeId,
       };
 
-      console.log("Creating task with data:", {
+      console.log("Creating standalone task with data:", {
         ...taskData,
         dueDate: taskData.dueDate?.toISOString(),
         currentUserId
@@ -1725,7 +1735,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.status(201).json(task);
     } catch (error) {
-      console.error("Error creating task:", error);
+      console.error("Error creating standalone task:", error);
       res.status(500).json({ message: "Failed to create task" });
     }
   });

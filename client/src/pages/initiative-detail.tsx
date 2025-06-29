@@ -516,7 +516,7 @@ export default function InitiativeDetailPage() {
               {keyResult && (
                 <div className="border border-blue-200 bg-blue-50 p-3 rounded-lg">
                   <div className="flex items-center justify-between">
-                    <Link href={`/key-result/${keyResult.id}`}>
+                    <Link href={`/key-results/${keyResult.id}`}>
                       <span className="text-sm font-semibold text-blue-900 hover:text-blue-700">
                         Key Result: {keyResult.title}
                       </span>

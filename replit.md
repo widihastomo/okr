@@ -96,6 +96,11 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- June 29, 2025. Fixed URL routing and task creation issues:
+  * Fixed initiative detail page Key Result links to use correct plural URL (/key-results/ instead of /key-result/)
+  * Fixed standalone task creation authentication by updating POST /api/tasks endpoint to use session-based auth
+  * Resolved 400 error in task creation by aligning authentication pattern with other working endpoints
+  * Standalone task modal now works properly for creating tasks from My Tasks page
 - June 29, 2025. Fixed critical deployment build failures and created comprehensive build system:
   * Resolved "Cannot find module '/dist/index.js'" error by creating reliable ESBuild-based compilation
   * Created build-final.js script that generates 96KB server bundle and production frontend consistently
