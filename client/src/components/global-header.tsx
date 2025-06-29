@@ -120,13 +120,16 @@ export default function GlobalHeader({ onMenuToggle }: GlobalHeaderProps) {
         {/* User Avatar Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="p-1 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none rounded-full">
+            <Button variant="ghost" size="sm" className="px-2 py-1 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none rounded-lg flex items-center space-x-2">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={(user as any)?.profileImageUrl} />
                 <AvatarFallback className="bg-blue-600 text-white text-sm font-semibold">
                   {getUserInitials()}
                 </AvatarFallback>
               </Avatar>
+              <span className="text-sm font-medium text-gray-700 hidden md:inline">
+                {(user as any)?.firstName} {(user as any)?.lastName}
+              </span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
