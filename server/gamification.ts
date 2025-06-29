@@ -335,8 +335,8 @@ export class GamificationService {
       SELECT 
         us.*,
         u.id as user_id,
-        u."firstName" as user_first_name,
-        u."lastName" as user_last_name,
+        u.first_name as user_first_name,
+        u.last_name as user_last_name,
         u.email as user_email
       FROM user_stats us
       JOIN users u ON us.user_id = u.id

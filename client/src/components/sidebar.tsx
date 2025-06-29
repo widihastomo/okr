@@ -11,7 +11,7 @@ import {
   User,
   Settings,
   X,
-
+  Trophy
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -62,7 +62,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       path: "/users",
       active: location === "/users"
     },
-
+    {
+      label: "Achievements",
+      icon: Trophy,
+      path: "/achievements",
+      active: location === "/achievements"
+    },
     {
       label: "Analytics",
       icon: BarChart3,

@@ -106,11 +106,16 @@ Changelog:
   * Implemented level progression system (100 points for level 2, then +50 points per level)
   * Added automatic streak tracking based on daily activity and longest streak records
   * Built comprehensive UI components: UserStatsCard, AchievementsGrid, Leaderboard, and achievement notifications
-  * Integrated achievements tab in dashboard navigation with complete progress visualization
   * Created 14 sample achievements across all categories with different rarity levels (common, rare, epic, legendary)
   * Added 10 level rewards with unique titles and descriptions for user progression motivation
   * Successfully tested system with real point awarding (10 points per check-in confirmed working)
   * Enhanced user engagement through visual progress indicators, badges, and competitive elements
+- June 29, 2025. Moved achievements functionality to separate page:
+  * Removed achievements tab from dashboard and created dedicated /achievements page
+  * Added Achievements menu item to sidebar navigation with Trophy icon
+  * Achievements page includes three tabs: Progress (user stats), Achievements (badges), and Leaderboard
+  * Fixed leaderboard database query to use correct column names (first_name, last_name)
+  * Maintained all gamification functionality while improving navigation and user experience
 - June 29, 2025. Completely removed task management functionality from initiative system:
   * Eliminated all task-related code from initiative creation and editing forms
   * Removed TaskModal component and all task CRUD operations from initiative detail page

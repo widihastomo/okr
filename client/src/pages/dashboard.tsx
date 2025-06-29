@@ -17,9 +17,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useTaskNotifications } from "@/hooks/useTaskNotifications";
 import { useLocation } from "wouter";
 import type { OKRWithKeyResults, KeyResult, Cycle, User } from "@shared/schema";
-import { UserStatsCard } from "@/components/gamification/user-stats-card";
-import { AchievementsGrid } from "@/components/gamification/achievements-grid";
-import { Leaderboard } from "@/components/gamification/leaderboard";
+
 
 export default function Dashboard() {
   const { toast } = useToast();
@@ -459,10 +457,6 @@ export default function Dashboard() {
               </span>
             )}
           </TabsTrigger>
-          <TabsTrigger value="achievements" className="flex items-center gap-2">
-            <Trophy className="w-4 h-4" />
-            Achievements
-          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="objectives" className="space-y-6 mt-6">
@@ -520,32 +514,7 @@ export default function Dashboard() {
           />
         </TabsContent>
 
-        <TabsContent value="achievements" className="space-y-6 mt-6">
-          {currentUser ? (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* User Stats */}
-              <div className="lg:col-span-1">
-                <UserStatsCard userId={currentUser.id} />
-              </div>
-              
-              {/* Achievements and Leaderboard */}
-              <div className="lg:col-span-2 space-y-6">
-                <AchievementsGrid userId={currentUser.id} />
-                <Leaderboard limit={10} />
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Trophy className="w-8 h-8 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Login Required</h3>
-              <p className="text-gray-500">
-                Please log in to view your achievements and progress.
-              </p>
-            </div>
-          )}
-        </TabsContent>
+
       </Tabs>
 
       {/* Modals */}

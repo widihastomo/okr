@@ -24,6 +24,7 @@ import Home from "@/pages/home";
 import Profile from "@/pages/profile";
 import NotFound from "@/pages/not-found";
 import AnalyticsPage from "@/pages/analytics";
+import AchievementsPage from "@/pages/achievements";
 
 
 function Router() {
@@ -90,7 +91,7 @@ function Router() {
             <Route path="/cycles" component={CyclesPage} />
             <Route path="/templates" component={TemplatesPage} />
             <Route path="/users" component={UsersPage} />
-  
+            <Route path="/achievements" component={AchievementsPage} />
             <Route path="/analytics" component={AnalyticsPage} />
             <Route component={NotFound} />
           </Switch>
