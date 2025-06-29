@@ -475,6 +475,23 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
                             </Link>
                           </DropdownMenuItem>
                         )}
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setEditingTask(task);
+                            setIsTaskModalOpen(true);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <Edit className="h-4 w-4 mr-2" />
+                          Edit Task
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => setTaskToDelete(task)}
+                          className="cursor-pointer text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete Task
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
@@ -484,6 +501,44 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
           </CardContent>
         </Card>
       )}
+
+      {/* Task Modal */}
+      {isTaskModalOpen && (
+        <TaskModal
+          isOpen={isTaskModalOpen}
+          onClose={() => {
+            setIsTaskModalOpen(false);
+            setEditingTask(null);
+          }}
+          task={editingTask}
+          onSuccess={() => {
+            queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
+            setIsTaskModalOpen(false);
+            setEditingTask(null);
+          }}
+        />
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!taskToDelete} onOpenChange={() => setTaskToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Task</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this task? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => taskToDelete && deleteTaskMutation.mutate(taskToDelete.id)}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
