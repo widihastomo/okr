@@ -218,8 +218,13 @@ export default function TaskDetailPage() {
                       <div className="text-sm text-blue-800">
                         <p className="font-medium">{task.initiative.title}</p>
                         {task.initiative.keyResult && (
-                          <p className="text-blue-600 mt-1">
-                            Key Result: {task.initiative.keyResult.title}
+                          <p className="mt-1">
+                            <span className="text-blue-800">Key Result: </span>
+                            <Link href={`/key-results/${task.initiative.keyResultId}`}>
+                              <span className="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                                {task.initiative.keyResult.title}
+                              </span>
+                            </Link>
                           </p>
                         )}
                       </div>
