@@ -595,7 +595,7 @@ export default function InitiativeDetailPage() {
                             </span>
                           </Link>
                           
-                          {/* Due Date and User Info */}
+                          {/* Due Date Info */}
                           <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
                             {task.dueDate && (
                               <div className="flex items-center gap-1">
@@ -605,12 +605,6 @@ export default function InitiativeDetailPage() {
                                 <span className={
                                   new Date(task.dueDate) < new Date() ? 'text-red-600 font-medium' : ''
                                 }>{formatDate(task.dueDate)}</span>
-                              </div>
-                            )}
-                            {task.assignedTo && task.assignedUser && (
-                              <div className="flex items-center gap-1">
-                                <User className="h-3 w-3" />
-                                <span>{task.assignedUser.firstName} {task.assignedUser.lastName}</span>
                               </div>
                             )}
                           </div>
