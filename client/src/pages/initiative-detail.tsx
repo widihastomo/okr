@@ -322,30 +322,37 @@ export default function InitiativeDetailPage() {
 
               {/* Related Initiatives */}
               {relatedInitiatives && relatedInitiatives.length > 0 && (
-                <div className="mt-4">
-                  <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    Initiative Terkait
-                  </h3>
-                  <div className="space-y-2">
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center">
+                      <FileText className="h-4 w-4 text-gray-600" />
+                    </div>
+                    <h3 className="font-semibold text-gray-900">Initiative Terkait</h3>
+                  </div>
+                  <div className="grid gap-3">
                     {relatedInitiatives.map((relInit: any) => (
                       <Link key={relInit.id} href={`/initiative/${relInit.id}`}>
-                        <div className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors cursor-pointer">
-                          <div className="flex items-start justify-between">
+                        <div className="group border-2 border-gray-200 rounded-xl p-4 hover:border-blue-300 hover:bg-blue-50/50 transition-all cursor-pointer">
+                          <div className="flex items-start justify-between gap-4">
                             <div className="flex-1">
-                              <h4 className="font-medium text-gray-900 hover:text-blue-600">
+                              <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
                                 {relInit.title}
                               </h4>
-                              <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
-                                <span className="flex items-center gap-1">
-                                  <User className="h-3 w-3" />
-                                  {relInit.pic?.firstName} {relInit.pic?.lastName}
-                                </span>
-                                <Badge className={getStatusColor(relInit.status)}>
+                              <div className="flex flex-wrap items-center gap-3 text-sm">
+                                <div className="flex items-center gap-1.5 text-gray-600">
+                                  <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center">
+                                    <User className="h-3 w-3" />
+                                  </div>
+                                  <span>{relInit.pic?.firstName} {relInit.pic?.lastName}</span>
+                                </div>
+                                <Badge className={`${getStatusColor(relInit.status)} text-xs`}>
                                   {getStatusLabel(relInit.status)}
                                 </Badge>
-                                <span>{relInit.progress || 0}%</span>
                               </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-2xl font-bold text-gray-900">{relInit.progress || 0}%</div>
+                              <div className="text-xs text-gray-500">Progress</div>
                             </div>
                           </div>
                         </div>
