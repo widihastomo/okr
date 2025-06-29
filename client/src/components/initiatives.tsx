@@ -371,7 +371,7 @@ export default function Initiatives({ userFilter, filteredKeyResultIds }: Initia
                 </div>
                 <CardTitle className="text-lg">
                   <Link href={`/initiatives/${initiative.id}`}>
-                    <span className="hover:text-blue-600 cursor-pointer">
+                    <span className="text-blue-600 hover:text-blue-800 cursor-pointer">
                       {initiative.title}
                     </span>
                   </Link>
