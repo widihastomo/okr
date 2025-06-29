@@ -550,9 +550,11 @@ export default function InitiativeDetailPage() {
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
-                            <h4 className="font-semibold text-gray-900 text-sm cursor-pointer hover:text-blue-600">
-                              {task.title}
-                            </h4>
+                            <Link href={`/tasks/${task.id}`}>
+                              <h4 className="font-semibold text-gray-900 text-sm cursor-pointer hover:text-blue-600 transition-colors">
+                                {task.title}
+                              </h4>
+                            </Link>
                             
                             {/* Health Score Indicator */}
                             <TooltipProvider>

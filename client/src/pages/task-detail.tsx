@@ -1,431 +1,353 @@
-import { useState } from "react";
+import { useParams } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useParams, Link } from "wouter";
+import { useState } from "react";
+import {
+  ArrowLeft,
+  Calendar,
+  User,
+  Flag,
+  Clock,
+  Edit,
+  Check,
+  X,
+} from "lucide-react";
+import { Link } from "wouter";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+
+// UI Components
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
-  ArrowLeft, 
-  Calendar, 
-  User, 
-  Flag, 
-  CheckCircle2, 
-  Clock, 
-  AlertCircle,
-  MessageSquare,
-  Send,
-  FileText,
-  Building2
-} from "lucide-react";
-import { format } from "date-fns";
-import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
+import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function TaskDetailPage() {
-  const { taskId } = useParams();
-  const { user } = useAuth();
+  const { id } = useParams();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
-  const [newComment, setNewComment] = useState("");
-  const [isUpdating, setIsUpdating] = useState(false);
 
-  // Fetch task details with related data
+  // Fetch task data
   const { data: task, isLoading } = useQuery({
-    queryKey: [`/api/tasks/${taskId}`],
-    enabled: !!taskId,
+    queryKey: ['/api/tasks', id],
+    enabled: !!id,
   });
 
+  // Extract initiative from task data  
+  const initiative = (task as any)?.initiative;
+
   // Update task status mutation
-  const updateTaskMutation = useMutation({
-    mutationFn: async (data: { status: string }) => {
-      const response = await apiRequest("PATCH", `/api/tasks/${taskId}`, data);
-      return response.json();
+  const updateTaskStatusMutation = useMutation({
+    mutationFn: async ({ status }: { status: string }) => {
+      return await apiRequest(`/api/tasks/${id}`, 'PATCH', { status });
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/tasks', id] });
       toast({
-        title: "Task Updated",
+        title: "Status Updated",
         description: "Task status has been updated successfully.",
         className: "border-green-200 bg-green-50 text-green-800",
       });
-      queryClient.invalidateQueries({ queryKey: [`/api/tasks/${taskId}`] });
-      queryClient.invalidateQueries({ queryKey: [`/api/users/${(user as any)?.id}/tasks`] });
-    },
-    onError: () => {
-      toast({
-        title: "Update Failed",
-        description: "Failed to update task status.",
-        variant: "destructive",
-      });
     },
   });
 
-  // Add comment mutation (placeholder for future implementation)
-  const addCommentMutation = useMutation({
-    mutationFn: async (comment: string) => {
-      // This would be implemented when comments feature is added
-      return Promise.resolve({ success: true });
-    },
-    onSuccess: () => {
-      setNewComment("");
-      toast({
-        title: "Comment Added",
-        description: "Your comment has been added.",
-        className: "border-green-200 bg-green-50 text-green-800",
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('id-ID', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
       });
-    },
-  });
-
-  const getUserInitials = (user: any) => {
-    if (!user) return "?";
-    const firstName = user.firstName || "";
-    const lastName = user.lastName || "";
-    if (firstName && lastName) {
-      return `${firstName[0]}${lastName[0]}`.toUpperCase();
+    } catch (error) {
+      return "Tanggal tidak valid";
     }
-    if (user.email) {
-      return user.email[0].toUpperCase();
-    }
-    return "U";
   };
 
-  const getStatusIcon = (status: string) => {
+  const getTaskStatusColor = (status: string) => {
     switch (status) {
       case "completed":
-        return <CheckCircle2 className="w-5 h-5 text-green-600" />;
+        return "bg-green-100 text-green-800 border-green-200";
       case "in_progress":
-        return <Clock className="w-5 h-5 text-blue-600" />;
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "not_started":
+        return "bg-gray-100 text-gray-800 border-gray-200";
       case "cancelled":
-        return <AlertCircle className="w-5 h-5 text-red-600" />;
+        return "bg-red-100 text-red-800 border-red-200";
       default:
-        return <Clock className="w-5 h-5 text-gray-400" />;
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getTaskStatusLabel = (status: string) => {
     switch (status) {
       case "completed":
-        return "bg-green-100 text-green-700 border-green-200";
+        return "Selesai";
       case "in_progress":
-        return "bg-blue-100 text-blue-700 border-blue-200";
+        return "Berlangsung";
+      case "not_started":
+        return "Belum Dimulai";
       case "cancelled":
-        return "bg-red-100 text-red-700 border-red-200";
+        return "Dibatalkan";
       default:
-        return "bg-gray-100 text-gray-700 border-gray-200";
+        return "Tidak Diketahui";
     }
   };
 
-  const getPriorityColor = (priority: string) => {
+  const getTaskPriorityColor = (priority: string) => {
     switch (priority) {
       case "high":
-        return "bg-red-100 text-red-700 border-red-200";
+        return "bg-red-100 text-red-800 border-red-200";
       case "medium":
-        return "bg-yellow-100 text-yellow-700 border-yellow-200";
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "low":
-        return "bg-green-100 text-green-700 border-green-200";
+        return "bg-green-100 text-green-800 border-green-200";
       default:
-        return "bg-gray-100 text-gray-700 border-gray-200";
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
-  const handleStatusUpdate = (newStatus: string) => {
-    setIsUpdating(true);
-    updateTaskMutation.mutate({ status: newStatus });
-    setTimeout(() => setIsUpdating(false), 500);
-  };
-
-  const handleAddComment = () => {
-    if (newComment.trim()) {
-      addCommentMutation.mutate(newComment);
+  const getTaskPriorityLabel = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return "Tinggi";
+      case "medium":
+        return "Sedang";
+      case "low":
+        return "Rendah";
+      default:
+        return "Tidak Diketahui";
     }
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
+            <div className="bg-white rounded-lg p-6">
+              <div className="h-6 bg-gray-200 rounded w-1/2 mb-4"></div>
+              <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!task) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Task Not Found</h2>
-          <p className="text-gray-600 mb-4">The task you're looking for doesn't exist.</p>
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-6xl mx-auto text-center py-12">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Task Not Found</h1>
+          <p className="text-gray-600 mb-6">The task you're looking for doesn't exist.</p>
           <Link href="/dashboard">
-            <Button>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Button>
+            <Button>Back to Dashboard</Button>
           </Link>
         </div>
       </div>
     );
   }
 
+  const taskData = task as any;
+  const isOverdue = taskData?.dueDate ? new Date(taskData.dueDate) < new Date() : false;
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="p-6">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between">
-              <Link href="/dashboard">
-                <Button variant="outline" size="sm">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back
-                </Button>
-              </Link>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-6">
+          <Link href={initiative ? `/initiative/${initiative.id}` : "/dashboard"}>
+            <Button variant="ghost" size="sm" className="p-2">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          </Link>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <h1 className="text-2xl font-bold text-gray-900">{taskData?.title}</h1>
+              <Badge className={`${getTaskStatusColor(taskData?.status || '')} text-sm`}>
+                {getTaskStatusLabel(taskData?.status || '')}
+              </Badge>
             </div>
+            {initiative && (
+              <p className="text-gray-600">
+                Initiative: <Link href={`/initiative/${initiative.id}`} className="text-blue-600 hover:underline">{initiative.title}</Link>
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Task Details */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Task Details</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Description */}
+                {taskData?.description && (
+                  <div>
+                    <h3 className="font-medium text-gray-900 mb-2">Description</h3>
+                    <p className="text-gray-700 leading-relaxed">{taskData.description}</p>
+                  </div>
+                )}
+
+                {/* Basic Info */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    {/* Priority */}
+                    <div className="flex items-center gap-2">
+                      <Flag className="h-4 w-4 text-gray-500" />
+                      <span className="text-sm text-gray-600">Priority:</span>
+                      <Badge className={`${getTaskPriorityColor(taskData?.priority || '')} text-xs`}>
+                        {getTaskPriorityLabel(taskData?.priority || '')}
+                      </Badge>
+                    </div>
+
+                    {/* Assigned User */}
+                    {taskData?.assignedUser && (
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-gray-500" />
+                        <span className="text-sm text-gray-600">Assigned to:</span>
+                        <span className="text-sm font-medium">
+                          {taskData.assignedUser.firstName} {taskData.assignedUser.lastName}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-3">
+                    {/* Due Date */}
+                    {taskData?.dueDate && (
+                      <div className="flex items-center gap-2">
+                        <Calendar className={`h-4 w-4 ${isOverdue ? 'text-red-600' : 'text-gray-500'}`} />
+                        <span className="text-sm text-gray-600">Due Date:</span>
+                        <span className={`text-sm font-medium ${isOverdue ? 'text-red-600' : ''}`}>
+                          {formatDate(taskData.dueDate)}
+                          {isOverdue && (
+                            <span className="ml-2 text-xs bg-red-100 text-red-700 px-2 py-1 rounded">
+                              Overdue
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Created Date */}
+                    {taskData?.createdAt && (
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-gray-500" />
+                        <span className="text-sm text-gray-600">Created:</span>
+                        <span className="text-sm">{formatDate(taskData.createdAt)}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Comments Section Placeholder */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Comments</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8 text-gray-500">
+                  <p>Comments feature coming soon</p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-6">
-            {/* Main Content */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Task Overview */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-blue-600" />
-                    Task Overview
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <div className="flex items-center gap-2 mb-4">
-                      {getStatusIcon(task.status)}
-                      <h1 className="text-2xl font-bold text-gray-900">{task.title}</h1>
-                    </div>
-                    <h3 className="font-medium text-gray-900 mb-2">Description</h3>
-                    <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">
-                      {task.description || "No description provided."}
-                    </p>
-                  </div>
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Quick Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Update Status
+                  </label>
+                  <Select
+                    value={taskData?.status || ''}
+                    onValueChange={(status) => updateTaskStatusMutation.mutate({ status })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="not_started">Belum Dimulai</SelectItem>
+                      <SelectItem value="in_progress">Sedang Dikerjakan</SelectItem>
+                      <SelectItem value="completed">Selesai</SelectItem>
+                      <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                  {/* Context Information */}
-                  {task.initiative && (
-                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                      <h4 className="font-medium text-blue-900 mb-2 flex items-center gap-2">
-                        <Building2 className="w-4 h-4" />
-                        Initiative Context
-                      </h4>
-                      <div className="text-sm text-blue-800">
-                        <p className="font-medium">{task.initiative.title}</p>
-                        {task.initiative.keyResult && (
-                          <p className="mt-1">
-                            <span className="text-blue-800">Key Result: </span>
-                            <Link href={`/key-results/${task.initiative.keyResultId}`}>
-                              <span className="text-blue-600 hover:text-blue-800 underline cursor-pointer">
-                                {task.initiative.keyResult.title}
-                              </span>
-                            </Link>
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                <Separator />
 
-              {/* Comments Section */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MessageSquare className="w-5 h-5 text-blue-600" />
-                    Comments & Updates
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Sample comments - this would be replaced with real data */}
-                  <div className="space-y-4">
-                    <div className="flex gap-3">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback className="bg-blue-600 text-white text-xs">
-                          {getUserInitials(task.assignedUser)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <div className="bg-gray-50 p-3 rounded-lg">
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="font-medium text-sm">
-                              {task.assignedUser ? 
-                                `${task.assignedUser.firstName} ${task.assignedUser.lastName}` : 
-                                "Unassigned"
-                              }
-                            </span>
-                            <span className="text-xs text-gray-500">
-                              {format(new Date(task.createdAt), "MMM d, yyyy 'at' h:mm a")}
-                            </span>
-                          </div>
-                          <p className="text-gray-700 text-sm">
-                            Task created and assigned.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Add new comment */}
-                  <div className="border-t pt-4">
-                    <div className="space-y-3">
-                      <Textarea
-                        placeholder="Add a comment or update..."
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        className="min-h-[80px]"
-                      />
-                      <div className="flex justify-end">
-                        <Button 
-                          onClick={handleAddComment}
-                          disabled={!newComment.trim() || addCommentMutation.isPending}
-                          className="bg-blue-600 hover:bg-blue-700"
-                        >
-                          <Send className="w-4 h-4 mr-2" />
-                          {addCommentMutation.isPending ? "Adding..." : "Add Comment"}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Task Status */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Task Status</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Current Status</label>
-                    <Select 
-                      value={task.status} 
-                      onValueChange={handleStatusUpdate}
-                      disabled={isUpdating}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="in_progress">In Progress</SelectItem>
-                        <SelectItem value="completed">Completed</SelectItem>
-                        <SelectItem value="cancelled">Cancelled</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-2">
-                    <Badge variant="outline" className={getStatusColor(task.status)}>
-                      {task.status.replace('_', ' ').toUpperCase()}
-                    </Badge>
-                    <Badge variant="outline" className={getPriorityColor(task.priority)}>
-                      {task.priority.toUpperCase()} PRIORITY
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Task Details */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Task Details</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Assigned To */}
-                  <div className="flex items-center gap-3">
-                    <User className="w-4 h-4 text-gray-500" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-700">Assigned To</p>
-                      {task.assignedUser ? (
-                        <div className="flex items-center gap-2 mt-1">
-                          <Avatar className="h-6 w-6">
-                            <AvatarFallback className="bg-blue-600 text-white text-xs">
-                              {getUserInitials(task.assignedUser)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span className="text-sm text-gray-900">
-                            {task.assignedUser.firstName} {task.assignedUser.lastName}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="text-sm text-gray-500">Unassigned</span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Due Date */}
-                  {task.dueDate && (
-                    <div className="flex items-center gap-3">
-                      <Calendar className="w-4 h-4 text-gray-500" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-700">Due Date</p>
-                        <p className="text-sm text-gray-900">
-                          {format(new Date(task.dueDate), "MMM d, yyyy")}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Priority */}
-                  <div className="flex items-center gap-3">
-                    <Flag className="w-4 h-4 text-gray-500" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-700">Priority</p>
-                      <p className="text-sm text-gray-900 capitalize">{task.priority}</p>
-                    </div>
-                  </div>
-
-                  {/* Created Date */}
-                  <div className="flex items-center gap-3">
-                    <Clock className="w-4 h-4 text-gray-500" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-700">Created</p>
-                      <p className="text-sm text-gray-900">
-                        {format(new Date(task.createdAt), "MMM d, yyyy")}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Quick Actions */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Quick Actions</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {task.initiative?.keyResultId && (
-                    <Link href={`/key-results/${task.initiative.keyResultId}`}>
-                      <Button variant="outline" className="w-full justify-start">
-                        <FileText className="w-4 h-4 mr-2" />
-                        View Key Result
-                      </Button>
-                    </Link>
-                  )}
-                  
+                <div className="space-y-2">
                   <Button 
                     variant="outline" 
                     className="w-full justify-start"
                     onClick={() => {
-                      const newStatus = task.status === "completed" ? "in_progress" : "completed";
-                      handleStatusUpdate(newStatus);
+                      // Future: Open edit modal
+                      toast({
+                        title: "Edit Task",
+                        description: "Edit functionality coming soon",
+                      });
                     }}
                   >
-                    <CheckCircle2 className="w-4 h-4 mr-2" />
-                    {task.status === "completed" ? "Mark as In Progress" : "Mark as Complete"}
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit Task
                   </Button>
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Task Progress */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Progress</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Status</span>
+                    <Badge className={`${getTaskStatusColor(taskData?.status || '')} text-xs`}>
+                      {getTaskStatusLabel(taskData?.status || '')}
+                    </Badge>
+                  </div>
+                  
+                  {taskData?.status === 'completed' && (
+                    <div className="flex items-center gap-2 text-green-600">
+                      <Check className="h-4 w-4" />
+                      <span className="text-sm font-medium">Task Completed</span>
+                    </div>
+                  )}
+                  
+                  {taskData?.status === 'cancelled' && (
+                    <div className="flex items-center gap-2 text-red-600">
+                      <X className="h-4 w-4" />
+                      <span className="text-sm font-medium">Task Cancelled</span>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

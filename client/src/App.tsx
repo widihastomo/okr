@@ -88,7 +88,7 @@ function Router() {
             <Route path="/initiatives/:id" component={InitiativeDetail} />
             <Route path="/objectives/:id" component={ObjectiveDetail} />
             <Route path="/projects/:id" component={ProjectDetail} />
-            <Route path="/tasks/:taskId" component={TaskDetail} />
+            <Route path="/tasks/:id" component={TaskDetail} />
             <Route path="/cycles" component={CyclesPage} />
             <Route path="/templates" component={TemplatesPage} />
             <Route path="/users" component={UsersPage} />
