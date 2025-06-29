@@ -1,6 +1,4 @@
 
-#!/usr/bin/env node
-
 // Simple production build - ESM compatible
 import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
 import { execSync } from 'child_process';
