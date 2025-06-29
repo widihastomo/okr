@@ -1166,9 +1166,7 @@ export default function KeyResultDetailPage() {
                                       {initiative.title}
                                     </p>
                                   </Link>
-                                  {initiative.description && (
-                                    <p className="text-sm text-gray-600 mt-1">{initiative.description}</p>
-                                  )}
+                                  
                                 </div>
                               </div>
                             </TableCell>
