@@ -35,7 +35,7 @@ export default function TaskDetailPage() {
 
   // Fetch task data
   const { data: task, isLoading, error } = useQuery({
-    queryKey: ['/api/tasks', id],
+    queryKey: [`/api/tasks/${id}`],
     enabled: !!id,
   });
 

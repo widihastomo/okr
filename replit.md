@@ -172,6 +172,12 @@ Changelog:
   * Initiative progress now relies on database-stored progress values rather than task calculations
   * Enhanced initiative detail page with comprehensive key result information display
   * Maintained all core initiative functionality while removing task complexity
+- June 29, 2025. Implemented comprehensive edit initiative functionality:
+  * Added "Edit Initiative" button on initiative detail page header
+  * Connected button to open existing InitiativeModal component in edit mode
+  * Pre-fills all current initiative data (title, description, status, priority, PIC, budget, dates, members)
+  * Automatic cache invalidation refreshes page data after successful updates
+  * Seamless integration with existing modal system for consistent user experience
 - June 29, 2025. Implemented automatic initiative member cleanup on task updates:
   * Added logic to remove members when they no longer have assigned tasks
   * Checks previous task assignee when task is reassigned or unassigned

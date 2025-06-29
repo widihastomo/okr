@@ -40,6 +40,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import TaskModal from "@/components/task-modal";
+import InitiativeModal from "@/components/initiative-modal";
 
 export default function InitiativeDetailPage() {
   const { id } = useParams();
@@ -50,6 +51,9 @@ export default function InitiativeDetailPage() {
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
   const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
+  
+  // State for initiative editing
+  const [isEditInitiativeModalOpen, setIsEditInitiativeModalOpen] = useState(false);
 
   // Fetch initiative details with all related data (PIC, members, key result)
   const { data: initiative, isLoading: initiativeLoading } = useQuery({
@@ -368,7 +372,11 @@ export default function InitiativeDetailPage() {
         </Link>
         
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => setIsEditInitiativeModalOpen(true)}
+          >
             <FileText className="h-4 w-4 mr-2" />
             Edit Initiative
           </Button>
@@ -807,6 +815,21 @@ export default function InitiativeDetailPage() {
         initiativeId={id!}
         isAdding={false}
       />
+
+      {/* Edit Initiative Modal */}
+      {initiative && (
+        <InitiativeModal
+          keyResultId={(initiative as any).keyResult?.id || ""}
+          initiative={initiative}
+          open={isEditInitiativeModalOpen}
+          onClose={() => setIsEditInitiativeModalOpen(false)}
+          onSuccess={() => {
+            setIsEditInitiativeModalOpen(false);
+            // Refresh initiative data
+            queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
+          }}
+        />
+      )}
     </div>
   );
 }
