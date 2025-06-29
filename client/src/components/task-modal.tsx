@@ -328,7 +328,7 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
             <div>
               <Label htmlFor="dueDate" className="flex items-center gap-2 mb-2">
                 <Clock className="h-4 w-4" />
-                Tenggat Waktu
+                Tenggat Waktu <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="dueDate"
@@ -337,6 +337,7 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
                 onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
                 min={initiativeData?.startDate ? new Date(initiativeData.startDate).toISOString().split('T')[0] : undefined}
                 max={initiativeData?.dueDate ? new Date(initiativeData.dueDate).toISOString().split('T')[0] : undefined}
+                required
               />
             </div>
           </div>
