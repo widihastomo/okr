@@ -11,6 +11,7 @@ import {
   Users,
   Clock,
   FileText,
+  Check,
 } from "lucide-react";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
@@ -22,6 +23,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import TaskModal from "@/components/task-modal";
 
 export default function InitiativeDetailPage() {
@@ -81,6 +88,32 @@ export default function InitiativeDetailPage() {
       toast({
         title: "Gagal menghapus task",
         variant: "destructive",
+      });
+    },
+  });
+
+  const updateTaskStatusMutation = useMutation({
+    mutationFn: async ({ taskId, status }: { taskId: string; status: string }) => {
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (!response.ok) throw new Error("Failed to update task status");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/tasks`], refetchType: 'active' });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`], refetchType: 'active' });
+      toast({
+        description: "Status task berhasil diupdate",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        description: "Gagal mengupdate status task",
       });
     },
   });
@@ -405,9 +438,53 @@ export default function InitiativeDetailPage() {
                             <h4 className="font-semibold text-gray-900 text-sm cursor-pointer hover:text-blue-600">
                               {task.title}
                             </h4>
-                            <Badge className={`${getTaskStatusColor(task.status)} text-xs py-0`}>
-                              {getTaskStatusLabel(task.status)}
-                            </Badge>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Badge 
+                                  className={`${getTaskStatusColor(task.status)} text-xs py-0 cursor-pointer hover:opacity-80`}
+                                >
+                                  {getTaskStatusLabel(task.status)}
+                                </Badge>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="start">
+                                <DropdownMenuItem
+                                  onClick={() => updateTaskStatusMutation.mutate({ taskId: task.id, status: 'not_started' })}
+                                  className="cursor-pointer"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    {task.status === 'not_started' && <Check className="h-3 w-3" />}
+                                    <span>Belum Dimulai</span>
+                                  </div>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => updateTaskStatusMutation.mutate({ taskId: task.id, status: 'in_progress' })}
+                                  className="cursor-pointer"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    {task.status === 'in_progress' && <Check className="h-3 w-3" />}
+                                    <span>Sedang Dikerjakan</span>
+                                  </div>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => updateTaskStatusMutation.mutate({ taskId: task.id, status: 'completed' })}
+                                  className="cursor-pointer"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    {task.status === 'completed' && <Check className="h-3 w-3" />}
+                                    <span>Selesai</span>
+                                  </div>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => updateTaskStatusMutation.mutate({ taskId: task.id, status: 'cancelled' })}
+                                  className="cursor-pointer"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    {task.status === 'cancelled' && <Check className="h-3 w-3" />}
+                                    <span>Dibatalkan</span>
+                                  </div>
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                             <Badge className={`${getTaskPriorityColor(task.priority)} text-xs py-0`}>
                               {getTaskPriorityLabel(task.priority)}
                             </Badge>
