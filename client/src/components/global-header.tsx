@@ -27,10 +27,7 @@ export default function GlobalHeader({ onMenuToggle }: GlobalHeaderProps) {
     setIsOKRModalOpen(true);
   };
 
-  const handleCreateProject = () => {
-    // Navigate to create project page or open modal
-    console.log("Create project clicked");
-  };
+  
 
   const getUserInitials = () => {
     const firstName = (user as any)?.firstName || "";
@@ -96,15 +93,7 @@ export default function GlobalHeader({ onMenuToggle }: GlobalHeaderProps) {
           <span className="text-xs opacity-75 ml-2 hidden md:inline">Ctrl+K</span>
         </Button>
 
-        {/* Create Project Button */}
-        <Button
-          onClick={handleCreateProject}
-          variant="outline"
-          className="border-pink-300 text-pink-600 hover:bg-pink-50 px-4 py-2 rounded-lg flex items-center space-x-2"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Buat Project</span>
-        </Button>
+        
 
         {/* Notification Bell */}
         <DropdownMenu>
