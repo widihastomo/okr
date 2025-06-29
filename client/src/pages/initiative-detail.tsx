@@ -659,8 +659,12 @@ export default function InitiativeDetailPage() {
                             )}
                             {task.dueDate && (
                               <div className="flex items-center gap-1">
-                                <Calendar className="h-3 w-3" />
-                                <span>{formatDate(task.dueDate)}</span>
+                                <Calendar className={`h-3 w-3 ${
+                                  new Date(task.dueDate) < new Date() ? 'text-red-600' : ''
+                                }`} />
+                                <span className={
+                                  new Date(task.dueDate) < new Date() ? 'text-red-600 font-medium' : ''
+                                }>{formatDate(task.dueDate)}</span>
                               </div>
                             )}
                           </div>
