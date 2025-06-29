@@ -96,6 +96,11 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- June 29, 2025. Improved task modal layout with consistent 2-column design:
+  * Fixed spacing and alignment of PIC and due date fields
+  * Implemented grid layout for better space utilization
+  * Consistent label styling with icons and proper spacing
+  * Enhanced form organization and visual hierarchy
 - June 29, 2025. Removed user filtering restrictions for task assignment:
   * Removed initiative owner and member filtering from task modal
   * All system users now available for task assignment regardless of initiative membership

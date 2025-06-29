@@ -287,44 +287,45 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="assignedTo" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              PIC (Penanggung Jawab)
-            </Label>
-            <Select
-              value={formData.assignedTo || "none"}
-              onValueChange={(value) => setFormData({ ...formData, assignedTo: value === "none" ? "" : value })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">Tidak ada</SelectItem>
-                {availableUsers.map((user: any) => (
-                  <SelectItem key={user.id} value={user.id}>
-                    {`${user.firstName} ${user.lastName}`}
-                    {picId === user.id && " (PIC Initiative)"}
-                  </SelectItem>
-                ))}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="assignedTo" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                PIC (Penanggung Jawab)
+              </Label>
+              <Select
+                value={formData.assignedTo || "none"}
+                onValueChange={(value) => setFormData({ ...formData, assignedTo: value === "none" ? "" : value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Tidak ada</SelectItem>
+                  {availableUsers.map((user: any) => (
+                    <SelectItem key={user.id} value={user.id}>
+                      {`${user.firstName} ${user.lastName}`}
+                      {picId === user.id && " (PIC Initiative)"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="dueDate" className="flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              Tenggat Waktu
-            </Label>
-            <Input
-              id="dueDate"
-              type="date"
-              value={formData.dueDate}
-              onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-              min={initiativeData?.startDate ? new Date(initiativeData.startDate).toISOString().split('T')[0] : undefined}
-              max={initiativeData?.dueDate ? new Date(initiativeData.dueDate).toISOString().split('T')[0] : undefined}
-            />
+            <div>
+              <Label htmlFor="dueDate" className="flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Tenggat Waktu
+              </Label>
+              <Input
+                id="dueDate"
+                type="date"
+                value={formData.dueDate}
+                onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                min={initiativeData?.startDate ? new Date(initiativeData.startDate).toISOString().split('T')[0] : undefined}
+                max={initiativeData?.dueDate ? new Date(initiativeData.dueDate).toISOString().split('T')[0] : undefined}
+              />
+            </div>
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t">
