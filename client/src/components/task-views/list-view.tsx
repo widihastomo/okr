@@ -209,13 +209,7 @@ export default function ListView({ tasks, onEditTask, onDeleteTask, userId }: Li
                 {task.title}
               </h4>
             </Link>
-            {task.initiative && (
-              <Link href={`/initiatives/${task.initiative.id}`}>
-                <span className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 cursor-pointer mt-1">
-                  📋 {task.initiative.title}
-                </span>
-              </Link>
-            )}
+            
           </div>
 
           {/* Status */}
