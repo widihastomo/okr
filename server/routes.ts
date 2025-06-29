@@ -332,7 +332,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/teams', async (req, res) => {
     try {
       const teams = await storage.getTeams();
-      res.json(teams);
+      // Include member data for each team
+      const teamsWithMembers = await Promise.all(teams.map(async (team) => {
+        const members = await storage.getTeamMembers(team.id);
+        return {
+          ...team,
+          members: members
+        };
+      }));
+      res.json(teamsWithMembers);
     } catch (error) {
       console.error("Error fetching teams:", error);
       res.status(500).json({ message: "Failed to fetch teams" });
@@ -554,8 +562,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = createOKRSchema.parse(req.body);
       console.log("Validated data:", JSON.stringify(validatedData, null, 2));
       
+      // If ownerType is team, set teamId to ownerId
+      const objectiveData = {
+        ...validatedData.objective,
+        teamId: validatedData.objective.ownerType === 'team' ? validatedData.objective.ownerId : null
+      };
+      
       // Create objective
-      const objective = await storage.createObjective(validatedData.objective);
+      const objective = await storage.createObjective(objectiveData);
       console.log("Created objective:", objective);
       
       // Create key results
@@ -608,9 +622,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Validated update data:", JSON.stringify(validatedData, null, 2));
       
       // Convert teamId to string if provided
+      // If ownerType is team, set teamId to ownerId
       const objectiveUpdate = {
         ...validatedData.objective,
-        teamId: validatedData.objective.teamId ? validatedData.objective.teamId.toString() : undefined,
+        teamId: validatedData.objective.ownerType === 'team' && validatedData.objective.ownerId 
+          ? validatedData.objective.ownerId 
+          : (validatedData.objective.ownerType === 'user' ? null : validatedData.objective.teamId),
         parentId: validatedData.objective.parentId ? validatedData.objective.parentId.toString() : undefined
       };
 
