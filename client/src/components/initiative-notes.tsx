@@ -57,6 +57,24 @@ interface InitiativeNotesProps {
   initiativeId: string;
 }
 
+// Define types for initiative notes
+interface InitiativeNote {
+  id: string;
+  type: string;
+  title: string;
+  content: string;
+  budgetAmount?: number;
+  budgetCategory?: string;
+  createdBy: string;
+  createdAt: string;
+  createdByUser?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+}
+
 const noteTypeConfig = {
   update: { label: "Update", icon: FileText, color: "bg-blue-100 text-blue-800" },
   budget: { label: "Budget", icon: DollarSign, color: "bg-green-100 text-green-800" },
@@ -99,7 +117,7 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
   });
 
   // Type the notes data properly
-  const typedNotes = Array.isArray(notes) ? notes : [];
+  const typedNotes = Array.isArray(notes) ? notes as InitiativeNote[] : [];
 
   // Create note mutation
   const createNoteMutation = useMutation({
@@ -114,9 +132,11 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
       setIsCreateOpen(false);
       resetForm();
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("Error creating note:", error);
       toast({
         title: "Gagal menambahkan catatan",
+        description: error?.message || "Terjadi kesalahan yang tidak diketahui",
         variant: "destructive",
       });
     },
@@ -135,9 +155,11 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
       setEditingNote(null);
       resetForm();
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("Error updating note:", error);
       toast({
         title: "Gagal memperbarui catatan",
+        description: error?.message || "Terjadi kesalahan yang tidak diketahui",
         variant: "destructive",
       });
     },
@@ -155,9 +177,11 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
       });
       setDeleteNoteId(null);
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("Error deleting note:", error);
       toast({
         title: "Gagal menghapus catatan",
+        description: error?.message || "Terjadi kesalahan yang tidak diketahui",
         variant: "destructive",
       });
     },
@@ -203,11 +227,11 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
 
   const handleEdit = (note: any) => {
     setNoteForm({
-      type: note.type,
-      title: note.title,
-      content: note.content,
-      budgetAmount: note.budgetAmount ? note.budgetAmount.toString() : "",
-      budgetCategory: note.budgetCategory || "",
+      type: note?.type || "update",
+      title: note?.title || "",
+      content: note?.content || "",
+      budgetAmount: note?.budgetAmount ? note.budgetAmount.toString() : "",
+      budgetCategory: note?.budgetCategory || "",
     });
     setEditingNote(note);
     setIsCreateOpen(true);
@@ -273,15 +297,17 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
             </p>
           ) : (
             <div className="space-y-4">
-              {typedNotes.map((note: any) => {
-                const config = noteTypeConfig[note.type as keyof typeof noteTypeConfig];
+              {typedNotes.map((note: InitiativeNote, index: number) => {
+                if (!note) return null;
+                const config = noteTypeConfig[note.type as keyof typeof noteTypeConfig] || noteTypeConfig.general;
                 const Icon = config.icon;
-                const isExpanded = expandedNotes.has(note.id);
+                const noteId = note.id || `note-${index}`;
+                const isExpanded = expandedNotes.has(noteId);
                 const isOwner = user?.id === note.createdBy;
 
                 return (
                   <div
-                    key={note.id}
+                    key={noteId || Math.random()}
                     className="border rounded-lg p-4 hover:shadow-sm transition-shadow"
                   >
                     <div className="flex items-start justify-between mb-2">
@@ -297,13 +323,13 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
                             </Badge>
                           </div>
                           
-                          <div className={`text-sm text-gray-600 ${!isExpanded && note.content.length > 200 ? 'line-clamp-3' : ''}`}>
+                          <div className={`text-sm text-gray-600 ${!isExpanded && (note.content?.length > 200) ? 'line-clamp-3' : ''}`}>
                             {note.content}
                           </div>
                           
-                          {note.content.length > 200 && (
+                          {(note.content?.length > 200) && (
                             <button
-                              onClick={() => toggleNoteExpansion(note.id)}
+                              onClick={() => toggleNoteExpansion(noteId)}
                               className="text-blue-600 text-sm mt-1 flex items-center gap-1 hover:text-blue-700"
                             >
                               {isExpanded ? (
@@ -344,7 +370,7 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
                             </span>
                             <span>•</span>
                             <span>
-                              {format(new Date(note.createdAt), "d MMMM yyyy HH:mm", { locale: idLocale })}
+                              {note.createdAt && format(new Date(note.createdAt), "d MMMM yyyy HH:mm", { locale: idLocale })}
                             </span>
                           </div>
                         </div>
@@ -362,7 +388,7 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => setDeleteNoteId(note.id)}
+                            onClick={() => setDeleteNoteId(noteId)}
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
