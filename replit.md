@@ -96,6 +96,13 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- June 29, 2025. Implemented automatic initiative member addition for task assignments:
+  * Added functionality to automatically add assigned users as initiative members
+  * Enhanced task creation and update endpoints to check existing membership before adding
+  * Implemented toast notifications to inform users when someone is automatically added as member
+  * Created dual toast system: success for task operation + info for member addition
+  * Backend validates membership to prevent duplicates and maintains data integrity
+  * Updated both POST (create) and PUT (update) task endpoints with member addition logic
 - June 29, 2025. Fixed user dropdown in task modal for adding and editing tasks:
   * Resolved issue where user list was not appearing in task assignment dropdown
   * Fixed filtering logic to properly access nested user data from initiative members

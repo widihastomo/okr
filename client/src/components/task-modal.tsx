@@ -103,13 +103,30 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
       if (!response.ok) throw new Error("Failed to create task");
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/tasks`] });
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}`] });
+      
+      // Show success toast for task creation
       toast({
         title: "Task berhasil dibuat",
         className: "border-green-200 bg-green-50 text-green-800",
       });
+      
+      // Show additional toast if user was automatically added as member
+      if (data.addedAsMember) {
+        const assignedUser = availableUsers.find(u => u.id === formData.assignedTo);
+        const userName = assignedUser ? `${assignedUser.firstName} ${assignedUser.lastName}` : "User";
+        
+        setTimeout(() => {
+          toast({
+            title: "Member baru ditambahkan",
+            description: `${userName} otomatis ditambahkan sebagai member initiative`,
+            className: "border-blue-200 bg-blue-50 text-blue-800",
+          });
+        }, 500);
+      }
+      
       onClose();
     },
     onError: () => {
@@ -123,20 +140,37 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
   const updateMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await fetch(`/api/tasks/${task.id}`, {
-        method: "PATCH",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
       if (!response.ok) throw new Error("Failed to update task");
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/tasks`] });
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}`] });
+      
+      // Show success toast for task update
       toast({
         title: "Task berhasil diupdate",
         className: "border-green-200 bg-green-50 text-green-800",
       });
+      
+      // Show additional toast if user was automatically added as member
+      if (data.addedAsMember) {
+        const assignedUser = availableUsers.find(u => u.id === formData.assignedTo);
+        const userName = assignedUser ? `${assignedUser.firstName} ${assignedUser.lastName}` : "User";
+        
+        setTimeout(() => {
+          toast({
+            title: "Member baru ditambahkan",
+            description: `${userName} otomatis ditambahkan sebagai member initiative`,
+            className: "border-blue-200 bg-blue-50 text-blue-800",
+          });
+        }, 500);
+      }
+      
       onClose();
     },
     onError: () => {

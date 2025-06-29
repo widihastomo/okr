@@ -1008,7 +1008,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Task not found" });
       }
       
-      res.json(updatedTask);
+      // Auto-add assigned user as initiative member if not already a member
+      let addedAsMember = false;
+      if (updatedTask.assignedTo && updatedTask.initiativeId) {
+        try {
+          // Check if user is already a member
+          const existingMembers = await storage.getInitiativeMembers(updatedTask.initiativeId);
+          const isAlreadyMember = existingMembers.some(member => 
+            member.userId === updatedTask.assignedTo || member.user?.id === updatedTask.assignedTo
+          );
+          
+          if (!isAlreadyMember) {
+            // Add user as initiative member
+            await storage.createInitiativeMember({
+              initiativeId: updatedTask.initiativeId,
+              userId: updatedTask.assignedTo,
+              role: "member"
+            });
+            addedAsMember = true;
+          }
+        } catch (error) {
+          console.error("Error adding user as initiative member:", error);
+        }
+      }
+      
+      res.json({ task: updatedTask, addedAsMember });
     } catch (error) {
       console.error("Error updating task:", error);
       res.status(500).json({ message: "Failed to update task" });
@@ -1376,7 +1400,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const task = await storage.createTask(result.data);
-      res.status(201).json(task);
+      
+      // Auto-add assigned user as initiative member if not already a member
+      let addedAsMember = false;
+      if (task.assignedTo && task.initiativeId) {
+        try {
+          // Check if user is already a member
+          const existingMembers = await storage.getInitiativeMembers(task.initiativeId);
+          const isAlreadyMember = existingMembers.some(member => 
+            member.userId === task.assignedTo || member.user?.id === task.assignedTo
+          );
+          
+          if (!isAlreadyMember) {
+            // Add user as initiative member
+            await storage.createInitiativeMember({
+              initiativeId: task.initiativeId,
+              userId: task.assignedTo,
+              role: "member"
+            });
+            addedAsMember = true;
+          }
+        } catch (error) {
+          console.error("Error adding user as initiative member:", error);
+        }
+      }
+      
+      res.status(201).json({ task, addedAsMember });
     } catch (error) {
       console.error("Error creating task:", error);
       res.status(500).json({ message: "Failed to create task" });
