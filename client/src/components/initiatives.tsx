@@ -9,9 +9,13 @@ import { Building2, Calendar, Flag, TrendingUp, Users, Plus } from "lucide-react
 import { format } from "date-fns";
 import { Link } from "wouter";
 import InitiativeModal from "@/components/initiative-modal";
-import type { Initiative, KeyResult } from "@shared/schema";
+import type { Initiative, KeyResult, User } from "@shared/schema";
 
-export default function Initiatives() {
+interface InitiativesProps {
+  userFilter?: string;
+}
+
+export default function Initiatives({ userFilter }: InitiativesProps) {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -26,11 +30,33 @@ export default function Initiatives() {
     queryKey: ['/api/key-results'],
   });
 
-  // Filter initiatives based on status and priority
+  // Fetch initiative members data
+  const { data: initiativeMembers = [] } = useQuery<any[]>({
+    queryKey: ['/api/initiative-members'],
+  });
+
+  // Filter initiatives based on status, priority, and user
   const filteredInitiatives = initiatives.filter(initiative => {
     const statusMatch = statusFilter === "all" || initiative.status === statusFilter;
     const priorityMatch = priorityFilter === "all" || initiative.priority === priorityFilter;
-    return statusMatch && priorityMatch;
+    
+    // User filter - show initiatives where:
+    // 1. No user filter applied (show all)
+    // 2. User is the PIC (owner)
+    // 3. User is a member of the initiative
+    let userMatch = true;
+    if (userFilter && userFilter !== 'all') {
+      // Check if user is the PIC
+      if (initiative.picId === userFilter) {
+        userMatch = true;
+      } else {
+        // Check if user is a member
+        const members = initiativeMembers.filter((m: any) => m.initiativeId === initiative.id);
+        userMatch = members.some((m: any) => m.userId === userFilter);
+      }
+    }
+    
+    return statusMatch && priorityMatch && userMatch;
   });
 
   // Helper function to get key result title

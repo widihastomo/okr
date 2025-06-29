@@ -418,7 +418,7 @@ export default function Dashboard() {
         </TabsContent>
         
         <TabsContent value="initiatives" className="mt-6">
-          <Initiatives />
+          <Initiatives userFilter={userFilter} />
         </TabsContent>
         
         <TabsContent value="my-tasks" className="mt-6">
