@@ -96,6 +96,15 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- June 29, 2025. Completely removed task management functionality from initiative system:
+  * Eliminated all task-related code from initiative creation and editing forms
+  * Removed TaskModal component and all task CRUD operations from initiative detail page
+  * Cleaned up initiative modal to focus purely on initiative information and team assignment
+  * Streamlined initiative detail page to show overview, key result information, and team members only
+  * Removed task state management, mutations, and UI components for simplified user experience
+  * Initiative progress now relies on database-stored progress values rather than task calculations
+  * Enhanced initiative detail page with comprehensive key result information display
+  * Maintained all core initiative functionality while removing task complexity
 - June 29, 2025. Implemented automatic initiative member cleanup on task updates:
   * Added logic to remove members when they no longer have assigned tasks
   * Checks previous task assignee when task is reassigned or unassigned

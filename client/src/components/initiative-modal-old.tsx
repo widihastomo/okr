@@ -62,6 +62,7 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
   const [open, setOpen] = useState(false);
   const [memberDropdownOpen, setMemberDropdownOpen] = useState(false);
   const [memberSearchTerm, setMemberSearchTerm] = useState("");
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -86,7 +87,7 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
       budget: actualEditingInitiative.budget || "",
       startDate: actualEditingInitiative.startDate ? new Date(actualEditingInitiative.startDate).toISOString().split('T')[0] : "",
       dueDate: actualEditingInitiative.dueDate ? new Date(actualEditingInitiative.dueDate).toISOString().split('T')[0] : "",
-      members: actualEditingInitiative.members?.map((m: any) => typeof m === 'string' ? m : m.userId || m.id) || [],
+      members: actualEditingInitiative.members?.map((m: any) => m.userId || m.user?.id || m.id) || [],
     } : {
       title: "",
       description: "",
@@ -103,10 +104,12 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
   // Handle modal state for editing
   useEffect(() => {
     if (externalOpen !== undefined) {
+      // If external open prop is provided, use it
       setOpen(externalOpen);
     } else if (actualEditingInitiative) {
       setOpen(true);
     } else if (onClose) {
+      // If we have onClose prop, we're being controlled externally
       setOpen(true);
     } else {
       setOpen(false);
@@ -116,9 +119,14 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
   // Reset form when editing initiative changes
   useEffect(() => {
     if (editingInitiative && form) {
+      // Extract member IDs from the members array
       const memberIds = editingInitiative.members?.map((m: any) => {
+        // Handle different member data structures
         if (typeof m === 'string') return m;
-        return m.userId || m.id;
+        if (m.userId) return m.userId;
+        if (m.user?.id) return m.user.id;
+        if (m.id && !m.initiativeId) return m.id; // Only use m.id if it's not the member record ID
+        return null;
       }).filter(Boolean) || [];
 
       form.reset({
@@ -255,6 +263,8 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
     }
   };
 
+
+
   return (
     <Sheet open={open} onOpenChange={handleClose}>
       <SheetContent className="w-full sm:w-[800px] sm:max-w-[800px] overflow-y-auto">
@@ -278,11 +288,12 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-700">
-                        Judul Initiative *
-                      </FormLabel>
+                      <FormLabel>Judul Initiative</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Masukkan judul initiative" />
+                        <Input 
+                          placeholder="Masukkan judul initiative"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -295,14 +306,12 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-700">
-                        Deskripsi
-                      </FormLabel>
+                      <FormLabel>Deskripsi</FormLabel>
                       <FormControl>
                         <Textarea 
-                          {...field} 
-                          placeholder="Jelaskan tujuan dan ruang lingkup initiative"
+                          placeholder="Deskripsi initiative"
                           className="min-h-[80px]"
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
@@ -310,28 +319,26 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
                   )}
                 />
 
-                {/* Status and Priority */}
+                {/* Status and Priority Row */}
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="status"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-medium text-gray-700">
-                          Status
-                        </FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <FormLabel>Status</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Pilih status" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="not_started">Belum Dimulai</SelectItem>
-                            <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
-                            <SelectItem value="completed">Selesai</SelectItem>
-                            <SelectItem value="on_hold">Ditahan</SelectItem>
-                            <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                            <SelectItem value="not_started">{getStatusLabel("not_started")}</SelectItem>
+                            <SelectItem value="in_progress">{getStatusLabel("in_progress")}</SelectItem>
+                            <SelectItem value="completed">{getStatusLabel("completed")}</SelectItem>
+                            <SelectItem value="on_hold">{getStatusLabel("on_hold")}</SelectItem>
+                            <SelectItem value="cancelled">{getStatusLabel("cancelled")}</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -344,20 +351,38 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
                     name="priority"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-medium text-gray-700">
-                          Prioritas
-                        </FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <FormLabel>Prioritas</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Pilih prioritas" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="low">Rendah</SelectItem>
-                            <SelectItem value="medium">Sedang</SelectItem>
-                            <SelectItem value="high">Tinggi</SelectItem>
-                            <SelectItem value="critical">Kritis</SelectItem>
+                            <SelectItem value="low">
+                              <div className="flex items-center gap-2">
+                                <Flag className="h-4 w-4 text-gray-500" />
+                                {getPriorityLabel("low")}
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="medium">
+                              <div className="flex items-center gap-2">
+                                <Flag className="h-4 w-4 text-yellow-500" />
+                                {getPriorityLabel("medium")}
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="high">
+                              <div className="flex items-center gap-2">
+                                <Flag className="h-4 w-4 text-red-500" />
+                                {getPriorityLabel("high")}
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="critical">
+                              <div className="flex items-center gap-2">
+                                <Flag className="h-4 w-4 text-red-600" />
+                                {getPriorityLabel("critical")}
+                              </div>
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -366,18 +391,68 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
                   />
                 </div>
 
-                {/* Dates and Budget */}
-                <div className="grid grid-cols-3 gap-4">
+                {/* PIC and Budget Row */}
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="picId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <User className="h-4 w-4" />
+                          PIC (Penanggung Jawab)
+                        </FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih PIC" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="none">Tidak ada</SelectItem>
+                            {users.map((user: any) => (
+                              <SelectItem key={user.id} value={user.id}>
+                                {`${user.firstName} ${user.lastName}`}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="budget"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Budget (Rp)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="10000000"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Date Range */}
+                <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="startDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-medium text-gray-700">
-                          Tanggal Mulai
-                        </FormLabel>
+                        <FormLabel>Tanggal Mulai</FormLabel>
                         <FormControl>
-                          <Input {...field} type="date" />
+                          <Input 
+                            type="date"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -389,70 +464,18 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
                     name="dueDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-medium text-gray-700">
-                          Tenggat Waktu
-                        </FormLabel>
+                        <FormLabel>Tenggat Waktu</FormLabel>
                         <FormControl>
-                          <Input {...field} type="date" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="budget"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm font-medium text-gray-700">
-                          Budget (Rp)
-                        </FormLabel>
-                        <FormControl>
-                          <Input {...field} type="number" placeholder="0" />
+                          <Input 
+                            type="date"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-              </div>
-
-              {/* Team Assignment Section */}
-              <div className="bg-blue-50 p-4 rounded-lg space-y-4">
-                <h3 className="font-medium text-gray-900 flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  Tim & Penanggung Jawab
-                </h3>
-
-                {/* PIC Selection */}
-                <FormField
-                  control={form.control}
-                  name="picId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-700">
-                        PIC (Person in Charge)
-                      </FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih PIC" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="none">Tidak ada PIC</SelectItem>
-                          {users.map((user) => (
-                            <SelectItem key={user.id} value={user.id}>
-                              {`${user.firstName} ${user.lastName}`}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
 
                 {/* Members Selection */}
                 <FormField
@@ -460,95 +483,114 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
                   name="members"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-700 mb-2">
+                      <FormLabel className="flex items-center gap-2">
+                        <Users className="h-4 w-4" />
                         Anggota Tim
                       </FormLabel>
-                      <div className="space-y-2">
+                      <FormControl>
                         <div className="relative">
-                          <Button
+                          {/* Dropdown Trigger */}
+                          <button
                             type="button"
-                            variant="outline"
                             onClick={() => setMemberDropdownOpen(!memberDropdownOpen)}
-                            className="w-full justify-between"
+                            className="w-full border rounded-md px-3 py-2 text-left bg-white flex items-center justify-between hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                           >
-                            <span className="flex items-center gap-2">
-                              <Users className="h-4 w-4" />
-                              {field.value && field.value.length > 0 
-                                ? `${field.value.length} anggota dipilih`
+                            <span className="text-sm">
+                              {field.value && field.value.length > 0
+                                ? `${field.value.length} anggota terpilih`
                                 : "Pilih anggota tim"
                               }
                             </span>
-                            <ChevronDown className="h-4 w-4" />
-                          </Button>
+                            <ChevronDown className="h-4 w-4 text-gray-400" />
+                          </button>
 
+                          {/* Dropdown Content */}
                           {memberDropdownOpen && (
-                            <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                              <div className="p-2 border-b">
+                            <div className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg">
+                              {/* Search Box */}
+                              <div className="p-3 border-b">
                                 <div className="relative">
-                                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
-                                  <Input
-                                    placeholder="Cari anggota..."
+                                  <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                  <input
+                                    type="text"
+                                    placeholder="Search"
                                     value={memberSearchTerm}
                                     onChange={(e) => setMemberSearchTerm(e.target.value)}
-                                    className="pl-8"
+                                    className="w-full pl-10 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                                   />
                                 </div>
                               </div>
-                              <div className="p-2 space-y-1">
+
+                              {/* Options List */}
+                              <div className="max-h-48 overflow-y-auto">
+                                {/* Select All Option */}
+                                <div className="flex items-center space-x-2 px-3 py-2 hover:bg-gray-50">
+                                  <Checkbox
+                                    id="select-all"
+                                    checked={field.value?.length === filteredUsers.length && filteredUsers.length > 0}
+                                    onCheckedChange={(checked: boolean) => {
+                                      if (checked) {
+                                        field.onChange(filteredUsers.map(user => user.id));
+                                      } else {
+                                        field.onChange([]);
+                                      }
+                                    }}
+                                  />
+                                  <label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
+                                    All
+                                  </label>
+                                </div>
+
+                                {/* User Options */}
                                 {filteredUsers.map((user) => (
-                                  <div key={user.id} className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded">
+                                  <div key={user.id} className="flex items-center space-x-2 px-3 py-2 hover:bg-gray-50">
                                     <Checkbox
-                                      id={user.id}
+                                      id={`member-${user.id}`}
                                       checked={field.value?.includes(user.id) || false}
-                                      onCheckedChange={(checked) => {
-                                        const currentMembers = field.value || [];
+                                      onCheckedChange={(checked: boolean) => {
                                         if (checked) {
-                                          field.onChange([...currentMembers, user.id]);
+                                          field.onChange([...(field.value || []), user.id]);
                                         } else {
-                                          field.onChange(currentMembers.filter(id => id !== user.id));
+                                          field.onChange(
+                                            field.value?.filter((id: string) => id !== user.id) || []
+                                          );
                                         }
                                       }}
                                     />
-                                    <label htmlFor={user.id} className="text-sm font-medium cursor-pointer">
+                                    <label 
+                                      htmlFor={`member-${user.id}`}
+                                      className="text-sm cursor-pointer flex-1"
+                                    >
                                       {`${user.firstName} ${user.lastName}`}
                                     </label>
                                   </div>
                                 ))}
+
+                                {filteredUsers.length === 0 && (
+                                  <div className="px-3 py-2 text-sm text-gray-500">
+                                    Tidak ada hasil ditemukan
+                                  </div>
+                                )}
                               </div>
                             </div>
                           )}
-                        </div>
 
-                        {/* Selected Members Display */}
-                        {field.value && field.value.length > 0 && (
-                          <div className="flex flex-wrap gap-2 mt-2">
-                            {field.value.map((memberId: string) => {
-                              const user = users.find(u => u.id === memberId);
-                              return user ? (
-                                <div key={memberId} className="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
-                                  <User className="h-3 w-3" />
-                                  {`${user.firstName} ${user.lastName}`}
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      const newMembers = field.value?.filter(id => id !== memberId) || [];
-                                      field.onChange(newMembers);
-                                    }}
-                                    className="ml-1 hover:text-blue-600"
-                                  >
-                                    <X className="h-3 w-3" />
-                                  </button>
-                                </div>
-                              ) : null;
-                            })}
-                          </div>
-                        )}
-                      </div>
+                          {/* Click outside to close */}
+                          {memberDropdownOpen && (
+                            <div
+                              className="fixed inset-0 z-40"
+                              onClick={() => setMemberDropdownOpen(false)}
+                            />
+                          )}
+                        </div>
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
+
+
 
               {/* Submit Button */}
               <div className="flex justify-end gap-3 pt-4 border-t">

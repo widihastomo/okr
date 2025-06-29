@@ -1,49 +1,29 @@
-import { useParams, Link } from "wouter";
+import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft,
   Calendar,
-  Flag,
   DollarSign,
+  Flag,
+  Target,
   User,
   Users,
-  CheckCircle2,
   Clock,
   FileText,
-  MessageSquare,
-  Paperclip,
-  Edit,
-  Trash2,
-  Plus,
 } from "lucide-react";
+import { Link } from "wouter";
+
+// UI Components
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
-import TaskModal from "@/components/task-modal";
-import { DeleteConfirmationModal } from "@/components/delete-confirmation-modal";
-import { useMutation } from "@tanstack/react-query";
-import { queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { MoreVertical } from "lucide-react";
 
 export default function InitiativeDetailPage() {
   const { id } = useParams();
-  const { toast } = useToast();
-  const [selectedTask, setSelectedTask] = useState<any>(null);
-  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-  const [deletingTask, setDeletingTask] = useState<any>(null);
-  const [isAddingTask, setIsAddingTask] = useState(false);
 
-  // Fetch initiative details with all related data (PIC, members, tasks, documents)
+  // Fetch initiative details with all related data (PIC, members, key result)
   const { data: initiative, isLoading: initiativeLoading } = useQuery({
     queryKey: [`/api/initiatives/${id}`],
     enabled: !!id,
@@ -51,58 +31,9 @@ export default function InitiativeDetailPage() {
 
   // Extract data from the comprehensive initiative object with proper typing
   const initiativeData = initiative as any;
-  const tasks = initiativeData?.tasks || [];
   const members = initiativeData?.members || [];
   const pic = initiativeData?.pic;
-
-  // Delete task mutation
-  const deleteTaskMutation = useMutation({
-    mutationFn: async (taskId: string) => {
-      const response = await fetch(`/api/tasks/${taskId}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) throw new Error("Failed to delete task");
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
-      toast({
-        title: "Task berhasil dihapus",
-        className: "border-green-200 bg-green-50 text-green-800",
-      });
-      setDeletingTask(null);
-    },
-    onError: () => {
-      toast({
-        title: "Gagal menghapus task",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Update task status mutation
-  const updateTaskStatusMutation = useMutation({
-    mutationFn: async ({
-      taskId,
-      status,
-    }: {
-      taskId: string;
-      status: string;
-    }) => {
-      const response = await fetch(`/api/tasks/${taskId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
-      if (!response.ok) throw new Error("Failed to update task");
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
-      toast({
-        title: "Status task berhasil diupdate",
-        className: "border-green-200 bg-green-50 text-green-800",
-      });
-    },
-  });
+  const keyResult = initiativeData?.keyResult;
 
   if (initiativeLoading) {
     return (
@@ -112,10 +43,10 @@ export default function InitiativeDetailPage() {
     );
   }
 
-  if (!initiative) {
+  if (!initiativeData) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-gray-500">Initiative not found</div>
+        <div className="text-red-500">Initiative not found</div>
       </div>
     );
   }
@@ -123,117 +54,105 @@ export default function InitiativeDetailPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 text-green-800 border-green-200";
       case "in_progress":
-        return "bg-blue-100 text-blue-800";
+        return "bg-blue-100 text-blue-800 border-blue-200";
       case "on_hold":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "cancelled":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
+        return "bg-red-100 text-red-800 border-red-200";
       case "not_started":
-        return "Belum Dimulai";
-      case "in_progress":
-        return "Sedang Berjalan";
-      case "completed":
-        return "Selesai";
-      case "on_hold":
-        return "Ditahan";
-      case "cancelled":
-        return "Dibatalkan";
+        return "bg-gray-100 text-gray-800 border-gray-200";
       default:
-        return status;
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "critical":
-        return "text-red-600";
+        return "bg-red-100 text-red-800 border-red-200";
       case "high":
-        return "text-red-500";
+        return "bg-orange-100 text-orange-800 border-orange-200";
       case "medium":
-        return "text-yellow-500";
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "low":
-        return "text-gray-500";
+        return "bg-green-100 text-green-800 border-green-200";
       default:
-        return "text-gray-500";
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "not_started": return "Belum Dimulai";
+      case "in_progress": return "Sedang Berjalan";
+      case "completed": return "Selesai";
+      case "on_hold": return "Ditahan";
+      case "cancelled": return "Dibatalkan";
+      default: return status;
     }
   };
 
   const getPriorityLabel = (priority: string) => {
     switch (priority) {
-      case "low":
-        return "Rendah";
-      case "medium":
-        return "Sedang";
-      case "high":
-        return "Tinggi";
-      case "critical":
-        return "Kritis";
-      default:
-        return priority;
+      case "low": return "Rendah";
+      case "medium": return "Sedang";
+      case "high": return "Tinggi";
+      case "critical": return "Kritis";
+      default: return priority;
     }
   };
 
-  const getTaskStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "bg-green-100 text-green-800";
-      case "in_progress":
-        return "bg-blue-100 text-blue-800";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+  const formatCurrency = (amount: string | number | null) => {
+    if (!amount) return "Tidak ada budget";
+    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(numAmount);
+  };
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return "Tidak ditentukan";
+    try {
+      return new Date(dateString).toLocaleDateString('id-ID', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      return "Tanggal tidak valid";
     }
   };
 
-  const getTaskStatusLabel = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "Menunggu";
-      case "in_progress":
-        return "Sedang Dikerjakan";
-      case "completed":
-        return "Selesai";
-      default:
-        return status;
-    }
+  const calculateProgress = () => {
+    // Since we removed task management, we'll use the progress from the database
+    return initiativeData.progress || 0;
   };
-
-  const completedTasks = tasks.filter(
-    (task: any) => task.status === "completed",
-  );
-  const progressPercentage =
-    tasks.length > 0
-      ? Math.round((completedTasks.length / tasks.length) * 100)
-      : 0;
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="mb-6">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => window.history.back()}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </Button>
-
-
+      <div className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Link href="/dashboard?tab=initiatives">
+              <Button variant="ghost" size="sm">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Kembali ke Dashboard
+              </Button>
+            </Link>
+            <div className="text-sm text-gray-500">
+              Dashboard &gt; Initiatives &gt; {initiativeData.title}
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Overview Card */}
@@ -252,391 +171,205 @@ export default function InitiativeDetailPage() {
                     {getStatusLabel(initiativeData.status)}
                   </Badge>
                 </div>
-                {initiativeData.description && (
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    {initiativeData.description}
-                  </p>
-                )}
-              </div>
-
-              <Separator />
-
-              {/* Progress */}
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Progress</span>
-                  <span className="text-sm text-gray-600">
-                    {progressPercentage}%
-                  </span>
-                </div>
-                <Progress value={progressPercentage} className="h-2" />
-                <p className="text-xs text-gray-500 mt-1">
-                  {completedTasks.length} dari {tasks.length} task selesai
+                <p className="text-gray-600 text-sm">
+                  {initiativeData.description || "Tidak ada deskripsi"}
                 </p>
               </div>
 
               <Separator />
 
-              {/* Details Grid */}
+              {/* Priority and Budget */}
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                    <Calendar className="h-4 w-4" />
-                    Tanggal Mulai
-                  </div>
-                  <p className="font-medium">
-                    {initiativeData.startDate
-                      ? new Date(initiativeData.startDate).toLocaleDateString(
-                          "id-ID",
-                        )
-                      : "-"}
-                  </p>
-                </div>
-
-                <div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                    <Calendar className="h-4 w-4" />
-                    Tenggat Waktu
-                  </div>
-                  <p className="font-medium">
-                    {initiativeData.dueDate
-                      ? new Date(initiativeData.dueDate).toLocaleDateString(
-                          "id-ID",
-                        )
-                      : "-"}
-                  </p>
-                </div>
-
-                <div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                    <Flag
-                      className={`h-4 w-4 ${getPriorityColor(initiativeData.priority)}`}
-                    />
-                    Prioritas
-                  </div>
-                  <p className="font-medium">
+                <div className="flex items-center space-x-2">
+                  <Flag className="h-4 w-4 text-gray-500" />
+                  <span className="text-sm text-gray-600">Prioritas:</span>
+                  <Badge className={getPriorityColor(initiativeData.priority)}>
                     {getPriorityLabel(initiativeData.priority)}
-                  </p>
+                  </Badge>
                 </div>
-
-                <div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                    <DollarSign className="h-4 w-4" />
-                    Budget
-                  </div>
-                  <p className="font-medium">
-                    {initiativeData.budget
-                      ? `Rp ${parseInt(initiativeData.budget).toLocaleString("id-ID")}`
-                      : "-"}
-                  </p>
+                <div className="flex items-center space-x-2">
+                  <DollarSign className="h-4 w-4 text-gray-500" />
+                  <span className="text-sm text-gray-600">Budget:</span>
+                  <span className="text-sm font-medium">
+                    {formatCurrency(initiativeData.budget)}
+                  </span>
                 </div>
               </div>
 
-              <Separator />
-
-              {/* Key Result Information */}
-              {initiativeData.keyResult && (
-                <div>
-                  <p className="text-sm text-gray-600 mb-3">Key Result Terkait</p>
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <Link
-                          href={`/key-result/${initiativeData.keyResultId}`}
-                          className="text-blue-600 hover:text-blue-700 hover:underline font-medium"
-                        >
-                          {initiativeData.keyResult.title}
-                        </Link>
-                        {initiativeData.keyResult.description && (
-                          <p className="text-sm text-gray-600 mt-1">
-                            {initiativeData.keyResult.description}
-                          </p>
-                        )}
-                        <div className="flex items-center gap-4 mt-3 text-sm">
-                          <div className="flex items-center gap-1">
-                            <span className="text-gray-500">Progress:</span>
-                            <span className="font-medium">
-                              {Math.round(((Number(initiativeData.keyResult.currentValue) - Number(initiativeData.keyResult.baseValue || 0)) / 
-                                (Number(initiativeData.keyResult.targetValue) - Number(initiativeData.keyResult.baseValue || 0))) * 100) || 0}%
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <span className="text-gray-500">Current:</span>
-                            <span className="font-medium">
-                              {Number(initiativeData.keyResult.currentValue).toLocaleString('id-ID')} {initiativeData.keyResult.unit}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <span className="text-gray-500">Target:</span>
-                            <span className="font-medium">
-                              {Number(initiativeData.keyResult.targetValue).toLocaleString('id-ID')} {initiativeData.keyResult.unit}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              {/* Timeline */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center space-x-2">
+                  <Calendar className="h-4 w-4 text-gray-500" />
+                  <span className="text-sm text-gray-600">Mulai:</span>
+                  <span className="text-sm font-medium">
+                    {formatDate(initiativeData.startDate)}
+                  </span>
                 </div>
-              )}
+                <div className="flex items-center space-x-2">
+                  <Clock className="h-4 w-4 text-gray-500" />
+                  <span className="text-sm text-gray-600">Tenggat:</span>
+                  <span className="text-sm font-medium">
+                    {formatDate(initiativeData.dueDate)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Progress */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-700">Progress</span>
+                  <span className="text-sm font-medium text-gray-900">
+                    {calculateProgress()}%
+                  </span>
+                </div>
+                <Progress value={calculateProgress()} className="h-2" />
+              </div>
             </CardContent>
           </Card>
 
-          {/* Tasks Card */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5" />
-                  Tasks ({tasks.length})
+          {/* Key Result Information Card */}
+          {keyResult && (
+            <Card className="border-blue-200 bg-blue-50">
+              <CardHeader>
+                <CardTitle className="text-blue-800 flex items-center gap-2">
+                  <Target className="h-5 w-5" />
+                  Key Result Terkait
                 </CardTitle>
-                <Button
-                  size="sm"
-                  className="bg-blue-600 hover:bg-blue-700"
-                  onClick={() => {
-                    setIsAddingTask(true);
-                    setSelectedTask(null);
-                    setIsTaskModalOpen(true);
-                  }}
-                >
-                  <Plus className="h-4 w-4 mr-1" />
-                  Tambah Task
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {tasks.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">Belum ada task</p>
-              ) : (
-                <div className="space-y-3">
-                  {tasks.map((task: any) => (
-                    <div
-                      key={task.id}
-                      className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <button
-                              onClick={() => {
-                                setSelectedTask(task);
-                                setIsTaskModalOpen(true);
-                                setIsAddingTask(false);
-                              }}
-                              className="font-medium hover:text-blue-600 text-left"
-                            >
-                              {task.title}
-                            </button>
-                            <Badge className={getTaskStatusColor(task.status)}>
-                              {getTaskStatusLabel(task.status)}
-                            </Badge>
-                            <Badge
-                              variant="outline"
-                              className={`${getPriorityColor(task.priority)} border-current`}
-                            >
-                              <Flag className="h-3 w-3 mr-1" />
-                              {getPriorityLabel(task.priority)}
-                            </Badge>
-                          </div>
-
-                          {task.description && (
-                            <p className="text-sm text-gray-600 mb-2">
-                              {task.description}
-                            </p>
-                          )}
-
-                          <div className="flex items-center gap-4 text-sm text-gray-500">
-                            {task.assignedTo && (
-                              <div className="flex items-center gap-1">
-                                <User className="h-4 w-4" />
-                                <span>{`${task.assignedTo.firstName} ${task.assignedTo.lastName}`}</span>
-                              </div>
-                            )}
-                            {task.dueDate && (
-                              <div className="flex items-center gap-1">
-                                <Calendar className="h-4 w-4" />
-                                <span>
-                                  {new Date(task.dueDate).toLocaleDateString(
-                                    "id-ID",
-                                  )}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                            >
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setSelectedTask(task);
-                                setIsTaskModalOpen(true);
-                                setIsAddingTask(false);
-                              }}
-                            >
-                              <Edit className="h-4 w-4 mr-2" />
-                              Edit
-                            </DropdownMenuItem>
-                            {task.status !== "completed" && (
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  updateTaskStatusMutation.mutate({
-                                    taskId: task.id,
-                                    status: "completed",
-                                  })
-                                }
-                              >
-                                <CheckCircle2 className="h-4 w-4 mr-2" />
-                                Mark as Complete
-                              </DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem
-                              onClick={() => setDeletingTask(task)}
-                              className="text-red-600"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </div>
-                  ))}
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Link href={`/key-result/${keyResult.id}`}>
+                    <h3 className="text-lg font-semibold text-blue-900 hover:text-blue-700 cursor-pointer">
+                      {keyResult.title}
+                    </h3>
+                  </Link>
+                  <p className="text-blue-700 text-sm mt-1">
+                    {keyResult.description || "Tidak ada deskripsi"}
+                  </p>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+
+                <div className="grid grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <span className="text-blue-600 font-medium">Progress:</span>
+                    <div className="mt-1">
+                      <Progress 
+                        value={keyResult.progress || 0} 
+                        className="h-2 bg-blue-100" 
+                      />
+                      <span className="text-blue-800 font-semibold">
+                        {(keyResult.progress || 0).toFixed(1)}%
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-blue-600 font-medium">Current:</span>
+                    <div className="text-blue-800 font-semibold">
+                      {keyResult.currentValue ? 
+                        new Intl.NumberFormat('id-ID').format(parseFloat(keyResult.currentValue)) : 
+                        '0'
+                      } {keyResult.unit || ''}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-blue-600 font-medium">Target:</span>
+                    <div className="text-blue-800 font-semibold">
+                      {keyResult.targetValue ? 
+                        new Intl.NumberFormat('id-ID').format(parseFloat(keyResult.targetValue)) : 
+                        '0'
+                      } {keyResult.unit || ''}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Team Card */}
+          {/* Team Members */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
-                Tim & PIC
+                Tim
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* PIC Section */}
-              <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <User className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm font-medium text-gray-700">
-                    PIC (Penanggung Jawab)
-                  </span>
-                </div>
-                {pic ? (
-                  <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-                    <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium">
-                      {pic.firstName?.charAt(0)}
-                      {pic.lastName?.charAt(0)}
+              {/* PIC */}
+              {pic && (
+                <div>
+                  <div className="text-sm font-medium text-gray-700 mb-2">
+                    PIC (Person in Charge)
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                      {pic.firstName?.charAt(0)}{pic.lastName?.charAt(0)}
                     </div>
                     <div>
-                      <p className="font-medium">{`${pic.firstName} ${pic.lastName}`}</p>
-                      <p className="text-sm text-gray-600">{pic.email}</p>
+                      <div className="font-medium text-gray-900">
+                        {pic.firstName} {pic.lastName}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {pic.email}
+                      </div>
                     </div>
                   </div>
-                ) : (
-                  <p className="text-gray-500 text-sm">Tidak ada PIC</p>
-                )}
-              </div>
-
-              <Separator />
-
-              {/* Members Section */}
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm font-medium text-gray-700">
-                      Anggota Tim
-                    </span>
-                  </div>
-                  <span className="text-xs text-gray-500">
-                    ({members.length})
-                  </span>
                 </div>
-                {members.length === 0 ? (
-                  <p className="text-gray-500 text-sm">Tidak ada anggota tim</p>
-                ) : (
-                  <div className="space-y-3">
+              )}
+
+              {/* Members */}
+              {members.length > 0 && (
+                <div>
+                  <div className="text-sm font-medium text-gray-700 mb-2">
+                    Anggota Tim ({members.length})
+                  </div>
+                  <div className="space-y-2">
                     {members.map((member: any) => (
-                      <div
-                        key={member.userId}
-                        className="flex items-center gap-3"
-                      >
-                        <div className="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                          {member.user.firstName?.charAt(0)}
-                          {member.user.lastName?.charAt(0)}
+                      <div key={member.id} className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                          {member.user?.firstName?.charAt(0)}{member.user?.lastName?.charAt(0)}
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">
-                            {`${member.user.firstName} ${member.user.lastName}`}
-                          </p>
-                          <p className="text-xs text-gray-600 truncate">
-                            {member.user.email}
-                          </p>
+                        <div>
+                          <div className="font-medium text-gray-900">
+                            {member.user?.firstName} {member.user?.lastName}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {member.user?.email}
+                          </div>
                         </div>
                       </div>
                     ))}
                   </div>
-                )}
-              </div>
+                </div>
+              )}
+
+              {!pic && members.length === 0 && (
+                <div className="text-center py-4 text-gray-500">
+                  <User className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                  <p className="text-sm">Belum ada anggota tim</p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
-          {/* Activity Card */}
+          {/* Recent Activity Placeholder */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5" />
-                Recent Activity
+                <FileText className="h-5 w-5" />
+                Aktivitas Terbaru
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500 text-center py-4">
-                No recent activity
-              </p>
+              <div className="text-center py-4 text-gray-500">
+                <FileText className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                <p className="text-sm">Belum ada aktivitas</p>
+              </div>
             </CardContent>
           </Card>
         </div>
       </div>
-
-      {/* Task Modal */}
-      {isTaskModalOpen && (
-        <TaskModal
-          open={isTaskModalOpen}
-          onClose={() => {
-            setIsTaskModalOpen(false);
-            setSelectedTask(null);
-            setIsAddingTask(false);
-          }}
-          task={selectedTask}
-          initiativeId={id}
-          isAdding={isAddingTask}
-        />
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {deletingTask && (
-        <DeleteConfirmationModal
-          open={true}
-          onOpenChange={() => setDeletingTask(null)}
-          onConfirm={() => deleteTaskMutation.mutate(deletingTask.id)}
-          title="Hapus Task"
-          description={`Apakah Anda yakin ingin menghapus task "${deletingTask.title}"? Tindakan ini tidak dapat dibatalkan.`}
-        />
-      )}
     </div>
   );
 }
