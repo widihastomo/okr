@@ -289,7 +289,7 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="assignedTo" className="flex items-center gap-2">
+              <Label htmlFor="assignedTo" className="flex items-center gap-2 mb-2">
                 <User className="h-4 w-4" />
                 PIC (Penanggung Jawab)
               </Label>
@@ -313,7 +313,7 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
             </div>
 
             <div>
-              <Label htmlFor="dueDate" className="flex items-center gap-2">
+              <Label htmlFor="dueDate" className="flex items-center gap-2 mb-2">
                 <Clock className="h-4 w-4" />
                 Tenggat Waktu
               </Label>
