@@ -138,7 +138,7 @@ Changelog:
   * Both options collapse automatically after successful creation with proper toast notifications
   * Enhanced user experience with color-coded actions and smooth transition animations
   * Maintains global accessibility across all authenticated pages from bottom-right corner
-  * Updated main FAB button color from blue to vibrant emerald green (bg-emerald-600/700) for better visibility and theme consistency
+  * Updated main FAB button color to vibrant orange (bg-orange-600/700) and "Buat OKR" button to blue primary (bg-blue-600/700) for better color differentiation
 - June 29, 2025. Completely removed task management functionality from initiative system:
   * Eliminated all task-related code from initiative creation and editing forms
   * Removed TaskModal component and all task CRUD operations from initiative detail page

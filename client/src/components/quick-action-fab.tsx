@@ -162,7 +162,7 @@ export default function QuickActionFAB() {
           {/* Buat OKR Button */}
           <Button
             onClick={handleOKRClick}
-            className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-4 py-3 rounded-full"
+            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-4 py-3 rounded-full"
           >
             <Target className="h-5 w-5" />
             <span className="font-medium">Buat OKR</span>
@@ -181,7 +181,7 @@ export default function QuickActionFAB() {
         {/* Main FAB Button */}
         <Button
           onClick={toggleExpanded}
-          className={`w-14 h-14 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 ${
+          className={`w-14 h-14 rounded-full bg-orange-600 hover:bg-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 ${
             isExpanded ? 'rotate-45' : 'rotate-0'
           }`}
         >
