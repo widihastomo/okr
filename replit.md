@@ -759,6 +759,14 @@ Changelog:
   * Filter options include "Semua User" (All Users) and individual user selection
   * Enhanced OKR filtering logic to check both direct ownership and team membership
   * User filter works in combination with existing status and cycle filters
+- June 29, 2025. Fixed complete user filter functionality and cleaned database:
+  * Added GET /api/tasks endpoint to fetch all tasks when "Semua User" is selected
+  * Updated My Tasks component to respect dashboard user filter selection instead of always showing current user's tasks
+  * Implemented filtered task notification counter that adjusts based on current user filter selection
+  * Added user name display next to avatar in header with responsive design
+  * Task notification badge shows count of overdue and due-today tasks for selected user filter
+  * Enhanced user experience with consistent filtering behavior across all dashboard components
+  * Cleaned all initiatives (4 records), initiative members (12 records), and tasks (15 records) from database for fresh testing
 - June 28, 2025. Resolved proxy connection error and enhanced server stability:
   * Fixed "dial tcp 127.0.0.1:5000: connect: connection refused" error preventing frontend-backend communication
   * Enhanced server configuration with proper 0.0.0.0 host binding for external access
