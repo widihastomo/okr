@@ -14,7 +14,7 @@ import { Plus, Target, CheckSquare, Building2, Trophy } from "lucide-react";
 import MyTasks from "@/components/my-tasks";
 import Initiatives from "@/components/initiatives";
 import { useAuth } from "@/hooks/useAuth";
-import { useTaskNotifications } from "@/hooks/useTaskNotifications";
+
 import { useLocation } from "wouter";
 import type { OKRWithKeyResults, KeyResult, Cycle, User } from "@shared/schema";
 
@@ -22,7 +22,7 @@ import type { OKRWithKeyResults, KeyResult, Cycle, User } from "@shared/schema";
 export default function Dashboard() {
   const { toast } = useToast();
   const { user: currentUser } = useAuth();
-  const { overdueAndDueTodayCount, hasNotifications } = useTaskNotifications();
+
   const [location, setLocation] = useLocation();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [cycleFilter, setCycleFilter] = useState<string>("all");
@@ -49,6 +49,35 @@ export default function Dashboard() {
   const { data: users = [] } = useQuery<User[]>({
     queryKey: ['/api/users'],
   });
+
+  // Fetch filtered tasks based on current user filter
+  const showAllUsers = userFilter === 'all' || userFilter === '' || !userFilter;
+  const targetUserId = showAllUsers ? null : userFilter;
+  
+  const { data: filteredTasks = [] } = useQuery<any[]>({
+    queryKey: showAllUsers ? ['/api/tasks'] : [`/api/users/${targetUserId}/tasks`],
+    enabled: showAllUsers || !!targetUserId,
+  });
+
+  // Calculate filtered task notifications that respect current filters
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const overdueAndDueTodayCount = filteredTasks.filter((task: any) => {
+    if (task.status === 'completed') return false;
+    
+    if (!task.dueDate) return false;
+    
+    const dueDate = new Date(task.dueDate);
+    dueDate.setHours(0, 0, 0, 0);
+    
+    // Include overdue tasks (due before today) and tasks due today
+    const isUrgent = dueDate <= today;
+    
+    return isUrgent;
+  }).length;
+
+  const hasNotifications = overdueAndDueTodayCount > 0;
 
   // Initialize tab and filters from URL query parameters
   useEffect(() => {
