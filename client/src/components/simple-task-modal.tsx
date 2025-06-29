@@ -123,9 +123,9 @@ export default function SimpleTaskModal({ open, onClose, task, onSuccess }: Simp
   const handleSubmit = () => {
     const dataToSubmit = {
       ...formData,
-      assignedTo: formData.assignedTo || null,
+      assignedTo: formData.assignedTo === "unassigned" ? null : formData.assignedTo || null,
       dueDate: formData.dueDate || null,
-      initiativeId: formData.initiativeId || null,
+      initiativeId: formData.initiativeId === "no-initiative" ? null : formData.initiativeId || null,
     };
 
     if (task) {
@@ -216,7 +216,7 @@ export default function SimpleTaskModal({ open, onClose, task, onSuccess }: Simp
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Tidak ada</SelectItem>
+                  <SelectItem value="unassigned">Tidak ada</SelectItem>
                   {users.map((user: any) => (
                     <SelectItem key={user.id} value={user.id}>
                       {user.firstName} {user.lastName}
@@ -251,7 +251,7 @@ export default function SimpleTaskModal({ open, onClose, task, onSuccess }: Simp
                 <SelectValue placeholder="Pilih initiative" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tidak ada</SelectItem>
+                <SelectItem value="no-initiative">Tidak ada</SelectItem>
                 {initiatives.map((initiative: any) => (
                   <SelectItem key={initiative.id} value={initiative.id}>
                     {initiative.title}
