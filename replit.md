@@ -96,6 +96,13 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- June 29, 2025. Fixed user dropdown in task modal for adding and editing tasks:
+  * Resolved issue where user list was not appearing in task assignment dropdown
+  * Fixed filtering logic to properly access nested user data from initiative members
+  * Updated filter to check both m.userId and m.user?.id patterns for member data structure
+  * Task modal now correctly displays all available users (PIC + initiative members + all users when no PIC)
+  * Enhanced user assignment functionality for comprehensive task management
+  * Verified both "Tambah Task" and "Edit Task" modals display user dropdown properly
 - June 29, 2025. Created comprehensive initiative detail page with task management:
   * Built dedicated initiative detail page showing full initiative information
   * Added progress tracking with visual progress bar and task completion statistics

@@ -51,18 +51,25 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
     enabled: !!initiativeId,
   });
 
-  // Cast types for proper access
+  // Cast types for proper access and add debugging
   const usersData = (users as any) || [];
   const initiativeData = (initiative as any) || {};
   const picId = initiativeData.picId;
   const initiativeMembers = initiativeData.members || [];
 
   // Filter available users based on initiative PIC and members
-  const availableUsers = Array.isArray(usersData) ? usersData.filter((user: any) => {
-    if (picId === user.id) return true;
-    if (Array.isArray(initiativeMembers) && initiativeMembers.some((m: any) => m.userId === user.id)) return true;
-    return false;
-  }) : [];
+  const availableUsers = Array.isArray(usersData) ? 
+    usersData.filter((user: any) => {
+      // Include PIC if exists
+      if (picId && picId === user.id) return true;
+      // Include all initiative members (check both userId and user.id patterns)
+      if (Array.isArray(initiativeMembers) && initiativeMembers.some((m: any) => 
+        m.userId === user.id || m.user?.id === user.id
+      )) return true;
+      // If no PIC is set, include all users for flexibility
+      if (!picId) return true;
+      return false;
+    }) : [];
 
   useEffect(() => {
     if (task && !isAdding) {
@@ -277,6 +284,7 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
                     {picId === user.id && " (PIC Initiative)"}
                   </SelectItem>
                 ))}
+
               </SelectContent>
             </Select>
           </div>
