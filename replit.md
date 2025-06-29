@@ -138,7 +138,7 @@ Changelog:
   * Both options collapse automatically after successful creation with proper toast notifications
   * Enhanced user experience with color-coded actions and smooth transition animations
   * Maintains global accessibility across all authenticated pages from bottom-right corner
-  * Updated main FAB button color from blue to neutral gray (bg-gray-800/900) for better theme consistency
+  * Updated main FAB button color from blue to vibrant indigo (bg-indigo-600/700) for better visibility and user engagement
 - June 29, 2025. Completely removed task management functionality from initiative system:
   * Eliminated all task-related code from initiative creation and editing forms
   * Removed TaskModal component and all task CRUD operations from initiative detail page
