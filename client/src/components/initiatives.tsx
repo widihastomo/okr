@@ -25,6 +25,8 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
     queryKey: ['/api/initiatives'],
   });
 
+
+
   // Fetch key results to show context
   const { data: keyResults = [] } = useQuery<KeyResult[]>({
     queryKey: ['/api/key-results'],
@@ -45,15 +47,14 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
     // 2. User is the PIC (owner)
     // 3. User is a member of the initiative
     let userMatch = true;
-    if (userFilter && userFilter !== 'all') {
+    if (userFilter && userFilter !== 'all' && userFilter !== '') {
       // Check if user is the PIC
-      if (initiative.picId === userFilter) {
-        userMatch = true;
-      } else {
-        // Check if user is a member
-        const members = initiativeMembers.filter((m: any) => m.initiativeId === initiative.id);
-        userMatch = members.some((m: any) => m.userId === userFilter);
-      }
+      const isPIC = initiative.picId === userFilter;
+      // Check if user is a member
+      const members = initiativeMembers.filter((m: any) => m.initiativeId === initiative.id);
+      const isMember = members.some((m: any) => m.userId === userFilter);
+      
+      userMatch = isPIC || isMember;
     }
     
     return statusMatch && priorityMatch && userMatch;

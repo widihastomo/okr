@@ -1225,6 +1225,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Initiative/Project routes
+  app.get("/api/initiatives", async (req, res) => {
+    try {
+      const initiatives = await storage.getInitiatives();
+      res.json(initiatives);
+    } catch (error) {
+      console.error("Error fetching initiatives:", error);
+      res.status(500).json({ message: "Failed to fetch initiatives" });
+    }
+  });
+
   app.post("/api/initiatives", async (req, res) => {
     try {
       const result = insertInitiativeSchema.safeParse(req.body);
@@ -1273,6 +1283,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Initiative member routes
+  app.get("/api/initiative-members", async (req, res) => {
+    try {
+      const members = await storage.getAllInitiativeMembers();
+      res.json(members);
+    } catch (error) {
+      console.error("Error fetching initiative members:", error);
+      res.status(500).json({ message: "Failed to fetch initiative members" });
+    }
+  });
+
   app.post("/api/initiative-members", async (req, res) => {
     try {
       const result = insertInitiativeMemberSchema.safeParse(req.body);

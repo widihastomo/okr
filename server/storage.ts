@@ -85,6 +85,7 @@ export interface IStorage {
   deleteInitiative(id: string): Promise<boolean>;
   
   // Initiative Members
+  getAllInitiativeMembers(): Promise<InitiativeMember[]>;
   createInitiativeMember(member: InsertInitiativeMember): Promise<InitiativeMember>;
   deleteInitiativeMember(id: string): Promise<boolean>;
   
@@ -656,6 +657,10 @@ export class DatabaseStorage implements IStorage {
   // Initiatives
   async getInitiatives(): Promise<Initiative[]> {
     return await db.select().from(initiatives);
+  }
+
+  async getAllInitiativeMembers(): Promise<InitiativeMember[]> {
+    return await db.select().from(initiativeMembers);
   }
 
   async getInitiativesByKeyResultId(keyResultId: string): Promise<any[]> {
