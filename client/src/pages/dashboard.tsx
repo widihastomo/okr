@@ -15,16 +15,19 @@ import MyTasks from "@/components/my-tasks";
 import Initiatives from "@/components/initiatives";
 import { useAuth } from "@/hooks/useAuth";
 import { useTaskNotifications } from "@/hooks/useTaskNotifications";
+import { useLocation } from "wouter";
 import type { OKRWithKeyResults, KeyResult, Cycle, User } from "@shared/schema";
 
 export default function Dashboard() {
   const { toast } = useToast();
   const { user: currentUser } = useAuth();
   const { overdueAndDueTodayCount, hasNotifications } = useTaskNotifications();
+  const [location, setLocation] = useLocation();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [cycleFilter, setCycleFilter] = useState<string>("all");
   const [userFilter, setUserFilter] = useState<string>("");
   const [hasAutoSelected, setHasAutoSelected] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<string>("objectives");
 
   const [editProgressModal, setEditProgressModal] = useState<{ open: boolean; keyResult?: KeyResult }>({
     open: false
@@ -45,6 +48,23 @@ export default function Dashboard() {
   const { data: users = [] } = useQuery<User[]>({
     queryKey: ['/api/users'],
   });
+
+  // Initialize tab from URL query parameter
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    if (tabParam && ['objectives', 'initiatives', 'my-tasks'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, []);
+
+  // Update URL when tab changes
+  const handleTabChange = (newTab: string) => {
+    setActiveTab(newTab);
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', newTab);
+    window.history.replaceState({}, '', url.toString());
+  };
 
   // Set default cycle to active cycle with shortest duration when cycles are loaded
   const activeCycles = cycles.filter(cycle => cycle.status === 'active');
@@ -354,7 +374,7 @@ export default function Dashboard() {
       <StatsOverview okrs={okrs} isLoading={isLoading} />
       
       {/* Tabbed Content */}
-      <Tabs defaultValue="objectives" className="mt-6">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-6">
         <TabsList className="grid w-full max-w-lg grid-cols-3">
           <TabsTrigger value="objectives" className="flex items-center gap-2">
             <Target className="w-4 h-4" />

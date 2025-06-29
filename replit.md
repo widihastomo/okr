@@ -96,8 +96,11 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
-- June 29, 2025. Enhanced initiatives with member display and key result navigation:
-  * Added member information display with overlapping circular avatars (up to 3 shown, "+X" for overflow)
+- June 29, 2025. Enhanced dashboard with query string tab tracking and navigation improvements:
+  * Added URL query string tracking for dashboard tabs (e.g., /dashboard?tab=initiatives)
+  * Tab changes automatically update URL for bookmark and sharing support
+  * Browser navigation preserves selected tab state across page loads
+  * Enhanced initiatives with member display using overlapping circular avatars (up to 3 shown, "+X" for overflow)
   * Implemented clickable member avatars that open dialog showing all members with name and email
   * Added hyperlink functionality from initiative cards to key result detail pages
   * Key Result titles now display as blue clickable links with hover effects

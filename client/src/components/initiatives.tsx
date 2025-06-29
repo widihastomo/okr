@@ -1,13 +1,37 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Building2, Calendar, Flag, TrendingUp, Users, Plus } from "lucide-react";
+import {
+  Building2,
+  Calendar,
+  Flag,
+  TrendingUp,
+  Users,
+  Plus,
+} from "lucide-react";
 import { format } from "date-fns";
 import { Link } from "wouter";
 import InitiativeModal from "@/components/initiative-modal";
@@ -29,80 +53,91 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
 
   // Fetch all initiatives
   const { data: initiatives = [], isLoading } = useQuery<Initiative[]>({
-    queryKey: ['/api/initiatives'],
+    queryKey: ["/api/initiatives"],
   });
 
-
-
   // Fetch key results to show context
-  const { data: keyResults = [], isLoading: keyResultsLoading } = useQuery<KeyResult[]>({
-    queryKey: ['/api/key-results'],
+  const { data: keyResults = [], isLoading: keyResultsLoading } = useQuery<
+    KeyResult[]
+  >({
+    queryKey: ["/api/key-results"],
   });
 
   // Fetch initiative members data
   const { data: initiativeMembers = [] } = useQuery<any[]>({
-    queryKey: ['/api/initiative-members'],
+    queryKey: ["/api/initiative-members"],
   });
 
   // Fetch users data to show PIC names
   const { data: users = [] } = useQuery<User[]>({
-    queryKey: ['/api/users'],
+    queryKey: ["/api/users"],
   });
 
   // Filter initiatives based on status, priority, and user
-  const filteredInitiatives = initiatives.filter(initiative => {
-    const statusMatch = statusFilter === "all" || initiative.status === statusFilter;
-    const priorityMatch = priorityFilter === "all" || initiative.priority === priorityFilter;
-    
+  const filteredInitiatives = initiatives.filter((initiative) => {
+    const statusMatch =
+      statusFilter === "all" || initiative.status === statusFilter;
+    const priorityMatch =
+      priorityFilter === "all" || initiative.priority === priorityFilter;
+
     // User filter - show initiatives where:
     // 1. No user filter applied (show all)
     // 2. User is the PIC (owner)
     // 3. User is a member of the initiative
     let userMatch = true;
-    if (userFilter && userFilter !== 'all' && userFilter !== '') {
+    if (userFilter && userFilter !== "all" && userFilter !== "") {
       // Check if user is the PIC
       const isPIC = initiative.picId === userFilter;
       // Check if user is a member
-      const members = initiativeMembers.filter((m: any) => m.initiativeId === initiative.id);
+      const members = initiativeMembers.filter(
+        (m: any) => m.initiativeId === initiative.id,
+      );
       const isMember = members.some((m: any) => m.userId === userFilter);
-      
+
       userMatch = isPIC || isMember;
     }
-    
+
     return statusMatch && priorityMatch && userMatch;
   });
 
   // Helper function to get key result title
   const getKeyResultTitle = (keyResultId: string) => {
     if (!keyResultId) return "No Key Result";
-    const keyResult = keyResults.find(kr => kr.id === keyResultId);
-    return keyResult?.title || (keyResultsLoading ? "Loading..." : "Key Result Not Found");
+    const keyResult = keyResults.find((kr) => kr.id === keyResultId);
+    return (
+      keyResult?.title ||
+      (keyResultsLoading ? "Loading..." : "Key Result Not Found")
+    );
   };
 
   // Helper function to get user name
   const getUserName = (userId: string | null) => {
     if (!userId) return "Unassigned";
-    const user = users.find(u => u.id === userId);
+    const user = users.find((u) => u.id === userId);
     return user ? `${user.firstName} ${user.lastName}` : "Unknown User";
   };
 
   // Helper function to get initiative members
   const getInitiativeMembers = (initiativeId: string) => {
-    return initiativeMembers.filter(member => member.initiativeId === initiativeId);
+    return initiativeMembers.filter(
+      (member) => member.initiativeId === initiativeId,
+    );
   };
 
   // Helper function to show members dialog
   const handleShowMembers = (initiative: Initiative) => {
     const members = getInitiativeMembers(initiative.id);
-    const memberUsers = members.map(member => {
-      const user = users.find(u => u.id === member.userId);
-      return user || null;
-    }).filter(Boolean);
+    const memberUsers = members
+      .map((member) => {
+        const user = users.find((u) => u.id === member.userId);
+        return user || null;
+      })
+      .filter(Boolean);
 
     setSelectedInitiativeMembers({
       initiativeId: initiative.id,
       initiativeTitle: initiative.title,
-      members: memberUsers
+      members: memberUsers,
     });
   };
 
@@ -117,22 +152,32 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
   // Helper function to get status color
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "completed": return "bg-green-100 text-green-800";
-      case "in_progress": return "bg-blue-100 text-blue-800";
-      case "on_hold": return "bg-yellow-100 text-yellow-800";
-      case "pending": return "bg-gray-100 text-gray-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "in_progress":
+        return "bg-blue-100 text-blue-800";
+      case "on_hold":
+        return "bg-yellow-100 text-yellow-800";
+      case "pending":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   // Helper function to get priority color
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "critical": return "bg-red-100 text-red-800";
-      case "high": return "bg-orange-100 text-orange-800";
-      case "medium": return "bg-yellow-100 text-yellow-800";
-      case "low": return "bg-green-100 text-green-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "critical":
+        return "bg-red-100 text-red-800";
+      case "high":
+        return "bg-orange-100 text-orange-800";
+      case "medium":
+        return "bg-yellow-100 text-yellow-800";
+      case "low":
+        return "bg-green-100 text-green-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -168,7 +213,7 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
           </Select>
         </div>
 
-        <Button 
+        <Button
           onClick={() => setShowCreateModal(true)}
           className="bg-blue-600 hover:bg-blue-700"
         >
@@ -196,13 +241,15 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
         <Card>
           <CardContent className="text-center py-12">
             <Building2 className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No initiatives found</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No initiatives found
+            </h3>
             <p className="text-gray-500 mb-4">
               {statusFilter !== "all" || priorityFilter !== "all"
                 ? "No initiatives match your current filters."
                 : "Get started by creating your first initiative."}
             </p>
-            <Button 
+            <Button
               onClick={() => setShowCreateModal(true)}
               className="bg-blue-600 hover:bg-blue-700"
             >
@@ -214,14 +261,23 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredInitiatives.map((initiative) => (
-            <Card key={initiative.id} className="hover:shadow-lg transition-shadow">
+            <Card
+              key={initiative.id}
+              className="hover:shadow-lg transition-shadow"
+            >
               <CardHeader>
                 <div className="flex justify-between items-start mb-2">
-                  <Badge className={getStatusColor(initiative.status || "pending")}>
-                    {initiative.status?.replace('_', ' ') || 'pending'}
+                  <Badge
+                    className={getStatusColor(initiative.status || "pending")}
+                  >
+                    {initiative.status?.replace("_", " ") || "pending"}
                   </Badge>
-                  <Badge className={getPriorityColor(initiative.priority || "medium")}>
-                    {initiative.priority || 'medium'}
+                  <Badge
+                    className={getPriorityColor(
+                      initiative.priority || "medium",
+                    )}
+                  >
+                    {initiative.priority || "medium"}
                   </Badge>
                 </div>
                 <CardTitle className="text-lg">
@@ -240,9 +296,14 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Progress</span>
-                    <span className="font-medium">{initiative.progressPercentage || 0}%</span>
+                    <span className="font-medium">
+                      {initiative.progressPercentage || 0}%
+                    </span>
                   </div>
-                  <Progress value={initiative.progressPercentage || 0} className="h-2" />
+                  <Progress
+                    value={initiative.progressPercentage || 0}
+                    className="h-2"
+                  />
                 </div>
 
                 {/* Key Result */}
@@ -250,7 +311,7 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
                   <TrendingUp className="w-4 h-4 text-gray-500" />
                   <span className="text-gray-600">Key Result:</span>
                   {initiative.keyResultId ? (
-                    <Link href={`/key-result/${initiative.keyResultId}`}>
+                    <Link href={`/key-results/${initiative.keyResultId}`}>
                       <span className="font-medium truncate text-blue-600 hover:text-blue-800 cursor-pointer hover:underline">
                         {getKeyResultTitle(initiative.keyResultId)}
                       </span>
@@ -267,9 +328,13 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
                   <div className="flex items-center gap-2 text-sm">
                     <Calendar className="w-4 h-4 text-gray-500" />
                     <span className="text-gray-600">Due:</span>
-                    <span className={`font-medium ${
-                      new Date(initiative.dueDate) < new Date() ? 'text-red-600' : ''
-                    }`}>
+                    <span
+                      className={`font-medium ${
+                        new Date(initiative.dueDate) < new Date()
+                          ? "text-red-600"
+                          : ""
+                      }`}
+                    >
                       {format(new Date(initiative.dueDate), "MMM dd, yyyy")}
                     </span>
                   </div>
@@ -292,7 +357,10 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
                     <Flag className="w-4 h-4 text-gray-500" />
                     <span className="text-gray-600">Budget:</span>
                     <span className="font-medium">
-                      Rp {new Intl.NumberFormat('id-ID').format(Number(initiative.budget))}
+                      Rp{" "}
+                      {new Intl.NumberFormat("id-ID").format(
+                        Number(initiative.budget),
+                      )}
                     </span>
                   </div>
                 )}
@@ -301,21 +369,29 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
                 <div className="mt-4">
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-600">Members:</span>
-                    <div 
+                    <div
                       className="flex -space-x-2 cursor-pointer"
                       onClick={() => handleShowMembers(initiative)}
                     >
                       {(() => {
                         const members = getInitiativeMembers(initiative.id);
-                        const memberUsers = members.slice(0, 3).map(member => {
-                          const user = users.find(u => u.id === member.userId);
-                          return user || null;
-                        }).filter((user): user is User => user !== null);
+                        const memberUsers = members
+                          .slice(0, 3)
+                          .map((member) => {
+                            const user = users.find(
+                              (u) => u.id === member.userId,
+                            );
+                            return user || null;
+                          })
+                          .filter((user): user is User => user !== null);
 
                         return (
                           <>
                             {memberUsers.map((user) => (
-                              <Avatar key={user.id} className="w-8 h-8 border-2 border-white">
+                              <Avatar
+                                key={user.id}
+                                className="w-8 h-8 border-2 border-white"
+                              >
                                 <AvatarFallback className="bg-gray-200 text-gray-700 text-xs">
                                   {getUserInitials(user)}
                                 </AvatarFallback>
@@ -323,11 +399,15 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
                             ))}
                             {members.length > 3 && (
                               <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 border-2 border-white">
-                                <span className="text-xs text-gray-700">+{members.length - 3}</span>
+                                <span className="text-xs text-gray-700">
+                                  +{members.length - 3}
+                                </span>
                               </div>
                             )}
                             {members.length === 0 && (
-                              <div className="text-sm text-gray-500">No members</div>
+                              <div className="text-sm text-gray-500">
+                                No members
+                              </div>
                             )}
                           </>
                         );
@@ -352,13 +432,15 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
 
       {/* Members Dialog */}
       {selectedInitiativeMembers && (
-        <Dialog 
-          open={!!selectedInitiativeMembers} 
+        <Dialog
+          open={!!selectedInitiativeMembers}
           onOpenChange={() => setSelectedInitiativeMembers(null)}
         >
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>{selectedInitiativeMembers.initiativeTitle} - Members</DialogTitle>
+              <DialogTitle>
+                {selectedInitiativeMembers.initiativeTitle} - Members
+              </DialogTitle>
             </DialogHeader>
             <div className="space-y-3 mt-4">
               {selectedInitiativeMembers.members.length > 0 ? (
@@ -376,7 +458,9 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
                   </div>
                 ))
               ) : (
-                <p className="text-gray-500 text-center py-4">No members assigned to this initiative</p>
+                <p className="text-gray-500 text-center py-4">
+                  No members assigned to this initiative
+                </p>
               )}
             </div>
           </DialogContent>
