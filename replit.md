@@ -96,13 +96,16 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
-- June 29, 2025. Enhanced dashboard with comprehensive query string tracking and navigation improvements:
+- June 29, 2025. Enhanced dashboard with comprehensive query string tracking and objective-based filtering:
   * Added URL query string tracking for dashboard tabs (e.g., /dashboard?tab=initiatives)
   * Added URL query string tracking for all filters: status, cycle, and user filters
   * Combined filtering support (e.g., /dashboard?tab=objectives&status=on_track&cycle=770e8400-e29b-41d4-a716-446655440001)
   * Smart URL cleaning removes default "all" values to maintain clean URLs
   * Tab and filter changes automatically update URL for bookmark and sharing support
   * Browser navigation preserves complete dashboard state across page loads
+  * Initiatives and My Tasks tabs now filter data based on visible objectives after filtering
+  * Initiatives only show those linked to key results from filtered objectives
+  * My Tasks only show tasks from initiatives that belong to filtered objectives' key results
   * Enhanced initiatives with member display using overlapping circular avatars (up to 3 shown, "+X" for overflow)
   * Implemented clickable member avatars that open dialog showing all members with name and email
   * Added hyperlink functionality from initiative cards to key result detail pages

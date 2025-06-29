@@ -11,7 +11,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-export default function MyTasks() {
+interface MyTasksProps {
+  filteredKeyResultIds?: string[];
+}
+
+export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
   const { user } = useAuth();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
@@ -62,13 +66,32 @@ export default function MyTasks() {
     staleTime: 0, // Always refetch to ensure we get latest tasks
   });
 
+  // Fetch all initiatives to check key result relationships
+  const { data: initiatives = [] } = useQuery<any[]>({
+    queryKey: ['/api/initiatives'],
+    enabled: !!filteredKeyResultIds && filteredKeyResultIds.length > 0,
+  });
+
   // Filter and sort tasks
   const tasks = Array.isArray(rawTasks) ? rawTasks as any[] : [];
   const filteredTasks = tasks
     .filter((task: any) => {
       const statusMatch = statusFilter === "all" || task.status === statusFilter;
       const priorityMatch = priorityFilter === "all" || task.priority === priorityFilter;
-      return statusMatch && priorityMatch;
+      
+      // Key Result filter - only show tasks from initiatives linked to filtered key results
+      let keyResultMatch = true;
+      if (filteredKeyResultIds && filteredKeyResultIds.length > 0) {
+        // Find the initiative for this task
+        const taskInitiative = initiatives.find((init: any) => init.id === task.initiativeId);
+        if (taskInitiative) {
+          keyResultMatch = filteredKeyResultIds.includes(taskInitiative.keyResultId);
+        } else {
+          keyResultMatch = false;
+        }
+      }
+      
+      return statusMatch && priorityMatch && keyResultMatch;
     })
     .sort((a: any, b: any) => {
       // Sort by deadline - earliest first, tasks without deadline go to end

@@ -39,9 +39,10 @@ import type { Initiative, KeyResult, User } from "@shared/schema";
 
 interface InitiativesProps {
   userFilter?: string;
+  filteredKeyResultIds?: string[];
 }
 
-export default function Initiatives({ userFilter }: InitiativesProps) {
+export default function Initiatives({ userFilter, filteredKeyResultIds }: InitiativesProps) {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -97,7 +98,13 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
       userMatch = isPIC || isMember;
     }
 
-    return statusMatch && priorityMatch && userMatch;
+    // Key Result filter - only show initiatives linked to filtered key results
+    let keyResultMatch = true;
+    if (filteredKeyResultIds && filteredKeyResultIds.length > 0) {
+      keyResultMatch = filteredKeyResultIds.includes(initiative.keyResultId);
+    }
+
+    return statusMatch && priorityMatch && userMatch && keyResultMatch;
   });
 
   // Helper function to get key result title

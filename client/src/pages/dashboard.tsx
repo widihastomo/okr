@@ -501,11 +501,16 @@ export default function Dashboard() {
         </TabsContent>
         
         <TabsContent value="initiatives" className="mt-6">
-          <Initiatives userFilter={userFilter} />
+          <Initiatives 
+            userFilter={userFilter} 
+            filteredKeyResultIds={okrs.flatMap(okr => okr.keyResults.map(kr => kr.id))}
+          />
         </TabsContent>
         
         <TabsContent value="my-tasks" className="mt-6">
-          <MyTasks />
+          <MyTasks 
+            filteredKeyResultIds={okrs.flatMap(okr => okr.keyResults.map(kr => kr.id))}
+          />
         </TabsContent>
       </Tabs>
 
