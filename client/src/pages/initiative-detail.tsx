@@ -69,7 +69,9 @@ export default function InitiativeDetailPage() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/tasks`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/tasks`], refetchType: 'active' });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`], refetchType: 'active' });
+      queryClient.invalidateQueries({ queryKey: ['/api/initiatives'], refetchType: 'active' });
       toast({
         title: "Task berhasil dihapus",
         className: "border-green-200 bg-green-50 text-green-800",

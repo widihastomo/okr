@@ -93,8 +93,9 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
       return response.json();
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/tasks`] });
-      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/tasks`], refetchType: 'active' });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}`], refetchType: 'active' });
+      queryClient.invalidateQueries({ queryKey: ['/api/initiatives'], refetchType: 'active' });
       
       // Show success toast for task creation
       toast({
@@ -137,8 +138,9 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
       return response.json();
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/tasks`] });
-      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/tasks`], refetchType: 'active' });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}`], refetchType: 'active' });
+      queryClient.invalidateQueries({ queryKey: ['/api/initiatives'], refetchType: 'active' });
       
       // Show success toast for task update
       toast({
