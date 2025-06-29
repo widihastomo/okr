@@ -181,7 +181,7 @@ export default function QuickActionFAB() {
         {/* Main FAB Button */}
         <Button
           onClick={toggleExpanded}
-          className={`w-14 h-14 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 ${
+          className={`w-14 h-14 rounded-full bg-gray-800 hover:bg-gray-900 text-white shadow-lg hover:shadow-xl transition-all duration-300 ${
             isExpanded ? 'rotate-45' : 'rotate-0'
           }`}
         >
