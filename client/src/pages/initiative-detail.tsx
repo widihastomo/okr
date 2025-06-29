@@ -1,5 +1,6 @@
 import { useParams } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import {
   ArrowLeft,
   Calendar,
@@ -12,6 +13,8 @@ import {
   FileText,
 } from "lucide-react";
 import { Link } from "wouter";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 // UI Components
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,13 +22,31 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function InitiativeDetailPage() {
   const { id } = useParams();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  // State for task modals
+  const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
+  const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<any>(null);
 
   // Fetch initiative details with all related data (PIC, members, key result)
   const { data: initiative, isLoading: initiativeLoading } = useQuery({
     queryKey: [`/api/initiatives/${id}`],
+    enabled: !!id,
+  });
+
+  // Fetch tasks for this initiative
+  const { data: tasks = [] } = useQuery<any[]>({
+    queryKey: [`/api/initiatives/${id}/tasks`],
     enabled: !!id,
   });
 
@@ -138,8 +159,102 @@ export default function InitiativeDetailPage() {
   };
 
   const calculateProgress = () => {
-    // Since we removed task management, we'll use the progress from the database
-    return initiativeData.progress || 0;
+    if (!tasks || tasks.length === 0) return initiativeData.progress || 0;
+    const completedTasks = tasks.filter((task: any) => task.status === "completed");
+    return Math.round((completedTasks.length / tasks.length) * 100);
+  };
+
+  // Task helper functions
+  const getTaskStatusColor = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "in_progress":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "cancelled":
+        return "bg-red-100 text-red-800 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const getTaskStatusLabel = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "Selesai";
+      case "in_progress":
+        return "Berlangsung";
+      case "pending":
+        return "Pending";
+      case "cancelled":
+        return "Dibatalkan";
+      default:
+        return "Tidak Diketahui";
+    }
+  };
+
+  const getTaskPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "medium":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "low":
+        return "bg-green-100 text-green-800 border-green-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const getTaskPriorityLabel = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return "Tinggi";
+      case "medium":
+        return "Sedang";
+      case "low":
+        return "Rendah";
+      default:
+        return "Tidak Diketahui";
+    }
+  };
+
+  // Task mutations
+  const deleteTaskMutation = useMutation({
+    mutationFn: async (taskId: string) => {
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('Failed to delete task');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/tasks`] });
+      toast({
+        title: "Task berhasil dihapus",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Gagal menghapus task",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Task handlers
+  const handleEditTask = (task: any) => {
+    setSelectedTask(task);
+    setIsEditTaskModalOpen(true);
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    if (confirm("Apakah Anda yakin ingin menghapus task ini?")) {
+      deleteTaskMutation.mutate(taskId);
+    }
   };
 
   return (
@@ -239,6 +354,94 @@ export default function InitiativeDetailPage() {
             </CardContent>
           </Card>
 
+          {/* Task Management Section */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Manajemen Task
+                </CardTitle>
+                <Button 
+                  onClick={() => setIsAddTaskModalOpen(true)}
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  Tambah Task
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {tasks.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <FileText className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                  <p className="text-sm">Belum ada task</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {tasks.map((task: any) => (
+                    <div key={task.id} className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h4 className="font-semibold text-gray-900 text-sm cursor-pointer hover:text-blue-600">
+                              {task.title}
+                            </h4>
+                            <Badge className={`${getTaskStatusColor(task.status)} text-xs py-0`}>
+                              {getTaskStatusLabel(task.status)}
+                            </Badge>
+                            <Badge className={`${getTaskPriorityColor(task.priority)} text-xs py-0`}>
+                              {getTaskPriorityLabel(task.priority)}
+                            </Badge>
+                          </div>
+                          
+                          {task.description && (
+                            <p className="text-xs text-gray-600 mb-2 line-clamp-2">
+                              {task.description}
+                            </p>
+                          )}
+                          
+                          <div className="flex items-center gap-3 text-xs text-gray-500">
+                            {task.assignedTo && (
+                              <div className="flex items-center gap-1">
+                                <User className="h-3 w-3" />
+                                <span>{task.assignedUser?.firstName} {task.assignedUser?.lastName}</span>
+                              </div>
+                            )}
+                            {task.dueDate && (
+                              <div className="flex items-center gap-1">
+                                <Calendar className="h-3 w-3" />
+                                <span>{formatDate(task.dueDate)}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditTask(task)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <FileText className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteTask(task.id)}
+                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                          >
+                            <Flag className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
         </div>
 
@@ -323,6 +526,171 @@ export default function InitiativeDetailPage() {
           </Card>
         </div>
       </div>
+
+      {/* Add Task Modal */}
+      <Dialog open={isAddTaskModalOpen} onOpenChange={setIsAddTaskModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Tambah Task Baru</DialogTitle>
+          </DialogHeader>
+          <TaskForm
+            onClose={() => setIsAddTaskModalOpen(false)}
+            initiativeId={id!}
+            onSuccess={() => {
+              queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/tasks`] });
+              setIsAddTaskModalOpen(false);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Task Modal */}
+      <Dialog open={isEditTaskModalOpen} onOpenChange={setIsEditTaskModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Task</DialogTitle>
+          </DialogHeader>
+          {selectedTask && (
+            <TaskForm
+              task={selectedTask}
+              onClose={() => setIsEditTaskModalOpen(false)}
+              initiativeId={id!}
+              onSuccess={() => {
+                queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/tasks`] });
+                setIsEditTaskModalOpen(false);
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+}
+
+// Simple Task Form Component
+function TaskForm({ task, onClose, initiativeId, onSuccess }: {
+  task?: any;
+  onClose: () => void;
+  initiativeId: string;
+  onSuccess: () => void;
+}) {
+  const [formData, setFormData] = useState({
+    title: task?.title || '',
+    description: task?.description || '',
+    status: task?.status || 'pending',
+    priority: task?.priority || 'medium',
+    dueDate: task?.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
+    assignedTo: task?.assignedTo || '',
+  });
+  const { toast } = useToast();
+
+  const isEditing = !!task;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      const url = isEditing ? `/api/tasks/${task.id}` : `/api/initiatives/${initiativeId}/tasks`;
+      const method = isEditing ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          initiativeId,
+          dueDate: formData.dueDate || null,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to save task');
+
+      toast({
+        title: isEditing ? "Task berhasil diupdate" : "Task berhasil dibuat",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+      
+      onSuccess();
+    } catch (error) {
+      toast({
+        title: "Gagal menyimpan task",
+        variant: "destructive",
+      });
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <Label htmlFor="title">Judul Task</Label>
+        <Input
+          id="title"
+          value={formData.title}
+          onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+          required
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <Label htmlFor="dueDate">Deadline</Label>
+          <Input
+            id="dueDate"
+            type="date"
+            value={formData.dueDate}
+            onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
+          />
+        </div>
+        <div>
+          <Label htmlFor="priority">Priority</Label>
+          <Select value={formData.priority} onValueChange={(value) => setFormData(prev => ({ ...prev, priority: value }))}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="low">Rendah</SelectItem>
+              <SelectItem value="medium">Sedang</SelectItem>
+              <SelectItem value="high">Tinggi</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {isEditing && (
+        <div>
+          <Label htmlFor="status">Status</Label>
+          <Select value={formData.status} onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="in_progress">Berlangsung</SelectItem>
+              <SelectItem value="completed">Selesai</SelectItem>
+              <SelectItem value="cancelled">Dibatalkan</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      <div>
+        <Label htmlFor="description">Deskripsi</Label>
+        <Textarea
+          id="description"
+          value={formData.description}
+          onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+          rows={3}
+        />
+      </div>
+
+      <div className="flex gap-2 pt-2">
+        <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+          Batal
+        </Button>
+        <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700">
+          {isEditing ? 'Update Task' : 'Buat Task'}
+        </Button>
+      </div>
+    </form>
   );
 }
