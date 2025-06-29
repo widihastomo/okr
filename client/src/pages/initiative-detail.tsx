@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
-import { TaskModal } from "@/components/task-modal";
+import TaskModal from "@/components/task-modal";
 import { DeleteConfirmationModal } from "@/components/delete-confirmation-modal";
 import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
@@ -28,23 +28,17 @@ export default function InitiativeDetailPage() {
   const [deletingTask, setDeletingTask] = useState<any>(null);
   const [isAddingTask, setIsAddingTask] = useState(false);
 
-  // Fetch initiative details
+  // Fetch initiative details with all related data (PIC, members, tasks, documents)
   const { data: initiative, isLoading: initiativeLoading } = useQuery({
     queryKey: [`/api/initiatives/${id}`],
     enabled: !!id,
   });
 
-  // Fetch initiative tasks
-  const { data: tasks = [], isLoading: tasksLoading } = useQuery({
-    queryKey: [`/api/initiatives/${id}/tasks`],
-    enabled: !!id,
-  });
-
-  // Fetch initiative members
-  const { data: members = [], isLoading: membersLoading } = useQuery({
-    queryKey: [`/api/initiatives/${id}/members`],
-    enabled: !!id,
-  });
+  // Extract data from the comprehensive initiative object with proper typing
+  const initiativeData = initiative as any;
+  const tasks = initiativeData?.tasks || [];
+  const members = initiativeData?.members || [];
+  const pic = initiativeData?.pic;
 
   // Delete task mutation
   const deleteTaskMutation = useMutation({
@@ -55,7 +49,6 @@ export default function InitiativeDetailPage() {
       if (!response.ok) throw new Error("Failed to delete task");
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/tasks`] });
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
       toast({
         title: "Task berhasil dihapus",
@@ -82,7 +75,6 @@ export default function InitiativeDetailPage() {
       if (!response.ok) throw new Error("Failed to update task");
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/tasks`] });
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
       toast({
         title: "Status task berhasil diupdate",
@@ -91,7 +83,7 @@ export default function InitiativeDetailPage() {
     },
   });
 
-  if (initiativeLoading || tasksLoading || membersLoading) {
+  if (initiativeLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-gray-500">Loading...</div>
@@ -106,6 +98,8 @@ export default function InitiativeDetailPage() {
       </div>
     );
   }
+
+
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -182,8 +176,8 @@ export default function InitiativeDetailPage() {
         
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Initiative Details</h1>
-          <Badge className={getStatusColor(initiative.status)}>
-            {getStatusLabel(initiative.status)}
+          <Badge className={getStatusColor(initiativeData.status)}>
+            {getStatusLabel(initiativeData.status)}
           </Badge>
         </div>
       </div>
@@ -199,9 +193,9 @@ export default function InitiativeDetailPage() {
             <CardContent className="space-y-4">
               {/* Title and Description */}
               <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-2">{initiative.title}</h2>
-                {initiative.description && (
-                  <p className="text-gray-600 text-sm leading-relaxed">{initiative.description}</p>
+                <h2 className="text-xl font-bold text-gray-900 mb-2">{initiativeData.title}</h2>
+                {initiativeData.description && (
+                  <p className="text-gray-600 text-sm leading-relaxed">{initiativeData.description}</p>
                 )}
               </div>
 
@@ -229,8 +223,8 @@ export default function InitiativeDetailPage() {
                     Tanggal Mulai
                   </div>
                   <p className="font-medium">
-                    {initiative.startDate 
-                      ? new Date(initiative.startDate).toLocaleDateString('id-ID')
+                    {initiativeData.startDate 
+                      ? new Date(initiativeData.startDate).toLocaleDateString('id-ID')
                       : '-'
                     }
                   </p>
@@ -242,8 +236,8 @@ export default function InitiativeDetailPage() {
                     Tenggat Waktu
                   </div>
                   <p className="font-medium">
-                    {initiative.dueDate 
-                      ? new Date(initiative.dueDate).toLocaleDateString('id-ID')
+                    {initiativeData.dueDate 
+                      ? new Date(initiativeData.dueDate).toLocaleDateString('id-ID')
                       : '-'
                     }
                   </p>
@@ -251,10 +245,10 @@ export default function InitiativeDetailPage() {
 
                 <div>
                   <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                    <Flag className={`h-4 w-4 ${getPriorityColor(initiative.priority)}`} />
+                    <Flag className={`h-4 w-4 ${getPriorityColor(initiativeData.priority)}`} />
                     Prioritas
                   </div>
-                  <p className="font-medium">{getPriorityLabel(initiative.priority)}</p>
+                  <p className="font-medium">{getPriorityLabel(initiativeData.priority)}</p>
                 </div>
 
                 <div>
@@ -263,8 +257,8 @@ export default function InitiativeDetailPage() {
                     Budget
                   </div>
                   <p className="font-medium">
-                    {initiative.budget 
-                      ? `Rp ${parseInt(initiative.budget).toLocaleString('id-ID')}`
+                    {initiativeData.budget 
+                      ? `Rp ${parseInt(initiativeData.budget).toLocaleString('id-ID')}`
                       : '-'
                     }
                   </p>
@@ -274,14 +268,14 @@ export default function InitiativeDetailPage() {
               <Separator />
 
               {/* Key Result Link */}
-              {initiative.keyResult && (
+              {initiativeData.keyResult && (
                 <div>
                   <p className="text-sm text-gray-600 mb-2">Key Result</p>
                   <Link 
-                    href={`/key-result/${initiative.keyResultId}`}
+                    href={`/key-result/${initiativeData.keyResultId}`}
                     className="text-blue-600 hover:text-blue-700 hover:underline"
                   >
-                    {initiative.keyResult.title}
+                    {initiativeData.keyResult.title}
                   </Link>
                 </div>
               )}
@@ -425,14 +419,14 @@ export default function InitiativeDetailPage() {
                   <User className="h-4 w-4 text-gray-500" />
                   <span className="text-sm font-medium text-gray-700">PIC (Penanggung Jawab)</span>
                 </div>
-                {initiative.pic ? (
+                {pic ? (
                   <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
                     <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium">
-                      {initiative.pic.firstName?.charAt(0)}{initiative.pic.lastName?.charAt(0)}
+                      {pic.firstName?.charAt(0)}{pic.lastName?.charAt(0)}
                     </div>
                     <div>
-                      <p className="font-medium">{`${initiative.pic.firstName} ${initiative.pic.lastName}`}</p>
-                      <p className="text-sm text-gray-600">{initiative.pic.email}</p>
+                      <p className="font-medium">{`${pic.firstName} ${pic.lastName}`}</p>
+                      <p className="text-sm text-gray-600">{pic.email}</p>
                     </div>
                   </div>
                 ) : (

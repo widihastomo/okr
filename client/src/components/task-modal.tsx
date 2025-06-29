@@ -29,7 +29,7 @@ interface TaskModalProps {
   isAdding?: boolean;
 }
 
-export function TaskModal({ open, onClose, task, initiativeId, isAdding }: TaskModalProps) {
+export default function TaskModal({ open, onClose, task, initiativeId, isAdding }: TaskModalProps) {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     title: "",
@@ -51,17 +51,18 @@ export function TaskModal({ open, onClose, task, initiativeId, isAdding }: TaskM
     enabled: !!initiativeId,
   });
 
-  const { data: initiativeMembers = [] } = useQuery({
-    queryKey: [`/api/initiatives/${initiativeId}/members`],
-    enabled: !!initiativeId,
-  });
+  // Cast types for proper access
+  const usersData = (users as any) || [];
+  const initiativeData = (initiative as any) || {};
+  const picId = initiativeData.picId;
+  const initiativeMembers = initiativeData.members || [];
 
   // Filter available users based on initiative PIC and members
-  const availableUsers = users.filter((user: any) => {
-    if (initiative?.picId === user.id) return true;
-    if (initiativeMembers.some((m: any) => m.userId === user.id)) return true;
+  const availableUsers = Array.isArray(usersData) ? usersData.filter((user: any) => {
+    if (picId === user.id) return true;
+    if (Array.isArray(initiativeMembers) && initiativeMembers.some((m: any) => m.userId === user.id)) return true;
     return false;
-  });
+  }) : [];
 
   useEffect(() => {
     if (task && !isAdding) {
@@ -273,7 +274,7 @@ export function TaskModal({ open, onClose, task, initiativeId, isAdding }: TaskM
                 {availableUsers.map((user: any) => (
                   <SelectItem key={user.id} value={user.id}>
                     {`${user.firstName} ${user.lastName}`}
-                    {initiative?.picId === user.id && " (PIC Initiative)"}
+                    {picId === user.id && " (PIC Initiative)"}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -290,8 +291,8 @@ export function TaskModal({ open, onClose, task, initiativeId, isAdding }: TaskM
               type="date"
               value={formData.dueDate}
               onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-              min={initiative?.startDate ? new Date(initiative.startDate).toISOString().split('T')[0] : undefined}
-              max={initiative?.dueDate ? new Date(initiative.dueDate).toISOString().split('T')[0] : undefined}
+              min={initiativeData?.startDate ? new Date(initiativeData.startDate).toISOString().split('T')[0] : undefined}
+              max={initiativeData?.dueDate ? new Date(initiativeData.dueDate).toISOString().split('T')[0] : undefined}
             />
           </div>
 
