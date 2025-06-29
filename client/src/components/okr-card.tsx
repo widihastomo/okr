@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Calendar, User, Clock, Edit, MoreVertical, Copy, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { Calendar, User, Users, Clock, Edit, MoreVertical, Copy, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import type { OKRWithKeyResults, KeyResult } from "@shared/schema";
 import { Link } from "wouter";
 import { CheckInModal } from "./check-in-modal";
@@ -141,7 +141,11 @@ export default function OKRCard({ okr, onEditProgress, onDuplicate, onDelete, cy
             
             <div className="flex items-center gap-4 text-sm text-gray-600">
               <span className="flex items-center gap-1">
-                <User className="w-4 h-4" />
+                {okr.ownerType === 'team' ? (
+                  <Users className="w-4 h-4" />
+                ) : (
+                  <User className="w-4 h-4" />
+                )}
                 {okr.owner}
               </span>
               
