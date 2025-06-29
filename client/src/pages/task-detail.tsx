@@ -34,10 +34,18 @@ export default function TaskDetailPage() {
   const queryClient = useQueryClient();
 
   // Fetch task data
-  const { data: task, isLoading } = useQuery({
+  const { data: task, isLoading, error } = useQuery({
     queryKey: ['/api/tasks', id],
     enabled: !!id,
   });
+
+  // Debug logging
+  useEffect(() => {
+    console.log('Task Detail Page - ID:', id);
+    console.log('Task Detail Page - Data:', task);
+    console.log('Task Detail Page - Loading:', isLoading);
+    console.log('Task Detail Page - Error:', error);
+  }, [id, task, isLoading, error]);
 
   // Extract initiative from task data  
   const initiative = (task as any)?.initiative;
@@ -143,7 +151,8 @@ export default function TaskDetailPage() {
     );
   }
 
-  if (!task) {
+  if (!task && !isLoading) {
+    console.log('Task not found - showing error page');
     return (
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-6xl mx-auto text-center py-12">
