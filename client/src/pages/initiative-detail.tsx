@@ -15,6 +15,7 @@ import {
   MoreVertical,
   Edit,
   Trash2,
+  Info,
 } from "lucide-react";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
@@ -32,6 +33,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import TaskModal from "@/components/task-modal";
 
 export default function InitiativeDetailPage() {
@@ -224,7 +231,57 @@ export default function InitiativeDetailPage() {
     if (!tasks || tasks.length === 0) return initiativeData.progress || 0;
     const completedTasks = tasks.filter((task: any) => task.status === "completed");
     return Math.round((completedTasks.length / tasks.length) * 100);
+  }
+
+  const calculateTaskHealthScore = (task: any) => {
+    let score = 100;
+    const now = new Date();
+    const dueDate = new Date(task.dueDate);
+    const daysUntilDue = Math.floor((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    
+    // Status impact
+    if (task.status === 'completed') {
+      return 100;
+    } else if (task.status === 'cancelled') {
+      return 0;
+    } else if (task.status === 'not_started' && daysUntilDue < 3) {
+      score -= 40; // Heavy penalty for not started tasks close to due date
+    } else if (task.status === 'in_progress' && daysUntilDue < 0) {
+      score -= 30; // Overdue in progress
+    }
+    
+    // Due date impact
+    if (daysUntilDue < 0) {
+      score -= 30; // Overdue
+    } else if (daysUntilDue < 3) {
+      score -= 20; // Due soon
+    } else if (daysUntilDue < 7) {
+      score -= 10; // Due this week
+    }
+    
+    // Priority impact
+    if (task.priority === 'high' && task.status === 'not_started') {
+      score -= 20; // High priority not started
+    } else if (task.priority === 'critical' && task.status !== 'completed') {
+      score -= 30; // Critical tasks not completed
+    }
+    
+    return Math.max(0, Math.min(100, score));
   };
+
+  const getTaskHealthColor = (score: number) => {
+    if (score >= 80) return "text-green-600 bg-green-50 border-green-200";
+    if (score >= 60) return "text-yellow-600 bg-yellow-50 border-yellow-200";
+    if (score >= 40) return "text-orange-600 bg-orange-50 border-orange-200";
+    return "text-red-600 bg-red-50 border-red-200";
+  };
+
+  const getTaskHealthLabel = (score: number) => {
+    if (score >= 80) return "Healthy";
+    if (score >= 60) return "At Risk";
+    if (score >= 40) return "Warning";
+    return "Critical";
+  };;
 
   // Task helper functions
   const getTaskStatusColor = (status: string) => {
@@ -368,26 +425,81 @@ export default function InitiativeDetailPage() {
                 </div>
               </div>
 
-              {/* Simple Progress */}
-              <div className="p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-700">Overall Progress</span>
-                  <span className={`text-lg font-bold ${
-                    calculateProgress() === 100 ? 'text-green-600' : 
-                    calculateProgress() >= 75 ? 'text-blue-600' : 
-                    calculateProgress() >= 50 ? 'text-yellow-600' : 
-                    'text-orange-600'
-                  }`}>{calculateProgress()}%</span>
+              {/* Progress and Health Summary */}
+              <div className="space-y-3">
+                {/* Overall Progress */}
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-700">Overall Progress</span>
+                    <span className={`text-lg font-bold ${
+                      calculateProgress() === 100 ? 'text-green-600' : 
+                      calculateProgress() >= 75 ? 'text-blue-600' : 
+                      calculateProgress() >= 50 ? 'text-yellow-600' : 
+                      'text-orange-600'
+                    }`}>{calculateProgress()}%</span>
+                  </div>
+                  <div className="relative">
+                    <Progress value={calculateProgress()} className="h-3" />
+                    <div className={`absolute inset-0 h-3 rounded-full ${
+                      calculateProgress() === 100 ? 'bg-green-500' : 
+                      calculateProgress() >= 75 ? 'bg-blue-500' : 
+                      calculateProgress() >= 50 ? 'bg-yellow-500' : 
+                      'bg-orange-500'
+                    }`} style={{ width: `${calculateProgress()}%` }} />
+                  </div>
                 </div>
-                <div className="relative">
-                  <Progress value={calculateProgress()} className="h-3" />
-                  <div className={`absolute inset-0 h-3 rounded-full ${
-                    calculateProgress() === 100 ? 'bg-green-500' : 
-                    calculateProgress() >= 75 ? 'bg-blue-500' : 
-                    calculateProgress() >= 50 ? 'bg-yellow-500' : 
-                    'bg-orange-500'
-                  }`} style={{ width: `${calculateProgress()}%` }} />
-                </div>
+
+                {/* Task Health Summary */}
+                {tasks && tasks.length > 0 && (
+                  <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-sm font-medium text-blue-900">Task Health Overview</div>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="w-4 h-4 text-blue-600 cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-sm">
+                            <div className="space-y-2 text-xs">
+                              <div className="font-medium">Health Score Calculation:</div>
+                              <div className="space-y-1">
+                                <div className="text-gray-600">• <span className="font-medium">Status Impact:</span> Completed (100%), Cancelled (0%), Not Started near due date (-40%), Overdue in progress (-30%)</div>
+                                <div className="text-gray-600">• <span className="font-medium">Due Date Impact:</span> Overdue (-30%), Due in 3 days (-20%), Due this week (-10%)</div>
+                                <div className="text-gray-600">• <span className="font-medium">Priority Impact:</span> High priority not started (-20%), Critical not completed (-30%)</div>
+                              </div>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                    <div className="grid grid-cols-4 gap-2 text-xs">
+                      <div className="text-center">
+                        <div className="font-semibold text-green-600">
+                          {tasks.filter((t: any) => calculateTaskHealthScore(t) >= 80).length}
+                        </div>
+                        <div className="text-gray-600">Healthy</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-semibold text-yellow-600">
+                          {tasks.filter((t: any) => calculateTaskHealthScore(t) >= 60 && calculateTaskHealthScore(t) < 80).length}
+                        </div>
+                        <div className="text-gray-600">At Risk</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-semibold text-orange-600">
+                          {tasks.filter((t: any) => calculateTaskHealthScore(t) >= 40 && calculateTaskHealthScore(t) < 60).length}
+                        </div>
+                        <div className="text-gray-600">Warning</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-semibold text-red-600">
+                          {tasks.filter((t: any) => calculateTaskHealthScore(t) < 40).length}
+                        </div>
+                        <div className="text-gray-600">Critical</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Key Result Information - Simplified */}
@@ -441,6 +553,45 @@ export default function InitiativeDetailPage() {
                             <h4 className="font-semibold text-gray-900 text-sm cursor-pointer hover:text-blue-600">
                               {task.title}
                             </h4>
+                            
+                            {/* Health Score Indicator */}
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div className="flex items-center gap-1">
+                                    <div className={`px-2 py-0.5 rounded-full text-xs font-medium border cursor-help ${getTaskHealthColor(calculateTaskHealthScore(task))}`}>
+                                      <span className="inline-flex items-center gap-1">
+                                        <div className={`w-2 h-2 rounded-full ${
+                                          calculateTaskHealthScore(task) >= 80 ? 'bg-green-500' :
+                                          calculateTaskHealthScore(task) >= 60 ? 'bg-yellow-500' :
+                                          calculateTaskHealthScore(task) >= 40 ? 'bg-orange-500' :
+                                          'bg-red-500'
+                                        }`} />
+                                        {calculateTaskHealthScore(task)}%
+                                      </span>
+                                    </div>
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-xs">
+                                  <div className="space-y-2 text-xs">
+                                    <div className="font-medium">Task Health Score: {getTaskHealthLabel(calculateTaskHealthScore(task))}</div>
+                                    <div className="space-y-1 text-gray-600">
+                                      <div>• Status: {getTaskStatusLabel(task.status)}</div>
+                                      <div>• Priority: {getTaskPriorityLabel(task.priority)}</div>
+                                      <div>• Due Date: {formatDate(task.dueDate)}</div>
+                                      {(() => {
+                                        const daysUntilDue = Math.floor((new Date(task.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                                        if (daysUntilDue < 0) return <div className="text-red-600">• Overdue by {Math.abs(daysUntilDue)} days</div>;
+                                        if (daysUntilDue === 0) return <div className="text-orange-600">• Due today</div>;
+                                        if (daysUntilDue <= 3) return <div className="text-yellow-600">• Due in {daysUntilDue} days</div>;
+                                        return <div>• Due in {daysUntilDue} days</div>;
+                                      })()}
+                                    </div>
+                                  </div>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Badge 

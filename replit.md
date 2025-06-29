@@ -96,6 +96,16 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- December 29, 2024. Implemented integrated task health score visualization:
+  * Added comprehensive health score calculation algorithm based on task status, due dates, and priority levels
+  * Health scores range from 0-100% with four categories: Healthy (80-100%), At Risk (60-79%), Warning (40-59%), Critical (0-39%)
+  * Visual indicators use color-coded badges with circular status dots (green, yellow, orange, red)
+  * Added Task Health Overview summary showing distribution of tasks across health categories
+  * Implemented interactive tooltips displaying detailed health score factors for each task
+  * Health calculation factors include: status impact (completed=100%, cancelled=0%), due date proximity, and priority urgency
+  * Enhanced task cards with inline health score badges positioned next to task titles
+  * Added informational tooltip explaining the health score calculation methodology
+  * Successfully integrated health visualization without disrupting existing task management functionality
 - June 29, 2025. Implemented comprehensive gamified progress achievement system:
   * Added complete database schema with achievements, user stats, level rewards, and activity logs tables
   * Created intelligent gamification service with automatic point awarding and achievement unlocking
