@@ -41,9 +41,10 @@ import {
 
 interface MyTasksProps {
   filteredKeyResultIds?: string[];
+  userFilter?: string;
 }
 
-export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
+export default function MyTasks({ filteredKeyResultIds, userFilter }: MyTasksProps) {
   const { user } = useAuth();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
@@ -63,12 +64,14 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
     return null;
   };
 
-  const userId = getUserId();
+  // Determine which user's tasks to fetch based on filter
+  const currentUserId = getUserId();
+  const targetUserId = userFilter && userFilter !== 'all' && userFilter !== '' ? userFilter : currentUserId;
 
-  // Fetch user's tasks
+  // Fetch tasks for the selected user
   const { data: tasks = [], isLoading } = useQuery<any[]>({
-    queryKey: [`/api/users/${userId}/tasks`],
-    enabled: !!userId,
+    queryKey: [`/api/users/${targetUserId}/tasks`],
+    enabled: !!targetUserId,
   });
 
   // Mutation for updating task
@@ -78,7 +81,7 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/users/${targetUserId}/tasks`] });
       queryClient.invalidateQueries({ queryKey: ['/api/initiatives'] });
       queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
       toast({
@@ -106,7 +109,7 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/users/${targetUserId}/tasks`] });
       queryClient.invalidateQueries({ queryKey: ['/api/initiatives'] });
       queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
       toast({
@@ -229,7 +232,7 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
             tasks={filteredTasks}
             onEditTask={handleEditTask}
             onDeleteTask={handleDeleteTask}
-            userId={userId}
+            userId={targetUserId}
           />
         )}
         
@@ -238,7 +241,7 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
             tasks={filteredTasks}
             onEditTask={handleEditTask}
             onDeleteTask={handleDeleteTask}
-            userId={userId}
+            userId={targetUserId}
           />
         )}
         
@@ -247,7 +250,7 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
             tasks={filteredTasks}
             onEditTask={handleEditTask}
             onDeleteTask={handleDeleteTask}
-            userId={userId}
+            userId={targetUserId}
           />
         )}
       </div>
@@ -257,7 +260,7 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
         open={showStandaloneTaskModal}
         onOpenChange={setShowStandaloneTaskModal}
         onSuccess={() => {
-          queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
+          queryClient.invalidateQueries({ queryKey: [`/api/users/${targetUserId}/tasks`] });
         }}
       />
 

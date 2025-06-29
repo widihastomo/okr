@@ -509,6 +509,7 @@ export default function Dashboard() {
         <TabsContent value="my-tasks" className="mt-6">
           <MyTasks 
             filteredKeyResultIds={okrs.flatMap(okr => okr.keyResults.map(kr => kr.id))}
+            userFilter={userFilter}
           />
         </TabsContent>
 
