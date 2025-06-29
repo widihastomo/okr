@@ -3,8 +3,9 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { 
   insertCycleSchema, insertTemplateSchema, insertObjectiveSchema, insertKeyResultSchema, 
-  insertCheckInSchema, insertInitiativeSchema, insertInitiativeMemberSchema, insertInitiativeDocumentSchema, insertTaskSchema,
-  updateKeyResultProgressSchema, createOKRFromTemplateSchema 
+  insertCheckInSchema, insertInitiativeSchema, insertInitiativeMemberSchema, insertInitiativeDocumentSchema, 
+  insertTaskSchema, insertInitiativeNoteSchema, updateKeyResultProgressSchema, createOKRFromTemplateSchema,
+  type User
 } from "@shared/schema";
 import { z } from "zod";
 import { setupEmailAuth } from "./authRoutes";
@@ -1078,6 +1079,141 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting initiative:", error);
       res.status(500).json({ message: "Failed to delete initiative" });
+    }
+  });
+
+  // Get initiative notes
+  app.get("/api/initiatives/:initiativeId/notes", async (req, res) => {
+    try {
+      const { initiativeId } = req.params;
+      const notes = await storage.getInitiativeNotes(initiativeId);
+      
+      // Get user information for each note
+      const notesWithUsers = await Promise.all(
+        notes.map(async (note) => {
+          const user = await storage.getUser(note.createdBy);
+          return {
+            ...note,
+            createdByUser: user || null
+          };
+        })
+      );
+      
+      res.json(notesWithUsers);
+    } catch (error) {
+      console.error("Error fetching initiative notes:", error);
+      res.status(500).json({ message: "Failed to fetch initiative notes" });
+    }
+  });
+
+  // Create initiative note
+  app.post("/api/initiatives/:initiativeId/notes", requireAuth, async (req, res) => {
+    try {
+      const { initiativeId } = req.params;
+      const currentUser = req.user as User;
+      
+      const createNoteSchema = insertInitiativeNoteSchema.extend({
+        initiativeId: z.string().uuid(),
+        createdBy: z.string().uuid()
+      });
+      
+      const noteData = createNoteSchema.parse({
+        ...req.body,
+        initiativeId,
+        createdBy: currentUser.id
+      });
+      
+      const newNote = await storage.createInitiativeNote(noteData);
+      
+      // Get user information for the response
+      const noteWithUser = {
+        ...newNote,
+        createdByUser: currentUser
+      };
+      
+      res.status(201).json(noteWithUser);
+    } catch (error) {
+      console.error("Error creating initiative note:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create initiative note" });
+    }
+  });
+
+  // Update initiative note
+  app.patch("/api/initiatives/:initiativeId/notes/:noteId", requireAuth, async (req, res) => {
+    try {
+      const { noteId } = req.params;
+      const currentUser = req.user as User;
+      
+      // Get existing note to check ownership
+      const existingNote = await storage.getInitiativeNotes(req.params.initiativeId);
+      const note = existingNote.find(n => n.id === noteId);
+      
+      if (!note) {
+        return res.status(404).json({ message: "Note not found" });
+      }
+      
+      // Only allow creator to update their note
+      if (note.createdBy !== currentUser.id) {
+        return res.status(403).json({ message: "Unauthorized to update this note" });
+      }
+      
+      const updateNoteSchema = insertInitiativeNoteSchema.partial();
+      const updateData = updateNoteSchema.parse(req.body);
+      
+      const updatedNote = await storage.updateInitiativeNote(noteId, updateData);
+      
+      if (!updatedNote) {
+        return res.status(404).json({ message: "Note not found" });
+      }
+      
+      // Get user information for the response
+      const noteWithUser = {
+        ...updatedNote,
+        createdByUser: currentUser
+      };
+      
+      res.json(noteWithUser);
+    } catch (error) {
+      console.error("Error updating initiative note:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update initiative note" });
+    }
+  });
+
+  // Delete initiative note
+  app.delete("/api/initiatives/:initiativeId/notes/:noteId", requireAuth, async (req, res) => {
+    try {
+      const { noteId, initiativeId } = req.params;
+      const currentUser = req.user as User;
+      
+      // Get existing note to check ownership
+      const existingNotes = await storage.getInitiativeNotes(initiativeId);
+      const note = existingNotes.find(n => n.id === noteId);
+      
+      if (!note) {
+        return res.status(404).json({ message: "Note not found" });
+      }
+      
+      // Only allow creator to delete their note
+      if (note.createdBy !== currentUser.id) {
+        return res.status(403).json({ message: "Unauthorized to delete this note" });
+      }
+      
+      const deleted = await storage.deleteInitiativeNote(noteId);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Note not found" });
+      }
+      
+      res.status(200).json({ message: "Note deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting initiative note:", error);
+      res.status(500).json({ message: "Failed to delete initiative note" });
     }
   });
 

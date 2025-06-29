@@ -150,6 +150,21 @@ export const initiativeDocuments = pgTable("initiative_documents", {
   uploadedAt: timestamp("uploaded_at").defaultNow(),
 });
 
+// Initiative notes for updates, budget allocations, and other information
+export const initiativeNotes = pgTable("initiative_notes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  initiativeId: uuid("initiative_id").references(() => initiatives.id).notNull(),
+  type: text("type").notNull().default("update"), // "update", "budget", "milestone", "risk", "decision", "general"
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  attachments: text("attachments").array(), // Array of file URLs
+  budgetAmount: decimal("budget_amount", { precision: 15, scale: 2 }), // For budget-type notes
+  budgetCategory: text("budget_category"), // "development", "marketing", "infrastructure", etc.
+  createdBy: uuid("created_by").references(() => users.id).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Tasks linked to initiatives
 export const tasks = pgTable("tasks", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -206,6 +221,12 @@ export const insertTaskSchema = createInsertSchema(tasks).omit({
   id: true,
   createdAt: true,
   completedAt: true,
+});
+
+export const insertInitiativeNoteSchema = createInsertSchema(initiativeNotes).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 // Gamification Tables
@@ -315,6 +336,7 @@ export type InsertInitiative = z.infer<typeof insertInitiativeSchema>;
 export type InsertInitiativeMember = z.infer<typeof insertInitiativeMemberSchema>;
 export type InsertInitiativeDocument = z.infer<typeof insertInitiativeDocumentSchema>;
 export type InsertTask = z.infer<typeof insertTaskSchema>;
+export type InsertInitiativeNote = z.infer<typeof insertInitiativeNoteSchema>;
 export type UpdateKeyResultProgress = z.infer<typeof updateKeyResultProgressSchema>;
 export type CreateOKRFromTemplate = z.infer<typeof createOKRFromTemplateSchema>;
 
@@ -334,6 +356,7 @@ export type CheckIn = typeof checkIns.$inferSelect;
 export type Initiative = typeof initiatives.$inferSelect;
 export type InitiativeMember = typeof initiativeMembers.$inferSelect;
 export type InitiativeDocument = typeof initiativeDocuments.$inferSelect;
+export type InitiativeNote = typeof initiativeNotes.$inferSelect;
 export type Task = typeof tasks.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type Team = typeof teams.$inferSelect;

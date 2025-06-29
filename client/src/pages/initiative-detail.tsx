@@ -42,6 +42,7 @@ import {
 } from "@/components/ui/tooltip";
 import TaskModal from "@/components/task-modal";
 import InitiativeModal from "@/components/initiative-modal";
+import { InitiativeNotes } from "@/components/initiative-notes";
 
 export default function InitiativeDetailPage() {
   const { id } = useParams();
@@ -791,6 +792,9 @@ export default function InitiativeDetailPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Initiative Notes */}
+        <InitiativeNotes initiativeId={id!} />
 
           {/* Recent Activity Placeholder */}
           <Card>

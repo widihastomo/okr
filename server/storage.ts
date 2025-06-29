@@ -1,12 +1,12 @@
 import { 
   cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives, tasks,
-  initiativeMembers, initiativeDocuments,
+  initiativeMembers, initiativeDocuments, initiativeNotes,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
   type CheckIn, type Initiative, type Task, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
-  type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
+  type InitiativeNote, type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
   type InsertUser, type UpsertUser, type InsertTeam, type InsertTeamMember,
   type InsertCheckIn, type InsertInitiative, type InsertInitiativeMember, type InsertInitiativeDocument, type InsertTask,
-  type OKRWithKeyResults, type CycleWithOKRs, type UpdateKeyResultProgress, type CreateOKRFromTemplate 
+  type InsertInitiativeNote, type OKRWithKeyResults, type CycleWithOKRs, type UpdateKeyResultProgress, type CreateOKRFromTemplate 
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc } from "drizzle-orm";
@@ -94,6 +94,12 @@ export interface IStorage {
   // Initiative Documents
   createInitiativeDocument(document: InsertInitiativeDocument): Promise<InitiativeDocument>;
   deleteInitiativeDocument(id: string): Promise<boolean>;
+  
+  // Initiative Notes
+  getInitiativeNotes(initiativeId: string): Promise<InitiativeNote[]>;
+  createInitiativeNote(note: InsertInitiativeNote): Promise<InitiativeNote>;
+  updateInitiativeNote(id: string, note: Partial<InsertInitiativeNote>): Promise<InitiativeNote | undefined>;
+  deleteInitiativeNote(id: string): Promise<boolean>;
   
   // Tasks
   getTasks(): Promise<Task[]>;
@@ -1074,6 +1080,34 @@ export class DatabaseStorage implements IStorage {
       await this.updateInitiativeProgress(task.initiativeId);
     }
     
+    return result.rowCount > 0;
+  }
+
+  // Initiative Notes
+  async getInitiativeNotes(initiativeId: string): Promise<InitiativeNote[]> {
+    return await db
+      .select()
+      .from(initiativeNotes)
+      .where(eq(initiativeNotes.initiativeId, initiativeId))
+      .orderBy(desc(initiativeNotes.createdAt));
+  }
+
+  async createInitiativeNote(note: InsertInitiativeNote): Promise<InitiativeNote> {
+    const [newNote] = await db.insert(initiativeNotes).values(note).returning();
+    return newNote;
+  }
+
+  async updateInitiativeNote(id: string, note: Partial<InsertInitiativeNote>): Promise<InitiativeNote | undefined> {
+    const [updatedNote] = await db
+      .update(initiativeNotes)
+      .set({ ...note, updatedAt: new Date() })
+      .where(eq(initiativeNotes.id, id))
+      .returning();
+    return updatedNote || undefined;
+  }
+
+  async deleteInitiativeNote(id: string): Promise<boolean> {
+    const result = await db.delete(initiativeNotes).where(eq(initiativeNotes.id, id));
     return result.rowCount > 0;
   }
 
