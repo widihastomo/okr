@@ -102,6 +102,11 @@ Changelog:
   * Preserves PIC status - never removes initiative owners
   * Only removes members who have zero remaining tasks in the initiative
   * Enhanced member management with automatic cleanup functionality
+- June 29, 2025. Improved initiative detail page layout and organization:
+  * Removed redundant h1 "Initiative Details" heading from page header
+  * Moved status Badge component from header to Overview section next to title
+  * Enhanced visual hierarchy with status badge positioned alongside initiative title
+  * Improved contextual relevance of status information within overview card
 - June 29, 2025. Improved task modal layout with consistent 2-column design:
   * Fixed spacing and alignment of PIC and due date fields
   * Implemented grid layout for better space utilization
