@@ -988,12 +988,20 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(users, eq(tasks.assignedTo, users.id))
       .where(eq(tasks.initiativeId, id));
 
+    // Get related key result
+    let keyResult = null;
+    if (initiative.keyResultId) {
+      const [kr] = await db.select().from(keyResults).where(eq(keyResults.id, initiative.keyResultId));
+      keyResult = kr;
+    }
+
     return {
       ...initiative,
       pic,
       members,
       documents,
       tasks: tasksData,
+      keyResult,
     };
   }
 
