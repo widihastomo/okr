@@ -1402,6 +1402,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/tasks/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const updatedTask = await storage.updateTask(id, req.body);
+      
+      if (!updatedTask) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      
+      res.json(updatedTask);
+    } catch (error) {
+      console.error("Error updating task:", error);
+      res.status(500).json({ message: "Failed to update task" });
+    }
+  });
+
   app.delete("/api/tasks/:id", async (req, res) => {
     try {
       const id = req.params.id;

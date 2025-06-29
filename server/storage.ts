@@ -761,6 +761,38 @@ export class DatabaseStorage implements IStorage {
     return task;
   }
 
+  async getTaskWithDetails(id: string): Promise<any | undefined> {
+    const result = await db
+      .select({
+        task: tasks,
+        assignedUser: users,
+        initiative: initiatives,
+        keyResult: keyResults,
+        objective: objectives
+      })
+      .from(tasks)
+      .leftJoin(users, eq(tasks.assignedTo, users.id))
+      .leftJoin(initiatives, eq(tasks.initiativeId, initiatives.id))
+      .leftJoin(keyResults, eq(initiatives.keyResultId, keyResults.id))
+      .leftJoin(objectives, eq(keyResults.objectiveId, objectives.id))
+      .where(eq(tasks.id, id));
+
+    if (result.length === 0) return undefined;
+
+    const row = result[0];
+    return {
+      ...row.task,
+      assignedUser: row.assignedUser || undefined,
+      initiative: row.initiative ? {
+        ...row.initiative,
+        keyResult: row.keyResult ? {
+          ...row.keyResult,
+          objective: row.objective || undefined
+        } : undefined
+      } : undefined
+    };
+  }
+
   // Automatic progress calculation based on completed tasks
   async updateInitiativeProgress(initiativeId: string): Promise<void> {
     const allTasks = await this.getTasksByInitiativeId(initiativeId);

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -115,9 +116,11 @@ export default function MyTasks() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
-                        <h3 className="font-medium text-gray-900 line-clamp-2">
-                          {task.title}
-                        </h3>
+                        <Link href={`/tasks/${task.id}`}>
+                          <h3 className="font-medium text-gray-900 line-clamp-2 hover:text-blue-600 cursor-pointer">
+                            {task.title}
+                          </h3>
+                        </Link>
                         
                         {task.description && (
                           <p className="text-sm text-gray-600 mt-1 line-clamp-2">
