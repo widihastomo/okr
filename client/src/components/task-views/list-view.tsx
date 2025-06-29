@@ -158,6 +158,27 @@ export default function ListView({ tasks, onEditTask, onDeleteTask, userId }: Li
     return 'Critical';
   };
 
+  // Sort tasks by due date (earliest first), then by priority
+  const sortedTasks = [...tasks].sort((a, b) => {
+    // Handle null/undefined due dates (put them at the end)
+    if (!a.dueDate && !b.dueDate) return 0;
+    if (!a.dueDate) return 1;
+    if (!b.dueDate) return -1;
+    
+    // Sort by due date (earliest first)
+    const dateA = new Date(a.dueDate).getTime();
+    const dateB = new Date(b.dueDate).getTime();
+    
+    if (dateA !== dateB) {
+      return dateA - dateB;
+    }
+    
+    // If due dates are equal, sort by priority (critical > high > medium > low)
+    const priorityOrder = { 'critical': 0, 'high': 1, 'medium': 2, 'low': 3 };
+    return (priorityOrder[a.priority as keyof typeof priorityOrder] || 99) - 
+           (priorityOrder[b.priority as keyof typeof priorityOrder] || 99);
+  });
+
   return (
     <div className="space-y-3">
       {/* Table Header */}
@@ -172,7 +193,7 @@ export default function ListView({ tasks, onEditTask, onDeleteTask, userId }: Li
       </div>
 
       {/* Task Rows */}
-      {tasks.map((task: any) => (
+      {sortedTasks.map((task: any) => (
         <div key={task.id} className="grid grid-cols-12 gap-4 px-4 py-3 bg-white rounded-lg border hover:shadow-sm transition-shadow">
           {/* Health Score */}
           <div className="col-span-1 flex items-center">
