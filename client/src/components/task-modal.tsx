@@ -3,11 +3,11 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -215,14 +215,14 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
   };
 
   return (
-    <Sheet open={open} onOpenChange={onClose}>
-      <SheetContent className="w-full sm:w-[500px] sm:max-w-[500px] overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-lg overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
             <CheckCircle2 className="h-5 w-5" />
             {isAdding ? "Tambah Task Baru" : "Edit Task"}
-          </SheetTitle>
-        </SheetHeader>
+          </DialogTitle>
+        </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-6">
           <div>
@@ -357,7 +357,7 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
             </Button>
           </div>
         </form>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 }

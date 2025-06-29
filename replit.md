@@ -129,6 +129,12 @@ Changelog:
   * Updated to use Dialog, DialogContent, DialogHeader, and DialogTitle components
   * Maintained all functionality while providing more standard modal interface
   * Improved user experience with centered modal presentation instead of side sheet
+- June 29, 2025. Converted TaskModal from Sheet to Dialog modal:
+  * Changed TaskModal component from sliding sheet to centered dialog modal
+  * Updated imports and components to use Dialog, DialogContent, DialogHeader, DialogTitle
+  * Set max-width to max-w-lg for appropriate form layout with 2-column grid fields
+  * Maintained all existing functionality including user assignment, validation, and form handling
+  * Improved user experience with standard modal interface instead of side panel
 - June 29, 2025. Enhanced quick action floating button with animated expandable interface:
   * Upgraded to QuickActionFAB component with animated expandable design showing "Buat OKR" and "Buat Task" options
   * Added smooth animations with staggered appearance of action buttons when FAB is clicked
