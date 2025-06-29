@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Calendar, CheckCircle2, Circle, CheckSquare, ChevronDown, Check, MoreVertical, User, Plus, Edit, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { useAuth } from "@/hooks/useAuth";
@@ -22,7 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import SimpleTaskModal from "@/components/simple-task-modal";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -125,6 +127,13 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<any>(null);
   const [taskToDelete, setTaskToDelete] = useState<any>(null);
+  const [showQuickTaskForm, setShowQuickTaskForm] = useState(false);
+  const [quickTaskData, setQuickTaskData] = useState({
+    title: '',
+    description: '',
+    priority: 'medium',
+    dueDate: ''
+  });
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -187,6 +196,112 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
       });
     },
   });
+
+  // Mutation for creating quick task
+  const createQuickTaskMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest("POST", "/api/tasks", data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/initiatives'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
+      toast({
+        title: "Task berhasil dibuat",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+      setShowQuickTaskForm(false);
+      setQuickTaskData({
+        title: '',
+        description: '',
+        priority: 'medium',
+        dueDate: ''
+      });
+    },
+    onError: (error) => {
+      console.error("Error creating task:", error);
+      toast({
+        title: "Gagal membuat task",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation for updating task
+  const updateTaskMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest("PUT", `/api/tasks/${data.id}`, data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/initiatives'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
+      toast({
+        title: "Task berhasil diupdate",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+      setShowQuickTaskForm(false);
+      setEditingTask(null);
+      setQuickTaskData({
+        title: '',
+        description: '',
+        priority: 'medium',
+        dueDate: ''
+      });
+    },
+    onError: (error) => {
+      console.error("Error updating task:", error);
+      toast({
+        title: "Gagal mengupdate task",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Handle quick task form submission
+  const handleQuickTaskSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!quickTaskData.title.trim()) {
+      toast({
+        title: "Title is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const taskData = {
+      title: quickTaskData.title,
+      description: quickTaskData.description,
+      status: editingTask ? editingTask.status : "not_started",
+      priority: quickTaskData.priority,
+      assignedTo: editingTask ? editingTask.assignedTo : userId, // Keep existing assignment for edits
+      dueDate: quickTaskData.dueDate || null,
+      initiativeId: editingTask ? editingTask.initiativeId : null, // Keep existing initiative for edits
+    };
+
+    if (editingTask) {
+      // Update existing task
+      updateTaskMutation.mutate({ ...taskData, id: editingTask.id });
+    } else {
+      // Create new task
+      createQuickTaskMutation.mutate(taskData);
+    }
+  };
+
+  // Handle form cancellation
+  const handleFormCancel = () => {
+    setShowQuickTaskForm(false);
+    setEditingTask(null);
+    setQuickTaskData({
+      title: '',
+      description: '',
+      priority: 'medium',
+      dueDate: ''
+    });
+  };
 
   // Fetch tasks assigned to current user
   const { data: rawTasks = [], isLoading } = useQuery({
@@ -288,13 +403,93 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
         </div>
         
         <Button
-          onClick={() => setIsTaskModalOpen(true)}
+          onClick={() => setShowQuickTaskForm(!showQuickTaskForm)}
           className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
           Tambah Task
         </Button>
       </div>
+
+      {/* Quick Task Form */}
+      {showQuickTaskForm && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>{editingTask ? "Edit Task" : "Buat Task Baru"}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleQuickTaskSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-2">
+                  <Label htmlFor="title">Judul Task</Label>
+                  <Input
+                    id="title"
+                    value={quickTaskData.title}
+                    onChange={(e) => setQuickTaskData({...quickTaskData, title: e.target.value})}
+                    placeholder="Masukkan judul task"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="dueDate">Tanggal Deadline</Label>
+                  <Input
+                    id="dueDate"
+                    type="date"
+                    value={quickTaskData.dueDate}
+                    onChange={(e) => setQuickTaskData({...quickTaskData, dueDate: e.target.value})}
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="priority">Prioritas</Label>
+                  <Select value={quickTaskData.priority} onValueChange={(value) => setQuickTaskData({...quickTaskData, priority: value})}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih prioritas" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Rendah</SelectItem>
+                      <SelectItem value="medium">Sedang</SelectItem>
+                      <SelectItem value="high">Tinggi</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="md:col-span-2">
+                  <Label htmlFor="description">Deskripsi</Label>
+                  <textarea
+                    id="description"
+                    value={quickTaskData.description}
+                    onChange={(e) => setQuickTaskData({...quickTaskData, description: e.target.value})}
+                    placeholder="Masukkan deskripsi task (opsional)"
+                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-2 justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleFormCancel}
+                >
+                  Batal
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={(createQuickTaskMutation.isPending || updateTaskMutation.isPending) || !quickTaskData.title.trim()}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  {editingTask 
+                    ? (updateTaskMutation.isPending ? "Mengupdate..." : "Update Task")
+                    : (createQuickTaskMutation.isPending ? "Membuat..." : "Buat Task")
+                  }
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Task List */}
       {filteredTasks.length === 0 ? (
@@ -478,7 +673,13 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
                         <DropdownMenuItem
                           onClick={() => {
                             setEditingTask(task);
-                            setIsTaskModalOpen(true);
+                            setQuickTaskData({
+                              title: task.title,
+                              description: task.description || '',
+                              priority: task.priority,
+                              dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : ''
+                            });
+                            setShowQuickTaskForm(true);
                           }}
                           className="cursor-pointer"
                         >
@@ -502,18 +703,7 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
         </Card>
       )}
 
-      {/* Task Modal */}
-      <SimpleTaskModal
-        open={isTaskModalOpen}
-        onClose={() => {
-          setIsTaskModalOpen(false);
-          setEditingTask(null);
-        }}
-        task={editingTask}
-        onSuccess={() => {
-          queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
-        }}
-      />
+
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!taskToDelete} onOpenChange={() => setTaskToDelete(null)}>
