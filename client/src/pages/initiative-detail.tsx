@@ -294,7 +294,7 @@ export default function InitiativeDetailPage() {
         return "bg-green-100 text-green-800 border-green-200";
       case "in_progress":
         return "bg-blue-100 text-blue-800 border-blue-200";
-      case "pending":
+      case "not_started":
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "cancelled":
         return "bg-red-100 text-red-800 border-red-200";
@@ -309,8 +309,8 @@ export default function InitiativeDetailPage() {
         return "Selesai";
       case "in_progress":
         return "Berlangsung";
-      case "pending":
-        return "Pending";
+      case "not_started":
+        return "Belum Dimulai";
       case "cancelled":
         return "Dibatalkan";
       default:

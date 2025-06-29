@@ -76,7 +76,11 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
   const tasks = Array.isArray(rawTasks) ? rawTasks as any[] : [];
   const filteredTasks = tasks
     .filter((task: any) => {
-      const statusMatch = statusFilter === "all" || task.status === statusFilter;
+      let statusMatch = statusFilter === "all" || task.status === statusFilter;
+      // Handle legacy status values for backwards compatibility
+      if (statusFilter === "not_started" && (task.status === "todo" || task.status === "pending")) {
+        statusMatch = true;
+      }
       const priorityMatch = priorityFilter === "all" || task.priority === priorityFilter;
       
       // Key Result filter - only show tasks from initiatives linked to filtered key results
@@ -129,6 +133,9 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
         return <CheckCircle2 className="w-5 h-5 text-green-600" />;
       case "in_progress":
         return <Circle className="w-5 h-5 text-blue-600" />;
+      case "cancelled":
+        return <Circle className="w-5 h-5 text-red-600" />;
+      case "not_started":
       default:
         return <Circle className="w-5 h-5 text-gray-400" />;
     }
@@ -153,9 +160,10 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="todo">To Do</SelectItem>
-            <SelectItem value="in_progress">In Progress</SelectItem>
-            <SelectItem value="completed">Completed</SelectItem>
+            <SelectItem value="not_started">Belum Dimulai</SelectItem>
+            <SelectItem value="in_progress">Sedang Dikerjakan</SelectItem>
+            <SelectItem value="completed">Selesai</SelectItem>
+            <SelectItem value="cancelled">Dibatalkan</SelectItem>
           </SelectContent>
         </Select>
 
@@ -233,9 +241,10 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="todo">To Do</SelectItem>
-                                <SelectItem value="in_progress">In Progress</SelectItem>
-                                <SelectItem value="completed">Completed</SelectItem>
+                                <SelectItem value="not_started">Belum Dimulai</SelectItem>
+                                <SelectItem value="in_progress">Sedang Dikerjakan</SelectItem>
+                                <SelectItem value="completed">Selesai</SelectItem>
+                                <SelectItem value="cancelled">Dibatalkan</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>

@@ -84,7 +84,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 const taskSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  status: z.enum(["not_started", "in_progress", "pending", "blocked", "completed"]).default("not_started"),
+  status: z.enum(["not_started", "in_progress", "completed", "cancelled"]).default("not_started"),
   priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
   assignedTo: z.string().optional(),
   dueDate: z.string().optional(),
@@ -1471,9 +1471,8 @@ export default function KeyResultDetailPage() {
                       <SelectContent>
                         <SelectItem value="not_started">Belum Dimulai</SelectItem>
                         <SelectItem value="in_progress">Sedang Dikerjakan</SelectItem>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="blocked">Blocked</SelectItem>
                         <SelectItem value="completed">Selesai</SelectItem>
+                        <SelectItem value="cancelled">Dibatalkan</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -1614,9 +1613,8 @@ export default function KeyResultDetailPage() {
                       <SelectContent>
                         <SelectItem value="not_started">Belum Dimulai</SelectItem>
                         <SelectItem value="in_progress">Sedang Dikerjakan</SelectItem>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="blocked">Blocked</SelectItem>
                         <SelectItem value="completed">Selesai</SelectItem>
+                        <SelectItem value="cancelled">Dibatalkan</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

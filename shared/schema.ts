@@ -156,7 +156,7 @@ export const tasks = pgTable("tasks", {
   initiativeId: uuid("initiative_id").references(() => initiatives.id).notNull(),
   title: text("title").notNull(),
   description: text("description"),
-  status: text("status").notNull().default("pending"), // "pending", "in_progress", "completed", "cancelled"
+  status: text("status").notNull().default("not_started"), // "not_started", "in_progress", "completed", "cancelled"
   priority: text("priority").notNull().default("medium"), // "low", "medium", "high"
   assignedTo: uuid("assigned_to"), // user ID
   dueDate: timestamp("due_date"),

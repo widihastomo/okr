@@ -29,12 +29,22 @@ interface TaskModalProps {
   isAdding?: boolean;
 }
 
+const getStatusLabel = (status: string) => {
+  switch (status) {
+    case "not_started": return "Belum Dimulai";
+    case "in_progress": return "Sedang Dikerjakan";
+    case "completed": return "Selesai";
+    case "cancelled": return "Dibatalkan";
+    default: return status;
+  }
+};
+
 export default function TaskModal({ open, onClose, task, initiativeId, isAdding }: TaskModalProps) {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    status: "pending",
+    status: "not_started",
     priority: "medium",
     assignedTo: "",
     dueDate: "",
@@ -260,9 +270,10 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pending">{getStatusLabel("pending")}</SelectItem>
+                  <SelectItem value="not_started">{getStatusLabel("not_started")}</SelectItem>
                   <SelectItem value="in_progress">{getStatusLabel("in_progress")}</SelectItem>
                   <SelectItem value="completed">{getStatusLabel("completed")}</SelectItem>
+                  <SelectItem value="cancelled">{getStatusLabel("cancelled")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>

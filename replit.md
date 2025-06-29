@@ -196,6 +196,14 @@ Changelog:
   * Implemented automatic progress calculation with proper Indonesian number formatting
   * Created clickable link navigation to related key result detail page
   * Enhanced visual design with blue-themed card for better information prominence
+- June 29, 2025. Standardized task status values across entire system:
+  * Updated database schema to use "not_started" as default instead of "pending"
+  * Standardized all task status values to: "not_started", "in_progress", "completed", "cancelled"
+  * Updated all frontend components (TaskModal, MyTasks, key-result-detail, initiative-detail) to use consistent status values
+  * Added backwards compatibility handling for legacy "pending" and "todo" status values
+  * Updated status dropdown options in all task forms to use Indonesian labels consistently
+  * Enhanced status display functions with proper color coding and labels for all four standard statuses
+  * Applied database migration to ensure schema consistency across development and production
 - June 29, 2025. Improved task modal layout with consistent 2-column design:
   * Fixed spacing and alignment of PIC and due date fields
   * Implemented grid layout for better space utilization
