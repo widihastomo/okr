@@ -552,140 +552,120 @@ export default function InitiativeDetailPage() {
                   <p className="text-sm">Belum ada task</p>
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {tasks.map((task: any) => (
-                    <div key={task.id} className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Link href={`/tasks/${task.id}`}>
-                              <h4 className="font-semibold text-gray-900 text-sm cursor-pointer hover:text-blue-600 transition-colors">
-                                {task.title}
-                              </h4>
-                            </Link>
-                            
-                            {/* Health Score Indicator */}
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <div className="flex items-center gap-1">
-                                    <div className={`px-2 py-0.5 rounded-full text-xs font-medium border cursor-help ${getTaskHealthColor(calculateTaskHealthScore(task))}`}>
-                                      <span className="inline-flex items-center gap-1">
-                                        <div className={`w-2 h-2 rounded-full ${
-                                          calculateTaskHealthScore(task) >= 80 ? 'bg-green-500' :
-                                          calculateTaskHealthScore(task) >= 60 ? 'bg-yellow-500' :
-                                          calculateTaskHealthScore(task) >= 40 ? 'bg-orange-500' :
-                                          'bg-red-500'
-                                        }`} />
-                                        {calculateTaskHealthScore(task)}%
-                                      </span>
-                                    </div>
-                                  </div>
-                                </TooltipTrigger>
-                                <TooltipContent className="max-w-xs">
-                                  <div className="space-y-2 text-xs">
-                                    <div className="font-medium">Task Health Score: {getTaskHealthLabel(calculateTaskHealthScore(task))}</div>
-                                    <div className="space-y-1 text-gray-600">
-                                      <div>• Status: {getTaskStatusLabel(task.status)}</div>
-                                      <div>• Priority: {getTaskPriorityLabel(task.priority)}</div>
-                                      <div>• Due Date: {formatDate(task.dueDate)}</div>
-                                      {(() => {
-                                        const daysUntilDue = Math.floor((new Date(task.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-                                        if (daysUntilDue < 0) return <div className="text-red-600">• Overdue by {Math.abs(daysUntilDue)} days</div>;
-                                        if (daysUntilDue === 0) return <div className="text-orange-600">• Due today</div>;
-                                        if (daysUntilDue <= 3) return <div className="text-yellow-600">• Due in {daysUntilDue} days</div>;
-                                        return <div>• Due in {daysUntilDue} days</div>;
-                                      })()}
-                                    </div>
-                                  </div>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
+                    <div key={task.id} className="flex items-center justify-between p-3 hover:bg-gray-50 transition-colors group">
+                      <div className="flex items-center gap-3 flex-1">
+                        {/* Task Health Score Dot */}
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className={`w-2 h-2 rounded-full cursor-help ${
+                                calculateTaskHealthScore(task) >= 80 ? 'bg-green-500' :
+                                calculateTaskHealthScore(task) >= 60 ? 'bg-yellow-500' :
+                                calculateTaskHealthScore(task) >= 40 ? 'bg-orange-500' :
+                                'bg-red-500'
+                              }`} />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs">
+                              <div className="space-y-2 text-xs">
+                                <div className="font-medium">Task Health Score: {getTaskHealthLabel(calculateTaskHealthScore(task))} ({calculateTaskHealthScore(task)}%)</div>
+                                <div className="space-y-1 text-gray-600">
+                                  <div>• Status: {getTaskStatusLabel(task.status)}</div>
+                                  <div>• Priority: {getTaskPriorityLabel(task.priority)}</div>
+                                  <div>• Due Date: {formatDate(task.dueDate)}</div>
+                                  {(() => {
+                                    const daysUntilDue = Math.floor((new Date(task.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                                    if (daysUntilDue < 0) return <div className="text-red-600">• Overdue by {Math.abs(daysUntilDue)} days</div>;
+                                    if (daysUntilDue === 0) return <div className="text-orange-600">• Due today</div>;
+                                    if (daysUntilDue <= 3) return <div className="text-yellow-600">• Due in {daysUntilDue} days</div>;
+                                    return <div>• Due in {daysUntilDue} days</div>;
+                                  })()}
+                                </div>
+                              </div>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
 
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Badge 
-                                  className={`${getTaskStatusColor(task.status)} text-xs py-0 cursor-pointer hover:opacity-80`}
-                                >
-                                  {getTaskStatusLabel(task.status)}
-                                </Badge>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="start">
-                                <DropdownMenuItem
-                                  onClick={() => updateTaskStatusMutation.mutate({ taskId: task.id, status: 'not_started' })}
-                                  className="cursor-pointer"
-                                >
-                                  <div className="flex items-center gap-2">
-                                    {task.status === 'not_started' && <Check className="h-3 w-3" />}
-                                    <span>Belum Dimulai</span>
-                                  </div>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => updateTaskStatusMutation.mutate({ taskId: task.id, status: 'in_progress' })}
-                                  className="cursor-pointer"
-                                >
-                                  <div className="flex items-center gap-2">
-                                    {task.status === 'in_progress' && <Check className="h-3 w-3" />}
-                                    <span>Sedang Dikerjakan</span>
-                                  </div>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => updateTaskStatusMutation.mutate({ taskId: task.id, status: 'completed' })}
-                                  className="cursor-pointer"
-                                >
-                                  <div className="flex items-center gap-2">
-                                    {task.status === 'completed' && <Check className="h-3 w-3" />}
-                                    <span>Selesai</span>
-                                  </div>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => updateTaskStatusMutation.mutate({ taskId: task.id, status: 'cancelled' })}
-                                  className="cursor-pointer"
-                                >
-                                  <div className="flex items-center gap-2">
-                                    {task.status === 'cancelled' && <Check className="h-3 w-3" />}
-                                    <span>Dibatalkan</span>
-                                  </div>
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                            <Badge className={`${getTaskPriorityColor(task.priority)} text-xs py-0`}>
-                              {getTaskPriorityLabel(task.priority)}
+                        {/* Task Title */}
+                        <Link href={`/tasks/${task.id}`}>
+                          <span className="font-medium text-gray-900 cursor-pointer hover:text-blue-600 transition-colors">
+                            {task.title}
+                          </span>
+                        </Link>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {/* Status Badge */}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Badge 
+                              className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80`}
+                            >
+                              {getTaskStatusLabel(task.status)}
                             </Badge>
-                          </div>
-                          
-                          {task.description && (
-                            <p className="text-xs text-gray-600 mb-2 line-clamp-2">
-                              {task.description}
-                            </p>
-                          )}
-                          
-                          <div className="flex items-center gap-3 text-xs text-gray-500">
-                            {task.assignedTo && (
-                              <div className="flex items-center gap-1">
-                                <User className="h-3 w-3" />
-                                <span>{task.assignedUser?.firstName} {task.assignedUser?.lastName}</span>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => updateTaskStatusMutation.mutate({ taskId: task.id, status: 'not_started' })}
+                              className="cursor-pointer"
+                            >
+                              <div className="flex items-center gap-2">
+                                {task.status === 'not_started' && <Check className="h-3 w-3" />}
+                                <span>Belum Dimulai</span>
                               </div>
-                            )}
-                            {task.dueDate && (
-                              <div className="flex items-center gap-1">
-                                <Calendar className={`h-3 w-3 ${
-                                  new Date(task.dueDate) < new Date() ? 'text-red-600' : ''
-                                }`} />
-                                <span className={
-                                  new Date(task.dueDate) < new Date() ? 'text-red-600 font-medium' : ''
-                                }>{formatDate(task.dueDate)}</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => updateTaskStatusMutation.mutate({ taskId: task.id, status: 'in_progress' })}
+                              className="cursor-pointer"
+                            >
+                              <div className="flex items-center gap-2">
+                                {task.status === 'in_progress' && <Check className="h-3 w-3" />}
+                                <span>Sedang Dikerjakan</span>
                               </div>
-                            )}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => updateTaskStatusMutation.mutate({ taskId: task.id, status: 'completed' })}
+                              className="cursor-pointer"
+                            >
+                              <div className="flex items-center gap-2">
+                                {task.status === 'completed' && <Check className="h-3 w-3" />}
+                                <span>Selesai</span>
+                              </div>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => updateTaskStatusMutation.mutate({ taskId: task.id, status: 'cancelled' })}
+                              className="cursor-pointer"
+                            >
+                              <div className="flex items-center gap-2">
+                                {task.status === 'cancelled' && <Check className="h-3 w-3" />}
+                                <span>Dibatalkan</span>
+                              </div>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+
+                        {/* Priority Badge */}
+                        <Badge className={`${getTaskPriorityColor(task.priority)} text-xs px-2 py-1`}>
+                          {getTaskPriorityLabel(task.priority)}
+                        </Badge>
+
+                        {/* Assigned User Avatars */}
+                        {task.assignedTo && task.assignedUser && (
+                          <div className="flex -space-x-2">
+                            <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white">
+                              {task.assignedUser.firstName?.charAt(0)}{task.assignedUser.lastName?.charAt(0)}
+                            </div>
                           </div>
-                        </div>
-                        
+                        )}
+
+                        {/* Action Menu */}
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 w-8 p-0"
+                              className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
                             >
                               <MoreVertical className="h-4 w-4" />
                             </Button>

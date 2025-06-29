@@ -196,6 +196,14 @@ Changelog:
   * Implemented automatic progress calculation with proper Indonesian number formatting
   * Created clickable link navigation to related key result detail page
   * Enhanced visual design with blue-themed card for better information prominence
+- June 29, 2025. Updated task UI design to clean minimalist layout:
+  * Converted task cards to streamlined horizontal rows matching user-provided reference design
+  * Task health score displayed as small colored dot indicator on left side with detailed tooltip
+  * Task titles remain clickable links with hover effects for navigation to task detail pages
+  * Status and priority badges positioned on right side for clean visual hierarchy
+  * User avatars shown as compact circular icons with initials
+  * Action menu hidden by default, appears on hover for cleaner interface
+  * Maintained comprehensive task health information in hover tooltips with score breakdown
 - June 29, 2025. Standardized task status values across entire system:
   * Updated database schema to use "not_started" as default instead of "pending"
   * Standardized all task status values to: "not_started", "in_progress", "completed", "cancelled"
