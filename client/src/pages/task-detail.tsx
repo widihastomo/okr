@@ -176,18 +176,12 @@ export default function TaskDetailPage() {
           {/* Header */}
           <div className="mb-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <Link href="/dashboard">
-                  <Button variant="outline" size="sm">
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back
-                  </Button>
-                </Link>
-                <div className="flex items-center gap-2">
-                  {getStatusIcon(task.status)}
-                  <h1 className="text-2xl font-bold text-gray-900">{task.title}</h1>
-                </div>
-              </div>
+              <Link href="/dashboard">
+                <Button variant="outline" size="sm">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back
+                </Button>
+              </Link>
             </div>
           </div>
 
@@ -204,6 +198,10 @@ export default function TaskDetailPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      {getStatusIcon(task.status)}
+                      <h1 className="text-2xl font-bold text-gray-900">{task.title}</h1>
+                    </div>
                     <h3 className="font-medium text-gray-900 mb-2">Description</h3>
                     <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">
                       {task.description || "No description provided."}
