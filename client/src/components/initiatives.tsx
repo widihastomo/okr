@@ -249,9 +249,17 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
                 <div className="flex items-center gap-2 text-sm">
                   <TrendingUp className="w-4 h-4 text-gray-500" />
                   <span className="text-gray-600">Key Result:</span>
-                  <span className="font-medium truncate">
-                    {getKeyResultTitle(initiative.keyResultId)}
-                  </span>
+                  {initiative.keyResultId ? (
+                    <Link href={`/key-result/${initiative.keyResultId}`}>
+                      <span className="font-medium truncate text-blue-600 hover:text-blue-800 cursor-pointer hover:underline">
+                        {getKeyResultTitle(initiative.keyResultId)}
+                      </span>
+                    </Link>
+                  ) : (
+                    <span className="font-medium truncate text-gray-500">
+                      No Key Result
+                    </span>
+                  )}
                 </div>
 
                 {/* Due Date */}

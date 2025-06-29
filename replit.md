@@ -96,12 +96,15 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
-- June 29, 2025. Fixed initiatives display issue in dashboard:
-  * Added missing GET /api/initiatives endpoint to properly fetch all initiatives from database
-  * Added missing GET /api/initiative-members endpoint for member data retrieval
-  * Resolved TypeScript errors by renaming getInitiativeMembers to getAllInitiativeMembers to avoid naming conflicts
-  * Verified all 4 initiatives are now properly returned from API including admin user's initiative
-  * Initiative filtering by user (PIC or member) now works correctly with proper API data
+- June 29, 2025. Enhanced initiatives with member display and key result navigation:
+  * Added member information display with overlapping circular avatars (up to 3 shown, "+X" for overflow)
+  * Implemented clickable member avatars that open dialog showing all members with name and email
+  * Added hyperlink functionality from initiative cards to key result detail pages
+  * Key Result titles now display as blue clickable links with hover effects
+  * Navigation routes to /key-result/{keyResultId} for direct access to related key results
+  * Fixed initiatives display issue by adding missing GET /api/initiatives and /api/initiative-members endpoints
+  * Resolved TypeScript errors and verified all 4 initiatives properly returned from API
+  * Initiative filtering by user (PIC or member) works correctly with proper API data
 - June 29, 2025. Added Initiatives tab to dashboard navigation:
   * Created new Initiatives component displaying all initiatives in card grid layout
   * Added tab between Objectives and My Tasks showing initiative cards with status, priority, progress
