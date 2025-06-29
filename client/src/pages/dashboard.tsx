@@ -13,11 +13,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Target, CheckSquare } from "lucide-react";
 import MyTasks from "@/components/my-tasks";
 import { useAuth } from "@/hooks/useAuth";
+import { useTaskNotifications } from "@/hooks/useTaskNotifications";
 import type { OKRWithKeyResults, KeyResult, Cycle, User } from "@shared/schema";
 
 export default function Dashboard() {
   const { toast } = useToast();
   const { user: currentUser } = useAuth();
+  const { overdueAndDueTodayCount, hasNotifications } = useTaskNotifications();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [cycleFilter, setCycleFilter] = useState<string>("all");
   const [userFilter, setUserFilter] = useState<string>("");
@@ -360,6 +362,11 @@ export default function Dashboard() {
           <TabsTrigger value="my-tasks" className="flex items-center gap-2">
             <CheckSquare className="w-4 h-4" />
             My Tasks
+            {hasNotifications && (
+              <span className="ml-1 bg-red-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] h-5 flex items-center justify-center">
+                {overdueAndDueTodayCount}
+              </span>
+            )}
           </TabsTrigger>
         </TabsList>
         
