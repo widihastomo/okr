@@ -22,7 +22,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import TaskModal from "@/components/task-modal";
+import SimpleTaskModal from "@/components/simple-task-modal";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -503,21 +503,17 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
       )}
 
       {/* Task Modal */}
-      {isTaskModalOpen && (
-        <TaskModal
-          isOpen={isTaskModalOpen}
-          onClose={() => {
-            setIsTaskModalOpen(false);
-            setEditingTask(null);
-          }}
-          task={editingTask}
-          onSuccess={() => {
-            queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
-            setIsTaskModalOpen(false);
-            setEditingTask(null);
-          }}
-        />
-      )}
+      <SimpleTaskModal
+        open={isTaskModalOpen}
+        onClose={() => {
+          setIsTaskModalOpen(false);
+          setEditingTask(null);
+        }}
+        task={editingTask}
+        onSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
+        }}
+      />
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!taskToDelete} onOpenChange={() => setTaskToDelete(null)}>

@@ -1681,6 +1681,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create a standalone task
+  app.post("/api/tasks", async (req, res) => {
+    try {
+      // Get current user ID - handle both development and production modes
+      let currentUserId: string;
+      if (process.env.NODE_ENV === 'development') {
+        // Use mock user ID for development
+        currentUserId = "550e8400-e29b-41d4-a716-446655440001";
+      } else {
+        // Production mode - require authentication
+        if (!req.session?.userId) {
+          return res.status(401).json({ message: "Authentication required" });
+        }
+        currentUserId = req.session.userId;
+      }
+
+      const taskData = {
+        ...req.body,
+        createdBy: currentUserId,
+        assignedTo: req.body.assignedTo || null,
+        dueDate: req.body.dueDate ? new Date(req.body.dueDate) : null,
+        initiativeId: req.body.initiativeId || null,
+      };
+
+      const result = insertTaskSchema.safeParse(taskData);
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid task data", errors: result.error.errors });
+      }
+
+      const task = await storage.createTask(result.data);
+      
+      // Update initiative progress if task is linked to an initiative
+      if (task.initiativeId) {
+        await storage.updateInitiativeProgress(task.initiativeId);
+      }
+
+      res.status(201).json(task);
+    } catch (error) {
+      console.error("Error creating task:", error);
+      res.status(500).json({ message: "Failed to create task" });
+    }
+  });
+
   // Get single task with details
   app.get("/api/tasks/:id", async (req, res) => {
     try {
