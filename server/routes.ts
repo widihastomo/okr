@@ -992,7 +992,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
         updateData.budget = null;
       }
       
-      const updatedInitiative = await storage.updateInitiative(id, updateData);
+      // Check if we're updating members
+      if (updateData.members !== undefined) {
+        // Get current initiative details
+        const currentInitiative = await storage.getInitiativeWithDetails(id);
+        if (!currentInitiative) {
+          return res.status(404).json({ message: "Initiative not found" });
+        }
+        
+        // Get current members
+        const currentMembers = await storage.getInitiativeMembers(id);
+        const currentMemberIds = currentMembers.map(m => m.userId);
+        
+        // Find members being removed
+        const newMemberIds = updateData.members || [];
+        const removedMemberIds = currentMemberIds.filter(memberId => !newMemberIds.includes(memberId));
+        
+        // Check if any removed members have assigned tasks
+        if (removedMemberIds.length > 0) {
+          const tasks = await storage.getTasksByInitiativeId(id);
+          const membersWithTasks = [];
+          
+          for (const memberId of removedMemberIds) {
+            const memberTasks = tasks.filter(task => task.assignedTo === memberId);
+            if (memberTasks.length > 0) {
+              const user = await storage.getUser(memberId);
+              membersWithTasks.push({
+                userName: user ? `${user.firstName} ${user.lastName}` : 'Unknown User',
+                taskCount: memberTasks.length
+              });
+            }
+          }
+          
+          if (membersWithTasks.length > 0) {
+            const errorMessage = membersWithTasks
+              .map(m => `${m.userName} memiliki ${m.taskCount} task`)
+              .join(', ');
+            return res.status(400).json({ 
+              message: `Tidak dapat menghapus member karena masih memiliki task yang ditugaskan: ${errorMessage}. Silakan hapus atau reassign task terlebih dahulu.`
+            });
+          }
+        }
+        
+        // Update members
+        // First, delete all existing members
+        await storage.deleteInitiativeMembersByInitiativeId(id);
+        
+        // Then add new members
+        for (const userId of newMemberIds) {
+          await storage.createInitiativeMember({
+            initiativeId: id,
+            userId: userId,
+            role: "member"
+          });
+        }
+      }
+      
+      // Remove members from updateData before passing to storage
+      const { members, ...dataToUpdate } = updateData;
+      
+      const updatedInitiative = await storage.updateInitiative(id, dataToUpdate);
       
       if (!updatedInitiative) {
         return res.status(404).json({ message: "Initiative not found" });

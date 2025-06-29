@@ -86,8 +86,10 @@ export interface IStorage {
   
   // Initiative Members
   getAllInitiativeMembers(): Promise<InitiativeMember[]>;
+  getInitiativeMembers(initiativeId: string): Promise<(InitiativeMember & { user: User })[]>;
   createInitiativeMember(member: InsertInitiativeMember): Promise<InitiativeMember>;
   deleteInitiativeMember(id: string): Promise<boolean>;
+  deleteInitiativeMembersByInitiativeId(initiativeId: string): Promise<boolean>;
   
   // Initiative Documents
   createInitiativeDocument(document: InsertInitiativeDocument): Promise<InitiativeDocument>;
@@ -716,6 +718,11 @@ export class DatabaseStorage implements IStorage {
 
   async deleteInitiativeMember(id: string): Promise<boolean> {
     const result = await db.delete(initiativeMembers).where(eq(initiativeMembers.id, id));
+    return result.rowCount > 0;
+  }
+
+  async deleteInitiativeMembersByInitiativeId(initiativeId: string): Promise<boolean> {
+    const result = await db.delete(initiativeMembers).where(eq(initiativeMembers.initiativeId, initiativeId));
     return result.rowCount > 0;
   }
 
