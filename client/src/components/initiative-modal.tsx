@@ -285,7 +285,7 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            {editingInitiative ? 'Edit Initiative' : 'Buat Initiative Baru'}
+            {actualEditingInitiative ? 'Edit Initiative' : 'Buat Initiative Baru'}
           </DialogTitle>
         </DialogHeader>
 
