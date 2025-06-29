@@ -62,8 +62,9 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
 
   // Helper function to get key result title
   const getKeyResultTitle = (keyResultId: string) => {
+    if (!keyResultId) return "No Key Result";
     const keyResult = keyResults.find(kr => kr.id === keyResultId);
-    return keyResult?.title || "Unknown Key Result";
+    return keyResult?.title || "Key Result Not Found";
   };
 
   // Helper function to get status color
