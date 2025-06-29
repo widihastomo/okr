@@ -159,27 +159,17 @@ export default function ListView({ tasks, onEditTask, onDeleteTask, userId }: Li
   };
 
   return (
-    <div className="space-y-3">
-      {/* Table Header */}
-      <div className="grid grid-cols-12 gap-4 px-4 py-2 bg-gray-50 rounded-lg text-sm font-medium text-gray-700">
-        <div className="col-span-1">Health</div>
-        <div className="col-span-4">Task</div>
-        <div className="col-span-2">Status</div>
-        <div className="col-span-1">Priority</div>
-        <div className="col-span-2">Due Date</div>
-        <div className="col-span-1">Assignee</div>
-        <div className="col-span-1">Actions</div>
-      </div>
+    <div className="space-y-2">
 
       {/* Task Rows */}
       {tasks.map((task: any) => (
-        <div key={task.id} className="grid grid-cols-12 gap-4 px-4 py-3 bg-white rounded-lg border hover:shadow-sm transition-shadow">
-          {/* Health Score */}
-          <div className="col-span-1 flex items-center">
+        <div key={task.id} className="flex items-center justify-between p-3 hover:bg-gray-50 transition-colors group">
+          <div className="flex items-center gap-3 flex-1">
+            {/* Task Health Score Dot */}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className={`w-3 h-3 rounded-full cursor-help ${
+                  <div className={`w-2 h-2 rounded-full cursor-help ${
                     calculateTaskHealthScore(task) >= 80 ? 'bg-green-500' :
                     calculateTaskHealthScore(task) >= 60 ? 'bg-yellow-500' :
                     calculateTaskHealthScore(task) >= 40 ? 'bg-orange-500' :
@@ -188,41 +178,58 @@ export default function ListView({ tasks, onEditTask, onDeleteTask, userId }: Li
                 </TooltipTrigger>
                 <TooltipContent className="max-w-xs">
                   <div className="space-y-2 text-xs">
-                    <div className="font-medium">
-                      Task Health: {getTaskHealthLabel(calculateTaskHealthScore(task))} ({calculateTaskHealthScore(task)}%)
-                    </div>
+                    <div className="font-medium">Task Health Score: {getTaskHealthLabel(calculateTaskHealthScore(task))} ({calculateTaskHealthScore(task)}%)</div>
                     <div className="space-y-1 text-gray-600">
                       <div>• Status: {getTaskStatusLabel(task.status)}</div>
                       <div>• Priority: {getTaskPriorityLabel(task.priority)}</div>
                       <div>• Due Date: {formatDate(task.dueDate) || 'No due date'}</div>
+                      {(() => {
+                        if (!task.dueDate) return null;
+                        const daysUntilDue = Math.floor((new Date(task.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                        if (daysUntilDue < 0) return <div className="text-red-600">• Overdue by {Math.abs(daysUntilDue)} days</div>;
+                        if (daysUntilDue === 0) return <div className="text-orange-600">• Due today</div>;
+                        if (daysUntilDue <= 3) return <div className="text-yellow-600">• Due in {daysUntilDue} days</div>;
+                        return <div>• Due in {daysUntilDue} days</div>;
+                      })()}
                     </div>
                   </div>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-          </div>
 
-          {/* Task Title */}
-          <div className="col-span-4">
-            <Link href={`/tasks/${task.id}`}>
-              <h4 className="font-medium text-gray-900 hover:text-blue-600 cursor-pointer">
-                {task.title}
-              </h4>
-            </Link>
-            {task.description && (
-              <p className="text-sm text-gray-600 line-clamp-1 mt-1">{task.description}</p>
-            )}
-            {task.initiative && (
-              <Link href={`/initiatives/${task.initiative.id}`}>
-                <span className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 cursor-pointer mt-1">
-                  📋 {task.initiative.title}
+            {/* Task Title and Info */}
+            <div className="flex-1">
+              <Link href={`/tasks/${task.id}`}>
+                <span className="font-medium text-gray-900 cursor-pointer hover:text-blue-600 transition-colors">
+                  {task.title}
                 </span>
               </Link>
-            )}
+              
+              {/* Due Date Info */}
+              <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                {task.dueDate && (
+                  <div className="flex items-center gap-1">
+                    <Calendar className={`h-3 w-3 ${
+                      new Date(task.dueDate) < new Date() ? 'text-red-600' : ''
+                    }`} />
+                    <span className={
+                      new Date(task.dueDate) < new Date() ? 'text-red-600 font-medium' : ''
+                    }>{formatDate(task.dueDate)}</span>
+                  </div>
+                )}
+                {task.initiative && (
+                  <Link href={`/initiatives/${task.initiative.id}`}>
+                    <span className="text-blue-600 hover:text-blue-800 cursor-pointer">
+                      📋 {task.initiative.title}
+                    </span>
+                  </Link>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Status */}
-          <div className="col-span-2">
+          <div className="flex items-center gap-2">
+            {/* Status Badge */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button 
@@ -271,44 +278,21 @@ export default function ListView({ tasks, onEditTask, onDeleteTask, userId }: Li
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
 
-          {/* Priority */}
-          <div className="col-span-1">
+            {/* Priority Badge */}
             <Badge className={`${getTaskPriorityColor(task.priority)} text-xs px-2 py-1`}>
               {getTaskPriorityLabel(task.priority)}
             </Badge>
-          </div>
 
-          {/* Due Date */}
-          <div className="col-span-2 text-sm">
-            {task.dueDate ? (
-              <div className="flex items-center gap-1">
-                <Calendar className={`h-3 w-3 ${
-                  new Date(task.dueDate) < new Date() ? 'text-red-600' : 'text-gray-500'
-                }`} />
-                <span className={
-                  new Date(task.dueDate) < new Date() ? 'text-red-600 font-medium' : 'text-gray-600'
-                }>
-                  {formatDate(task.dueDate)}
-                </span>
-                {new Date(task.dueDate) < new Date() && (
-                  <AlertCircle className="h-3 w-3 text-red-600" />
-                )}
-              </div>
-            ) : (
-              <span className="text-gray-400">No due date</span>
-            )}
-          </div>
-
-          {/* Assignee */}
-          <div className="col-span-1">
-            {task.assignedUser ? (
+            {/* Assigned User Avatars */}
+            {task.assignedTo && task.assignedUser && (
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium cursor-help">
-                      {task.assignedUser.firstName?.charAt(0)}{task.assignedUser.lastName?.charAt(0)}
+                    <div className="flex -space-x-2">
+                      <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white cursor-help">
+                        {task.assignedUser.firstName?.charAt(0)}{task.assignedUser.lastName?.charAt(0)}
+                      </div>
                     </div>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -318,27 +302,31 @@ export default function ListView({ tasks, onEditTask, onDeleteTask, userId }: Li
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-            ) : (
-              <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                <User className="h-4 w-4 text-gray-600" />
-              </div>
             )}
-          </div>
 
-          {/* Actions */}
-          <div className="col-span-1">
+            {/* Action Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
+                >
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onEditTask(task)} className="cursor-pointer">
+                <DropdownMenuItem
+                  onClick={() => onEditTask(task)}
+                  className="cursor-pointer"
+                >
                   <Edit className="h-4 w-4 mr-2" />
                   Edit
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onDeleteTask(task)} className="cursor-pointer text-red-600">
+                <DropdownMenuItem
+                  onClick={() => onDeleteTask(task)}
+                  className="cursor-pointer text-red-600"
+                >
                   <Trash2 className="h-4 w-4 mr-2" />
                   Delete
                 </DropdownMenuItem>
