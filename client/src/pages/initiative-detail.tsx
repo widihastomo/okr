@@ -16,6 +16,7 @@ import {
   Edit,
   Trash2,
   Info,
+  ChevronDown,
 } from "lucide-react";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
@@ -616,9 +617,10 @@ export default function InitiativeDetailPage() {
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Badge 
-                              className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80`}
+                              className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1`}
                             >
                               {getTaskStatusLabel(task.status)}
+                              <ChevronDown className="h-3 w-3" />
                             </Badge>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
@@ -692,7 +694,7 @@ export default function InitiativeDetailPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                              className="h-6 w-6 p-0"
                             >
                               <MoreVertical className="h-4 w-4" />
                             </Button>
