@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Plus, Calendar, Flag, FileText, Users, User, Search, ChevronDown, X } from "lucide-react";
@@ -86,7 +86,13 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
       budget: actualEditingInitiative.budget || "",
       startDate: actualEditingInitiative.startDate ? new Date(actualEditingInitiative.startDate).toISOString().split('T')[0] : "",
       dueDate: actualEditingInitiative.dueDate ? new Date(actualEditingInitiative.dueDate).toISOString().split('T')[0] : "",
-      members: actualEditingInitiative.members?.map((m: any) => typeof m === 'string' ? m : m.userId || m.id) || [],
+      members: actualEditingInitiative.members?.map((m: any) => {
+        if (typeof m === 'string') return m;
+        if (m.userId) return m.userId;
+        if (m.user?.id) return m.user.id;
+        if (m.id && !m.initiativeId) return m.id;
+        return null;
+      }).filter(Boolean) || [],
     } : {
       title: "",
       description: "",
@@ -98,6 +104,13 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
       dueDate: "",
       members: [],
     },
+  });
+
+  // Watch the members field to ensure UI synchronization
+  const watchedMembers = useWatch({
+    control: form.control,
+    name: "members",
+    defaultValue: []
   });
 
   // Handle modal state for editing
@@ -115,25 +128,29 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
 
   // Reset form when editing initiative changes
   useEffect(() => {
-    if (editingInitiative && form) {
-      const memberIds = editingInitiative.members?.map((m: any) => {
+    if (actualEditingInitiative && form) {
+      // Extract member IDs properly from the members array
+      const memberIds = actualEditingInitiative.members?.map((m: any) => {
         if (typeof m === 'string') return m;
-        return m.userId || m.id;
+        // Handle different member data structures
+        if (m.userId) return m.userId;
+        if (m.user?.id) return m.user.id;
+        if (m.id && !m.initiativeId) return m.id; // User ID, not member record ID
+        return null;
       }).filter(Boolean) || [];
 
-      form.reset({
-        title: editingInitiative.title || "",
-        description: editingInitiative.description || "",
-        status: editingInitiative.status || "not_started",
-        priority: editingInitiative.priority || "medium",
-        picId: editingInitiative.picId || "",
-        budget: editingInitiative.budget || "",
-        startDate: editingInitiative.startDate ? new Date(editingInitiative.startDate).toISOString().split('T')[0] : "",
-        dueDate: editingInitiative.dueDate ? new Date(editingInitiative.dueDate).toISOString().split('T')[0] : "",
-        members: memberIds,
-      });
+      // Use setValue for each field to ensure proper form updates
+      form.setValue('title', actualEditingInitiative.title || "");
+      form.setValue('description', actualEditingInitiative.description || "");
+      form.setValue('status', actualEditingInitiative.status || "not_started");
+      form.setValue('priority', actualEditingInitiative.priority || "medium");
+      form.setValue('picId', actualEditingInitiative.picId || "");
+      form.setValue('budget', actualEditingInitiative.budget || "");
+      form.setValue('startDate', actualEditingInitiative.startDate ? new Date(actualEditingInitiative.startDate).toISOString().split('T')[0] : "");
+      form.setValue('dueDate', actualEditingInitiative.dueDate ? new Date(actualEditingInitiative.dueDate).toISOString().split('T')[0] : "");
+      form.setValue('members', memberIds);
     }
-  }, [editingInitiative, form]);
+  }, [actualEditingInitiative, form]);
 
   // Handle modal close
   const handleClose = (isOpen: boolean) => {
@@ -495,25 +512,28 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
                                 </div>
                               </div>
                               <div className="p-2 space-y-1">
-                                {filteredUsers.map((user) => (
-                                  <div key={user.id} className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded">
-                                    <Checkbox
-                                      id={user.id}
-                                      checked={field.value?.includes(user.id) || false}
-                                      onCheckedChange={(checked) => {
-                                        const currentMembers = field.value || [];
-                                        if (checked) {
-                                          field.onChange([...currentMembers, user.id]);
-                                        } else {
-                                          field.onChange(currentMembers.filter(id => id !== user.id));
-                                        }
-                                      }}
-                                    />
-                                    <label htmlFor={user.id} className="text-sm font-medium cursor-pointer">
-                                      {`${user.firstName} ${user.lastName}`}
-                                    </label>
-                                  </div>
-                                ))}
+                                {filteredUsers.map((user) => {
+                                  const isChecked = watchedMembers?.includes(user.id) || false;
+                                  return (
+                                    <div key={user.id} className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded">
+                                      <Checkbox
+                                        id={user.id}
+                                        checked={isChecked}
+                                        onCheckedChange={(checked) => {
+                                          const currentMembers = watchedMembers || [];
+                                          if (checked) {
+                                            field.onChange([...currentMembers, user.id]);
+                                          } else {
+                                            field.onChange(currentMembers.filter(id => id !== user.id));
+                                          }
+                                        }}
+                                      />
+                                      <label htmlFor={user.id} className="text-sm font-medium cursor-pointer">
+                                        {`${user.firstName} ${user.lastName}`}
+                                      </label>
+                                    </div>
+                                  );
+                                })}
                               </div>
                             </div>
                           )}
