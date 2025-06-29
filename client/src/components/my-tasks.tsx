@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, CheckCircle2, Circle, CheckSquare, ChevronDown, Check, MoreVertical, User } from "lucide-react";
+import { Calendar, CheckCircle2, Circle, CheckSquare, ChevronDown, Check, MoreVertical, User, Plus, Edit, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
@@ -22,6 +22,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import TaskModal from "@/components/task-modal";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface MyTasksProps {
   filteredKeyResultIds?: string[];
@@ -111,6 +122,9 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
   const { user } = useAuth();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<any>(null);
+  const [taskToDelete, setTaskToDelete] = useState<any>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -146,6 +160,29 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
       toast({
         title: "Error",
         description: "Failed to update task status.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation for deleting task
+  const deleteTaskMutation = useMutation({
+    mutationFn: async (taskId: string) => {
+      return await apiRequest(`/api/tasks/${taskId}`, 'DELETE');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
+      toast({
+        title: "Task Deleted",
+        description: "Task has been deleted successfully.",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+      setTaskToDelete(null);
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete task.",
         variant: "destructive",
       });
     },
@@ -221,32 +258,42 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
 
   return (
     <div className="space-y-6">
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="not_started">Belum Dimulai</SelectItem>
-            <SelectItem value="in_progress">Sedang Dikerjakan</SelectItem>
-            <SelectItem value="completed">Selesai</SelectItem>
-            <SelectItem value="cancelled">Dibatalkan</SelectItem>
-          </SelectContent>
-        </Select>
+      {/* Header with Filters and Add Task Button */}
+      <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="not_started">Belum Dimulai</SelectItem>
+              <SelectItem value="in_progress">Sedang Dikerjakan</SelectItem>
+              <SelectItem value="completed">Selesai</SelectItem>
+              <SelectItem value="cancelled">Dibatalkan</SelectItem>
+            </SelectContent>
+          </Select>
 
-        <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-          <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Priority" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Priorities</SelectItem>
-            <SelectItem value="high">High</SelectItem>
-            <SelectItem value="medium">Medium</SelectItem>
-            <SelectItem value="low">Low</SelectItem>
-          </SelectContent>
-        </Select>
+          <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Priority" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Priorities</SelectItem>
+              <SelectItem value="high">High</SelectItem>
+              <SelectItem value="medium">Medium</SelectItem>
+              <SelectItem value="low">Low</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <Button
+          onClick={() => setIsTaskModalOpen(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+        >
+          <Plus className="h-4 w-4" />
+          Tambah Task
+        </Button>
       </div>
 
       {/* Task List */}
