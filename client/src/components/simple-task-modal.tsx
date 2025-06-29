@@ -83,6 +83,7 @@ export default function SimpleTaskModal({ open, onClose, task, onSuccess }: Simp
       const response = await fetch(`/api/tasks`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(data),
       });
       if (!response.ok) {
@@ -108,6 +109,7 @@ export default function SimpleTaskModal({ open, onClose, task, onSuccess }: Simp
       const response = await fetch(`/api/tasks/${task.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(data),
       });
       if (!response.ok) throw new Error("Failed to update task");
