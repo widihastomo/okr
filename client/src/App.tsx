@@ -25,6 +25,7 @@ import Profile from "@/pages/profile";
 import NotFound from "@/pages/not-found";
 import AnalyticsPage from "@/pages/analytics";
 import AchievementsPage from "@/pages/achievements";
+import QuickTaskFAB from "@/components/quick-task-fab";
 
 
 function Router() {
@@ -96,6 +97,9 @@ function Router() {
             <Route component={NotFound} />
           </Switch>
         </div>
+
+        {/* Quick Task Floating Action Button */}
+        <QuickTaskFAB />
       </div>
     </div>
   );
