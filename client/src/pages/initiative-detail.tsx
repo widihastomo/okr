@@ -180,11 +180,8 @@ export default function InitiativeDetailPage() {
           Kembali ke Initiatives
         </Link>
         
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{initiative.title}</h1>
-            <p className="text-gray-600 mt-1">{initiative.description}</p>
-          </div>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-gray-900">Initiative Details</h1>
           <Badge className={getStatusColor(initiative.status)}>
             {getStatusLabel(initiative.status)}
           </Badge>
@@ -200,6 +197,16 @@ export default function InitiativeDetailPage() {
               <CardTitle>Overview</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Title and Description */}
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-2">{initiative.title}</h2>
+                {initiative.description && (
+                  <p className="text-gray-600 text-sm leading-relaxed">{initiative.description}</p>
+                )}
+              </div>
+
+              <Separator />
+
               {/* Progress */}
               <div>
                 <div className="flex justify-between items-center mb-2">
