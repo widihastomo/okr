@@ -1504,6 +1504,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create task for specific initiative
+  // Get tasks by initiative ID
+  app.get("/api/initiatives/:initiativeId/tasks", async (req, res) => {
+    try {
+      const initiativeId = req.params.initiativeId;
+      const tasks = await storage.getTasksByInitiativeId(initiativeId);
+      
+      // Get user details for each task
+      const tasksWithUsers = await Promise.all(tasks.map(async (task) => {
+        let assignedUser = null;
+        if (task.assignedTo) {
+          assignedUser = await storage.getUser(task.assignedTo);
+        }
+        return {
+          ...task,
+          assignedUser
+        };
+      }));
+      
+      res.json(tasksWithUsers);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+      res.status(500).json({ message: "Failed to fetch tasks" });
+    }
+  });
+
   app.post("/api/initiatives/:initiativeId/tasks", async (req, res) => {
     try {
       const initiativeId = req.params.initiativeId;
