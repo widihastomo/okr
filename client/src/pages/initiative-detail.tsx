@@ -587,12 +587,34 @@ export default function InitiativeDetailPage() {
                           </Tooltip>
                         </TooltipProvider>
 
-                        {/* Task Title */}
-                        <Link href={`/tasks/${task.id}`}>
-                          <span className="font-medium text-gray-900 cursor-pointer hover:text-blue-600 transition-colors">
-                            {task.title}
-                          </span>
-                        </Link>
+                        {/* Task Title and Info */}
+                        <div className="flex-1">
+                          <Link href={`/tasks/${task.id}`}>
+                            <span className="font-medium text-gray-900 cursor-pointer hover:text-blue-600 transition-colors">
+                              {task.title}
+                            </span>
+                          </Link>
+                          
+                          {/* Due Date and User Info */}
+                          <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                            {task.dueDate && (
+                              <div className="flex items-center gap-1">
+                                <Calendar className={`h-3 w-3 ${
+                                  new Date(task.dueDate) < new Date() ? 'text-red-600' : ''
+                                }`} />
+                                <span className={
+                                  new Date(task.dueDate) < new Date() ? 'text-red-600 font-medium' : ''
+                                }>{formatDate(task.dueDate)}</span>
+                              </div>
+                            )}
+                            {task.assignedTo && task.assignedUser && (
+                              <div className="flex items-center gap-1">
+                                <User className="h-3 w-3" />
+                                <span>{task.assignedUser.firstName} {task.assignedUser.lastName}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
 
                       <div className="flex items-center gap-2">
@@ -652,11 +674,22 @@ export default function InitiativeDetailPage() {
 
                         {/* Assigned User Avatars */}
                         {task.assignedTo && task.assignedUser && (
-                          <div className="flex -space-x-2">
-                            <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white">
-                              {task.assignedUser.firstName?.charAt(0)}{task.assignedUser.lastName?.charAt(0)}
-                            </div>
-                          </div>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="flex -space-x-2">
+                                  <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white cursor-help">
+                                    {task.assignedUser.firstName?.charAt(0)}{task.assignedUser.lastName?.charAt(0)}
+                                  </div>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <div className="text-xs">
+                                  {task.assignedUser.firstName} {task.assignedUser.lastName}
+                                </div>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         )}
 
                         {/* Action Menu */}

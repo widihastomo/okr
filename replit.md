@@ -196,6 +196,12 @@ Changelog:
   * Implemented automatic progress calculation with proper Indonesian number formatting
   * Created clickable link navigation to related key result detail page
   * Enhanced visual design with blue-themed card for better information prominence
+- June 29, 2025. Enhanced task display with due date and user information:
+  * Added due date display below task titles with calendar icons and color-coded overdue indicators
+  * Added assigned user name display below task titles with user icons
+  * Created interactive tooltips on user avatars showing full names on hover
+  * Overdue tasks highlighted in red for immediate visual attention
+  * Maintained clean layout structure with secondary information positioned below titles
 - June 29, 2025. Updated task UI design to clean minimalist layout:
   * Converted task cards to streamlined horizontal rows matching user-provided reference design
   * Task health score displayed as small colored dot indicator on left side with detailed tooltip
