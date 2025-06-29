@@ -82,16 +82,7 @@ export default function GlobalHeader({ onMenuToggle }: GlobalHeaderProps) {
 
       {/* Right side - Action buttons and notifications */}
       <div className="flex items-center space-x-3">
-        {/* Create OKR Button */}
-        <Button
-          onClick={handleCreateOKR}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
-          title="Buat OKR (Ctrl+K)"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Buat OKR</span>
-          <span className="text-xs opacity-75 ml-2 hidden md:inline">Ctrl+K</span>
-        </Button>
+        
 
         
 
