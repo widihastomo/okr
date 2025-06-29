@@ -160,6 +160,17 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
         }, 500);
       }
       
+      // Show toast if user was automatically removed as member
+      if (data.removedAsMember) {
+        setTimeout(() => {
+          toast({
+            title: "Member dihapus",
+            description: "User dihapus dari initiative karena tidak memiliki task lagi",
+            className: "border-orange-200 bg-orange-50 text-orange-800",
+          });
+        }, 1000);
+      }
+      
       onClose();
     },
     onError: () => {

@@ -95,6 +95,7 @@ export interface IStorage {
   
   // Tasks
   getTasks(): Promise<Task[]>;
+  getTask(id: string): Promise<Task | undefined>;
   createTask(task: InsertTask): Promise<Task>;
   updateTask(id: string, task: Partial<InsertTask>): Promise<Task | undefined>;
   deleteTask(id: string): Promise<boolean>;
@@ -1005,6 +1006,11 @@ export class DatabaseStorage implements IStorage {
   async deleteInitiativeDocument(id: string): Promise<boolean> {
     const result = await db.delete(initiativeDocuments).where(eq(initiativeDocuments.id, id));
     return result.rowCount > 0;
+  }
+
+  async getTask(id: string): Promise<Task | undefined> {
+    const [task] = await db.select().from(tasks).where(eq(tasks.id, id));
+    return task || undefined;
   }
 
   async deleteTask(id: string): Promise<boolean> {

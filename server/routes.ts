@@ -1543,8 +1543,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = req.params.id;
       
       // Get the original task before updating to check previous assignee
-      const originalTask = await storage.getTaskWithDetails(id);
-      const originalAssignedTo = originalTask?.assignedTo?.id;
+      const originalTask = await storage.getTask(id);
+      const originalAssignedTo = originalTask?.assignedTo;
+      console.log("📋 Original task assignee:", originalAssignedTo);
+      console.log("🔄 New assignee will be:", req.body.assignedTo);
       
       const updatedTask = await storage.updateTask(id, req.body);
       
@@ -1582,6 +1584,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           originalAssignedTo !== updatedTask.assignedTo && 
           updatedTask.initiativeId) {
         try {
+          console.log("🔍 Checking member removal for user:", originalAssignedTo);
+          
           // Check if the previous assignee has any other tasks in this initiative
           const allTasks = await storage.getTasksByInitiativeId(updatedTask.initiativeId);
           const hasOtherTasks = allTasks.some(task => 
@@ -1592,6 +1596,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const initiative = await storage.getInitiativeWithDetails(updatedTask.initiativeId);
           const isPIC = initiative && initiative.picId === originalAssignedTo;
           
+          console.log(`User ${originalAssignedTo}: hasOtherTasks=${hasOtherTasks}, isPIC=${isPIC}`);
+          
           // If user has no other tasks and is not PIC, remove them as member
           if (!hasOtherTasks && !isPIC) {
             const existingMembers = await storage.getInitiativeMembers(updatedTask.initiativeId);
@@ -1600,15 +1606,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
             if (memberToRemove) {
               await storage.deleteInitiativeMember(memberToRemove.id);
               removedAsMember = true;
+              console.log("✅ Member removed from initiative");
             }
           }
         } catch (memberError) {
           console.error("Error removing user from initiative members:", memberError);
-          // Continue without failing the task update
         }
+      } else {
+        console.log("❌ Member removal conditions not met:", {
+          originalAssignedTo: !!originalAssignedTo,
+          differentAssignee: originalAssignedTo !== updatedTask.assignedTo,
+          hasInitiativeId: !!updatedTask.initiativeId
+        });
       }
       
-      res.json({ ...updatedTask, addedAsMember, removedAsMember });
+      // Update initiative progress after updating task
+      await storage.updateInitiativeProgress(updatedTask.initiativeId);
+      
+      res.json({ task: updatedTask, addedAsMember, removedAsMember });
     } catch (error) {
       console.error("Error updating task:", error);
       res.status(500).json({ message: "Failed to update task" });
