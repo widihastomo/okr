@@ -1684,21 +1684,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create a standalone task
   app.post("/api/tasks", async (req, res) => {
     try {
-      // Get current user ID - handle both development and production modes
-      let currentUserId: string;
-      if (process.env.NODE_ENV === 'development') {
-        // Use mock user ID for development
-        currentUserId = "550e8400-e29b-41d4-a716-446655440001";
-      } else {
-        // Production mode - require authentication
-        if (!req.session?.userId) {
-          return res.status(401).json({ message: "Authentication required" });
-        }
-        currentUserId = req.session.userId;
+      // Get current user ID from session
+      if (!req.session?.userId) {
+        return res.status(401).json({ message: "Authentication required" });
       }
+      const currentUserId = req.session.userId;
 
       const taskData = {
-        ...req.body,
+        title: req.body.title,
+        description: req.body.description,
+        status: req.body.status,
+        priority: req.body.priority,
         createdBy: currentUserId,
         assignedTo: req.body.assignedTo || null,
         dueDate: req.body.dueDate ? new Date(req.body.dueDate) : null,
