@@ -208,6 +208,68 @@ export const insertTaskSchema = createInsertSchema(tasks).omit({
   completedAt: true,
 });
 
+// Gamification Tables
+export const achievements = pgTable("achievements", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  category: text("category").notNull(), // "progress", "streak", "milestone", "collaboration"
+  badgeIcon: text("badge_icon").notNull(), // icon name for the badge
+  badgeColor: text("badge_color").notNull(), // color scheme for the badge
+  points: integer("points").notNull().default(0),
+  condition: jsonb("condition").notNull(), // JSON defining achievement conditions
+  isActive: boolean("is_active").notNull().default(true),
+  rarity: text("rarity").notNull().default("common"), // "common", "rare", "epic", "legendary"
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const userAchievements = pgTable("user_achievements", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  achievementId: uuid("achievement_id").notNull().references(() => achievements.id),
+  unlockedAt: timestamp("unlocked_at").defaultNow(),
+  progress: integer("progress").notNull().default(0), // current progress towards achievement
+  isCompleted: boolean("is_completed").notNull().default(false),
+});
+
+export const userStats = pgTable("user_stats", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull().references(() => users.id).unique(),
+  totalPoints: integer("total_points").notNull().default(0),
+  level: integer("level").notNull().default(1),
+  currentStreak: integer("current_streak").notNull().default(0), // days of consecutive activity
+  longestStreak: integer("longest_streak").notNull().default(0),
+  lastActivityDate: text("last_activity_date"),
+  objectivesCompleted: integer("objectives_completed").notNull().default(0),
+  keyResultsCompleted: integer("key_results_completed").notNull().default(0),
+  checkInsCreated: integer("check_ins_created").notNull().default(0),
+  initiativesCreated: integer("initiatives_created").notNull().default(0),
+  collaborationScore: integer("collaboration_score").notNull().default(0),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const levelRewards = pgTable("level_rewards", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  level: integer("level").notNull().unique(),
+  title: text("title").notNull(), // "Goal Setter", "Progress Tracker", etc.
+  description: text("description").notNull(),
+  badgeIcon: text("badge_icon").notNull(),
+  badgeColor: text("badge_color").notNull(),
+  pointsRequired: integer("points_required").notNull(),
+  unlockMessage: text("unlock_message").notNull(),
+});
+
+export const activityLogs = pgTable("activity_logs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  action: text("action").notNull(), // "check_in_created", "objective_completed", etc.
+  entityType: text("entity_type").notNull(), // "objective", "key_result", "initiative"
+  entityId: uuid("entity_id").notNull(),
+  pointsEarned: integer("points_earned").notNull().default(0),
+  metadata: jsonb("metadata"), // additional context about the action
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const updateKeyResultProgressSchema = z.object({
   id: z.string(),
   currentValue: z.number(),
@@ -217,6 +279,31 @@ export const updateKeyResultProgressSchema = z.object({
 export const createOKRFromTemplateSchema = z.object({
   cycleId: z.string(),
   templateId: z.string(),
+});
+
+// Gamification Insert Schemas
+export const insertAchievementSchema = createInsertSchema(achievements).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertUserAchievementSchema = createInsertSchema(userAchievements).omit({
+  id: true,
+  unlockedAt: true,
+});
+
+export const insertUserStatsSchema = createInsertSchema(userStats).omit({
+  id: true,
+  updatedAt: true,
+});
+
+export const insertLevelRewardSchema = createInsertSchema(levelRewards).omit({
+  id: true,
+});
+
+export const insertActivityLogSchema = createInsertSchema(activityLogs).omit({
+  id: true,
+  createdAt: true,
 });
 
 export type InsertCycle = z.infer<typeof insertCycleSchema>;
@@ -231,6 +318,13 @@ export type InsertTask = z.infer<typeof insertTaskSchema>;
 export type UpdateKeyResultProgress = z.infer<typeof updateKeyResultProgressSchema>;
 export type CreateOKRFromTemplate = z.infer<typeof createOKRFromTemplateSchema>;
 
+// Gamification Types
+export type InsertAchievement = z.infer<typeof insertAchievementSchema>;
+export type InsertUserAchievement = z.infer<typeof insertUserAchievementSchema>;
+export type InsertUserStats = z.infer<typeof insertUserStatsSchema>;
+export type InsertLevelReward = z.infer<typeof insertLevelRewardSchema>;
+export type InsertActivityLog = z.infer<typeof insertActivityLogSchema>;
+
 // Primary type definitions - single source of truth
 export type Cycle = typeof cycles.$inferSelect;
 export type Template = typeof templates.$inferSelect;
@@ -244,6 +338,13 @@ export type Task = typeof tasks.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type Team = typeof teams.$inferSelect;
 export type TeamMember = typeof teamMembers.$inferSelect;
+
+// Gamification Primary Types
+export type Achievement = typeof achievements.$inferSelect;
+export type UserAchievement = typeof userAchievements.$inferSelect;
+export type UserStats = typeof userStats.$inferSelect;
+export type LevelReward = typeof levelRewards.$inferSelect;
+export type ActivityLog = typeof activityLogs.$inferSelect;
 
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
@@ -313,6 +414,36 @@ export const tasksRelations = relations(tasks, ({ one }) => ({
   }),
   creator: one(users, {
     fields: [tasks.createdBy],
+    references: [users.id],
+  }),
+}));
+
+// Gamification Relations
+export const achievementsRelations = relations(achievements, ({ many }) => ({
+  userAchievements: many(userAchievements),
+}));
+
+export const userAchievementsRelations = relations(userAchievements, ({ one }) => ({
+  user: one(users, {
+    fields: [userAchievements.userId],
+    references: [users.id],
+  }),
+  achievement: one(achievements, {
+    fields: [userAchievements.achievementId],
+    references: [achievements.id],
+  }),
+}));
+
+export const userStatsRelations = relations(userStats, ({ one }) => ({
+  user: one(users, {
+    fields: [userStats.userId],
+    references: [users.id],
+  }),
+}));
+
+export const activityLogsRelations = relations(activityLogs, ({ one }) => ({
+  user: one(users, {
+    fields: [activityLogs.userId],
     references: [users.id],
   }),
 }));

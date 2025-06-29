@@ -4,6 +4,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { scheduleCycleStatusUpdates } from "./cycle-status-updater";
 import { populateDatabase } from "./populate-postgres";
+import { populateGamificationData } from "./gamification-data";
 import { testDatabaseConnection } from "./db";
 import { validateEnvironment, getConfig } from "./config";
 

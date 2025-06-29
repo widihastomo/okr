@@ -12,6 +12,8 @@ import { requireAuth, hashPassword } from "./emailAuth";
 import { calculateProgressStatus } from "./progress-tracker";
 import { updateObjectiveWithAutoStatus } from "./storage";
 import { updateCycleStatuses } from "./cycle-status-updater";
+import { gamificationService } from "./gamification";
+import { populateGamificationData } from "./gamification-data";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
@@ -780,6 +782,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: keyResultId,
         currentValue: parseFloat(req.body.value)
       });
+
+      // Award points for creating a check-in
+      try {
+        await gamificationService.awardPoints(
+          checkInData.createdBy,
+          "check_in_created",
+          "key_result",
+          keyResultId,
+          10, // 10 points for check-in
+          { value: req.body.value, notes: req.body.notes }
+        );
+      } catch (gamificationError) {
+        console.error("Error awarding points for check-in:", gamificationError);
+        // Don't fail the check-in creation if gamification fails
+      }
       
       res.status(201).json(checkIn);
     } catch (error) {
@@ -892,6 +909,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
           await storage.createTask(validatedTaskData);
         }
+      }
+
+      // Award points for creating an initiative
+      try {
+        await gamificationService.awardPoints(
+          currentUser.id,
+          "initiative_created",
+          "initiative",
+          initiative.id,
+          25, // 25 points for creating initiative
+          { title: initiative.title, keyResultId }
+        );
+      } catch (gamificationError) {
+        console.error("Error awarding points for initiative creation:", gamificationError);
       }
       
       res.status(201).json(initiative);
@@ -1678,6 +1709,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(stats);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch stats" });
+    }
+  });
+
+  // Gamification API Routes
+  app.get("/api/gamification/stats/:userId", requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const stats = await gamificationService.getUserStats(userId);
+      
+      if (!stats) {
+        // Initialize stats for new user
+        const newStats = await gamificationService.initializeUserStats(userId);
+        return res.json(newStats);
+      }
+      
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching user stats:", error);
+      res.status(500).json({ message: "Failed to fetch user stats" });
+    }
+  });
+
+  app.get("/api/gamification/achievements/:userId", requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const achievements = await gamificationService.getUserAchievements(userId);
+      res.json(achievements);
+    } catch (error) {
+      console.error("Error fetching user achievements:", error);
+      res.status(500).json({ message: "Failed to fetch user achievements" });
+    }
+  });
+
+  app.get("/api/gamification/activity/:userId", requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const activity = await gamificationService.getUserActivity(userId, limit);
+      res.json(activity);
+    } catch (error) {
+      console.error("Error fetching user activity:", error);
+      res.status(500).json({ message: "Failed to fetch user activity" });
+    }
+  });
+
+  app.get("/api/gamification/leaderboard", requireAuth, async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const leaderboard = await gamificationService.getLeaderboard(limit);
+      res.json(leaderboard);
+    } catch (error) {
+      console.error("Error fetching leaderboard:", error);
+      res.status(500).json({ message: "Failed to fetch leaderboard" });
+    }
+  });
+
+  // Initialize gamification data
+  app.post("/api/gamification/initialize", requireAuth, async (req, res) => {
+    try {
+      await populateGamificationData();
+      res.json({ message: "Gamification data initialized successfully" });
+    } catch (error) {
+      console.error("Error initializing gamification data:", error);
+      res.status(500).json({ message: "Failed to initialize gamification data" });
     }
   });
 
