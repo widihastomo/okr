@@ -18,18 +18,30 @@ export default function MyTasks() {
   const userId = user && typeof user === 'object' && 'id' in user ? (user as any).id : null;
 
   // Fetch tasks assigned to current user
-  const { data: tasks = [], isLoading } = useQuery({
+  const { data: rawTasks = [], isLoading } = useQuery({
     queryKey: [`/api/users/${userId}/tasks`],
     enabled: !!userId,
     staleTime: 0, // Always refetch to ensure we get latest tasks
   });
 
-  // Filter tasks
-  const filteredTasks = tasks.filter((task: any) => {
-    const statusMatch = statusFilter === "all" || task.status === statusFilter;
-    const priorityMatch = priorityFilter === "all" || task.priority === priorityFilter;
-    return statusMatch && priorityMatch;
-  });
+  // Filter and sort tasks
+  const tasks = Array.isArray(rawTasks) ? rawTasks as any[] : [];
+  const filteredTasks = tasks
+    .filter((task: any) => {
+      const statusMatch = statusFilter === "all" || task.status === statusFilter;
+      const priorityMatch = priorityFilter === "all" || task.priority === priorityFilter;
+      return statusMatch && priorityMatch;
+    })
+    .sort((a: any, b: any) => {
+      // Sort by deadline - earliest first, tasks without deadline go to end
+      if (!a.dueDate && !b.dueDate) return 0;
+      if (!a.dueDate) return 1;
+      if (!b.dueDate) return -1;
+      
+      const dateA = new Date(a.dueDate);
+      const dateB = new Date(b.dueDate);
+      return dateA.getTime() - dateB.getTime();
+    });
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
