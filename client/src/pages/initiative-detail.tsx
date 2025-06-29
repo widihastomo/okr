@@ -22,11 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import TaskModal from "@/components/task-modal";
 
 export default function InitiativeDetailPage() {
   const { id } = useParams();
@@ -532,169 +528,21 @@ export default function InitiativeDetailPage() {
       </div>
 
       {/* Add Task Modal */}
-      <Dialog open={isAddTaskModalOpen} onOpenChange={setIsAddTaskModalOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Tambah Task Baru</DialogTitle>
-          </DialogHeader>
-          <TaskForm
-            onClose={() => setIsAddTaskModalOpen(false)}
-            initiativeId={id!}
-            onSuccess={() => {
-              queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/tasks`] });
-              setIsAddTaskModalOpen(false);
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+      <TaskModal
+        open={isAddTaskModalOpen}
+        onClose={() => setIsAddTaskModalOpen(false)}
+        initiativeId={id!}
+        isAdding={true}
+      />
 
       {/* Edit Task Modal */}
-      <Dialog open={isEditTaskModalOpen} onOpenChange={setIsEditTaskModalOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Edit Task</DialogTitle>
-          </DialogHeader>
-          {selectedTask && (
-            <TaskForm
-              task={selectedTask}
-              onClose={() => setIsEditTaskModalOpen(false)}
-              initiativeId={id!}
-              onSuccess={() => {
-                queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/tasks`] });
-                setIsEditTaskModalOpen(false);
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      <TaskModal
+        open={isEditTaskModalOpen}
+        onClose={() => setIsEditTaskModalOpen(false)}
+        task={selectedTask}
+        initiativeId={id!}
+        isAdding={false}
+      />
     </div>
-  );
-}
-
-// Simple Task Form Component
-function TaskForm({ task, onClose, initiativeId, onSuccess }: {
-  task?: any;
-  onClose: () => void;
-  initiativeId: string;
-  onSuccess: () => void;
-}) {
-  const [formData, setFormData] = useState({
-    title: task?.title || '',
-    description: task?.description || '',
-    status: task?.status || 'pending',
-    priority: task?.priority || 'medium',
-    dueDate: task?.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
-    assignedTo: task?.assignedTo || '',
-  });
-  const { toast } = useToast();
-
-  const isEditing = !!task;
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    try {
-      const url = isEditing ? `/api/tasks/${task.id}` : `/api/initiatives/${initiativeId}/tasks`;
-      const method = isEditing ? 'PUT' : 'POST';
-      
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          initiativeId,
-          dueDate: formData.dueDate || null,
-        }),
-      });
-
-      if (!response.ok) throw new Error('Failed to save task');
-
-      toast({
-        title: isEditing ? "Task berhasil diupdate" : "Task berhasil dibuat",
-        className: "border-green-200 bg-green-50 text-green-800",
-      });
-      
-      onSuccess();
-    } catch (error) {
-      toast({
-        title: "Gagal menyimpan task",
-        variant: "destructive",
-      });
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <Label htmlFor="title">Judul Task</Label>
-        <Input
-          id="title"
-          value={formData.title}
-          onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-          required
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <Label htmlFor="dueDate">Deadline</Label>
-          <Input
-            id="dueDate"
-            type="date"
-            value={formData.dueDate}
-            onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
-          />
-        </div>
-        <div>
-          <Label htmlFor="priority">Priority</Label>
-          <Select value={formData.priority} onValueChange={(value) => setFormData(prev => ({ ...prev, priority: value }))}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="low">Rendah</SelectItem>
-              <SelectItem value="medium">Sedang</SelectItem>
-              <SelectItem value="high">Tinggi</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      {isEditing && (
-        <div>
-          <Label htmlFor="status">Status</Label>
-          <Select value={formData.status} onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="in_progress">Berlangsung</SelectItem>
-              <SelectItem value="completed">Selesai</SelectItem>
-              <SelectItem value="cancelled">Dibatalkan</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      )}
-
-      <div>
-        <Label htmlFor="description">Deskripsi</Label>
-        <Textarea
-          id="description"
-          value={formData.description}
-          onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-          rows={3}
-        />
-      </div>
-
-      <div className="flex gap-2 pt-2">
-        <Button type="button" variant="outline" onClick={onClose} className="flex-1">
-          Batal
-        </Button>
-        <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700">
-          {isEditing ? 'Update Task' : 'Buat Task'}
-        </Button>
-      </div>
-    </form>
   );
 }
