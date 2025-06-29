@@ -98,6 +98,7 @@ export interface IStorage {
   updateTask(id: string, task: Partial<InsertTask>): Promise<Task | undefined>;
   deleteTask(id: string): Promise<boolean>;
   getTasksByInitiativeId(initiativeId: string): Promise<Task[]>;
+  getTasksByUserId(userId: string): Promise<Task[]>;
   updateInitiativeProgress(initiativeId: string): Promise<void>;
   
   // Key Result with Details
@@ -980,6 +981,35 @@ export class DatabaseStorage implements IStorage {
     }
     
     return result.rowCount > 0;
+  }
+
+  async getTasksByUserId(userId: string): Promise<Task[]> {
+    // Get all tasks assigned to the user with related initiative, key result, and objective information
+    const userTasks = await db
+      .select({
+        task: tasks,
+        initiative: initiatives,
+        keyResult: keyResults,
+        objective: objectives
+      })
+      .from(tasks)
+      .leftJoin(initiatives, eq(tasks.initiativeId, initiatives.id))
+      .leftJoin(keyResults, eq(initiatives.keyResultId, keyResults.id))
+      .leftJoin(objectives, eq(keyResults.objectiveId, objectives.id))
+      .where(eq(tasks.assignedTo, userId))
+      .orderBy(desc(tasks.dueDate));
+
+    // Transform the results to include nested data
+    return userTasks.map(row => ({
+      ...row.task,
+      initiative: row.initiative ? {
+        ...row.initiative,
+        keyResult: row.keyResult ? {
+          ...row.keyResult,
+          objective: row.objective || undefined
+        } : undefined
+      } : undefined
+    }));
   }
 }
 

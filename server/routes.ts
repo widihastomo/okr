@@ -1314,6 +1314,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get tasks for a specific user
+  app.get("/api/users/:userId/tasks", async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const userTasks = await storage.getTasksByUserId(userId);
+      res.json(userTasks);
+    } catch (error) {
+      console.error("Error fetching user tasks:", error);
+      res.status(500).json({ message: "Failed to fetch user tasks" });
+    }
+  });
+
   // Create task for specific initiative
   app.post("/api/initiatives/:initiativeId/tasks", async (req, res) => {
     try {
