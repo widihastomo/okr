@@ -139,6 +139,14 @@ Changelog:
   * Enhanced user experience with color-coded actions and smooth transition animations
   * Maintains global accessibility across all authenticated pages from bottom-right corner
   * Updated main FAB button color to vibrant orange (bg-orange-600/700) and "Buat OKR" button to blue primary (bg-blue-600/700) for better color differentiation
+- June 29, 2025. Reorganized initiative detail page layout with improved information architecture:
+  * Moved related initiatives section into the main overview card for better contextual grouping
+  * Relocated team members and recent activity sections to right sidebar for cleaner layout
+  * Changed from single-column to grid layout (2:1 ratio) for better space utilization
+  * Integrated key result information within overview card with compact blue-themed design
+  * Added related initiatives list showing other initiatives from same key result
+  * Enhanced visual hierarchy with main content on left and supplementary info on right
+  * Improved navigation flow by grouping related content together in logical sections
 - June 29, 2025. Completely removed task management functionality from initiative system:
   * Eliminated all task-related code from initiative creation and editing forms
   * Removed TaskModal component and all task CRUD operations from initiative detail page

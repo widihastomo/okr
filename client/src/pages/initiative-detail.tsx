@@ -35,6 +35,15 @@ export default function InitiativeDetailPage() {
   const pic = initiativeData?.pic;
   const keyResult = initiativeData?.keyResult;
 
+  // Fetch related initiatives from the same key result
+  const { data: relatedInitiatives } = useQuery({
+    queryKey: ['/api/initiatives'],
+    enabled: !!keyResult?.id,
+    select: (data: any[]) => data.filter(init => 
+      init.keyResultId === keyResult?.id && init.id !== id
+    ),
+  });
+
   if (initiativeLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -157,125 +166,141 @@ export default function InitiativeDetailPage() {
       </div>
 
       {/* Main Content */}
-      <div className="space-y-6">
-        {/* Initiative Overview */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Target className="h-5 w-5" />
-              Initiative Overview
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Title and Description */}
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">{initiativeData.title}</h1>
-              {initiativeData.description && (
-                <p className="text-gray-600 mb-3">{initiativeData.description}</p>
-              )}
-              
-              {/* Initiative Details */}
-              <div className="flex flex-wrap gap-4 mt-3 text-sm">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-gray-600">Status:</span>
-                  <Badge className={getStatusColor(initiativeData.status)}>
-                    {getStatusLabel(initiativeData.status)}
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-gray-600">Priority:</span>
-                  <Badge className={getPriorityColor(initiativeData.priority)}>
-                    {getPriorityLabel(initiativeData.priority)}
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-gray-600">Budget:</span>
-                  <span className="text-gray-900">{formatCurrency(initiativeData.budget)}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-gray-600">Timeline:</span>
-                  <span className="text-gray-900">{formatDate(initiativeData.startDate)} - {formatDate(initiativeData.dueDate)}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Progress Section */}
-            <div className="grid grid-cols-3 gap-6 bg-gray-50 p-4 rounded-lg">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">{calculateProgress()}%</div>
-                <div className="text-sm text-gray-600">Progress</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">{formatCurrency(initiativeData.budget)}</div>
-                <div className="text-sm text-gray-600">Budget</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">{getStatusLabel(initiativeData.status)}</div>
-                <div className="text-sm text-gray-600">Status</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Key Result Information Card */}
-        {keyResult && (
-          <Card className="border-blue-200 bg-blue-50">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column - Main Content */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Initiative Overview */}
+          <Card>
             <CardHeader>
-              <CardTitle className="text-blue-800 flex items-center gap-2">
+              <CardTitle className="text-lg flex items-center gap-2">
                 <Target className="h-5 w-5" />
-                Key Result Terkait
+                Initiative Overview
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
-                <Link href={`/key-result/${keyResult.id}`}>
-                  <h3 className="text-lg font-semibold text-blue-900 hover:text-blue-700 cursor-pointer">
-                    {keyResult.title}
-                  </h3>
-                </Link>
-                <p className="text-blue-700 text-sm mt-1">
-                  {keyResult.description || "Tidak ada deskripsi"}
-                </p>
+              {/* Title and Description */}
+              <div className="mb-6">
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">{initiativeData.title}</h1>
+                {initiativeData.description && (
+                  <p className="text-gray-600 mb-3">{initiativeData.description}</p>
+                )}
+                
+                {/* Initiative Details */}
+                <div className="flex flex-wrap gap-4 mt-3 text-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-gray-600">Status:</span>
+                    <Badge className={getStatusColor(initiativeData.status)}>
+                      {getStatusLabel(initiativeData.status)}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-gray-600">Priority:</span>
+                    <Badge className={getPriorityColor(initiativeData.priority)}>
+                      {getPriorityLabel(initiativeData.priority)}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-gray-600">Budget:</span>
+                    <span className="text-gray-900">{formatCurrency(initiativeData.budget)}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-gray-600">Timeline:</span>
+                    <span className="text-gray-900">{formatDate(initiativeData.startDate)} - {formatDate(initiativeData.dueDate)}</span>
+                  </div>
+                </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 text-sm">
-                <div>
-                  <span className="text-blue-600 font-medium">Progress:</span>
-                  <div className="mt-1">
-                    <Progress 
-                      value={keyResult.progress || 0} 
-                      className="h-2 bg-blue-100" 
-                    />
-                    <span className="text-blue-800 font-semibold">
-                      {(keyResult.progress || 0).toFixed(1)}%
+              {/* Progress Section */}
+              <div className="grid grid-cols-3 gap-6 bg-gray-50 p-4 rounded-lg">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">{calculateProgress()}%</div>
+                  <div className="text-sm text-gray-600">Progress</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">{formatCurrency(initiativeData.budget)}</div>
+                  <div className="text-sm text-gray-600">Budget</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600">{getStatusLabel(initiativeData.status)}</div>
+                  <div className="text-sm text-gray-600">Status</div>
+                </div>
+              </div>
+
+              {/* Key Result Information inside Overview */}
+              {keyResult && (
+                <div className="border-l-4 border-blue-500 bg-blue-50 p-4 rounded-r-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Target className="h-4 w-4 text-blue-600" />
+                    <span className="font-medium text-blue-800">Key Result Terkait</span>
+                  </div>
+                  <Link href={`/key-result/${keyResult.id}`}>
+                    <h4 className="font-semibold text-blue-900 hover:text-blue-700 cursor-pointer mb-1">
+                      {keyResult.title}
+                    </h4>
+                  </Link>
+                  <p className="text-sm text-blue-700">
+                    {keyResult.description || "Tidak ada deskripsi"}
+                  </p>
+                  <div className="flex items-center gap-4 mt-2 text-sm">
+                    <span className="text-blue-600">
+                      Progress: <span className="font-semibold">{(keyResult.progress || 0).toFixed(1)}%</span>
+                    </span>
+                    <span className="text-blue-600">
+                      Target: <span className="font-semibold">
+                        {keyResult.targetValue ? 
+                          new Intl.NumberFormat('id-ID').format(parseFloat(keyResult.targetValue)) : 
+                          '0'
+                        } {keyResult.unit || ''}
+                      </span>
                     </span>
                   </div>
                 </div>
-                <div>
-                  <span className="text-blue-600 font-medium">Current:</span>
-                  <div className="text-blue-800 font-semibold">
-                    {keyResult.currentValue ? 
-                      new Intl.NumberFormat('id-ID').format(parseFloat(keyResult.currentValue)) : 
-                      '0'
-                    } {keyResult.unit || ''}
+              )}
+
+              {/* Related Initiatives */}
+              {relatedInitiatives && relatedInitiatives.length > 0 && (
+                <div className="mt-4">
+                  <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Initiative Terkait
+                  </h3>
+                  <div className="space-y-2">
+                    {relatedInitiatives.map((relInit: any) => (
+                      <Link key={relInit.id} href={`/initiative/${relInit.id}`}>
+                        <div className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors cursor-pointer">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <h4 className="font-medium text-gray-900 hover:text-blue-600">
+                                {relInit.title}
+                              </h4>
+                              <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
+                                <span className="flex items-center gap-1">
+                                  <User className="h-3 w-3" />
+                                  {relInit.pic?.firstName} {relInit.pic?.lastName}
+                                </span>
+                                <Badge className={getStatusColor(relInit.status)}>
+                                  {getStatusLabel(relInit.status)}
+                                </Badge>
+                                <span>{relInit.progress || 0}%</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
                   </div>
                 </div>
-                <div>
-                  <span className="text-blue-600 font-medium">Target:</span>
-                  <div className="text-blue-800 font-semibold">
-                    {keyResult.targetValue ? 
-                      new Intl.NumberFormat('id-ID').format(parseFloat(keyResult.targetValue)) : 
-                      '0'
-                    } {keyResult.unit || ''}
-                  </div>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
-        )}
 
-        {/* Team Members */}
-        <Card>
+
+        </div>
+
+        {/* Right Column - Team and Recent Activity */}
+        <div className="space-y-6">
+          {/* Team Members */}
+          <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
@@ -340,21 +365,22 @@ export default function InitiativeDetailPage() {
           </CardContent>
         </Card>
 
-        {/* Recent Activity Placeholder */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Aktivitas Terbaru
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-4 text-gray-500">
-              <FileText className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-              <p className="text-sm">Belum ada aktivitas</p>
-            </div>
-          </CardContent>
-        </Card>
+          {/* Recent Activity Placeholder */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Aktivitas Terbaru
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-4 text-gray-500">
+                <FileText className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                <p className="text-sm">Belum ada aktivitas</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
