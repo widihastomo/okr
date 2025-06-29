@@ -1034,40 +1034,7 @@ export class DatabaseStorage implements IStorage {
     return task || undefined;
   }
 
-  async getTaskWithDetails(id: string): Promise<any> {
-    const taskData = await db
-      .select({
-        task: tasks,
-        initiative: initiatives,
-        keyResult: keyResults,
-        objective: objectives,
-        assignedUser: users
-      })
-      .from(tasks)
-      .leftJoin(initiatives, eq(tasks.initiativeId, initiatives.id))
-      .leftJoin(keyResults, eq(initiatives.keyResultId, keyResults.id))
-      .leftJoin(objectives, eq(keyResults.objectiveId, objectives.id))
-      .leftJoin(users, eq(tasks.assignedTo, users.id))
-      .where(eq(tasks.id, id))
-      .limit(1);
 
-    if (taskData.length === 0) {
-      return undefined;
-    }
-
-    const row = taskData[0];
-    return {
-      ...row.task,
-      initiative: row.initiative ? {
-        ...row.initiative,
-        keyResult: row.keyResult ? {
-          ...row.keyResult,
-          objective: row.objective || undefined
-        } : undefined
-      } : undefined,
-      assignedUser: row.assignedUser || undefined
-    };
-  }
 
   async deleteTask(id: string): Promise<boolean> {
     // Get task before deletion to access initiativeId
