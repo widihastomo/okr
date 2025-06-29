@@ -100,6 +100,7 @@ export interface IStorage {
   getTasksByInitiativeId(initiativeId: string): Promise<Task[]>;
   getTasksByUserId(userId: string): Promise<Task[]>;
   updateInitiativeProgress(initiativeId: string): Promise<void>;
+  getTaskWithDetails(id: string): Promise<Task | undefined>;
   
   // Key Result with Details
   getKeyResultWithDetails(id: string): Promise<KeyResultWithDetails | undefined>;

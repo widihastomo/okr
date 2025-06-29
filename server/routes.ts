@@ -1326,6 +1326,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get single task with details
+  app.get("/api/tasks/:id", async (req, res) => {
+    try {
+      const taskId = req.params.id;
+      const task = await storage.getTaskWithDetails(taskId);
+      
+      if (!task) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      
+      res.json(task);
+    } catch (error) {
+      console.error("Error fetching task:", error);
+      res.status(500).json({ message: "Failed to fetch task" });
+    }
+  });
+
   // Create task for specific initiative
   app.post("/api/initiatives/:initiativeId/tasks", async (req, res) => {
     try {
