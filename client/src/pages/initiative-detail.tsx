@@ -410,59 +410,67 @@ export default function InitiativeDetailPage() {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* PIC Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                PIC (Penanggung Jawab)
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {initiative.pic ? (
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium">
-                    {initiative.pic.firstName?.charAt(0)}{initiative.pic.lastName?.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="font-medium">{`${initiative.pic.firstName} ${initiative.pic.lastName}`}</p>
-                    <p className="text-sm text-gray-600">{initiative.pic.email}</p>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-gray-500">Tidak ada PIC</p>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Members Card */}
+          {/* Team Card */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
-                Tim ({members.length})
+                Tim & PIC
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              {members.length === 0 ? (
-                <p className="text-gray-500">Tidak ada anggota tim</p>
-              ) : (
-                <div className="space-y-3">
-                  {members.map((member: any) => (
-                    <div key={member.userId} className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                        {member.user.firstName?.charAt(0)}{member.user.lastName?.charAt(0)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">
-                          {`${member.user.firstName} ${member.user.lastName}`}
-                        </p>
-                        <p className="text-xs text-gray-600 truncate">{member.user.email}</p>
-                      </div>
-                    </div>
-                  ))}
+            <CardContent className="space-y-4">
+              {/* PIC Section */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <User className="h-4 w-4 text-gray-500" />
+                  <span className="text-sm font-medium text-gray-700">PIC (Penanggung Jawab)</span>
                 </div>
-              )}
+                {initiative.pic ? (
+                  <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+                    <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium">
+                      {initiative.pic.firstName?.charAt(0)}{initiative.pic.lastName?.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="font-medium">{`${initiative.pic.firstName} ${initiative.pic.lastName}`}</p>
+                      <p className="text-sm text-gray-600">{initiative.pic.email}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-gray-500 text-sm">Tidak ada PIC</p>
+                )}
+              </div>
+
+              <Separator />
+
+              {/* Members Section */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-gray-500" />
+                    <span className="text-sm font-medium text-gray-700">Anggota Tim</span>
+                  </div>
+                  <span className="text-xs text-gray-500">({members.length})</span>
+                </div>
+                {members.length === 0 ? (
+                  <p className="text-gray-500 text-sm">Tidak ada anggota tim</p>
+                ) : (
+                  <div className="space-y-3">
+                    {members.map((member: any) => (
+                      <div key={member.userId} className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                          {member.user.firstName?.charAt(0)}{member.user.lastName?.charAt(0)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {`${member.user.firstName} ${member.user.lastName}`}
+                          </p>
+                          <p className="text-xs text-gray-600 truncate">{member.user.email}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
 
