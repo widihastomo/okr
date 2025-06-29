@@ -172,8 +172,7 @@ export default function InitiativeDetailPage() {
           {/* Initiative Overview */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Target className="h-5 w-5" />
+              <CardTitle className="text-lg">
                 Initiative Overview
               </CardTitle>
             </CardHeader>
@@ -188,50 +187,30 @@ export default function InitiativeDetailPage() {
               
               {/* Initiative Details Grid */}
               <div className="grid grid-cols-2 gap-3">
-                <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-                  <div className="w-8 h-8 bg-gray-200 rounded flex items-center justify-center">
-                    <Flag className="h-4 w-4 text-gray-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Status</p>
-                    <Badge className={`${getStatusColor(initiativeData.status)} border-0 py-0`}>
-                      {getStatusLabel(initiativeData.status)}
-                    </Badge>
-                  </div>
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-xs text-gray-500 mb-1">Status</p>
+                  <Badge className={`${getStatusColor(initiativeData.status)} border-0 py-0`}>
+                    {getStatusLabel(initiativeData.status)}
+                  </Badge>
                 </div>
                 
-                <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-                  <div className="w-8 h-8 bg-gray-200 rounded flex items-center justify-center">
-                    <Target className="h-4 w-4 text-gray-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Priority</p>
-                    <Badge className={`${getPriorityColor(initiativeData.priority)} border-0 py-0`}>
-                      {getPriorityLabel(initiativeData.priority)}
-                    </Badge>
-                  </div>
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-xs text-gray-500 mb-1">Priority</p>
+                  <Badge className={`${getPriorityColor(initiativeData.priority)} border-0 py-0`}>
+                    {getPriorityLabel(initiativeData.priority)}
+                  </Badge>
                 </div>
                 
-                <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-                  <div className="w-8 h-8 bg-gray-200 rounded flex items-center justify-center">
-                    <DollarSign className="h-4 w-4 text-gray-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Budget</p>
-                    <p className="text-sm font-semibold text-gray-900">{formatCurrency(initiativeData.budget)}</p>
-                  </div>
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-xs text-gray-500 mb-1">Budget</p>
+                  <p className="text-sm font-semibold text-gray-900">{formatCurrency(initiativeData.budget)}</p>
                 </div>
                 
-                <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-                  <div className="w-8 h-8 bg-gray-200 rounded flex items-center justify-center">
-                    <Calendar className="h-4 w-4 text-gray-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Timeline</p>
-                    <p className="text-sm font-semibold text-gray-900">
-                      {formatDate(initiativeData.startDate)} - {formatDate(initiativeData.dueDate)}
-                    </p>
-                  </div>
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-xs text-gray-500 mb-1">Timeline</p>
+                  <p className="text-sm font-semibold text-gray-900">
+                    {formatDate(initiativeData.startDate)} - {formatDate(initiativeData.dueDate)}
+                  </p>
                 </div>
               </div>
 
@@ -249,18 +228,12 @@ export default function InitiativeDetailPage() {
                   
                   <div className="grid grid-cols-2 gap-3">
                     <div className="bg-white/70 backdrop-blur rounded-lg p-3">
-                      <div className="flex items-center gap-1.5 mb-1">
-                        <DollarSign className="h-3 w-3 text-green-600" />
-                        <span className="text-xs font-medium text-gray-600">Budget Allocated</span>
-                      </div>
+                      <span className="text-xs font-medium text-gray-600 block mb-1">Budget Allocated</span>
                       <p className="text-sm font-bold text-gray-900">{formatCurrency(initiativeData.budget)}</p>
                     </div>
                     
                     <div className="bg-white/70 backdrop-blur rounded-lg p-3">
-                      <div className="flex items-center gap-1.5 mb-1">
-                        <Clock className="h-3 w-3 text-purple-600" />
-                        <span className="text-xs font-medium text-gray-600">Days Remaining</span>
-                      </div>
+                      <span className="text-xs font-medium text-gray-600 block mb-1">Days Remaining</span>
                       <p className="text-sm font-bold text-gray-900">
                         {initiativeData.dueDate ? 
                           Math.max(0, Math.ceil((new Date(initiativeData.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))) 
@@ -276,14 +249,9 @@ export default function InitiativeDetailPage() {
               {keyResult && (
                 <div className="border border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-3 rounded-lg">
                   <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 bg-blue-600 rounded flex items-center justify-center">
-                        <Target className="h-3 w-3 text-white" />
-                      </div>
-                      <span className="text-sm font-semibold text-blue-900">Key Result Terkait</span>
-                    </div>
-                    <Link href={`/key-result/${keyResult.id}`}>
-                      <ArrowLeft className="h-3 w-3 text-blue-600 hover:text-blue-800 rotate-180" />
+                    <span className="text-sm font-semibold text-blue-900">Key Result Terkait</span>
+                    <Link href={`/key-result/${keyResult.id}`} className="text-blue-600 hover:text-blue-800 text-xs">
+                      →
                     </Link>
                   </div>
                   
@@ -323,12 +291,7 @@ export default function InitiativeDetailPage() {
               {/* Related Initiatives */}
               {relatedInitiatives && relatedInitiatives.length > 0 && (
                 <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-6 h-6 bg-gray-200 rounded flex items-center justify-center">
-                      <FileText className="h-3 w-3 text-gray-600" />
-                    </div>
-                    <h3 className="text-sm font-semibold text-gray-900">Initiative Terkait</h3>
-                  </div>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3">Initiative Terkait</h3>
                   <div className="grid gap-2">
                     {relatedInitiatives.map((relInit: any) => (
                       <Link key={relInit.id} href={`/initiative/${relInit.id}`}>
@@ -339,12 +302,9 @@ export default function InitiativeDetailPage() {
                                 {relInit.title}
                               </h4>
                               <div className="flex flex-wrap items-center gap-2 text-xs">
-                                <div className="flex items-center gap-1 text-gray-600">
-                                  <div className="w-5 h-5 bg-gray-200 rounded-full flex items-center justify-center">
-                                    <User className="h-2.5 w-2.5" />
-                                  </div>
-                                  <span>{relInit.pic?.firstName} {relInit.pic?.lastName}</span>
-                                </div>
+                                <span className="text-gray-600">
+                                  {relInit.pic?.firstName} {relInit.pic?.lastName}
+                                </span>
                                 <Badge className={`${getStatusColor(relInit.status)} text-xs py-0`}>
                                   {getStatusLabel(relInit.status)}
                                 </Badge>
@@ -372,8 +332,7 @@ export default function InitiativeDetailPage() {
           {/* Team Members */}
           <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
+            <CardTitle>
               Tim
             </CardTitle>
           </CardHeader>
@@ -428,7 +387,6 @@ export default function InitiativeDetailPage() {
 
             {!pic && members.length === 0 && (
               <div className="text-center py-4 text-gray-500">
-                <User className="h-8 w-8 mx-auto mb-2 text-gray-400" />
                 <p className="text-sm">Belum ada anggota tim</p>
               </div>
             )}
@@ -438,14 +396,12 @@ export default function InitiativeDetailPage() {
           {/* Recent Activity Placeholder */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
+              <CardTitle>
                 Aktivitas Terbaru
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-center py-4 text-gray-500">
-                <FileText className="h-8 w-8 mx-auto mb-2 text-gray-400" />
                 <p className="text-sm">Belum ada aktivitas</p>
               </div>
             </CardContent>
