@@ -1112,24 +1112,27 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getTasksByUserId(userId: string): Promise<Task[]> {
-    // Get all tasks assigned to the user with related initiative, key result, and objective information
+    // Get all tasks assigned to the user with related initiative, key result, objective, and user information
     const userTasks = await db
       .select({
         task: tasks,
         initiative: initiatives,
         keyResult: keyResults,
-        objective: objectives
+        objective: objectives,
+        assignedUser: users
       })
       .from(tasks)
       .leftJoin(initiatives, eq(tasks.initiativeId, initiatives.id))
       .leftJoin(keyResults, eq(initiatives.keyResultId, keyResults.id))
       .leftJoin(objectives, eq(keyResults.objectiveId, objectives.id))
+      .leftJoin(users, eq(tasks.assignedTo, users.id))
       .where(eq(tasks.assignedTo, userId))
       .orderBy(desc(tasks.dueDate));
 
     // Transform the results to include nested data
     return userTasks.map(row => ({
       ...row.task,
+      assignedUser: row.assignedUser || undefined,
       initiative: row.initiative ? {
         ...row.initiative,
         keyResult: row.keyResult ? {
