@@ -616,12 +616,12 @@ export default function InitiativeDetailPage() {
                         {/* Status Badge */}
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Badge 
-                              className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1`}
+                            <button 
+                              className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
                             >
                               {getTaskStatusLabel(task.status)}
                               <ChevronDown className="h-3 w-3" />
-                            </Badge>
+                            </button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem
