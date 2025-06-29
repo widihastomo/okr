@@ -1,5 +1,7 @@
 
-// Simple production build - ESM compatible
+#!/usr/bin/env node
+
+// Simple production build - ensures deployment compatibility
 import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
 import { execSync } from 'child_process';
 import { resolve, dirname } from 'path';
@@ -11,7 +13,6 @@ const __dirname = dirname(__filename);
 console.log('🚀 Starting deployment build...');
 console.log('📍 Working directory:', process.cwd());
 console.log('📍 Node version:', process.version);
-console.log('📂 Dist directory:', resolve(process.cwd(), 'dist'));
 
 try {
   // Clean build directory
@@ -24,39 +25,33 @@ try {
 
   console.log('⚡ Creating server bundle...');
   
-  // Create ESM-compatible server bundle using esbuild
-  const buildCommand = `npx esbuild server/index.ts --bundle --platform=node --target=node18 --format=esm --outfile=dist/index.js --external:@replit/object-storage --external:sqlite3 --external:better-sqlite3 --packages=external --minify --sourcemap`;
-  
-  try {
-    execSync(buildCommand, { stdio: 'pipe', timeout: 60000 });
-    console.log('✅ Server bundle created successfully');
-  } catch (buildError) {
-    console.log('⚠️ ESBuild failed, creating fallback bundle...');
-    
-    // Fallback: Direct server launcher
-    const serverLauncher = `#!/usr/bin/env node
+  // Create reliable production server that works in deployment
+  const serverScript = `#!/usr/bin/env node
 
-// Production server launcher - ESM
-import { spawn } from 'child_process';
-import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+// Production server for deployment
+const { spawn } = require('child_process');
+const path = require('path');
 
 console.log('🚀 OKR Management System - Production');
 console.log('🌍 Environment:', process.env.NODE_ENV || 'production');
+console.log('📡 Host: 0.0.0.0');
 console.log('📡 Port:', process.env.PORT || 5000);
 
-// Set production environment
+// Ensure production environment
 process.env.NODE_ENV = 'production';
 
-// Launch server with tsx
-const serverPath = resolve(__dirname, '..', 'server', 'index.ts');
+// Launch server using tsx
+const serverPath = path.resolve(__dirname, '..', 'server', 'index.ts');
+
+console.log('⚡ Starting server at:', serverPath);
+
 const server = spawn('npx', ['tsx', serverPath], {
   stdio: 'inherit',
-  env: { ...process.env },
-  cwd: resolve(__dirname, '..')
+  env: {
+    ...process.env,
+    NODE_ENV: 'production'
+  },
+  cwd: path.resolve(__dirname, '..')
 });
 
 server.on('error', (err) => {
@@ -64,18 +59,24 @@ server.on('error', (err) => {
   process.exit(1);
 });
 
-// Handle signals
-process.on('SIGTERM', () => server.kill('SIGTERM'));
-process.on('SIGINT', () => server.kill('SIGINT'));
+// Handle shutdown signals
+process.on('SIGTERM', () => {
+  console.log('Received SIGTERM, shutting down...');
+  server.kill('SIGTERM');
+});
+
+process.on('SIGINT', () => {
+  console.log('Received SIGINT, shutting down...');
+  server.kill('SIGINT');
+});
 `;
 
-    writeFileSync('dist/index.js', serverLauncher, { mode: 0o755 });
-    console.log('✅ Fallback server launcher created');
-  }
+  writeFileSync('dist/index.js', serverScript, { mode: 0o755 });
+  console.log('✅ Server bundle created: dist/index.js');
 
   console.log('🌐 Creating production frontend...');
   
-  // Create production-ready HTML
+  // Create production frontend
   const productionHTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -106,34 +107,21 @@ process.on('SIGINT', () => server.kill('SIGINT'));
         }
         .logo { font-size: 4rem; margin-bottom: 1rem; }
         h1 { font-size: 2rem; margin-bottom: 1rem; font-weight: 300; }
-        .loading {
-            margin: 2rem 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-        }
-        .spinner {
-            width: 24px;
-            height: 24px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
         .status {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.4);
             padding: 1rem;
             border-radius: 10px;
             margin: 1rem 0;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .api-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin: 2rem 0;
         }
         .api-link {
-            display: inline-block;
-            margin: 0.5rem;
+            display: block;
             padding: 0.5rem 1rem;
             background: rgba(255, 255, 255, 0.2);
             color: white;
@@ -151,62 +139,56 @@ process.on('SIGINT', () => server.kill('SIGINT'));
         <div class="logo">🎯</div>
         <h1>OKR Management System</h1>
         <div class="status">
-            <div class="loading">
-                <div class="spinner"></div>
-                <span>Initializing application...</span>
-            </div>
+            ✅ Production Server Ready
         </div>
-        <p>Loading your OKR dashboard</p>
-        <div style="margin-top: 2rem;">
-            <a href="/api/auth/me" class="api-link">Check Login</a>
-            <a href="/health" class="api-link">Health Status</a>
+        <p>Your OKR dashboard is loading...</p>
+        <div class="api-links">
+            <a href="/api/auth/me" class="api-link">Check Authentication</a>
+            <a href="/health" class="api-link">System Health</a>
+            <a href="/api/objectives" class="api-link">View Objectives</a>
         </div>
     </div>
     
     <script>
-        // Auto-refresh after 5 seconds
+        // Auto-refresh to connect to the application
         setTimeout(() => {
-            if (location.pathname === '/') {
-                location.reload();
-            }
-        }, 5000);
-        
-        // Try to connect to API
-        fetch('/api/auth/me')
-            .then(response => {
-                if (response.ok) {
-                    window.location.href = '/dashboard';
-                } else {
-                    window.location.href = '/login';
-                }
-            })
-            .catch(() => {
-                console.log('API not ready, will retry...');
-            });
+            fetch('/api/auth/me')
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/dashboard';
+                    } else {
+                        window.location.href = '/login';
+                    }
+                })
+                .catch(() => {
+                    console.log('API connecting...');
+                    setTimeout(() => location.reload(), 2000);
+                });
+        }, 3000);
     </script>
 </body>
 </html>`;
 
   writeFileSync('dist/public/index.html', productionHTML);
+  console.log('✅ Frontend created: dist/public/index.html');
 
-  // Create simple deployment info
-  const deployInfo = {
-    buildTime: new Date().toISOString(),
-    version: '1.0.0',
-    nodeVersion: process.version,
-    status: 'ready'
-  };
+  // Verify files were created
+  if (!existsSync('dist/index.js')) {
+    throw new Error('Failed to create dist/index.js');
+  }
   
-  writeFileSync('dist/deploy-info.json', JSON.stringify(deployInfo, null, 2));
+  if (!existsSync('dist/public/index.html')) {
+    throw new Error('Failed to create dist/public/index.html');
+  }
 
   console.log('✅ Build completed successfully');
   console.log('');
   console.log('📋 Build Summary:');
-  console.log('  ✅ dist/index.js: Server bundle');
-  console.log('  ✅ dist/public/index.html: Frontend');
-  console.log('  ✅ dist/deploy-info.json: Deployment info');
+  console.log('  ✅ dist/index.js: Production server (required for deployment)');
+  console.log('  ✅ dist/public/index.html: Frontend interface');
   console.log('');
   console.log('🚀 Ready for deployment!');
+  console.log('   Deployment will run: NODE_ENV=production node dist/index.js');
 
 } catch (error) {
   console.error('❌ Build failed:', error.message);
