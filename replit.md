@@ -96,6 +96,12 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- June 29, 2025. Added Initiatives tab to dashboard navigation:
+  * Created new Initiatives component displaying all initiatives in card grid layout
+  * Added tab between Objectives and My Tasks showing initiative cards with status, priority, progress
+  * Displays key result context, due dates, PIC assignments, and budget information
+  * Includes status and priority filters for easy initiative management
+  * Links to create new initiatives through existing modal system
 - June 26, 2025. Initial setup
 - June 26, 2025. Added comprehensive user and team management system:
   * Database schema extended with users, teams, and team members tables

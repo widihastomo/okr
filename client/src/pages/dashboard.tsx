@@ -10,8 +10,9 @@ import { DeleteConfirmationModal } from "@/components/delete-confirmation-modal"
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Target, CheckSquare } from "lucide-react";
+import { Plus, Target, CheckSquare, Building2 } from "lucide-react";
 import MyTasks from "@/components/my-tasks";
+import Initiatives from "@/components/initiatives";
 import { useAuth } from "@/hooks/useAuth";
 import { useTaskNotifications } from "@/hooks/useTaskNotifications";
 import type { OKRWithKeyResults, KeyResult, Cycle, User } from "@shared/schema";
@@ -354,10 +355,14 @@ export default function Dashboard() {
       
       {/* Tabbed Content */}
       <Tabs defaultValue="objectives" className="mt-6">
-        <TabsList className="grid w-full max-w-md grid-cols-2">
+        <TabsList className="grid w-full max-w-lg grid-cols-3">
           <TabsTrigger value="objectives" className="flex items-center gap-2">
             <Target className="w-4 h-4" />
             Objectives
+          </TabsTrigger>
+          <TabsTrigger value="initiatives" className="flex items-center gap-2">
+            <Building2 className="w-4 h-4" />
+            Initiatives
           </TabsTrigger>
           <TabsTrigger value="my-tasks" className="flex items-center gap-2">
             <CheckSquare className="w-4 h-4" />
@@ -410,6 +415,10 @@ export default function Dashboard() {
               );
             })
           )}
+        </TabsContent>
+        
+        <TabsContent value="initiatives" className="mt-6">
+          <Initiatives />
         </TabsContent>
         
         <TabsContent value="my-tasks" className="mt-6">
