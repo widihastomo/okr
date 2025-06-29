@@ -96,6 +96,12 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- June 29, 2025. Implemented automatic initiative member cleanup on task updates:
+  * Added logic to remove members when they no longer have assigned tasks
+  * Checks previous task assignee when task is reassigned or unassigned
+  * Preserves PIC status - never removes initiative owners
+  * Only removes members who have zero remaining tasks in the initiative
+  * Enhanced member management with automatic cleanup functionality
 - June 29, 2025. Improved task modal layout with consistent 2-column design:
   * Fixed spacing and alignment of PIC and due date fields
   * Implemented grid layout for better space utilization

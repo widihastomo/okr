@@ -1541,6 +1541,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/tasks/:id", async (req, res) => {
     try {
       const id = req.params.id;
+      
+      // Get the original task before updating to check previous assignee
+      const originalTask = await storage.getTaskWithDetails(id);
+      const originalAssignedTo = originalTask?.assignedTo?.id;
+      
       const updatedTask = await storage.updateTask(id, req.body);
       
       if (!updatedTask) {
@@ -1549,6 +1554,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Auto-add assigned user as initiative member if not already a member
       let addedAsMember = false;
+      let removedAsMember = false;
+      
       if (updatedTask.assignedTo && updatedTask.initiativeId) {
         try {
           // Check if user is already a member
@@ -1570,7 +1577,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      res.json({ ...updatedTask, addedAsMember });
+      // Check if the previous assignee should be removed from initiative members
+      if (originalAssignedTo && 
+          originalAssignedTo !== updatedTask.assignedTo && 
+          updatedTask.initiativeId) {
+        try {
+          // Check if the previous assignee has any other tasks in this initiative
+          const allTasks = await storage.getTasksByInitiativeId(updatedTask.initiativeId);
+          const hasOtherTasks = allTasks.some(task => 
+            task.assignedTo === originalAssignedTo && task.id !== id
+          );
+          
+          // Get initiative details to check if user is PIC
+          const initiative = await storage.getInitiativeWithDetails(updatedTask.initiativeId);
+          const isPIC = initiative && initiative.picId === originalAssignedTo;
+          
+          // If user has no other tasks and is not PIC, remove them as member
+          if (!hasOtherTasks && !isPIC) {
+            const existingMembers = await storage.getInitiativeMembers(updatedTask.initiativeId);
+            const memberToRemove = existingMembers.find(member => member.userId === originalAssignedTo);
+            
+            if (memberToRemove) {
+              await storage.deleteInitiativeMember(memberToRemove.id);
+              removedAsMember = true;
+            }
+          }
+        } catch (memberError) {
+          console.error("Error removing user from initiative members:", memberError);
+          // Continue without failing the task update
+        }
+      }
+      
+      res.json({ ...updatedTask, addedAsMember, removedAsMember });
     } catch (error) {
       console.error("Error updating task:", error);
       res.status(500).json({ message: "Failed to update task" });
