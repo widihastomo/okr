@@ -189,26 +189,26 @@ export default function InitiativeDetailPage() {
               {/* Initiative Details Row */}
               <div className="flex flex-wrap items-center gap-4 p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center gap-1.5">
-                  <Flag className="h-3 w-3 text-gray-600" />
+                  <Flag className="h-3 w-3 text-gray-600" title="Status Initiative" />
                   <Badge className={`${getStatusColor(initiativeData.status)} border-0 py-0 text-xs`}>
                     {getStatusLabel(initiativeData.status)}
                   </Badge>
                 </div>
                 
                 <div className="flex items-center gap-1.5">
-                  <Target className="h-3 w-3 text-gray-600" />
+                  <Target className="h-3 w-3 text-gray-600" title="Priority Initiative" />
                   <Badge className={`${getPriorityColor(initiativeData.priority)} border-0 py-0 text-xs`}>
                     {getPriorityLabel(initiativeData.priority)}
                   </Badge>
                 </div>
                 
                 <div className="flex items-center gap-1.5">
-                  <DollarSign className="h-3 w-3 text-gray-600" />
+                  <DollarSign className="h-3 w-3 text-gray-600" title="Budget yang Dialokasikan" />
                   <span className="text-sm font-semibold text-gray-900">{formatCurrency(initiativeData.budget)}</span>
                 </div>
                 
                 <div className="flex items-center gap-1.5">
-                  <Calendar className="h-3 w-3 text-gray-600" />
+                  <Calendar className="h-3 w-3 text-gray-600" title="Timeline Initiative" />
                   <span className="text-sm font-semibold text-gray-900">
                     {formatDate(initiativeData.startDate)} - {formatDate(initiativeData.dueDate)}
                   </span>
