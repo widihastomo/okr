@@ -177,82 +177,145 @@ export default function InitiativeDetailPage() {
                 Initiative Overview
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               {/* Title and Description */}
-              <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">{initiativeData.title}</h1>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 mb-3">{initiativeData.title}</h1>
                 {initiativeData.description && (
-                  <p className="text-gray-600 mb-3">{initiativeData.description}</p>
+                  <p className="text-gray-600 leading-relaxed">{initiativeData.description}</p>
                 )}
-                
-                {/* Initiative Details */}
-                <div className="flex flex-wrap gap-4 mt-3 text-sm">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-600">Status:</span>
-                    <Badge className={getStatusColor(initiativeData.status)}>
+              </div>
+              
+              {/* Initiative Details Grid */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+                    <Flag className="h-5 w-5 text-gray-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Status</p>
+                    <Badge className={`${getStatusColor(initiativeData.status)} border-0`}>
                       {getStatusLabel(initiativeData.status)}
                     </Badge>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-600">Priority:</span>
-                    <Badge className={getPriorityColor(initiativeData.priority)}>
+                </div>
+                
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+                    <Target className="h-5 w-5 text-gray-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Priority</p>
+                    <Badge className={`${getPriorityColor(initiativeData.priority)} border-0`}>
                       {getPriorityLabel(initiativeData.priority)}
                     </Badge>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-600">Budget:</span>
-                    <span className="text-gray-900">{formatCurrency(initiativeData.budget)}</span>
+                </div>
+                
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+                    <DollarSign className="h-5 w-5 text-gray-600" />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-600">Timeline:</span>
-                    <span className="text-gray-900">{formatDate(initiativeData.startDate)} - {formatDate(initiativeData.dueDate)}</span>
+                  <div>
+                    <p className="text-xs text-gray-500">Budget</p>
+                    <p className="text-sm font-semibold text-gray-900">{formatCurrency(initiativeData.budget)}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+                    <Calendar className="h-5 w-5 text-gray-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Timeline</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      {formatDate(initiativeData.startDate)} - {formatDate(initiativeData.dueDate)}
+                    </p>
                   </div>
                 </div>
               </div>
 
               {/* Progress Section */}
-              <div className="grid grid-cols-3 gap-6 bg-gray-50 p-4 rounded-lg">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">{calculateProgress()}%</div>
-                  <div className="text-sm text-gray-600">Progress</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">{formatCurrency(initiativeData.budget)}</div>
-                  <div className="text-sm text-gray-600">Budget</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-600">{getStatusLabel(initiativeData.status)}</div>
-                  <div className="text-sm text-gray-600">Status</div>
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl">
+                <h3 className="font-semibold text-gray-900 mb-4">Progress Overview</h3>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-gray-700">Overall Progress</span>
+                      <span className="text-2xl font-bold text-blue-600">{calculateProgress()}%</span>
+                    </div>
+                    <Progress value={calculateProgress()} className="h-3 bg-blue-100" />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 pt-2">
+                    <div className="bg-white/70 backdrop-blur rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-1">
+                        <DollarSign className="h-4 w-4 text-green-600" />
+                        <span className="text-xs font-medium text-gray-600">Budget Allocated</span>
+                      </div>
+                      <p className="text-lg font-bold text-gray-900">{formatCurrency(initiativeData.budget)}</p>
+                    </div>
+                    
+                    <div className="bg-white/70 backdrop-blur rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Clock className="h-4 w-4 text-purple-600" />
+                        <span className="text-xs font-medium text-gray-600">Days Remaining</span>
+                      </div>
+                      <p className="text-lg font-bold text-gray-900">
+                        {initiativeData.dueDate ? 
+                          Math.max(0, Math.ceil((new Date(initiativeData.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))) 
+                          : '-'
+                        } days
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Key Result Information inside Overview */}
               {keyResult && (
-                <div className="border-l-4 border-blue-500 bg-blue-50 p-4 rounded-r-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Target className="h-4 w-4 text-blue-600" />
-                    <span className="font-medium text-blue-800">Key Result Terkait</span>
+                <div className="border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-5 rounded-xl">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <Target className="h-4 w-4 text-white" />
+                      </div>
+                      <span className="font-semibold text-blue-900">Key Result Terkait</span>
+                    </div>
+                    <Link href={`/key-result/${keyResult.id}`}>
+                      <ArrowLeft className="h-4 w-4 text-blue-600 hover:text-blue-800 rotate-180" />
+                    </Link>
                   </div>
+                  
                   <Link href={`/key-result/${keyResult.id}`}>
-                    <h4 className="font-semibold text-blue-900 hover:text-blue-700 cursor-pointer mb-1">
+                    <h4 className="font-semibold text-blue-900 hover:text-blue-700 transition-colors mb-2">
                       {keyResult.title}
                     </h4>
                   </Link>
-                  <p className="text-sm text-blue-700">
-                    {keyResult.description || "Tidak ada deskripsi"}
-                  </p>
-                  <div className="flex items-center gap-4 mt-2 text-sm">
-                    <span className="text-blue-600">
-                      Progress: <span className="font-semibold">{(keyResult.progress || 0).toFixed(1)}%</span>
-                    </span>
-                    <span className="text-blue-600">
-                      Target: <span className="font-semibold">
+                  
+                  {keyResult.description && (
+                    <p className="text-sm text-blue-700 mb-3">
+                      {keyResult.description}
+                    </p>
+                  )}
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-white/50 backdrop-blur rounded-lg p-3">
+                      <p className="text-xs text-blue-600 mb-1">Progress</p>
+                      <div className="flex items-center gap-2">
+                        <Progress value={keyResult.progress || 0} className="h-2 bg-blue-100 flex-1" />
+                        <span className="text-sm font-bold text-blue-900">{(keyResult.progress || 0).toFixed(1)}%</span>
+                      </div>
+                    </div>
+                    <div className="bg-white/50 backdrop-blur rounded-lg p-3">
+                      <p className="text-xs text-blue-600 mb-1">Target</p>
+                      <p className="text-sm font-bold text-blue-900">
                         {keyResult.targetValue ? 
                           new Intl.NumberFormat('id-ID').format(parseFloat(keyResult.targetValue)) : 
                           '0'
                         } {keyResult.unit || ''}
-                      </span>
-                    </span>
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
