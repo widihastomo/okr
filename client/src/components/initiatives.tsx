@@ -21,6 +21,11 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [selectedInitiativeMembers, setSelectedInitiativeMembers] = useState<{
+    initiativeId: string;
+    initiativeTitle: string;
+    members: any[];
+  } | null>(null);
 
   // Fetch all initiatives
   const { data: initiatives = [], isLoading } = useQuery<Initiative[]>({
@@ -79,6 +84,34 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
     if (!userId) return "Unassigned";
     const user = users.find(u => u.id === userId);
     return user ? `${user.firstName} ${user.lastName}` : "Unknown User";
+  };
+
+  // Helper function to get initiative members
+  const getInitiativeMembers = (initiativeId: string) => {
+    return initiativeMembers.filter(member => member.initiativeId === initiativeId);
+  };
+
+  // Helper function to show members dialog
+  const handleShowMembers = (initiative: Initiative) => {
+    const members = getInitiativeMembers(initiative.id);
+    const memberUsers = members.map(member => {
+      const user = users.find(u => u.id === member.userId);
+      return user || null;
+    }).filter(Boolean);
+
+    setSelectedInitiativeMembers({
+      initiativeId: initiative.id,
+      initiativeTitle: initiative.title,
+      members: memberUsers
+    });
+  };
+
+  // Helper function to get user initials
+  const getUserInitials = (user: User): string => {
+    if (user.firstName && user.lastName) {
+      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+    }
+    return user.email.slice(0, 2).toUpperCase();
   };
 
   // Helper function to get status color
@@ -255,6 +288,45 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
                     </span>
                   </div>
                 )}
+
+                {/* Members */}
+                <div className="mt-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600">Members:</span>
+                    <div 
+                      className="flex -space-x-2 cursor-pointer"
+                      onClick={() => handleShowMembers(initiative)}
+                    >
+                      {(() => {
+                        const members = getInitiativeMembers(initiative.id);
+                        const memberUsers = members.slice(0, 3).map(member => {
+                          const user = users.find(u => u.id === member.userId);
+                          return user || null;
+                        }).filter((user): user is User => user !== null);
+
+                        return (
+                          <>
+                            {memberUsers.map((user) => (
+                              <Avatar key={user.id} className="w-8 h-8 border-2 border-white">
+                                <AvatarFallback className="bg-gray-200 text-gray-700 text-xs">
+                                  {getUserInitials(user)}
+                                </AvatarFallback>
+                              </Avatar>
+                            ))}
+                            {members.length > 3 && (
+                              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 border-2 border-white">
+                                <span className="text-xs text-gray-700">+{members.length - 3}</span>
+                              </div>
+                            )}
+                            {members.length === 0 && (
+                              <div className="text-sm text-gray-500">No members</div>
+                            )}
+                          </>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -268,6 +340,39 @@ export default function Initiatives({ userFilter }: InitiativesProps) {
           onClose={() => setShowCreateModal(false)}
           onSuccess={() => setShowCreateModal(false)}
         />
+      )}
+
+      {/* Members Dialog */}
+      {selectedInitiativeMembers && (
+        <Dialog 
+          open={!!selectedInitiativeMembers} 
+          onOpenChange={() => setSelectedInitiativeMembers(null)}
+        >
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>{selectedInitiativeMembers.initiativeTitle} - Members</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3 mt-4">
+              {selectedInitiativeMembers.members.length > 0 ? (
+                selectedInitiativeMembers.members.map((user) => (
+                  <div key={user.id} className="flex items-center gap-3">
+                    <Avatar className="w-10 h-10">
+                      <AvatarFallback className="bg-blue-100 text-blue-700">
+                        {getUserInitials(user)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium">{getUserName(user.id)}</p>
+                      <p className="text-sm text-gray-500">{user.email}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-center py-4">No members assigned to this initiative</p>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );
