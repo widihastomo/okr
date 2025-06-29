@@ -1,14 +1,7 @@
 
-#!/usr/bin/env node
-
 // Simple production build - ensures deployment compatibility
-import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
+import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { execSync } from 'child_process';
-import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 console.log('🚀 Starting deployment build...');
 console.log('📍 Working directory:', process.cwd());
@@ -72,7 +65,7 @@ process.on('SIGINT', () => {
 `;
 
   writeFileSync('dist/index.js', serverScript, { mode: 0o755 });
-  console.log('✅ Server bundle created: dist/index.js');
+  console.log('✅ Server bundle created successfully');
 
   console.log('🌐 Creating production frontend...');
   
@@ -170,7 +163,15 @@ process.on('SIGINT', () => {
 </html>`;
 
   writeFileSync('dist/public/index.html', productionHTML);
-  console.log('✅ Frontend created: dist/public/index.html');
+
+  // Create deployment metadata
+  const deployInfo = {
+    buildTime: new Date().toISOString(),
+    nodeVersion: process.version,
+    files: ['dist/index.js', 'dist/public/index.html']
+  };
+  
+  writeFileSync('dist/deploy-info.json', JSON.stringify(deployInfo, null, 2));
 
   // Verify files were created
   if (!existsSync('dist/index.js')) {
@@ -184,11 +185,11 @@ process.on('SIGINT', () => {
   console.log('✅ Build completed successfully');
   console.log('');
   console.log('📋 Build Summary:');
-  console.log('  ✅ dist/index.js: Production server (required for deployment)');
-  console.log('  ✅ dist/public/index.html: Frontend interface');
+  console.log('  ✅ dist/index.js: Server bundle');
+  console.log('  ✅ dist/public/index.html: Frontend');
+  console.log('  ✅ dist/deploy-info.json: Deployment info');
   console.log('');
   console.log('🚀 Ready for deployment!');
-  console.log('   Deployment will run: NODE_ENV=production node dist/index.js');
 
 } catch (error) {
   console.error('❌ Build failed:', error.message);
