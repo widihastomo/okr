@@ -66,12 +66,13 @@ export default function MyTasks({ filteredKeyResultIds, userFilter }: MyTasksPro
 
   // Determine which user's tasks to fetch based on filter
   const currentUserId = getUserId();
-  const targetUserId = userFilter && userFilter !== 'all' && userFilter !== '' ? userFilter : currentUserId;
+  const showAllUsers = userFilter === 'all' || userFilter === '' || !userFilter;
+  const targetUserId = showAllUsers ? null : userFilter;
 
-  // Fetch tasks for the selected user
+  // Fetch tasks for the selected user or all tasks
   const { data: tasks = [], isLoading } = useQuery<any[]>({
-    queryKey: [`/api/users/${targetUserId}/tasks`],
-    enabled: !!targetUserId,
+    queryKey: showAllUsers ? ['/api/tasks'] : [`/api/users/${targetUserId}/tasks`],
+    enabled: showAllUsers || !!targetUserId,
   });
 
   // Mutation for updating task
@@ -81,7 +82,11 @@ export default function MyTasks({ filteredKeyResultIds, userFilter }: MyTasksPro
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/users/${targetUserId}/tasks`] });
+      // Invalidate both all tasks and specific user tasks queries
+      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+      if (targetUserId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/users/${targetUserId}/tasks`] });
+      }
       queryClient.invalidateQueries({ queryKey: ['/api/initiatives'] });
       queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
       toast({
@@ -109,7 +114,11 @@ export default function MyTasks({ filteredKeyResultIds, userFilter }: MyTasksPro
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/users/${targetUserId}/tasks`] });
+      // Invalidate both all tasks and specific user tasks queries
+      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+      if (targetUserId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/users/${targetUserId}/tasks`] });
+      }
       queryClient.invalidateQueries({ queryKey: ['/api/initiatives'] });
       queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
       toast({
@@ -232,7 +241,7 @@ export default function MyTasks({ filteredKeyResultIds, userFilter }: MyTasksPro
             tasks={filteredTasks}
             onEditTask={handleEditTask}
             onDeleteTask={handleDeleteTask}
-            userId={targetUserId}
+            userId={targetUserId || currentUserId || ''}
           />
         )}
         
@@ -241,7 +250,7 @@ export default function MyTasks({ filteredKeyResultIds, userFilter }: MyTasksPro
             tasks={filteredTasks}
             onEditTask={handleEditTask}
             onDeleteTask={handleDeleteTask}
-            userId={targetUserId}
+            userId={targetUserId || currentUserId || ''}
           />
         )}
         
@@ -250,7 +259,7 @@ export default function MyTasks({ filteredKeyResultIds, userFilter }: MyTasksPro
             tasks={filteredTasks}
             onEditTask={handleEditTask}
             onDeleteTask={handleDeleteTask}
-            userId={targetUserId}
+            userId={targetUserId || currentUserId || ''}
           />
         )}
       </div>
@@ -260,7 +269,11 @@ export default function MyTasks({ filteredKeyResultIds, userFilter }: MyTasksPro
         open={showStandaloneTaskModal}
         onOpenChange={setShowStandaloneTaskModal}
         onSuccess={() => {
-          queryClient.invalidateQueries({ queryKey: [`/api/users/${targetUserId}/tasks`] });
+          // Invalidate both all tasks and specific user tasks queries
+          queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+          if (targetUserId) {
+            queryClient.invalidateQueries({ queryKey: [`/api/users/${targetUserId}/tasks`] });
+          }
         }}
       />
 
