@@ -1682,21 +1682,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create a standalone task
-  app.post("/api/tasks", async (req, res) => {
+  app.post("/api/tasks", requireAuth, async (req, res) => {
     try {
-      console.log("POST /api/tasks - Session data:", {
-        sessionId: req.sessionID,
-        userId: req.session?.userId,
-        hasSession: !!req.session,
-        cookies: req.headers.cookie
-      });
-      
-      // Get current user ID from session
-      if (!req.session?.userId) {
-        console.log("Task creation failed - no session userId");
-        return res.status(401).json({ message: "Authentication required" });
-      }
-      const currentUserId = req.session.userId;
+      const currentUser = req.user as any;
+      const currentUserId = currentUser.id;
 
       // Validate and prepare task data
       const taskData = {
