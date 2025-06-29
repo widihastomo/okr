@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Menu, Bell, Plus, Settings, User, LogOut } from "lucide-react";
 import {
   DropdownMenu,
@@ -11,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import OKRFormModal from "./okr-form-modal";
 import { Link } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
 
 interface GlobalHeaderProps {
   onMenuToggle?: () => void;
@@ -19,6 +21,7 @@ interface GlobalHeaderProps {
 export default function GlobalHeader({ onMenuToggle }: GlobalHeaderProps) {
   const [notificationCount] = useState(1);
   const [isOKRModalOpen, setIsOKRModalOpen] = useState(false);
+  const { user } = useAuth();
 
   const handleCreateOKR = () => {
     setIsOKRModalOpen(true);
@@ -27,6 +30,18 @@ export default function GlobalHeader({ onMenuToggle }: GlobalHeaderProps) {
   const handleCreateProject = () => {
     // Navigate to create project page or open modal
     console.log("Create project clicked");
+  };
+
+  const getUserInitials = () => {
+    const firstName = (user as any)?.firstName || "";
+    const lastName = (user as any)?.lastName || "";
+    if (firstName && lastName) {
+      return `${firstName[0]}${lastName[0]}`.toUpperCase();
+    }
+    if ((user as any)?.email) {
+      return (user as any).email[0].toUpperCase();
+    }
+    return "U";
   };
 
   // Global keyboard shortcut for creating OKR (Ctrl+K or Cmd+K)
@@ -126,9 +141,12 @@ export default function GlobalHeader({ onMenuToggle }: GlobalHeaderProps) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm" className="p-1 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none rounded-full">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <User className="h-4 w-4 text-blue-600" />
-              </div>
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={(user as any)?.profileImageUrl} />
+                <AvatarFallback className="bg-blue-600 text-white text-sm font-semibold">
+                  {getUserInitials()}
+                </AvatarFallback>
+              </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
