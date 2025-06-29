@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -80,17 +80,7 @@ export default function SimpleTaskModal({ open, onClose, task, onSuccess }: Simp
 
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await fetch(`/api/tasks`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        console.error("Task creation error:", error);
-        throw new Error(error.message || "Failed to create task");
-      }
+      const response = await apiRequest("POST", "/api/tasks", data);
       return response.json();
     },
     onSuccess: () => {
@@ -106,13 +96,7 @@ export default function SimpleTaskModal({ open, onClose, task, onSuccess }: Simp
 
   const updateMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await fetch(`/api/tasks/${task.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error("Failed to update task");
+      const response = await apiRequest("PUT", `/api/tasks/${task.id}`, data);
       return response.json();
     },
     onSuccess: () => {
