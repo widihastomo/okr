@@ -777,6 +777,11 @@ Changelog:
   * Added passive event listeners for improved scroll performance
   * Enhanced coordinate calculation to account for scroll offsets accurately
   * Connector lines now move smoothly and maintain connections during page scrolling
+- June 29, 2025. Fixed edit cycle modal not displaying data:
+  * Fixed incorrect useState call that should have been useEffect for updating form data when cycle prop changes
+  * Added useEffect import and proper dependency array to watch for cycle changes
+  * Edit cycle modal now correctly populates all form fields with existing cycle data
+  * Form fields now properly display current values for name, type, dates, status, and description
 - June 28, 2025. Resolved proxy connection error and enhanced server stability:
   * Fixed "dial tcp 127.0.0.1:5000: connect: connection refused" error preventing frontend-backend communication
   * Enhanced server configuration with proper 0.0.0.0 host binding for external access

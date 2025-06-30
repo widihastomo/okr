@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -55,7 +55,7 @@ export default function EditCycleModal({ cycle, open, onOpenChange }: EditCycleM
   };
 
   // Update form data when cycle changes
-  useState(() => {
+  useEffect(() => {
     if (cycle) {
       setFormData({
         name: cycle.name,
@@ -66,7 +66,7 @@ export default function EditCycleModal({ cycle, open, onOpenChange }: EditCycleM
         description: cycle.description || "",
       });
     }
-  });
+  }, [cycle]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
