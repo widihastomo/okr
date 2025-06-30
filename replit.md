@@ -782,6 +782,12 @@ Changelog:
   * Added useEffect import and proper dependency array to watch for cycle changes
   * Edit cycle modal now correctly populates all form fields with existing cycle data
   * Form fields now properly display current values for name, type, dates, status, and description
+- June 29, 2025. Fixed cycle status update functionality:
+  * Identified missing Q2 2025 cycle causing status update function to not detect active cycles
+  * Added comprehensive debug logging to cycle status calculation showing date comparisons
+  * Created missing Q2 2025 cycle (April-June 2025) to cover current period
+  * Status update function now correctly updates Q2 2025 from "planning" to "active" 
+  * Fixed cycle coverage gap between Q1 (completed) and Q3 (planning) cycles
 - June 28, 2025. Resolved proxy connection error and enhanced server stability:
   * Fixed "dial tcp 127.0.0.1:5000: connect: connection refused" error preventing frontend-backend communication
   * Enhanced server configuration with proper 0.0.0.0 host binding for external access
