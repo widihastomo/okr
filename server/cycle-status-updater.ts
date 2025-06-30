@@ -11,37 +11,40 @@ export interface CycleStatusUpdate {
  * Determines the appropriate status for a cycle based on current date
  */
 function calculateCycleStatus(startDate: string, endDate: string, currentStatus: string): string {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0); // Reset to start of day for accurate comparison
-  
-  const start = new Date(startDate);
-  start.setHours(0, 0, 0, 0);
-  
-  const end = new Date(endDate);
-  end.setHours(23, 59, 59, 999); // End of day
-  
-  console.log(`🕐 Date comparison: today=${today.toISOString()}, start=${start.toISOString()}, end=${end.toISOString()}`);
-  
-  // If current date is before start date, should be "planning"
-  if (today < start) {
-    console.log("📅 Status should be 'planning' (today < start)");
-    return "planning";
+  try {
+    // Get current date in GMT+7 (Indonesia timezone)
+    const now = new Date();
+    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const indonesiaTime = new Date(utc + (7 * 3600000)); // GMT+7
+    
+    // Format to YYYY-MM-DD for comparison
+    const year = indonesiaTime.getFullYear();
+    const month = String(indonesiaTime.getMonth() + 1).padStart(2, '0');
+    const day = String(indonesiaTime.getDate()).padStart(2, '0');
+    const todayStr = `${year}-${month}-${day}`;
+    
+    // Normalize date strings to YYYY-MM-DD format
+    const startStr = startDate.includes('T') ? startDate.split('T')[0] : startDate;
+    const endStr = endDate.includes('T') ? endDate.split('T')[0] : endDate;
+    
+    // Compare date strings directly 
+    if (todayStr < startStr) {
+      return "planning";
+    }
+    
+    if (todayStr > endStr) {
+      return "completed";
+    }
+    
+    if (todayStr >= startStr && todayStr <= endStr) {
+      return "active";
+    }
+    
+    return currentStatus;
+  } catch (error) {
+    console.error("Error in calculateCycleStatus:", error);
+    return currentStatus;
   }
-  
-  // If current date is after end date, should be "completed"
-  if (today > end) {
-    console.log("📅 Status should be 'completed' (today > end)");
-    return "completed";
-  }
-  
-  // If current date is between start and end date, should be "active"
-  if (today >= start && today <= end) {
-    console.log("📅 Status should be 'active' (start <= today <= end)");
-    return "active";
-  }
-  
-  console.log("📅 Fallback to current status:", currentStatus);
-  return currentStatus; // Fallback to current status
 }
 
 /**

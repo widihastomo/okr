@@ -788,6 +788,12 @@ Changelog:
   * Created missing Q2 2025 cycle (April-June 2025) to cover current period
   * Status update function now correctly updates Q2 2025 from "planning" to "active" 
   * Fixed cycle coverage gap between Q1 (completed) and Q3 (planning) cycles
+- June 29, 2025. Implemented GMT+7 timezone for cycle status calculations:
+  * Updated cycle status calculation to use Indonesian timezone (GMT+7) instead of UTC
+  * Fixed date format inconsistencies in database (timestamp vs date-only formats)
+  * Simplified timezone conversion using manual offset calculation for better reliability
+  * Status updates now correctly reflect Indonesian business hours and dates
+  * Successfully tested with proper cycle transitions based on Indonesian timezone
 - June 28, 2025. Resolved proxy connection error and enhanced server stability:
   * Fixed "dial tcp 127.0.0.1:5000: connect: connection refused" error preventing frontend-backend communication
   * Enhanced server configuration with proper 0.0.0.0 host binding for external access
