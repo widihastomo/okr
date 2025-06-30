@@ -772,10 +772,6 @@ Changelog:
   * Button includes Plus icon and proper styling for creating new initiatives
   * Button only appears in create mode, not when editing existing initiatives
   * Users can now properly add new initiatives to key results from the detail page
-- June 29, 2025. Fixed mobile sidebar overlay z-index issue:
-  * Increased mobile overlay z-index from z-20 to z-40 for proper clickability
-  * Increased sidebar z-index from z-10 to z-50 to ensure proper layering
-  * Mobile users can now properly close sidebar by tapping outside the menu area
 - June 28, 2025. Resolved proxy connection error and enhanced server stability:
   * Fixed "dial tcp 127.0.0.1:5000: connect: connection refused" error preventing frontend-backend communication
   * Enhanced server configuration with proper 0.0.0.0 host binding for external access
