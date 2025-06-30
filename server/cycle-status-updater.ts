@@ -20,21 +20,27 @@ function calculateCycleStatus(startDate: string, endDate: string, currentStatus:
   const end = new Date(endDate);
   end.setHours(23, 59, 59, 999); // End of day
   
+  console.log(`🕐 Date comparison: today=${today.toISOString()}, start=${start.toISOString()}, end=${end.toISOString()}`);
+  
   // If current date is before start date, should be "planning"
   if (today < start) {
+    console.log("📅 Status should be 'planning' (today < start)");
     return "planning";
   }
   
   // If current date is after end date, should be "completed"
   if (today > end) {
+    console.log("📅 Status should be 'completed' (today > end)");
     return "completed";
   }
   
   // If current date is between start and end date, should be "active"
   if (today >= start && today <= end) {
+    console.log("📅 Status should be 'active' (start <= today <= end)");
     return "active";
   }
   
+  console.log("📅 Fallback to current status:", currentStatus);
   return currentStatus; // Fallback to current status
 }
 
@@ -47,9 +53,13 @@ export async function updateCycleStatuses(): Promise<CycleStatusUpdate[]> {
     const cycles = await storage.getCycles();
     const updates: CycleStatusUpdate[] = [];
     
+    console.log("🔄 Checking cycle statuses for", cycles.length, "cycles");
+    
     for (const cycle of cycles) {
       const currentStatus = cycle.status;
       const newStatus = calculateCycleStatus(cycle.startDate, cycle.endDate, currentStatus);
+      
+      console.log(`📅 Cycle "${cycle.name}": ${cycle.startDate} to ${cycle.endDate}, current: ${currentStatus}, calculated: ${newStatus}`);
       
       if (newStatus !== currentStatus) {
         // Update the cycle status
@@ -62,6 +72,8 @@ export async function updateCycleStatuses(): Promise<CycleStatusUpdate[]> {
           reason = "Siklus berakhir";
         } else if (newStatus === "planning" && currentStatus === "active") {
           reason = "Siklus belum dimulai";
+        } else {
+          reason = `Status berubah dari ${currentStatus} ke ${newStatus}`;
         }
         
         updates.push({
@@ -70,9 +82,14 @@ export async function updateCycleStatuses(): Promise<CycleStatusUpdate[]> {
           newStatus: newStatus,
           reason: reason
         });
+        
+        console.log(`✅ Updated cycle "${cycle.name}" from ${currentStatus} to ${newStatus}`);
+      } else {
+        console.log(`ℹ️ Cycle "${cycle.name}" status unchanged: ${currentStatus}`);
       }
     }
     
+    console.log("🔄 Status update completed. Updated", updates.length, "cycles");
     return updates;
   } catch (error) {
     console.error("Error updating cycle statuses:", error);
