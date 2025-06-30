@@ -772,6 +772,11 @@ Changelog:
   * Button includes Plus icon and proper styling for creating new initiatives
   * Button only appears in create mode, not when editing existing initiatives
   * Users can now properly add new initiatives to key results from the detail page
+- June 29, 2025. Enhanced ConnectorLine component with improved scroll functionality:
+  * Updated scroll position detection using window.scrollX/scrollY with better browser compatibility
+  * Added passive event listeners for improved scroll performance
+  * Enhanced coordinate calculation to account for scroll offsets accurately
+  * Connector lines now move smoothly and maintain connections during page scrolling
 - June 28, 2025. Resolved proxy connection error and enhanced server stability:
   * Fixed "dial tcp 127.0.0.1:5000: connect: connection refused" error preventing frontend-backend communication
   * Enhanced server configuration with proper 0.0.0.0 host binding for external access

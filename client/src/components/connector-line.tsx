@@ -25,16 +25,16 @@ export const ConnectorLine: React.FC<ConnectorLineProps> = ({
         const fromRect = fromEl.getBoundingClientRect();
         const toRect = toEl.getBoundingClientRect();
         
-        // Get scroll position to account for page scrolling
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+        // Get scroll position using both methods for better compatibility
+        const scrollX = window.scrollX || window.pageXOffset;
+        const scrollY = window.scrollY || window.pageYOffset;
 
-        // Calculate connection points
-        const x1 = fromRect.right + scrollLeft;
-        const y1 = fromRect.top + fromRect.height / 2 + scrollTop;
+        // Calculate connection points with scroll offset
+        const x1 = fromRect.right + scrollX;
+        const y1 = fromRect.top + fromRect.height / 2 + scrollY;
 
-        const x2 = toRect.left + scrollLeft;
-        const y2 = toRect.top + toRect.height / 2 + scrollTop;
+        const x2 = toRect.left + scrollX;
+        const y2 = toRect.top + toRect.height / 2 + scrollY;
 
         setLineCoords({ x1, y1, x2, y2 });
         setIsVisible(true);
@@ -46,9 +46,9 @@ export const ConnectorLine: React.FC<ConnectorLineProps> = ({
     // Initial update
     updateLine();
     
-    // Update on resize and scroll
+    // Update on resize and scroll with passive listeners for better performance
     window.addEventListener("resize", updateLine);
-    window.addEventListener("scroll", updateLine);
+    window.addEventListener("scroll", updateLine, { passive: true });
     
     // Use MutationObserver to detect DOM changes
     const observer = new MutationObserver(updateLine);

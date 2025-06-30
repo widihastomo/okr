@@ -1,0 +1,85 @@
+import React, { useEffect, useState } from "react";
+
+type ConnectorLineProps = {
+  fromId: string; // ID elemen sumber
+  toId: string;   // ID elemen tujuan
+};
+
+export const ConnectorLine: React.FC<ConnectorLineProps> = ({ fromId, toId }) => {
+  const [lineCoords, setLineCoords] = useState({ x1: 0, y1: 0, x2: 0, y2: 0 });
+
+  useEffect(() => {
+    const updateLine = () => {
+      const fromEl = document.getElementById(fromId);
+      const toEl = document.getElementById(toId);
+
+      if (fromEl && toEl) {
+        const fromRect = fromEl.getBoundingClientRect();
+        const toRect = toEl.getBoundingClientRect();
+
+        // Anda bisa menggunakan window scroll offset agar absolut ke dokumen
+        const scrollX = window.scrollX || window.pageXOffset;
+        const scrollY = window.scrollY || window.pageYOffset;
+
+        const x1 = fromRect.right + scrollX;
+        const y1 = fromRect.top + fromRect.height / 2 + scrollY;
+
+        const x2 = toRect.left + scrollX;
+        const y2 = toRect.top + toRect.height / 2 + scrollY;
+
+        setLineCoords({ x1, y1, x2, y2 });
+      }
+    };
+
+    // Update saat pertama kali mount
+    updateLine();
+
+    // Listener resize dan scroll
+    window.addEventListener("resize", updateLine);
+    window.addEventListener("scroll", updateLine);
+
+    return () => {
+      window.removeEventListener("resize", updateLine);
+      window.removeEventListener("scroll", updateLine);
+    };
+  }, [fromId, toId]);
+
+  const { x1, y1, x2, y2 } = lineCoords;
+
+  return (
+    <svg
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        pointerEvents: "none",
+        zIndex: 0,
+      }}
+    >
+      <line
+        x1={x1}
+        y1={y1}
+        x2={x2}
+        y2={y2}
+        stroke="#d33"
+        strokeWidth="2"
+        markerEnd="url(#arrow)"
+      />
+      <defs>
+        <marker
+          id="arrow"
+          markerWidth="8"
+          markerHeight="8"
+          refX="5"
+          refY="3"
+          orient="auto"
+          markerUnits="strokeWidth"
+        >
+          <path d="M0,0 L0,6 L6,3 z" fill="#d33" />
+        </marker>
+      </defs>
+    </svg>
+  );
+};
