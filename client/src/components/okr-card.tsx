@@ -131,7 +131,7 @@ export default function OKRCard({ okr, onEditProgress, onDuplicate, onDelete, cy
                 )}
               </Button>
               <div className="flex items-center gap-3">
-                <Link href={`/objective/${okr.id}`}>
+                <Link href={`/objectives/${okr.id}`}>
                   <h3 className="text-xl font-bold hover:underline cursor-pointer">
                     {okr.title}
                   </h3>
