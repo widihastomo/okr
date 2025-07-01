@@ -15,6 +15,7 @@ export default function StatsOverview({ okrs, isLoading }: StatsOverviewProps) {
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+
   // Calculate stats from filtered OKR data
   const calculateStats = () => {
     if (!okrs || okrs.length === 0) {
@@ -28,85 +29,90 @@ export default function StatsOverview({ okrs, isLoading }: StatsOverviewProps) {
       };
     }
 
-    const totalOKRs = okrs.length;
-    const onTrack = okrs.filter(okr => okr.status === 'on_track').length;
-    const atRisk = okrs.filter(okr => okr.status === 'at_risk').length;
-    const completed = okrs.filter(okr => okr.status === 'completed').length;
-    const behind = okrs.filter(okr => okr.status === 'behind').length;
-    const inProgress = okrs.filter(okr => okr.status === 'in_progress').length;
-    
-    // Calculate average progress
-    const totalProgress = okrs.reduce((sum, okr) => sum + (okr.overallProgress || 0), 0);
-    const avgProgress = totalOKRs > 0 ? Math.round(totalProgress / totalOKRs) : 0;
+    const statusCounts = okrs.reduce((acc, okr) => {
+      const status = okr.status;
+      if (status === 'on_track') acc.onTrack++;
+      else if (status === 'at_risk') acc.atRisk++;
+      else if (status === 'completed') acc.completed++;
+      else if (status === 'behind') acc.behind++;
+      return acc;
+    }, { onTrack: 0, atRisk: 0, completed: 0, behind: 0 });
+
+    const totalProgress = okrs.reduce((sum, okr) => {
+      const progress = okr.keyResults.reduce((keyResultSum, kr) => {
+        const currentValue = parseFloat(kr.currentValue || '0');
+        const targetValue = parseFloat(kr.targetValue);
+        const baseValue = parseFloat(kr.baseValue || '0');
+        
+        if (kr.keyResultType === 'increase_to') {
+          return keyResultSum + Math.min(100, Math.max(0, ((currentValue - baseValue) / (targetValue - baseValue)) * 100));
+        } else if (kr.keyResultType === 'decrease_to') {
+          return keyResultSum + Math.min(100, Math.max(0, ((baseValue - currentValue) / (baseValue - targetValue)) * 100));
+        } else {
+          return keyResultSum + (currentValue >= targetValue ? 100 : 0);
+        }
+      }, 0);
+      
+      return sum + (okr.keyResults.length > 0 ? progress / okr.keyResults.length : 0);
+    }, 0);
 
     return {
-      totalOKRs,
-      onTrack,
-      atRisk,
-      completed,
-      behind,
-      inProgress,
-      avgProgress
+      totalOKRs: okrs.length,
+      ...statusCounts,
+      avgProgress: okrs.length > 0 ? Math.round(totalProgress / okrs.length) : 0
     };
   };
 
   const stats = calculateStats();
 
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        {[...Array(4)].map((_, i) => (
-          <Card key={i} className="animate-pulse">
-            <CardContent className="p-6">
-              <div className="h-16 bg-gray-200 rounded"></div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    );
-  }
-
   const statCards = [
     {
       title: "Total OKRs",
-      value: stats.totalOKRs,
+      value: isLoading ? "..." : stats.totalOKRs.toString(),
       icon: Target,
       iconBg: "bg-blue-100",
       iconColor: "text-blue-600"
     },
     {
       title: "Completed",
-      value: stats.completed,
-      icon: Trophy,
+      value: isLoading ? "..." : stats.completed.toString(),
+      icon: CheckCircle,
       iconBg: "bg-green-100",
       iconColor: "text-green-600"
     },
     {
       title: "Behind",
-      value: stats.behind,
-      icon: Clock,
+      value: isLoading ? "..." : stats.behind.toString(),
+      icon: AlertTriangle,
       iconBg: "bg-red-100",
       iconColor: "text-red-600"
     },
     {
       title: "Avg Progress",
-      value: `${stats.avgProgress}%`,
+      value: isLoading ? "..." : `${stats.avgProgress}%`,
       icon: TrendingUp,
       iconBg: "bg-purple-100",
       iconColor: "text-purple-600"
     }
   ];
 
-  // Auto-rotate cards on mobile
+  // Auto-rotate cards on mobile - only runs after component mounts
   useEffect(() => {
-    const isMobile = window.innerWidth < 640;
-    if (!isMobile) return;
+    const checkAndSetupAutoRotate = () => {
+      const isMobile = window.innerWidth < 640;
+      if (!isMobile) return;
 
-    const interval = setInterval(() => {
-      setCurrentCard((prev) => (prev + 1) % statCards.length);
-    }, 3000);
+      const interval = setInterval(() => {
+        setCurrentCard((prev) => (prev + 1) % statCards.length);
+      }, 3000);
 
-    return () => clearInterval(interval);
+      return interval;
+    };
+
+    const interval = checkAndSetupAutoRotate();
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [statCards.length]);
 
   // Handle touch/mouse events for swipe
