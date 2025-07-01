@@ -148,7 +148,7 @@ export default function ObjectiveDetail() {
   };
 
   // Calculate overall progress as average of key results
-  const calculateOverallProgress = (keyResults: typeof objective?.keyResults): number => {
+  const calculateOverallProgress = (keyResults: KeyResult[]): number => {
     if (!keyResults || keyResults.length === 0) return 0;
     
     const totalProgress = keyResults.reduce((sum, kr) => {
