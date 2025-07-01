@@ -96,6 +96,15 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 01, 2025. Implemented comprehensive edit key result functionality:
+  * Created EditKeyResultModal component with complete form for editing all key result fields
+  * Added form fields: title, description, key result type, base/target/current values, unit, status, due date
+  * Integrated PATCH /api/key-results/:id endpoint for full key result updates
+  * Replaced edit progress button with edit key result button using Edit icon
+  * Enhanced OKR card to show single Edit button that opens comprehensive key result editing modal
+  * Users can now edit all aspects of key results beyond just progress updates
+  * Maintained number formatting with Indonesian locale and proper validation
+  * Added automatic cache invalidation for immediate UI updates after editing
 - June 29, 2025. Completed customizable task view modes with sorting functionality:
   * Implemented three task view modes: Kanban, List, and Timeline views for better task visualization
   * Added task sorting in List view by due date (earliest first) with secondary priority sorting

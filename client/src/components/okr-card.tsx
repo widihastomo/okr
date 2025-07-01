@@ -378,28 +378,17 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplic
                       unit={kr.unit}
                       keyResultType={kr.keyResultType}
                     />
-                    <div className="flex gap-1">
+                    {onEditKeyResult && (
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => onEditProgress(kr)}
+                        onClick={() => onEditKeyResult(kr)}
                         className="text-primary hover:text-blue-700"
-                        title="Edit Progress"
+                        title="Edit Key Result"
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
-                      {onEditKeyResult && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onEditKeyResult(kr)}
-                          className="text-gray-600 hover:text-blue-700"
-                          title="Edit Key Result"
-                        >
-                          <Settings className="w-4 h-4" />
-                        </Button>
-                      )}
-                    </div>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
