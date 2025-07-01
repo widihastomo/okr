@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Menu, Bell, Plus, Settings, User, LogOut } from "lucide-react";
+import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,9 +17,10 @@ import { useAuth } from "@/hooks/useAuth";
 
 interface GlobalHeaderProps {
   onMenuToggle?: () => void;
+  sidebarOpen?: boolean;
 }
 
-export default function GlobalHeader({ onMenuToggle }: GlobalHeaderProps) {
+export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeaderProps) {
   const [notificationCount] = useState(1);
   const [isOKRModalOpen, setIsOKRModalOpen] = useState(false);
   const { user } = useAuth();
@@ -57,7 +59,13 @@ export default function GlobalHeader({ onMenuToggle }: GlobalHeaderProps) {
   }, []);
 
   return (
-    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between fixed top-0 left-0 right-0 z-60">
+    <header className={cn(
+      "bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between fixed top-0 right-0 z-60 transition-all duration-300",
+      // Mobile: full width (sidebar is overlay)
+      "left-0",
+      // Desktop: adjust left margin based on sidebar state
+      sidebarOpen ? "lg:left-64" : "lg:left-16"
+    )}>
       {/* Left side - Menu toggle and Logo */}
       <div className="flex items-center space-x-3">
         {/* Hamburger menu button - always visible */}

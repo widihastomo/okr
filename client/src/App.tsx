@@ -64,7 +64,7 @@ function Router() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Global Header */}
-      <GlobalHeader onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
+      <GlobalHeader onMenuToggle={() => setSidebarOpen(!sidebarOpen)} sidebarOpen={sidebarOpen} />
       
       <div className="flex pt-16">
         {/* Sidebar */}
