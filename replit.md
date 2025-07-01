@@ -794,6 +794,13 @@ Changelog:
   * Simplified timezone conversion using manual offset calculation for better reliability
   * Status updates now correctly reflect Indonesian business hours and dates
   * Successfully tested with proper cycle transitions based on Indonesian timezone
+- June 30, 2025. Fixed critical UI and navigation issues:
+  * Fixed progress status component error by adding null checks for undefined progressPercentage values
+  * Added (progressPercentage || 0).toFixed() to prevent "Cannot read properties of undefined" errors
+  * Fixed objective detail page URL from /objective/ to /objectives/ (missing 's')
+  * Resolved mobile responsive navigation not being clickable by fixing z-index layering
+  * Increased mobile overlay z-index from z-20 to z-40 and sidebar z-index from z-10 to z-50
+  * Mobile navigation menu items are now fully interactive and clickable
 - June 28, 2025. Resolved proxy connection error and enhanced server stability:
   * Fixed "dial tcp 127.0.0.1:5000: connect: connection refused" error preventing frontend-backend communication
   * Enhanced server configuration with proper 0.0.0.0 host binding for external access
