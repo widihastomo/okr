@@ -127,7 +127,7 @@ export default function GoalDetail() {
     onSuccess: () => {
       toast({
         title: "Success",
-        description: "Key Result berhasil dibuat",
+        description: "Ukuran Keberhasilan berhasil dibuat",
         variant: "default",
         className: "border-green-200 bg-green-50 text-green-800",
       });
@@ -147,7 +147,7 @@ export default function GoalDetail() {
     onError: (error: Error) => {
       toast({
         title: "Error",
-        description: error.message || "Gagal membuat Key Result",
+        description: error.message || "Gagal membuat Ukuran Keberhasilan",
         variant: "destructive",
       });
     }
@@ -364,26 +364,26 @@ export default function GoalDetail() {
       {/* Tabs Section */}
       <Tabs defaultValue="key-results" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="key-results">Hasil Utama ({goal.keyResults.length})</TabsTrigger>
+          <TabsTrigger value="key-results">Ukuran Keberhasilan ({goal.keyResults.length})</TabsTrigger>
           <TabsTrigger value="initiatives">Rencana ({rencana.length})</TabsTrigger>
           <TabsTrigger value="tasks">Tugas ({tugas.length})</TabsTrigger>
         </TabsList>
 
-        {/* Key Results Tab */}
+        {/* Ukuran Keberhasilan Tab */}
         <TabsContent 
           value="key-results" 
           className={`space-y-4 transition-all duration-1000 ${
             shouldHighlight ? 'ring-4 ring-blue-300 ring-opacity-50 bg-blue-50/30 rounded-lg p-4' : ''
           }`}
         >
-          {/* Add Key Result Button */}
+          {/* Add Ukuran Keberhasilan Button */}
           <div className="flex justify-end">
             <Button 
               onClick={() => setAddKeyResultModal({ open: true })}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Tambah Key Result
+              Tambah Ukuran Keberhasilan
             </Button>
           </div>
           
@@ -391,16 +391,16 @@ export default function GoalDetail() {
             <Card className="border-2 border-dashed border-blue-200 bg-blue-50/50">
               <CardContent className="p-8 text-center">
                 <Target className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-blue-900 mb-2">Belum ada Key Result</h3>
+                <h3 className="text-lg font-medium text-blue-900 mb-2">Belum ada Ukuran Keberhasilan</h3>
                 <p className="text-blue-700 mb-4">
-                  Mulai tambahkan Key Result untuk mengukur progress goal ini
+                  Mulai tambahkan Ukuran Keberhasilan untuk mengukur progress goal ini
                 </p>
                 <Button 
                   onClick={() => setAddKeyResultModal({ open: true })}
                   className="bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  Tambah Key Result Pertama
+                  Tambah Ukuran Keberhasilan Pertama
                 </Button>
               </CardContent>
             </Card>
@@ -412,7 +412,7 @@ export default function GoalDetail() {
                 <Card key={kr.id}>
                   <CardContent className="p-6">
                     <div className="space-y-4">
-                      {/* Key Result Header */}
+                      {/* Ukuran Keberhasilan Header */}
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
@@ -448,7 +448,7 @@ export default function GoalDetail() {
                             size="sm"
                             onClick={() => handleEditKeyResult(kr)}
                             className="text-primary hover:text-blue-700"
-                            title="Edit Key Result"
+                            title="Edit Ukuran Keberhasilan"
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
@@ -816,13 +816,13 @@ export default function GoalDetail() {
       <Dialog open={addKeyResultModal.open} onOpenChange={(open) => setAddKeyResultModal({ open })}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Tambah Key Result Baru</DialogTitle>
+            <DialogTitle>Tambah Ukuran Keberhasilan Baru</DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4">
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <Label htmlFor="title">Judul Key Result *</Label>
+                <Label htmlFor="title">Judul Ukuran Keberhasilan *</Label>
                 <Input
                   id="title"
                   value={keyResultForm.title}
@@ -838,14 +838,14 @@ export default function GoalDetail() {
                   id="description"
                   value={keyResultForm.description}
                   onChange={(e) => setKeyResultForm({ ...keyResultForm, description: e.target.value })}
-                  placeholder="Deskripsi detail tentang Key Result ini"
+                  placeholder="Deskripsi detail tentang Ukuran Keberhasilan ini"
                   rows={3}
                 />
               </div>
               
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="keyResultType">Tipe Key Result *</Label>
+                  <Label htmlFor="keyResultType">Tipe Ukuran Keberhasilan *</Label>
                   <Select 
                     value={keyResultForm.keyResultType} 
                     onValueChange={(value) => setKeyResultForm({ ...keyResultForm, keyResultType: value })}
@@ -941,7 +941,7 @@ export default function GoalDetail() {
                 disabled={createKeyResultMutation.isPending || !keyResultForm.title || !keyResultForm.baseValue || !keyResultForm.targetValue}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
-                {createKeyResultMutation.isPending ? "Menyimpan..." : "Buat Key Result"}
+                {createKeyResultMutation.isPending ? "Menyimpan..." : "Buat Ukuran Keberhasilan"}
               </Button>
             </div>
           </div>

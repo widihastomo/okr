@@ -74,7 +74,7 @@ export default function EditKeyResultModal({
     },
     onSuccess: () => {
       toast({
-        title: "Key Result berhasil diperbarui",
+        title: "Ukuran Keberhasilan berhasil diperbarui",
         description: "Perubahan telah disimpan.",
         variant: "default",
         className: "border-green-200 bg-green-50 text-green-800",
@@ -86,8 +86,8 @@ export default function EditKeyResultModal({
     },
     onError: (error: any) => {
       toast({
-        title: "Gagal memperbarui Key Result",
-        description: error.message || "Terjadi kesalahan saat memperbarui Key Result.",
+        title: "Gagal memperbarui Ukuran Keberhasilan",
+        description: error.message || "Terjadi kesalahan saat memperbarui Ukuran Keberhasilan.",
         variant: "destructive",
       });
     },
@@ -111,9 +111,9 @@ export default function EditKeyResultModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit Key Result</DialogTitle>
+          <DialogTitle>Edit Ukuran Keberhasilan</DialogTitle>
           <DialogDescription>
-            Ubah detail Key Result termasuk target, status, dan informasi lainnya.
+            Ubah detail Ukuran Keberhasilan termasuk target, status, dan informasi lainnya.
           </DialogDescription>
         </DialogHeader>
 
@@ -125,7 +125,7 @@ export default function EditKeyResultModal({
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Judul Key Result</FormLabel>
+                  <FormLabel>Judul Ukuran Keberhasilan</FormLabel>
                   <FormControl>
                     <Input 
                       placeholder="Contoh: Meningkatkan pendapatan bulanan"
@@ -146,7 +146,7 @@ export default function EditKeyResultModal({
                   <FormLabel>Deskripsi (Opsional)</FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder="Deskripsi detail tentang Key Result ini..."
+                      placeholder="Deskripsi detail tentang Ukuran Keberhasilan ini..."
                       rows={3}
                       {...field} 
                     />
@@ -156,14 +156,14 @@ export default function EditKeyResultModal({
               )}
             />
 
-            {/* Key Result Type and Values */}
+            {/* Tipe Ukuran Keberhasilan dan Nilai */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="keyResultType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tipe Key Result</FormLabel>
+                    <FormLabel>Tipe Ukuran Keberhasilan</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>

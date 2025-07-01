@@ -296,10 +296,10 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplic
         </div>
       </div>
 
-      {/* Key Results */}
+      {/* Ukuran Keberhasilan */}
       {isExpanded && (
         <CardContent className="p-3 sm:p-6">
-          <h4 className="text-sm font-semibold text-gray-700 mb-3 sm:mb-4">Key Results</h4>
+          <h4 className="text-sm font-semibold text-gray-700 mb-3 sm:mb-4">Ukuran Keberhasilan</h4>
         <div className="space-y-3 sm:space-y-4">
           {okr.keyResults.map((kr) => {
             const progress = calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);

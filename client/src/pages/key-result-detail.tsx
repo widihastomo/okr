@@ -707,8 +707,8 @@ export default function KeyResultDetailPage() {
     return (
       <div className="p-6">
         <div className="text-center py-12">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Key Result tidak ditemukan</h2>
-          <p className="text-gray-600 mb-4">Key Result yang Anda cari tidak dapat ditemukan.</p>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Ukuran Keberhasilan tidak ditemukan</h2>
+          <p className="text-gray-600 mb-4">Ukuran Keberhasilan yang Anda cari tidak dapat ditemukan.</p>
           <Button onClick={() => setLocation("/")}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Kembali ke Dashboard
@@ -777,7 +777,7 @@ export default function KeyResultDetailPage() {
           />
           <Button variant="outline" size="sm">
             <Edit className="h-4 w-4 mr-2" />
-            Edit Key Result
+            Edit Ukuran Keberhasilan
           </Button>
         </div>
       </div>
@@ -790,7 +790,7 @@ export default function KeyResultDetailPage() {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Target className="h-5 w-5" />
-                Key Result Overview
+                Ukuran Keberhasilan Overview
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
