@@ -1888,6 +1888,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get tasks for an objective
+  app.get("/api/tasks/objective/:objectiveId", async (req, res) => {
+    try {
+      const objectiveId = req.params.objectiveId;
+      
+      // First get all initiatives for this objective
+      const initiatives = await storage.getInitiativesByObjectiveId(objectiveId);
+      
+      // Then get all tasks for these initiatives
+      const tasks = [];
+      for (const initiative of initiatives) {
+        const initiativeTasks = await storage.getTasksByInitiativeId(initiative.id);
+        
+        // Add initiative info to each task
+        const tasksWithInitiative = initiativeTasks.map(task => ({
+          ...task,
+          initiative: {
+            id: initiative.id,
+            title: initiative.title
+          }
+        }));
+        
+        tasks.push(...tasksWithInitiative);
+      }
+      
+      res.json(tasks);
+    } catch (error) {
+      console.error("Error fetching tasks for objective:", error);
+      res.status(500).json({ message: "Failed to fetch tasks" });
+    }
+  });
+
   app.put("/api/tasks/:id", async (req, res) => {
     try {
       const id = req.params.id;

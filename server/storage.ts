@@ -79,6 +79,7 @@ export interface IStorage {
   // Initiatives
   getInitiatives(): Promise<Initiative[]>;
   getInitiativesByKeyResultId(keyResultId: string): Promise<Initiative[]>;
+  getInitiativesByObjectiveId(objectiveId: string): Promise<Initiative[]>;
   getInitiativeWithDetails(id: string): Promise<any>;
   createInitiative(initiative: InsertInitiative): Promise<Initiative>;
   updateInitiative(id: string, initiative: Partial<InsertInitiative>): Promise<Initiative | undefined>;
@@ -689,6 +690,20 @@ export class DatabaseStorage implements IStorage {
     );
     
     return initiativesWithDetails;
+  }
+
+  async getInitiativesByObjectiveId(objectiveId: string): Promise<Initiative[]> {
+    // First get all key results for this objective
+    const keyResultsList = await this.getKeyResultsByObjectiveId(objectiveId);
+    
+    // Then get all initiatives for these key results
+    const initiativesList = [];
+    for (const kr of keyResultsList) {
+      const krInitiatives = await db.select().from(initiatives).where(eq(initiatives.keyResultId, kr.id));
+      initiativesList.push(...krInitiatives);
+    }
+    
+    return initiativesList;
   }
 
   async createInitiative(initiativeData: InsertInitiative): Promise<Initiative> {
