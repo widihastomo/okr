@@ -399,67 +399,65 @@ export default function Dashboard() {
       {/* Page Header */}
       <div className="mb-4 sm:mb-6 w-full">
         <div className="flex flex-col space-y-3 sm:space-y-4">
-          <div>
-            <h1 className="text-lg sm:text-2xl font-semibold text-gray-900">OKR Dashboard</h1>
-            <p className="text-gray-600 mt-0.5 sm:mt-1 text-xs sm:text-base">Track your objectives and key results</p>
+          {/* Title and Create Button Row */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+            <div>
+              <h1 className="text-lg sm:text-2xl font-semibold text-gray-900">OKR Dashboard</h1>
+              <p className="text-gray-600 mt-0.5 sm:mt-1 text-xs sm:text-base">Track your objectives and key results</p>
+            </div>
+            <div className="flex-shrink-0">
+              <CreateOKRButton />
+            </div>
           </div>
           
           {/* Filter Controls */}
-          <div className="flex flex-col space-y-2 sm:space-y-3 w-full">
-            {/* First row - Filter dropdowns */}
-            <div className="flex flex-col gap-2 sm:flex-row sm:gap-3 w-full">
-              <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
-                <SelectTrigger className="w-full sm:w-[140px] text-xs sm:text-sm h-8 sm:h-10">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua Status</SelectItem>
-                  <SelectItem value="not_started">Not Started</SelectItem>
-                  <SelectItem value="on_track">On Track</SelectItem>
-                  <SelectItem value="at_risk">At Risk</SelectItem>
-                  <SelectItem value="behind">Behind</SelectItem>
-                  <SelectItem value="paused">Paused</SelectItem>
-                  <SelectItem value="canceled">Canceled</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="partially_achieved">Partially Achieved</SelectItem>
-                  <SelectItem value="not_achieved">Not Achieved</SelectItem>
-                  <SelectItem value="in_progress">In Progress</SelectItem>
-                </SelectContent>
-              </Select>
-              
-              <Select value={cycleFilter} onValueChange={handleCycleFilterChange}>
-                <SelectTrigger className="w-full sm:w-[150px] md:w-[180px] text-xs sm:text-sm h-8 sm:h-10">
-                  <SelectValue placeholder="Pilih Cycle" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua Cycle</SelectItem>
-                  {cycles.map(cycle => (
-                    <SelectItem key={cycle.id} value={cycle.id}>
-                      {cycle.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={userFilter} onValueChange={handleUserFilterChange}>
-                <SelectTrigger className="w-full sm:w-[150px] md:w-[180px] text-xs sm:text-sm h-8 sm:h-10">
-                  <SelectValue placeholder="Pilih User" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua User</SelectItem>
-                  {users.map(user => (
-                    <SelectItem key={user.id} value={user.id}>
-                      {user.firstName} {user.lastName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="flex flex-col gap-2 sm:flex-row sm:gap-3 w-full">
+            <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
+              <SelectTrigger className="w-full sm:w-[140px] text-xs sm:text-sm h-8 sm:h-10">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Status</SelectItem>
+                <SelectItem value="not_started">Not Started</SelectItem>
+                <SelectItem value="on_track">On Track</SelectItem>
+                <SelectItem value="at_risk">At Risk</SelectItem>
+                <SelectItem value="behind">Behind</SelectItem>
+                <SelectItem value="paused">Paused</SelectItem>
+                <SelectItem value="canceled">Canceled</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="partially_achieved">Partially Achieved</SelectItem>
+                <SelectItem value="not_achieved">Not Achieved</SelectItem>
+                <SelectItem value="in_progress">In Progress</SelectItem>
+              </SelectContent>
+            </Select>
             
-            {/* Second row - Create button */}
-            <div className="flex justify-start sm:justify-end">
-              <CreateOKRButton />
-            </div>
+            <Select value={cycleFilter} onValueChange={handleCycleFilterChange}>
+              <SelectTrigger className="w-full sm:w-[150px] md:w-[180px] text-xs sm:text-sm h-8 sm:h-10">
+                <SelectValue placeholder="Pilih Cycle" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Cycle</SelectItem>
+                {cycles.map(cycle => (
+                  <SelectItem key={cycle.id} value={cycle.id}>
+                    {cycle.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={userFilter} onValueChange={handleUserFilterChange}>
+              <SelectTrigger className="w-full sm:w-[150px] md:w-[180px] text-xs sm:text-sm h-8 sm:h-10">
+                <SelectValue placeholder="Pilih User" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua User</SelectItem>
+                {users.map(user => (
+                  <SelectItem key={user.id} value={user.id}>
+                    {user.firstName} {user.lastName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
