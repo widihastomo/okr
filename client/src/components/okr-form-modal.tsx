@@ -3,6 +3,7 @@ import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useLocation } from "wouter";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ interface ObjectiveFormModalProps {
 export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
   const isEditMode = !!okr;
 
   // Fetch data yang diperlukan
@@ -169,10 +171,10 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
 
       return await response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
         title: "Success",
-        description: `OKR ${isEditMode ? 'updated' : 'created'} successfully`,
+        description: `Goal ${isEditMode ? 'diperbarui' : 'berhasil dibuat'}`,
         variant: "default",
         className: "border-green-200 bg-green-50 text-green-800",
       });
@@ -181,6 +183,11 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
       queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
       onOpenChange(false);
       form.reset();
+      
+      // Redirect to objective detail page with highlight for Key Results
+      if (!isEditMode && data?.id) {
+        setLocation(`/objectives/${data.id}?highlight=keyresults`);
+      }
     },
     onError: (error: Error) => {
       toast({

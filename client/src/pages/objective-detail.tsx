@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useParams } from "wouter";
+import { useParams, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +15,10 @@ import { ObjectiveStatusBadge } from "@/components/objective-status-badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { OKRWithKeyResults, KeyResult, Initiative, Task, Cycle, User, Team } from "@shared/schema";
@@ -29,6 +33,7 @@ type TaskWithInitiative = Task & {
 
 export default function GoalDetail() {
   const { id } = useParams();
+  const [location] = useLocation();
   const { toast } = useToast();
   const [checkInModal, setCheckInModal] = useState<{ open: boolean; keyResult?: KeyResult }>({
     open: false
@@ -36,6 +41,30 @@ export default function GoalDetail() {
   const [editKeyResultModal, setEditKeyResultModal] = useState<{ open: boolean; keyResult?: KeyResult }>({
     open: false
   });
+  const [addKeyResultModal, setAddKeyResultModal] = useState<{ open: boolean }>({
+    open: false
+  });
+  const [shouldHighlight, setShouldHighlight] = useState(false);
+  const [keyResultForm, setKeyResultForm] = useState({
+    title: '',
+    description: '',
+    keyResultType: 'increase_to',
+    baseValue: '',
+    targetValue: '',
+    currentValue: '',
+    unit: 'number',
+    dueDate: ''
+  });
+
+  // Check for highlight parameter in URL
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.split('?')[1] || '');
+    if (urlParams.get('highlight') === 'keyresults') {
+      setShouldHighlight(true);
+      // Remove highlight after animation
+      setTimeout(() => setShouldHighlight(false), 3000);
+    }
+  }, [location]);
   
   // Fetch goal data
   const { data: goal, isLoading } = useQuery<OKRWithKeyResults>({
@@ -83,6 +112,46 @@ export default function GoalDetail() {
     }
     return user?.email || userId;
   };
+
+  // Mutation for creating new Key Result
+  const createKeyResultMutation = useMutation({
+    mutationFn: async (keyResultData: any) => {
+      const response = await apiRequest('POST', '/api/key-results', {
+        ...keyResultData,
+        objectiveId: id,
+        currentValue: keyResultData.currentValue || keyResultData.baseValue
+      });
+
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Key Result berhasil dibuat",
+        variant: "default",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+      queryClient.invalidateQueries({ queryKey: [`/api/okrs/${id}`] });
+      setAddKeyResultModal({ open: false });
+      setKeyResultForm({
+        title: '',
+        description: '',
+        keyResultType: 'increase_to',
+        baseValue: '',
+        targetValue: '',
+        currentValue: '',
+        unit: 'number',
+        dueDate: ''
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal membuat Key Result",
+        variant: "destructive",
+      });
+    }
+  });
 
   const getKeyResultTypeIcon = (type: string) => {
     switch (type) {
@@ -301,11 +370,38 @@ export default function GoalDetail() {
         </TabsList>
 
         {/* Key Results Tab */}
-        <TabsContent value="key-results" className="space-y-4">
+        <TabsContent 
+          value="key-results" 
+          className={`space-y-4 transition-all duration-1000 ${
+            shouldHighlight ? 'ring-4 ring-blue-300 ring-opacity-50 bg-blue-50/30 rounded-lg p-4' : ''
+          }`}
+        >
+          {/* Add Key Result Button */}
+          <div className="flex justify-end">
+            <Button 
+              onClick={() => setAddKeyResultModal({ open: true })}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Tambah Key Result
+            </Button>
+          </div>
+          
           {goal.keyResults.length === 0 ? (
-            <Card>
-              <CardContent className="p-6 text-center text-gray-500">
-                Belum ada hasil utama untuk goal ini
+            <Card className="border-2 border-dashed border-blue-200 bg-blue-50/50">
+              <CardContent className="p-8 text-center">
+                <Target className="w-12 h-12 text-blue-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-blue-900 mb-2">Belum ada Key Result</h3>
+                <p className="text-blue-700 mb-4">
+                  Mulai tambahkan Key Result untuk mengukur progress goal ini
+                </p>
+                <Button 
+                  onClick={() => setAddKeyResultModal({ open: true })}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Tambah Key Result Pertama
+                </Button>
               </CardContent>
             </Card>
           ) : (
@@ -715,6 +811,142 @@ export default function GoalDetail() {
         onOpenChange={(open) => setEditKeyResultModal({ open })}
         keyResult={editKeyResultModal.keyResult}
       />
+
+      {/* Add Key Result Modal */}
+      <Dialog open={addKeyResultModal.open} onOpenChange={(open) => setAddKeyResultModal({ open })}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Tambah Key Result Baru</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <Label htmlFor="title">Judul Key Result *</Label>
+                <Input
+                  id="title"
+                  value={keyResultForm.title}
+                  onChange={(e) => setKeyResultForm({ ...keyResultForm, title: e.target.value })}
+                  placeholder="Contoh: Meningkatkan pendapatan bulanan menjadi 100 juta"
+                  required
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="description">Deskripsi</Label>
+                <Textarea
+                  id="description"
+                  value={keyResultForm.description}
+                  onChange={(e) => setKeyResultForm({ ...keyResultForm, description: e.target.value })}
+                  placeholder="Deskripsi detail tentang Key Result ini"
+                  rows={3}
+                />
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="keyResultType">Tipe Key Result *</Label>
+                  <Select 
+                    value={keyResultForm.keyResultType} 
+                    onValueChange={(value) => setKeyResultForm({ ...keyResultForm, keyResultType: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="increase_to">Peningkatan</SelectItem>
+                      <SelectItem value="decrease_to">Penurunan</SelectItem>
+                      <SelectItem value="achieve_or_not">Ya/Tidak</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <Label htmlFor="unit">Unit *</Label>
+                  <Select 
+                    value={keyResultForm.unit} 
+                    onValueChange={(value) => setKeyResultForm({ ...keyResultForm, unit: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="number">Angka</SelectItem>
+                      <SelectItem value="percentage">Persentase (%)</SelectItem>
+                      <SelectItem value="currency">Mata Uang (Rp)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <Label htmlFor="dueDate">Tenggat Waktu</Label>
+                  <Input
+                    id="dueDate"
+                    type="date"
+                    value={keyResultForm.dueDate}
+                    onChange={(e) => setKeyResultForm({ ...keyResultForm, dueDate: e.target.value })}
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="baseValue">Nilai Awal *</Label>
+                  <Input
+                    id="baseValue"
+                    type="number"
+                    value={keyResultForm.baseValue}
+                    onChange={(e) => setKeyResultForm({ ...keyResultForm, baseValue: e.target.value })}
+                    placeholder="0"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="targetValue">Target *</Label>
+                  <Input
+                    id="targetValue"
+                    type="number"
+                    value={keyResultForm.targetValue}
+                    onChange={(e) => setKeyResultForm({ ...keyResultForm, targetValue: e.target.value })}
+                    placeholder="100"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="currentValue">Nilai Saat Ini</Label>
+                  <Input
+                    id="currentValue"
+                    type="number"
+                    value={keyResultForm.currentValue}
+                    onChange={(e) => setKeyResultForm({ ...keyResultForm, currentValue: e.target.value })}
+                    placeholder="Akan otomatis sama dengan nilai awal"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-2 pt-4">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setAddKeyResultModal({ open: false })}
+              >
+                Batal
+              </Button>
+              <Button 
+                type="button" 
+                onClick={() => createKeyResultMutation.mutate(keyResultForm)}
+                disabled={createKeyResultMutation.isPending || !keyResultForm.title || !keyResultForm.baseValue || !keyResultForm.targetValue}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                {createKeyResultMutation.isPending ? "Menyimpan..." : "Buat Key Result"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
