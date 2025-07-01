@@ -11,7 +11,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Trash2, Edit } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Plus, Trash2, Edit, HelpCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { OKRWithKeyResults, Cycle, User, Objective, Team, KeyResult } from "@shared/schema";
@@ -326,9 +327,25 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                   name="objective.title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Objective Title</FormLabel>
+                      <FormLabel className="flex items-center gap-2">
+                        Judul Goal*
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent side="right" className="max-w-xs">
+                              <p className="text-sm">
+                                Nama goal yang ingin dicapai. Gunakan bahasa yang inspiratif dan mudah dipahami oleh tim.
+                                <br /><br />
+                                <strong>Contoh:</strong> "Meningkatkan Kepuasan Pelanggan", "Memperluas Jangkauan Pasar", "Mengoptimalkan Efisiensi Operasional"
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter objective title" {...field} />
+                        <Input placeholder="Contoh: Meningkatkan Kepuasan Pelanggan" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -340,10 +357,26 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                   name="objective.description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Description</FormLabel>
+                      <FormLabel className="flex items-center gap-2">
+                        Deskripsi Goal
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent side="right" className="max-w-xs">
+                              <p className="text-sm">
+                                Penjelasan detail tentang goal ini, mengapa penting, dan dampak yang diharapkan terhadap organisasi.
+                                <br /><br />
+                                <strong>Tips:</strong> Jelaskan konteks bisnis dan manfaat yang akan diperoleh ketika goal ini tercapai.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </FormLabel>
                       <FormControl>
                         <Textarea 
-                          placeholder="Enter objective description" 
+                          placeholder="Contoh: Goal ini akan meningkatkan loyalitas pelanggan melalui peningkatan kualitas layanan dan pengalaman pengguna yang lebih baik..." 
                           {...field} 
                         />
                       </FormControl>
@@ -358,18 +391,34 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                     name="objective.cycleId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Cycle</FormLabel>
+                        <FormLabel className="flex items-center gap-2">
+                          Siklus
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent side="right" className="max-w-xs">
+                                <p className="text-sm">
+                                  Periode waktu untuk menyelesaikan goal ini. Pilih siklus yang sesuai dengan target timeline Anda.
+                                  <br /><br />
+                                  <strong>Tips:</strong> Siklus bulanan untuk target jangka pendek, quarterly untuk target jangka menengah.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </FormLabel>
                         <Select 
                           onValueChange={(value) => field.onChange(value === "none" ? undefined : value)} 
                           value={field.value || "none"}
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select cycle" />
+                              <SelectValue placeholder="Pilih siklus" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="none">No Cycle</SelectItem>
+                            <SelectItem value="none">Tanpa Siklus</SelectItem>
                             {cycles?.map((cycle) => (
                               <SelectItem key={cycle.id} value={cycle.id}>
                                 {cycle.name}
@@ -387,16 +436,34 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                     name="objective.ownerType"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Owner Type</FormLabel>
+                        <FormLabel className="flex items-center gap-2">
+                          Tipe Pemilik
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent side="right" className="max-w-xs">
+                                <p className="text-sm">
+                                  Tentukan apakah goal ini dimiliki oleh individu atau tim.
+                                  <br /><br />
+                                  <strong>Individu:</strong> Goal personal atau tanggung jawab satu orang
+                                  <br />
+                                  <strong>Tim:</strong> Goal yang membutuhkan kolaborasi tim
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select owner type" />
+                              <SelectValue placeholder="Pilih tipe pemilik" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="user">User</SelectItem>
-                            <SelectItem value="team">Team</SelectItem>
+                            <SelectItem value="user">Individu</SelectItem>
+                            <SelectItem value="team">Tim</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -409,11 +476,28 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                     name="objective.ownerId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{ownerType === "team" ? "Team" : "User"}</FormLabel>
+                        <FormLabel className="flex items-center gap-2">
+                          {ownerType === "team" ? "Tim" : "Pemilik"}
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent side="right" className="max-w-xs">
+                                <p className="text-sm">
+                                  {ownerType === "team" 
+                                    ? "Pilih tim yang bertanggung jawab mencapai goal ini. Tim yang dipilih akan menjadi pemilik dan penanggung jawab keberhasilan goal."
+                                    : "Pilih individu yang bertanggung jawab mencapai goal ini. Pemilik akan menjadi penanggung jawab utama dalam pelaksanaan dan pelaporan progress."
+                                  }
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder={`Select ${ownerType === "team" ? "team" : "user"}`} />
+                              <SelectValue placeholder={ownerType === "team" ? "Pilih tim" : "Pilih pemilik"} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -442,18 +526,34 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                   name="objective.parentId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Parent Objective (Optional)</FormLabel>
+                      <FormLabel className="flex items-center gap-2">
+                        Goal Induk (Opsional)
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent side="right" className="max-w-xs">
+                              <p className="text-sm">
+                                Jika goal ini merupakan bagian dari goal yang lebih besar, pilih goal induk yang relevan.
+                                <br /><br />
+                                <strong>Contoh:</strong> Goal "Meningkatkan Penjualan" bisa menjadi induk dari "Meningkatkan Konversi Website"
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </FormLabel>
                       <Select 
                         onValueChange={(value) => field.onChange(value === "none" ? undefined : value)} 
                         value={field.value || "none"}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select parent objective" />
+                            <SelectValue placeholder="Pilih goal induk" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="none">No Parent</SelectItem>
+                          <SelectItem value="none">Tanpa Goal Induk</SelectItem>
                           {objectives?.filter(obj => !isEditMode || obj.id !== okr?.id).map((objective) => (
                             <SelectItem key={objective.id} value={objective.id}>
                               {objective.title}
@@ -480,7 +580,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                   className="bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  Add Key Result
+                  Tambah Key Result
                 </Button>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -527,9 +627,26 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                         name={`keyResults.${index}.title`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Title</FormLabel>
+                            <FormLabel className="flex items-center gap-2">
+                              Judul Key Result*
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
+                                  </TooltipTrigger>
+                                  <TooltipContent side="right" className="max-w-xs">
+                                    <p className="text-sm">
+                                      Judul akan menjadi bagian yang paling terlihat dari Key Result Anda dan harus jelas serta dapat diukur. 
+                                      Tidak boleh ada keraguan tentang apa yang ingin Anda capai.
+                                      <br /><br />
+                                      <strong>Contoh:</strong> 'Meningkatkan pendapatan dari Rp20.000.000 ke Rp30.000.000'.
+                                    </p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </FormLabel>
                             <FormControl>
-                              <Input placeholder="Enter key result title" {...field} />
+                              <Input placeholder="Masukkan nama Key Result" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -541,17 +658,37 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                         name={`keyResults.${index}.keyResultType`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Type</FormLabel>
+                            <FormLabel className="flex items-center gap-2">
+                              Tipe Key Result
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
+                                  </TooltipTrigger>
+                                  <TooltipContent side="right" className="max-w-xs">
+                                    <p className="text-sm">
+                                      Pilih metode perhitungan yang sesuai:
+                                      <br /><br />
+                                      <strong>Peningkatan:</strong> Untuk target yang ingin ditingkatkan (pendapatan, penjualan)
+                                      <br />
+                                      <strong>Penurunan:</strong> Untuk target yang ingin dikurangi (biaya, waktu)
+                                      <br />
+                                      <strong>Ya/Tidak:</strong> Untuk pencapaian yang bersifat biner (fitur selesai/belum)
+                                    </p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger>
-                                  <SelectValue placeholder="Select type" />
+                                  <SelectValue placeholder="Pilih tipe" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="increase_to">Increase To</SelectItem>
-                                <SelectItem value="decrease_to">Decrease To</SelectItem>
-                                <SelectItem value="achieve_or_not">Achieve or Not</SelectItem>
+                                <SelectItem value="increase_to">Peningkatan</SelectItem>
+                                <SelectItem value="decrease_to">Penurunan</SelectItem>
+                                <SelectItem value="achieve_or_not">Ya/Tidak</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -565,10 +702,26 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                       name={`keyResults.${index}.description`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Description</FormLabel>
+                          <FormLabel className="flex items-center gap-2">
+                            Deskripsi
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
+                                </TooltipTrigger>
+                                <TooltipContent side="right" className="max-w-xs">
+                                  <p className="text-sm">
+                                    Jelaskan secara spesifik apa yang akan diukur dan mengapa ini penting untuk goal Anda.
+                                    <br /><br />
+                                    <strong>Tips:</strong> Buat deskripsi yang jelas sehingga setiap orang memahami cara mengukur keberhasilan Key Result ini.
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </FormLabel>
                           <FormControl>
                             <Textarea 
-                              placeholder="Enter key result description" 
+                              placeholder="Contoh: Meningkatkan jumlah pelanggan aktif melalui strategi pemasaran digital dan program referral" 
                               {...field} 
                             />
                           </FormControl>
@@ -583,7 +736,23 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                         name={`keyResults.${index}.baseValue`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Nilai Awal</FormLabel>
+                            <FormLabel className="flex items-center gap-2">
+                              Nilai Awal*
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
+                                  </TooltipTrigger>
+                                  <TooltipContent side="right" className="max-w-xs">
+                                    <p className="text-sm">
+                                      Titik awal dari pengukuran Anda saat ini. Ini adalah kondisi awal sebelum upaya perbaikan dimulai.
+                                      <br /><br />
+                                      <strong>Contoh:</strong> Pendapatan saat ini Rp20.000.000, jumlah pengguna 1.000, atau tingkat kepuasan 70%.
+                                    </p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </FormLabel>
                             <FormControl>
                               <Input 
                                 type="text" 
@@ -607,7 +776,23 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                         name={`keyResults.${index}.targetValue`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Target</FormLabel>
+                            <FormLabel className="flex items-center gap-2">
+                              Target*
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
+                                  </TooltipTrigger>
+                                  <TooltipContent side="right" className="max-w-xs">
+                                    <p className="text-sm">
+                                      Nilai yang ingin Anda capai di akhir periode. Target harus ambisius namun realistis.
+                                      <br /><br />
+                                      <strong>Contoh:</strong> Meningkatkan pendapatan ke Rp30.000.000, mencapai 5.000 pengguna, atau tingkat kepuasan 90%.
+                                    </p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </FormLabel>
                             <FormControl>
                               <Input 
                                 type="text" 
@@ -631,19 +816,41 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                         name={`keyResults.${index}.unit`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Unit</FormLabel>
+                            <FormLabel className="flex items-center gap-2">
+                              Unit
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
+                                  </TooltipTrigger>
+                                  <TooltipContent side="right" className="max-w-xs">
+                                    <p className="text-sm">
+                                      Satuan pengukuran untuk Key Result Anda:
+                                      <br /><br />
+                                      <strong>Angka:</strong> Jumlah pengguna, produk terjual
+                                      <br />
+                                      <strong>Persentase:</strong> Tingkat kepuasan, konversi
+                                      <br />
+                                      <strong>Mata Uang:</strong> Pendapatan, biaya
+                                      <br />
+                                      <strong>Waktu:</strong> Hari atau jam untuk durasi
+                                    </p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger>
-                                  <SelectValue placeholder="Select unit" />
+                                  <SelectValue placeholder="Pilih unit" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="number">Number</SelectItem>
-                                <SelectItem value="percentage">Percentage</SelectItem>
-                                <SelectItem value="currency">Currency</SelectItem>
-                                <SelectItem value="days">Days</SelectItem>
-                                <SelectItem value="hours">Hours</SelectItem>
+                                <SelectItem value="number">Angka</SelectItem>
+                                <SelectItem value="percentage">Persentase</SelectItem>
+                                <SelectItem value="currency">Mata Uang</SelectItem>
+                                <SelectItem value="days">Hari</SelectItem>
+                                <SelectItem value="hours">Jam</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -658,7 +865,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
 
             <div className="flex justify-end gap-4">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
+                Batal
               </Button>
               <Button 
                 type="submit"
@@ -666,8 +873,8 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
                 {mutation.isPending 
-                  ? (isEditMode ? "Updating..." : "Creating...") 
-                  : (isEditMode ? "Update OKR" : "Create OKR")
+                  ? (isEditMode ? "Memperbarui..." : "Membuat...") 
+                  : (isEditMode ? "Update Goal" : "Buat Goal")
                 }
               </Button>
             </div>
@@ -689,7 +896,7 @@ export function CreateOKRButton() {
         className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
       >
         <Plus className="w-4 h-4 mr-2" />
-        Create OKR
+        Buat Goal
       </Button>
       <OKRFormModal open={open} onOpenChange={setOpen} />
     </>

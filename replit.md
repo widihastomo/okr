@@ -96,6 +96,15 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 01, 2025. Implemented comprehensive tooltip hints system for enhanced user guidance:
+  * Added helpful tooltip hints next to all form fields in OKR creation modal
+  * Tooltips provide detailed Indonesian explanations for each field with practical examples
+  * Goal fields include: Judul Goal (with inspirational examples), Deskripsi Goal (with context importance), Siklus (timeline guidance), Tipe Pemilik (individual vs team), Pemilik (responsibility assignment), Goal Induk (hierarchical relationships)
+  * Key Result fields include: Judul Key Result (measurable examples), Deskripsi (specificity guidance), Tipe Key Result (calculation method explanations), Nilai Awal (baseline examples), Target (ambitious but realistic examples), Unit (measurement types with examples)
+  * Used HelpCircle icons from Lucide React as consistent visual indicators for all tooltips
+  * Tooltips positioned to the right with max-width constraints for optimal readability
+  * Completed Indonesian language conversion for all remaining UI elements including buttons and placeholders
+  * Enhanced user experience with contextual guidance reducing form completion errors and improving understanding
 - July 01, 2025. Converted application interface to Indonesian language and terminology:
   * Updated all interface text from English to Indonesian across the application  
   * Changed navigation menu items: Dashboard → Beranda, Cycles → Siklus, Templates → Template, Users → Pengguna, Achievements → Pencapaian, Analytics → Analitik
