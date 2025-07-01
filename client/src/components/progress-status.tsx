@@ -180,9 +180,6 @@ export function SimpleProgressStatus({
   const config = getStatusConfig(status);
   const StatusIcon = config.icon;
   
-  // Ensure progressPercentage is a valid number
-  const safeProgressPercentage = progressPercentage || 0;
-  
   // Calculate ideal progress based on cycle dates
   const now = new Date();
   const cycleStart = new Date(startDate);
@@ -245,7 +242,7 @@ export function SimpleProgressStatus({
                   default: return 'bg-gray-400';
                 }
               })()}`}
-              style={{ width: `${Math.min(100, Math.max(0, safeProgressPercentage))}%` }}
+              style={{ width: `${Math.min(100, Math.max(0, progressPercentage || 0))}%` }}
             />
             {/* Threshold indicator for ideal progress */}
             <div 
@@ -255,11 +252,11 @@ export function SimpleProgressStatus({
           </div>
           {/* Enhanced tooltip on hover */}
           <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
-            Progress: {safeProgressPercentage.toFixed(1)}% | Target ideal: {Number(idealProgress).toFixed(1)}%
+            Progress: {(progressPercentage || 0).toFixed(1)}% | Target ideal: {Number(idealProgress).toFixed(1)}%
             <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
           </div>
         </div>
-        <span className="text-sm font-medium">{safeProgressPercentage.toFixed(1)}%</span>
+        <span className="text-sm font-medium">{(progressPercentage || 0).toFixed(1)}%</span>
       </div>
       {/* Progress explanation */}
       <div className="mt-2 text-xs text-gray-500 flex items-center gap-4">
