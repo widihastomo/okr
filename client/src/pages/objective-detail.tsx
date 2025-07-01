@@ -2,11 +2,11 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Edit, Calendar, User as UserIcon, Clock, Plus, Target, BarChart3, TrendingUp, TrendingDown, CheckCircle2, MoreVertical, Building, ClipboardList, CheckSquare } from "lucide-react";
+import { ArrowLeft, Edit, Calendar, User as UserIcon, Clock, Plus, Target, BarChart3, TrendingUp, TrendingDown, CheckCircle2, MoreVertical, Building, ClipboardList, CheckSquare, Trash2, FileText } from "lucide-react";
 import { Link } from "wouter";
 import { CheckInModal } from "@/components/check-in-modal";
 import EditKeyResultModal from "@/components/edit-key-result-modal";
@@ -67,6 +67,21 @@ export default function ObjectiveDetail() {
     queryKey: [`/api/tasks/objective/${id}`],
     enabled: !!id,
   });
+  
+  // Fetch users for name display
+  const { data: users = [] } = useQuery<User[]>({
+    queryKey: ['/api/users'],
+  });
+  
+  // Helper function to get user name
+  const getUserName = (userId: string): string => {
+    if (!users) return userId;
+    const user = users.find((u: any) => u.id === userId);
+    if (user && user.firstName && user.lastName) {
+      return `${user.firstName} ${user.lastName}`;
+    }
+    return user?.email || userId;
+  };
 
   const getKeyResultTypeIcon = (type: string) => {
     switch (type) {
@@ -363,7 +378,7 @@ export default function ObjectiveDetail() {
                           progressPercentage={progress}
                           timeProgressPercentage={kr.timeProgressPercentage || 0}
                           dueDate={kr.dueDate ? (typeof kr.dueDate === 'string' ? kr.dueDate : kr.dueDate.toISOString()) : null}
-                          startDate={cycle?.startDate || null}
+                          startDate={cycle?.startDate || undefined}
                         />
                         
                         {kr.dueDate && (
@@ -394,70 +409,117 @@ export default function ObjectiveDetail() {
               </CardContent>
             </Card>
           ) : (
-            initiatives.map((initiative) => {
-              const initiativeTasks = getTasksByInitiative(initiative.id);
-              
-              return (
-                <Card key={initiative.id}>
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <Link href={`/initiatives/${initiative.id}`}>
-                            <h3 className="font-semibold text-gray-900 hover:text-blue-600 cursor-pointer">
-                              {initiative.title}
-                            </h3>
-                          </Link>
-                          {initiative.description && (
-                            <p className="text-sm text-gray-600 mt-1">{initiative.description}</p>
-                          )}
-                        </div>
-                        
-                        <div className="flex items-center gap-2">
-                          <Badge className={getStatusBadgeClass(initiative.status)}>
-                            {initiative.status === 'not_started' ? 'Belum Mulai' :
-                             initiative.status === 'in_progress' ? 'Sedang Berjalan' :
-                             initiative.status === 'completed' ? 'Selesai' : 'Dibatalkan'}
-                          </Badge>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <MoreVertical className="w-4 h-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                              <Link href={`/initiatives/${initiative.id}`}>
-                                <DropdownMenuItem>
-                                  <ClipboardList className="w-4 h-4 mr-2" />
-                                  Lihat Detail
-                                </DropdownMenuItem>
-                              </Link>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {initiatives.map((initiative) => (
+                <Card key={initiative.id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex gap-2">
+                        <Badge className={
+                          initiative.status === "completed" ? "bg-green-100 text-green-800" :
+                          initiative.status === "in_progress" ? "bg-blue-100 text-blue-800" :
+                          initiative.status === "on_hold" ? "bg-yellow-100 text-yellow-800" :
+                          "bg-gray-100 text-gray-800"
+                        }>
+                          {initiative.status?.replace("_", " ") || "pending"}
+                        </Badge>
+                        <Badge className={
+                          initiative.priority === "critical" ? "bg-red-100 text-red-800" :
+                          initiative.priority === "high" ? "bg-orange-100 text-orange-800" :
+                          initiative.priority === "medium" ? "bg-yellow-100 text-yellow-800" :
+                          "bg-green-100 text-green-800"
+                        }>
+                          {initiative.priority || "medium"}
+                        </Badge>
                       </div>
-
-                      {/* Initiative Progress */}
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600">Progress</span>
-                          <span className="font-medium">{initiative.progressPercentage || 0}%</span>
-                        </div>
-                        <Progress value={initiative.progressPercentage || 0} className="h-2" />
-                      </div>
-
-                      {/* Initiative Tasks Summary */}
-                      {initiativeTasks.length > 0 && (
-                        <div className="text-sm text-gray-600">
-                          <CheckSquare className="w-4 h-4 inline-block mr-1" />
-                          {initiativeTasks.filter(t => t.status === 'completed').length} dari {initiativeTasks.length} task selesai
-                        </div>
-                      )}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-red-600">
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
+                    <CardTitle className="text-lg">
+                      <Link href={`/initiatives/${initiative.id}`}>
+                        <span className="hover:text-blue-600 cursor-pointer">
+                          {initiative.title}
+                        </span>
+                      </Link>
+                    </CardTitle>
+                    {initiative.description && (
+                      <CardDescription className="line-clamp-2">
+                        {initiative.description}
+                      </CardDescription>
+                    )}
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Progress */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Progress</span>
+                        <span className="font-medium">
+                          {initiative.progressPercentage || 0}%
+                        </span>
+                      </div>
+                      <Progress
+                        value={initiative.progressPercentage || 0}
+                        className="h-2"
+                      />
+                    </div>
+
+                    {/* Due Date */}
+                    {initiative.dueDate && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="w-4 h-4 text-gray-500" />
+                        <span className="text-gray-600">Due:</span>
+                        <span className={`font-medium ${
+                          new Date(initiative.dueDate) < new Date() ? "text-red-600" : ""
+                        }`}>
+                          {new Date(initiative.dueDate).toLocaleDateString('id-ID', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric'
+                          })}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* PIC */}
+                    {initiative.picId && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <UserIcon className="w-4 h-4 text-gray-500" />
+                        <span className="text-gray-600">PIC:</span>
+                        <span className="font-medium truncate">
+                          {getUserName(initiative.picId)}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Budget */}
+                    {initiative.budget && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Building className="w-4 h-4 text-gray-500" />
+                        <span className="text-gray-600">Budget:</span>
+                        <span className="font-medium">
+                          Rp {parseFloat(initiative.budget).toLocaleString('id-ID')}
+                        </span>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
-              );
-            })
+              ))}
+            </div>
           )}
         </TabsContent>
 
@@ -465,51 +527,110 @@ export default function ObjectiveDetail() {
         <TabsContent value="tasks" className="space-y-4">
           {tasks.length === 0 ? (
             <Card>
-              <CardContent className="p-6 text-center text-gray-500">
-                Belum ada tasks untuk objective ini
+              <CardContent className="text-center py-12">
+                <FileText className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  Belum ada tasks
+                </h3>
+                <p className="text-gray-500">
+                  Tasks akan muncul ketika initiatives dibuat.
+                </p>
               </CardContent>
             </Card>
           ) : (
-            <div className="grid gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {tasks.map((task) => (
-                <Card key={task.id}>
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-gray-900">{task.title}</h4>
-                        {task.description && (
-                          <p className="text-sm text-gray-600 mt-1">{task.description}</p>
-                        )}
-                        
-                        <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                          {task.initiative && (
-                            <Link href={`/initiatives/${task.initiative.id}`}>
-                              <span className="text-blue-600 hover:text-blue-800 cursor-pointer">
-                                <ClipboardList className="w-3 h-3 inline-block mr-1" />
-                                {task.initiative.title}
-                              </span>
-                            </Link>
-                          )}
-                          
-                          {task.dueDate && (
-                            <div className="flex items-center gap-1">
-                              <Calendar className="w-3 h-3" />
-                              <span>{new Date(task.dueDate).toLocaleDateString('id-ID', {
-                                day: 'numeric',
-                                month: 'short',
-                                year: 'numeric'
-                              })}</span>
-                            </div>
-                          )}
-                        </div>
+                <Card key={task.id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex gap-2">
+                        <Badge className={
+                          task.status === "completed" ? "bg-green-100 text-green-800" :
+                          task.status === "in_progress" ? "bg-blue-100 text-blue-800" :
+                          task.status === "cancelled" ? "bg-gray-100 text-gray-800" :
+                          "bg-yellow-100 text-yellow-800"
+                        }>
+                          {task.status === 'not_started' ? 'Belum Mulai' :
+                           task.status === 'in_progress' ? 'Sedang Berjalan' :
+                           task.status === 'completed' ? 'Selesai' : 'Dibatalkan'}
+                        </Badge>
+                        <Badge className={
+                          task.priority === "high" ? "bg-red-100 text-red-800" :
+                          task.priority === "medium" ? "bg-yellow-100 text-yellow-800" :
+                          "bg-green-100 text-green-800"
+                        }>
+                          {task.priority === 'high' ? 'Tinggi' :
+                           task.priority === 'medium' ? 'Sedang' : 'Rendah'}
+                        </Badge>
                       </div>
-                      
-                      <Badge className={getStatusBadgeClass(task.status)}>
-                        {task.status === 'not_started' ? 'Belum Mulai' :
-                         task.status === 'in_progress' ? 'Sedang Berjalan' :
-                         task.status === 'completed' ? 'Selesai' : 'Dibatalkan'}
-                      </Badge>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-red-600">
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
+                    <CardTitle className="text-lg">
+                      {task.title}
+                    </CardTitle>
+                    {task.description && (
+                      <CardDescription className="line-clamp-2">
+                        {task.description}
+                      </CardDescription>
+                    )}
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {/* Initiative Link */}
+                    {task.initiative && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <ClipboardList className="w-4 h-4 text-gray-500" />
+                        <span className="text-gray-600">Initiative:</span>
+                        <Link href={`/initiatives/${task.initiative.id}`}>
+                          <span className="font-medium text-blue-600 hover:text-blue-800 cursor-pointer hover:underline truncate">
+                            {task.initiative.title}
+                          </span>
+                        </Link>
+                      </div>
+                    )}
+
+                    {/* Due Date */}
+                    {task.dueDate && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="w-4 h-4 text-gray-500" />
+                        <span className="text-gray-600">Due:</span>
+                        <span className={`font-medium ${
+                          new Date(task.dueDate) < new Date() ? "text-red-600" : ""
+                        }`}>
+                          {new Date(task.dueDate).toLocaleDateString('id-ID', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric'
+                          })}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Assigned To */}
+                    {task.assignedTo && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <UserIcon className="w-4 h-4 text-gray-500" />
+                        <span className="text-gray-600">Assigned:</span>
+                        <span className="font-medium truncate">
+                          {getUserName(task.assignedTo)}
+                        </span>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               ))}
