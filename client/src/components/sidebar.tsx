@@ -99,14 +99,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       >
         <div className="flex flex-col h-full">
           {/* Header spacer */}
-          <div className="h-16 flex items-center justify-center border-b border-gray-200">
-            {isOpen ? (
-              <div className="text-sm font-medium text-gray-600">OKR Manager</div>
-            ) : (
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xs">OK</span>
-              </div>
-            )}
+          <div className="h-16 border-b border-gray-200">
           </div>
           
           {/* Navigation Menu */}
