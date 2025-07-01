@@ -14,6 +14,7 @@ import { SimpleProgressStatus } from "@/components/progress-status";
 import { ObjectiveStatusBadge } from "@/components/objective-status-badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { OKRWithKeyResults, KeyResult, Initiative, Task, Cycle, User, Team } from "@shared/schema";
@@ -538,103 +539,161 @@ export default function ObjectiveDetail() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {tasks.map((task) => (
-                <Card key={task.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="flex gap-2">
-                        <Badge className={
-                          task.status === "completed" ? "bg-green-100 text-green-800" :
-                          task.status === "in_progress" ? "bg-blue-100 text-blue-800" :
-                          task.status === "cancelled" ? "bg-gray-100 text-gray-800" :
-                          "bg-yellow-100 text-yellow-800"
-                        }>
-                          {task.status === 'not_started' ? 'Belum Mulai' :
-                           task.status === 'in_progress' ? 'Sedang Berjalan' :
-                           task.status === 'completed' ? 'Selesai' : 'Dibatalkan'}
-                        </Badge>
-                        <Badge className={
-                          task.priority === "high" ? "bg-red-100 text-red-800" :
-                          task.priority === "medium" ? "bg-yellow-100 text-yellow-800" :
-                          "bg-green-100 text-green-800"
-                        }>
-                          {task.priority === 'high' ? 'Tinggi' :
-                           task.priority === 'medium' ? 'Sedang' : 'Rendah'}
-                        </Badge>
-                      </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-red-600">
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                    <CardTitle className="text-lg">
-                      {task.title}
-                    </CardTitle>
-                    {task.description && (
-                      <CardDescription className="line-clamp-2">
-                        {task.description}
-                      </CardDescription>
-                    )}
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {/* Initiative Link */}
-                    {task.initiative && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <ClipboardList className="w-4 h-4 text-gray-500" />
-                        <span className="text-gray-600">Initiative:</span>
-                        <Link href={`/initiatives/${task.initiative.id}`}>
-                          <span className="font-medium text-blue-600 hover:text-blue-800 cursor-pointer hover:underline truncate">
-                            {task.initiative.title}
-                          </span>
-                        </Link>
-                      </div>
-                    )}
+            <Card>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Health</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Task</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assignee</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {tasks.map((task) => {
+                        // Calculate task health score
+                        const calculateHealthScore = (task: any) => {
+                          let score = 100;
+                          
+                          // Status impact
+                          if (task.status === 'completed') score = 100;
+                          else if (task.status === 'cancelled') score = 0;
+                          else if (task.status === 'in_progress') score = 70;
+                          else score = 40; // not_started
+                          
+                          // Due date impact
+                          if (task.dueDate) {
+                            const now = new Date();
+                            const due = new Date(task.dueDate);
+                            const daysDiff = Math.ceil((due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                            
+                            if (daysDiff < 0) score = Math.max(0, score - 30); // Overdue
+                            else if (daysDiff <= 1) score = Math.max(0, score - 20); // Due today/tomorrow
+                            else if (daysDiff <= 3) score = Math.max(0, score - 10); // Due soon
+                          }
+                          
+                          // Priority impact
+                          if (task.priority === 'high' && task.status !== 'completed') {
+                            score = Math.max(0, score - 15);
+                          }
+                          
+                          return Math.max(0, Math.min(100, score));
+                        };
 
-                    {/* Due Date */}
-                    {task.dueDate && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Calendar className="w-4 h-4 text-gray-500" />
-                        <span className="text-gray-600">Due:</span>
-                        <span className={`font-medium ${
-                          new Date(task.dueDate) < new Date() ? "text-red-600" : ""
-                        }`}>
-                          {new Date(task.dueDate).toLocaleDateString('id-ID', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric'
-                          })}
-                        </span>
-                      </div>
-                    )}
+                        const healthScore = calculateHealthScore(task);
+                        const getHealthColor = (score: number) => {
+                          if (score >= 80) return 'bg-green-500';
+                          if (score >= 60) return 'bg-yellow-500';
+                          if (score >= 40) return 'bg-orange-500';
+                          return 'bg-red-500';
+                        };
 
-                    {/* Assigned To */}
-                    {task.assignedTo && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <UserIcon className="w-4 h-4 text-gray-500" />
-                        <span className="text-gray-600">Assigned:</span>
-                        <span className="font-medium truncate">
-                          {getUserName(task.assignedTo)}
-                        </span>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                        return (
+                          <tr key={task.id} className="hover:bg-gray-50">
+                            <td className="px-4 py-4">
+                              <div 
+                                className={`w-3 h-3 rounded-full ${getHealthColor(healthScore)}`}
+                                title={`Health Score: ${healthScore}%`}
+                              />
+                            </td>
+                            <td className="px-4 py-4">
+                              <div className="font-medium text-gray-900">{task.title}</div>
+                              {task.initiative && (
+                                <div className="text-sm text-gray-500">
+                                  Initiative: {task.initiative.title}
+                                </div>
+                              )}
+                            </td>
+                            <td className="px-4 py-4">
+                              <Select
+                                value={task.status}
+                                onValueChange={(newStatus) => {
+                                  // Handle status update here
+                                  console.log('Update status:', task.id, newStatus);
+                                }}
+                              >
+                                <SelectTrigger className="w-32">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="not_started">Belum Dimulai</SelectItem>
+                                  <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
+                                  <SelectItem value="completed">Selesai</SelectItem>
+                                  <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </td>
+                            <td className="px-4 py-4">
+                              <Badge className={
+                                task.priority === "high" ? "bg-red-100 text-red-800" :
+                                task.priority === "medium" ? "bg-yellow-100 text-yellow-800" :
+                                "bg-green-100 text-green-800"
+                              }>
+                                {task.priority === 'high' ? 'Tinggi' :
+                                 task.priority === 'medium' ? 'Sedang' : 'Rendah'}
+                              </Badge>
+                            </td>
+                            <td className="px-4 py-4">
+                              {task.dueDate ? (
+                                <span className={`text-sm ${
+                                  new Date(task.dueDate) < new Date() ? "text-red-600 font-medium" : "text-gray-900"
+                                }`}>
+                                  {new Date(task.dueDate).toLocaleDateString('id-ID', {
+                                    day: '2-digit',
+                                    month: 'short',
+                                    year: 'numeric'
+                                  })}
+                                </span>
+                              ) : (
+                                <span className="text-gray-400">-</span>
+                              )}
+                            </td>
+                            <td className="px-4 py-4">
+                              {task.assignedTo ? (
+                                <div className="flex items-center gap-2">
+                                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                                    {getUserName(task.assignedTo).split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                                  </div>
+                                  <span className="text-sm font-medium text-gray-900">
+                                    {getUserName(task.assignedTo)}
+                                  </span>
+                                </div>
+                              ) : (
+                                <span className="text-gray-400">Unassigned</span>
+                              )}
+                            </td>
+                            <td className="px-4 py-4">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem>
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem className="text-red-600">
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
           )}
         </TabsContent>
       </Tabs>

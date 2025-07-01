@@ -96,16 +96,17 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
-- July 01, 2025. Enhanced objective detail page with consistent card-based layout:
-  * Converted initiatives and tasks display from table/list format to card-based grid layout
-  * Initiatives now display in responsive grid (1 column mobile, 2 columns tablet, 3 columns desktop)
+- July 01, 2025. Enhanced objective detail page with improved table layout for tasks:
+  * Converted initiatives display to responsive card-based grid layout (1 column mobile, 2 columns tablet, 3 columns desktop)
   * Each initiative card shows status badges, priority, progress bar, due date, PIC, and budget
-  * Tasks also display in card grid with status, priority badges, and related information
+  * Converted tasks display to professional table layout with columns: Health, Task, Status, Priority, Due Date, Assignee, Actions
+  * Added health score indicator with colored dots (green, yellow, orange, red) based on status, due dates, and priority
+  * Implemented interactive status dropdown in table for quick task status updates
+  * Added user avatars with initials and names in assignee column
+  * Enhanced due date display with red highlighting for overdue tasks
   * Added empty state designs with icons and descriptive messages for better UX
-  * Consistent visual styling matching dashboard card design across all pages
-  * Added dropdown menus with edit/delete actions on both initiative and task cards
+  * Added dropdown menus with edit/delete actions on initiative cards and task rows
   * Enhanced user name display by fetching user data for PIC assignments
-  * Fixed TypeScript errors and improved type safety throughout the component
 - July 01, 2025. Implemented comprehensive edit key result functionality:
   * Created EditKeyResultModal component with complete form for editing all key result fields
   * Added form fields: title, description, key result type, base/target/current values, unit, status, due date
