@@ -113,8 +113,8 @@ export default function OKRCard({ okr, onEditProgress, onDuplicate, onDelete, cy
   };
 
   return (
-    <Card className="mb-6 shadow-lg border-0">
-      <div className="bg-white text-gray-900 p-6 rounded-t-lg border-b">
+    <Card className="mb-4 sm:mb-6 shadow-lg border-0">
+      <div className="bg-white text-gray-900 p-4 sm:p-6 rounded-t-lg border-b">
         <div className="flex justify-between items-start">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
@@ -130,13 +130,15 @@ export default function OKRCard({ okr, onEditProgress, onDuplicate, onDelete, cy
                   <ChevronDown className="w-6 h-6 text-gray-600 hover:text-blue-600" />
                 )}
               </Button>
-              <div className="flex items-center gap-3">
+              <div className="flex-1 min-w-0">
                 <Link href={`/objectives/${okr.id}`}>
-                  <h3 className="text-xl font-bold hover:underline cursor-pointer">
+                  <h3 className="text-lg sm:text-xl font-bold hover:underline cursor-pointer leading-tight">
                     {okr.title}
                   </h3>
                 </Link>
-                <p className="text-xs text-gray-600">{okr.description}</p>
+                {okr.description && (
+                  <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">{okr.description}</p>
+                )}
               </div>
             </div>
             

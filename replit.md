@@ -801,6 +801,16 @@ Changelog:
   * Resolved mobile responsive navigation not being clickable by fixing z-index layering
   * Increased mobile overlay z-index from z-20 to z-40 and sidebar z-index from z-10 to z-50
   * Mobile navigation menu items are now fully interactive and clickable
+  * Removed logo duplication between GlobalHeader and sidebar components for cleaner interface
+- July 01, 2025. Improved responsive dashboard layout for better mobile experience:
+  * Updated dashboard padding to be responsive (p-4 sm:p-6) for better mobile space utilization
+  * Reorganized filter controls with vertical stacking on mobile and horizontal layout on larger screens
+  * Made filter dropdowns full-width on mobile (w-full) and fixed-width on larger screens
+  * Separated Create OKR button to its own row with proper alignment
+  * Enhanced tab layout with responsive text (full names on desktop, abbreviations on mobile)
+  * Reduced notification badge size for better mobile display
+  * Improved OKR card spacing and padding for mobile devices (mb-4 sm:mb-6, p-4 sm:p-6)
+  * Enhanced OKR card title and description layout with better line-clamping and responsive font sizes
 - June 28, 2025. Resolved proxy connection error and enhanced server stability:
   * Fixed "dial tcp 127.0.0.1:5000: connect: connection refused" error preventing frontend-backend communication
   * Enhanced server configuration with proper 0.0.0.0 host binding for external access
