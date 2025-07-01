@@ -831,6 +831,15 @@ Changelog:
   * Added responsive width classes (w-full sm:w-auto) to Create OKR button
   * Mobile users now have full-width button for better touch accessibility
   * Desktop maintains auto width for compact layout
+- July 01, 2025. Converted Key Result type badges to icons with tooltips:
+  * Replaced text badges with intuitive icons: TrendingUp (increase), TrendingDown (decrease), Target (binary)
+  * Added informative Indonesian tooltips explaining calculation methods on hover
+  * Improved visual design with cleaner, more compact layout without badge text
+  * Enhanced user understanding of different Key Result calculation types
+- July 01, 2025. Fixed header dropdown z-index to appear above sidebar:
+  * Increased header z-index from z-50 to z-60 for proper layering
+  * Added z-[70] to notification and user dropdown menus for visibility above sidebar
+  * Fixed dropdown overflow issues ensuring menus display correctly on all screen sizes
 - June 28, 2025. Resolved proxy connection error and enhanced server stability:
   * Fixed "dial tcp 127.0.0.1:5000: connect: connection refused" error preventing frontend-backend communication
   * Enhanced server configuration with proper 0.0.0.0 host binding for external access

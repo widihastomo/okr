@@ -57,7 +57,7 @@ export default function GlobalHeader({ onMenuToggle }: GlobalHeaderProps) {
   }, []);
 
   return (
-    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between fixed top-0 left-0 right-0 z-50">
+    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between fixed top-0 left-0 right-0 z-60">
       {/* Left side - Menu toggle and Logo */}
       <div className="flex items-center space-x-3">
         {/* Hamburger menu button - always visible */}
@@ -101,7 +101,7 @@ export default function GlobalHeader({ onMenuToggle }: GlobalHeaderProps) {
               )}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-64">
+          <DropdownMenuContent align="end" className="w-64 z-[70]">
             <DropdownMenuItem>
               <div className="flex flex-col space-y-1">
                 <p className="text-sm font-medium">Update progress OKR Q1</p>
@@ -132,7 +132,7 @@ export default function GlobalHeader({ onMenuToggle }: GlobalHeaderProps) {
               </span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuContent align="end" className="w-56 z-[70]">
             <DropdownMenuItem asChild>
               <Link href="/profile" className="flex items-center space-x-2 cursor-pointer">
                 <User className="h-4 w-4" />
