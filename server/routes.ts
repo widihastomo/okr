@@ -559,7 +559,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }),
         keyResults: z.array(insertKeyResultSchema.omit({ objectiveId: true }).extend({
           assignedTo: z.string().nullable().optional(),
-        }))
+        })).optional().default([])
       });
       
       const validatedData = createOKRSchema.parse(req.body);
@@ -2003,7 +2003,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Update initiative progress after updating task
-      await storage.updateInitiativeProgress(updatedTask.initiativeId);
+      if (updatedTask.initiativeId && typeof updatedTask.initiativeId === 'string') {
+        await storage.updateInitiativeProgress(updatedTask.initiativeId);
+      }
       
       res.json({ task: updatedTask, addedAsMember, removedAsMember });
     } catch (error) {

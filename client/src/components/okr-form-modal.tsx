@@ -147,7 +147,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
           teamId: data.objective.teamId === undefined ? null : data.objective.teamId,
           parentId: data.objective.parentId === undefined ? null : data.objective.parentId,
         },
-
+        keyResults: [] // Send empty array for Goals-only creation
       };
 
       const response = isEditMode
