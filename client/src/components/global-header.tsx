@@ -59,13 +59,7 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
   }, []);
 
   return (
-    <header className={cn(
-      "bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between fixed top-0 right-0 z-60 transition-all duration-300",
-      // Mobile: full width (sidebar is overlay)
-      "left-0",
-      // Desktop: adjust left margin based on sidebar state
-      sidebarOpen ? "lg:left-64" : "lg:left-16"
-    )}>
+    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between fixed top-0 left-0 right-0 z-50">
       {/* Left side - Menu toggle and Logo */}
       <div className="flex items-center space-x-3">
         {/* Hamburger menu button - always visible */}
