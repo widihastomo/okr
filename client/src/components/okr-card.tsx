@@ -113,8 +113,8 @@ export default function OKRCard({ okr, onEditProgress, onDuplicate, onDelete, cy
   };
 
   return (
-    <Card className="mb-4 sm:mb-6 shadow-lg border-0">
-      <div className="bg-white text-gray-900 p-4 sm:p-6 rounded-t-lg border-b">
+    <Card className="mb-3 sm:mb-6 shadow-lg border-0">
+      <div className="bg-white text-gray-900 p-3 sm:p-6 rounded-t-lg border-b">
         <div className="flex justify-between items-start">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
@@ -297,9 +297,9 @@ export default function OKRCard({ okr, onEditProgress, onDuplicate, onDelete, cy
 
       {/* Key Results */}
       {isExpanded && (
-        <CardContent className="p-6">
-          <h4 className="text-sm font-semibold text-gray-700 mb-4">Key Results</h4>
-        <div className="space-y-4">
+        <CardContent className="p-3 sm:p-6">
+          <h4 className="text-sm font-semibold text-gray-700 mb-3 sm:mb-4">Key Results</h4>
+        <div className="space-y-3 sm:space-y-4">
           {okr.keyResults.map((kr) => {
             const progress = calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
             const getKeyResultTypeLabel = (type: string) => {
@@ -312,7 +312,7 @@ export default function OKRCard({ okr, onEditProgress, onDuplicate, onDelete, cy
             };
             
             return (
-              <div key={kr.id} className="p-4 bg-gray-50 rounded-lg space-y-3">
+              <div key={kr.id} className="p-3 sm:p-4 bg-gray-50 rounded-lg space-y-2 sm:space-y-3">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">

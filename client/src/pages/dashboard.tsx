@@ -395,21 +395,21 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="p-4 sm:p-6">
+    <div className="p-3 sm:p-6">
       {/* Page Header */}
-      <div className="mb-6">
-        <div className="flex flex-col space-y-4">
+      <div className="mb-4 sm:mb-6">
+        <div className="flex flex-col space-y-3 sm:space-y-4">
           <div>
-            <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">OKR Dashboard</h1>
-            <p className="text-gray-600 mt-1 text-sm sm:text-base">Track your objectives and key results</p>
+            <h1 className="text-lg sm:text-2xl font-semibold text-gray-900">OKR Dashboard</h1>
+            <p className="text-gray-600 mt-0.5 sm:mt-1 text-xs sm:text-base">Track your objectives and key results</p>
           </div>
           
           {/* Filter Controls */}
-          <div className="flex flex-col space-y-3">
+          <div className="flex flex-col space-y-2 sm:space-y-3">
             {/* First row - Filter dropdowns */}
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
               <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
-                <SelectTrigger className="w-full sm:w-[140px]">
+                <SelectTrigger className="w-full sm:w-[140px] text-xs sm:text-sm h-8 sm:h-10">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -428,7 +428,7 @@ export default function Dashboard() {
               </Select>
               
               <Select value={cycleFilter} onValueChange={handleCycleFilterChange}>
-                <SelectTrigger className="w-full sm:w-[150px] md:w-[180px]">
+                <SelectTrigger className="w-full sm:w-[150px] md:w-[180px] text-xs sm:text-sm h-8 sm:h-10">
                   <SelectValue placeholder="Pilih Cycle" />
                 </SelectTrigger>
                 <SelectContent>
@@ -442,7 +442,7 @@ export default function Dashboard() {
               </Select>
 
               <Select value={userFilter} onValueChange={handleUserFilterChange}>
-                <SelectTrigger className="w-full sm:w-[150px] md:w-[180px]">
+                <SelectTrigger className="w-full sm:w-[150px] md:w-[180px] text-xs sm:text-sm h-8 sm:h-10">
                   <SelectValue placeholder="Pilih User" />
                 </SelectTrigger>
                 <SelectContent>
@@ -468,24 +468,24 @@ export default function Dashboard() {
       <StatsOverview okrs={okrs} isLoading={isLoading} />
       
       {/* Tabbed Content */}
-      <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-6">
-        <TabsList className="grid w-full max-w-2xl grid-cols-3 h-12">
-          <TabsTrigger value="objectives" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-4 sm:mt-6">
+        <TabsList className="grid w-full max-w-2xl grid-cols-3 h-9 sm:h-12">
+          <TabsTrigger value="objectives" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
             <Target className="w-3 h-3 sm:w-4 sm:h-4" />
             <span className="hidden sm:inline">Objectives</span>
             <span className="sm:hidden">OKRs</span>
           </TabsTrigger>
-          <TabsTrigger value="initiatives" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+          <TabsTrigger value="initiatives" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
             <Building2 className="w-3 h-3 sm:w-4 sm:h-4" />
             <span className="hidden sm:inline">Initiatives</span>
             <span className="sm:hidden">Init</span>
           </TabsTrigger>
-          <TabsTrigger value="my-tasks" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+          <TabsTrigger value="my-tasks" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
             <CheckSquare className="w-3 h-3 sm:w-4 sm:h-4" />
             <span className="hidden sm:inline">My Tasks</span>
             <span className="sm:hidden">Tasks</span>
             {hasNotifications && (
-              <span className="ml-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[18px] h-4 flex items-center justify-center">
+              <span className="ml-0.5 sm:ml-1 bg-red-500 text-white text-xs rounded-full px-1 sm:px-1.5 py-0.5 min-w-[16px] sm:min-w-[18px] h-3.5 sm:h-4 flex items-center justify-center">
                 {overdueAndDueTodayCount}
               </span>
             )}
