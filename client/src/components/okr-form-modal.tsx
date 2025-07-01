@@ -215,9 +215,6 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Objective Information Card */}
             <Card>
-              <CardHeader>
-                <CardTitle>Objective Information</CardTitle>
-              </CardHeader>
               <CardContent className="space-y-4">
                 <FormField
                   control={form.control}
