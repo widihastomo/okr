@@ -97,12 +97,14 @@ The application is configured for deployment on Replit with the following setup:
 ```
 Changelog:
 - July 01, 2025. Converted application interface to Indonesian language and terminology:
-  * Updated all interface text from English to Indonesian across the application
+  * Updated all interface text from English to Indonesian across the application  
   * Changed navigation menu items: Dashboard → Beranda, Cycles → Siklus, Templates → Template, Users → Pengguna, Achievements → Pencapaian, Analytics → Analitik
-  * Updated objective detail page tabs: Key Results → Hasil Utama, Initiatives → Inisiatif, Tasks → Tugas
+  * Updated objective detail page tabs: Key Results → Hasil Utama, Initiatives → Rencana, Tasks → Tugas
   * Changed table headers to Indonesian: Health → Kesehatan, Task → Tugas, Priority → Prioritas, Due Date → Tenggat, Assignee → Ditugaskan, Actions → Aksi
   * Updated button text: Edit → Ubah, Delete → Hapus, Profile → Profil, Logout → Keluar
-  * Changed field labels: Owner → Pemilik, Progress → Kemajuan, Due → Tenggat, Budget → Anggaran, Initiative → Inisiatif
+  * Changed field labels: Owner → Pemilik, Progress → Kemajuan, Due → Tenggat, Budget → Anggaran, Initiative → Rencana
+  * Changed core terminology: objective → goal, initiative → rencana, task → tugas throughout all components
+  * Updated component names: Initiatives → Rencana, MyTasks → MyTugas, function names and variable names
   * Updated empty state messages and user interface elements to use Indonesian terminology
   * Maintained consistent Indonesian business terminology throughout the application
 - July 01, 2025. Enhanced objective detail page with improved table layout for tasks:

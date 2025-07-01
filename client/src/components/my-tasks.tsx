@@ -22,8 +22,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import StandaloneTaskModal from "./standalone-task-modal";
-import TaskViewSelector, { ViewMode } from "./task-view-selector";
+import StandaloneTugasModal from "./standalone-task-modal";
+import TugasViewSelector, { ViewMode } from "./task-view-selector";
 import KanbanView from "./task-views/kanban-view";
 import ListView from "./task-views/list-view";
 import TimelineView from "./task-views/timeline-view";
@@ -39,12 +39,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-interface MyTasksProps {
+interface MyTugasProps {
   filteredKeyResultIds?: string[];
   userFilter?: string;
 }
 
-export default function MyTasks({ filteredKeyResultIds, userFilter }: MyTasksProps) {
+export default function MyTugas({ filteredKeyResultIds, userFilter }: MyTugasProps) {
   const { user } = useAuth();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
@@ -228,7 +228,7 @@ export default function MyTasks({ filteredKeyResultIds, userFilter }: MyTasksPro
           </Select>
         </div>
 
-        <TaskViewSelector 
+        <TugasViewSelector 
           currentView={viewMode} 
           onViewChange={setViewMode}
         />
@@ -264,8 +264,8 @@ export default function MyTasks({ filteredKeyResultIds, userFilter }: MyTasksPro
         )}
       </div>
 
-      {/* Standalone Task Modal */}
-      <StandaloneTaskModal
+      {/* Standalone Tugas Modal */}
+      <StandaloneTugasModal
         open={showStandaloneTaskModal}
         onOpenChange={setShowStandaloneTaskModal}
         onSuccess={() => {

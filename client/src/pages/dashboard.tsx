@@ -12,8 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Target, CheckSquare, Building2, Trophy } from "lucide-react";
-import MyTasks from "@/components/my-tasks";
-import Initiatives from "@/components/initiatives";
+import MyTugas from "@/components/my-tasks";
+import Rencana from "@/components/initiatives";
 import { useAuth } from "@/hooks/useAuth";
 
 import { useLocation } from "wouter";
@@ -479,18 +479,18 @@ export default function Dashboard() {
         <TabsList className="grid w-full grid-cols-3 h-9 sm:h-12">
           <TabsTrigger value="objectives" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
             <Target className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span className="hidden sm:inline">Objectives</span>
-            <span className="sm:hidden">OKRs</span>
+            <span className="hidden sm:inline">Goals</span>
+            <span className="sm:hidden">Goals</span>
           </TabsTrigger>
           <TabsTrigger value="initiatives" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
             <Building2 className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span className="hidden sm:inline">Initiatives</span>
-            <span className="sm:hidden">Init</span>
+            <span className="hidden sm:inline">Rencana</span>
+            <span className="sm:hidden">Rencana</span>
           </TabsTrigger>
           <TabsTrigger value="my-tasks" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
             <CheckSquare className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span className="hidden sm:inline">My Tasks</span>
-            <span className="sm:hidden">Tasks</span>
+            <span className="hidden sm:inline">Tugas Saya</span>
+            <span className="sm:hidden">Tugas</span>
             {hasNotifications && (
               <span className="ml-0.5 sm:ml-1 bg-red-500 text-white text-xs rounded-full px-1 sm:px-1.5 py-0.5 min-w-[16px] sm:min-w-[18px] h-3.5 sm:h-4 flex items-center justify-center">
                 {overdueAndDueTodayCount}
@@ -543,14 +543,14 @@ export default function Dashboard() {
         </TabsContent>
         
         <TabsContent value="initiatives" className="mt-6">
-          <Initiatives 
+          <Rencana 
             userFilter={userFilter} 
             filteredKeyResultIds={okrs.flatMap(okr => okr.keyResults.map(kr => kr.id))}
           />
         </TabsContent>
         
         <TabsContent value="my-tasks" className="mt-6">
-          <MyTasks 
+          <MyTugas 
             filteredKeyResultIds={okrs.flatMap(okr => okr.keyResults.map(kr => kr.id))}
             userFilter={userFilter}
           />

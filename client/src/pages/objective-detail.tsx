@@ -524,9 +524,9 @@ export default function GoalDetail() {
           )}
         </TabsContent>
 
-        {/* Tasks Tab */}
+        {/* Tugas Tab */}
         <TabsContent value="tasks" className="space-y-4">
-          {tasks.length === 0 ? (
+          {tugas.length === 0 ? (
             <Card>
               <CardContent className="text-center py-12">
                 <FileText className="w-12 h-12 mx-auto mb-4 text-gray-400" />
@@ -555,7 +555,7 @@ export default function GoalDetail() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
-                      {tasks.map((task) => {
+                      {tugas.map((task) => {
                         // Calculate task health score
                         const calculateHealthScore = (task: any) => {
                           let score = 100;

@@ -50,12 +50,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-interface InitiativesProps {
+interface RencanaProps {
   userFilter?: string;
   filteredKeyResultIds?: string[];
 }
 
-export default function Initiatives({ userFilter, filteredKeyResultIds }: InitiativesProps) {
+export default function Rencana({ userFilter, filteredKeyResultIds }: RencanaProps) {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -68,8 +68,8 @@ export default function Initiatives({ userFilter, filteredKeyResultIds }: Initia
   } | null>(null);
   const { toast } = useToast();
 
-  // Fetch all initiatives
-  const { data: initiatives = [], isLoading } = useQuery<Initiative[]>({
+  // Fetch all rencana
+  const { data: rencana = [], isLoading } = useQuery<Initiative[]>({
     queryKey: ["/api/initiatives"],
   });
 
@@ -114,8 +114,8 @@ export default function Initiatives({ userFilter, filteredKeyResultIds }: Initia
     },
   });
 
-  // Filter initiatives based on status, priority, and user
-  const filteredInitiatives = initiatives.filter((initiative) => {
+  // Filter rencana based on status, priority, and user
+  const filteredRencana = rencana.filter((initiative) => {
     const statusMatch =
       statusFilter === "all" || initiative.status === statusFilter;
     const priorityMatch =
@@ -298,16 +298,16 @@ export default function Initiatives({ userFilter, filteredKeyResultIds }: Initia
             </Card>
           ))}
         </div>
-      ) : filteredInitiatives.length === 0 ? (
+      ) : filteredRencana.length === 0 ? (
         <Card>
           <CardContent className="text-center py-12">
             <Building2 className="w-12 h-12 mx-auto mb-4 text-gray-400" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No initiatives found
+              Tidak ada rencana ditemukan
             </h3>
             <p className="text-gray-500 mb-4">
               {statusFilter !== "all" || priorityFilter !== "all"
-                ? "No initiatives match your current filters."
+                ? "Tidak ada rencana yang sesuai dengan filter Anda."
                 : "Get started by creating your first initiative."}
             </p>
             <Button
@@ -321,7 +321,7 @@ export default function Initiatives({ userFilter, filteredKeyResultIds }: Initia
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredInitiatives.map((initiative) => (
+          {filteredRencana.map((initiative) => (
             <Card
               key={initiative.id}
               className="hover:shadow-lg transition-shadow"
