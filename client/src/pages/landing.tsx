@@ -28,11 +28,11 @@ export default function Landing() {
       <div className="container mx-auto px-4 py-16 text-center">
         <h1 className="text-5xl font-bold text-gray-900 mb-6">
           Kelola Tujuan Tim dengan
-          <span className="text-blue-600 block">Metodologi OKR</span>
+          <span className="text-blue-600 block">Metodologi Goal</span>
         </h1>
         <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-          Platform manajemen tujuan komprehensif yang menggunakan metodologi Objectives and Key Results (OKR) 
-          untuk membantu tim dan individu melacak, menyelaraskan, dan mencapai objektif mereka dengan presisi dan keterlibatan.
+          Platform manajemen tujuan komprehensif yang menggunakan metodologi Goals and Key Results 
+          untuk membantu tim dan individu melacak, menyelaraskan, dan mencapai tujuan mereka dengan presisi dan keterlibatan.
         </p>
         <Button 
           onClick={() => window.location.href = '/api/login'}
@@ -165,7 +165,7 @@ export default function Landing() {
             <div className="bg-gradient-to-br from-blue-600/10 to-blue-600/20 p-8 rounded-2xl">
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Siap Mulai?</h3>
               <p className="text-gray-600 mb-6">
-                Bergabunglah dengan ribuan tim yang telah merasakan manfaat metodologi OKR 
+                Bergabunglah dengan ribuan tim yang telah merasakan manfaat metodologi Goal 
                 untuk mencapai tujuan bisnis mereka.
               </p>
               <Button 

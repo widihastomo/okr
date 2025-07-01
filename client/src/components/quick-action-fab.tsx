@@ -40,7 +40,7 @@ const taskSchema = z.object({
   priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
   assignedTo: z.string().optional(),
   dueDate: z.string().optional(),
-  initiativeId: z.string().min(1, "Initiative is required"),
+  initiativeId: z.string().min(1, "Rencana is required"),
 });
 
 type TaskFormData = z.infer<typeof taskSchema>;
@@ -53,8 +53,8 @@ export default function QuickActionFAB() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  // Fetch initiatives for dropdown
-  const { data: initiatives = [] } = useQuery<any[]>({
+  // Fetch rencana for dropdown
+  const { data: rencana = [] } = useQuery<any[]>({
     queryKey: ["/api/initiatives"],
     enabled: showTaskModal,
   });
@@ -166,22 +166,22 @@ export default function QuickActionFAB() {
             ? 'opacity-100 transform translate-y-0' 
             : 'opacity-0 transform translate-y-4 pointer-events-none'
         }`}>
-          {/* Buat OKR Button */}
+          {/* Buat Goal Button */}
           <Button
             onClick={handleOKRClick}
             className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-4 py-3 rounded-full"
           >
             <Target className="h-5 w-5" />
-            <span className="font-medium">Buat OKR</span>
+            <span className="font-medium">Buat Goal</span>
           </Button>
 
-          {/* Buat Task Button */}
+          {/* Buat Tugas Button */}
           <Button
             onClick={handleTaskClick}
             className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-4 py-3 rounded-full"
           >
             <FileText className="h-5 w-5" />
-            <span className="font-medium">Buat Task</span>
+            <span className="font-medium">Buat Tugas</span>
           </Button>
         </div>
 
@@ -217,7 +217,7 @@ export default function QuickActionFAB() {
                     <FormItem>
                       <FormLabel className="flex items-center space-x-1">
                         <Target className="h-4 w-4" />
-                        <span>Initiative</span>
+                        <span>Rencana</span>
                       </FormLabel>
                       <Select 
                         onValueChange={field.onChange} 
@@ -225,19 +225,19 @@ export default function QuickActionFAB() {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Pilih initiative" />
+                            <SelectValue placeholder="Pilih rencana" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {initiatives && initiatives.length > 0 ? (
-                            initiatives.filter((initiative: any) => initiative && initiative.id).map((initiative: any) => (
-                              <SelectItem key={initiative.id} value={initiative.id}>
-                                {initiative.title || "Untitled Initiative"}
+                          {rencana && rencana.length > 0 ? (
+                            rencana.filter((item: any) => item && item.id).map((item: any) => (
+                              <SelectItem key={item.id} value={item.id}>
+                                {item.title || "Untitled Rencana"}
                               </SelectItem>
                             ))
                           ) : (
                             <div className="py-2 px-3 text-sm text-muted-foreground">
-                              Tidak ada initiative tersedia
+                              Tidak ada rencana tersedia
                             </div>
                           )}
                         </SelectContent>

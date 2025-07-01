@@ -76,9 +76,9 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
         {/* Logo */}
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">OK</span>
+            <span className="text-white font-bold text-sm">GM</span>
           </div>
-          <span className="font-semibold text-gray-900 text-lg">OKR Manager</span>
+          <span className="font-semibold text-gray-900 text-lg">Goal Manager</span>
         </div>
       </div>
 

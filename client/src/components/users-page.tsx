@@ -579,7 +579,7 @@ export default function UsersPage() {
                     <TableHead>Email</TableHead>
                     <TableHead>Role</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="text-right">Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -628,15 +628,15 @@ export default function UsersPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                               <DropdownMenuItem onClick={() => setEditingUser(user)}>
                                 <Edit className="mr-2 h-4 w-4" />
-                                Edit user
+                                Ubah pengguna
                               </DropdownMenuItem>
                               {currentUser?.role === 'admin' && (
                                 <DropdownMenuItem onClick={() => setEditingPassword(user)}>
                                   <Key className="mr-2 h-4 w-4" />
-                                  Change Password
+                                  Ubah Password
                                 </DropdownMenuItem>
                               )}
                               <DropdownMenuSeparator />
@@ -647,7 +647,7 @@ export default function UsersPage() {
                                     onSelect={(e) => e.preventDefault()}
                                   >
                                     <Trash2 className="mr-2 h-4 w-4" />
-                                    Delete user
+                                    Hapus pengguna
                                   </DropdownMenuItem>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>

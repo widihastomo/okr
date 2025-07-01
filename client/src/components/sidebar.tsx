@@ -38,7 +38,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       active: location === "/" || location === "/"
     },
     {
-      label: "OKR Perusahaan",
+      label: "Goals Perusahaan",
       icon: Building2,
       path: "/company-okr",
       active: location === "/company-okr"
