@@ -27,7 +27,7 @@ type TaskWithInitiative = Task & {
   };
 };
 
-export default function ObjectiveDetail() {
+export default function GoalDetail() {
   const { id } = useParams();
   const { toast } = useToast();
   const [checkInModal, setCheckInModal] = useState<{ open: boolean; keyResult?: KeyResult }>({
@@ -37,34 +37,34 @@ export default function ObjectiveDetail() {
     open: false
   });
   
-  // Fetch objective data
-  const { data: objective, isLoading } = useQuery<OKRWithKeyResults>({
+  // Fetch goal data
+  const { data: goal, isLoading } = useQuery<OKRWithKeyResults>({
     queryKey: [`/api/okrs/${id}`],
     enabled: !!id,
   });
 
   // Fetch cycle data
   const { data: cycle } = useQuery<Cycle>({
-    queryKey: [`/api/cycles/${objective?.cycleId}`],
-    enabled: !!objective?.cycleId,
+    queryKey: [`/api/cycles/${goal?.cycleId}`],
+    enabled: !!goal?.cycleId,
   });
 
   // Fetch owner data
   const { data: owner } = useQuery<User | Team>({
-    queryKey: objective?.ownerType === 'user' 
-      ? [`/api/users/${objective?.ownerId}`]
-      : [`/api/teams/${objective?.ownerId}`],
-    enabled: !!objective?.ownerId && !!objective?.ownerType,
+    queryKey: goal?.ownerType === 'user' 
+      ? [`/api/users/${goal?.ownerId}`]
+      : [`/api/teams/${goal?.ownerId}`],
+    enabled: !!goal?.ownerId && !!goal?.ownerType,
   });
 
-  // Fetch initiatives for this objective
-  const { data: initiatives = [] } = useQuery<Initiative[]>({
+  // Fetch rencana for this goal
+  const { data: rencana = [] } = useQuery<Initiative[]>({
     queryKey: [`/api/initiatives/objective/${id}`],
     enabled: !!id,
   });
 
-  // Fetch tasks for initiatives
-  const { data: tasks = [] } = useQuery<TaskWithInitiative[]>({
+  // Fetch tugas for rencana
+  const { data: tugas = [] } = useQuery<TaskWithInitiative[]>({
     queryKey: [`/api/tasks/objective/${id}`],
     enabled: !!id,
   });
@@ -164,7 +164,7 @@ export default function ObjectiveDetail() {
   const getOwnerDisplay = () => {
     if (!owner) return "Tidak ada";
     
-    if (objective?.ownerType === 'user') {
+    if (goal?.ownerType === 'user') {
       const userOwner = owner as User;
       return `${userOwner.firstName || ''} ${userOwner.lastName || ''}`.trim() || userOwner.email;
     } else {
@@ -188,28 +188,28 @@ export default function ObjectiveDetail() {
     }
   };
 
-  const getTasksByInitiative = (initiativeId: string) => {
-    return tasks.filter(task => task.initiativeId === initiativeId);
+  const getTugasByRencana = (rencanaId: string) => {
+    return tugas.filter(task => task.initiativeId === rencanaId);
   };
 
   if (isLoading) {
     return (
       <div className="p-6">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-        <p className="text-center text-gray-500 mt-2">Memuat objective...</p>
+        <p className="text-center text-gray-500 mt-2">Memuat goal...</p>
       </div>
     );
   }
 
-  if (!objective) {
+  if (!goal) {
     return (
       <div className="p-6">
-        <p className="text-center text-gray-500">Objective tidak ditemukan</p>
+        <p className="text-center text-gray-500">Goal tidak ditemukan</p>
       </div>
     );
   }
 
-  const overallProgress = calculateOverallProgress(objective.keyResults);
+  const overallProgress = calculateOverallProgress(goal.keyResults);
 
   return (
     <div className="p-4 sm:p-6 max-w-full">
@@ -226,11 +226,11 @@ export default function ObjectiveDetail() {
             
             <div className="space-y-2">
               <div className="flex items-start gap-3 flex-wrap">
-                <h1 className="text-2xl font-bold text-gray-900">{objective.title}</h1>
-                <ObjectiveStatusBadge status={objective.status} />
+                <h1 className="text-2xl font-bold text-gray-900">{goal.title}</h1>
+                <ObjectiveStatusBadge status={goal.status} />
               </div>
-              {objective.description && (
-                <p className="text-gray-600">{objective.description}</p>
+              {goal.description && (
+                <p className="text-gray-600">{goal.description}</p>
               )}
             </div>
           </div>
@@ -257,7 +257,7 @@ export default function ObjectiveDetail() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2 mb-2">
-              {objective.ownerType === 'team' ? (
+              {goal.ownerType === 'team' ? (
                 <Building className="w-4 h-4 text-gray-500" />
               ) : (
                 <UserIcon className="w-4 h-4 text-gray-500" />
@@ -274,7 +274,7 @@ export default function ObjectiveDetail() {
               <Target className="w-4 h-4 text-gray-500" />
               <span className="text-sm text-gray-500">Hasil Utama</span>
             </div>
-            <p className="font-medium">{objective.keyResults.length}</p>
+            <p className="font-medium">{goal.keyResults.length}</p>
           </CardContent>
         </Card>
         
@@ -295,21 +295,21 @@ export default function ObjectiveDetail() {
       {/* Tabs Section */}
       <Tabs defaultValue="key-results" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="key-results">Hasil Utama ({objective.keyResults.length})</TabsTrigger>
-          <TabsTrigger value="initiatives">Inisiatif ({initiatives.length})</TabsTrigger>
-          <TabsTrigger value="tasks">Tugas ({tasks.length})</TabsTrigger>
+          <TabsTrigger value="key-results">Hasil Utama ({goal.keyResults.length})</TabsTrigger>
+          <TabsTrigger value="initiatives">Rencana ({rencana.length})</TabsTrigger>
+          <TabsTrigger value="tasks">Tugas ({tugas.length})</TabsTrigger>
         </TabsList>
 
         {/* Key Results Tab */}
         <TabsContent value="key-results" className="space-y-4">
-          {objective.keyResults.length === 0 ? (
+          {goal.keyResults.length === 0 ? (
             <Card>
               <CardContent className="p-6 text-center text-gray-500">
-                Belum ada hasil utama untuk tujuan ini
+                Belum ada hasil utama untuk goal ini
               </CardContent>
             </Card>
           ) : (
-            objective.keyResults.map((kr) => {
+            goal.keyResults.map((kr) => {
               const progress = calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
               
               return (
@@ -401,17 +401,17 @@ export default function ObjectiveDetail() {
           )}
         </TabsContent>
 
-        {/* Initiatives Tab */}
+        {/* Rencana Tab */}
         <TabsContent value="initiatives" className="space-y-4">
-          {initiatives.length === 0 ? (
+          {rencana.length === 0 ? (
             <Card>
               <CardContent className="p-6 text-center text-gray-500">
-                Belum ada inisiatif untuk tujuan ini
+                Belum ada rencana untuk goal ini
               </CardContent>
             </Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {initiatives.map((initiative) => (
+              {rencana.map((initiative) => (
                 <Card key={initiative.id} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <div className="flex justify-between items-start mb-2">
