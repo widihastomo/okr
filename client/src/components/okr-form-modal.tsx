@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,12 +12,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Plus, Trash2, Edit, HelpCircle } from "lucide-react";
+import { HelpCircle, Plus, Edit } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import type { OKRWithKeyResults, Cycle, User, Objective, Team, KeyResult } from "@shared/schema";
+import type { OKRWithKeyResults, Cycle, User, Objective, Team } from "@shared/schema";
 
-const okrFormSchema = z.object({
+const objectiveFormSchema = z.object({
   objective: z.object({
     title: z.string().min(1, "Objective title is required"),
     description: z.string().optional(),
@@ -29,44 +29,19 @@ const okrFormSchema = z.object({
     teamId: z.string().optional().nullable(),
     parentId: z.string().optional().nullable(),
   }),
-  keyResults: z.array(z.object({
-    id: z.string().optional(),
-    title: z.string().min(1, "Key result title is required"),
-    description: z.string().optional(),
-    currentValue: z.string().default("0"),
-    targetValue: z.string().min(1, "Target value is required"),
-    baseValue: z.string().optional(),
-    unit: z.string().default("number"),
-    keyResultType: z.string().default("increase_to"),
-    status: z.string().default("in_progress"),
-  })).min(1, "At least one key result is required"),
 });
 
-type OKRFormData = z.infer<typeof okrFormSchema>;
+type ObjectiveFormData = z.infer<typeof objectiveFormSchema>;
 
-// Utility functions for number formatting
-const formatNumberWithCommas = (value: string | number): string => {
-  if (!value) return '';
-  const num = typeof value === 'string' ? parseFloat(value) : value;
-  if (isNaN(num)) return '';
-  return num.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-};
 
-const parseNumberFromFormatted = (value: string): string => {
-  if (!value) return '';
-  // Remove thousand separators (dots) but keep decimal separator (comma)
-  const cleanValue = value.replace(/\./g, '').replace(',', '.');
-  const num = parseFloat(cleanValue);
-  return isNaN(num) ? '' : num.toString();
-};
 
-interface OKRFormModalProps {
+interface ObjectiveFormModalProps {
   okr?: OKRWithKeyResults; // undefined untuk create, object untuk edit
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalProps) {
+export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const isEditMode = !!okr;
@@ -77,8 +52,8 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
   const { data: teams } = useQuery<Team[]>({ queryKey: ["/api/teams"] });
   const { data: objectives } = useQuery<Objective[]>({ queryKey: ["/api/objectives"] });
 
-  const form = useForm<OKRFormData>({
-    resolver: zodResolver(okrFormSchema),
+  const form = useForm<ObjectiveFormData>({
+    resolver: zodResolver(objectiveFormSchema),
     defaultValues: isEditMode ? {
       objective: {
         title: okr.title,
@@ -91,17 +66,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
         teamId: okr.teamId === null ? undefined : okr.teamId,
         parentId: okr.parentId === null ? undefined : okr.parentId,
       },
-      keyResults: okr.keyResults.map(kr => ({
-        id: kr.id,
-        title: kr.title,
-        description: kr.description || "",
-        currentValue: kr.currentValue,
-        targetValue: kr.targetValue,
-        baseValue: kr.baseValue || "",
-        unit: kr.unit,
-        keyResultType: kr.keyResultType,
-        status: kr.status,
-      })),
+
     } : {
       objective: {
         title: "",
@@ -114,16 +79,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
         teamId: undefined,
         parentId: undefined,
       },
-      keyResults: [{
-        title: "",
-        description: "",
-        currentValue: "0",
-        targetValue: "",
-        baseValue: "",
-        unit: "number",
-        keyResultType: "increase_to",
-        status: "in_progress",
-      }],
+
     },
   });
 
@@ -143,17 +99,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
             teamId: okr.teamId === null ? undefined : okr.teamId,
             parentId: okr.parentId === null ? undefined : okr.parentId,
           },
-          keyResults: okr.keyResults.map(kr => ({
-            id: kr.id,
-            title: kr.title,
-            description: kr.description || "",
-            currentValue: kr.currentValue,
-            targetValue: kr.targetValue,
-            baseValue: kr.baseValue || "",
-            unit: kr.unit,
-            keyResultType: kr.keyResultType,
-            status: kr.status,
-          })),
+
         });
       } else {
         form.reset({
@@ -168,28 +114,16 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
             teamId: undefined,
             parentId: undefined,
           },
-          keyResults: [{
-            title: "",
-            description: "",
-            currentValue: "0",
-            targetValue: "",
-            baseValue: "",
-            unit: "number",
-            keyResultType: "increase_to",
-            status: "in_progress",
-          }],
+
         });
       }
     }
   }, [open, okr, isEditMode, form]);
 
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "keyResults",
-  });
+
 
   const mutation = useMutation({
-    mutationFn: async (data: OKRFormData) => {
+    mutationFn: async (data: ObjectiveFormData) => {
       // Calculate the owner display name based on owner type and ID
       let ownerName = "";
       if (data.objective.ownerType === "team" && data.objective.ownerId) {
@@ -200,31 +134,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
         ownerName = user ? `${user.firstName} ${user.lastName}` : "";
       }
 
-      // If editing, identify key results that need to be deleted
-      let keyResultsToDelete: string[] = [];
-      if (isEditMode && okr) {
-        const originalKeyResultIds = okr.keyResults.map(kr => kr.id);
-        const currentKeyResultIds = data.keyResults
-          .filter(kr => kr.id) // Only existing key results have IDs
-          .map(kr => kr.id!);
-        
-        keyResultsToDelete = originalKeyResultIds.filter(
-          id => !currentKeyResultIds.includes(id)
-        );
-      }
 
-      // Delete removed key results first
-      if (keyResultsToDelete.length > 0) {
-        for (const keyResultId of keyResultsToDelete) {
-          const deleteResponse = await fetch(`/api/key-results/${keyResultId}`, {
-            method: "DELETE",
-          });
-          
-          if (!deleteResponse.ok) {
-            throw new Error(`Failed to delete key result ${keyResultId}`);
-          }
-        }
-      }
 
       // Prepare the payload with the calculated owner name
       const payload = {
@@ -237,9 +147,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
           teamId: data.objective.teamId === undefined ? null : data.objective.teamId,
           parentId: data.objective.parentId === undefined ? null : data.objective.parentId,
         },
-        keyResults: data.keyResults.map(kr => ({
-          ...kr,
-        })),
+
       };
 
       const response = isEditMode
@@ -283,24 +191,13 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
     },
   });
 
-  const onSubmit = (data: OKRFormData) => {
+  const onSubmit = (data: ObjectiveFormData) => {
     console.log("Form submitted with data:", data);
     console.log("Form errors:", form.formState.errors);
     mutation.mutate(data);
   };
 
-  const addKeyResult = () => {
-    append({
-      title: "",
-      description: "",
-      currentValue: "0",
-      targetValue: "",
-      baseValue: "",
-      unit: "number",
-      keyResultType: "increase_to",
-      status: "in_progress",
-    });
-  };
+
 
   const ownerType = form.watch("objective.ownerType");
 
@@ -308,9 +205,9 @@ export default function OKRFormModal({ okr, open, onOpenChange }: OKRFormModalPr
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEditMode ? 'Edit OKR' : 'Create New OKR'}</DialogTitle>
+          <DialogTitle>{isEditMode ? 'Edit Goal' : 'Buat Goal Baru'}</DialogTitle>
           <DialogDescription>
-            {isEditMode ? 'Update the objective and key results' : 'Define your objective and key results'}
+            {isEditMode ? 'Update goal ini' : 'Tentukan goal Anda - Key Results dapat ditambahkan nanti di halaman detail'}
           </DialogDescription>
         </DialogHeader>
 
