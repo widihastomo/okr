@@ -835,6 +835,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update Key Result (full update)
+  app.patch("/api/key-results/:id", async (req, res) => {
+    try {
+      const keyResultId = req.params.id;
+      const updateData = req.body;
+      
+      // Convert numeric strings to numbers
+      if (updateData.currentValue) updateData.currentValue = parseFloat(updateData.currentValue).toString();
+      if (updateData.targetValue) updateData.targetValue = parseFloat(updateData.targetValue).toString();
+      if (updateData.baseValue) updateData.baseValue = updateData.baseValue ? parseFloat(updateData.baseValue).toString() : null;
+      
+      // Convert date string to Date if provided
+      if (updateData.dueDate) {
+        updateData.dueDate = new Date(updateData.dueDate);
+      }
+
+      const updatedKeyResult = await storage.updateKeyResult(keyResultId, updateData);
+      
+      if (!updatedKeyResult) {
+        return res.status(404).json({ message: "Key result not found" });
+      }
+      
+      res.json(updatedKeyResult);
+    } catch (error) {
+      console.error("Error updating key result:", error);
+      res.status(500).json({ message: "Failed to update key result" });
+    }
+  });
+
   // Delete Key Result
   app.delete("/api/key-results/:id", async (req, res) => {
     try {

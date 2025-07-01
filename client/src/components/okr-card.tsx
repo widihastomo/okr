@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Calendar, User, Users, Clock, Edit, MoreVertical, Copy, Trash2, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Target } from "lucide-react";
+import { Calendar, User, Users, Clock, Edit, MoreVertical, Copy, Trash2, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Target, Settings } from "lucide-react";
 import type { OKRWithKeyResults, KeyResult } from "@shared/schema";
 import { Link } from "wouter";
 import { CheckInModal } from "./check-in-modal";
@@ -16,6 +16,7 @@ import { EditOKRButton } from "./okr-form-modal";
 interface OKRCardProps {
   okr: OKRWithKeyResults;
   onEditProgress: (keyResult: KeyResult) => void;
+  onEditKeyResult?: (keyResult: KeyResult) => void;
   onRefresh: () => void;
   onDuplicate?: (okr: OKRWithKeyResults) => void;
   onDelete?: (okrId: string) => void;
@@ -25,7 +26,7 @@ interface OKRCardProps {
   index?: number;
 }
 
-export default function OKRCard({ okr, onEditProgress, onDuplicate, onDelete, cycleStartDate, cycleEndDate, cycle, index = 0 }: OKRCardProps) {
+export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplicate, onDelete, cycleStartDate, cycleEndDate, cycle, index = 0 }: OKRCardProps) {
   const [isExpanded, setIsExpanded] = useState(index === 0);
   
   const calculateProgress = (current: string, target: string, keyResultType: string, baseValue?: string | null): number => {
@@ -377,14 +378,28 @@ export default function OKRCard({ okr, onEditProgress, onDuplicate, onDelete, cy
                       unit={kr.unit}
                       keyResultType={kr.keyResultType}
                     />
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onEditProgress(kr)}
-                      className="text-primary hover:text-blue-700"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onEditProgress(kr)}
+                        className="text-primary hover:text-blue-700"
+                        title="Edit Progress"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      {onEditKeyResult && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onEditKeyResult(kr)}
+                          className="text-gray-600 hover:text-blue-700"
+                          title="Edit Key Result"
+                        >
+                          <Settings className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">

@@ -6,6 +6,7 @@ import StatsOverview from "@/components/stats-overview";
 import OKRCard from "@/components/okr-card";
 import { CreateOKRButton } from "@/components/okr-form-modal";
 import EditProgressModal from "@/components/edit-progress-modal";
+import EditKeyResultModal from "@/components/edit-key-result-modal";
 import { DeleteConfirmationModal } from "@/components/delete-confirmation-modal";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -31,6 +32,10 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<string>("objectives");
 
   const [editProgressModal, setEditProgressModal] = useState<{ open: boolean; keyResult?: KeyResult }>({
+    open: false
+  });
+
+  const [editKeyResultModal, setEditKeyResultModal] = useState<{ open: boolean; keyResult?: KeyResult }>({
     open: false
   });
 
@@ -372,6 +377,10 @@ export default function Dashboard() {
     setEditProgressModal({ open: true, keyResult });
   };
 
+  const handleEditKeyResult = (keyResult: KeyResult) => {
+    setEditKeyResultModal({ open: true, keyResult });
+  };
+
   // Key result click now navigates to dedicated page via Link in OKRCard
 
   const handleDuplicateOKR = (okr: OKRWithKeyResults) => {
@@ -519,6 +528,7 @@ export default function Dashboard() {
                   key={okr.id}
                   okr={okr}
                   onEditProgress={handleEditProgress}
+                  onEditKeyResult={handleEditKeyResult}
                   onRefresh={refetch}
                   onDuplicate={handleDuplicateOKR}
                   onDelete={handleDeleteOKR}
@@ -556,6 +566,12 @@ export default function Dashboard() {
         onOpenChange={(open) => setEditProgressModal({ open, keyResult: open ? editProgressModal.keyResult : undefined })}
         keyResult={editProgressModal.keyResult}
         onSuccess={refetch}
+      />
+
+      <EditKeyResultModal
+        open={editKeyResultModal.open}
+        onOpenChange={(open) => setEditKeyResultModal({ open, keyResult: open ? editKeyResultModal.keyResult : undefined })}
+        keyResult={editKeyResultModal.keyResult}
       />
 
 
