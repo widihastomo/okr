@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Calendar, User, Users, Clock, Edit, MoreVertical, Copy, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { Calendar, User, Users, Clock, Edit, MoreVertical, Copy, Trash2, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Target } from "lucide-react";
 import type { OKRWithKeyResults, KeyResult } from "@shared/schema";
 import { Link } from "wouter";
 import { CheckInModal } from "./check-in-modal";
@@ -310,6 +310,34 @@ export default function OKRCard({ okr, onEditProgress, onDuplicate, onDelete, cy
                 default: return type;
               }
             };
+
+            const getKeyResultTypeIcon = (type: string) => {
+              switch (type) {
+                case "increase_to":
+                  return {
+                    icon: TrendingUp,
+                    tooltip: "Target Peningkatan - Progress dihitung dari nilai awal ke target"
+                  };
+                case "decrease_to":
+                  return {
+                    icon: TrendingDown,
+                    tooltip: "Target Penurunan - Progress dihitung mundur dari nilai awal ke target"
+                  };
+                case "achieve_or_not":
+                  return {
+                    icon: Target,
+                    tooltip: "Target Binary - 100% jika tercapai, 0% jika tidak"
+                  };
+                default:
+                  return {
+                    icon: Target,
+                    tooltip: "Tipe target tidak diketahui"
+                  };
+              }
+            };
+
+            const typeConfig = getKeyResultTypeIcon(kr.keyResultType);
+            const IconComponent = typeConfig.icon;
             
             return (
               <div key={kr.id} className="p-3 sm:p-4 bg-gray-50 rounded-lg space-y-2 sm:space-y-3">
@@ -322,9 +350,15 @@ export default function OKRCard({ okr, onEditProgress, onDuplicate, onDelete, cy
                       >
                         {kr.title}
                       </Link>
-                      <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
-                        {getKeyResultTypeLabel(kr.keyResultType)}
-                      </span>
+                      <div className="relative group">
+                        <IconComponent 
+                          className="w-4 h-4 text-gray-500 hover:text-gray-700 cursor-help" 
+                        />
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-20 whitespace-nowrap">
+                          {typeConfig.tooltip}
+                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
+                        </div>
+                      </div>
                     </div>
                     <p className="text-sm text-gray-600 mb-2">{kr.description}</p>
                     <div className="text-xs text-gray-500">
