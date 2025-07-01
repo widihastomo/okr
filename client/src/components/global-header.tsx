@@ -138,7 +138,7 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
             <DropdownMenuItem asChild>
               <Link href="/profile" className="flex items-center space-x-2 cursor-pointer">
                 <User className="h-4 w-4" />
-                <span>Profile</span>
+                <span>Profil</span>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -150,7 +150,7 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
               }}
             >
               <LogOut className="h-4 w-4" />
-              <span>Logout</span>
+              <span>Keluar</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

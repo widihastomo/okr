@@ -237,7 +237,7 @@ export default function ObjectiveDetail() {
           
           <Button variant="outline" size="sm">
             <Edit className="w-4 h-4 mr-2" />
-            Edit
+            Ubah
           </Button>
         </div>
       </div>
@@ -262,7 +262,7 @@ export default function ObjectiveDetail() {
               ) : (
                 <UserIcon className="w-4 h-4 text-gray-500" />
               )}
-              <span className="text-sm text-gray-500">Owner</span>
+              <span className="text-sm text-gray-500">Pemilik</span>
             </div>
             <p className="font-medium">{getOwnerDisplay()}</p>
           </CardContent>
@@ -272,7 +272,7 @@ export default function ObjectiveDetail() {
           <CardContent className="p-4">
             <div className="flex items-center space-x-2 mb-2">
               <Target className="w-4 h-4 text-gray-500" />
-              <span className="text-sm text-gray-500">Key Results</span>
+              <span className="text-sm text-gray-500">Hasil Utama</span>
             </div>
             <p className="font-medium">{objective.keyResults.length}</p>
           </CardContent>
@@ -295,9 +295,9 @@ export default function ObjectiveDetail() {
       {/* Tabs Section */}
       <Tabs defaultValue="key-results" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="key-results">Key Results ({objective.keyResults.length})</TabsTrigger>
-          <TabsTrigger value="initiatives">Initiatives ({initiatives.length})</TabsTrigger>
-          <TabsTrigger value="tasks">Tasks ({tasks.length})</TabsTrigger>
+          <TabsTrigger value="key-results">Hasil Utama ({objective.keyResults.length})</TabsTrigger>
+          <TabsTrigger value="initiatives">Inisiatif ({initiatives.length})</TabsTrigger>
+          <TabsTrigger value="tasks">Tugas ({tasks.length})</TabsTrigger>
         </TabsList>
 
         {/* Key Results Tab */}
@@ -305,7 +305,7 @@ export default function ObjectiveDetail() {
           {objective.keyResults.length === 0 ? (
             <Card>
               <CardContent className="p-6 text-center text-gray-500">
-                Belum ada key results untuk objective ini
+                Belum ada hasil utama untuk tujuan ini
               </CardContent>
             </Card>
           ) : (
@@ -406,7 +406,7 @@ export default function ObjectiveDetail() {
           {initiatives.length === 0 ? (
             <Card>
               <CardContent className="p-6 text-center text-gray-500">
-                Belum ada initiatives untuk objective ini
+                Belum ada inisiatif untuk tujuan ini
               </CardContent>
             </Card>
           ) : (
@@ -442,11 +442,11 @@ export default function ObjectiveDetail() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem>
                             <Edit className="mr-2 h-4 w-4" />
-                            Edit
+                            Ubah
                           </DropdownMenuItem>
                           <DropdownMenuItem className="text-red-600">
                             <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
+                            Hapus
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -468,7 +468,7 @@ export default function ObjectiveDetail() {
                     {/* Progress */}
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Progress</span>
+                        <span className="text-gray-600">Kemajuan</span>
                         <span className="font-medium">
                           {initiative.progressPercentage || 0}%
                         </span>
@@ -483,7 +483,7 @@ export default function ObjectiveDetail() {
                     {initiative.dueDate && (
                       <div className="flex items-center gap-2 text-sm">
                         <Calendar className="w-4 h-4 text-gray-500" />
-                        <span className="text-gray-600">Due:</span>
+                        <span className="text-gray-600">Tenggat:</span>
                         <span className={`font-medium ${
                           new Date(initiative.dueDate) < new Date() ? "text-red-600" : ""
                         }`}>
@@ -511,7 +511,7 @@ export default function ObjectiveDetail() {
                     {initiative.budget && (
                       <div className="flex items-center gap-2 text-sm">
                         <Building className="w-4 h-4 text-gray-500" />
-                        <span className="text-gray-600">Budget:</span>
+                        <span className="text-gray-600">Anggaran:</span>
                         <span className="font-medium">
                           Rp {parseFloat(initiative.budget).toLocaleString('id-ID')}
                         </span>
@@ -531,10 +531,10 @@ export default function ObjectiveDetail() {
               <CardContent className="text-center py-12">
                 <FileText className="w-12 h-12 mx-auto mb-4 text-gray-400" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Belum ada tasks
+                  Belum ada tugas
                 </h3>
                 <p className="text-gray-500">
-                  Tasks akan muncul ketika initiatives dibuat.
+                  Tugas akan muncul ketika inisiatif dibuat.
                 </p>
               </CardContent>
             </Card>
@@ -545,13 +545,13 @@ export default function ObjectiveDetail() {
                   <table className="w-full">
                     <thead className="bg-gray-50 border-b">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Health</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Task</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kesehatan</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tugas</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assignee</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prioritas</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tenggat</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ditugaskan</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
@@ -605,7 +605,7 @@ export default function ObjectiveDetail() {
                               <div className="font-medium text-gray-900">{task.title}</div>
                               {task.initiative && (
                                 <div className="text-sm text-gray-500">
-                                  Initiative: {task.initiative.title}
+                                  Inisiatif: {task.initiative.title}
                                 </div>
                               )}
                             </td>
@@ -664,7 +664,7 @@ export default function ObjectiveDetail() {
                                   </span>
                                 </div>
                               ) : (
-                                <span className="text-gray-400">Unassigned</span>
+                                <span className="text-gray-400">Belum Ditugaskan</span>
                               )}
                             </td>
                             <td className="px-4 py-4">
@@ -677,11 +677,11 @@ export default function ObjectiveDetail() {
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem>
                                     <Edit className="mr-2 h-4 w-4" />
-                                    Edit
+                                    Ubah
                                   </DropdownMenuItem>
                                   <DropdownMenuItem className="text-red-600">
                                     <Trash2 className="mr-2 h-4 w-4" />
-                                    Delete
+                                    Hapus
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>

@@ -32,44 +32,44 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const menuItems = [
     {
-      label: "Dashboard",
+      label: "Beranda",
       icon: LayoutDashboard,
       path: "/",
       active: location === "/" || location === "/"
     },
     {
-      label: "Company OKRs",
+      label: "OKR Perusahaan",
       icon: Building2,
       path: "/company-okr",
       active: location === "/company-okr"
     },
 
     {
-      label: "Cycles",
+      label: "Siklus",
       icon: RotateCcw,
       path: "/cycles",
       active: location === "/cycles"
     },
     {
-      label: "Templates",
+      label: "Template",
       icon: FileText,
       path: "/templates",
       active: location === "/templates"
     },
     {
-      label: "Users",
+      label: "Pengguna",
       icon: Users,
       path: "/users",
       active: location === "/users"
     },
     {
-      label: "Achievements",
+      label: "Pencapaian",
       icon: Trophy,
       path: "/achievements",
       active: location === "/achievements"
     },
     {
-      label: "Analytics",
+      label: "Analitik",
       icon: BarChart3,
       path: "/analytics",
       active: location === "/analytics"
