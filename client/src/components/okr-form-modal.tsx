@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { HelpCircle, Plus, Edit } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -213,9 +213,8 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Objective Information Card */}
-            <Card>
-              <CardContent className="space-y-4">
+            {/* Goal Information */}
+            <div className="space-y-6">
                 <FormField
                   control={form.control}
                   name="objective.title"
@@ -459,10 +458,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                     </FormItem>
                   )}
                 />
-              </CardContent>
-            </Card>
-
-
+            </div>
 
             <div className="flex justify-end gap-4">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

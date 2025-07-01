@@ -96,6 +96,14 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 01, 2025. Simplified Goal creation form by removing Key Results section and Card frame:
+  * Removed all Key Results input fields, validation, and functionality from main form
+  * Simplified form to Goals/Objectives creation only - Key Results added via detail page
+  * Removed Card frame wrapper and adjusted form layout with better spacing
+  * Maintained all Indonesian tooltip hints for Goal fields with comprehensive guidance
+  * Updated form title and description to reflect Goals-only creation purpose
+  * Cleaned up unused imports and code dependencies (Card components, KeyResult types)
+  * Enhanced form proportions without Card wrapper for better visual layout
 - July 01, 2025. Implemented comprehensive tooltip hints system for enhanced user guidance:
   * Added helpful tooltip hints next to all form fields in OKR creation modal
   * Tooltips provide detailed Indonesian explanations for each field with practical examples
