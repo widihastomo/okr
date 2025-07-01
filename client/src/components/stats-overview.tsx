@@ -91,19 +91,19 @@ export default function StatsOverview({ okrs, isLoading }: StatsOverviewProps) {
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6 mb-6 lg:mb-8">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-6 mb-4 sm:mb-6 lg:mb-8">
       {statCards.map((stat) => {
         const Icon = stat.icon;
         return (
           <Card key={stat.title} className="shadow-sm border border-gray-200">
-            <CardContent className="p-4 lg:p-6">
+            <CardContent className="p-3 sm:p-4 lg:p-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs lg:text-sm font-medium text-gray-600">{stat.title}</p>
-                  <p className="text-lg lg:text-2xl font-semibold text-gray-900 mt-1">{stat.value}</p>
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-gray-600 truncate">{stat.title}</p>
+                  <p className="text-base sm:text-lg lg:text-2xl font-semibold text-gray-900 mt-0.5">{stat.value}</p>
                 </div>
-                <div className={`w-8 h-8 lg:w-12 lg:h-12 ${stat.iconBg} rounded-lg flex items-center justify-center`}>
-                  <Icon className={`w-4 h-4 lg:w-6 lg:h-6 ${stat.iconColor}`} />
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 ${stat.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                  <Icon className={`w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 ${stat.iconColor}`} />
                 </div>
               </div>
             </CardContent>

@@ -72,7 +72,7 @@ function Router() {
         
         {/* Main Content */}
         <div className={cn(
-          "flex-1 min-h-[calc(100vh-4rem)] transition-all duration-300",
+          "flex-1 min-h-[calc(100vh-4rem)] transition-all duration-300 overflow-x-hidden",
           // Mobile: no margin left (sidebar is overlay)
           "ml-0",
           // Desktop: margin based on sidebar state

@@ -819,6 +819,14 @@ Changelog:
   * Enhanced key results section with tighter spacing (space-y-2) and compact padding (p-3) on mobile
   * Improved mobile typography with smaller fonts and reduced gaps throughout dashboard
   * Dashboard now uses screen space much more efficiently on mobile devices
+- July 01, 2025. Fixed mobile horizontal overflow issues completely:
+  * Added global CSS rules to prevent horizontal scrolling on html, body, and root elements
+  * Fixed stats overview cards with truncated text and flexible layouts using min-w-0
+  * Made OKR card progress bars responsive (w-24 sm:w-32 lg:w-40) instead of fixed width
+  * Added overflow-x-hidden to main content containers at dashboard and app level
+  * Implemented proper flex layouts with gap control and min-width constraints
+  * Status badges now use truncate for long text and smaller sizes on mobile
+  * All components now properly contained within viewport width without horizontal scrolling
 - June 28, 2025. Resolved proxy connection error and enhanced server stability:
   * Fixed "dial tcp 127.0.0.1:5000: connect: connection refused" error preventing frontend-backend communication
   * Enhanced server configuration with proper 0.0.0.0 host binding for external access

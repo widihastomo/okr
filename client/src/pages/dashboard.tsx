@@ -395,9 +395,9 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="p-3 sm:p-6">
+    <div className="p-3 sm:p-6 overflow-x-hidden">
       {/* Page Header */}
-      <div className="mb-4 sm:mb-6">
+      <div className="mb-4 sm:mb-6 w-full">
         <div className="flex flex-col space-y-3 sm:space-y-4">
           <div>
             <h1 className="text-lg sm:text-2xl font-semibold text-gray-900">OKR Dashboard</h1>
@@ -405,9 +405,9 @@ export default function Dashboard() {
           </div>
           
           {/* Filter Controls */}
-          <div className="flex flex-col space-y-2 sm:space-y-3">
+          <div className="flex flex-col space-y-2 sm:space-y-3 w-full">
             {/* First row - Filter dropdowns */}
-            <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
+            <div className="flex flex-col gap-2 sm:flex-row sm:gap-3 w-full">
               <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
                 <SelectTrigger className="w-full sm:w-[140px] text-xs sm:text-sm h-8 sm:h-10">
                   <SelectValue placeholder="Status" />
@@ -468,8 +468,8 @@ export default function Dashboard() {
       <StatsOverview okrs={okrs} isLoading={isLoading} />
       
       {/* Tabbed Content */}
-      <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-4 sm:mt-6">
-        <TabsList className="grid w-full max-w-2xl grid-cols-3 h-9 sm:h-12">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-4 sm:mt-6 w-full">
+        <TabsList className="grid w-full grid-cols-3 h-9 sm:h-12">
           <TabsTrigger value="objectives" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
             <Target className="w-3 h-3 sm:w-4 sm:h-4" />
             <span className="hidden sm:inline">Objectives</span>

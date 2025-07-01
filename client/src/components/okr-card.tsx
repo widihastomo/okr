@@ -115,9 +115,9 @@ export default function OKRCard({ okr, onEditProgress, onDuplicate, onDelete, cy
   return (
     <Card className="mb-3 sm:mb-6 shadow-lg border-0">
       <div className="bg-white text-gray-900 p-3 sm:p-6 rounded-t-lg border-b">
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
+        <div className="flex justify-between items-start gap-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1 sm:gap-2 mb-2">
               <Button
                 variant="ghost"
                 size="sm"
@@ -176,9 +176,9 @@ export default function OKRCard({ okr, onEditProgress, onDuplicate, onDelete, cy
               )}
             </div>
           </div>
-          <div className="flex items-start space-x-3">
-            <div className="flex flex-col items-end">
-              <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-start gap-2 sm:gap-3">
+            <div className="flex flex-col items-end min-w-0">
+              <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2 flex-wrap justify-end">
                 {(() => {
                   const getProgressConfig = (status: string) => {
                     switch (status) {
@@ -202,16 +202,16 @@ export default function OKRCard({ okr, onEditProgress, onDuplicate, onDelete, cy
                   };
                   const config = getProgressConfig(okr.status);
                   return (
-                    <div className={`flex items-center gap-2 px-3 py-1 ${config.bgColor} ${config.textColor} rounded-full text-sm font-medium`}>
-                      <div className={`w-2 h-2 ${config.dotColor} rounded-full`}></div>
-                      {config.label}
+                    <div className={`flex items-center gap-1 px-2 py-0.5 ${config.bgColor} ${config.textColor} rounded-full text-xs sm:text-sm font-medium whitespace-nowrap`}>
+                      <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 ${config.dotColor} rounded-full flex-shrink-0`}></div>
+                      <span className="truncate">{config.label}</span>
                     </div>
                   );
                 })()}
-                <span className="text-lg font-semibold text-gray-900">{overallProgress.toFixed(1)}%</span>
+                <span className="text-base sm:text-lg font-semibold text-gray-900">{overallProgress.toFixed(1)}%</span>
               </div>
               <div 
-                className="w-40 bg-gray-200 rounded-full h-2 mb-1 relative group cursor-pointer"
+                className="w-24 sm:w-32 lg:w-40 bg-gray-200 rounded-full h-2 mb-1 relative group cursor-pointer"
                 title={(() => {
                   const now = new Date();
                   const cycleStart = cycleStartDate ? new Date(cycleStartDate) : new Date();
