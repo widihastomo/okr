@@ -686,7 +686,7 @@ export function CreateOKRButton() {
     <>
       <Button 
         onClick={() => setOpen(true)}
-        className="bg-blue-600 hover:bg-blue-700 text-white"
+        className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
       >
         <Plus className="w-4 h-4 mr-2" />
         Create OKR

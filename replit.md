@@ -827,6 +827,10 @@ Changelog:
   * Implemented proper flex layouts with gap control and min-width constraints
   * Status badges now use truncate for long text and smaller sizes on mobile
   * All components now properly contained within viewport width without horizontal scrolling
+- July 01, 2025. Made Create OKR button full width on mobile:
+  * Added responsive width classes (w-full sm:w-auto) to Create OKR button
+  * Mobile users now have full-width button for better touch accessibility
+  * Desktop maintains auto width for compact layout
 - June 28, 2025. Resolved proxy connection error and enhanced server stability:
   * Fixed "dial tcp 127.0.0.1:5000: connect: connection refused" error preventing frontend-backend communication
   * Enhanced server configuration with proper 0.0.0.0 host binding for external access
