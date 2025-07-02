@@ -7,10 +7,33 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { ChevronsUpDown, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { cn } from "@/lib/utils";
 import type { KeyResult } from "@shared/schema";
+
+// Unit options for Key Results
+const unitOptions = [
+  "Rp", // Rupiah (currency)
+  "%", // Percentage
+  "orang", // People
+  "hari", // Days
+  "bulan", // Months
+  "unit", // Generic units
+  "buah", // Pieces
+  "rating", // Rating
+  "skor", // Score
+  "ton", // Tons
+  "kg", // Kilograms
+  "meter", // Meters
+  "jam", // Hours
+  "minggu", // Weeks
+  "tahun", // Years
+];
 
 const editKeyResultSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -191,12 +214,72 @@ export default function EditKeyResultModal({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Unit (Opsional)</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="Contoh: Rp, %, buah, orang"
-                          {...field} 
-                        />
-                      </FormControl>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                "w-full justify-between",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value || "Pilih atau ketik unit..."}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0">
+                          <Command>
+                            <CommandInput 
+                              placeholder="Cari atau ketik unit baru..." 
+                              onValueChange={(value: string) => {
+                                if (value && !unitOptions.includes(value)) {
+                                  field.onChange(value);
+                                }
+                              }}
+                            />
+                            <CommandList>
+                              <CommandEmpty>
+                                <Button
+                                  variant="ghost"
+                                  className="w-full text-left justify-start h-auto p-2"
+                                  onClick={() => {
+                                    const input = document.querySelector('[placeholder="Cari atau ketik unit baru..."]') as HTMLInputElement;
+                                    if (input && input.value) {
+                                      field.onChange(input.value);
+                                    }
+                                  }}
+                                >
+                                  Tambah unit baru
+                                </Button>
+                              </CommandEmpty>
+                              <CommandGroup>
+                                {unitOptions.map((unit: string) => (
+                                  <CommandItem
+                                    value={unit}
+                                    key={unit}
+                                    onSelect={() => {
+                                      field.onChange(unit);
+                                    }}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        unit === field.value
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                    {unit}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                       <FormMessage />
                     </FormItem>
                   )}
