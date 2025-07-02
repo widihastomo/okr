@@ -1243,6 +1243,10 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
             {/* Conditional Value Fields */}
             {(() => {
               const keyResultType = keyResultForm.watch("keyResultType");
+              console.log("Current keyResultType:", keyResultType);
+              console.log("Is should_stay_above?", keyResultType === "should_stay_above");
+              console.log("Is should_stay_below?", keyResultType === "should_stay_below");
+              console.log("Should show input?", keyResultType === "should_stay_above" || keyResultType === "should_stay_below");
               
               if (keyResultType === "achieve_or_not") {
                 return null; // Don't show any value fields
