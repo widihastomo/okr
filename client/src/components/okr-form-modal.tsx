@@ -1297,11 +1297,11 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                           </FormLabel>
                           <FormControl>
                             <Input 
-                              {...field}
-                              placeholder="100" 
-                              type="number" 
-                              step="0.1" 
-                              value={field.value || ""} 
+                              placeholder="100"
+                              required
+                              value={field.value || ""}
+                              onChange={(e) => field.onChange(e.target.value)}
+                              step="0.1"
                             />
                           </FormControl>
                           <FormMessage />
