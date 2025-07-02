@@ -50,11 +50,24 @@ const keyResultSchema = z.object({
   description: z.string().optional(),
   keyResultType: z.enum(["increase_to", "decrease_to", "achieve_or_not", "should_stay_above", "should_stay_below"]).default("increase_to"),
   baseValue: z.string().optional(),
-  targetValue: z.string().min(1, "Target wajib diisi"),
+  targetValue: z.string().optional(),
   currentValue: z.string().default("0"),
-  unit: z.string().min(1, "Unit wajib diisi"),
+  unit: z.string().optional(),
   status: z.string().default("in_progress"),
   dueDate: z.string().optional().nullable(),
+}).refine((data) => {
+  // Target wajib diisi untuk semua tipe kecuali achieve_or_not yang tidak memiliki target
+  if (data.keyResultType !== "achieve_or_not" && !data.targetValue) {
+    return false;
+  }
+  // Unit wajib diisi untuk semua tipe kecuali achieve_or_not
+  if (data.keyResultType !== "achieve_or_not" && !data.unit) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Target dan Unit wajib diisi untuk tipe ini",
+  path: ["targetValue"]
 });
 
 const objectiveFormSchema = z.object({
@@ -950,7 +963,15 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
       currentValue: z.string().optional(),
       unit: z.string().optional(),
       status: z.string().optional(),
-
+    }).refine((data) => {
+      // Target wajib diisi untuk semua tipe kecuali achieve_or_not
+      if (data.keyResultType !== "achieve_or_not" && !data.targetValue) {
+        return false;
+      }
+      return true;
+    }, {
+      message: "Target harus diisi",
+      path: ["targetValue"]
     }).refine((data) => {
       // Unit wajib diisi kecuali untuk tipe achieve_or_not
       if (data.keyResultType !== "achieve_or_not" && !data.unit) {
@@ -1004,6 +1025,37 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
       }
     }
   }, [open, isEditing, editingKeyResult, keyResultForm]);
+
+  // Watch for keyResultType changes and clear inappropriate fields
+  const currentKeyResultType = keyResultForm.watch("keyResultType");
+  useEffect(() => {
+    if (currentKeyResultType === "achieve_or_not") {
+      // Clear target, base, and current values for achieve_or_not type
+      keyResultForm.setValue("targetValue", "");
+      keyResultForm.setValue("baseValue", "");
+      keyResultForm.setValue("currentValue", "");
+      keyResultForm.setValue("unit", "");
+    } else if (currentKeyResultType === "should_stay_above" || currentKeyResultType === "should_stay_below") {
+      // For stay above/below types, we only need target value
+      keyResultForm.setValue("baseValue", "");
+      keyResultForm.setValue("currentValue", "0");
+      // Keep target value and unit
+      if (!keyResultForm.getValues("targetValue")) {
+        keyResultForm.setValue("targetValue", "0");
+      }
+    } else {
+      // For increase_to and decrease_to, ensure all values are set
+      if (!keyResultForm.getValues("baseValue")) {
+        keyResultForm.setValue("baseValue", "0");
+      }
+      if (!keyResultForm.getValues("targetValue")) {
+        keyResultForm.setValue("targetValue", "0");
+      }
+      if (!keyResultForm.getValues("currentValue")) {
+        keyResultForm.setValue("currentValue", "0");
+      }
+    }
+  }, [currentKeyResultType, keyResultForm]);
 
   const handleSubmit = (data: KeyResultFormData) => {
     // Convert formatted values to numeric before submitting
@@ -1262,6 +1314,8 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
             {/* Conditional Value Fields */}
             {(() => {
               const keyResultType = keyResultForm.watch("keyResultType");
+              console.log("Current keyResultType:", keyResultType);
+              console.log("Current form values:", keyResultForm.getValues());
               
               if (keyResultType === "achieve_or_not") {
                 return null; // Don't show any value fields
@@ -1301,8 +1355,13 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                               type="text" 
                               value={field.value || ""} 
                               onChange={(e) => {
+                                console.log("Target input onChange triggered");
+                                console.log("Input value:", e.target.value);
+                                console.log("Current field value:", field.value);
                                 handleNumberInputChange(e.target.value, (formattedValue) => {
+                                  console.log("Formatted value:", formattedValue);
                                   field.onChange(formattedValue);
+                                  console.log("After onChange, field should be:", formattedValue);
                                 });
                               }}
                               onBlur={field.onBlur}
