@@ -978,8 +978,10 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
   useEffect(() => {
     if (open) {
       if (isEditing && editingKeyResult) {
+        console.log("Resetting with editing data:", editingKeyResult);
         keyResultForm.reset(editingKeyResult);
       } else {
+        console.log("Resetting with default values");
         keyResultForm.reset({
           title: "",
           description: "",
@@ -1279,7 +1281,20 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                             
                           </FormLabel>
                           <FormControl>
-                            <Input placeholder="100" type="number" step="0.1" {...field} />
+                            <Input 
+                              placeholder="100" 
+                              type="number" 
+                              step="0.1" 
+                              value={field.value || ""} 
+                              onChange={(e) => {
+                                console.log("Input change:", e.target.value);
+                                field.onChange(e);
+                              }}
+                              onBlur={field.onBlur}
+                              name={field.name}
+                              disabled={false}
+                              readOnly={false}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
