@@ -1286,11 +1286,18 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                             <Input 
                               placeholder="100" 
                               type="text" 
-                              value={field.value || ""} 
+                              value={field.value ? parseFloat(field.value).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) : ""}
                               onChange={(e) => {
-                                handleNumberInputChange(e.target.value, (formattedValue) => {
-                                  field.onChange(formattedValue); // Store formatted value directly
-                                });
+                                const inputValue = e.target.value;
+                                const cleanValue = inputValue.replace(/\./g, '').replace(',', '.');
+                                const num = parseFloat(cleanValue);
+                                
+                                if (!isNaN(num) && num > 999999999999.99) {
+                                  field.onChange('999999999999.99');
+                                } else {
+                                  const rawValue = isNaN(num) ? '' : num.toString();
+                                  field.onChange(rawValue);
+                                }
                               }}
                               onBlur={field.onBlur}
                               name={field.name}
