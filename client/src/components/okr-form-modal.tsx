@@ -1262,6 +1262,8 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
             {/* Conditional Value Fields */}
             {(() => {
               const keyResultType = keyResultForm.watch("keyResultType");
+              console.log("Current keyResultType:", keyResultType);
+              console.log("Current form values:", keyResultForm.getValues());
               
               if (keyResultType === "achieve_or_not") {
                 return null; // Don't show any value fields
@@ -1301,8 +1303,13 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                               type="text" 
                               value={field.value || ""} 
                               onChange={(e) => {
+                                console.log("Target input onChange triggered");
+                                console.log("Input value:", e.target.value);
+                                console.log("Current field value:", field.value);
                                 handleNumberInputChange(e.target.value, (formattedValue) => {
+                                  console.log("Formatted value:", formattedValue);
                                   field.onChange(formattedValue); // Store formatted value directly
+                                  console.log("After onChange, field should be:", formattedValue);
                                 });
                               }}
                               onBlur={field.onBlur}
