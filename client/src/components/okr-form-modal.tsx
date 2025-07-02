@@ -88,6 +88,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
   const [, setLocation] = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
   const [keyResultModalOpen, setKeyResultModalOpen] = useState(false);
+  const [editingKeyResultIndex, setEditingKeyResultIndex] = useState<number | null>(null);
   const isEditMode = !!okr;
 
   // Fetch data yang diperlukan
@@ -287,8 +288,22 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
 
   const handleAddKeyResult = (keyResultData: KeyResultFormData) => {
     const currentKeyResults = form.getValues("keyResults") || [];
-    form.setValue("keyResults", [...currentKeyResults, keyResultData]);
+    if (editingKeyResultIndex !== null) {
+      // Update existing key result
+      const updatedKeyResults = [...currentKeyResults];
+      updatedKeyResults[editingKeyResultIndex] = keyResultData;
+      form.setValue("keyResults", updatedKeyResults);
+    } else {
+      // Add new key result
+      form.setValue("keyResults", [...currentKeyResults, keyResultData]);
+    }
     setKeyResultModalOpen(false);
+    setEditingKeyResultIndex(null);
+  };
+
+  const editKeyResult = (index: number) => {
+    setEditingKeyResultIndex(index);
+    setKeyResultModalOpen(true);
   };
 
   const removeKeyResult = (index: number) => {
@@ -738,15 +753,26 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                                   {keyResult.keyResultType === 'achieve_or_not' ? '-' : (keyResult.unit || '-')}
                                 </TableCell>
                                 <TableCell className="text-center">
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => removeKeyResult(index)}
-                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
+                                  <div className="flex justify-center gap-1">
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => editKeyResult(index)}
+                                      className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                    >
+                                      <Edit className="w-4 h-4" />
+                                    </Button>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => removeKeyResult(index)}
+                                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                  </div>
                                 </TableCell>
                               </TableRow>
                             ))}
@@ -755,38 +781,51 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                       </div>
 
                       {/* Mobile Card View */}
-                      <div className="md:hidden space-y-3">
+                      <div className="md:hidden space-y-4">
                         {keyResults.map((keyResult, index) => (
-                          <div key={index} className="border rounded-lg p-4 bg-white">
-                            <div className="flex items-start justify-between mb-3">
-                              <div className="flex items-center gap-2 flex-1">
-                                <Target className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                          <div key={index} className="border rounded-xl p-4 bg-gradient-to-r from-blue-50 to-white shadow-sm">
+                            <div className="flex items-start justify-between mb-4">
+                              <div className="flex items-start gap-3 flex-1">
+                                <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                  <Target className="w-4 h-4 text-blue-600" />
+                                </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="font-medium text-sm leading-tight">
+                                  <h4 className="font-semibold text-sm text-gray-900 leading-tight mb-1">
                                     {keyResult.title || `Ukuran Keberhasilan ${index + 1}`}
-                                  </p>
+                                  </h4>
                                   {keyResult.description && (
-                                    <p className="text-xs text-gray-500 mt-1">
+                                    <p className="text-xs text-gray-600 leading-relaxed">
                                       {keyResult.description}
                                     </p>
                                   )}
                                 </div>
                               </div>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => removeKeyResult(index)}
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
+                              <div className="flex gap-1 flex-shrink-0 ml-2">
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => editKeyResult(index)}
+                                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-100 h-8 w-8 p-0"
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeKeyResult(index)}
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-100 h-8 w-8 p-0"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
                             </div>
                             
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-center">
-                                <span className="text-xs text-gray-500">Tipe:</span>
-                                <Badge variant="outline" className="text-xs">
+                            <div className="space-y-3">
+                              <div className="flex justify-between items-center p-2 bg-white rounded-lg">
+                                <span className="text-xs font-medium text-gray-600">Tipe Perhitungan:</span>
+                                <Badge variant="outline" className="text-xs border-blue-200 text-blue-700">
                                   {keyResult.keyResultType === 'increase_to' && 'Naik ke'}
                                   {keyResult.keyResultType === 'decrease_to' && 'Turun ke'}
                                   {keyResult.keyResultType === 'achieve_or_not' && 'Ya/Tidak'}
@@ -796,22 +835,28 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                               </div>
                               
                               {keyResult.keyResultType !== 'achieve_or_not' && (
-                                <>
-                                  <div className="grid grid-cols-3 gap-2 text-xs">
+                                <div className="bg-white rounded-lg p-3 border border-gray-100">
+                                  <div className="grid grid-cols-3 gap-3">
                                     <div className="text-center">
-                                      <span className="text-gray-500 block">Awal</span>
-                                      <span className="font-medium">{keyResult.baseValue || '0'}</span>
+                                      <div className="text-xs font-medium text-gray-500 mb-1">Nilai Awal</div>
+                                      <div className="text-sm font-semibold text-gray-900 bg-gray-50 rounded-md py-1">
+                                        {keyResult.baseValue || '0'}
+                                      </div>
                                     </div>
                                     <div className="text-center">
-                                      <span className="text-gray-500 block">Target</span>
-                                      <span className="font-medium">{keyResult.targetValue || '0'}</span>
+                                      <div className="text-xs font-medium text-gray-500 mb-1">Target</div>
+                                      <div className="text-sm font-semibold text-blue-600 bg-blue-50 rounded-md py-1">
+                                        {keyResult.targetValue || '0'}
+                                      </div>
                                     </div>
                                     <div className="text-center">
-                                      <span className="text-gray-500 block">Unit</span>
-                                      <span className="font-medium">{keyResult.unit || '-'}</span>
+                                      <div className="text-xs font-medium text-gray-500 mb-1">Unit</div>
+                                      <div className="text-sm font-semibold text-gray-700 bg-gray-50 rounded-md py-1">
+                                        {keyResult.unit || '-'}
+                                      </div>
                                     </div>
                                   </div>
-                                </>
+                                </div>
                               )}
                             </div>
                           </div>
@@ -878,6 +923,8 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
         open={keyResultModalOpen} 
         onOpenChange={setKeyResultModalOpen}
         onSubmit={handleAddKeyResult}
+        editingKeyResult={editingKeyResultIndex !== null ? keyResults[editingKeyResultIndex] : undefined}
+        isEditing={editingKeyResultIndex !== null}
       />
     </Dialog>
   );
@@ -888,9 +935,11 @@ interface KeyResultModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (keyResult: KeyResultFormData) => void;
+  editingKeyResult?: KeyResultFormData;
+  isEditing?: boolean;
 }
 
-function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
+function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEditing }: KeyResultModalProps) {
   const keyResultForm = useForm<KeyResultFormData>({
     resolver: zodResolver(z.object({
       title: z.string().min(1, "Judul harus diisi"),
@@ -925,6 +974,26 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
     },
   });
 
+  // Reset form when modal opens or when switching between create/edit modes
+  useEffect(() => {
+    if (open) {
+      if (isEditing && editingKeyResult) {
+        keyResultForm.reset(editingKeyResult);
+      } else {
+        keyResultForm.reset({
+          title: "",
+          description: "",
+          keyResultType: "increase_to",
+          baseValue: "",
+          targetValue: "",
+          currentValue: "0",
+          unit: "",
+          status: "in_progress",
+        });
+      }
+    }
+  }, [open, isEditing, editingKeyResult, keyResultForm]);
+
   const handleSubmit = (data: KeyResultFormData) => {
     onSubmit(data);
     keyResultForm.reset();
@@ -939,7 +1008,9 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Tambah Ukuran Keberhasilan</DialogTitle>
+          <DialogTitle>
+            {isEditing ? "Edit Ukuran Keberhasilan" : "Tambah Ukuran Keberhasilan"}
+          </DialogTitle>
         </DialogHeader>
 
         <Form {...keyResultForm}>
