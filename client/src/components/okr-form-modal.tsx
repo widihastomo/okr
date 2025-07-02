@@ -15,7 +15,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { HelpCircle, Plus, Edit, ChevronRight, ChevronLeft, Target, Trash2, TrendingUp, TrendingDown, ChevronsUpDown, Check } from "lucide-react";
@@ -392,20 +391,20 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                     <FormItem>
                       <FormLabel className="flex items-center gap-2">
                         Judul Goal*
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent side="right" className="max-w-xs">
+                        
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                            </PopoverTrigger>
+                            <PopoverContent side="right" className="max-w-xs">
                               <p className="text-sm">
                                 Nama goal yang ingin dicapai. Gunakan bahasa yang inspiratif dan mudah dipahami oleh tim.
                                 <br /><br />
                                 <strong>Contoh:</strong> "Meningkatkan Kepuasan Pelanggan", "Memperluas Jangkauan Pasar", "Mengoptimalkan Efisiensi Operasional"
                               </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                            </PopoverContent>
+                          </Popover>
+                        
                       </FormLabel>
                       <FormControl>
                         <Input placeholder="Contoh: Meningkatkan Kepuasan Pelanggan" {...field} />
@@ -422,20 +421,20 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                     <FormItem>
                       <FormLabel className="flex items-center gap-2">
                         Deskripsi Goal
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent side="right" className="max-w-xs">
+                        
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                            </PopoverTrigger>
+                            <PopoverContent side="right" className="max-w-xs">
                               <p className="text-sm">
                                 Penjelasan detail tentang goal ini, mengapa penting, dan dampak yang diharapkan terhadap organisasi.
                                 <br /><br />
                                 <strong>Tips:</strong> Jelaskan konteks bisnis dan manfaat yang akan diperoleh ketika goal ini tercapai.
                               </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                            </PopoverContent>
+                          </Popover>
+                        
                       </FormLabel>
                       <FormControl>
                         <Textarea 
@@ -456,20 +455,18 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                       <FormItem>
                         <FormLabel className="flex items-center gap-2">
                           Siklus
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
-                              </TooltipTrigger>
-                              <TooltipContent side="right" className="max-w-xs">
-                                <p className="text-sm">
-                                  Periode waktu untuk menyelesaikan goal ini. Pilih siklus yang sesuai dengan target timeline Anda.
-                                  <br /><br />
-                                  <strong>Tips:</strong> Siklus bulanan untuk target jangka pendek, quarterly untuk target jangka menengah.
-                                </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                            </PopoverTrigger>
+                            <PopoverContent side="right" className="max-w-xs">
+                              <p className="text-sm">
+                                Periode waktu untuk menyelesaikan goal ini. Pilih siklus yang sesuai dengan target timeline Anda.
+                                <br /><br />
+                                <strong>Tips:</strong> Siklus bulanan untuk target jangka pendek, quarterly untuk target jangka menengah.
+                              </p>
+                            </PopoverContent>
+                          </Popover>
                         </FormLabel>
                         <Select 
                           onValueChange={(value) => field.onChange(value === "none" ? undefined : value)} 
@@ -501,12 +498,12 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                       <FormItem>
                         <FormLabel className="flex items-center gap-2">
                           Tipe Pemilik
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
-                              </TooltipTrigger>
-                              <TooltipContent side="right" className="max-w-xs">
+                          
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              </PopoverTrigger>
+                              <PopoverContent side="right" className="max-w-xs">
                                 <p className="text-sm">
                                   Tentukan apakah goal ini dimiliki oleh individu atau tim.
                                   <br /><br />
@@ -514,9 +511,9 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                                   <br />
                                   <strong>Tim:</strong> Goal yang membutuhkan kolaborasi tim
                                 </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                              </PopoverContent>
+                            </Popover>
+                          
                         </FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
@@ -541,21 +538,21 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                       <FormItem>
                         <FormLabel className="flex items-center gap-2">
                           {ownerType === "team" ? "Tim" : "Pemilik"}
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
-                              </TooltipTrigger>
-                              <TooltipContent side="right" className="max-w-xs">
+                          
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              </PopoverTrigger>
+                              <PopoverContent side="right" className="max-w-xs">
                                 <p className="text-sm">
                                   {ownerType === "team" 
                                     ? "Pilih tim yang bertanggung jawab mencapai goal ini. Tim yang dipilih akan menjadi pemilik dan penanggung jawab keberhasilan goal."
                                     : "Pilih individu yang bertanggung jawab mencapai goal ini. Pemilik akan menjadi penanggung jawab utama dalam pelaksanaan dan pelaporan progress."
                                   }
                                 </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                              </PopoverContent>
+                            </Popover>
+                          
                         </FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
@@ -591,20 +588,20 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                     <FormItem>
                       <FormLabel className="flex items-center gap-2">
                         Goal Induk (Opsional)
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent side="right" className="max-w-xs">
+                        
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                            </PopoverTrigger>
+                            <PopoverContent side="right" className="max-w-xs">
                               <p className="text-sm">
                                 Jika goal ini merupakan bagian dari goal yang lebih besar, pilih goal induk yang relevan.
                                 <br /><br />
                                 <strong>Contoh:</strong> Goal "Meningkatkan Penjualan" bisa menjadi induk dari "Meningkatkan Konversi Website"
                               </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                            </PopoverContent>
+                          </Popover>
+                        
                       </FormLabel>
                       <Select 
                         onValueChange={(value) => field.onChange(value === "none" ? undefined : value)} 
@@ -843,12 +840,12 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                 <FormItem>
                   <FormLabel className="flex items-center gap-2">
                     Judul Ukuran Keberhasilan*
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
+                    
+                      <Popover>
+                        <PopoverTrigger>
                           <HelpCircle className="w-4 h-4 text-gray-400" />
-                        </TooltipTrigger>
-                        <TooltipContent side="right" className="max-w-xs">
+                        </PopoverTrigger>
+                        <PopoverContent side="right" className="max-w-xs">
                           <p>
                             <strong>Buat judul yang spesifik dan terukur</strong>
                             <br /><br />
@@ -858,9 +855,9 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                             <br /><br />
                             <strong>Hindari:</strong> "Meningkatkan kualitas", "Menjadi lebih baik"
                           </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                        </PopoverContent>
+                      </Popover>
+                    
                   </FormLabel>
                   <FormControl>
                     <Input placeholder="Contoh: Meningkatkan rating kepuasan menjadi 4.5" {...field} />
@@ -878,12 +875,12 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                 <FormItem>
                   <FormLabel className="flex items-center gap-2">
                     Deskripsi
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
+                    
+                      <Popover>
+                        <PopoverTrigger>
                           <HelpCircle className="w-4 h-4 text-gray-400" />
-                        </TooltipTrigger>
-                        <TooltipContent side="right" className="max-w-xs">
+                        </PopoverTrigger>
+                        <PopoverContent side="right" className="max-w-xs">
                           <p>
                             <strong>Jelaskan konteks dan detail pengukuran</strong>
                             <br /><br />
@@ -893,9 +890,9 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                             <br /><br />
                             <strong>Contoh:</strong> "Diukur melalui survey bulanan dengan minimal 100 responden"
                           </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                        </PopoverContent>
+                      </Popover>
+                    
                   </FormLabel>
                   <FormControl>
                     <Textarea placeholder="Deskripsi detail tentang Ukuran Keberhasilan ini" {...field} />
@@ -914,12 +911,12 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                   <FormItem>
                     <FormLabel className="flex items-center gap-2">
                       Tipe Ukuran Keberhasilan
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger>
+                      
+                        <Popover>
+                          <PopoverTrigger>
                             <HelpCircle className="w-4 h-4 text-gray-400" />
-                          </TooltipTrigger>
-                          <TooltipContent side="right" className="max-w-xs">
+                          </PopoverTrigger>
+                          <PopoverContent side="right" className="max-w-xs">
                             <p>
                               <strong>Pilih metode perhitungan yang sesuai:</strong>
                               <br /><br />
@@ -933,9 +930,9 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                               <br />
                               <strong>Ya/Tidak:</strong> Pencapaian biner (tercapai = 100%, tidak = 0%)
                             </p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                          </PopoverContent>
+                        </Popover>
+                      
                     </FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
@@ -990,12 +987,12 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                     <FormItem>
                       <FormLabel className="flex items-center gap-2">
                         Unit*
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger>
+                        
+                          <Popover>
+                            <PopoverTrigger>
                               <HelpCircle className="w-4 h-4 text-gray-400" />
-                            </TooltipTrigger>
-                            <TooltipContent side="right" className="max-w-xs">
+                            </PopoverTrigger>
+                            <PopoverContent side="right" className="max-w-xs">
                               <p>
                                 <strong>Tentukan satuan pengukuran yang spesifik</strong>
                                 <br /><br />
@@ -1005,9 +1002,9 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                                 <br /><br />
                                 Anda bisa memilih dari daftar yang tersedia atau mengetik unit baru sesuai kebutuhan.
                               </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                            </PopoverContent>
+                          </Popover>
+                        
                       </FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
@@ -1101,12 +1098,12 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                         <FormItem>
                           <FormLabel className="flex items-center gap-2">
                             Target*
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger>
+                            
+                              <Popover>
+                                <PopoverTrigger>
                                   <HelpCircle className="w-4 h-4 text-gray-400" />
-                                </TooltipTrigger>
-                                <TooltipContent side="right" className="max-w-xs">
+                                </PopoverTrigger>
+                                <PopoverContent side="right" className="max-w-xs">
                                   <p>
                                     <strong>Threshold yang harus dipertahankan</strong>
                                     <br /><br />
@@ -1116,9 +1113,9 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                                     <br /><br />
                                     <strong>Contoh:</strong> Rating tetap di atas 4.0, biaya tetap di bawah 50 juta, response time di bawah 3 detik
                                   </p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
+                                </PopoverContent>
+                              </Popover>
+                            
                           </FormLabel>
                           <FormControl>
                             <Input placeholder="100" type="number" step="0.1" {...field} />
@@ -1142,12 +1139,12 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                       <FormItem>
                         <FormLabel className="flex items-center gap-2">
                           Nilai Awal
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger>
+                          
+                            <Popover>
+                              <PopoverTrigger>
                                 <HelpCircle className="w-4 h-4 text-gray-400" />
-                              </TooltipTrigger>
-                              <TooltipContent side="right" className="max-w-xs">
+                              </PopoverTrigger>
+                              <PopoverContent side="right" className="max-w-xs">
                                 <p>
                                   <strong>Nilai baseline sebagai titik awal pengukuran</strong>
                                   <br /><br />
@@ -1157,9 +1154,9 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                                   <br /><br />
                                   <strong>Contoh:</strong> Rating saat ini 3.2, pendapatan bulan lalu 50 juta, waktu respons 5 detik
                                 </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                              </PopoverContent>
+                            </Popover>
+                          
                         </FormLabel>
                         <FormControl>
                           <Input placeholder="0" type="number" step="0.1" {...field} />
@@ -1177,12 +1174,12 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                       <FormItem>
                         <FormLabel className="flex items-center gap-2">
                           Target*
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger>
+                          
+                            <Popover>
+                              <PopoverTrigger>
                                 <HelpCircle className="w-4 h-4 text-gray-400" />
-                              </TooltipTrigger>
-                              <TooltipContent side="right" className="max-w-xs">
+                              </PopoverTrigger>
+                              <PopoverContent side="right" className="max-w-xs">
                                 <p>
                                   <strong>Nilai target yang ingin dicapai di akhir periode</strong>
                                   <br /><br />
@@ -1192,9 +1189,9 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                                   <br /><br />
                                   <strong>Contoh:</strong> Rating 4.5, pendapatan 100 juta, waktu respons 2 detik
                                 </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                              </PopoverContent>
+                            </Popover>
+                          
                         </FormLabel>
                         <FormControl>
                           <Input placeholder="100" type="number" step="0.1" {...field} />
@@ -1212,12 +1209,12 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                       <FormItem>
                         <FormLabel className="flex items-center gap-2">
                           Nilai Saat Ini
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger>
+                          
+                            <Popover>
+                              <PopoverTrigger>
                                 <HelpCircle className="w-4 h-4 text-gray-400" />
-                              </TooltipTrigger>
-                              <TooltipContent side="right" className="max-w-xs">
+                              </PopoverTrigger>
+                              <PopoverContent side="right" className="max-w-xs">
                                 <p>
                                   <strong>Kondisi terkini atau titik awal saat ini</strong>
                                   <br /><br />
@@ -1227,9 +1224,9 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                                   <br /><br />
                                   <strong>Note:</strong> Nilai ini dapat diubah sewaktu-waktu melalui fitur update progress.
                                 </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                              </PopoverContent>
+                            </Popover>
+                          
                         </FormLabel>
                         <FormControl>
                           <Input placeholder="0" type="number" step="0.1" {...field} />

@@ -96,11 +96,13 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
-- July 02, 2025. Fixed tooltip z-index to appear above modal content:
-  * Modified base TooltipContent component to use z-[9999] with Portal for proper layering
-  * Added TooltipPrimitive.Portal to ensure tooltips render outside modal container
-  * Fixed user experience issue where helpful tooltip hints were being covered by modal content
-  * All tooltip hints now display properly above modal content for better accessibility and usability
+- July 02, 2025. Converted tooltip hints to clickable popovers for better mobile UX:
+  * Changed all tooltip hints in OKR form modal from hover-based to click-based interactions using Popover components
+  * Updated help icons from gray to blue color (text-blue-500) with cursor-pointer for clear clickable indication
+  * Replaced Tooltip/TooltipTrigger/TooltipContent with Popover/PopoverTrigger/PopoverContent components
+  * Removed need for TooltipProvider wrapper, simplifying component structure
+  * Enhanced mobile usability where hover interactions don't work well on touch devices
+  * All helpful hint content now accessible via click instead of hover for better accessibility
 - July 02, 2025. Implemented conditional form fields for different Key Result types:
   * Updated OKR form modal and edit Key Result modal with dynamic field display based on type selection
   * increase_to/decrease_to types: show nilai awal (base value), target, nilai saat ini (current value), and unit fields
