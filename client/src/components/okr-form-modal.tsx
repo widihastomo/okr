@@ -1257,47 +1257,19 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
               if (keyResultType === "should_stay_above" || keyResultType === "should_stay_below") {
                 return (
                   <div className="grid grid-cols-1 gap-4">
-                    {/* Target Value Only */}
-                    <FormField
-                      control={keyResultForm.control}
-                      name="targetValue"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="flex items-center gap-2">
-                            Target*
-                            
-                              <Popover>
-                                <PopoverTrigger>
-                                  <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                                </PopoverTrigger>
-                                <PopoverContent side="right" className="max-w-xs">
-                                  <p>
-                                    <strong>Threshold yang harus dipertahankan</strong>
-                                    <br /><br />
-                                    Untuk tipe "Tetap di atas": tentukan nilai minimum yang harus selalu dijaga atau dipertahankan.
-                                    <br />
-                                    Untuk tipe "Tetap di bawah": tentukan nilai maksimum yang tidak boleh dilampaui.
-                                    <br /><br />
-                                    <strong>Contoh:</strong> Rating tetap di atas 4.0, biaya tetap di bawah 50 juta, response time di bawah 3 detik
-                                  </p>
-                                </PopoverContent>
-                              </Popover>
-                            
-                          </FormLabel>
-                          <FormControl>
-                            <Input 
-                              placeholder="100" 
-                              type="text" 
-                              value={field.value || ""} 
-                              onChange={(e) => field.onChange(e.target.value)}
-                              onBlur={field.onBlur}
-                              name={field.name}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    {/* Target Value Only - Simplified */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Target*
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="100"
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        value={keyResultForm.watch("targetValue") || ""}
+                        onChange={(e) => keyResultForm.setValue("targetValue", e.target.value)}
+                      />
+                    </div>
                   </div>
                 );
               }
