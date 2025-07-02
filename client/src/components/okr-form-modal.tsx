@@ -781,48 +781,48 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                       {/* Mobile Card View */}
                       <div className="md:hidden space-y-4">
                         {keyResults.map((keyResult, index) => (
-                          <div key={index} className="border rounded-xl p-4 bg-gradient-to-r from-blue-50 to-white shadow-sm">
-                            <div className="flex items-start justify-between mb-4">
-                              <div className="flex items-start gap-3 flex-1">
-                                <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                  <Target className="w-4 h-4 text-blue-600" />
+                          <div key={index} className="border rounded-lg p-3 bg-gradient-to-r from-blue-50 to-white shadow-sm">
+                            <div className="flex items-start justify-between mb-3">
+                              <div className="flex items-start gap-2 flex-1">
+                                <div className="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                                  <Target className="w-3 h-3 text-blue-600" />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <h4 className="font-semibold text-sm text-gray-900 leading-tight mb-1">
+                                  <h4 className="font-semibold text-sm text-gray-900 leading-tight mb-0.5">
                                     {keyResult.title || `Ukuran Keberhasilan ${index + 1}`}
                                   </h4>
                                   {keyResult.description && (
-                                    <p className="text-xs text-gray-600 leading-relaxed">
+                                    <p className="text-xs text-gray-600 leading-snug">
                                       {keyResult.description}
                                     </p>
                                   )}
                                 </div>
                               </div>
-                              <div className="flex gap-1 flex-shrink-0 ml-2">
+                              <div className="flex gap-1 flex-shrink-0 ml-1">
                                 <Button
                                   type="button"
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => editKeyResult(index)}
-                                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-100 h-8 w-8 p-0"
+                                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-100 h-6 w-6 p-0"
                                 >
-                                  <Edit className="w-4 h-4" />
+                                  <Edit className="w-3 h-3" />
                                 </Button>
                                 <Button
                                   type="button"
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => removeKeyResult(index)}
-                                  className="text-red-600 hover:text-red-700 hover:bg-red-100 h-8 w-8 p-0"
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-100 h-6 w-6 p-0"
                                 >
-                                  <Trash2 className="w-4 h-4" />
+                                  <Trash2 className="w-3 h-3" />
                                 </Button>
                               </div>
                             </div>
                             
-                            <div className="space-y-3">
-                              <div className="flex justify-between items-center p-2 bg-white rounded-lg">
-                                <span className="text-xs font-medium text-gray-600">Tipe Perhitungan:</span>
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center p-1.5 bg-white rounded-md">
+                                <span className="text-xs font-medium text-gray-600">Tipe:</span>
                                 <Badge variant="outline" className="text-xs border-blue-200 text-blue-700">
                                   {keyResult.keyResultType === 'increase_to' && 'Naik ke'}
                                   {keyResult.keyResultType === 'decrease_to' && 'Turun ke'}
@@ -833,23 +833,23 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                               </div>
                               
                               {keyResult.keyResultType !== 'achieve_or_not' && (
-                                <div className="bg-white rounded-lg p-3 border border-gray-100">
-                                  <div className="grid grid-cols-3 gap-3">
+                                <div className="bg-white rounded-md p-2 border border-gray-100">
+                                  <div className="grid grid-cols-3 gap-2">
                                     <div className="text-center">
-                                      <div className="text-xs font-medium text-gray-500 mb-1">Nilai Awal</div>
-                                      <div className="text-sm font-semibold text-gray-900 bg-gray-50 rounded-md py-1">
+                                      <div className="text-xs font-medium text-gray-500 mb-0.5">Awal</div>
+                                      <div className="text-xs font-semibold text-gray-900 bg-gray-50 rounded px-1 py-0.5">
                                         {keyResult.baseValue || '0'}
                                       </div>
                                     </div>
                                     <div className="text-center">
-                                      <div className="text-xs font-medium text-gray-500 mb-1">Target</div>
-                                      <div className="text-sm font-semibold text-blue-600 bg-blue-50 rounded-md py-1">
+                                      <div className="text-xs font-medium text-gray-500 mb-0.5">Target</div>
+                                      <div className="text-xs font-semibold text-blue-600 bg-blue-50 rounded px-1 py-0.5">
                                         {keyResult.targetValue || '0'}
                                       </div>
                                     </div>
                                     <div className="text-center">
-                                      <div className="text-xs font-medium text-gray-500 mb-1">Unit</div>
-                                      <div className="text-sm font-semibold text-gray-700 bg-gray-50 rounded-md py-1">
+                                      <div className="text-xs font-medium text-gray-500 mb-0.5">Unit</div>
+                                      <div className="text-xs font-semibold text-gray-700 bg-gray-50 rounded px-1 py-0.5">
                                         {keyResult.unit || '-'}
                                       </div>
                                     </div>
