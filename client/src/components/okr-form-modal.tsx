@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -658,58 +659,69 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                       <p className="text-sm">Klik tombol di atas untuk menambahkan</p>
                     </div>
                   ) : (
-                    <div className="space-y-4">
-                      {keyResults.map((keyResult, index) => (
-                        <Card key={index} className="border border-gray-200">
-                          <CardHeader className="pb-4">
-                            <div className="flex justify-between items-center">
-                              <CardTitle className="text-sm flex items-center gap-2">
-                                <Target className="w-4 h-4" />
-                                {keyResult.title || `Ukuran Keberhasilan ${index + 1}`}
-                              </CardTitle>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => removeKeyResult(index)}
-                                className="text-red-600 hover:text-red-700"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                              <div>
-                                <span className="text-gray-500">Tipe:</span>
-                                <p className="font-medium">
-                                  {keyResult.keyResultType === 'increase_to' && 'Increase To (Naik ke)'}
-                                  {keyResult.keyResultType === 'decrease_to' && 'Decrease To (Turun ke)'}
-                                  {keyResult.keyResultType === 'achieve_or_not' && 'Achieve or Not (Ya/Tidak)'}
-                                </p>
-                              </div>
-                              <div>
-                                <span className="text-gray-500">Unit:</span>
-                                <p className="font-medium">{keyResult.unit || '-'}</p>
-                              </div>
-                              <div>
-                                <span className="text-gray-500">Nilai Awal:</span>
-                                <p className="font-medium">{keyResult.baseValue || '0'}</p>
-                              </div>
-                              <div>
-                                <span className="text-gray-500">Target:</span>
-                                <p className="font-medium">{keyResult.targetValue || '0'}</p>
-                              </div>
-                            </div>
-                            {keyResult.description && (
-                              <div className="mt-3 pt-3 border-t">
-                                <span className="text-gray-500 text-sm">Deskripsi:</span>
-                                <p className="text-sm mt-1">{keyResult.description}</p>
-                              </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      ))}
+                    <div className="border rounded-lg">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Ukuran Keberhasilan</TableHead>
+                            <TableHead>Tipe</TableHead>
+                            <TableHead className="text-center">Nilai Awal</TableHead>
+                            <TableHead className="text-center">Target</TableHead>
+                            <TableHead className="text-center">Unit</TableHead>
+                            <TableHead className="text-center">Aksi</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {keyResults.map((keyResult, index) => (
+                            <TableRow key={index}>
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  <Target className="w-4 h-4 text-blue-600" />
+                                  <div>
+                                    <p className="font-medium">
+                                      {keyResult.title || `Ukuran Keberhasilan ${index + 1}`}
+                                    </p>
+                                    {keyResult.description && (
+                                      <p className="text-sm text-gray-500 mt-1">
+                                        {keyResult.description}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="outline" className="text-xs">
+                                  {keyResult.keyResultType === 'increase_to' && 'Naik ke'}
+                                  {keyResult.keyResultType === 'decrease_to' && 'Turun ke'}
+                                  {keyResult.keyResultType === 'achieve_or_not' && 'Ya/Tidak'}
+                                  {keyResult.keyResultType === 'should_stay_above' && 'Tetap di atas'}
+                                  {keyResult.keyResultType === 'should_stay_below' && 'Tetap di bawah'}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-center">
+                                {keyResult.keyResultType === 'achieve_or_not' ? '-' : (keyResult.baseValue || '0')}
+                              </TableCell>
+                              <TableCell className="text-center">
+                                {keyResult.keyResultType === 'achieve_or_not' ? '-' : (keyResult.targetValue || '0')}
+                              </TableCell>
+                              <TableCell className="text-center">
+                                {keyResult.keyResultType === 'achieve_or_not' ? '-' : (keyResult.unit || '-')}
+                              </TableCell>
+                              <TableCell className="text-center">
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeKeyResult(index)}
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
                     </div>
                   )}
                 </CardContent>
