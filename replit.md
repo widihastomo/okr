@@ -96,6 +96,13 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 02, 2025. Enhanced OKR form modal with comprehensive mobile responsive design:
+  * Converted header section to responsive layout - button becomes full-width on mobile with shortened text ("Tambah")
+  * Implemented dual-layout Key Results display: desktop table view vs mobile card-based layout
+  * Mobile cards show all key result information in compact, touch-friendly format with proper spacing
+  * Enhanced navigation buttons with vertical stacking on mobile and full-width buttons for better accessibility
+  * All form elements now optimized for mobile interaction with proper responsive breakpoints (sm:, md:)
+  * Maintained desktop functionality while providing superior mobile user experience
 - July 02, 2025. Restored "Tambah unit baru" (Add new unit) functionality with safe implementation:
   * Fixed infinite loop error by using separate state (unitSearchValue) for Command component input
   * Implemented controlled search input without causing Command component state conflicts

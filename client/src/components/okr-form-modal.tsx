@@ -663,13 +663,14 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                     <p className="text-sm text-gray-600">
                       Tambahkan Ukuran Keberhasilan untuk mengukur progress goal ini
                     </p>
-                    <Button type="button" onClick={addKeyResult} variant="outline">
+                    <Button type="button" onClick={addKeyResult} variant="outline" className="w-full sm:w-auto">
                       <Plus className="w-4 h-4 mr-2" />
-                      Tambah Ukuran Keberhasilan
+                      <span className="hidden sm:inline">Tambah Ukuran Keberhasilan</span>
+                      <span className="sm:hidden">Tambah</span>
                     </Button>
                   </div>
 
@@ -680,37 +681,105 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                       <p className="text-sm">Klik tombol di atas untuk menambahkan</p>
                     </div>
                   ) : (
-                    <div className="border rounded-lg">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Ukuran Keberhasilan</TableHead>
-                            <TableHead>Tipe</TableHead>
-                            <TableHead className="text-center">Nilai Awal</TableHead>
-                            <TableHead className="text-center">Target</TableHead>
-                            <TableHead className="text-center">Unit</TableHead>
-                            <TableHead className="text-center">Aksi</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {keyResults.map((keyResult, index) => (
-                            <TableRow key={index}>
-                              <TableCell>
-                                <div className="flex items-center gap-2">
-                                  <Target className="w-4 h-4 text-blue-600" />
-                                  <div>
-                                    <p className="font-medium">
-                                      {keyResult.title || `Ukuran Keberhasilan ${index + 1}`}
-                                    </p>
-                                    {keyResult.description && (
-                                      <p className="text-sm text-gray-500 mt-1">
-                                        {keyResult.description}
+                    <div>
+                      {/* Desktop Table View */}
+                      <div className="hidden md:block border rounded-lg">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Ukuran Keberhasilan</TableHead>
+                              <TableHead>Tipe</TableHead>
+                              <TableHead className="text-center">Nilai Awal</TableHead>
+                              <TableHead className="text-center">Target</TableHead>
+                              <TableHead className="text-center">Unit</TableHead>
+                              <TableHead className="text-center">Aksi</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {keyResults.map((keyResult, index) => (
+                              <TableRow key={index}>
+                                <TableCell>
+                                  <div className="flex items-center gap-2">
+                                    <Target className="w-4 h-4 text-blue-600" />
+                                    <div>
+                                      <p className="font-medium">
+                                        {keyResult.title || `Ukuran Keberhasilan ${index + 1}`}
                                       </p>
-                                    )}
+                                      {keyResult.description && (
+                                        <p className="text-sm text-gray-500 mt-1">
+                                          {keyResult.description}
+                                        </p>
+                                      )}
+                                    </div>
                                   </div>
+                                </TableCell>
+                                <TableCell>
+                                  <Badge variant="outline" className="text-xs">
+                                    {keyResult.keyResultType === 'increase_to' && 'Naik ke'}
+                                    {keyResult.keyResultType === 'decrease_to' && 'Turun ke'}
+                                    {keyResult.keyResultType === 'achieve_or_not' && 'Ya/Tidak'}
+                                    {keyResult.keyResultType === 'should_stay_above' && 'Tetap di atas'}
+                                    {keyResult.keyResultType === 'should_stay_below' && 'Tetap di bawah'}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  {keyResult.keyResultType === 'achieve_or_not' ? '-' : (keyResult.baseValue || '0')}
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  {keyResult.keyResultType === 'achieve_or_not' ? '-' : (keyResult.targetValue || '0')}
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  {keyResult.keyResultType === 'achieve_or_not' ? '-' : (keyResult.unit || '-')}
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => removeKeyResult(index)}
+                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+
+                      {/* Mobile Card View */}
+                      <div className="md:hidden space-y-3">
+                        {keyResults.map((keyResult, index) => (
+                          <div key={index} className="border rounded-lg p-4 bg-white">
+                            <div className="flex items-start justify-between mb-3">
+                              <div className="flex items-center gap-2 flex-1">
+                                <Target className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-sm leading-tight">
+                                    {keyResult.title || `Ukuran Keberhasilan ${index + 1}`}
+                                  </p>
+                                  {keyResult.description && (
+                                    <p className="text-xs text-gray-500 mt-1">
+                                      {keyResult.description}
+                                    </p>
+                                  )}
                                 </div>
-                              </TableCell>
-                              <TableCell>
+                              </div>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeKeyResult(index)}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-xs text-gray-500">Tipe:</span>
                                 <Badge variant="outline" className="text-xs">
                                   {keyResult.keyResultType === 'increase_to' && 'Naik ke'}
                                   {keyResult.keyResultType === 'decrease_to' && 'Turun ke'}
@@ -718,31 +787,30 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                                   {keyResult.keyResultType === 'should_stay_above' && 'Tetap di atas'}
                                   {keyResult.keyResultType === 'should_stay_below' && 'Tetap di bawah'}
                                 </Badge>
-                              </TableCell>
-                              <TableCell className="text-center">
-                                {keyResult.keyResultType === 'achieve_or_not' ? '-' : (keyResult.baseValue || '0')}
-                              </TableCell>
-                              <TableCell className="text-center">
-                                {keyResult.keyResultType === 'achieve_or_not' ? '-' : (keyResult.targetValue || '0')}
-                              </TableCell>
-                              <TableCell className="text-center">
-                                {keyResult.keyResultType === 'achieve_or_not' ? '-' : (keyResult.unit || '-')}
-                              </TableCell>
-                              <TableCell className="text-center">
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => removeKeyResult(index)}
-                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
+                              </div>
+                              
+                              {keyResult.keyResultType !== 'achieve_or_not' && (
+                                <>
+                                  <div className="grid grid-cols-3 gap-2 text-xs">
+                                    <div className="text-center">
+                                      <span className="text-gray-500 block">Awal</span>
+                                      <span className="font-medium">{keyResult.baseValue || '0'}</span>
+                                    </div>
+                                    <div className="text-center">
+                                      <span className="text-gray-500 block">Target</span>
+                                      <span className="font-medium">{keyResult.targetValue || '0'}</span>
+                                    </div>
+                                    <div className="text-center">
+                                      <span className="text-gray-500 block">Unit</span>
+                                      <span className="font-medium">{keyResult.unit || '-'}</span>
+                                    </div>
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </CardContent>
@@ -750,28 +818,33 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
             )}
 
             {/* Navigation Buttons */}
-            <div className="flex justify-between gap-4">
+            <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4">
               {!isEditMode && currentStep > 1 && (
                 <Button 
                   type="button" 
                   variant="outline" 
                   onClick={prevStep}
-                  className="border-blue-600 text-blue-600 hover:bg-blue-50"
+                  className="border-blue-600 text-blue-600 hover:bg-blue-50 w-full sm:w-auto"
                 >
                   <ChevronLeft className="w-4 h-4 mr-2" />
                   Kembali
                 </Button>
               )}
               
-              <div className="flex gap-2 ml-auto">
-                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <div className="flex flex-col sm:flex-row gap-2 sm:ml-auto w-full sm:w-auto">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => onOpenChange(false)}
+                  className="w-full sm:w-auto order-2 sm:order-1"
+                >
                   Batal
                 </Button>
                 
                 {!isEditMode && currentStep === 1 ? (
                   <Button 
                     type="submit"
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto order-1 sm:order-2"
                   >
                     Lanjut
                     <ChevronRight className="w-4 h-4 ml-2" />
@@ -780,7 +853,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                   <Button 
                     type="submit"
                     disabled={mutation.isPending}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto order-1 sm:order-2"
                   >
                     {mutation.isPending 
                       ? (isEditMode ? "Memperbarui..." : "Membuat...") 
