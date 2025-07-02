@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import OKRFormModal from "@/components/okr-form-modal";
@@ -302,21 +303,16 @@ export default function QuickTaskFAB() {
                       <User className="h-3 w-3" />
                       Assigned To
                     </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih user" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="unassigned">Belum Ditugaskan</SelectItem>
-                        {(users as any[]).map((user: any) => (
-                          <SelectItem key={user.id} value={user.id}>
-                            {user.firstName} {user.lastName}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <SearchableUserSelect
+                        users={users as any[]}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        placeholder="Pilih user"
+                        emptyMessage="Tidak ada user ditemukan"
+                        allowUnassigned={true}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

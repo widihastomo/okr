@@ -11,6 +11,7 @@ import { DeleteConfirmationModal } from "@/components/delete-confirmation-modal"
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 import { Plus, Target, CheckSquare, Building2, Trophy } from "lucide-react";
 import MyTugas from "@/components/my-tasks";
 import Rencana from "@/components/initiatives";
@@ -460,19 +461,15 @@ export default function Dashboard() {
               </SelectContent>
             </Select>
 
-            <Select value={userFilter} onValueChange={handleUserFilterChange}>
-              <SelectTrigger className="w-full sm:w-[150px] md:w-[180px] text-xs sm:text-sm h-8 sm:h-10">
-                <SelectValue placeholder="Pilih User" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua User</SelectItem>
-                {users.map(user => (
-                  <SelectItem key={user.id} value={user.id}>
-                    {user.firstName} {user.lastName}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchableUserSelect
+              users={users}
+              value={userFilter}
+              onValueChange={handleUserFilterChange}
+              placeholder="Pilih User"
+              emptyMessage="Tidak ada user ditemukan"
+              allowAll={true}
+              className="w-full sm:w-[150px] md:w-[180px] text-xs sm:text-sm h-8 sm:h-10"
+            />
           </div>
         </div>
       </div>

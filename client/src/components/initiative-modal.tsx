@@ -31,6 +31,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -466,21 +467,16 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
                       <FormLabel className="text-sm font-medium text-gray-700">
                         PIC (Person in Charge)
                       </FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih PIC" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="none">Tidak ada PIC</SelectItem>
-                          {users.map((user) => (
-                            <SelectItem key={user.id} value={user.id}>
-                              {`${user.firstName} ${user.lastName}`}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <SearchableUserSelect
+                          users={users}
+                          value={field.value === "none" ? "unassigned" : field.value}
+                          onValueChange={(value) => field.onChange(value === "unassigned" ? "none" : value)}
+                          placeholder="Pilih PIC"
+                          emptyMessage="Tidak ada user ditemukan"
+                          allowUnassigned={true}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

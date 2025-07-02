@@ -21,6 +21,7 @@ import { HelpCircle, Plus, Edit, ChevronRight, ChevronLeft, Target, Trash2, Tren
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
+import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 import type { OKRWithKeyResults, Cycle, User, Objective, Team } from "@shared/schema";
 
 // Unit options for Key Results
@@ -572,27 +573,32 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                             </Popover>
                           
                         </FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+{ownerType === "team" ? (
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih tim" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {teams?.map((team) => (
+                                <SelectItem key={team.id} value={team.id}>
+                                  {team.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder={ownerType === "team" ? "Pilih tim" : "Pilih pemilik"} />
-                            </SelectTrigger>
+                            <SearchableUserSelect
+                              users={users || []}
+                              value={field.value}
+                              onValueChange={field.onChange}
+                              placeholder="Pilih pemilik"
+                              emptyMessage="Tidak ada user ditemukan"
+                            />
                           </FormControl>
-                          <SelectContent>
-                            {ownerType === "team" 
-                              ? teams?.map((team) => (
-                                  <SelectItem key={team.id} value={team.id}>
-                                    {team.name}
-                                  </SelectItem>
-                                ))
-                              : users?.map((user) => (
-                                  <SelectItem key={user.id} value={user.id}>
-                                    {user.firstName} {user.lastName} ({user.email})
-                                  </SelectItem>
-                                ))
-                            }
-                          </SelectContent>
-                        </Select>
+                        )}
                         <FormMessage />
                       </FormItem>
                     )}

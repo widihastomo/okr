@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CheckCircle2, Clock, Flag, User } from "lucide-react";
+import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 
 interface TaskModalProps {
   open: boolean;
@@ -321,23 +322,14 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
                 <User className="h-4 w-4" />
                 PIC (Penanggung Jawab)
               </Label>
-              <Select
-                value={formData.assignedTo || "none"}
-                onValueChange={(value) => setFormData({ ...formData, assignedTo: value === "none" ? "" : value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Tidak ada</SelectItem>
-                  {availableUsers.map((user: any) => (
-                    <SelectItem key={user.id} value={user.id}>
-                      {`${user.firstName} ${user.lastName}`}
-                      {picId === user.id && " (PIC Initiative)"}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchableUserSelect
+                users={availableUsers}
+                value={formData.assignedTo || "unassigned"}
+                onValueChange={(value) => setFormData({ ...formData, assignedTo: value === "unassigned" ? "" : value })}
+                placeholder="Pilih PIC"
+                emptyMessage="Tidak ada user ditemukan"
+                allowUnassigned={true}
+              />
             </div>
 
             <div>

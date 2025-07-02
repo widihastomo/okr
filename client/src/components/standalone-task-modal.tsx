@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
@@ -206,20 +207,15 @@ export default function StandaloneTaskModal({ open, onOpenChange, onSuccess }: S
                       <User className="h-4 w-4" />
                       <span>PIC</span>
                     </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || userId}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {users.filter((user: any) => user && user.id).map((user: any) => (
-                          <SelectItem key={user.id} value={user.id}>
-                            {user.firstName} {user.lastName}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <SearchableUserSelect
+                        users={users.filter((user: any) => user && user.id)}
+                        value={field.value || userId}
+                        onValueChange={field.onChange}
+                        placeholder="Pilih PIC"
+                        emptyMessage="Tidak ada user ditemukan"
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
