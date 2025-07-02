@@ -87,7 +87,6 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
   const [, setLocation] = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
   const [keyResultModalOpen, setKeyResultModalOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
   const isEditMode = !!okr;
 
   // Fetch data yang diperlukan
@@ -813,8 +812,6 @@ interface KeyResultModalProps {
 }
 
 function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
-  const [searchValue, setSearchValue] = useState("");
-  
   const keyResultForm = useForm<KeyResultFormData>({
     resolver: zodResolver(z.object({
       title: z.string().min(1, "Judul harus diisi"),
@@ -1062,50 +1059,31 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                           <Command>
                             <CommandInput 
                               placeholder="Cari atau ketik unit baru..." 
-                              value={searchValue}
-                              onValueChange={setSearchValue}
                             />
                             <CommandList>
                               <CommandEmpty>
-                                {searchValue && searchValue.trim() && !unitOptions.includes(searchValue.trim()) && (
-                                  <CommandItem
-                                    value={searchValue}
-                                    onSelect={() => {
-                                      field.onChange(searchValue.trim());
-                                      setSearchValue("");
-                                    }}
-                                    className="cursor-pointer"
-                                  >
-                                    <Plus className="mr-2 h-4 w-4" />
-                                    Tambah "{searchValue.trim()}"
-                                  </CommandItem>
-                                )}
+                                Tidak ada unit ditemukan.
                               </CommandEmpty>
                               <CommandGroup>
-                                {unitOptions
-                                  .filter(unit => 
-                                    unit.toLowerCase().includes(searchValue.toLowerCase())
-                                  )
-                                  .map((unit: string) => (
-                                    <CommandItem
-                                      value={unit}
-                                      key={unit}
-                                      onSelect={() => {
-                                        field.onChange(unit);
-                                        setSearchValue("");
-                                      }}
-                                    >
-                                      <Check
-                                        className={cn(
-                                          "mr-2 h-4 w-4",
-                                          unit === field.value
-                                            ? "opacity-100"
-                                            : "opacity-0"
-                                        )}
-                                      />
-                                      {unit}
-                                    </CommandItem>
-                                  ))}
+                                {unitOptions.map((unit: string) => (
+                                  <CommandItem
+                                    value={unit}
+                                    key={unit}
+                                    onSelect={() => {
+                                      field.onChange(unit);
+                                    }}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        unit === field.value
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                    {unit}
+                                  </CommandItem>
+                                ))}
                               </CommandGroup>
                             </CommandList>
                           </Command>
