@@ -183,22 +183,25 @@ export default function EditKeyResultModal({
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="unit"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Unit (Opsional)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="Contoh: Rp, %, buah, orang"
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Unit - Hide for achieve_or_not type */}
+              {form.watch("keyResultType") !== "achieve_or_not" && (
+                <FormField
+                  control={form.control}
+                  name="unit"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Unit (Opsional)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Contoh: Rp, %, buah, orang"
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
 
             {/* Conditional Value Fields */}

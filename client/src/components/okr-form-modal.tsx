@@ -883,20 +883,22 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                 )}
               />
 
-              {/* Unit */}
-              <FormField
-                control={keyResultForm.control}
-                name="unit"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Unit*</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Contoh: rating, %, orang, Rp" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Unit - Hide for achieve_or_not type */}
+              {keyResultForm.watch("keyResultType") !== "achieve_or_not" && (
+                <FormField
+                  control={keyResultForm.control}
+                  name="unit"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Unit*</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Contoh: rating, %, orang, Rp" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
 
             {/* Conditional Value Fields */}
