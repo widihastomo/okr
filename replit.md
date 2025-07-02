@@ -97,7 +97,8 @@ The application is configured for deployment on Replit with the following setup:
 ```
 Changelog:
 - July 02, 2025. Fixed tooltip z-index to appear above modal content:
-  * Applied z-[100] class to all TooltipContent components in OKR form modal to ensure tooltips appear above modal overlay
+  * Modified base TooltipContent component to use z-[9999] with Portal for proper layering
+  * Added TooltipPrimitive.Portal to ensure tooltips render outside modal container
   * Fixed user experience issue where helpful tooltip hints were being covered by modal content
   * All tooltip hints now display properly above modal content for better accessibility and usability
 - July 02, 2025. Implemented conditional form fields for different Key Result types:
