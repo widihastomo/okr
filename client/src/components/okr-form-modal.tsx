@@ -996,7 +996,15 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
   }, [open, isEditing, editingKeyResult, keyResultForm]);
 
   const handleSubmit = (data: KeyResultFormData) => {
-    onSubmit(data);
+    // Convert formatted values to numeric before submitting
+    const processedData = {
+      ...data,
+      baseValue: data.baseValue ? getNumberValueForSubmission(data.baseValue) : "",
+      targetValue: data.targetValue ? getNumberValueForSubmission(data.targetValue) : "",
+      currentValue: data.currentValue ? getNumberValueForSubmission(data.currentValue) : "",
+    };
+    
+    onSubmit(processedData);
     keyResultForm.reset();
   };
 
@@ -1335,10 +1343,10 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                           <Input 
                             placeholder="0" 
                             type="text" 
-                            value={formatNumberWithSeparator(field.value || "")} 
+                            value={field.value || ""} 
                             onChange={(e) => {
                               handleNumberInputChange(e.target.value, (formattedValue) => {
-                                field.onChange(getNumberValueForSubmission(formattedValue));
+                                field.onChange(formattedValue); // Store formatted value directly
                               });
                             }}
                             onBlur={field.onBlur}
@@ -1381,10 +1389,10 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                           <Input 
                             placeholder="100" 
                             type="text" 
-                            value={formatNumberWithSeparator(field.value || "")} 
+                            value={field.value || ""} 
                             onChange={(e) => {
                               handleNumberInputChange(e.target.value, (formattedValue) => {
-                                field.onChange(getNumberValueForSubmission(formattedValue));
+                                field.onChange(formattedValue); // Store formatted value directly
                               });
                             }}
                             onBlur={field.onBlur}
@@ -1427,10 +1435,10 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                           <Input 
                             placeholder="0" 
                             type="text" 
-                            value={formatNumberWithSeparator(field.value || "")} 
+                            value={field.value || ""} 
                             onChange={(e) => {
                               handleNumberInputChange(e.target.value, (formattedValue) => {
-                                field.onChange(getNumberValueForSubmission(formattedValue));
+                                field.onChange(formattedValue); // Store formatted value directly
                               });
                             }}
                             onBlur={field.onBlur}

@@ -55,11 +55,8 @@ export function handleNumberInputChange(
   value: string,
   onChange: (value: string) => void
 ) {
-  console.log('Input received:', value);
-  
   // Allow only digits, one comma, and dots (we'll format the dots)
   let input = value.replace(/[^\d,]/g, "");
-  console.log('After cleaning:', input);
   
   // Handle multiple commas - only keep the first one
   const commaIndex = input.indexOf(',');
@@ -67,12 +64,10 @@ export function handleNumberInputChange(
     const beforeComma = input.substring(0, commaIndex);
     const afterComma = input.substring(commaIndex + 1).replace(/,/g, ''); // Remove additional commas
     input = beforeComma + ',' + afterComma;
-    console.log('After comma handling:', input);
   }
   
   // Apply formatting
   const formatted = formatNumberWithSeparator(input);
-  console.log('Final formatted:', formatted);
   onChange(formatted);
 }
 
@@ -80,6 +75,13 @@ export function handleNumberInputChange(
  * Convert formatted string to raw number string for form submission
  */
 export function getNumberValueForSubmission(formattedValue: string): string {
+  if (!formattedValue) return "";
+  
+  // For incomplete input like "7," just return the formatted value as-is
+  if (formattedValue.endsWith(',')) {
+    return formattedValue;
+  }
+  
   const numericValue = parseFormattedNumber(formattedValue);
   return numericValue.toString();
 }

@@ -77,7 +77,13 @@ export default function EditProgressModal({
   });
 
   const onSubmit = (data: UpdateProgressFormData) => {
-    updateProgressMutation.mutate(data);
+    // Convert formatted value to numeric before submitting
+    const processedData = {
+      ...data,
+      currentValue: data.currentValue ? getNumberValueForSubmission(data.currentValue) : "",
+    };
+    
+    updateProgressMutation.mutate(processedData);
   };
 
   const calculateProgress = (current: string, target: string, keyResultType: string, baseValue?: string | null): number => {
@@ -170,10 +176,10 @@ export default function EditProgressModal({
                       <Input
                         type="text"
                         placeholder="Enter current value"
-                        value={formatNumberWithSeparator(field.value || "")}
+                        value={field.value || ""}
                         onChange={(e) => {
                           handleNumberInputChange(e.target.value, (formattedValue) => {
-                            field.onChange(getNumberValueForSubmission(formattedValue));
+                            field.onChange(formattedValue); // Store formatted value directly
                           });
                         }}
                         onBlur={field.onBlur}
