@@ -397,7 +397,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                             <TooltipTrigger asChild>
                               <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
                             </TooltipTrigger>
-                            <TooltipContent side="right" className="max-w-xs z-[100]">
+                            <TooltipContent side="right" className="max-w-xs z-[9999]">
                               <p className="text-sm">
                                 Nama goal yang ingin dicapai. Gunakan bahasa yang inspiratif dan mudah dipahami oleh tim.
                                 <br /><br />
@@ -427,7 +427,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                             <TooltipTrigger asChild>
                               <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
                             </TooltipTrigger>
-                            <TooltipContent side="right" className="max-w-xs z-[100]">
+                            <TooltipContent side="right" className="max-w-xs z-[9999]">
                               <p className="text-sm">
                                 Penjelasan detail tentang goal ini, mengapa penting, dan dampak yang diharapkan terhadap organisasi.
                                 <br /><br />
@@ -461,7 +461,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                               <TooltipTrigger asChild>
                                 <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
                               </TooltipTrigger>
-                              <TooltipContent side="right" className="max-w-xs z-[100]">
+                              <TooltipContent side="right" className="max-w-xs z-[9999]">
                                 <p className="text-sm">
                                   Periode waktu untuk menyelesaikan goal ini. Pilih siklus yang sesuai dengan target timeline Anda.
                                   <br /><br />
@@ -506,7 +506,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                               <TooltipTrigger asChild>
                                 <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
                               </TooltipTrigger>
-                              <TooltipContent side="right" className="max-w-xs z-[100]">
+                              <TooltipContent side="right" className="max-w-xs z-[9999]">
                                 <p className="text-sm">
                                   Tentukan apakah goal ini dimiliki oleh individu atau tim.
                                   <br /><br />
@@ -546,7 +546,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                               <TooltipTrigger asChild>
                                 <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
                               </TooltipTrigger>
-                              <TooltipContent side="right" className="max-w-xs z-[100]">
+                              <TooltipContent side="right" className="max-w-xs z-[9999]">
                                 <p className="text-sm">
                                   {ownerType === "team" 
                                     ? "Pilih tim yang bertanggung jawab mencapai goal ini. Tim yang dipilih akan menjadi pemilik dan penanggung jawab keberhasilan goal."
@@ -596,7 +596,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                             <TooltipTrigger asChild>
                               <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
                             </TooltipTrigger>
-                            <TooltipContent side="right" className="max-w-xs z-[100]">
+                            <TooltipContent side="right" className="max-w-xs z-[9999]">
                               <p className="text-sm">
                                 Jika goal ini merupakan bagian dari goal yang lebih besar, pilih goal induk yang relevan.
                                 <br /><br />
@@ -848,7 +848,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                         <TooltipTrigger>
                           <HelpCircle className="w-4 h-4 text-gray-400" />
                         </TooltipTrigger>
-                        <TooltipContent side="right" className="max-w-xs z-[100]">
+                        <TooltipContent side="right" className="max-w-xs z-[9999]">
                           <p>
                             <strong>Buat judul yang spesifik dan terukur</strong>
                             <br /><br />
@@ -883,7 +883,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                         <TooltipTrigger>
                           <HelpCircle className="w-4 h-4 text-gray-400" />
                         </TooltipTrigger>
-                        <TooltipContent side="right" className="max-w-xs z-[100]">
+                        <TooltipContent side="right" className="max-w-xs z-[9999]">
                           <p>
                             <strong>Jelaskan konteks dan detail pengukuran</strong>
                             <br /><br />
@@ -919,7 +919,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                           <TooltipTrigger>
                             <HelpCircle className="w-4 h-4 text-gray-400" />
                           </TooltipTrigger>
-                          <TooltipContent side="right" className="max-w-xs z-[100]">
+                          <TooltipContent side="right" className="max-w-xs z-[9999]">
                             <p>
                               <strong>Pilih metode perhitungan yang sesuai:</strong>
                               <br /><br />
@@ -995,7 +995,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                             <TooltipTrigger>
                               <HelpCircle className="w-4 h-4 text-gray-400" />
                             </TooltipTrigger>
-                            <TooltipContent side="right" className="max-w-xs z-[100]">
+                            <TooltipContent side="right" className="max-w-xs z-[9999]">
                               <p>
                                 <strong>Tentukan satuan pengukuran yang spesifik</strong>
                                 <br /><br />
@@ -1106,7 +1106,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                                 <TooltipTrigger>
                                   <HelpCircle className="w-4 h-4 text-gray-400" />
                                 </TooltipTrigger>
-                                <TooltipContent side="right" className="max-w-xs z-[100]">
+                                <TooltipContent side="right" className="max-w-xs z-[9999]">
                                   <p>
                                     <strong>Threshold yang harus dipertahankan</strong>
                                     <br /><br />
@@ -1147,7 +1147,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                               <TooltipTrigger>
                                 <HelpCircle className="w-4 h-4 text-gray-400" />
                               </TooltipTrigger>
-                              <TooltipContent side="right" className="max-w-xs z-[100]">
+                              <TooltipContent side="right" className="max-w-xs z-[9999]">
                                 <p>
                                   <strong>Nilai baseline sebagai titik awal pengukuran</strong>
                                   <br /><br />
@@ -1182,7 +1182,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                               <TooltipTrigger>
                                 <HelpCircle className="w-4 h-4 text-gray-400" />
                               </TooltipTrigger>
-                              <TooltipContent side="right" className="max-w-xs z-[100]">
+                              <TooltipContent side="right" className="max-w-xs z-[9999]">
                                 <p>
                                   <strong>Nilai target yang ingin dicapai di akhir periode</strong>
                                   <br /><br />
@@ -1217,7 +1217,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                               <TooltipTrigger>
                                 <HelpCircle className="w-4 h-4 text-gray-400" />
                               </TooltipTrigger>
-                              <TooltipContent side="right" className="max-w-xs z-[100]">
+                              <TooltipContent side="right" className="max-w-xs z-[9999]">
                                 <p>
                                   <strong>Kondisi terkini atau titik awal saat ini</strong>
                                   <br /><br />
