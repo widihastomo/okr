@@ -1288,7 +1288,10 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                             <Input 
                               placeholder="100" 
                               type="text" 
-                              {...field}
+                              value={field.value || ""} 
+                              onChange={(e) => field.onChange(e.target.value)}
+                              onBlur={field.onBlur}
+                              name={field.name}
                             />
                           </FormControl>
                           <FormMessage />
