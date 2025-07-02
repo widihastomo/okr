@@ -15,6 +15,7 @@ import { Plus, Target, CheckSquare, Building2, Trophy } from "lucide-react";
 import MyTugas from "@/components/my-tasks";
 import Rencana from "@/components/initiatives";
 import { useAuth } from "@/hooks/useAuth";
+import { DashboardHelpBubble } from "@/components/help-bubble";
 
 import { useLocation } from "wouter";
 import type { OKRWithKeyResults, KeyResult, Cycle, User } from "@shared/schema";
@@ -410,9 +411,14 @@ export default function Dashboard() {
         <div className="flex flex-col space-y-3 sm:space-y-4">
           {/* Title and Create Button Row */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
-            <div>
-              <h1 className="text-lg sm:text-2xl font-semibold text-gray-900">OKR Dashboard</h1>
-              <p className="text-gray-600 mt-0.5 sm:mt-1 text-xs sm:text-base">Track your objectives and key results</p>
+            <div className="flex items-center">
+              <div>
+                <h1 className="text-lg sm:text-2xl font-semibold text-gray-900">OKR Dashboard</h1>
+                <p className="text-gray-600 mt-0.5 sm:mt-1 text-xs sm:text-base">Track your objectives and key results</p>
+              </div>
+              {currentUser && (
+                <DashboardHelpBubble userId={(currentUser as any).id} />
+              )}
             </div>
             <div className="flex-shrink-0">
               <CreateOKRButton />

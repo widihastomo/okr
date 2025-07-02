@@ -15,6 +15,7 @@ import { updateObjectiveWithAutoStatus } from "./storage";
 import { updateCycleStatuses } from "./cycle-status-updater";
 import { gamificationService } from "./gamification";
 import { populateGamificationData } from "./gamification-data";
+import { registerAIRoutes } from "./ai-routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
@@ -2125,6 +2126,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to initialize gamification data" });
     }
   });
+
+  // Register AI routes
+  registerAIRoutes(app);
 
   const httpServer = createServer(app);
   return httpServer;
