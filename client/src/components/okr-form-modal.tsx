@@ -1253,8 +1253,12 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
               }
               
               if (keyResultType === "should_stay_above" || keyResultType === "should_stay_below") {
+                console.log("Rendering should_stay input for type:", keyResultType);
                 return (
                   <div className="grid grid-cols-1 gap-4">
+                    <div className="text-sm text-red-500 p-2 border">
+                      DEBUG: Rendering for {keyResultType}
+                    </div>
                     {/* Target Value Only */}
                     <FormField
                       control={keyResultForm.control}
