@@ -242,13 +242,15 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
   // Navigation functions
   const nextStep = async () => {
     if (currentStep === 1) {
-      // Validate step 1 fields before proceeding
-      const isValid = await form.trigger([
-        "objective.title",
-        "objective.ownerId", 
-        "objective.ownerType"
-      ]);
-      if (isValid) {
+      // Validate required step 1 fields before proceeding
+      const titleValid = await form.trigger("objective.title");
+      const ownerTypeValid = await form.trigger("objective.ownerType");
+      
+      console.log("Step 1 validation - title:", titleValid, "ownerType:", ownerTypeValid);
+      console.log("Form values:", form.getValues());
+      console.log("Form errors:", form.formState.errors);
+      
+      if (titleValid && ownerTypeValid) {
         setCurrentStep(2);
       }
     }
@@ -826,7 +828,12 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
             {/* Navigation Buttons */}
             <div className="flex justify-between gap-4">
               {!isEditMode && currentStep > 1 && (
-                <Button type="button" variant="outline" onClick={prevStep}>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={prevStep}
+                  className="border-blue-600 text-blue-600 hover:bg-blue-50"
+                >
                   <ChevronLeft className="w-4 h-4 mr-2" />
                   Kembali
                 </Button>
@@ -838,7 +845,11 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                 </Button>
                 
                 {!isEditMode && currentStep === 1 ? (
-                  <Button type="button" onClick={nextStep}>
+                  <Button 
+                    type="button" 
+                    onClick={nextStep}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
                     Lanjut
                     <ChevronRight className="w-4 h-4 ml-2" />
                   </Button>
