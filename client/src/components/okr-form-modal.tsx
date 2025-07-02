@@ -1250,43 +1250,8 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
               
               if (keyResultType === "should_stay_above" || keyResultType === "should_stay_below") {
                 return (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* Base Value */}
-                    <FormField
-                      control={keyResultForm.control}
-                      name="baseValue"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="flex items-center gap-2">
-                            Nilai Awal
-                            
-                              <Popover>
-                                <PopoverTrigger>
-                                  <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                                </PopoverTrigger>
-                                <PopoverContent side="right" className="max-w-xs">
-                                  <p>
-                                    <strong>Nilai baseline sebagai titik awal pengukuran</strong>
-                                    <br /><br />
-                                    Masukkan kondisi saat ini atau kondisi awal sebelum dimulainya OKR ini.
-                                    <br /><br />
-                                    <strong>Tips:</strong> Gunakan data aktual yang valid dan dapat diverifikasi
-                                    <br /><br />
-                                    <strong>Contoh:</strong> Rating saat ini 3.2, pendapatan bulan lalu 50 juta, waktu respons 5 detik
-                                  </p>
-                                </PopoverContent>
-                              </Popover>
-                            
-                          </FormLabel>
-                          <FormControl>
-                            <Input placeholder="0" type="number" step="0.1" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    {/* Target Value */}
+                  <div className="grid grid-cols-1 gap-4">
+                    {/* Target Value Only */}
                     <FormField
                       control={keyResultForm.control}
                       name="targetValue"
@@ -1315,41 +1280,6 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                           </FormLabel>
                           <FormControl>
                             <Input placeholder="100" type="number" step="0.1" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    {/* Current Value */}
-                    <FormField
-                      control={keyResultForm.control}
-                      name="currentValue"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="flex items-center gap-2">
-                            Nilai Saat Ini
-                            
-                              <Popover>
-                                <PopoverTrigger>
-                                  <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                                </PopoverTrigger>
-                                <PopoverContent side="right" className="max-w-xs">
-                                  <p>
-                                    <strong>Kondisi terkini atau titik awal saat ini</strong>
-                                    <br /><br />
-                                    Masukkan nilai aktual saat ini yang akan menjadi starting point untuk tracking progress.
-                                    <br /><br />
-                                    <strong>Tips:</strong> Biasanya dimulai dari nilai yang sama dengan "Nilai Awal" dan akan diupdate melalui check-in berkala.
-                                    <br /><br />
-                                    <strong>Note:</strong> Nilai ini dapat diubah sewaktu-waktu melalui fitur update progress.
-                                  </p>
-                                </PopoverContent>
-                              </Popover>
-                            
-                          </FormLabel>
-                          <FormControl>
-                            <Input placeholder="0" type="number" step="0.1" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
