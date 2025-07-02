@@ -97,7 +97,6 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
         currentValue: kr.currentValue,
         unit: kr.unit,
         status: kr.status,
-        dueDate: kr.dueDate ? new Date(kr.dueDate).toISOString().split('T')[0] : undefined,
       })) || [],
     } : {
       objective: {
@@ -142,7 +141,6 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
             currentValue: kr.currentValue,
             unit: kr.unit,
             status: kr.status,
-            dueDate: kr.dueDate ? new Date(kr.dueDate).toISOString().split('T')[0] : undefined,
           })) || [],
         });
       } else {
@@ -769,7 +767,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
       currentValue: z.string().optional(),
       unit: z.string().min(1, "Unit harus diisi"),
       status: z.string().optional(),
-      dueDate: z.string().optional(),
+
     })),
     defaultValues: {
       title: "",
@@ -780,7 +778,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
       currentValue: "0",
       unit: "",
       status: "in_progress",
-      dueDate: undefined,
+
     },
   });
 
@@ -936,25 +934,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
               />
             </div>
 
-            {/* Due Date */}
-            <FormField
-              control={keyResultForm.control}
-              name="dueDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tenggat Waktu</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="date" 
-                      {...field}
-                      value={field.value ?? ""}
-                      onChange={(e) => field.onChange(e.target.value || null)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
 
             {/* Action Buttons */}
             <div className="flex justify-end gap-4">

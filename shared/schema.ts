@@ -90,7 +90,7 @@ export const keyResults = pgTable("key_results", {
   unit: text("unit").notNull().default("number"), // "number", "percentage", "currency"
   keyResultType: text("key_result_type").notNull().default("increase_to"), // "increase_to", "decrease_to", "achieve_or_not"
   status: text("status").notNull().default("on_track"), // "on_track", "at_risk", "behind", "completed"
-  dueDate: timestamp("due_date"), // Target completion date
+
   lastUpdated: timestamp("last_updated").defaultNow(),
   confidence: integer("confidence").default(5), // 1-10 scale for confidence level
   timeProgressPercentage: integer("time_progress_percentage").default(0), // Ideal progress based on timeline

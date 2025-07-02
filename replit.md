@@ -96,6 +96,14 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 02, 2025. Completed comprehensive removal of due date functionality from Key Results system:
+  * Removed all due date references from Key Result forms and components throughout the system
+  * Updated OKR form modal to exclude due date field from Key Result creation and editing
+  * Cleaned up Key Result detail modal by removing due date display sections
+  * Fixed server routes to use cycle end dates instead of key result due dates for progress calculations
+  * Updated objective detail page to remove due date input field and references
+  * Maintained initiative due date functionality while removing Key Result due date completely
+  * All Key Result operations now function without due date dependencies for cleaner system architecture
 - July 01, 2025. Simplified Goal creation form by removing Key Results section and Card frame:
   * Removed all Key Results input fields, validation, and functionality from main form
   * Simplified form to Goals/Objectives creation only - Key Results added via detail page

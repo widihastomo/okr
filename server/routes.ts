@@ -846,10 +846,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (updateData.targetValue) updateData.targetValue = parseFloat(updateData.targetValue).toString();
       if (updateData.baseValue) updateData.baseValue = updateData.baseValue ? parseFloat(updateData.baseValue).toString() : null;
       
-      // Convert date string to Date if provided
-      if (updateData.dueDate) {
-        updateData.dueDate = new Date(updateData.dueDate);
-      }
+
 
       const updatedKeyResult = await storage.updateKeyResult(keyResultId, updateData);
       
@@ -1357,9 +1354,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const objective = await storage.getObjective(keyResult.objectiveId);
         if (objective && objective.cycleId) {
           const cycle = await storage.getCycle(objective.cycleId);
-          if (cycle && keyResult.dueDate) {
+          if (cycle) {
             const startDate = new Date(cycle.startDate);
-            const endDate = keyResult.dueDate;
+            const endDate = new Date(cycle.endDate);
             
             const progressStatus = calculateProgressStatus(keyResult, startDate, endDate);
             

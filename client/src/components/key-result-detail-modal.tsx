@@ -224,13 +224,7 @@ export function KeyResultDetailModal({ keyResultId, isOpen, onClose }: KeyResult
                         />
                       </div>
 
-                      {/* Due Date */}
-                      {keyResult.dueDate && (
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <Clock className="h-4 w-4" />
-                          <span>Deadline: {format(new Date(keyResult.dueDate), "dd MMM yyyy")}</span>
-                        </div>
-                      )}
+
                     </CardContent>
                   </Card>
 

@@ -52,8 +52,7 @@ export default function GoalDetail() {
     baseValue: '',
     targetValue: '',
     currentValue: '',
-    unit: 'number',
-    dueDate: ''
+    unit: 'number'
   });
 
   // Check for highlight parameter in URL
@@ -140,8 +139,7 @@ export default function GoalDetail() {
         baseValue: '',
         targetValue: '',
         currentValue: '',
-        unit: 'number',
-        dueDate: ''
+        unit: 'number'
       });
     },
     onError: (error: Error) => {
@@ -474,20 +472,9 @@ export default function GoalDetail() {
                           status={kr.status}
                           progressPercentage={progress}
                           timeProgressPercentage={kr.timeProgressPercentage || 0}
-                          dueDate={kr.dueDate ? (typeof kr.dueDate === 'string' ? kr.dueDate : kr.dueDate.toISOString()) : null}
+                          dueDate={null}
                           startDate={cycle?.startDate || undefined}
                         />
-                        
-                        {kr.dueDate && (
-                          <div className="flex items-center gap-1 text-xs text-gray-500">
-                            <Calendar className="w-3 h-3" />
-                            <span>Target: {new Date(kr.dueDate).toLocaleDateString('id-ID', {
-                              day: 'numeric',
-                              month: 'short',
-                              year: 'numeric'
-                            })}</span>
-                          </div>
-                        )}
                       </div>
                     </div>
                   </CardContent>
@@ -878,15 +865,7 @@ export default function GoalDetail() {
                   </Select>
                 </div>
                 
-                <div>
-                  <Label htmlFor="dueDate">Tenggat Waktu</Label>
-                  <Input
-                    id="dueDate"
-                    type="date"
-                    value={keyResultForm.dueDate}
-                    onChange={(e) => setKeyResultForm({ ...keyResultForm, dueDate: e.target.value })}
-                  />
-                </div>
+
               </div>
               
               <div className="grid grid-cols-3 gap-4">

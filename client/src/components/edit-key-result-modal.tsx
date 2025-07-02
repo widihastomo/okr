@@ -21,7 +21,7 @@ const editKeyResultSchema = z.object({
   unit: z.string().optional(),
   keyResultType: z.enum(["increase_to", "decrease_to", "achieve_or_not"]),
   status: z.enum(["on_track", "at_risk", "behind", "completed", "in_progress"]),
-  dueDate: z.string().optional(),
+
 });
 
 type EditKeyResultFormData = z.infer<typeof editKeyResultSchema>;
@@ -51,7 +51,7 @@ export default function EditKeyResultModal({
       unit: keyResult.unit || "",
       keyResultType: keyResult.keyResultType as "increase_to" | "decrease_to" | "achieve_or_not",
       status: keyResult.status as "on_track" | "at_risk" | "behind" | "completed" | "in_progress",
-      dueDate: typeof keyResult.dueDate === 'string' ? keyResult.dueDate : (keyResult.dueDate ? keyResult.dueDate.toISOString().split('T')[0] : ""),
+
     } : undefined,
   });
 
@@ -67,7 +67,7 @@ export default function EditKeyResultModal({
           baseValue: data.baseValue || null,
           unit: data.unit || null,
           description: data.description || null,
-          dueDate: data.dueDate || null,
+
         }
       );
       return response;
