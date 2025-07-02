@@ -684,7 +684,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                       <Target className="w-5 h-5" />
                       Ukuran Keberhasilan
                     </CardTitle>
-                    <Button type="button" onClick={addKeyResult} variant="outline" className="w-full sm:w-auto">
+                    <Button type="button" onClick={addKeyResult} variant="outline" className="w-full sm:w-auto border-blue-600 text-blue-600 hover:bg-blue-50">
                       <Plus className="w-4 h-4 mr-2" />
                       <span className="hidden sm:inline">Tambah Ukuran Keberhasilan</span>
                       <span className="sm:hidden">Tambah</span>

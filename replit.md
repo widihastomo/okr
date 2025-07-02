@@ -96,6 +96,13 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 02, 2025. Enhanced OKR form layout with improved button styling and streamlined interface:
+  * Removed descriptive text below "Ukuran Keberhasilan" title for cleaner interface
+  * Moved "Tambah Ukuran Keberhasilan" button to be aligned with section title in header
+  * Applied blue outline styling (border-blue-600 text-blue-600 hover:bg-blue-50) to match app theme
+  * Improved decimal comma input handling by storing formatted values in forms instead of immediate parsing
+  * Fixed form submission to properly convert Indonesian formatted numbers (7,5 becomes 7.5) before database storage
+  * Enhanced user experience with cleaner layout and proper decimal input support for Indonesian users
 - July 02, 2025. Implemented comprehensive search functionality for all user select inputs and enhanced Key Result editing:
   * Created reusable SearchableUserSelect component with Command pattern for search capabilities
   * Updated all user selection dropdowns: OKR Form Modal owner selection, Dashboard user filter, Quick Task FAB, Initiative Modal PIC selection, TaskModal, and Standalone Task Modal
