@@ -841,7 +841,27 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Judul Ukuran Keberhasilan*</FormLabel>
+                  <FormLabel className="flex items-center gap-2">
+                    Judul Ukuran Keberhasilan*
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <HelpCircle className="w-4 h-4 text-gray-400" />
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className="max-w-xs">
+                          <p>
+                            <strong>Buat judul yang spesifik dan terukur</strong>
+                            <br /><br />
+                            Gunakan kata kerja yang jelas dan angka yang spesifik untuk hasil yang mudah diukur.
+                            <br /><br />
+                            <strong>Contoh baik:</strong> "Meningkatkan tingkat retensi pengguna menjadi 85%", "Mengurangi waktu respon dari 5 detik menjadi 2 detik"
+                            <br /><br />
+                            <strong>Hindari:</strong> "Meningkatkan kualitas", "Menjadi lebih baik"
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </FormLabel>
                   <FormControl>
                     <Input placeholder="Contoh: Meningkatkan rating kepuasan menjadi 4.5" {...field} />
                   </FormControl>
@@ -856,7 +876,27 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Deskripsi</FormLabel>
+                  <FormLabel className="flex items-center gap-2">
+                    Deskripsi
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <HelpCircle className="w-4 h-4 text-gray-400" />
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className="max-w-xs">
+                          <p>
+                            <strong>Jelaskan konteks dan detail pengukuran</strong>
+                            <br /><br />
+                            Berikan informasi yang membantu pemahaman bagaimana mengukur dan mencapai target ini.
+                            <br /><br />
+                            <strong>Sertakan:</strong> Metode pengukuran, sumber data, frekuensi review, atau kriteria khusus
+                            <br /><br />
+                            <strong>Contoh:</strong> "Diukur melalui survey bulanan dengan minimal 100 responden"
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </FormLabel>
                   <FormControl>
                     <Textarea placeholder="Deskripsi detail tentang Ukuran Keberhasilan ini" {...field} />
                   </FormControl>
@@ -872,7 +912,31 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                 name="keyResultType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tipe Ukuran Keberhasilan</FormLabel>
+                    <FormLabel className="flex items-center gap-2">
+                      Tipe Ukuran Keberhasilan
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <HelpCircle className="w-4 h-4 text-gray-400" />
+                          </TooltipTrigger>
+                          <TooltipContent side="right" className="max-w-xs">
+                            <p>
+                              <strong>Pilih metode perhitungan yang sesuai:</strong>
+                              <br /><br />
+                              <strong>Naik ke:</strong> Progress = (Saat ini - Awal) / (Target - Awal) × 100%
+                              <br />
+                              <strong>Turun ke:</strong> Progress = (Awal - Saat ini) / (Awal - Target) × 100%
+                              <br />
+                              <strong>Tetap di atas:</strong> Threshold minimum yang harus dipertahankan
+                              <br />
+                              <strong>Tetap di bawah:</strong> Threshold maksimum yang tidak boleh dilampaui
+                              <br />
+                              <strong>Ya/Tidak:</strong> Pencapaian biner (tercapai = 100%, tidak = 0%)
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -924,7 +988,27 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                   name="unit"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Unit*</FormLabel>
+                      <FormLabel className="flex items-center gap-2">
+                        Unit*
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <HelpCircle className="w-4 h-4 text-gray-400" />
+                            </TooltipTrigger>
+                            <TooltipContent side="right" className="max-w-xs">
+                              <p>
+                                <strong>Tentukan satuan pengukuran yang spesifik</strong>
+                                <br /><br />
+                                Pilih unit yang jelas dan mudah dipahami untuk memudahkan tracking progress.
+                                <br /><br />
+                                <strong>Contoh unit:</strong> Rp (rupiah), % (persen), orang (jumlah orang), hari (durasi), rating (1-5), skor (nilai), ton (berat), dll
+                                <br /><br />
+                                Anda bisa memilih dari daftar yang tersedia atau mengetik unit baru sesuai kebutuhan.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -1015,7 +1099,27 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                       name="targetValue"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Target*</FormLabel>
+                          <FormLabel className="flex items-center gap-2">
+                            Target*
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <HelpCircle className="w-4 h-4 text-gray-400" />
+                                </TooltipTrigger>
+                                <TooltipContent side="right" className="max-w-xs">
+                                  <p>
+                                    <strong>Threshold yang harus dipertahankan</strong>
+                                    <br /><br />
+                                    Untuk tipe "Tetap di atas": tentukan nilai minimum yang harus selalu dijaga atau dipertahankan.
+                                    <br />
+                                    Untuk tipe "Tetap di bawah": tentukan nilai maksimum yang tidak boleh dilampaui.
+                                    <br /><br />
+                                    <strong>Contoh:</strong> Rating tetap di atas 4.0, biaya tetap di bawah 50 juta, response time di bawah 3 detik
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </FormLabel>
                           <FormControl>
                             <Input placeholder="100" type="number" step="0.1" {...field} />
                           </FormControl>
@@ -1036,7 +1140,27 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                     name="baseValue"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nilai Awal</FormLabel>
+                        <FormLabel className="flex items-center gap-2">
+                          Nilai Awal
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <HelpCircle className="w-4 h-4 text-gray-400" />
+                              </TooltipTrigger>
+                              <TooltipContent side="right" className="max-w-xs">
+                                <p>
+                                  <strong>Nilai baseline sebagai titik awal pengukuran</strong>
+                                  <br /><br />
+                                  Masukkan kondisi saat ini atau kondisi awal sebelum dimulainya OKR ini.
+                                  <br /><br />
+                                  <strong>Tips:</strong> Gunakan data aktual yang valid dan dapat diverifikasi
+                                  <br /><br />
+                                  <strong>Contoh:</strong> Rating saat ini 3.2, pendapatan bulan lalu 50 juta, waktu respons 5 detik
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </FormLabel>
                         <FormControl>
                           <Input placeholder="0" type="number" step="0.1" {...field} />
                         </FormControl>
@@ -1051,7 +1175,27 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                     name="targetValue"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Target*</FormLabel>
+                        <FormLabel className="flex items-center gap-2">
+                          Target*
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <HelpCircle className="w-4 h-4 text-gray-400" />
+                              </TooltipTrigger>
+                              <TooltipContent side="right" className="max-w-xs">
+                                <p>
+                                  <strong>Nilai target yang ingin dicapai di akhir periode</strong>
+                                  <br /><br />
+                                  Tentukan target yang ambisius namun realistis dan dapat dicapai dengan upaya yang optimal.
+                                  <br /><br />
+                                  <strong>Tips:</strong> Target harus menantang tapi tidak mustahil. Gunakan data historis atau benchmark industri sebagai acuan.
+                                  <br /><br />
+                                  <strong>Contoh:</strong> Rating 4.5, pendapatan 100 juta, waktu respons 2 detik
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </FormLabel>
                         <FormControl>
                           <Input placeholder="100" type="number" step="0.1" {...field} />
                         </FormControl>
@@ -1066,7 +1210,27 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                     name="currentValue"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nilai Saat Ini</FormLabel>
+                        <FormLabel className="flex items-center gap-2">
+                          Nilai Saat Ini
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <HelpCircle className="w-4 h-4 text-gray-400" />
+                              </TooltipTrigger>
+                              <TooltipContent side="right" className="max-w-xs">
+                                <p>
+                                  <strong>Kondisi terkini atau titik awal saat ini</strong>
+                                  <br /><br />
+                                  Masukkan nilai aktual saat ini yang akan menjadi starting point untuk tracking progress.
+                                  <br /><br />
+                                  <strong>Tips:</strong> Biasanya dimulai dari nilai yang sama dengan "Nilai Awal" dan akan diupdate melalui check-in berkala.
+                                  <br /><br />
+                                  <strong>Note:</strong> Nilai ini dapat diubah sewaktu-waktu melalui fitur update progress.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </FormLabel>
                         <FormControl>
                           <Input placeholder="0" type="number" step="0.1" {...field} />
                         </FormControl>
