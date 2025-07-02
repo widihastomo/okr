@@ -5,7 +5,7 @@ import {
   insertCycleSchema, insertTemplateSchema, insertObjectiveSchema, insertKeyResultSchema, 
   insertCheckInSchema, insertInitiativeSchema, insertInitiativeMemberSchema, insertInitiativeDocumentSchema, 
   insertTaskSchema, insertInitiativeNoteSchema, updateKeyResultProgressSchema, createOKRFromTemplateSchema,
-  insertEmojiReactionSchema, type User
+  type User
 } from "@shared/schema";
 import { z } from "zod";
 import { setupEmailAuth } from "./authRoutes";
@@ -2123,88 +2123,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error initializing gamification data:", error);
       res.status(500).json({ message: "Failed to initialize gamification data" });
-    }
-  });
-
-  // Emoji Reactions for Goals/Objectives
-  app.get("/api/objectives/:id/reactions", async (req, res) => {
-    try {
-      const objectiveId = req.params.id;
-      const reactions = await storage.getEmojiReactions(objectiveId);
-      res.json(reactions);
-    } catch (error) {
-      console.error("Error fetching emoji reactions:", error);
-      res.status(500).json({ message: "Failed to fetch emoji reactions" });
-    }
-  });
-
-  app.post("/api/objectives/:id/reactions", requireAuth, async (req, res) => {
-    try {
-      const objectiveId = req.params.id;
-      const { emoji } = req.body;
-      const currentUser = req.session.user;
-
-      if (!currentUser) {
-        return res.status(401).json({ message: "User not authenticated" });
-      }
-
-      if (!emoji || typeof emoji !== 'string' || emoji.length > 10) {
-        return res.status(400).json({ message: "Valid emoji is required" });
-      }
-
-      const reactionData = insertEmojiReactionSchema.parse({
-        objectiveId,
-        userId: currentUser.id,
-        emoji
-      });
-
-      const reaction = await storage.createEmojiReaction(reactionData);
-      res.status(201).json(reaction);
-    } catch (error) {
-      console.error("Error creating emoji reaction:", error);
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid data", errors: error.errors });
-      }
-      res.status(500).json({ message: "Failed to create emoji reaction" });
-    }
-  });
-
-  app.delete("/api/objectives/:id/reactions/:emoji", requireAuth, async (req, res) => {
-    try {
-      const objectiveId = req.params.id;
-      const emoji = req.params.emoji;
-      const currentUser = req.session.user;
-
-      if (!currentUser) {
-        return res.status(401).json({ message: "User not authenticated" });
-      }
-
-      const deleted = await storage.deleteEmojiReaction(objectiveId, currentUser.id, emoji);
-      
-      if (!deleted) {
-        return res.status(404).json({ message: "Reaction not found" });
-      }
-      
-      res.status(204).send();
-    } catch (error) {
-      console.error("Error deleting emoji reaction:", error);
-      res.status(500).json({ message: "Failed to delete emoji reaction" });
-    }
-  });
-
-  app.get("/api/objectives/:id/with-reactions", async (req, res) => {
-    try {
-      const objectiveId = req.params.id;
-      const objectiveWithReactions = await storage.getObjectiveWithReactions(objectiveId);
-      
-      if (!objectiveWithReactions) {
-        return res.status(404).json({ message: "Objective not found" });
-      }
-      
-      res.json(objectiveWithReactions);
-    } catch (error) {
-      console.error("Error fetching objective with reactions:", error);
-      res.status(500).json({ message: "Failed to fetch objective with reactions" });
     }
   });
 
