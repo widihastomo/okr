@@ -246,10 +246,6 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
       const titleValid = await form.trigger("objective.title");
       const ownerTypeValid = await form.trigger("objective.ownerType");
       
-      console.log("Step 1 validation - title:", titleValid, "ownerType:", ownerTypeValid);
-      console.log("Form values:", form.getValues());
-      console.log("Form errors:", form.formState.errors);
-      
       if (titleValid && ownerTypeValid) {
         setCurrentStep(2);
       }
@@ -286,9 +282,13 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
   };
 
   const onSubmit = (data: ObjectiveFormData) => {
-    console.log("Form submitted with data:", data);
-    console.log("Form errors:", form.formState.errors);
-    mutation.mutate(data);
+    // Only submit if we're in edit mode or on step 2 (final step)
+    if (isEditMode || currentStep === 2) {
+      mutation.mutate(data);
+    } else {
+      // If on step 1, proceed to step 2
+      nextStep();
+    }
   };
 
 
@@ -846,8 +846,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                 
                 {!isEditMode && currentStep === 1 ? (
                   <Button 
-                    type="button" 
-                    onClick={nextStep}
+                    type="submit"
                     className="bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     Lanjut
