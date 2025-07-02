@@ -1039,9 +1039,9 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
       // For stay above/below types, we only need target value
       keyResultForm.setValue("baseValue", "");
       keyResultForm.setValue("currentValue", "0");
-      // Keep target value and unit
-      if (!keyResultForm.getValues("targetValue")) {
-        keyResultForm.setValue("targetValue", "0");
+      // Reset target value to empty string to allow fresh input
+      if (!isEditing) {
+        keyResultForm.setValue("targetValue", "");
       }
     } else {
       // For increase_to and decrease_to, ensure all values are set
@@ -1055,7 +1055,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
         keyResultForm.setValue("currentValue", "0");
       }
     }
-  }, [currentKeyResultType, keyResultForm]);
+  }, [currentKeyResultType, keyResultForm, isEditing]);
 
   const handleSubmit = (data: KeyResultFormData) => {
     // Convert formatted values to numeric before submitting
