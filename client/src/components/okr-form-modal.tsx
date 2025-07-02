@@ -87,6 +87,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
   const [, setLocation] = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
   const [keyResultModalOpen, setKeyResultModalOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   const isEditMode = !!okr;
 
   // Fetch data yang diperlukan
@@ -812,6 +813,8 @@ interface KeyResultModalProps {
 }
 
 function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
+  const [searchValue, setSearchValue] = useState("");
+  
   const keyResultForm = useForm<KeyResultFormData>({
     resolver: zodResolver(z.object({
       title: z.string().min(1, "Judul harus diisi"),
@@ -820,9 +823,18 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
       baseValue: z.string().optional(),
       targetValue: z.string().min(1, "Target harus diisi"),
       currentValue: z.string().optional(),
-      unit: z.string().min(1, "Unit harus diisi"),
+      unit: z.string().optional(),
       status: z.string().optional(),
 
+    }).refine((data) => {
+      // Unit wajib diisi kecuali untuk tipe achieve_or_not
+      if (data.keyResultType !== "achieve_or_not" && !data.unit) {
+        return false;
+      }
+      return true;
+    }, {
+      message: "Unit harus diisi",
+      path: ["unit"]
     })),
     defaultValues: {
       title: "",
@@ -1050,47 +1062,50 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                           <Command>
                             <CommandInput 
                               placeholder="Cari atau ketik unit baru..." 
-                              onValueChange={(value: string) => {
-                                if (value && !unitOptions.includes(value)) {
-                                  field.onChange(value);
-                                }
-                              }}
+                              value={searchValue}
+                              onValueChange={setSearchValue}
                             />
                             <CommandList>
                               <CommandEmpty>
-                                <Button
-                                  variant="ghost"
-                                  className="w-full text-left justify-start h-auto p-2"
-                                  onClick={() => {
-                                    const input = document.querySelector('[placeholder="Cari atau ketik unit baru..."]') as HTMLInputElement;
-                                    if (input && input.value) {
-                                      field.onChange(input.value);
-                                    }
-                                  }}
-                                >
-                                  Tambah unit baru
-                                </Button>
+                                {searchValue && searchValue.trim() && !unitOptions.includes(searchValue.trim()) && (
+                                  <CommandItem
+                                    value={searchValue}
+                                    onSelect={() => {
+                                      field.onChange(searchValue.trim());
+                                      setSearchValue("");
+                                    }}
+                                    className="cursor-pointer"
+                                  >
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    Tambah "{searchValue.trim()}"
+                                  </CommandItem>
+                                )}
                               </CommandEmpty>
                               <CommandGroup>
-                                {unitOptions.map((unit: string) => (
-                                  <CommandItem
-                                    value={unit}
-                                    key={unit}
-                                    onSelect={() => {
-                                      field.onChange(unit);
-                                    }}
-                                  >
-                                    <Check
-                                      className={cn(
-                                        "mr-2 h-4 w-4",
-                                        unit === field.value
-                                          ? "opacity-100"
-                                          : "opacity-0"
-                                      )}
-                                    />
-                                    {unit}
-                                  </CommandItem>
-                                ))}
+                                {unitOptions
+                                  .filter(unit => 
+                                    unit.toLowerCase().includes(searchValue.toLowerCase())
+                                  )
+                                  .map((unit: string) => (
+                                    <CommandItem
+                                      value={unit}
+                                      key={unit}
+                                      onSelect={() => {
+                                        field.onChange(unit);
+                                        setSearchValue("");
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          unit === field.value
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                      {unit}
+                                    </CommandItem>
+                                  ))}
                               </CommandGroup>
                             </CommandList>
                           </Command>
