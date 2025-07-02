@@ -397,7 +397,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                               <button 
                                 type="button" 
                                 className="inline-flex items-center justify-center"
-                                onClick={(e) => e.preventDefault()}
+                                
                               >
                                 <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                               </button>
@@ -433,7 +433,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                               <button 
                                 type="button" 
                                 className="inline-flex items-center justify-center"
-                                onClick={(e) => e.preventDefault()}
+                                
                               >
                                 <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                               </button>
@@ -472,7 +472,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                               <button 
                                 type="button" 
                                 className="inline-flex items-center justify-center"
-                                onClick={(e) => e.preventDefault()}
+                                
                               >
                                 <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                               </button>
@@ -612,7 +612,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                               <button 
                                 type="button" 
                                 className="inline-flex items-center justify-center"
-                                onClick={(e) => e.preventDefault()}
+                                
                               >
                                 <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                               </button>
