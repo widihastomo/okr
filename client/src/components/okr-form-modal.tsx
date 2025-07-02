@@ -679,22 +679,19 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
             {(currentStep === 2 || isEditMode) && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Target className="w-5 h-5" />
-                    Ukuran Keberhasilan
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                    <p className="text-sm text-gray-600">
-                      Tambahkan Ukuran Keberhasilan untuk mengukur progress goal ini
-                    </p>
+                    <CardTitle className="flex items-center gap-2">
+                      <Target className="w-5 h-5" />
+                      Ukuran Keberhasilan
+                    </CardTitle>
                     <Button type="button" onClick={addKeyResult} variant="outline" className="w-full sm:w-auto">
                       <Plus className="w-4 h-4 mr-2" />
                       <span className="hidden sm:inline">Tambah Ukuran Keberhasilan</span>
                       <span className="sm:hidden">Tambah</span>
                     </Button>
                   </div>
+                </CardHeader>
+                <CardContent className="space-y-6">
 
                   {keyResults.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
