@@ -96,6 +96,14 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 02, 2025. Fixed check-in form input to match Key Result types with proper conditional display:
+  * increase_to/decrease_to types: show numeric input field for "Nilai Saat Ini" with target display
+  * should_stay_above/should_stay_below types: show toggle switch for target achievement status
+  * achieve_or_not type: show toggle switch for binary achievement (tercapai/belum tercapai)
+  * Enhanced form logic to submit appropriate values based on Key Result type and toggle states
+  * Added Switch component import and proper state management for achieved/not achieved status
+  * Fixed handleSubmit function to calculate correct values for each Key Result type before submission
+  * Form now provides contextually appropriate interface for each Key Result calculation method
 - July 02, 2025. Enhanced OKR form modal with comprehensive mobile responsive design:
   * Converted header section to responsive layout - button becomes full-width on mobile with shortened text ("Tambah")
   * Implemented dual-layout Key Results display: desktop table view vs mobile card-based layout

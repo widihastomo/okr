@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -58,6 +59,7 @@ export function CheckInModal({
 }: CheckInModalProps) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(currentValue);
+  const [achieved, setAchieved] = useState(parseFloat(currentValue) >= parseFloat(targetValue));
   const [notes, setNotes] = useState("");
   const [confidence, setConfidence] = useState([5]);
   const [showNumberWarning, setShowNumberWarning] = useState(false);
@@ -85,6 +87,7 @@ export function CheckInModal({
       });
       setOpen(false);
       setValue(currentValue);
+      setAchieved(parseFloat(currentValue) >= parseFloat(targetValue));
       setNotes("");
       setConfidence([5]);
     },
@@ -100,8 +103,20 @@ export function CheckInModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    let submitValue = value;
+    
+    // Handle different key result types
+    if (keyResultType === "achieve_or_not") {
+      // For binary type, use target value if achieved, otherwise 0
+      submitValue = achieved ? targetValue : "0";
+    } else if (keyResultType === "should_stay_above" || keyResultType === "should_stay_below") {
+      // For threshold types, use target value if achieved, otherwise current value
+      submitValue = achieved ? targetValue : value;
+    }
+    
     checkInMutation.mutate({
-      value,
+      value: submitValue,
       notes,
       confidence: confidence[0],
     });
@@ -169,45 +184,91 @@ export function CheckInModal({
             <p className="text-sm text-gray-600 mt-1">{keyResultTitle}</p>
           </div>
 
-          <div>
-            <Label htmlFor="value" className="text-sm font-medium">
-              Nilai Saat Ini {getUnitDisplay(unit)}
-            </Label>
-            <Input
-              id="value"
-              type="text"
-              value={formatNumberWithCommas(value)}
-              onChange={(e) => {
-                const inputValue = e.target.value;
-                const cleanValue = inputValue.replace(/\./g, '').replace(',', '.');
-                const num = parseFloat(cleanValue);
-                
-                if (!isNaN(num) && num > 999999999999.99) {
-                  setShowNumberWarning(true);
-                  setValue('999999999999.99');
-                } else {
-                  setShowNumberWarning(false);
-                  const rawValue = parseNumberFromFormatted(inputValue);
-                  setValue(rawValue);
-                }
-              }}
-              className="mt-1"
-              required
-            />
-            <div className="text-xs text-gray-500 mt-1">
-              Target: {unit === "currency" ? `Rp ${formatNumberWithCommas(targetValue)}` : 
-                       unit === "percentage" ? `${formatNumberWithCommas(targetValue)}%` :
-                       `${formatNumberWithCommas(targetValue)} ${getUnitDisplay(unit)}`}
-            </div>
-            {showNumberWarning && (
-              <div className="text-xs text-orange-600 mt-1 font-medium">
-                ⚠️ Nilai maksimum adalah 999.999.999.999,99 - angka telah disesuaikan
+          {/* Conditional Input Based on Key Result Type */}
+          {(keyResultType === "increase_to" || keyResultType === "decrease_to") && (
+            <div>
+              <Label htmlFor="value" className="text-sm font-medium">
+                Nilai Saat Ini {getUnitDisplay(unit)}
+              </Label>
+              <Input
+                id="value"
+                type="text"
+                value={formatNumberWithCommas(value)}
+                onChange={(e) => {
+                  const inputValue = e.target.value;
+                  const cleanValue = inputValue.replace(/\./g, '').replace(',', '.');
+                  const num = parseFloat(cleanValue);
+                  
+                  if (!isNaN(num) && num > 999999999999.99) {
+                    setShowNumberWarning(true);
+                    setValue('999999999999.99');
+                  } else {
+                    setShowNumberWarning(false);
+                    const rawValue = parseNumberFromFormatted(inputValue);
+                    setValue(rawValue);
+                  }
+                }}
+                className="mt-1"
+                required
+              />
+              <div className="text-xs text-gray-500 mt-1">
+                Target: {unit === "currency" ? `Rp ${formatNumberWithCommas(targetValue)}` : 
+                         unit === "percentage" ? `${formatNumberWithCommas(targetValue)}%` :
+                         `${formatNumberWithCommas(targetValue)} ${getUnitDisplay(unit)}`}
               </div>
-            )}
-            <div className="text-xs mt-1 font-medium">
-              {getProgressHint()}
+              {showNumberWarning && (
+                <div className="text-xs text-orange-600 mt-1 font-medium">
+                  ⚠️ Nilai maksimum adalah 999.999.999.999,99 - angka telah disesuaikan
+                </div>
+              )}
+              <div className="text-xs mt-1 font-medium">
+                {getProgressHint()}
+              </div>
             </div>
-          </div>
+          )}
+
+          {(keyResultType === "should_stay_above" || keyResultType === "should_stay_below") && (
+            <div>
+              <Label className="text-sm font-medium">
+                Status Target
+              </Label>
+              <div className="flex items-center space-x-3 mt-2">
+                <Switch
+                  checked={achieved}
+                  onCheckedChange={setAchieved}
+                />
+                <span className="text-sm">
+                  {achieved ? "✅ Target tercapai" : "❌ Target belum tercapai"}
+                </span>
+              </div>
+              <div className="text-xs text-gray-500 mt-1">
+                Target: {keyResultType === "should_stay_above" ? "Tetap di atas" : "Tetap di bawah"} {" "}
+                {unit === "currency" ? `Rp ${formatNumberWithCommas(targetValue)}` : 
+                 unit === "percentage" ? `${formatNumberWithCommas(targetValue)}%` :
+                 `${formatNumberWithCommas(targetValue)} ${getUnitDisplay(unit)}`}
+              </div>
+            </div>
+          )}
+
+          {keyResultType === "achieve_or_not" && (
+            <div>
+              <Label className="text-sm font-medium">
+                Status Pencapaian
+              </Label>
+              <div className="flex items-center space-x-3 mt-2">
+                <Switch
+                  checked={achieved}
+                  onCheckedChange={setAchieved}
+                />
+                <span className="text-sm">
+                  {achieved ? "✅ Tercapai" : "❌ Belum tercapai"}
+                </span>
+              </div>
+              <div className="text-xs text-gray-500 mt-1">
+                Target: {keyResultTitle}
+              </div>
+            </div>
+          )}
 
           <div>
             <Label htmlFor="confidence" className="text-sm font-medium">
