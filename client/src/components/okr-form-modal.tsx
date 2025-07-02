@@ -64,6 +64,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
+  const [keyResultModalOpen, setKeyResultModalOpen] = useState(false);
   const isEditMode = !!okr;
 
   // Fetch data yang diperlukan
@@ -260,19 +261,13 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
 
   // Key Result management functions
   const addKeyResult = () => {
+    setKeyResultModalOpen(true);
+  };
+
+  const handleAddKeyResult = (keyResultData: KeyResultFormData) => {
     const currentKeyResults = form.getValues("keyResults") || [];
-    const newKeyResult: KeyResultFormData = {
-      title: "",
-      description: "",
-      keyResultType: "increase_to",
-      baseValue: "",
-      targetValue: "",
-      currentValue: "0",
-      unit: "",
-      status: "in_progress",
-      dueDate: undefined,
-    };
-    form.setValue("keyResults", [...currentKeyResults, newKeyResult]);
+    form.setValue("keyResults", [...currentKeyResults, keyResultData]);
+    setKeyResultModalOpen(false);
   };
 
   const removeKeyResult = (index: number) => {
@@ -644,13 +639,13 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {keyResults.map((_, index) => (
-                        <Card key={index} className="border-dashed border-2">
+                      {keyResults.map((keyResult, index) => (
+                        <Card key={index} className="border border-gray-200">
                           <CardHeader className="pb-4">
                             <div className="flex justify-between items-center">
                               <CardTitle className="text-sm flex items-center gap-2">
                                 <Target className="w-4 h-4" />
-                                Ukuran Keberhasilan {index + 1}
+                                {keyResult.title || `Ukuran Keberhasilan ${index + 1}`}
                               </CardTitle>
                               <Button
                                 type="button"
@@ -663,159 +658,35 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                               </Button>
                             </div>
                           </CardHeader>
-                          <CardContent className="space-y-4">
-                            {/* Key Result Title */}
-                            <FormField
-                              control={form.control}
-                              name={`keyResults.${index}.title`}
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Judul Ukuran Keberhasilan*</FormLabel>
-                                  <FormControl>
-                                    <Input placeholder="Contoh: Meningkatkan rating kepuasan menjadi 4.5" {...field} />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-
-                            {/* Key Result Description */}
-                            <FormField
-                              control={form.control}
-                              name={`keyResults.${index}.description`}
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Deskripsi</FormLabel>
-                                  <FormControl>
-                                    <Textarea placeholder="Deskripsi detail tentang Ukuran Keberhasilan ini" {...field} />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              {/* Key Result Type */}
-                              <FormField
-                                control={form.control}
-                                name={`keyResults.${index}.keyResultType`}
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>Tipe Ukuran Keberhasilan</FormLabel>
-                                    <Select onValueChange={field.onChange} value={field.value}>
-                                      <FormControl>
-                                        <SelectTrigger>
-                                          <SelectValue placeholder="Pilih tipe" />
-                                        </SelectTrigger>
-                                      </FormControl>
-                                      <SelectContent>
-                                        <SelectItem value="increase_to">
-                                          <div className="flex items-center gap-2">
-                                            <TrendingUp className="w-4 h-4" />
-                                            Increase To (Naik ke)
-                                          </div>
-                                        </SelectItem>
-                                        <SelectItem value="decrease_to">
-                                          <div className="flex items-center gap-2">
-                                            <TrendingDown className="w-4 h-4" />
-                                            Decrease To (Turun ke)
-                                          </div>
-                                        </SelectItem>
-                                        <SelectItem value="achieve_or_not">
-                                          <div className="flex items-center gap-2">
-                                            <Target className="w-4 h-4" />
-                                            Achieve or Not (Ya/Tidak)
-                                          </div>
-                                        </SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-
-                              {/* Unit */}
-                              <FormField
-                                control={form.control}
-                                name={`keyResults.${index}.unit`}
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>Unit*</FormLabel>
-                                    <FormControl>
-                                      <Input placeholder="Contoh: rating, %, orang, Rp" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
+                          <CardContent>
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <span className="text-gray-500">Tipe:</span>
+                                <p className="font-medium">
+                                  {keyResult.keyResultType === 'increase_to' && 'Increase To (Naik ke)'}
+                                  {keyResult.keyResultType === 'decrease_to' && 'Decrease To (Turun ke)'}
+                                  {keyResult.keyResultType === 'achieve_or_not' && 'Achieve or Not (Ya/Tidak)'}
+                                </p>
+                              </div>
+                              <div>
+                                <span className="text-gray-500">Unit:</span>
+                                <p className="font-medium">{keyResult.unit || '-'}</p>
+                              </div>
+                              <div>
+                                <span className="text-gray-500">Nilai Awal:</span>
+                                <p className="font-medium">{keyResult.baseValue || '0'}</p>
+                              </div>
+                              <div>
+                                <span className="text-gray-500">Target:</span>
+                                <p className="font-medium">{keyResult.targetValue || '0'}</p>
+                              </div>
                             </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                              {/* Base Value */}
-                              <FormField
-                                control={form.control}
-                                name={`keyResults.${index}.baseValue`}
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>Nilai Awal</FormLabel>
-                                    <FormControl>
-                                      <Input placeholder="0" type="number" step="0.1" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-
-                              {/* Target Value */}
-                              <FormField
-                                control={form.control}
-                                name={`keyResults.${index}.targetValue`}
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>Target*</FormLabel>
-                                    <FormControl>
-                                      <Input placeholder="100" type="number" step="0.1" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-
-                              {/* Current Value */}
-                              <FormField
-                                control={form.control}
-                                name={`keyResults.${index}.currentValue`}
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>Nilai Saat Ini</FormLabel>
-                                    <FormControl>
-                                      <Input placeholder="0" type="number" step="0.1" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-                            </div>
-
-                            {/* Due Date */}
-                            <FormField
-                              control={form.control}
-                              name={`keyResults.${index}.dueDate`}
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Tenggat Waktu</FormLabel>
-                                  <FormControl>
-                                    <Input 
-                                      type="date" 
-                                      {...field}
-                                      value={field.value ?? ""}
-                                      onChange={(e) => field.onChange(e.target.value || null)}
-                                    />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
+                            {keyResult.description && (
+                              <div className="mt-3 pt-3 border-t">
+                                <span className="text-gray-500 text-sm">Deskripsi:</span>
+                                <p className="text-sm mt-1">{keyResult.description}</p>
+                              </div>
+                            )}
                           </CardContent>
                         </Card>
                       ))}
@@ -865,6 +736,237 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                   </Button>
                 )}
               </div>
+            </div>
+          </form>
+        </Form>
+      </DialogContent>
+
+      {/* Key Result Modal */}
+      <KeyResultModal 
+        open={keyResultModalOpen} 
+        onOpenChange={setKeyResultModalOpen}
+        onSubmit={handleAddKeyResult}
+      />
+    </Dialog>
+  );
+}
+
+// Component untuk KeyResult Modal
+interface KeyResultModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (keyResult: KeyResultFormData) => void;
+}
+
+function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
+  const keyResultForm = useForm<KeyResultFormData>({
+    resolver: zodResolver(z.object({
+      title: z.string().min(1, "Judul harus diisi"),
+      description: z.string().optional(),
+      keyResultType: z.enum(["increase_to", "decrease_to", "achieve_or_not"]),
+      baseValue: z.string().optional(),
+      targetValue: z.string().min(1, "Target harus diisi"),
+      currentValue: z.string().optional(),
+      unit: z.string().min(1, "Unit harus diisi"),
+      status: z.string().optional(),
+      dueDate: z.string().optional(),
+    })),
+    defaultValues: {
+      title: "",
+      description: "",
+      keyResultType: "increase_to",
+      baseValue: "",
+      targetValue: "",
+      currentValue: "0",
+      unit: "",
+      status: "in_progress",
+      dueDate: undefined,
+    },
+  });
+
+  const handleSubmit = (data: KeyResultFormData) => {
+    onSubmit(data);
+    keyResultForm.reset();
+  };
+
+  const handleCancel = () => {
+    onOpenChange(false);
+    keyResultForm.reset();
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Tambah Ukuran Keberhasilan</DialogTitle>
+        </DialogHeader>
+
+        <Form {...keyResultForm}>
+          <form onSubmit={keyResultForm.handleSubmit(handleSubmit)} className="space-y-6">
+            {/* Key Result Title */}
+            <FormField
+              control={keyResultForm.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Judul Ukuran Keberhasilan*</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Contoh: Meningkatkan rating kepuasan menjadi 4.5" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Key Result Description */}
+            <FormField
+              control={keyResultForm.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Deskripsi</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Deskripsi detail tentang Ukuran Keberhasilan ini" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Key Result Type */}
+              <FormField
+                control={keyResultForm.control}
+                name="keyResultType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipe Ukuran Keberhasilan</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih tipe" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="increase_to">
+                          <div className="flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4" />
+                            Increase To (Naik ke)
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="decrease_to">
+                          <div className="flex items-center gap-2">
+                            <TrendingDown className="w-4 h-4" />
+                            Decrease To (Turun ke)
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="achieve_or_not">
+                          <div className="flex items-center gap-2">
+                            <Target className="w-4 h-4" />
+                            Achieve or Not (Ya/Tidak)
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Unit */}
+              <FormField
+                control={keyResultForm.control}
+                name="unit"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Unit*</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Contoh: rating, %, orang, Rp" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Base Value */}
+              <FormField
+                control={keyResultForm.control}
+                name="baseValue"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nilai Awal</FormLabel>
+                    <FormControl>
+                      <Input placeholder="0" type="number" step="0.1" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Target Value */}
+              <FormField
+                control={keyResultForm.control}
+                name="targetValue"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Target*</FormLabel>
+                    <FormControl>
+                      <Input placeholder="100" type="number" step="0.1" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Current Value */}
+              <FormField
+                control={keyResultForm.control}
+                name="currentValue"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nilai Saat Ini</FormLabel>
+                    <FormControl>
+                      <Input placeholder="0" type="number" step="0.1" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Due Date */}
+            <FormField
+              control={keyResultForm.control}
+              name="dueDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tenggat Waktu</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="date" 
+                      {...field}
+                      value={field.value ?? ""}
+                      onChange={(e) => field.onChange(e.target.value || null)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-4">
+              <Button type="button" variant="outline" onClick={handleCancel}>
+                Batal
+              </Button>
+              <Button 
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                Simpan Ukuran Keberhasilan
+              </Button>
             </div>
           </form>
         </Form>
