@@ -1297,11 +1297,16 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                           </FormLabel>
                           <FormControl>
                             <Input 
-                              placeholder="100"
-                              required
-                              value={field.value || ""}
-                              onChange={(e) => field.onChange(e.target.value)}
-                              step="0.1"
+                              placeholder="100" 
+                              type="text" 
+                              value={field.value || ""} 
+                              onChange={(e) => {
+                                handleNumberInputChange(e.target.value, (formattedValue) => {
+                                  field.onChange(formattedValue); // Store formatted value directly
+                                });
+                              }}
+                              onBlur={field.onBlur}
+                              name={field.name}
                             />
                           </FormControl>
                           <FormMessage />
