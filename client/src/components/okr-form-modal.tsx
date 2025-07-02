@@ -11,28 +11,45 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { HelpCircle, Plus, Edit } from "lucide-react";
+import { HelpCircle, Plus, Edit, ChevronRight, ChevronLeft, Target, Trash2, TrendingUp, TrendingDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { OKRWithKeyResults, Cycle, User, Objective, Team } from "@shared/schema";
 
+const keyResultSchema = z.object({
+  id: z.string().optional(), // untuk edit mode
+  title: z.string().min(1, "Judul Ukuran Keberhasilan wajib diisi"),
+  description: z.string().optional(),
+  keyResultType: z.enum(["increase_to", "decrease_to", "achieve_or_not"]).default("increase_to"),
+  baseValue: z.string().optional(),
+  targetValue: z.string().min(1, "Target wajib diisi"),
+  currentValue: z.string().default("0"),
+  unit: z.string().min(1, "Unit wajib diisi"),
+  status: z.string().default("in_progress"),
+  dueDate: z.string().optional().nullable(),
+});
+
 const objectiveFormSchema = z.object({
   objective: z.object({
-    title: z.string().min(1, "Objective title is required"),
+    title: z.string().min(1, "Judul Goal wajib diisi"),
     description: z.string().optional(),
     owner: z.string().optional(), // Made optional since it's calculated from ownerType and ownerId
     ownerType: z.enum(["user", "team"]).default("user"),
-    ownerId: z.string().min(1, "Owner is required"),
+    ownerId: z.string().min(1, "Pemilik wajib dipilih"),
     status: z.string().default("in_progress"),
     cycleId: z.string().optional().nullable(),
     teamId: z.string().optional().nullable(),
     parentId: z.string().optional().nullable(),
   }),
+  keyResults: z.array(keyResultSchema).default([]),
 });
 
 type ObjectiveFormData = z.infer<typeof objectiveFormSchema>;
+type KeyResultFormData = z.infer<typeof keyResultSchema>;
 
 
 
@@ -46,6 +63,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
+  const [currentStep, setCurrentStep] = useState(1);
   const isEditMode = !!okr;
 
   // Fetch data yang diperlukan
@@ -68,7 +86,18 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
         teamId: okr.teamId === null ? undefined : okr.teamId,
         parentId: okr.parentId === null ? undefined : okr.parentId,
       },
-
+      keyResults: okr.keyResults?.map(kr => ({
+        id: kr.id,
+        title: kr.title,
+        description: kr.description || "",
+        keyResultType: kr.keyResultType as "increase_to" | "decrease_to" | "achieve_or_not",
+        baseValue: kr.baseValue || "",
+        targetValue: kr.targetValue,
+        currentValue: kr.currentValue,
+        unit: kr.unit,
+        status: kr.status,
+        dueDate: kr.dueDate ? new Date(kr.dueDate).toISOString().split('T')[0] : undefined,
+      })) || [],
     } : {
       objective: {
         title: "",
@@ -81,13 +110,14 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
         teamId: undefined,
         parentId: undefined,
       },
-
+      keyResults: [],
     },
   });
 
   // Reset form when okr prop changes or dialog opens
   useEffect(() => {
     if (open) {
+      setCurrentStep(1); // Reset to step 1 when dialog opens
       if (isEditMode && okr) {
         form.reset({
           objective: {
@@ -101,7 +131,18 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
             teamId: okr.teamId === null ? undefined : okr.teamId,
             parentId: okr.parentId === null ? undefined : okr.parentId,
           },
-
+          keyResults: okr.keyResults?.map(kr => ({
+            id: kr.id,
+            title: kr.title,
+            description: kr.description || "",
+            keyResultType: kr.keyResultType as "increase_to" | "decrease_to" | "achieve_or_not",
+            baseValue: kr.baseValue || "",
+            targetValue: kr.targetValue,
+            currentValue: kr.currentValue,
+            unit: kr.unit,
+            status: kr.status,
+            dueDate: kr.dueDate ? new Date(kr.dueDate).toISOString().split('T')[0] : undefined,
+          })) || [],
         });
       } else {
         form.reset({
@@ -116,7 +157,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
             teamId: undefined,
             parentId: undefined,
           },
-
+          keyResults: [],
         });
       }
     }
@@ -149,7 +190,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
           teamId: data.objective.teamId === undefined ? null : data.objective.teamId,
           parentId: data.objective.parentId === undefined ? null : data.objective.parentId,
         },
-        keyResults: [] // Send empty array for Goals-only creation
+        keyResults: data.keyResults || []
       };
 
       const response = isEditMode
@@ -184,9 +225,9 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
       onOpenChange(false);
       form.reset();
       
-      // Redirect to objective detail page with highlight for Key Results
+      // Redirect to objective detail page
       if (!isEditMode && data?.id) {
-        setLocation(`/objectives/${data.id}?highlight=keyresults`);
+        setLocation(`/objectives/${data.id}`);
       }
     },
     onError: (error: Error) => {
@@ -198,6 +239,50 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
     },
   });
 
+  // Navigation functions
+  const nextStep = async () => {
+    if (currentStep === 1) {
+      // Validate step 1 fields before proceeding
+      const isValid = await form.trigger([
+        "objective.title",
+        "objective.ownerId", 
+        "objective.ownerType"
+      ]);
+      if (isValid) {
+        setCurrentStep(2);
+      }
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  // Key Result management functions
+  const addKeyResult = () => {
+    const currentKeyResults = form.getValues("keyResults") || [];
+    const newKeyResult: KeyResultFormData = {
+      title: "",
+      description: "",
+      keyResultType: "increase_to",
+      baseValue: "",
+      targetValue: "",
+      currentValue: "0",
+      unit: "",
+      status: "in_progress",
+      dueDate: undefined,
+    };
+    form.setValue("keyResults", [...currentKeyResults, newKeyResult]);
+  };
+
+  const removeKeyResult = (index: number) => {
+    const currentKeyResults = form.getValues("keyResults") || [];
+    const updatedKeyResults = currentKeyResults.filter((_, i) => i !== index);
+    form.setValue("keyResults", updatedKeyResults);
+  };
+
   const onSubmit = (data: ObjectiveFormData) => {
     console.log("Form submitted with data:", data);
     console.log("Form errors:", form.formState.errors);
@@ -207,21 +292,81 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
 
 
   const ownerType = form.watch("objective.ownerType");
+  const keyResults = form.watch("keyResults") || [];
+
+  // Helper function to get step indicator
+  const getStepIndicator = () => {
+    if (isEditMode) return null; // No step indicator for edit mode
+    
+    return (
+      <div className="flex items-center justify-center mb-6">
+        <div className="flex items-center space-x-4">
+          {/* Step 1 */}
+          <div className="flex items-center">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+              currentStep >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
+            }`}>
+              1
+            </div>
+            <span className={`ml-2 text-sm font-medium ${
+              currentStep >= 1 ? 'text-blue-600' : 'text-gray-500'
+            }`}>
+              Informasi Goal
+            </span>
+          </div>
+          
+          {/* Connector */}
+          <ChevronRight className="w-5 h-5 text-gray-400" />
+          
+          {/* Step 2 */}
+          <div className="flex items-center">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+              currentStep >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
+            }`}>
+              2
+            </div>
+            <span className={`ml-2 text-sm font-medium ${
+              currentStep >= 2 ? 'text-blue-600' : 'text-gray-500'
+            }`}>
+              Ukuran Keberhasilan
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEditMode ? 'Edit Goal' : 'Buat Goal Baru'}</DialogTitle>
+          <DialogTitle>
+            {isEditMode ? 'Edit Goal' : 'Buat Goal Baru'}
+          </DialogTitle>
           <DialogDescription>
-            {isEditMode ? 'Update goal ini' : 'Tentukan goal Anda - Key Results dapat ditambahkan nanti di halaman detail'}
+            {isEditMode 
+              ? 'Update goal ini dan Ukuran Keberhasilan' 
+              : currentStep === 1 
+                ? 'Langkah 1: Tentukan informasi dasar goal Anda'
+                : 'Langkah 2: Tambahkan Ukuran Keberhasilan untuk mengukur progress'
+            }
           </DialogDescription>
         </DialogHeader>
 
+        {getStepIndicator()}
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Goal Information */}
-            <div className="space-y-6">
+            {/* Step 1: Goal Information */}
+            {(currentStep === 1 || isEditMode) && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Target className="w-5 h-5" />
+                    Informasi Goal
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
                 <FormField
                   control={form.control}
                   name="objective.title"
@@ -465,22 +610,251 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                     </FormItem>
                   )}
                 />
-            </div>
+                </CardContent>
+              </Card>
+            )}
 
-            <div className="flex justify-end gap-4">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Batal
-              </Button>
-              <Button 
-                type="submit"
-                disabled={mutation.isPending}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                {mutation.isPending 
-                  ? (isEditMode ? "Memperbarui..." : "Membuat...") 
-                  : (isEditMode ? "Update Goal" : "Buat Goal")
-                }
-              </Button>
+            {/* Step 2: Key Results */}
+            {(currentStep === 2 || isEditMode) && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Target className="w-5 h-5" />
+                    Ukuran Keberhasilan
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm text-gray-600">
+                      Tambahkan Ukuran Keberhasilan untuk mengukur progress goal ini
+                    </p>
+                    <Button type="button" onClick={addKeyResult} variant="outline">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Tambah Ukuran Keberhasilan
+                    </Button>
+                  </div>
+
+                  {keyResults.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <Target className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                      <p>Belum ada Ukuran Keberhasilan</p>
+                      <p className="text-sm">Klik tombol di atas untuk menambahkan</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {keyResults.map((_, index) => (
+                        <Card key={index} className="border-dashed border-2">
+                          <CardHeader className="pb-4">
+                            <div className="flex justify-between items-center">
+                              <CardTitle className="text-sm flex items-center gap-2">
+                                <Target className="w-4 h-4" />
+                                Ukuran Keberhasilan {index + 1}
+                              </CardTitle>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeKeyResult(index)}
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="space-y-4">
+                            {/* Key Result Title */}
+                            <FormField
+                              control={form.control}
+                              name={`keyResults.${index}.title`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Judul Ukuran Keberhasilan*</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="Contoh: Meningkatkan rating kepuasan menjadi 4.5" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            {/* Key Result Description */}
+                            <FormField
+                              control={form.control}
+                              name={`keyResults.${index}.description`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Deskripsi</FormLabel>
+                                  <FormControl>
+                                    <Textarea placeholder="Deskripsi detail tentang Ukuran Keberhasilan ini" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {/* Key Result Type */}
+                              <FormField
+                                control={form.control}
+                                name={`keyResults.${index}.keyResultType`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Tipe Ukuran Keberhasilan</FormLabel>
+                                    <Select onValueChange={field.onChange} value={field.value}>
+                                      <FormControl>
+                                        <SelectTrigger>
+                                          <SelectValue placeholder="Pilih tipe" />
+                                        </SelectTrigger>
+                                      </FormControl>
+                                      <SelectContent>
+                                        <SelectItem value="increase_to">
+                                          <div className="flex items-center gap-2">
+                                            <TrendingUp className="w-4 h-4" />
+                                            Increase To (Naik ke)
+                                          </div>
+                                        </SelectItem>
+                                        <SelectItem value="decrease_to">
+                                          <div className="flex items-center gap-2">
+                                            <TrendingDown className="w-4 h-4" />
+                                            Decrease To (Turun ke)
+                                          </div>
+                                        </SelectItem>
+                                        <SelectItem value="achieve_or_not">
+                                          <div className="flex items-center gap-2">
+                                            <Target className="w-4 h-4" />
+                                            Achieve or Not (Ya/Tidak)
+                                          </div>
+                                        </SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              {/* Unit */}
+                              <FormField
+                                control={form.control}
+                                name={`keyResults.${index}.unit`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Unit*</FormLabel>
+                                    <FormControl>
+                                      <Input placeholder="Contoh: rating, %, orang, Rp" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              {/* Base Value */}
+                              <FormField
+                                control={form.control}
+                                name={`keyResults.${index}.baseValue`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Nilai Awal</FormLabel>
+                                    <FormControl>
+                                      <Input placeholder="0" type="number" step="0.1" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              {/* Target Value */}
+                              <FormField
+                                control={form.control}
+                                name={`keyResults.${index}.targetValue`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Target*</FormLabel>
+                                    <FormControl>
+                                      <Input placeholder="100" type="number" step="0.1" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              {/* Current Value */}
+                              <FormField
+                                control={form.control}
+                                name={`keyResults.${index}.currentValue`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Nilai Saat Ini</FormLabel>
+                                    <FormControl>
+                                      <Input placeholder="0" type="number" step="0.1" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+
+                            {/* Due Date */}
+                            <FormField
+                              control={form.control}
+                              name={`keyResults.${index}.dueDate`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Tenggat Waktu</FormLabel>
+                                  <FormControl>
+                                    <Input 
+                                      type="date" 
+                                      {...field}
+                                      value={field.value ?? ""}
+                                      onChange={(e) => field.onChange(e.target.value || null)}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Navigation Buttons */}
+            <div className="flex justify-between gap-4">
+              {!isEditMode && currentStep > 1 && (
+                <Button type="button" variant="outline" onClick={prevStep}>
+                  <ChevronLeft className="w-4 h-4 mr-2" />
+                  Kembali
+                </Button>
+              )}
+              
+              <div className="flex gap-2 ml-auto">
+                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                  Batal
+                </Button>
+                
+                {!isEditMode && currentStep === 1 ? (
+                  <Button type="button" onClick={nextStep}>
+                    Lanjut
+                    <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                ) : (
+                  <Button 
+                    type="submit"
+                    disabled={mutation.isPending}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    {mutation.isPending 
+                      ? (isEditMode ? "Memperbarui..." : "Membuat...") 
+                      : (isEditMode ? "Update Goal" : "Buat Goal")
+                    }
+                  </Button>
+                )}
+              </div>
             </div>
           </form>
         </Form>
