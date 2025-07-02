@@ -107,6 +107,7 @@ Changelog:
   * Implemented proper form state management for editing existing Key Results with auto-population of current values
   * Mobile cards now feature gradient background, improved typography, better organized value displays, and enhanced touch interactions
   * Desktop table includes both edit (blue) and delete (red) action buttons with proper hover states
+  * Fixed "should stay above/below" input field validation and form binding issues for proper editing functionality
   * Complete Key Result CRUD functionality now available with intuitive UI across all device sizes
 - July 02, 2025. Fixed inconsistent help icon colors in OKR form modal:
   * Updated all remaining HelpCircle icons from gray (text-gray-400) to consistent blue color scheme
