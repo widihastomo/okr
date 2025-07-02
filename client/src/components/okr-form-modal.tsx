@@ -1299,9 +1299,9 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                           </FormLabel>
                           <FormControl>
                             <Input 
+                              {...field}
                               placeholder="100" 
                               type="text" 
-                              value={field.value || ""} 
                               onChange={(e) => {
                                 console.log("Target input onChange triggered");
                                 console.log("Input value:", e.target.value);
@@ -1312,8 +1312,6 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                                   console.log("After onChange, field should be:", formattedValue);
                                 });
                               }}
-                              onBlur={field.onBlur}
-                              name={field.name}
                             />
                           </FormControl>
                           <FormMessage />
