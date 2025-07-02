@@ -149,7 +149,7 @@ export function EmojiReactions({ objectiveId, className }: EmojiReactionsProps) 
             )}
             onClick={() => handleEmojiClick(emoji)}
             title={emojiReactions.map(r => 
-              `${r.user.firstName || ''} ${r.user.lastName || ''} (${r.user.email})`
+              r.user ? `${r.user.firstName || ''} ${r.user.lastName || ''} (${r.user.email})` : 'Unknown User'
             ).join(', ')}
           >
             <span className="mr-1">{emoji}</span>
