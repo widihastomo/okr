@@ -1355,16 +1355,22 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                               type="text" 
                               value={field.value || ""} 
                               onChange={(e) => {
-                                console.log("Target input onChange triggered");
-                                console.log("Input value:", e.target.value);
-                                console.log("Current field value:", field.value);
-                                handleNumberInputChange(e.target.value, (formattedValue) => {
-                                  console.log("Formatted value:", formattedValue);
-                                  field.onChange(formattedValue);
-                                  console.log("After onChange, field should be:", formattedValue);
-                                });
+                                const inputValue = e.target.value;
+                                // Allow direct input without complex formatting for these types
+                                if (inputValue === "" || /^\d*\.?\d*$/.test(inputValue)) {
+                                  field.onChange(inputValue);
+                                }
                               }}
-                              onBlur={field.onBlur}
+                              onBlur={(e) => {
+                                // Format only on blur to maintain input experience
+                                const value = e.target.value;
+                                if (value && !isNaN(Number(value))) {
+                                  handleNumberInputChange(value, (formattedValue) => {
+                                    field.onChange(formattedValue);
+                                  });
+                                }
+                                field.onBlur();
+                              }}
                               name={field.name}
                             />
                           </FormControl>
