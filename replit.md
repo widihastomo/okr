@@ -103,7 +103,9 @@ Changelog:
   * Improved decimal comma input handling by storing formatted values in forms instead of immediate parsing
   * Fixed form submission to properly convert Indonesian formatted numbers (7,5 becomes 7.5) before database storage
   * Enhanced user experience with cleaner layout and proper decimal input support for Indonesian users
-  * Fixed "should stay" target input field editability issue by implementing exact pattern from commit "Ensure proper display of input fields for different key result types" using formatNumberInput and parseNumberInput functions
+  * Fixed "should stay" target input field editability issue by implementing simple type="number" input approach instead of complex formatting functions
+  * Resolved syntax errors and compilation failures by using user-provided working code pattern
+  * Target input now uses type="number" with step="0.1" for decimal input support
   * Reduced mobile card view height by optimizing padding, spacing, and element sizes for better mobile responsiveness
 - July 02, 2025. Implemented comprehensive search functionality for all user select inputs and enhanced Key Result editing:
   * Created reusable SearchableUserSelect component with Command pattern for search capabilities

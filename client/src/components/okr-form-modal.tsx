@@ -856,6 +856,8 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                                   </div>
                                 </div>
                               )}
+
+                              
                             </div>
                           </div>
                         ))}
@@ -1295,11 +1297,13 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                           </FormLabel>
                           <FormControl>
                             <Input 
-                              placeholder="100"
-                              required
-                              value={formatNumberInput(field.value)}
-                              onChange={(e) => field.onChange(parseNumberInput(e.target.value))}
-                              step="0.1"
+                              placeholder="100" 
+                              type="number" 
+                              step="0.1" 
+                              value={field.value || ""} 
+                              onChange={field.onChange}
+                              onBlur={field.onBlur}
+                              name={field.name}
                             />
                           </FormControl>
                           <FormMessage />
