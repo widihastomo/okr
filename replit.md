@@ -96,6 +96,13 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 02, 2025. Restored "Tambah unit baru" (Add new unit) functionality with safe implementation:
+  * Fixed infinite loop error by using separate state (unitSearchValue) for Command component input
+  * Implemented controlled search input without causing Command component state conflicts
+  * Users can now search existing units and create custom units by typing new unit names
+  * "Tambah unit baru" option appears in CommandEmpty when typed unit doesn't exist in predefined list
+  * Clicking custom unit option immediately adds it to the Key Result form
+  * Enhanced unit dropdown with both search functionality and unit creation capability
 - July 02, 2025. Converted tooltip hints to clickable popovers for better mobile UX:
   * Changed all tooltip hints in OKR form modal from hover-based to click-based interactions using Popover components
   * Updated help icons from gray to blue color (text-blue-500) with cursor-pointer for clear clickable indication

@@ -812,6 +812,8 @@ interface KeyResultModalProps {
 }
 
 function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
+  const [unitSearchValue, setUnitSearchValue] = useState("");
+  
   const keyResultForm = useForm<KeyResultFormData>({
     resolver: zodResolver(z.object({
       title: z.string().min(1, "Judul harus diisi"),
@@ -1059,31 +1061,53 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                           <Command>
                             <CommandInput 
                               placeholder="Cari atau ketik unit baru..." 
+                              value={unitSearchValue}
+                              onValueChange={setUnitSearchValue}
                             />
                             <CommandList>
                               <CommandEmpty>
-                                Tidak ada unit ditemukan.
+                                {unitSearchValue && unitSearchValue.trim() && !unitOptions.includes(unitSearchValue.trim()) && (
+                                  <div className="p-1">
+                                    <CommandItem
+                                      value={unitSearchValue}
+                                      onSelect={() => {
+                                        field.onChange(unitSearchValue.trim());
+                                        setUnitSearchValue("");
+                                      }}
+                                      className="cursor-pointer"
+                                    >
+                                      <Plus className="mr-2 h-4 w-4" />
+                                      Tambah "{unitSearchValue.trim()}"
+                                    </CommandItem>
+                                  </div>
+                                )}
                               </CommandEmpty>
                               <CommandGroup>
-                                {unitOptions.map((unit: string) => (
-                                  <CommandItem
-                                    value={unit}
-                                    key={unit}
-                                    onSelect={() => {
-                                      field.onChange(unit);
-                                    }}
-                                  >
-                                    <Check
-                                      className={cn(
-                                        "mr-2 h-4 w-4",
-                                        unit === field.value
-                                          ? "opacity-100"
-                                          : "opacity-0"
-                                      )}
-                                    />
-                                    {unit}
-                                  </CommandItem>
-                                ))}
+                                {unitOptions
+                                  .filter(unit => 
+                                    unit.toLowerCase().includes(unitSearchValue.toLowerCase())
+                                  )
+                                  .map((unit: string) => (
+                                    <CommandItem
+                                      value={unit}
+                                      key={unit}
+                                      onSelect={() => {
+                                        field.onChange(unit);
+                                        setUnitSearchValue("");
+                                      }}
+                                      className="cursor-pointer"
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          unit === field.value
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                      {unit}
+                                    </CommandItem>
+                                  ))}
                               </CommandGroup>
                             </CommandList>
                           </Command>
