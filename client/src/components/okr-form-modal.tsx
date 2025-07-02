@@ -899,52 +899,85 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Base Value */}
-              <FormField
-                control={keyResultForm.control}
-                name="baseValue"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nilai Awal</FormLabel>
-                    <FormControl>
-                      <Input placeholder="0" type="number" step="0.1" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            {/* Conditional Value Fields */}
+            {(() => {
+              const keyResultType = keyResultForm.watch("keyResultType");
+              
+              if (keyResultType === "achieve_or_not") {
+                return null; // Don't show any value fields
+              }
+              
+              if (keyResultType === "should_stay_above" || keyResultType === "should_stay_below") {
+                return (
+                  <div className="grid grid-cols-1 gap-4">
+                    {/* Target Value Only */}
+                    <FormField
+                      control={keyResultForm.control}
+                      name="targetValue"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Target*</FormLabel>
+                          <FormControl>
+                            <Input placeholder="100" type="number" step="0.1" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                );
+              }
+              
+              // For increase_to and decrease_to types
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Base Value */}
+                  <FormField
+                    control={keyResultForm.control}
+                    name="baseValue"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nilai Awal</FormLabel>
+                        <FormControl>
+                          <Input placeholder="0" type="number" step="0.1" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              {/* Target Value */}
-              <FormField
-                control={keyResultForm.control}
-                name="targetValue"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Target*</FormLabel>
-                    <FormControl>
-                      <Input placeholder="100" type="number" step="0.1" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  {/* Target Value */}
+                  <FormField
+                    control={keyResultForm.control}
+                    name="targetValue"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Target*</FormLabel>
+                        <FormControl>
+                          <Input placeholder="100" type="number" step="0.1" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              {/* Current Value */}
-              <FormField
-                control={keyResultForm.control}
-                name="currentValue"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nilai Saat Ini</FormLabel>
-                    <FormControl>
-                      <Input placeholder="0" type="number" step="0.1" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                  {/* Current Value */}
+                  <FormField
+                    control={keyResultForm.control}
+                    name="currentValue"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nilai Saat Ini</FormLabel>
+                        <FormControl>
+                          <Input placeholder="0" type="number" step="0.1" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              );
+            })()}
 
 
 

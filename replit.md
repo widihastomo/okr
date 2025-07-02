@@ -96,6 +96,13 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 02, 2025. Implemented conditional form fields for different Key Result types:
+  * Updated OKR form modal and edit Key Result modal with dynamic field display based on type selection
+  * increase_to/decrease_to types: show nilai awal (base value), target, and nilai saat ini (current value) fields
+  * should_stay_above/should_stay_below types: only show target field for threshold-based tracking
+  * achieve_or_not type: no value fields displayed for binary achievement tracking
+  * Enhanced user experience with contextually appropriate field combinations for each Key Result type
+  * Form uses watch() to monitor type selection and dynamically renders appropriate input fields
 - July 02, 2025. Completed comprehensive removal of due date functionality from Key Results system:
   * Removed all due date references from Key Result forms and components throughout the system
   * Updated OKR form modal to exclude due date field from Key Result creation and editing

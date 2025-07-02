@@ -201,67 +201,105 @@ export default function EditKeyResultModal({
               />
             </div>
 
-            {/* Values */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <FormField
-                control={form.control}
-                name="baseValue"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nilai Awal</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="0"
-                        value={field.value ? formatNumberInput(field.value) : ''}
-                        onChange={(e) => field.onChange(parseNumberInput(e.target.value))}
-                        step="0.1"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            {/* Conditional Value Fields */}
+            {(() => {
+              const keyResultType = form.watch("keyResultType");
+              
+              if (keyResultType === "achieve_or_not") {
+                return null; // Don't show any value fields
+              }
+              
+              if (keyResultType === "should_stay_above" || keyResultType === "should_stay_below") {
+                return (
+                  <div className="grid grid-cols-1 gap-4">
+                    {/* Target Value Only */}
+                    <FormField
+                      control={form.control}
+                      name="targetValue"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Target</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="100"
+                              required
+                              value={formatNumberInput(field.value)}
+                              onChange={(e) => field.onChange(parseNumberInput(e.target.value))}
+                              step="0.1"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                );
+              }
+              
+              // For increase_to and decrease_to types
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="baseValue"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nilai Awal</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="0"
+                            value={field.value ? formatNumberInput(field.value) : ''}
+                            onChange={(e) => field.onChange(parseNumberInput(e.target.value))}
+                            step="0.1"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <FormField
-                control={form.control}
-                name="targetValue"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Target</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="100"
-                        required
-                        value={formatNumberInput(field.value)}
-                        onChange={(e) => field.onChange(parseNumberInput(e.target.value))}
-                        step="0.1"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  <FormField
+                    control={form.control}
+                    name="targetValue"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Target</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="100"
+                            required
+                            value={formatNumberInput(field.value)}
+                            onChange={(e) => field.onChange(parseNumberInput(e.target.value))}
+                            step="0.1"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <FormField
-                control={form.control}
-                name="currentValue"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nilai Saat Ini</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="50"
-                        required
-                        value={formatNumberInput(field.value)}
-                        onChange={(e) => field.onChange(parseNumberInput(e.target.value))}
-                        step="0.1"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                  <FormField
+                    control={form.control}
+                    name="currentValue"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nilai Saat Ini</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="50"
+                            required
+                            value={formatNumberInput(field.value)}
+                            onChange={(e) => field.onChange(parseNumberInput(e.target.value))}
+                            step="0.1"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              );
+            })()}
 
             
 
