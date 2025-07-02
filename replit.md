@@ -96,6 +96,11 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 02, 2025. Fixed inconsistent help icon colors in OKR form modal:
+  * Updated all remaining HelpCircle icons from gray (text-gray-400) to consistent blue color scheme
+  * Applied text-blue-500 hover:text-blue-600 cursor-pointer to all help icons for visual consistency
+  * All help icons throughout the OKR form modal now use the same blue color as key result tooltips
+  * Enhanced user experience with consistent visual indicators across all form sections
 - July 02, 2025. Fixed check-in form input to match Key Result types with proper conditional display:
   * increase_to/decrease_to types: show numeric input field for "Nilai Saat Ini" with target display
   * should_stay_above/should_stay_below types: show toggle switch for target achievement status

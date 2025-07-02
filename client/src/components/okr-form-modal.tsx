@@ -949,7 +949,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                     
                       <Popover>
                         <PopoverTrigger>
-                          <HelpCircle className="w-4 h-4 text-gray-400" />
+                          <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                         </PopoverTrigger>
                         <PopoverContent side="right" className="max-w-xs">
                           <p>
@@ -984,7 +984,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                     
                       <Popover>
                         <PopoverTrigger>
-                          <HelpCircle className="w-4 h-4 text-gray-400" />
+                          <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                         </PopoverTrigger>
                         <PopoverContent side="right" className="max-w-xs">
                           <p>
@@ -1020,7 +1020,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                       
                         <Popover>
                           <PopoverTrigger>
-                            <HelpCircle className="w-4 h-4 text-gray-400" />
+                            <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                           </PopoverTrigger>
                           <PopoverContent side="right" className="max-w-xs">
                             <p>
@@ -1096,7 +1096,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                         
                           <Popover>
                             <PopoverTrigger>
-                              <HelpCircle className="w-4 h-4 text-gray-400" />
+                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                             </PopoverTrigger>
                             <PopoverContent side="right" className="max-w-xs">
                               <p>
@@ -1185,7 +1185,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                             
                               <Popover>
                                 <PopoverTrigger>
-                                  <HelpCircle className="w-4 h-4 text-gray-400" />
+                                  <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                                 </PopoverTrigger>
                                 <PopoverContent side="right" className="max-w-xs">
                                   <p>
@@ -1226,7 +1226,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                           
                             <Popover>
                               <PopoverTrigger>
-                                <HelpCircle className="w-4 h-4 text-gray-400" />
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                               </PopoverTrigger>
                               <PopoverContent side="right" className="max-w-xs">
                                 <p>
@@ -1261,7 +1261,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                           
                             <Popover>
                               <PopoverTrigger>
-                                <HelpCircle className="w-4 h-4 text-gray-400" />
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                               </PopoverTrigger>
                               <PopoverContent side="right" className="max-w-xs">
                                 <p>
@@ -1296,7 +1296,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                           
                             <Popover>
                               <PopoverTrigger>
-                                <HelpCircle className="w-4 h-4 text-gray-400" />
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                               </PopoverTrigger>
                               <PopoverContent side="right" className="max-w-xs">
                                 <p>
