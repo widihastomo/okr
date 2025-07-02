@@ -10,6 +10,7 @@ import { Link } from "wouter";
 import { CheckInModal } from "./check-in-modal";
 import { SimpleProgressStatus } from "./progress-status";
 import { useState } from "react";
+import { EmojiReactions } from "./emoji-reactions";
 
 import { EditOKRButton } from "./okr-form-modal";
 
@@ -140,6 +141,11 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplic
                 {okr.description && (
                   <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">{okr.description}</p>
                 )}
+                
+                {/* Emoji Reactions */}
+                <div className="mt-3">
+                  <EmojiReactions objectiveId={okr.id} className="flex-wrap" />
+                </div>
               </div>
             </div>
             

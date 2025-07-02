@@ -98,6 +98,15 @@ export const keyResults = pgTable("key_results", {
   timeProgressPercentage: integer("time_progress_percentage").default(0), // Ideal progress based on timeline
 });
 
+// Emoji reactions for objectives/goals
+export const emojiReactions = pgTable("emoji_reactions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  objectiveId: uuid("objective_id").notNull().references(() => objectives.id, { onDelete: "cascade" }),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  emoji: text("emoji").notNull(), // The emoji character (e.g., "🎉", "👍", "🔥")
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Check-ins for tracking progress updates
 export const checkIns = pgTable("check_ins", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -473,6 +482,30 @@ export const activityLogsRelations = relations(activityLogs, ({ one }) => ({
   }),
 }));
 
+export const emojiReactionsRelations = relations(emojiReactions, ({ one }) => ({
+  objective: one(objectives, {
+    fields: [emojiReactions.objectiveId],
+    references: [objectives.id],
+  }),
+  user: one(users, {
+    fields: [emojiReactions.userId],
+    references: [users.id],
+  }),
+}));
+
+export const objectivesRelations = relations(objectives, ({ one, many }) => ({
+  cycle: one(cycles, {
+    fields: [objectives.cycleId],
+    references: [cycles.id],
+  }),
+  keyResults: many(keyResults),
+  emojiReactions: many(emojiReactions),
+  team: one(teams, {
+    fields: [objectives.teamId],
+    references: [teams.id],
+  }),
+}));
+
 // Authentication schemas
 export const loginSchema = z.object({
   email: z.string().email("Email tidak valid"),
@@ -532,4 +565,17 @@ export type CycleWithOKRs = Cycle & {
   totalObjectives: number;
   completedObjectives: number;
   avgProgress: number;
+};
+
+// Emoji reactions schemas
+export const insertEmojiReactionSchema = createInsertSchema(emojiReactions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type EmojiReaction = typeof emojiReactions.$inferSelect;
+export type InsertEmojiReaction = z.infer<typeof insertEmojiReactionSchema>;
+
+export type ObjectiveWithReactions = Objective & {
+  emojiReactions: (EmojiReaction & { user: User })[];
 };

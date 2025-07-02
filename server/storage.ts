@@ -1,9 +1,10 @@
 import { 
   cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives, tasks,
-  initiativeMembers, initiativeDocuments, initiativeNotes,
+  initiativeMembers, initiativeDocuments, initiativeNotes, emojiReactions,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
   type CheckIn, type Initiative, type Task, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
-  type InitiativeNote, type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
+  type InitiativeNote, type EmojiReaction, type InsertEmojiReaction, type ObjectiveWithReactions,
+  type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
   type InsertUser, type UpsertUser, type InsertTeam, type InsertTeamMember,
   type InsertCheckIn, type InsertInitiative, type InsertInitiativeMember, type InsertInitiativeDocument, type InsertTask,
   type InsertInitiativeNote, type OKRWithKeyResults, type CycleWithOKRs, type UpdateKeyResultProgress, type CreateOKRFromTemplate 
@@ -115,6 +116,12 @@ export interface IStorage {
   
   // Key Result with Details
   getKeyResultWithDetails(id: string): Promise<KeyResultWithDetails | undefined>;
+
+  // Emoji Reactions
+  getEmojiReactions(objectiveId: string): Promise<(EmojiReaction & { user: User })[]>;
+  createEmojiReaction(reaction: InsertEmojiReaction): Promise<EmojiReaction>;
+  deleteEmojiReaction(objectiveId: string, userId: string, emoji: string): Promise<boolean>;
+  getObjectiveWithReactions(objectiveId: string): Promise<ObjectiveWithReactions | undefined>;
 
   // Combined
   getOKRsWithKeyResults(): Promise<OKRWithKeyResults[]>;
@@ -1123,6 +1130,71 @@ export class DatabaseStorage implements IStorage {
         } : undefined
       } : undefined
     }));
+  }
+
+  // Emoji Reactions
+  async getEmojiReactions(objectiveId: string): Promise<(EmojiReaction & { user: User })[]> {
+    const reactions = await db
+      .select({
+        reaction: emojiReactions,
+        user: users
+      })
+      .from(emojiReactions)
+      .innerJoin(users, eq(emojiReactions.userId, users.id))
+      .where(eq(emojiReactions.objectiveId, objectiveId))
+      .orderBy(desc(emojiReactions.createdAt));
+
+    return reactions.map(row => ({
+      ...row.reaction,
+      user: row.user
+    }));
+  }
+
+  async createEmojiReaction(reaction: InsertEmojiReaction): Promise<EmojiReaction> {
+    // First, check if user already has a reaction with this emoji for this objective
+    const existingReaction = await db
+      .select()
+      .from(emojiReactions)
+      .where(
+        and(
+          eq(emojiReactions.objectiveId, reaction.objectiveId),
+          eq(emojiReactions.userId, reaction.userId),
+          eq(emojiReactions.emoji, reaction.emoji)
+        )
+      );
+
+    if (existingReaction.length > 0) {
+      // If reaction exists, return it instead of creating duplicate
+      return existingReaction[0];
+    }
+
+    const [newReaction] = await db.insert(emojiReactions).values(reaction).returning();
+    return newReaction;
+  }
+
+  async deleteEmojiReaction(objectiveId: string, userId: string, emoji: string): Promise<boolean> {
+    const result = await db
+      .delete(emojiReactions)
+      .where(
+        and(
+          eq(emojiReactions.objectiveId, objectiveId),
+          eq(emojiReactions.userId, userId),
+          eq(emojiReactions.emoji, emoji)
+        )
+      );
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  async getObjectiveWithReactions(objectiveId: string): Promise<ObjectiveWithReactions | undefined> {
+    const objective = await this.getObjective(objectiveId);
+    if (!objective) return undefined;
+
+    const reactions = await this.getEmojiReactions(objectiveId);
+    
+    return {
+      ...objective,
+      emojiReactions: reactions
+    };
   }
 }
 
