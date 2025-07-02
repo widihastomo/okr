@@ -972,6 +972,17 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
     },
   });
 
+  // Number formatting functions from commit: "Ensure proper display of input fields for different key result types"
+  const formatNumberInput = (value: string) => {
+    const number = parseFloat(value.replace(/[.,]/g, ''));
+    if (isNaN(number)) return value;
+    return new Intl.NumberFormat('id-ID').format(number);
+  };
+
+  const parseNumberInput = (value: string) => {
+    return value.replace(/[.,]/g, '');
+  };
+
   // Reset form when modal opens or when switching between create/edit modes
   useEffect(() => {
     if (open) {
@@ -1284,23 +1295,11 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                           </FormLabel>
                           <FormControl>
                             <Input 
-                              placeholder="100" 
-                              type="text" 
-                              value={field.value ? parseFloat(field.value).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) : ""}
-                              onChange={(e) => {
-                                const inputValue = e.target.value;
-                                const cleanValue = inputValue.replace(/\./g, '').replace(',', '.');
-                                const num = parseFloat(cleanValue);
-                                
-                                if (!isNaN(num) && num > 999999999999.99) {
-                                  field.onChange('999999999999.99');
-                                } else {
-                                  const rawValue = isNaN(num) ? '' : num.toString();
-                                  field.onChange(rawValue);
-                                }
-                              }}
-                              onBlur={field.onBlur}
-                              name={field.name}
+                              placeholder="100"
+                              required
+                              value={formatNumberInput(field.value)}
+                              onChange={(e) => field.onChange(parseNumberInput(e.target.value))}
+                              step="0.1"
                             />
                           </FormControl>
                           <FormMessage />
