@@ -575,6 +575,10 @@ export class MemStorage implements IStorage {
       case "decrease_to":
         if (baseNum === targetNum) return 0;
         return Math.max(0, Math.min(100, ((baseNum - currentNum) / (baseNum - targetNum)) * 100));
+      case "should_stay_above":
+        return currentNum >= targetNum ? 100 : 0;
+      case "should_stay_below":
+        return currentNum <= targetNum ? 100 : 0;
       case "achieve_or_not":
         return currentNum >= targetNum ? 100 : 0;
       default:

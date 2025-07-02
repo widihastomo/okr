@@ -67,6 +67,10 @@ export function KeyResultDetailModal({ keyResultId, isOpen, onClose }: KeyResult
           return 0;
         }
         return base === target ? 0 : ((base - current) / (base - target)) * 100;
+      case "should_stay_above":
+        return current >= target ? 100 : 0;
+      case "should_stay_below":
+        return current <= target ? 100 : 0;
       case "achieve_or_not":
         return current >= target ? 100 : 0;
       default:
@@ -77,11 +81,15 @@ export function KeyResultDetailModal({ keyResultId, isOpen, onClose }: KeyResult
   const getKeyResultTypeLabel = (type: string) => {
     switch (type) {
       case "increase_to":
-        return "Increase to";
+        return "Naik ke (Increase to)";
       case "decrease_to":
-        return "Decrease to";
+        return "Turun ke (Decrease to)";
+      case "should_stay_above":
+        return "Harus tetap di atas (Stay Above)";
+      case "should_stay_below":
+        return "Harus tetap di bawah (Stay Below)";
       case "achieve_or_not":
-        return "Achieve or not";
+        return "Ya/Tidak (Achieve or not)";
       default:
         return type;
     }

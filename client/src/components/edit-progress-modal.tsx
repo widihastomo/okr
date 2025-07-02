@@ -96,6 +96,14 @@ export default function EditProgressModal({
         const decreaseProgress = ((baseNum - currentNum) / (baseNum - targetNum)) * 100;
         return Math.min(100, Math.max(0, decreaseProgress));
         
+      case "should_stay_above":
+        // Binary: 100% if current >= target (staying above threshold), 0% otherwise
+        return currentNum >= targetNum ? 100 : 0;
+        
+      case "should_stay_below":
+        // Binary: 100% if current <= target (staying below threshold), 0% otherwise
+        return currentNum <= targetNum ? 100 : 0;
+        
       case "achieve_or_not":
         // Binary: 100% if current >= target, 0% otherwise
         return currentNum >= targetNum ? 100 : 0;

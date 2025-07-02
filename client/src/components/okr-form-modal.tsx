@@ -24,7 +24,7 @@ const keyResultSchema = z.object({
   id: z.string().optional(), // untuk edit mode
   title: z.string().min(1, "Judul Ukuran Keberhasilan wajib diisi"),
   description: z.string().optional(),
-  keyResultType: z.enum(["increase_to", "decrease_to", "achieve_or_not"]).default("increase_to"),
+  keyResultType: z.enum(["increase_to", "decrease_to", "achieve_or_not", "should_stay_above", "should_stay_below"]).default("increase_to"),
   baseValue: z.string().optional(),
   targetValue: z.string().min(1, "Target wajib diisi"),
   currentValue: z.string().default("0"),
@@ -91,7 +91,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
         id: kr.id,
         title: kr.title,
         description: kr.description || "",
-        keyResultType: kr.keyResultType as "increase_to" | "decrease_to" | "achieve_or_not",
+        keyResultType: kr.keyResultType as "increase_to" | "decrease_to" | "achieve_or_not" | "should_stay_above" | "should_stay_below",
         baseValue: kr.baseValue || "",
         targetValue: kr.targetValue,
         currentValue: kr.currentValue,
@@ -135,7 +135,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
             id: kr.id,
             title: kr.title,
             description: kr.description || "",
-            keyResultType: kr.keyResultType as "increase_to" | "decrease_to" | "achieve_or_not",
+            keyResultType: kr.keyResultType as "increase_to" | "decrease_to" | "achieve_or_not" | "should_stay_above" | "should_stay_below",
             baseValue: kr.baseValue || "",
             targetValue: kr.targetValue,
             currentValue: kr.currentValue,
@@ -761,7 +761,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
     resolver: zodResolver(z.object({
       title: z.string().min(1, "Judul harus diisi"),
       description: z.string().optional(),
-      keyResultType: z.enum(["increase_to", "decrease_to", "achieve_or_not"]),
+      keyResultType: z.enum(["increase_to", "decrease_to", "achieve_or_not", "should_stay_above", "should_stay_below"]),
       baseValue: z.string().optional(),
       targetValue: z.string().min(1, "Target harus diisi"),
       currentValue: z.string().optional(),
@@ -849,19 +849,31 @@ function KeyResultModal({ open, onOpenChange, onSubmit }: KeyResultModalProps) {
                         <SelectItem value="increase_to">
                           <div className="flex items-center gap-2">
                             <TrendingUp className="w-4 h-4" />
-                            Increase To (Naik ke)
+                            Naik ke (Increase To)
                           </div>
                         </SelectItem>
                         <SelectItem value="decrease_to">
                           <div className="flex items-center gap-2">
                             <TrendingDown className="w-4 h-4" />
-                            Decrease To (Turun ke)
+                            Turun ke (Decrease To)
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="should_stay_above">
+                          <div className="flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4" />
+                            Harus tetap di atas (Stay Above)
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="should_stay_below">
+                          <div className="flex items-center gap-2">
+                            <TrendingDown className="w-4 h-4" />
+                            Harus tetap di bawah (Stay Below)
                           </div>
                         </SelectItem>
                         <SelectItem value="achieve_or_not">
                           <div className="flex items-center gap-2">
                             <Target className="w-4 h-4" />
-                            Achieve or Not (Ya/Tidak)
+                            Ya/Tidak (Achieve or Not)
                           </div>
                         </SelectItem>
                       </SelectContent>

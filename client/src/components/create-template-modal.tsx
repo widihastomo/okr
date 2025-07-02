@@ -18,7 +18,7 @@ import { insertTemplateSchema } from "@shared/schema";
 
 const keyResultSchema = z.object({
   title: z.string().min(1, "Key result title is required"),
-  type: z.enum(["increase_to", "decrease_to", "achieve_or_not"]),
+  type: z.enum(["increase_to", "decrease_to", "achieve_or_not", "should_stay_above", "should_stay_below"]),
   unit: z.enum(["number", "percentage", "currency"]),
   targetValue: z.string().min(1, "Target value is required"),
   baseValue: z.string().optional(),
@@ -370,9 +370,11 @@ function ObjectiveTemplate({ objIndex, form, onRemove, canRemove }: {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="increase_to">Increase To</SelectItem>
-                          <SelectItem value="decrease_to">Decrease To</SelectItem>
-                          <SelectItem value="achieve_or_not">Achieve or Not</SelectItem>
+                          <SelectItem value="increase_to">Naik ke (Increase To)</SelectItem>
+                          <SelectItem value="decrease_to">Turun ke (Decrease To)</SelectItem>
+                          <SelectItem value="should_stay_above">Harus tetap di atas (Stay Above)</SelectItem>
+                          <SelectItem value="should_stay_below">Harus tetap di bawah (Stay Below)</SelectItem>
+                          <SelectItem value="achieve_or_not">Ya/Tidak (Achieve or Not)</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

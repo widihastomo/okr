@@ -68,6 +68,12 @@ export function calculateProgressStatus(
         ? Math.max(0, Math.min(100, ((base - current) / (base - target)) * 100))
         : current <= target ? 100 : 0;
       break;
+    case 'should_stay_above':
+      progressPercentage = current >= target ? 100 : 0;
+      break;
+    case 'should_stay_below':
+      progressPercentage = current <= target ? 100 : 0;
+      break;
     case 'achieve_or_not':
       progressPercentage = current >= target ? 100 : 0;
       break;

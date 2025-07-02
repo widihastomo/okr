@@ -841,9 +841,11 @@ export default function GoalDetail() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="increase_to">Peningkatan</SelectItem>
-                      <SelectItem value="decrease_to">Penurunan</SelectItem>
-                      <SelectItem value="achieve_or_not">Ya/Tidak</SelectItem>
+                      <SelectItem value="increase_to">Naik ke (Increase To)</SelectItem>
+                      <SelectItem value="decrease_to">Turun ke (Decrease To)</SelectItem>
+                      <SelectItem value="should_stay_above">Harus tetap di atas (Stay Above)</SelectItem>
+                      <SelectItem value="should_stay_below">Harus tetap di bawah (Stay Below)</SelectItem>
+                      <SelectItem value="achieve_or_not">Ya/Tidak (Achieve or Not)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

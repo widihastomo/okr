@@ -113,6 +113,12 @@ function calculateKeyResultProgress(keyResult: KeyResult): number {
       if (baseNum <= targetNum) return 0;
       return Math.min(100, Math.max(0, ((baseNum - currentNum) / (baseNum - targetNum)) * 100));
     
+    case "should_stay_above":
+      return currentNum >= targetNum ? 100 : 0;
+    
+    case "should_stay_below":
+      return currentNum <= targetNum ? 100 : 0;
+    
     case "achieve_or_not":
       return currentNum >= targetNum ? 100 : 0;
     

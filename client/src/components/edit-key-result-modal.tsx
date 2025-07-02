@@ -19,7 +19,7 @@ const editKeyResultSchema = z.object({
   targetValue: z.string().min(1, "Target value is required"),
   baseValue: z.string().optional(),
   unit: z.string().optional(),
-  keyResultType: z.enum(["increase_to", "decrease_to", "achieve_or_not"]),
+  keyResultType: z.enum(["increase_to", "decrease_to", "achieve_or_not", "should_stay_above", "should_stay_below"]),
   status: z.enum(["on_track", "at_risk", "behind", "completed", "in_progress"]),
 
 });
@@ -49,7 +49,7 @@ export default function EditKeyResultModal({
       targetValue: keyResult.targetValue,
       baseValue: keyResult.baseValue || "",
       unit: keyResult.unit || "",
-      keyResultType: keyResult.keyResultType as "increase_to" | "decrease_to" | "achieve_or_not",
+      keyResultType: keyResult.keyResultType as "increase_to" | "decrease_to" | "achieve_or_not" | "should_stay_above" | "should_stay_below",
       status: keyResult.status as "on_track" | "at_risk" | "behind" | "completed" | "in_progress",
 
     } : undefined,
@@ -171,9 +171,11 @@ export default function EditKeyResultModal({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="increase_to">Increase To (Naik ke)</SelectItem>
-                        <SelectItem value="decrease_to">Decrease To (Turun ke)</SelectItem>
-                        <SelectItem value="achieve_or_not">Achieve or Not (Ya/Tidak)</SelectItem>
+                        <SelectItem value="increase_to">Naik ke (Increase To)</SelectItem>
+                        <SelectItem value="decrease_to">Turun ke (Decrease To)</SelectItem>
+                        <SelectItem value="should_stay_above">Harus tetap di atas (Stay Above)</SelectItem>
+                        <SelectItem value="should_stay_below">Harus tetap di bawah (Stay Below)</SelectItem>
+                        <SelectItem value="achieve_or_not">Ya/Tidak (Achieve or Not)</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
