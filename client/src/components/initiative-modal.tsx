@@ -4,6 +4,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Plus, Calendar, Flag, FileText, Users, User, Search, ChevronDown, X } from "lucide-react";
+import { formatNumberWithSeparator, handleNumberInputChange, getNumberValueForSubmission } from "@/lib/number-utils";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -442,7 +443,18 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
                           Budget (Rp)
                         </FormLabel>
                         <FormControl>
-                          <Input {...field} type="number" placeholder="0" />
+                          <Input 
+                            type="text" 
+                            placeholder="0" 
+                            value={formatNumberWithSeparator(field.value || "")} 
+                            onChange={(e) => {
+                              handleNumberInputChange(e.target.value, (formattedValue) => {
+                                field.onChange(getNumberValueForSubmission(formattedValue));
+                              });
+                            }}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { formatNumberWithSeparator, handleNumberInputChange, getNumberValueForSubmission } from "@/lib/number-utils";
 import type { KeyResult } from "@shared/schema";
 
 const updateProgressSchema = z.object({
@@ -167,10 +168,16 @@ export default function EditProgressModal({
                     <FormLabel>Current Value</FormLabel>
                     <FormControl>
                       <Input
-                        type="number"
-                        step="0.01"
+                        type="text"
                         placeholder="Enter current value"
-                        {...field}
+                        value={formatNumberWithSeparator(field.value || "")}
+                        onChange={(e) => {
+                          handleNumberInputChange(e.target.value, (formattedValue) => {
+                            field.onChange(getNumberValueForSubmission(formattedValue));
+                          });
+                        }}
+                        onBlur={field.onBlur}
+                        name={field.name}
                       />
                     </FormControl>
                     <FormMessage />

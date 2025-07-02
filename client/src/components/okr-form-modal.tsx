@@ -22,6 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
+import { formatNumberWithSeparator, handleNumberInputChange, getNumberValueForSubmission } from "@/lib/number-utils";
 import type { OKRWithKeyResults, Cycle, User, Objective, Team } from "@shared/schema";
 
 // Unit options for Key Results
@@ -1281,10 +1282,13 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                           <FormControl>
                             <Input 
                               placeholder="100" 
-                              type="number" 
-                              step="0.1" 
-                              value={field.value || ""} 
-                              onChange={field.onChange}
+                              type="text" 
+                              value={formatNumberWithSeparator(field.value || "")} 
+                              onChange={(e) => {
+                                handleNumberInputChange(e.target.value, (formattedValue) => {
+                                  field.onChange(getNumberValueForSubmission(formattedValue));
+                                });
+                              }}
                               onBlur={field.onBlur}
                               name={field.name}
                             />
@@ -1328,7 +1332,18 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                           
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder="0" type="number" step="0.1" {...field} />
+                          <Input 
+                            placeholder="0" 
+                            type="text" 
+                            value={formatNumberWithSeparator(field.value || "")} 
+                            onChange={(e) => {
+                              handleNumberInputChange(e.target.value, (formattedValue) => {
+                                field.onChange(getNumberValueForSubmission(formattedValue));
+                              });
+                            }}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1363,7 +1378,18 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                           
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder="100" type="number" step="0.1" {...field} />
+                          <Input 
+                            placeholder="100" 
+                            type="text" 
+                            value={formatNumberWithSeparator(field.value || "")} 
+                            onChange={(e) => {
+                              handleNumberInputChange(e.target.value, (formattedValue) => {
+                                field.onChange(getNumberValueForSubmission(formattedValue));
+                              });
+                            }}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1398,7 +1424,18 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                           
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder="0" type="number" step="0.1" {...field} />
+                          <Input 
+                            placeholder="0" 
+                            type="text" 
+                            value={formatNumberWithSeparator(field.value || "")} 
+                            onChange={(e) => {
+                              handleNumberInputChange(e.target.value, (formattedValue) => {
+                                field.onChange(getNumberValueForSubmission(formattedValue));
+                              });
+                            }}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

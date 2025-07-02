@@ -109,6 +109,9 @@ Changelog:
   * Desktop table includes both edit (blue) and delete (red) action buttons with proper hover states
   * Fixed "should stay above/below" input field validation and form binding issues for proper editing functionality
   * Resolved "should_stay_below" type input field rendering issue - all Key Result types now display appropriate input fields correctly
+  * Added comprehensive thousand separator formatting to all number inputs with Indonesian format (1.000.000)
+  * Implemented number utils library with proper parsing and formatting for all numeric input fields
+  * Updated OKR Form Modal, Initiative Modal, and Edit Progress Modal to use consistent thousand separators
   * Complete Key Result CRUD functionality now available with intuitive UI across all device sizes
 - July 02, 2025. Fixed inconsistent help icon colors in OKR form modal:
   * Updated all remaining HelpCircle icons from gray (text-gray-400) to consistent blue color scheme
