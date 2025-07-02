@@ -4,24 +4,27 @@
 
 /**
  * Format number with Indonesian thousand separators (dot as thousand separator)
- * Example: 1000000 -> "1.000.000"
+ * Example: 1000000 -> "1.000.000", 7500.5 -> "7.500,5"
  */
 export function formatNumberWithSeparator(value: string | number): string {
   if (!value && value !== 0) return "";
   
-  // Convert to string and remove any existing separators
-  const numStr = value.toString().replace(/\./g, "");
+  // Convert to string and handle different input formats
+  let numStr = value.toString();
   
-  // Handle decimal numbers
+  // Remove existing thousand separators (dots) but keep decimal comma
+  numStr = numStr.replace(/\.(?=\d{3})/g, "");
+  
+  // Handle decimal numbers (split by comma)
   const parts = numStr.split(",");
   const integerPart = parts[0];
   const decimalPart = parts[1];
   
-  // Add thousand separators to integer part
+  // Add thousand separators to integer part only
   const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   
   // Return with decimal part if exists
-  return decimalPart ? `${formattedInteger},${decimalPart}` : formattedInteger;
+  return decimalPart !== undefined ? `${formattedInteger},${decimalPart}` : formattedInteger;
 }
 
 /**
@@ -44,13 +47,29 @@ export function handleNumberInputChange(
   value: string,
   onChange: (value: string) => void
 ) {
-  // Remove all non-digit characters except comma for decimal
-  const cleaned = value.replace(/[^\d,]/g, "");
+  // Allow digits, comma for decimal, and dots for thousands
+  let cleaned = value.replace(/[^\d,\.]/g, "");
   
-  // Format with thousand separators
-  const formatted = formatNumberWithSeparator(cleaned);
+  // Handle multiple commas - only allow one comma
+  const commaCount = (cleaned.match(/,/g) || []).length;
+  if (commaCount > 1) {
+    const firstCommaIndex = cleaned.indexOf(',');
+    cleaned = cleaned.substring(0, firstCommaIndex + 1) + cleaned.substring(firstCommaIndex + 1).replace(/,/g, '');
+  }
   
-  onChange(formatted);
+  // Split by comma to handle integer and decimal parts separately
+  const parts = cleaned.split(',');
+  const integerPart = parts[0] || '';
+  const decimalPart = parts[1];
+  
+  // Remove existing dots from integer part and add thousand separators
+  const cleanInteger = integerPart.replace(/\./g, '');
+  const formattedInteger = cleanInteger.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  
+  // Combine with decimal part if exists
+  const result = decimalPart !== undefined ? `${formattedInteger},${decimalPart}` : formattedInteger;
+  
+  onChange(result);
 }
 
 /**
