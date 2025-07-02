@@ -192,16 +192,27 @@ export default function GoalDetail() {
     
     switch (keyResultType) {
       case "increase_to":
-        if (targetNum === baseNum) return currentNum >= targetNum ? 100 : 0;
+        // Formula: (Current - Base) / (Target - Base) * 100%
+        if (targetNum <= baseNum) return 0; // Invalid configuration
         const increaseProgress = ((currentNum - baseNum) / (targetNum - baseNum)) * 100;
         return Math.min(100, Math.max(0, increaseProgress));
         
       case "decrease_to":
-        if (baseNum <= targetNum) return currentNum <= targetNum ? 100 : 0;
+        // Formula: (Base - Current) / (Base - Target) * 100%
+        if (baseNum <= targetNum) return 0; // Invalid configuration
         const decreaseProgress = ((baseNum - currentNum) / (baseNum - targetNum)) * 100;
         return Math.min(100, Math.max(0, decreaseProgress));
         
+      case "should_stay_above":
+        // Binary: 100% if current >= target, 0% otherwise
+        return currentNum >= targetNum ? 100 : 0;
+        
+      case "should_stay_below":
+        // Binary: 100% if current <= target, 0% otherwise
+        return currentNum <= targetNum ? 100 : 0;
+        
       case "achieve_or_not":
+        // Binary: 100% if current >= target, 0% otherwise
         return currentNum >= targetNum ? 100 : 0;
         
       default:

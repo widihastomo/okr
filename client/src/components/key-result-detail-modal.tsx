@@ -56,26 +56,50 @@ export function KeyResultDetailModal({ keyResultId, isOpen, onClose }: KeyResult
     const target = parseFloat(keyResult.targetValue);
     const base = keyResult.baseValue ? parseFloat(keyResult.baseValue) : 0;
 
+    let progress = 0;
+
     switch (keyResult.keyResultType) {
       case "increase_to":
-        if (base === 0) {
-          return target === 0 ? 0 : (current / target) * 100;
+        // Formula: (Current - Base) / (Target - Base) * 100%
+        if (target <= base) {
+          progress = 0; // Invalid configuration
+        } else {
+          progress = ((current - base) / (target - base)) * 100;
+          progress = Math.min(100, Math.max(0, progress));
         }
-        return target === base ? 0 : ((current - base) / (target - base)) * 100;
+        break;
+        
       case "decrease_to":
-        if (base === 0) {
-          return 0;
+        // Formula: (Base - Current) / (Base - Target) * 100%
+        if (base <= target) {
+          progress = 0; // Invalid configuration
+        } else {
+          progress = ((base - current) / (base - target)) * 100;
+          progress = Math.min(100, Math.max(0, progress));
         }
-        return base === target ? 0 : ((base - current) / (base - target)) * 100;
+        break;
+        
       case "should_stay_above":
-        return current >= target ? 100 : 0;
+        // Binary: 100% if current >= target, 0% otherwise
+        progress = current >= target ? 100 : 0;
+        break;
+        
       case "should_stay_below":
-        return current <= target ? 100 : 0;
+        // Binary: 100% if current <= target, 0% otherwise
+        progress = current <= target ? 100 : 0;
+        break;
+        
       case "achieve_or_not":
-        return current >= target ? 100 : 0;
+        // Binary: 100% if current >= target, 0% otherwise
+        progress = current >= target ? 100 : 0;
+        break;
+        
       default:
-        return 0;
+        progress = 0;
+        break;
     }
+    
+    return progress;
   };
 
   const getKeyResultTypeLabel = (type: string) => {

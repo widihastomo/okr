@@ -100,31 +100,57 @@ export function calculateObjectiveStatus(
 }
 
 function calculateKeyResultProgress(keyResult: KeyResult): number {
-  const currentNum = parseFloat(keyResult.currentValue) || 0;
-  const targetNum = parseFloat(keyResult.targetValue) || 0;
-  const baseNum = parseFloat(keyResult.baseValue || "0") || 0;
+  const current = parseFloat(keyResult.currentValue) || 0;
+  const target = parseFloat(keyResult.targetValue) || 0;
+  const base = parseFloat(keyResult.baseValue || "0") || 0;
+
+  let progressPercentage = 0;
 
   switch (keyResult.keyResultType) {
     case "increase_to":
-      if (targetNum <= baseNum) return 0;
-      return Math.min(100, Math.max(0, ((currentNum - baseNum) / (targetNum - baseNum)) * 100));
+      // Formula: (Current - Base) / (Target - Base) * 100%
+      if (target <= base) {
+        // Invalid configuration: target should be greater than base
+        progressPercentage = 0;
+      } else {
+        progressPercentage = ((current - base) / (target - base)) * 100;
+        progressPercentage = Math.min(100, Math.max(0, progressPercentage));
+      }
+      break;
     
     case "decrease_to":
-      if (baseNum <= targetNum) return 0;
-      return Math.min(100, Math.max(0, ((baseNum - currentNum) / (baseNum - targetNum)) * 100));
+      // Formula: (Base - Current) / (Base - Target) * 100%
+      if (base <= target) {
+        // Invalid configuration: base should be greater than target
+        progressPercentage = 0;
+      } else {
+        progressPercentage = ((base - current) / (base - target)) * 100;
+        progressPercentage = Math.min(100, Math.max(0, progressPercentage));
+      }
+      break;
     
     case "should_stay_above":
-      return currentNum >= targetNum ? 100 : 0;
+      // Binary: 100% if current >= target, 0% otherwise
+      progressPercentage = current >= target ? 100 : 0;
+      break;
     
     case "should_stay_below":
-      return currentNum <= targetNum ? 100 : 0;
+      // Binary: 100% if current <= target, 0% otherwise
+      progressPercentage = current <= target ? 100 : 0;
+      break;
     
     case "achieve_or_not":
-      return currentNum >= targetNum ? 100 : 0;
+      // Binary: 100% if current >= target, 0% otherwise
+      progressPercentage = current >= target ? 100 : 0;
+      break;
     
     default:
-      return Math.min(100, Math.max(0, (currentNum / targetNum) * 100));
+      // Fallback for unknown types
+      progressPercentage = 0;
+      break;
   }
+
+  return Math.round(progressPercentage * 100) / 100; // Round to 2 decimal places
 }
 
 function calculateTimeProgress(cycle: Cycle | null): number {

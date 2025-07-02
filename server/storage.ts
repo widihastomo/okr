@@ -127,9 +127,9 @@ async function updateKeyResultWithAutoStatus(keyResult: KeyResult, cycleId: stri
   // Get cycle to determine dates
   const [cycle] = await db.select().from(cycles).where(eq(cycles.id, cycleId));
   
-  if (cycle && keyResult.dueDate) {
+  if (cycle) {
     const startDate = new Date(cycle.startDate);
-    const endDate = keyResult.dueDate;
+    const endDate = new Date(cycle.endDate);
     
     const progressStatus = calculateProgressStatus(keyResult, startDate, endDate);
     
@@ -384,18 +384,29 @@ export class DatabaseStorage implements IStorage {
 
     switch (keyResultType) {
       case "increase_to":
-        if (targetNum <= baseNum) return 0;
+        // Formula: (Current - Base) / (Target - Base) * 100%
+        if (targetNum <= baseNum) return 0; // Invalid configuration
         return Math.min(100, Math.max(0, ((currentNum - baseNum) / (targetNum - baseNum)) * 100));
       
       case "decrease_to":
-        if (baseNum <= targetNum) return 0;
+        // Formula: (Base - Current) / (Base - Target) * 100%
+        if (baseNum <= targetNum) return 0; // Invalid configuration
         return Math.min(100, Math.max(0, ((baseNum - currentNum) / (baseNum - targetNum)) * 100));
       
+      case "should_stay_above":
+        // Binary: 100% if current >= target, 0% otherwise
+        return currentNum >= targetNum ? 100 : 0;
+      
+      case "should_stay_below":
+        // Binary: 100% if current <= target, 0% otherwise
+        return currentNum <= targetNum ? 100 : 0;
+      
       case "achieve_or_not":
+        // Binary: 100% if current >= target, 0% otherwise
         return currentNum >= targetNum ? 100 : 0;
       
       default:
-        return Math.min(100, Math.max(0, (currentNum / targetNum) * 100));
+        return 0; // Unknown type, return 0
     }
   }
 
@@ -555,7 +566,7 @@ export class DatabaseStorage implements IStorage {
     return await Promise.all(keyResultsList.map(async kr => {
       try {
         const startDate = new Date(cycle.startDate);
-        const endDate = new Date(kr.dueDate || cycle.endDate);
+        const endDate = new Date(cycle.endDate);
         
         const progressStatus = calculateProgressStatus(kr, startDate, endDate);
         const lastCheckIn = await this.getLastCheckInForKeyResult(kr.id);
@@ -774,8 +785,10 @@ export class DatabaseStorage implements IStorage {
   async createTask(taskData: InsertTask): Promise<Task> {
     const [task] = await db.insert(tasks).values(taskData).returning();
     
-    // Recalculate initiative progress after task creation
-    await this.updateInitiativeProgress(taskData.initiativeId);
+    // Recalculate initiative progress after task creation (only if task is linked to initiative)
+    if (taskData.initiativeId) {
+      await this.updateInitiativeProgress(taskData.initiativeId);
+    }
     
     return task;
   }
@@ -787,8 +800,8 @@ export class DatabaseStorage implements IStorage {
       .where(eq(tasks.id, id))
       .returning();
 
-    if (task) {
-      // Recalculate initiative progress after task update
+    if (task && task.initiativeId) {
+      // Recalculate initiative progress after task update (only if task is linked to initiative)
       await this.updateInitiativeProgress(task.initiativeId);
     }
 
@@ -1057,8 +1070,8 @@ export class DatabaseStorage implements IStorage {
     
     const result = await db.delete(tasks).where(eq(tasks.id, id));
     
-    if (result.rowCount > 0 && task) {
-      // Recalculate initiative progress after task deletion
+    if (result.rowCount > 0 && task?.initiativeId) {
+      // Recalculate initiative progress after task deletion (only if task was linked to initiative)
       await this.updateInitiativeProgress(task.initiativeId);
     }
     

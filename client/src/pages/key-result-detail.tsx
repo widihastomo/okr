@@ -594,12 +594,46 @@ export default function KeyResultDetailPage() {
       const base = parseFloat(keyResult.baseValue || "0");
       
       let actualProgress = 0;
-      if (keyResult.keyResultType === "increase_to") {
-        actualProgress = ((current - base) / (target - base)) * 100;
-      } else if (keyResult.keyResultType === "decrease_to") {
-        actualProgress = ((base - current) / (base - target)) * 100;
-      } else if (keyResult.keyResultType === "achieve_or_not") {
-        actualProgress = current >= target ? 100 : 0;
+      
+      switch (keyResult.keyResultType) {
+        case "increase_to":
+          // Formula: (Current - Base) / (Target - Base) * 100%
+          if (target <= base) {
+            actualProgress = 0; // Invalid configuration
+          } else {
+            actualProgress = ((current - base) / (target - base)) * 100;
+            actualProgress = Math.min(100, Math.max(0, actualProgress));
+          }
+          break;
+          
+        case "decrease_to":
+          // Formula: (Base - Current) / (Base - Target) * 100%
+          if (base <= target) {
+            actualProgress = 0; // Invalid configuration
+          } else {
+            actualProgress = ((base - current) / (base - target)) * 100;
+            actualProgress = Math.min(100, Math.max(0, actualProgress));
+          }
+          break;
+          
+        case "should_stay_above":
+          // Binary: 100% if current >= target, 0% otherwise
+          actualProgress = current >= target ? 100 : 0;
+          break;
+          
+        case "should_stay_below":
+          // Binary: 100% if current <= target, 0% otherwise
+          actualProgress = current <= target ? 100 : 0;
+          break;
+          
+        case "achieve_or_not":
+          // Binary: 100% if current >= target, 0% otherwise
+          actualProgress = current >= target ? 100 : 0;
+          break;
+          
+        default:
+          actualProgress = 0;
+          break;
       }
 
       // Calculate ideal progress based on time
@@ -861,11 +895,11 @@ export default function KeyResultDetailPage() {
                   <Progress value={Math.min(progress, 100)} className="h-3" />
                   {/* Ideal Progress Threshold Indicator */}
                   {(() => {
-                    if (!cycle || !keyResult.dueDate) return null;
+                    if (!cycle) return null;
                     
                     const now = new Date();
                     const cycleStart = new Date(cycle.startDate);
-                    const keyResultEnd = new Date(keyResult.dueDate);
+                    const keyResultEnd = new Date(cycle.endDate);
                     
                     if (now < cycleStart) return null;
                     

@@ -59,23 +59,42 @@ export function calculateProgressStatus(
   
   switch (keyResult.keyResultType) {
     case 'increase_to':
-      progressPercentage = base !== target 
-        ? Math.max(0, Math.min(100, ((current - base) / (target - base)) * 100))
-        : current >= target ? 100 : 0;
+      // Formula: (Current - Base) / (Target - Base) * 100%
+      if (target <= base) {
+        progressPercentage = 0; // Invalid configuration
+      } else {
+        progressPercentage = ((current - base) / (target - base)) * 100;
+        progressPercentage = Math.min(100, Math.max(0, progressPercentage));
+      }
       break;
+      
     case 'decrease_to':
-      progressPercentage = base !== target
-        ? Math.max(0, Math.min(100, ((base - current) / (base - target)) * 100))
-        : current <= target ? 100 : 0;
+      // Formula: (Base - Current) / (Base - Target) * 100%
+      if (base <= target) {
+        progressPercentage = 0; // Invalid configuration
+      } else {
+        progressPercentage = ((base - current) / (base - target)) * 100;
+        progressPercentage = Math.min(100, Math.max(0, progressPercentage));
+      }
       break;
+      
     case 'should_stay_above':
+      // Binary: 100% if current >= target, 0% otherwise
       progressPercentage = current >= target ? 100 : 0;
       break;
+      
     case 'should_stay_below':
+      // Binary: 100% if current <= target, 0% otherwise
       progressPercentage = current <= target ? 100 : 0;
       break;
+      
     case 'achieve_or_not':
+      // Binary: 100% if current >= target, 0% otherwise
       progressPercentage = current >= target ? 100 : 0;
+      break;
+      
+    default:
+      progressPercentage = 0;
       break;
   }
   
