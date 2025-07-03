@@ -518,47 +518,46 @@ export default function GoalDetail() {
 
       {/* Tabs Section */}
       <Tabs defaultValue="key-results" className="space-y-6">
-        <div className="flex">
+        <div className="flex items-center justify-start mb-6">
           {/* Tab 1 - Arrow shape */}
           <TabsTrigger 
             value="key-results"
-            className="relative bg-white border border-gray-300 px-6 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 rounded-l-lg min-w-[200px]"
+            className="relative bg-gray-100 border border-gray-300 px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 flex items-center gap-3 min-w-[280px]"
             style={{
-              clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%)'
+              clipPath: 'polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%)',
+              marginRight: '-20px',
+              zIndex: 1
             }}
           >
-            <div className="flex items-center gap-2">
-              <span className="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">1</span>
-              <span>Ukuran Keberhasilan ({goal.keyResults.length})</span>
-            </div>
+            <span className="bg-white text-blue-600 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">1</span>
+            <span>Ukuran Keberhasilan ({goal.keyResults.length})</span>
           </TabsTrigger>
           
           {/* Tab 2 - Arrow shape */}
           <TabsTrigger 
             value="initiatives"
-            className="relative bg-white border-t border-b border-gray-300 px-6 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 -ml-[15px] min-w-[200px]"
+            className="relative bg-gray-100 border border-gray-300 px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 flex items-center gap-3 min-w-[280px]"
             style={{
-              clipPath: 'polygon(15px 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0 50%)'
+              clipPath: 'polygon(20px 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0 50%)',
+              marginRight: '-20px',
+              zIndex: 2
             }}
           >
-            <div className="flex items-center gap-2">
-              <span className="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">2</span>
-              <span>Rencana ({rencana.length})</span>
-            </div>
+            <span className="bg-white text-blue-600 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold ml-5">2</span>
+            <span>Rencana ({rencana.length})</span>
           </TabsTrigger>
           
           {/* Tab 3 - Arrow shape */}
           <TabsTrigger 
             value="tasks"
-            className="relative bg-white border border-gray-300 px-6 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 rounded-r-lg -ml-[15px] min-w-[200px]"
+            className="relative bg-gray-100 border border-gray-300 px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 flex items-center gap-3 min-w-[280px]"
             style={{
-              clipPath: 'polygon(15px 0, 100% 0, 100% 100%, 15px 100%, 0 50%)'
+              clipPath: 'polygon(20px 0, 100% 0, 100% 100%, 20px 100%, 0 50%)',
+              zIndex: 3
             }}
           >
-            <div className="flex items-center gap-2">
-              <span className="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">3</span>
-              <span>Tugas ({tugas.length})</span>
-            </div>
+            <span className="bg-white text-blue-600 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold ml-5">3</span>
+            <span>Tugas ({tugas.length})</span>
           </TabsTrigger>
         </div>
 
