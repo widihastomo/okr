@@ -124,6 +124,22 @@ export default function GoalDetail() {
     return user?.email || userId;
   };
 
+  // Calculate days remaining based on cycle end date
+  const calculateDaysRemaining = () => {
+    const today = new Date();
+    
+    if (cycle?.endDate) {
+      const endDate = new Date(cycle.endDate);
+      const diffTime = endDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays;
+    }
+    
+    return undefined;
+  };
+
+  const daysRemaining = calculateDaysRemaining();
+
   // Mutation for creating new Key Result
   const createKeyResultMutation = useMutation({
     mutationFn: async (keyResultData: any) => {
