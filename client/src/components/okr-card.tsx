@@ -292,7 +292,7 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplic
                   );
                 })()}
               </div>
-              <p className="text-sm text-gray-500 text-right">Overall Progress</p>
+              
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
