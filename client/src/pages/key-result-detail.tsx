@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, Fragment } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation, Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -1224,8 +1224,8 @@ export default function KeyResultDetailPage() {
                       const tasks = getTasksForInitiative(initiative.id);
 
                       return (
-                        <React.Fragment key={initiative.id}>
-                          <TableRow key={`row-${initiative.id}`}>
+                        <Fragment key={initiative.id}>
+                          <TableRow>
                             <TableCell className="font-medium">
                               <div className="flex items-center gap-2">
                                 <Button
@@ -1467,7 +1467,7 @@ export default function KeyResultDetailPage() {
                               </TableCell>
                             </TableRow>
                           )}
-                        </React.Fragment>
+                        </Fragment>
                       );
                     })}
                   </TableBody>

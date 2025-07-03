@@ -411,7 +411,6 @@ export default function Dashboard() {
             keyResultType: kr.keyResultType,
             status: "in_progress",
             objectiveId: newObjective.id,
-            dueDate: kr.dueDate,
           }),
         });
 
@@ -510,7 +509,7 @@ export default function Dashboard() {
                 <p className="text-gray-600 mt-0.5 sm:mt-1 text-xs sm:text-base">Track your objectives and key results</p>
               </div>
               {currentUser && (
-                <DashboardHelpBubble userId={(currentUser as any).id} />
+                <DashboardHelpBubble userId={currentUser.id as string} />
               )}
             </div>
             <div className="flex-shrink-0">
