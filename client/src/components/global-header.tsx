@@ -190,8 +190,8 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
         <div className="relative">
           {/* Expanded Action Buttons */}
           <div 
-            className={`absolute right-0 bottom-full mb-2 transition-all duration-300 ${
-              isExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
+            className={`absolute right-0 top-full mt-2 transition-all duration-300 ${
+              isExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
             }`}
           >
             <div className="flex flex-col space-y-2">
