@@ -274,53 +274,25 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
                   </div>
                 </div>
 
-                {/* Goal Induk dan Status */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Goal Induk */}
-                  <div>
-                    <Label>Goal Induk (Opsional)</Label>
-                    <Select
-                      value={form.watch("parentId") || "none"}
-                      onValueChange={(value) => form.setValue("parentId", value === "none" ? undefined : value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih goal induk" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Tidak ada goal induk</SelectItem>
-                        {availableParentObjectives.map((obj) => (
-                          <SelectItem key={obj.id} value={obj.id}>
-                            {obj.title}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Status */}
-                  <div>
-                    <Label>Status</Label>
-                    <Select
-                      value={form.watch("status")}
-                      onValueChange={(value) => form.setValue("status", value as any)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="not_started">Belum Dimulai</SelectItem>
-                        <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
-                        <SelectItem value="on_track">Sesuai Target</SelectItem>
-                        <SelectItem value="at_risk">Berisiko</SelectItem>
-                        <SelectItem value="behind">Tertinggal</SelectItem>
-                        <SelectItem value="paused">Dijeda</SelectItem>
-                        <SelectItem value="canceled">Dibatalkan</SelectItem>
-                        <SelectItem value="completed">Selesai</SelectItem>
-                        <SelectItem value="partially_achieved">Tercapai Sebagian</SelectItem>
-                        <SelectItem value="not_achieved">Tidak Tercapai</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                {/* Goal Induk */}
+                <div>
+                  <Label>Goal Induk (Opsional)</Label>
+                  <Select
+                    value={form.watch("parentId") || "none"}
+                    onValueChange={(value) => form.setValue("parentId", value === "none" ? undefined : value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih goal induk" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Tidak ada goal induk</SelectItem>
+                      {availableParentObjectives.map((obj) => (
+                        <SelectItem key={obj.id} value={obj.id}>
+                          {obj.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </CardContent>
