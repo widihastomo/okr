@@ -1321,7 +1321,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
               
               if (keyResultType === "should_stay_above" || keyResultType === "should_stay_below") {
                 return (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {/* Base Value - Disabled */}
                     <FormField
                       control={keyResultForm.control}
@@ -1393,35 +1393,38 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                       )}
                     />
 
-                    {/* Current Value - Disabled */}
+                    {/* Current Value */}
                     <FormField
                       control={keyResultForm.control}
                       name="currentValue"
                       render={({ field }) => (
-                        <FormItem className="sm:col-span-2">
+                        <FormItem>
                           <FormLabel className="flex items-center gap-2">
-                            Kondisi Saat Ini
+                            Nilai Saat Ini*
                             <Popover>
                               <PopoverTrigger>
                                 <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                               </PopoverTrigger>
                               <PopoverContent side="right" className="max-w-xs">
                                 <p>
-                                  <strong>Akan diupdate melalui check-in</strong>
+                                  <strong>Kondisi actual saat ini</strong>
                                   <br /><br />
-                                  Untuk Key Result tipe threshold, kondisi saat ini akan diupdate melalui proses check-in dengan format ya/tidak (tercapai/tidak tercapai).
+                                  Isikan nilai kondisi saat ini untuk dibandingkan dengan threshold target. Nilai ini akan diupdate melalui proses check-in regular.
+                                  <br /><br />
+                                  <strong>Contoh:</strong> Rating saat ini 4.2, biaya saat ini 45 juta, response time saat ini 2.8 detik
                                 </p>
                               </PopoverContent>
                             </Popover>
                           </FormLabel>
                           <FormControl>
                             <Input 
-                              placeholder="Update via check-in" 
-                              disabled
-                              value="Belum tercapai"
-                              className="bg-gray-50 text-gray-500 cursor-not-allowed"
+                              placeholder="50" 
+                              type="number" 
+                              step="0.1"
+                              {...field}
                             />
                           </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
