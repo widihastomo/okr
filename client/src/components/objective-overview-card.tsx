@@ -128,7 +128,41 @@ export default function ObjectiveOverviewCard({
               </p>
             </div>
           </div>
-          <ObjectiveStatusBadge status={objective.status} />
+          {(() => {
+            const getProgressConfig = (status: string) => {
+              switch (status) {
+                case 'on_track':
+                  return { bgColor: 'bg-green-100', textColor: 'text-green-800', dotColor: 'bg-green-500', label: 'Sesuai Target' };
+                case 'at_risk':
+                  return { bgColor: 'bg-orange-100', textColor: 'text-orange-800', dotColor: 'bg-orange-500', label: 'Berisiko' };
+                case 'behind':
+                  return { bgColor: 'bg-red-100', textColor: 'text-red-800', dotColor: 'bg-red-500', label: 'Tertinggal' };
+                case 'completed':
+                  return { bgColor: 'bg-purple-100', textColor: 'text-purple-800', dotColor: 'bg-purple-500', label: 'Selesai' };
+                case 'in_progress':
+                  return { bgColor: 'bg-blue-100', textColor: 'text-blue-800', dotColor: 'bg-blue-500', label: 'Berlangsung' };
+                case 'not_started':
+                  return { bgColor: 'bg-gray-100', textColor: 'text-gray-800', dotColor: 'bg-gray-500', label: 'Belum Dimulai' };
+                case 'paused':
+                  return { bgColor: 'bg-yellow-100', textColor: 'text-yellow-800', dotColor: 'bg-yellow-500', label: 'Dijeda' };
+                case 'canceled':
+                  return { bgColor: 'bg-red-100', textColor: 'text-red-800', dotColor: 'bg-red-500', label: 'Dibatalkan' };
+                case 'partially_achieved':
+                  return { bgColor: 'bg-amber-100', textColor: 'text-amber-800', dotColor: 'bg-amber-500', label: 'Tercapai Sebagian' };
+                case 'not_achieved':
+                  return { bgColor: 'bg-red-100', textColor: 'text-red-800', dotColor: 'bg-red-500', label: 'Tidak Tercapai' };
+                default:
+                  return { bgColor: 'bg-gray-100', textColor: 'text-gray-800', dotColor: 'bg-gray-500', label: 'Tidak Diketahui' };
+              }
+            };
+            const config = getProgressConfig(objective.status);
+            return (
+              <div className={`flex items-center gap-1 px-2 py-0.5 ${config.bgColor} ${config.textColor} rounded-full text-xs font-medium whitespace-nowrap`}>
+                <div className={`w-1.5 h-1.5 ${config.dotColor} rounded-full flex-shrink-0`}></div>
+                <span className="truncate">{config.label}</span>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Additional Info Section */}
