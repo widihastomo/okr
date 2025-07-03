@@ -136,12 +136,22 @@ export default function EditKeyResultModal({
     const isTypeChanging = keyResult && data.keyResultType !== keyResult.keyResultType;
     const hasCheckIns = checkInData && checkInData.count > 0;
     
+    console.log("Edit Key Result Submit Debug:", {
+      keyResult: keyResult?.keyResultType,
+      newType: data.keyResultType,
+      isTypeChanging,
+      hasCheckIns,
+      checkInCount: checkInData?.count
+    });
+    
     if (isTypeChanging && hasCheckIns) {
       // Show warning dialog
+      console.log("Showing warning dialog");
       setPendingFormData(data);
       setShowWarning(true);
     } else {
       // Proceed directly with update
+      console.log("Proceeding with direct update");
       updateKeyResultMutation.mutate(data);
     }
   };
@@ -449,8 +459,14 @@ export default function EditKeyResultModal({
       {keyResult && (
         <KeyResultTypeChangeWarning
           open={showWarning}
-          onOpenChange={setShowWarning}
-          onConfirm={handleConfirmTypeChange}
+          onOpenChange={(open) => {
+            console.log("Warning dialog onOpenChange:", open);
+            setShowWarning(open);
+          }}
+          onConfirm={() => {
+            console.log("Warning dialog confirmed");
+            handleConfirmTypeChange();
+          }}
           currentType={keyResult.keyResultType}
           newType={pendingFormData?.keyResultType || ""}
           checkInCount={checkInData?.count || 0}
