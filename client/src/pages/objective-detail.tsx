@@ -300,10 +300,7 @@ export default function GoalDetail() {
           </Button>
         </Link>
         
-        {/* Breadcrumb */}
-        <div className="text-sm text-gray-500 mb-2">
-          Dashboard &gt; Goals &gt; {goal.title}
-        </div>
+        
         
         {/* Title and Actions */}
         <div className="flex items-start justify-between gap-4 mb-6">
