@@ -15,13 +15,7 @@ import {
   User as UserIcon,
   ExternalLink,
 } from "lucide-react";
-import type {
-  OKRWithKeyResults,
-  Initiative,
-  Task,
-  User,
-  Cycle,
-} from "@shared/schema";
+import type { OKRWithKeyResults, Initiative, Task, User, Cycle } from "@shared/schema";
 import { Link } from "wouter";
 import { calculateKeyResultProgress } from "@shared/progress-calculator";
 
@@ -54,8 +48,8 @@ export default function ObjectiveOverviewCard({
     } else {
       // Handle user owner - check if owner has firstName/lastName properties (User type)
       const userOwner = owner as any;
-      return userOwner?.firstName && userOwner?.lastName
-        ? `${userOwner.firstName} ${userOwner.lastName}`
+      return userOwner?.firstName && userOwner?.lastName 
+        ? `${userOwner.firstName} ${userOwner.lastName}` 
         : userOwner?.email || "User tidak ditemukan";
     }
   };
@@ -106,30 +100,80 @@ export default function ObjectiveOverviewCard({
   };
 
   return (
-    <>
-      <Card className="hover:shadow-lg transition-shadow">
-        <CardHeader className="pb-4">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-3">
-              <div
-                className={`p-2 rounded-full ${getHealthColor(overallProgress)}`}
-              >
-                <Target className="w-5 h-5" />
-              </div>
-              <div>
-                <CardTitle className="text-lg line-clamp-2">
-                  {objective.title}
-                </CardTitle>
-                <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                  {objective.description}
-                </p>
+    <Card className="hover:shadow-lg transition-shadow">
+      <CardHeader className="pb-4">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-full ${getHealthColor(overallProgress)}`}>
+              <Target className="w-5 h-5" />
+            </div>
+            <div>
+              <CardTitle className="text-lg line-clamp-2">
+                {objective.title}
+              </CardTitle>
+              <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                {objective.description}
+              </p>
+
+              {/* Additional Info Section */}
+              <div className="mt-4 pt-4 border-t border-gray-200 space-y-3">
+                {/* Goal Induk Info */}
+                {parentObjective && (
+                  <div className="flex items-start sm:items-center gap-2 text-sm">
+                    <Target className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
+                    <span className="text-gray-500 flex-shrink-0">
+                      Bagian dari:
+                    </span>
+                    <Link href={`/objectives/${parentObjective.id}`}>
+                      <span className="font-medium text-blue-600 hover:text-blue-800 hover:underline cursor-pointer flex items-start sm:items-center gap-1 break-words">
+                        {parentObjective.title}
+                        <ExternalLink className="w-3 h-3 flex-shrink-0 mt-0.5 sm:mt-0" />
+                      </span>
+                    </Link>
+                  </div>
+                )}
+
+                {/* Periode and Pemilik Info - Stack on mobile */}
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 text-sm">
+                  <div className="flex items-start sm:items-center gap-2">
+                    <Calendar className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                      <span className="font-medium">
+                        {cycle?.name || "Tidak ada cycle"}
+                      </span>
+                      {cycle && (
+                        <span className="text-xs text-gray-400 block sm:inline">
+                          ({new Date(cycle.startDate).toLocaleDateString("id-ID")} -{" "}
+                          {new Date(cycle.endDate).toLocaleDateString("id-ID")})
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-start sm:items-center gap-2">
+                    {objective.ownerType === "team" ? (
+                      <Building className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
+                    ) : (
+                      <UserIcon className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
+                    )}
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                      <span className="font-medium break-words">
+                        {getOwnerDisplay()}
+                      </span>
+                      <span className="text-xs text-gray-400 capitalize">
+                        ({objective.ownerType === "team" ? "Tim" : "Individual"})
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            <Badge className={getHealthColor(overallProgress)}>
-              {overallProgress}%
-            </Badge>
           </div>
-        </CardHeader>
+          <Badge className={getHealthColor(overallProgress)}>
+            {overallProgress}%
+          </Badge>
+        </div>
+      </CardHeader>
 
       <CardContent className="space-y-6">
         {/* Progress Bar with Visual Indicators */}
@@ -256,64 +300,5 @@ export default function ObjectiveOverviewCard({
         </div>
       </CardContent>
     </Card>
-
-    {/* Additional Info Section - Full width outside container */}
-    <div className="mt-4 pt-4 border-t border-gray-200 space-y-3">
-      {/* Goal Induk Info */}
-      {parentObjective && (
-        <div className="flex items-start sm:items-center gap-2 text-sm">
-          <Target className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
-          <span className="text-gray-500 flex-shrink-0">
-            Bagian dari:
-          </span>
-          <Link href={`/objectives/${parentObjective.id}`}>
-            <span className="font-medium text-blue-600 hover:text-blue-800 hover:underline cursor-pointer flex items-start sm:items-center gap-1 break-words">
-              {parentObjective.title}
-              <ExternalLink className="w-3 h-3 flex-shrink-0 mt-0.5 sm:mt-0" />
-            </span>
-          </Link>
-        </div>
-      )}
-
-      {/* Periode and Pemilik Info - Stack on mobile */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 text-sm">
-        <div className="flex items-start sm:items-center gap-2">
-          <Calendar className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
-          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-            <span className="font-medium">
-              {cycle?.name || "Tidak ada cycle"}
-            </span>
-            {cycle && (
-              <span className="text-xs text-gray-400 block sm:inline">
-                (
-                {new Date(cycle.startDate).toLocaleDateString(
-                  "id-ID",
-                )}{" "}
-                -{" "}
-                {new Date(cycle.endDate).toLocaleDateString("id-ID")})
-              </span>
-            )}
-          </div>
-        </div>
-
-        <div className="flex items-start sm:items-center gap-2">
-          {objective.ownerType === "team" ? (
-            <Building className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
-          ) : (
-            <UserIcon className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
-          )}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-            <span className="font-medium break-words">
-              {getOwnerDisplay()}
-            </span>
-            <span className="text-xs text-gray-400 capitalize">
-              ({objective.ownerType === "team" ? "Tim" : "Individual"}
-              )
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-    </>
   );
 }
