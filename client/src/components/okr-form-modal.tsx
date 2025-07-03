@@ -68,6 +68,41 @@ const keyResultSchema = z.object({
 }, {
   message: "Target dan Unit wajib diisi untuk tipe ini",
   path: ["targetValue"]
+}).refine((data) => {
+  // Logical validation for different key result types
+  if (data.keyResultType === "achieve_or_not") {
+    return true; // No numerical validation needed for binary type
+  }
+
+  const current = parseFloat(data.currentValue || "0");
+  const target = parseFloat(data.targetValue || "0");
+  const base = parseFloat(data.baseValue || "0");
+
+  if (data.keyResultType === "increase_to") {
+    // For increase_to: base < target (we want to increase from base to target)
+    if (data.baseValue && data.targetValue) {
+      if (base >= target) {
+        return false; // Base should be less than target for increase
+      }
+    }
+    return true;
+  }
+
+  if (data.keyResultType === "decrease_to") {
+    // For decrease_to: base > target (we want to decrease from base to target)
+    if (data.baseValue && data.targetValue) {
+      if (base <= target) {
+        return false; // Base should be greater than target for decrease
+      }
+    }
+    return true;
+  }
+
+  // For should_stay types, no specific logical validation needed
+  return true;
+}, {
+  message: "Nilai tidak logis: untuk 'increase_to' nilai awal harus lebih kecil dari target, untuk 'decrease_to' nilai awal harus lebih besar dari target",
+  path: ["baseValue"]
 });
 
 const objectiveFormSchema = z.object({
