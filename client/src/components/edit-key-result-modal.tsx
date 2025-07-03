@@ -459,13 +459,7 @@ export default function EditKeyResultModal({
               </Button>
             </div>
             
-            {/* Debug info for development */}
-            {process.env.NODE_ENV === 'development' && (
-              <div className="mt-4 p-2 bg-gray-100 rounded text-xs">
-                <div>Form Valid: {form.formState.isValid ? 'Yes' : 'No'}</div>
-                <div>Errors: {JSON.stringify(form.formState.errors, null, 2)}</div>
-              </div>
-            )}
+
           </form>
         </Form>
       </DialogContent>
@@ -474,14 +468,8 @@ export default function EditKeyResultModal({
       {keyResult && (
         <KeyResultTypeChangeWarning
           open={showWarning}
-          onOpenChange={(open) => {
-            console.log("Warning dialog onOpenChange:", open);
-            setShowWarning(open);
-          }}
-          onConfirm={() => {
-            console.log("Warning dialog confirmed");
-            handleConfirmTypeChange();
-          }}
+          onOpenChange={setShowWarning}
+          onConfirm={handleConfirmTypeChange}
           currentType={keyResult.keyResultType}
           newType={pendingFormData?.keyResultType || ""}
           checkInCount={checkInData?.count || 0}
