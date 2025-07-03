@@ -643,6 +643,7 @@ export default function GoalDetail() {
                 <div className="text-xs text-gray-500">dari semua ukuran</div>
               </div>
             </div>
+
           </div>
 
           {goal.keyResults.length === 0 ? (
