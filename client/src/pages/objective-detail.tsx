@@ -243,13 +243,20 @@ export default function GoalDetail() {
   };
 
   const getOwnerDisplay = () => {
-    if (!owner) return "Tidak ada";
+    console.log('getOwnerDisplay debug:', { goal, owner, ownerType: goal?.ownerType, ownerId: goal?.ownerId });
+    
+    if (!owner) {
+      console.log('No owner data found');
+      return "Memuat...";
+    }
     
     if (goal?.ownerType === 'user') {
       const userOwner = owner as User;
+      console.log('User owner:', userOwner);
       return `${userOwner.firstName || ''} ${userOwner.lastName || ''}`.trim() || userOwner.email;
     } else {
       const teamOwner = owner as Team;
+      console.log('Team owner:', teamOwner);
       return teamOwner.name;
     }
   };
