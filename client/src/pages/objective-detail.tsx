@@ -21,6 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import AIHelpBubble from "@/components/ai-help-bubble";
 import type { OKRWithKeyResults, KeyResult, Initiative, Task, Cycle, User, Team } from "@shared/schema";
 
 // Type for tasks with initiative info
@@ -1105,6 +1106,18 @@ export default function GoalDetail() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* AI Help Bubble */}
+      <AIHelpBubble 
+        context="objective_detail" 
+        data={{ 
+          objective: goal,
+          keyResults: goal?.keyResults || [],
+          cycleId: goal?.cycleId,
+          cycleName: cycle?.name
+        }}
+        position="bottom-right"
+      />
     </div>
   );
 }

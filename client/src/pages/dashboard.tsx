@@ -27,6 +27,7 @@ import MyTugas from "@/components/my-tasks";
 import Rencana from "@/components/initiatives";
 import { useAuth } from "@/hooks/useAuth";
 import { DashboardHelpBubble } from "@/components/help-bubble";
+import AIHelpBubble from "@/components/ai-help-bubble";
 
 import { useLocation } from "wouter";
 import type { OKRWithKeyResults, KeyResult, Cycle, User } from "@shared/schema";
@@ -689,6 +690,18 @@ export default function Dashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* AI Help Bubble */}
+      <AIHelpBubble 
+        context="dashboard" 
+        data={{ 
+          totalOkrs: okrs.length,
+          statusFilter,
+          cycleFilter,
+          activeTab 
+        }}
+        position="bottom-right"
+      />
     </div>
   );
 }
