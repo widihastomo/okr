@@ -328,19 +328,22 @@ export default function GoalDetail() {
           </div>
         </div>
         
-        {/* Title and Status */}
-        <div className="flex items-start gap-3 flex-wrap mb-2">
-          <h1 className="text-2xl font-bold text-gray-900">{goal.title}</h1>
-          <ObjectiveStatusBadge status={goal.status} />
-        </div>
-        {goal.description && (
-          <p className="text-gray-600">{goal.description}</p>
-        )}
       </div>
 
       {/* Objective Information Card */}
       <Card className="mb-6">
         <CardContent className="p-6">
+          {/* Title, Status, and Description */}
+          <div className="mb-6 pb-6 border-b border-gray-200">
+            <div className="flex items-start gap-3 flex-wrap mb-3">
+              <h1 className="text-2xl font-bold text-gray-900">{goal.title}</h1>
+              <ObjectiveStatusBadge status={goal.status} />
+            </div>
+            {goal.description && (
+              <p className="text-gray-600">{goal.description}</p>
+            )}
+          </div>
+          
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <div className="flex items-center space-x-2 mb-2">

@@ -2,7 +2,18 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Menu, Bell, Plus, Settings, User, LogOut, FileText, Target, Calendar, Flag } from "lucide-react";
+import {
+  Menu,
+  Bell,
+  Plus,
+  Settings,
+  User,
+  LogOut,
+  FileText,
+  Target,
+  Calendar,
+  Flag,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -57,7 +68,10 @@ const taskFormSchema = z.object({
   assignedTo: z.string().optional(),
 });
 
-export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeaderProps) {
+export default function GlobalHeader({
+  onMenuToggle,
+  sidebarOpen,
+}: GlobalHeaderProps) {
   const [notificationCount] = useState(1);
   const [isOKRModalOpen, setIsOKRModalOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -78,26 +92,26 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
 
   // Fetch initiatives and users
   const { data: rencana } = useQuery({
-    queryKey: ['/api/initiatives'],
+    queryKey: ["/api/initiatives"],
   });
 
   const { data: users } = useQuery({
-    queryKey: ['/api/users'],
+    queryKey: ["/api/users"],
   });
 
   // Create task mutation
   const createTaskMutation = useMutation({
     mutationFn: async (taskData: z.infer<typeof taskFormSchema>) => {
-      const response = await fetch('/api/tasks', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(taskData),
       });
-      if (!response.ok) throw new Error('Failed to create task');
+      if (!response.ok) throw new Error("Failed to create task");
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
       toast({
         title: "Task berhasil dibuat",
         className: "border-green-200 bg-green-50 text-green-800",
@@ -131,8 +145,6 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
     createTaskMutation.mutate(data);
   };
 
-  
-
   const getUserInitials = () => {
     const firstName = (user as any)?.firstName || "";
     const lastName = (user as any)?.lastName || "";
@@ -148,15 +160,15 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
   // Global keyboard shortcut for creating OKR (Ctrl+K or Cmd+K)
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+      if ((event.ctrlKey || event.metaKey) && event.key === "k") {
         event.preventDefault();
         setIsOKRModalOpen(true);
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
 
@@ -174,50 +186,51 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
         >
           <Menu className="h-5 w-5 text-gray-600" />
         </Button>
-        
+
         {/* Logo */}
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-sm">GM</span>
           </div>
-          <span className="font-semibold text-gray-900 text-lg">Goal Manager</span>
+          <span className="font-semibold text-gray-900 text-lg">Sentri</span>
         </div>
       </div>
 
       {/* Right side - Action buttons and notifications */}
       <div className="flex items-center space-x-3">
-        {/* User Avatar Menu */}
+        {/* Notification Bell */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="px-2 py-1 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none rounded-lg flex items-center space-x-2">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={(user as any)?.profileImageUrl} />
-                <AvatarFallback className="bg-blue-600 text-white text-sm font-semibold">
-                  {getUserInitials()}
-                </AvatarFallback>
-              </Avatar>
-              <span className="text-sm font-medium text-gray-700 hidden md:inline">
-                {(user as any)?.firstName} {(user as any)?.lastName}
-              </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="relative p-2 hover:bg-gray-100"
+            >
+              <Bell className="h-5 w-5 text-gray-600" />
+              {notificationCount > 0 && (
+                <Badge
+                  variant="destructive"
+                  className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+                >
+                  {notificationCount}
+                </Badge>
+              )}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 z-[70]">
-            <DropdownMenuItem asChild>
-              <Link href="/profile" className="flex items-center space-x-2 cursor-pointer">
-                <User className="h-4 w-4" />
-                <span>Profil</span>
-              </Link>
+          <DropdownMenuContent align="end" className="w-64 z-[70]">
+            <DropdownMenuItem>
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium">Update progress OKR Q1</p>
+                <p className="text-xs text-gray-500">2 jam yang lalu</p>
+              </div>
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              className="flex items-center space-x-2 cursor-pointer text-red-600 hover:text-red-700"
-              onClick={() => {
-                fetch('/api/auth/logout', { method: 'POST' })
-                  .then(() => window.location.href = '/');
-              }}
-            >
-              <LogOut className="h-4 w-4" />
-              <span>Keluar</span>
+            <DropdownMenuItem>
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium">
+                  Deadline key result mendekat
+                </p>
+                <p className="text-xs text-gray-500">1 hari yang lalu</p>
+              </div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -225,9 +238,11 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
         {/* Quick Action FAB */}
         <div className="relative">
           {/* Expanded Action Buttons */}
-          <div 
+          <div
             className={`absolute right-0 top-full mt-2 transition-all duration-300 ${
-              isExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
+              isExpanded
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 -translate-y-2 pointer-events-none"
             }`}
           >
             <div className="flex flex-col space-y-2">
@@ -252,40 +267,53 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
           <Button
             onClick={toggleExpanded}
             className={`h-8 w-8 rounded-full bg-orange-600 hover:bg-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 ${
-              isExpanded ? 'rotate-45' : 'rotate-0'
+              isExpanded ? "rotate-45" : "rotate-0"
             }`}
           >
             <Plus className="h-4 w-4" />
           </Button>
         </div>
 
-        {/* Notification Bell */}
+        {/* User Avatar Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="relative p-2 hover:bg-gray-100">
-              <Bell className="h-5 w-5 text-gray-600" />
-              {notificationCount > 0 && (
-                <Badge 
-                  variant="destructive" 
-                  className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-                >
-                  {notificationCount}
-                </Badge>
-              )}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="px-2 py-1 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none rounded-lg flex items-center space-x-2"
+            >
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={(user as any)?.profileImageUrl} />
+                <AvatarFallback className="bg-blue-600 text-white text-sm font-semibold">
+                  {getUserInitials()}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-sm font-medium text-gray-700 hidden md:inline">
+                {(user as any)?.firstName} {(user as any)?.lastName}
+              </span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-64 z-[70]">
-            <DropdownMenuItem>
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium">Update progress OKR Q1</p>
-                <p className="text-xs text-gray-500">2 jam yang lalu</p>
-              </div>
+          <DropdownMenuContent align="end" className="w-56 z-[70]">
+            <DropdownMenuItem asChild>
+              <Link
+                href="/profile"
+                className="flex items-center space-x-2 cursor-pointer"
+              >
+                <User className="h-4 w-4" />
+                <span>Profil</span>
+              </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium">Deadline key result mendekat</p>
-                <p className="text-xs text-gray-500">1 hari yang lalu</p>
-              </div>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="flex items-center space-x-2 cursor-pointer text-red-600 hover:text-red-700"
+              onClick={() => {
+                fetch("/api/auth/logout", { method: "POST" }).then(
+                  () => (window.location.href = "/"),
+                );
+              }}
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Keluar</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -302,7 +330,10 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleTaskSubmit)} className="space-y-4">
+            <form
+              onSubmit={form.handleSubmit(handleTaskSubmit)}
+              className="space-y-4"
+            >
               <div className="grid grid-cols-1 gap-4">
                 {/* Initiative Selection */}
                 <FormField
@@ -314,8 +345,8 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
                         <Target className="h-4 w-4" />
                         <span>Rencana</span>
                       </FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
+                      <Select
+                        onValueChange={field.onChange}
                         value={field.value || undefined}
                       >
                         <FormControl>
@@ -324,12 +355,16 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {rencana && Array.isArray(rencana) && rencana.length > 0 ? (
-                            rencana.filter((item: any) => item && item.id).map((item: any) => (
-                              <SelectItem key={item.id} value={item.id}>
-                                {item.title || "Untitled Rencana"}
-                              </SelectItem>
-                            ))
+                          {rencana &&
+                          Array.isArray(rencana) &&
+                          rencana.length > 0 ? (
+                            rencana
+                              .filter((item: any) => item && item.id)
+                              .map((item: any) => (
+                                <SelectItem key={item.id} value={item.id}>
+                                  {item.title || "Untitled Rencana"}
+                                </SelectItem>
+                              ))
                           ) : (
                             <div className="py-2 px-3 text-sm text-muted-foreground">
                               Tidak ada rencana tersedia
@@ -369,10 +404,10 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
                           <span>Deadline</span>
                         </FormLabel>
                         <FormControl>
-                          <Input 
-                            type="date" 
-                            {...field} 
-                            value={field.value || ""} 
+                          <Input
+                            type="date"
+                            {...field}
+                            value={field.value || ""}
                           />
                         </FormControl>
                         <FormMessage />
@@ -389,7 +424,10 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
                           <Flag className="h-4 w-4" />
                           <span>Prioritas</span>
                         </FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue />
@@ -416,19 +454,28 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
                           <User className="h-4 w-4" />
                           <span>PIC</span>
                         </FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value || "unassigned"}>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value || "unassigned"}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="unassigned">Belum Ditugaskan</SelectItem>
-                            {users && Array.isArray(users) && users.filter((user: any) => user && user.id).map((user: any) => (
-                              <SelectItem key={user.id} value={user.id}>
-                                {user.firstName} {user.lastName}
-                              </SelectItem>
-                            ))}
+                            <SelectItem value="unassigned">
+                              Belum Ditugaskan
+                            </SelectItem>
+                            {users &&
+                              Array.isArray(users) &&
+                              users
+                                .filter((user: any) => user && user.id)
+                                .map((user: any) => (
+                                  <SelectItem key={user.id} value={user.id}>
+                                    {user.firstName} {user.lastName}
+                                  </SelectItem>
+                                ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -481,10 +528,7 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
       </Dialog>
 
       {/* Global OKR Creation Modal */}
-      <OKRFormModal 
-        open={isOKRModalOpen} 
-        onOpenChange={setIsOKRModalOpen} 
-      />
+      <OKRFormModal open={isOKRModalOpen} onOpenChange={setIsOKRModalOpen} />
     </header>
   );
 }
