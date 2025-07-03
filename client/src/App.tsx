@@ -25,7 +25,7 @@ import Profile from "@/pages/profile";
 import NotFound from "@/pages/not-found";
 import AnalyticsPage from "@/pages/analytics";
 import AchievementsPage from "@/pages/achievements";
-import QuickActionFAB from "@/components/quick-action-fab";
+
 
 
 function Router() {
@@ -98,8 +98,7 @@ function Router() {
           </Switch>
         </div>
 
-        {/* Quick Action Floating Action Button */}
-        <QuickActionFAB />
+
       </div>
     </div>
   );
