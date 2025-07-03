@@ -306,12 +306,14 @@ export default function GoalDetail() {
       <div className="mb-6">
         {/* Back button and Actions in same row */}
         <div className="flex items-center justify-between mb-4">
-          <Link href="/dashboard">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Kembali ke Dashboard
-            </Button>
-          </Link>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => window.history.back()}
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Kembali
+          </Button>
           
           <div className="flex items-center gap-2">
             <Button 
