@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -52,6 +52,7 @@ export default function QuickActionFAB() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const fabRef = useRef<HTMLDivElement>(null);
 
   // Fetch rencana for dropdown
   const { data: rencana = [] } = useQuery<any[]>({
@@ -157,9 +158,23 @@ export default function QuickActionFAB() {
     setIsExpanded(false);
   };
 
+  // Close FAB when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (fabRef.current && !fabRef.current.contains(event.target as Node) && isExpanded) {
+        setIsExpanded(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isExpanded]);
+
   return (
     <>
-      <div className={`fixed bottom-6 right-6 z-50 flex flex-col items-end space-y-3 ${
+      <div ref={fabRef} className={`fixed bottom-6 right-6 z-50 flex flex-col items-end space-y-3 ${
         !isExpanded ? 'pointer-events-none' : ''
       }`}>
         {/* Action Options - appear when expanded */}
