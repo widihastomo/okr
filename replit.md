@@ -96,6 +96,12 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 03, 2025. Enhanced Key Result type icons and tooltips with comprehensive visual indicators:
+  * Added MoveUp icon for "should_stay_above" type with tooltip "Tetap Di Atas - Nilai harus tetap berada di atas ambang batas target"
+  * Added MoveDown icon for "should_stay_below" type with tooltip "Tetap Di Bawah - Nilai harus tetap berada di bawah ambang batas target"
+  * Improved existing tooltips: TrendingUp for "increase_to", TrendingDown for "decrease_to", Target for "achieve_or_not"
+  * All 5 key result types now have distinct visual indicators with informative Indonesian tooltips
+  * Enhanced user understanding of different calculation methods through visual design
 - July 03, 2025. Fixed create OKR database validation errors for empty numeric fields:
   * Resolved "invalid input syntax for type numeric" error by converting empty strings to "0" for required fields
   * Fixed "null value violates not-null constraint" error for currentValue and targetValue fields

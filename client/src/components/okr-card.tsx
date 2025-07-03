@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Calendar, User, Users, Clock, Edit, MoreVertical, Copy, Trash2, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Target, Settings } from "lucide-react";
+import { Calendar, User, Users, Clock, Edit, MoreVertical, Copy, Trash2, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Target, Settings, MoveUp, MoveDown } from "lucide-react";
 import type { OKRWithKeyResults, KeyResult } from "@shared/schema";
 import { Link } from "wouter";
 import { CheckInModal } from "./check-in-modal";
@@ -323,6 +323,16 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplic
                   return {
                     icon: TrendingDown,
                     tooltip: "Target Penurunan - Progress dihitung mundur dari nilai awal ke target"
+                  };
+                case "should_stay_above":
+                  return {
+                    icon: MoveUp,
+                    tooltip: "Tetap Di Atas - Nilai harus tetap berada di atas ambang batas target"
+                  };
+                case "should_stay_below":
+                  return {
+                    icon: MoveDown,
+                    tooltip: "Tetap Di Bawah - Nilai harus tetap berada di bawah ambang batas target"
                   };
                 case "achieve_or_not":
                   return {
