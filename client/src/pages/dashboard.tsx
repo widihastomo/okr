@@ -33,6 +33,18 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
+import {
   Plus,
   Search,
   Filter,
@@ -103,7 +115,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { DashboardHelpBubble } from "@/components/help-bubble";
 import AIHelpBubble from "@/components/ai-help-bubble";
 
-import { useLocation } from "wouter";
 import type { OKRWithKeyResults, KeyResult, Cycle, User } from "@shared/schema";
 
 import { calculateKeyResultProgress } from "@shared/progress-calculator";
@@ -656,17 +667,6 @@ export default function Dashboard() {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {okrs.slice(0, 3).map((objective) => {
-                    const objectiveInitiatives = okrs.filter(
-                      (initiative) =>
-                        objective.keyResults.some(
-                          (kr) => kr.id === initiative.keyResultId,
-                        ),
-                    );
-                    const objectiveTasks = okrs.filter((task) =>
-                      objectiveInitiatives.some(
-                        (initiative) => initiative.id === task.initiativeId,
-                      ),
-                    );
 
                     // Calculate overall progress
                     //const overallProgress = calculateOverallProgress(
@@ -685,9 +685,7 @@ export default function Dashboard() {
                       return result.progressPercentage >= 100;
                     }).length;
 
-                    const completedTasks = objectiveTasks.filter(
-                      (t) => t.status === "completed",
-                    ).length;
+                    const completedTasks = 0; // Placeholder - tasks not available in this context
 
                     // Find cycle for this objective
                     const objectiveCycle = cycles.find(
@@ -712,7 +710,7 @@ export default function Dashboard() {
                         keyResultsCompleted={completedKeyResults}
                         totalKeyResults={objective.keyResults.length}
                         tasksCompleted={completedTasks}
-                        totalTasks={objectiveTasks.length}
+                        totalTasks={0}
                       />
                     );
                   })}
@@ -745,7 +743,8 @@ export default function Dashboard() {
                 {overdueAndDueTodayCount}
               </span>
             )}
-          </TabsList>
+          </TabsTrigger>
+        </TabsList>
 
         <TabsContent value="objectives" className="space-y-4">
           {okrs.length === 0 ? (
@@ -757,17 +756,6 @@ export default function Dashboard() {
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {okrs.map((okr, index) => {
-                const objectiveInitiatives = okrs.filter(
-                  (initiative) =>
-                    okr.keyResults.some(
-                      (kr) => kr.id === initiative.keyResultId,
-                    ),
-                );
-                const objectiveTasks = okrs.filter((task) =>
-                  objectiveInitiatives.some(
-                    (initiative) => initiative.id === task.initiativeId,
-                  ),
-                );
 
                 // Find cycle for this OKR to get start and end date
                 const cycle = cycles.find(c => c.id === okr.cycleId);
@@ -784,8 +772,8 @@ export default function Dashboard() {
                   <div key={okr.id} className="space-y-4">
                     <ObjectiveOverviewCard
                       objective={okr}
-                      initiatives={objectiveInitiatives}
-                      tasks={objectiveTasks}
+                      initiatives={[]}
+                      tasks={[]}
                       daysRemaining={daysRemaining}
                       cycle={cycle}
                       owner={owner}
