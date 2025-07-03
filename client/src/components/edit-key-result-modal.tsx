@@ -40,13 +40,28 @@ const unitOptions = [
 const editKeyResultSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  currentValue: z.string().min(1, "Current value is required"),
-  targetValue: z.string().min(1, "Target value is required"),
+  currentValue: z.string().optional(), // Optional since achieve_or_not doesn't need this
+  targetValue: z.string().optional(), // Optional since achieve_or_not doesn't need this  
   baseValue: z.string().optional(),
   unit: z.string().optional(),
   keyResultType: z.enum(["increase_to", "decrease_to", "achieve_or_not", "should_stay_above", "should_stay_below"]),
   status: z.enum(["on_track", "at_risk", "behind", "completed", "in_progress"]),
-
+}).refine((data) => {
+  // Dynamic validation based on key result type
+  if (data.keyResultType === "achieve_or_not") {
+    return true; // No value fields required for binary type
+  }
+  
+  if (data.keyResultType === "should_stay_above" || data.keyResultType === "should_stay_below") {
+    return data.targetValue && data.targetValue.length > 0; // Only target required for threshold types
+  }
+  
+  // For increase_to and decrease_to, target and current are required
+  return data.targetValue && data.targetValue.length > 0 && 
+         data.currentValue && data.currentValue.length > 0;
+}, {
+  message: "Required fields are missing based on key result type",
+  path: ["targetValue"] // Point to targetValue as the main field
 });
 
 type EditKeyResultFormData = z.infer<typeof editKeyResultSchema>;
@@ -164,7 +179,8 @@ export default function EditKeyResultModal({
     setPendingFormData(null);
   };
 
-  const formatNumberInput = (value: string) => {
+  const formatNumberInput = (value: string | undefined) => {
+    if (!value) return '';
     const number = parseFloat(value.replace(/[.,]/g, ''));
     if (isNaN(number)) return value;
     return new Intl.NumberFormat('id-ID').format(number);
@@ -353,8 +369,8 @@ export default function EditKeyResultModal({
                             <Input 
                               placeholder="100"
                               required
-                              value={formatNumberInput(field.value)}
-                              onChange={(e) => field.onChange(parseNumberInput(e.target.value))}
+                              value={formatNumberInput(field.value || '')}
+                              onChange={(e) => field.onChange(parseNumberInput(e.target.value) || '')}
                               step="0.1"
                             />
                           </FormControl>
@@ -379,7 +395,7 @@ export default function EditKeyResultModal({
                           <Input 
                             placeholder="0"
                             value={field.value ? formatNumberInput(field.value) : ''}
-                            onChange={(e) => field.onChange(parseNumberInput(e.target.value))}
+                            onChange={(e) => field.onChange(parseNumberInput(e.target.value) || '')}
                             step="0.1"
                           />
                         </FormControl>
@@ -399,7 +415,7 @@ export default function EditKeyResultModal({
                             placeholder="100"
                             required
                             value={formatNumberInput(field.value)}
-                            onChange={(e) => field.onChange(parseNumberInput(e.target.value))}
+                            onChange={(e) => field.onChange(parseNumberInput(e.target.value) || '')}
                             step="0.1"
                           />
                         </FormControl>
@@ -419,7 +435,7 @@ export default function EditKeyResultModal({
                             placeholder="50"
                             required
                             value={formatNumberInput(field.value)}
-                            onChange={(e) => field.onChange(parseNumberInput(e.target.value))}
+                            onChange={(e) => field.onChange(parseNumberInput(e.target.value) || '')}
                             step="0.1"
                           />
                         </FormControl>
@@ -447,10 +463,24 @@ export default function EditKeyResultModal({
                 type="submit"
                 disabled={updateKeyResultMutation.isPending}
                 className="bg-blue-600 hover:bg-blue-700"
+                onClick={() => {
+                  console.log("Submit button clicked");
+                  console.log("Form errors:", form.formState.errors);
+                  console.log("Form values:", form.getValues());
+                  console.log("Form valid:", form.formState.isValid);
+                }}
               >
                 {updateKeyResultMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
               </Button>
             </div>
+            
+            {/* Debug info for development */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="mt-4 p-2 bg-gray-100 rounded text-xs">
+                <div>Form Valid: {form.formState.isValid ? 'Yes' : 'No'}</div>
+                <div>Errors: {JSON.stringify(form.formState.errors, null, 2)}</div>
+              </div>
+            )}
           </form>
         </Form>
       </DialogContent>
