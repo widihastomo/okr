@@ -37,6 +37,7 @@ import {
   ExternalLink,
   ChevronDown,
   ChevronRight,
+  AlertTriangle,
 } from "lucide-react";
 import { Link } from "wouter";
 import { CheckInModal } from "@/components/check-in-modal";
@@ -1227,7 +1228,7 @@ export default function GoalDetail() {
               
               <div className="bg-white p-4 rounded-lg border border-purple-100">
                 <div className="flex items-center gap-2 mb-1">
-                  <Users className="w-4 h-4 text-indigo-600" />
+                  <UserIcon className="w-4 h-4 text-indigo-600" />
                   <span className="text-sm font-medium text-gray-700">Ditugaskan</span>
                 </div>
                 <div className="text-2xl font-bold text-indigo-600">
