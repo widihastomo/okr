@@ -488,8 +488,8 @@ export default function GoalDetail() {
         </div>
       </div>
 
-      {/* Objective Information Card */}
-      <Card className="mb-6">
+      {/* Objective Information */}
+      <div className="mb-6">
         {/* Title and Status */}
         <div className="flex items-start gap-3 flex-wrap mb-4 p-6 pb-0">
           <h1 className="text-2xl font-bold text-gray-900">{goal.title}</h1>
@@ -535,7 +535,7 @@ export default function GoalDetail() {
             </p>
           </div>
         </div>
-      </Card>
+      </div>
       {/* Tabs Section */}
       <Tabs defaultValue="key-results" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
