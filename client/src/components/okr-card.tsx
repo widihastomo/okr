@@ -508,12 +508,25 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
                         const targetVal = parseFloat(kr.targetValue);
                         const baseVal = kr.baseValue ? parseFloat(kr.baseValue) : 0;
                         
-                        if (kr.unit === 'Rp') {
-                          return `Rp ${currentVal.toLocaleString('id-ID')} → Rp ${targetVal.toLocaleString('id-ID')} (dari Rp ${baseVal.toLocaleString('id-ID')})`;
-                        } else if (kr.unit === '%') {
-                          return `${currentVal.toLocaleString('id-ID')}% → ${targetVal.toLocaleString('id-ID')}% (dari ${baseVal.toLocaleString('id-ID')}%)`;
+                        // For decrease_to, show baseline → current (indicating reduction progress)
+                        // For increase_to, show current → target (indicating growth progress)
+                        if (kr.keyResultType === 'decrease_to') {
+                          if (kr.unit === 'Rp') {
+                            return `Rp ${baseVal.toLocaleString('id-ID')} → Rp ${currentVal.toLocaleString('id-ID')} (target: Rp ${targetVal.toLocaleString('id-ID')})`;
+                          } else if (kr.unit === '%') {
+                            return `${baseVal.toLocaleString('id-ID')}% → ${currentVal.toLocaleString('id-ID')}% (target: ${targetVal.toLocaleString('id-ID')}%)`;
+                          } else {
+                            return `${baseVal.toLocaleString('id-ID')} → ${currentVal.toLocaleString('id-ID')} ${kr.unit || ''} (target: ${targetVal.toLocaleString('id-ID')})`;
+                          }
                         } else {
-                          return `${currentVal.toLocaleString('id-ID')} → ${targetVal.toLocaleString('id-ID')} ${kr.unit || ''} (dari ${baseVal.toLocaleString('id-ID')})`;
+                          // increase_to type
+                          if (kr.unit === 'Rp') {
+                            return `Rp ${currentVal.toLocaleString('id-ID')} → Rp ${targetVal.toLocaleString('id-ID')} (dari Rp ${baseVal.toLocaleString('id-ID')})`;
+                          } else if (kr.unit === '%') {
+                            return `${currentVal.toLocaleString('id-ID')}% → ${targetVal.toLocaleString('id-ID')}% (dari ${baseVal.toLocaleString('id-ID')}%)`;
+                          } else {
+                            return `${currentVal.toLocaleString('id-ID')} → ${targetVal.toLocaleString('id-ID')} ${kr.unit || ''} (dari ${baseVal.toLocaleString('id-ID')})`;
+                          }
                         }
                       })()}
                     </div>
