@@ -96,6 +96,12 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 03, 2025. Implemented auto-login for development mode to eliminate repeated login requirements:
+  * Extended session TTL from 7 days to 30 days for development convenience
+  * Added automatic session creation in development mode using admin user ID
+  * Configured middleware to auto-authenticate API requests during development
+  * Development mode now bypasses manual login while maintaining production security
+  * Sessions persist through server restarts for seamless development experience
 - July 03, 2025. Implemented Context-Aware AI Help Bubbles with intelligent insights generation:
   * Created AIHelpBubble component with floating action button design and expandable card interface
   * Integrated with existing OpenAI infrastructure (ai-insights.ts, ai-routes.ts) for generating contextual help

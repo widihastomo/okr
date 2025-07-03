@@ -10,7 +10,7 @@ const PgSession = ConnectPgSimple(session);
 const MemoryStoreSession = MemoryStore(session);
 
 export function getSession() {
-  const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
+  const sessionTtl = 30 * 24 * 60 * 60 * 1000; // 30 days for development convenience
   const isProduction = process.env.NODE_ENV === 'production';
   
   let store;
@@ -99,22 +99,12 @@ export async function authenticateUser(loginData: LoginData): Promise<User | nul
 }
 
 export const requireAuth: RequestHandler = async (req, res, next) => {
-  // Skip auth in development mode
+  // Auto-login for development mode
   if (process.env.NODE_ENV === 'development') {
-    // Create a mock user for development
-    const mockUser = {
-      id: "550e8400-e29b-41d4-a716-446655440001",
-      email: "dev@example.com",
-      firstName: "Dev",
-      lastName: "User",
-      role: "admin",
-      isActive: true,
-      profileImageUrl: null,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    (req as any).user = mockUser;
-    return next();
+    // Auto-set session if not already set
+    if (!req.session.userId) {
+      req.session.userId = "550e8400-e29b-41d4-a716-446655440001";
+    }
   }
   
   if (!req.session?.userId) {
