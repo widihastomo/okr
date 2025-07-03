@@ -131,8 +131,8 @@ export default function Dashboard() {
     
     const userParam = urlParams.get('user');
     if (userParam) {
-      // Handle "all" explicitly for user filter
-      setUserFilter(userParam === 'all' ? '' : userParam);
+      // Keep the actual parameter value including "all"
+      setUserFilter(userParam);
     }
   }, []);
 
@@ -182,8 +182,10 @@ export default function Dashboard() {
 
   // Update URL when user filter changes
   const handleUserFilterChange = (newUser: string) => {
-    setUserFilter(newUser);
-    updateURL({ user: newUser });
+    // Convert empty string to "all" for consistency
+    const userValue = newUser === '' ? 'all' : newUser;
+    setUserFilter(userValue);
+    updateURL({ user: userValue });
   };
 
   // Set default cycle to active cycle with shortest duration when cycles are loaded
@@ -280,11 +282,7 @@ export default function Dashboard() {
       }
     }
     
-    const result = statusMatch && cycleMatch && userMatch;
-    // Debug logging
-    console.log(`OKR ${okr.title}: status=${statusMatch}(${okr.status} vs ${statusFilter}), cycle=${cycleMatch}(${okr.cycleId} vs ${cycleFilter}), user=${userMatch}(${okr.ownerId} vs ${userFilter}), result=${result}`);
-    
-    return result;
+    return statusMatch && cycleMatch && userMatch;
   });
 
   // Mutation for deleting OKR
