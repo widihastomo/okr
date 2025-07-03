@@ -178,14 +178,14 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
                   <div>
                     <Label>Siklus</Label>
                     <Select
-                      value={form.watch("cycleId") || ""}
-                      onValueChange={(value) => form.setValue("cycleId", value || undefined)}
+                      value={form.watch("cycleId") || "none"}
+                      onValueChange={(value) => form.setValue("cycleId", value === "none" ? undefined : value)}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Pilih siklus" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Tidak ada siklus</SelectItem>
+                        <SelectItem value="none">Tidak ada siklus</SelectItem>
                         {cycles?.map((cycle) => (
                           <SelectItem key={cycle.id} value={cycle.id}>
                             {cycle.name}
