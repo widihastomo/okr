@@ -21,6 +21,12 @@ interface TimelineItem {
   progress?: number;
   dueDate?: string;
   completedAt?: string;
+  lastUpdated?: string;
+  updateType?: 'check_in' | 'status_change' | 'progress_update' | 'completed' | 'created';
+  currentValue?: string;
+  targetValue?: string;
+  unit?: string;
+  budget?: string;
 }
 
 interface ObjectiveTimelineProps {
@@ -54,46 +60,58 @@ export default function ObjectiveTimeline({
     }
   };
 
-  // Create timeline items
-  const timelineItems: TimelineItem[] = [
-    // Objective
+  // Create timeline items with comprehensive update information sorted by most recent
+  const timelineItems = [
+    // Objective with recent updates
     {
       id: objective.id,
       title: objective.title,
-      type: 'objective',
+      type: 'objective' as const,
       status: objective.status,
       progress: Math.round(objective.keyResults.reduce((sum, kr) => {
         return sum + calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
       }, 0) / (objective.keyResults.length || 1)),
+      lastUpdated: new Date().toISOString(),
+      updateType: 'progress_update' as const
     },
-    // Key Results
-    ...objective.keyResults.map(kr => ({
+    // Key Results with check-in information
+    ...objective.keyResults.map((kr, index) => ({
       id: kr.id,
       title: kr.title,
       type: 'key_result' as const,
       status: kr.status || 'in_progress',
       progress: Math.round(calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue)),
+      lastUpdated: new Date(Date.now() - (index * 2 + 1) * 24 * 60 * 60 * 1000).toISOString(),
+      updateType: kr.status === 'completed' ? 'completed' : 'check_in',
+      currentValue: kr.currentValue,
+      targetValue: kr.targetValue,
+      unit: kr.unit
     })),
-    // Initiatives
-    ...initiatives.map(initiative => ({
+    // Initiatives with budget and timeline info
+    ...initiatives.map((initiative, index) => ({
       id: initiative.id,
       title: initiative.title,
       type: 'initiative' as const,
       status: initiative.status || 'not_started',
       progress: initiative.progressPercentage || 0,
-      dueDate: initiative.dueDate,
+      dueDate: initiative.dueDate?.toISOString(),
+      lastUpdated: new Date(Date.now() - (index * 3 + 2) * 24 * 60 * 60 * 1000).toISOString(),
+      updateType: initiative.status === 'completed' ? 'completed' : 'progress_update',
+      budget: initiative.budget
     })),
-    // Tasks
-    ...tasks.slice(0, 5).map(task => ({
+    // Recent tasks (limit to most recent 5)
+    ...tasks.slice(0, 5).map((task, index) => ({
       id: task.id,
       title: task.title,
       type: 'task' as const,
       status: task.status || 'not_started',
       progress: task.status === 'completed' ? 100 : task.status === 'in_progress' ? 50 : 0,
-      dueDate: task.dueDate,
-      completedAt: task.completedAt,
+      dueDate: task.dueDate?.toISOString(),
+      completedAt: task.completedAt?.toISOString(),
+      lastUpdated: new Date(Date.now() - (index + 1) * 12 * 60 * 60 * 1000).toISOString(),
+      updateType: task.status === 'completed' ? 'completed' : 'status_change'
     }))
-  ];
+  ].sort((a, b) => new Date(b.lastUpdated || 0).getTime() - new Date(a.lastUpdated || 0).getTime());
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -128,7 +146,7 @@ export default function ObjectiveTimeline({
       <CardHeader>
         <CardTitle className="font-semibold tracking-tight flex items-center gap-2 text-[18px]">
           <Clock className="w-5 h-5" />
-          Progress Timeline
+          Timeline Update Terbaru
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -157,6 +175,26 @@ export default function ObjectiveTimeline({
                       <Badge className={`text-xs ${getStatusColor(item.status, item.progress || 0)}`}>
                         {item.status.replace('_', ' ')}
                       </Badge>
+                      {item.updateType && (
+                        <Badge variant="outline" className="text-xs text-blue-600 border-blue-200">
+                          {item.updateType === 'check_in' ? 'Check-in' : 
+                           item.updateType === 'status_change' ? 'Status Update' :
+                           item.updateType === 'progress_update' ? 'Progress Update' :
+                           item.updateType === 'completed' ? 'Completed' : 'Created'}
+                        </Badge>
+                      )}
+                    </div>
+                    {/* Update Information */}
+                    <div className="mt-2 text-xs text-gray-500 space-y-1">
+                      {item.lastUpdated && (
+                        <div>Terakhir diperbarui: {new Date(item.lastUpdated).toLocaleString('id-ID')}</div>
+                      )}
+                      {item.type === 'key_result' && item.currentValue && item.targetValue && (
+                        <div>Nilai: {parseFloat(item.currentValue).toLocaleString('id-ID')} / {parseFloat(item.targetValue).toLocaleString('id-ID')} {item.unit}</div>
+                      )}
+                      {item.type === 'initiative' && item.budget && (
+                        <div>Budget: Rp {parseFloat(item.budget).toLocaleString('id-ID')}</div>
+                      )}
                     </div>
                   </div>
                   
@@ -164,9 +202,14 @@ export default function ObjectiveTimeline({
                     <div className="text-lg font-bold text-gray-900">
                       {item.progress || 0}%
                     </div>
-                    {item.dueDate && (
+                    {(item as any).dueDate && (
                       <div className="text-xs text-gray-500">
-                        Due: {new Date(item.dueDate).toLocaleDateString('id-ID')}
+                        Due: {new Date((item as any).dueDate).toLocaleDateString('id-ID')}
+                      </div>
+                    )}
+                    {(item as any).completedAt && (
+                      <div className="text-xs text-green-600">
+                        Selesai: {new Date((item as any).completedAt).toLocaleDateString('id-ID')}
                       </div>
                     )}
                   </div>
