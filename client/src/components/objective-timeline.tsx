@@ -126,7 +126,7 @@ export default function ObjectiveTimeline({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="font-semibold tracking-tight flex items-center gap-2 text-[18px]">
           <Clock className="w-5 h-5" />
           Progress Timeline
         </CardTitle>
