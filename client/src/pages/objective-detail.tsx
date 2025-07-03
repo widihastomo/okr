@@ -518,11 +518,11 @@ export default function GoalDetail() {
 
       {/* Tabs Section */}
       <Tabs defaultValue="key-results" className="space-y-6">
-        <div className="flex items-center justify-start mb-6">
+        <TabsList className="grid w-full grid-cols-3 h-auto p-0 bg-transparent gap-0 rounded-none mb-6">
           {/* Tab 1 - Arrow shape */}
           <TabsTrigger 
             value="key-results"
-            className="relative bg-gray-100 border border-gray-300 px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 flex items-center gap-3 min-w-[280px]"
+            className="relative bg-gray-100 border border-gray-300 px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 flex items-center gap-3 justify-start"
             style={{
               clipPath: 'polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%)',
               marginRight: '-20px',
@@ -536,7 +536,7 @@ export default function GoalDetail() {
           {/* Tab 2 - Arrow shape */}
           <TabsTrigger 
             value="initiatives"
-            className="relative bg-gray-100 border border-gray-300 px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 flex items-center gap-3 min-w-[280px]"
+            className="relative bg-gray-100 border border-gray-300 px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 flex items-center gap-3 justify-start"
             style={{
               clipPath: 'polygon(20px 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0 50%)',
               marginRight: '-20px',
@@ -550,7 +550,7 @@ export default function GoalDetail() {
           {/* Tab 3 - Arrow shape */}
           <TabsTrigger 
             value="tasks"
-            className="relative bg-gray-100 border border-gray-300 px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 flex items-center gap-3 min-w-[280px]"
+            className="relative bg-gray-100 border border-gray-300 px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 flex items-center gap-3 justify-start"
             style={{
               clipPath: 'polygon(20px 0, 100% 0, 100% 100%, 20px 100%, 0 50%)',
               zIndex: 3
@@ -559,7 +559,7 @@ export default function GoalDetail() {
             <span className="bg-white text-blue-600 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold ml-5">3</span>
             <span>Tugas ({tugas.length})</span>
           </TabsTrigger>
-        </div>
+        </TabsList>
 
         {/* Ukuran Keberhasilan Tab */}
         <TabsContent
