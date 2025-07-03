@@ -96,6 +96,13 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 03, 2025. Fixed form edit displaying incorrect numbers and number parsing issues:
+  * Fixed edit form to display numbers with proper thousand separators (1000 shows as "1.000")
+  * Corrected double parseFloat() issue in form submissions - removed frontend parsing redundancy
+  * Enhanced form data loading to format database values with Indonesian thousand separators for display
+  * Updated edit key result modal to properly format numbers when loading existing data
+  * Fixed thousand separator removal logic to prevent numeric value multiplication errors
+  * All forms now display and save numbers correctly: 1000 displays as "1.000" but saves as 1000
 - July 03, 2025. Fixed number parsing issue causing incorrect value storage (1000 saved as 100,000):
   * Corrected double parseFloat() issue in form submissions - removed frontend parsing redundancy
   * Updated edit key result modal to only clean separators before sending to server

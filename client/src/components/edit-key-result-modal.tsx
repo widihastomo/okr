@@ -116,6 +116,8 @@ export default function EditKeyResultModal({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+
+
   // Get check-in count for this key result
   const { data: checkInData } = useQuery({
     queryKey: ["/api/key-results", keyResult?.id, "check-ins", "count"],
@@ -132,9 +134,9 @@ export default function EditKeyResultModal({
     values: keyResult ? {
       title: keyResult.title,
       description: keyResult.description || "",
-      currentValue: keyResult.currentValue,
-      targetValue: keyResult.targetValue,
-      baseValue: keyResult.baseValue || "",
+      currentValue: keyResult.currentValue ? new Intl.NumberFormat('id-ID').format(parseFloat(keyResult.currentValue)) : "",
+      targetValue: keyResult.targetValue ? new Intl.NumberFormat('id-ID').format(parseFloat(keyResult.targetValue)) : "",
+      baseValue: keyResult.baseValue ? new Intl.NumberFormat('id-ID').format(parseFloat(keyResult.baseValue)) : "",
       unit: keyResult.unit || "",
       keyResultType: keyResult.keyResultType as "increase_to" | "decrease_to" | "achieve_or_not" | "should_stay_above" | "should_stay_below",
       status: keyResult.status as "on_track" | "at_risk" | "behind" | "completed" | "in_progress",
