@@ -973,13 +973,12 @@ export default function GoalDetail() {
                             </div>
                           </div>
                           
-                          {/* Progress text below bar - like in dashboard */}
+                          {/* Progress text below bar - exactly like in dashboard */}
                           <div className="mt-2 text-xs text-gray-600 flex items-center gap-2">
-                            <span>→ Progress saat ini</span>
-                            <span className="text-gray-400">|</span>
+                            <div className="w-0.5 h-3 bg-gray-400 opacity-70"></div>
                             <span>
-                              Target ideal ({(() => {
-                                if (!cycle) return "0.0";
+                              {(() => {
+                                if (!cycle) return "Target ideal (0% - belum dimulai)";
                                 
                                 const now = new Date();
                                 const start = new Date(cycle.startDate);
@@ -987,6 +986,14 @@ export default function GoalDetail() {
                                 const totalTime = end.getTime() - start.getTime();
                                 const timePassed = Math.max(0, now.getTime() - start.getTime());
                                 const timeProgressRatio = Math.min(1, timePassed / totalTime);
+                                
+                                if (now > end) {
+                                  return "Target capaian (100%)";
+                                }
+                                
+                                if (timeProgressRatio < 0) {
+                                  return "Target ideal (0% - belum dimulai)";
+                                }
                                 
                                 const idealProgress = goal?.keyResults ? (() => {
                                   if (goal.keyResults.length === 0) return 0;
@@ -1009,8 +1016,8 @@ export default function GoalDetail() {
                                   return totalIdealProgress / goal.keyResults.length;
                                 })() : timeProgressRatio * 100;
                                 
-                                return idealProgress.toFixed(1);
-                              })()}%)
+                                return `Target ideal (${idealProgress.toFixed(1)}%)`;
+                              })()}
                             </span>
                           </div>
                         </div>
