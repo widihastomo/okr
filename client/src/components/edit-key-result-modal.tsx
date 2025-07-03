@@ -453,7 +453,13 @@ export default function EditKeyResultModal({
                 type="submit"
                 disabled={updateKeyResultMutation.isPending}
                 className="bg-blue-600 hover:bg-blue-700"
-
+                onClick={(e) => {
+                  console.log("Button clicked, form state:", {
+                    isValid: form.formState.isValid,
+                    errors: form.formState.errors,
+                    values: form.getValues()
+                  });
+                }}
               >
                 {updateKeyResultMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
               </Button>
