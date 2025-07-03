@@ -101,7 +101,7 @@ const keyResultSchema = z.object({
   // For should_stay types, no specific logical validation needed
   return true;
 }, {
-  message: "Nilai tidak logis: untuk 'increase_to' nilai awal harus lebih kecil dari target, untuk 'decrease_to' nilai awal harus lebih besar dari target",
+  message: "Nilai tidak logis: untuk 'Naik ke Target' nilai awal harus lebih kecil dari target, untuk 'Turun ke Target' nilai awal harus lebih besar dari target",
   path: ["baseValue"]
 });
 
