@@ -7,7 +7,7 @@ import OKRCard from "@/components/okr-card";
 import { CreateOKRButton } from "@/components/okr-form-modal";
 import EditProgressModal from "@/components/edit-progress-modal";
 import EditKeyResultModal from "@/components/edit-key-result-modal";
-import { DeleteConfirmationModal } from "@/components/delete-confirmation-modal";
+import { CascadeDeleteConfirmationModal } from "@/components/cascade-delete-confirmation-modal";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -44,7 +44,10 @@ export default function Dashboard() {
   const [deleteConfirmModal, setDeleteConfirmModal] = useState<{ 
     open: boolean; 
     okrId?: string; 
-    okrTitle?: string; 
+    okrTitle?: string;
+    keyResultsCount?: number;
+    initiativesCount?: number;
+    tasksCount?: number;
   }>({
     open: false
   });
@@ -389,14 +392,31 @@ export default function Dashboard() {
     duplicateOKRMutation.mutate(okr);
   };
 
-  const handleDeleteOKR = (okrId: string) => {
-    // Find the OKR to get its title for the confirmation modal
-    const okrToDelete = okrs.find(okr => okr.id === okrId);
-    setDeleteConfirmModal({ 
-      open: true, 
-      okrId, 
-      okrTitle: okrToDelete?.title || "OKR ini" 
-    });
+  const handleDeleteOKR = async (okrId: string) => {
+    try {
+      // Get cascade deletion info
+      const response = await apiRequest(`/api/objectives/${okrId}/cascade-info`);
+      
+      setDeleteConfirmModal({ 
+        open: true, 
+        okrId, 
+        okrTitle: response.objective.title,
+        keyResultsCount: response.counts.keyResults,
+        initiativesCount: response.counts.initiatives,
+        tasksCount: response.counts.tasks
+      });
+    } catch (error) {
+      // Fallback to basic deletion if cascade info fails
+      const okrToDelete = okrs.find(okr => okr.id === okrId);
+      setDeleteConfirmModal({ 
+        open: true, 
+        okrId, 
+        okrTitle: okrToDelete?.title || "OKR ini",
+        keyResultsCount: 0,
+        initiativesCount: 0,
+        tasksCount: 0
+      });
+    }
   };
 
   const confirmDeleteOKR = () => {
@@ -579,14 +599,15 @@ export default function Dashboard() {
 
 
 
-      {/* Delete Confirmation Modal */}
-      <DeleteConfirmationModal
+      {/* Cascade Delete Confirmation Modal */}
+      <CascadeDeleteConfirmationModal
         open={deleteConfirmModal.open}
-        onOpenChange={(open) => setDeleteConfirmModal({ open })}
+        onOpenChange={(open: boolean) => setDeleteConfirmModal({ open })}
         onConfirm={confirmDeleteOKR}
-        title="Hapus OKR"
-        itemName={deleteConfirmModal.okrTitle}
-        description={`Apakah Anda yakin ingin menghapus OKR "${deleteConfirmModal.okrTitle}"? Semua Key Results dan data terkait akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.`}
+        objectiveTitle={deleteConfirmModal.okrTitle || ""}
+        keyResultsCount={deleteConfirmModal.keyResultsCount || 0}
+        initiativesCount={deleteConfirmModal.initiativesCount || 0}
+        tasksCount={deleteConfirmModal.tasksCount || 0}
       />
     </div>
   );

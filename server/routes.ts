@@ -220,16 +220,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get cascade deletion info for objective
+  app.get("/api/objectives/:id/cascade-info", async (req, res) => {
+    try {
+      const id = req.params.id;
+      
+      // Get objective info
+      const objective = await storage.getObjective(id);
+      if (!objective) {
+        return res.status(404).json({ message: "Objective not found" });
+      }
+      
+      // Get key results count
+      const keyResultsList = await storage.getKeyResultsByObjectiveId(id);
+      
+      // Get initiatives count (from all key results)
+      let initiativesCount = 0;
+      let tasksCount = 0;
+      
+      for (const keyResult of keyResultsList) {
+        const keyResultInitiatives = await storage.getInitiativesByKeyResultId(keyResult.id);
+        initiativesCount += keyResultInitiatives.length;
+        
+        // Get tasks count for each initiative
+        for (const initiative of keyResultInitiatives) {
+          const initiativeTasks = await storage.getTasksByInitiativeId(initiative.id);
+          tasksCount += initiativeTasks.length;
+        }
+      }
+      
+      res.json({
+        objective: {
+          id: objective.id,
+          title: objective.title
+        },
+        counts: {
+          keyResults: keyResultsList.length,
+          initiatives: initiativesCount,
+          tasks: tasksCount
+        }
+      });
+    } catch (error) {
+      console.error("Error getting cascade info:", error);
+      res.status(500).json({ message: "Failed to get cascade info" });
+    }
+  });
+
   app.delete("/api/objectives/:id", async (req, res) => {
     try {
       const id = req.params.id;
-      const deleted = await storage.deleteObjective(id);
+      const deleted = await storage.deleteObjectiveWithCascade(id);
       
       if (!deleted) {
         return res.status(404).json({ message: "Objective not found" });
       }
       
-      res.json({ message: "Objective deleted successfully" });
+      res.json({ message: "Objective and all related data deleted successfully" });
     } catch (error) {
       console.error("Error deleting objective:", error);
       res.status(500).json({ message: "Failed to delete objective" });

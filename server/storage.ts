@@ -36,6 +36,7 @@ export interface IStorage {
   createObjective(objective: InsertObjective): Promise<Objective>;
   updateObjective(id: string, objective: Partial<InsertObjective>): Promise<Objective | undefined>;
   deleteObjective(id: string): Promise<boolean>;
+  deleteObjectiveWithCascade(id: string): Promise<boolean>;
   getObjectivesByCycleId(cycleId: string): Promise<Objective[]>;
   
   // Key Results
@@ -524,6 +525,50 @@ export class DatabaseStorage implements IStorage {
   async deleteObjective(id: string): Promise<boolean> {
     const result = await db.delete(objectives).where(eq(objectives.id, id));
     return (result.rowCount ?? 0) > 0;
+  }
+
+  async deleteObjectiveWithCascade(id: string): Promise<boolean> {
+    try {
+      // Get all key results for this objective
+      const objectiveKeyResults = await db.select().from(keyResults).where(eq(keyResults.objectiveId, id));
+      
+      // For each key result, delete related data
+      for (const keyResult of objectiveKeyResults) {
+        // Delete check-ins for each key result
+        await db.delete(checkIns).where(eq(checkIns.keyResultId, keyResult.id));
+        
+        // Get all initiatives for this key result and delete related data
+        const keyResultInitiatives = await db.select().from(initiatives).where(eq(initiatives.keyResultId, keyResult.id));
+        
+        for (const initiative of keyResultInitiatives) {
+          // Delete tasks for each initiative
+          await db.delete(tasks).where(eq(tasks.initiativeId, initiative.id));
+          
+          // Delete initiative members
+          await db.delete(initiativeMembers).where(eq(initiativeMembers.initiativeId, initiative.id));
+          
+          // Delete initiative documents
+          await db.delete(initiativeDocuments).where(eq(initiativeDocuments.initiativeId, initiative.id));
+          
+          // Delete initiative notes
+          await db.delete(initiativeNotes).where(eq(initiativeNotes.initiativeId, initiative.id));
+          
+          // Delete the initiative itself
+          await db.delete(initiatives).where(eq(initiatives.id, initiative.id));
+        }
+        
+        // Delete the key result itself
+        await db.delete(keyResults).where(eq(keyResults.id, keyResult.id));
+      }
+      
+      // Finally, delete the objective
+      const result = await db.delete(objectives).where(eq(objectives.id, id));
+      return (result.rowCount ?? 0) > 0;
+      
+    } catch (error) {
+      console.error("Error in cascading delete:", error);
+      throw error;
+    }
   }
 
   // Key Results
