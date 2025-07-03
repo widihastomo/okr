@@ -96,6 +96,14 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 03, 2025. Implemented restriction on editing key result types when check-ins exist to maintain data integrity:
+  * Disabled key result type editing when existing check-ins are present to prevent data confusion
+  * Added automatic check-in count query to determine edit restrictions for type field
+  * Replaced complex warning modal system with simple field disabling approach for better UX
+  * Display clear explanatory message showing why type cannot be changed (number of existing check-ins)
+  * Simplified edit modal logic by removing type change warning components and state management
+  * Other key result fields (title, description, values, status) remain fully editable regardless of check-in history
+  * Enhanced data consistency by preventing type changes that could invalidate existing progress data
 - July 03, 2025. Completed comprehensive validation system for key result forms with logical business rules:
   * Added logical validation for "Naik ke Target" (increase_to) requiring initial value < target value
   * Added logical validation for "Turun ke Target" (decrease_to) requiring initial value > target value

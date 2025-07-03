@@ -16,7 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import type { KeyResult } from "@shared/schema";
-import { KeyResultTypeChangeWarning } from "./key-result-type-change-warning";
+
 
 // Unit options for Key Results
 const unitOptions = [
@@ -112,8 +112,7 @@ export default function EditKeyResultModal({
   onOpenChange,
   keyResult,
 }: EditKeyResultModalProps) {
-  const [showWarning, setShowWarning] = useState(false);
-  const [pendingFormData, setPendingFormData] = useState<EditKeyResultFormData | null>(null);
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -182,26 +181,9 @@ export default function EditKeyResultModal({
   });
 
   const handleSubmit = (data: EditKeyResultFormData) => {
-    // Check if key result type is changing and there are existing check-ins
-    const isTypeChanging = keyResult && data.keyResultType !== keyResult.keyResultType;
-    const hasCheckIns = checkInData && checkInData.count > 0;
-    
-    if (isTypeChanging && hasCheckIns) {
-      // Show warning dialog
-      setPendingFormData(data);
-      setShowWarning(true);
-    } else {
-      // Proceed directly with update
-      updateKeyResultMutation.mutate(data);
-    }
-  };
-
-  const handleConfirmTypeChange = () => {
-    if (pendingFormData) {
-      updateKeyResultMutation.mutate(pendingFormData);
-    }
-    setShowWarning(false);
-    setPendingFormData(null);
+    // Since type changing is now disabled when there are check-ins,
+    // we can directly proceed with the update
+    updateKeyResultMutation.mutate(data);
   };
 
   // Watch for key result type changes and clear validation errors
@@ -281,20 +263,40 @@ export default function EditKeyResultModal({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Tipe Ukuran Keberhasilan</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih tipe" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="increase_to">Naik ke (Increase To)</SelectItem>
-                        <SelectItem value="decrease_to">Turun ke (Decrease To)</SelectItem>
-                        <SelectItem value="should_stay_above">Harus tetap di atas (Stay Above)</SelectItem>
-                        <SelectItem value="should_stay_below">Harus tetap di bawah (Stay Below)</SelectItem>
-                        <SelectItem value="achieve_or_not">Ya/Tidak (Achieve or Not)</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    {(checkInData?.count || 0) > 0 ? (
+                      <div className="space-y-2">
+                        <Input
+                          value={
+                            field.value === "increase_to" ? "Naik ke (Increase To)" :
+                            field.value === "decrease_to" ? "Turun ke (Decrease To)" :
+                            field.value === "should_stay_above" ? "Harus tetap di atas (Stay Above)" :
+                            field.value === "should_stay_below" ? "Harus tetap di bawah (Stay Below)" :
+                            field.value === "achieve_or_not" ? "Ya/Tidak (Achieve or Not)" :
+                            field.value
+                          }
+                          disabled
+                          className="bg-gray-100 text-gray-500"
+                        />
+                        <p className="text-xs text-gray-500">
+                          Tipe tidak dapat diubah karena sudah ada {checkInData.count} check-in yang tercatat.
+                        </p>
+                      </div>
+                    ) : (
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih tipe" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="increase_to">Naik ke (Increase To)</SelectItem>
+                          <SelectItem value="decrease_to">Turun ke (Decrease To)</SelectItem>
+                          <SelectItem value="should_stay_above">Harus tetap di atas (Stay Above)</SelectItem>
+                          <SelectItem value="should_stay_below">Harus tetap di bawah (Stay Below)</SelectItem>
+                          <SelectItem value="achieve_or_not">Ya/Tidak (Achieve or Not)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -508,17 +510,7 @@ export default function EditKeyResultModal({
         </Form>
       </DialogContent>
       
-      {/* Type Change Warning Dialog */}
-      {keyResult && (
-        <KeyResultTypeChangeWarning
-          open={showWarning}
-          onOpenChange={setShowWarning}
-          onConfirm={handleConfirmTypeChange}
-          currentType={keyResult.keyResultType}
-          newType={pendingFormData?.keyResultType || ""}
-          checkInCount={checkInData?.count || 0}
-        />
-      )}
+
     </Dialog>
   );
 }
