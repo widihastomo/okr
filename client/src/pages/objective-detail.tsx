@@ -483,140 +483,122 @@ export default function GoalDetail() {
               
               return (
                 <div key={kr.id} className="border border-gray-200 rounded-lg bg-white shadow-sm">
-                  {/* Header dengan title dan tombol actions */}
-                  <div className="flex items-center justify-between p-4 pb-2">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-medium text-gray-900">{kr.title}</h3>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            {getKeyResultTypeIcon(kr.keyResultType)}
-                          </TooltipTrigger>
-                          <TooltipContent side="right" align="center">
-                            <p>{getKeyResultTypeTooltip(kr.keyResultType)}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                  {/* Mobile optimized layout */}
+                  <div className="p-4">
+                    {/* Header with title, icon and actions */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-2 flex-1">
+                        <h3 className="font-medium text-gray-900 text-base">{kr.title}</h3>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              {getKeyResultTypeIcon(kr.keyResultType)}
+                            </TooltipTrigger>
+                            <TooltipContent side="right" align="center">
+                              <p>{getKeyResultTypeTooltip(kr.keyResultType)}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => handleCheckIn(kr)}
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-sm"
+                        >
+                          <TrendingUp className="w-3 h-3 mr-1" />
+                          Update
+                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem onClick={() => window.location.href = `/key-results/${kr.id}`}>
+                              <Target className="mr-2 h-4 w-4" />
+                              Lihat Detail
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleEditKeyResult(kr)}>
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit Ukuran Keberhasilan
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => handleCheckIn(kr)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
-                      >
-                        <TrendingUp className="w-4 h-4 mr-1" />
-                        Update
-                      </Button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <MoreVertical className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem onClick={() => window.location.href = `/key-results/${kr.id}`}>
-                            <Target className="mr-2 h-4 w-4" />
-                            Lihat Detail
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleEditKeyResult(kr)}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit Ukuran Keberhasilan
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
 
-                  {/* Description */}
-                  {kr.description && (
-                    <div className="px-4 pb-2">
-                      <p className="text-sm text-gray-600">{kr.description}</p>
-                    </div>
-                  )}
+                    {/* Description */}
+                    {kr.description && (
+                      <div className="mb-3">
+                        <p className="text-sm text-gray-600">{kr.description}</p>
+                      </div>
+                    )}
 
-                  {/* Values line */}
-                  <div className="px-4 pb-2">
-                    <p className="text-sm text-gray-600">
-                      {(() => {
-                        // Handle achieve_or_not type
-                        if (kr.keyResultType === 'achieve_or_not') {
-                          return progress >= 100 ? 'Status: Tercapai' : 'Status: Belum tercapai';
-                        }
-                        
-                        // Handle should_stay types  
-                        if (kr.keyResultType === 'should_stay_above' || kr.keyResultType === 'should_stay_below') {
+                    {/* Values line */}
+                    <div className="mb-3">
+                      <p className="text-sm text-gray-600">
+                        {(() => {
+                          // Handle achieve_or_not type
+                          if (kr.keyResultType === 'achieve_or_not') {
+                            return progress >= 100 ? 'Status: Tercapai' : 'Status: Belum tercapai';
+                          }
+                          
+                          // Handle should_stay types  
+                          if (kr.keyResultType === 'should_stay_above' || kr.keyResultType === 'should_stay_below') {
+                            const currentVal = parseFloat(kr.currentValue);
+                            const targetVal = parseFloat(kr.targetValue);
+                            const unitDisplay = kr.unit === 'Rp' ? 'Rp ' : kr.unit === '%' ? '' : '';
+                            const unitSuffix = kr.unit === '%' ? '%' : '';
+                            
+                            return `Saat ini: ${unitDisplay}${currentVal.toLocaleString('id-ID')}${unitSuffix} | Threshold: ${unitDisplay}${targetVal.toLocaleString('id-ID')}${unitSuffix}`;
+                          }
+                          
+                          // Handle increase_to and decrease_to types
                           const currentVal = parseFloat(kr.currentValue);
                           const targetVal = parseFloat(kr.targetValue);
-                          const unitDisplay = kr.unit === 'Rp' ? 'Rp ' : kr.unit === '%' ? '' : '';
-                          const unitSuffix = kr.unit === '%' ? '%' : '';
+                          const baseVal = kr.baseValue ? parseFloat(kr.baseValue) : 0;
                           
-                          return `Saat ini: ${unitDisplay}${currentVal.toLocaleString('id-ID')}${unitSuffix} | Threshold: ${unitDisplay}${targetVal.toLocaleString('id-ID')}${unitSuffix}`;
-                        }
-                        
-                        // Handle increase_to and decrease_to types
-                        const currentVal = parseFloat(kr.currentValue);
-                        const targetVal = parseFloat(kr.targetValue);
-                        const baseVal = kr.baseValue ? parseFloat(kr.baseValue) : 0;
-                        
-                        if (kr.keyResultType === 'decrease_to') {
-                          if (kr.unit === 'Rp') {
-                            return `Rp ${baseVal.toLocaleString('id-ID')} → Rp ${targetVal.toLocaleString('id-ID')} (capaian: Rp ${currentVal.toLocaleString('id-ID')})`;
-                          } else if (kr.unit === '%') {
-                            return `${baseVal.toLocaleString('id-ID')}% → ${targetVal.toLocaleString('id-ID')}% (capaian: ${currentVal.toLocaleString('id-ID')}%)`;
+                          if (kr.keyResultType === 'decrease_to') {
+                            if (kr.unit === 'Rp') {
+                              return `${baseVal.toLocaleString('id-ID')} → ${targetVal.toLocaleString('id-ID')} Rupiah (capaian: ${currentVal.toLocaleString('id-ID')})`;
+                            } else if (kr.unit === '%') {
+                              return `${baseVal.toLocaleString('id-ID')}% → ${targetVal.toLocaleString('id-ID')}% (capaian: ${currentVal.toLocaleString('id-ID')}%)`;
+                            } else {
+                              return `${baseVal.toLocaleString('id-ID')} → ${targetVal.toLocaleString('id-ID')} ${kr.unit || ''} (capaian: ${currentVal.toLocaleString('id-ID')})`;
+                            }
                           } else {
-                            return `${baseVal.toLocaleString('id-ID')} → ${targetVal.toLocaleString('id-ID')} ${kr.unit || ''} (capaian: ${currentVal.toLocaleString('id-ID')})`;
+                            // increase_to type
+                            if (kr.unit === 'Rp') {
+                              return `${baseVal.toLocaleString('id-ID')} → ${targetVal.toLocaleString('id-ID')} Rupiah (capaian: ${currentVal.toLocaleString('id-ID')})`;
+                            } else if (kr.unit === '%') {
+                              return `${baseVal.toLocaleString('id-ID')}% → ${targetVal.toLocaleString('id-ID')}% (capaian: ${currentVal.toLocaleString('id-ID')}%)`;
+                            } else {
+                              return `${baseVal.toLocaleString('id-ID')} → ${targetVal.toLocaleString('id-ID')} ${kr.unit || ''} (capaian: ${currentVal.toLocaleString('id-ID')})`;
+                            }
                           }
-                        } else {
-                          // increase_to type
-                          if (kr.unit === 'Rp') {
-                            return `Rp ${baseVal.toLocaleString('id-ID')} → Rp ${targetVal.toLocaleString('id-ID')} (capaian: Rp ${currentVal.toLocaleString('id-ID')})`;
-                          } else if (kr.unit === '%') {
-                            return `${baseVal.toLocaleString('id-ID')}% → ${targetVal.toLocaleString('id-ID')}% (capaian: ${currentVal.toLocaleString('id-ID')}%)`;
-                          } else {
-                            return `${baseVal.toLocaleString('id-ID')} → ${targetVal.toLocaleString('id-ID')} ${kr.unit || ''} (capaian: ${currentVal.toLocaleString('id-ID')})`;
-                          }
-                        }
-                      })()}
-                    </p>
-                  </div>
+                        })()}
+                      </p>
+                    </div>
 
-                  {/* Progress section dengan badge dan progress bar */}
-                  <div className="px-4 pb-4">
-                    <div className="flex items-center gap-2 mb-2">
+                    {/* Badge */}
+                    <div className="mb-3">
                       <Badge 
                         variant="secondary" 
-                        className="bg-blue-500 text-white hover:bg-blue-600 flex items-center gap-1"
+                        className="bg-blue-500 text-white hover:bg-blue-600 flex items-center gap-1 w-fit"
                       >
                         <TrendingUp className="w-3 h-3" />
                         Lebih Cepat
                       </Badge>
                     </div>
                     
-                    {/* Progress bar dan info */}
-                    <div className="flex items-center gap-3">
-                      <div className="flex-1 relative">
-                        <Progress value={progress} className="h-2" />
-                        {cycle && (() => {
-                          const now = new Date();
-                          const start = new Date(cycle.startDate);
-                          const end = new Date(cycle.endDate);
-                          const totalTime = end.getTime() - start.getTime();
-                          const timePassed = now.getTime() - start.getTime();
-                          const idealProgress = Math.max(0, Math.min(100, (timePassed / totalTime) * 100));
-                          
-                          return (
-                            <div 
-                              className="absolute top-0 h-2 w-0.5 bg-gray-400 opacity-70"
-                              style={{ left: `${idealProgress}%` }}
-                              title={`Target ideal: ${idealProgress.toFixed(1)}%`}
-                            />
-                          );
-                        })()}
-                      </div>
-                      <div className="text-right">
-                        <div className="text-lg font-semibold text-gray-900">{progress.toFixed(1)}%</div>
-                        <div className="text-xs text-gray-500">
+                    {/* Progress bar and percentage */}
+                    <div className="mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 relative">
+                          <Progress value={progress} className="h-2" />
                           {cycle && (() => {
                             const now = new Date();
                             const start = new Date(cycle.startDate);
@@ -624,33 +606,25 @@ export default function GoalDetail() {
                             const totalTime = end.getTime() - start.getTime();
                             const timePassed = now.getTime() - start.getTime();
                             const idealProgress = Math.max(0, Math.min(100, (timePassed / totalTime) * 100));
-                            return `Target ideal (${idealProgress.toFixed(1)}%)`;
+                            
+                            return (
+                              <div 
+                                className="absolute top-0 h-2 w-0.5 bg-gray-400 opacity-70"
+                                style={{ left: `${idealProgress}%` }}
+                                title={`Target ideal: ${idealProgress.toFixed(1)}%`}
+                              />
+                            );
                           })()}
+                        </div>
+                        <div className="text-lg font-semibold text-gray-900">
+                          {progress.toFixed(0)}%
                         </div>
                       </div>
                     </div>
                     
-                    {/* Progress info dengan last update */}
-                    <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
-                      <div className="flex items-center gap-1">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        <span>Progress saat ini</span>
-                        <span className="text-gray-400">|</span>
-                        {cycle && (() => {
-                          const now = new Date();
-                          const start = new Date(cycle.startDate);
-                          const end = new Date(cycle.endDate);
-                          const totalTime = end.getTime() - start.getTime();
-                          const timePassed = now.getTime() - start.getTime();
-                          const idealProgress = Math.max(0, Math.min(100, (timePassed / totalTime) * 100));
-                          return (
-                            <>
-                              <span>Target ideal ({idealProgress.toFixed(1)}%)</span>
-                            </>
-                          );
-                        })()}
-                      </div>
-                      <span>Terakhir update: 3 Jul 2025</span>
+                    {/* Last update */}
+                    <div className="text-xs text-gray-500">
+                      Terakhir update: 3 Jul 2025
                     </div>
                   </div>
                 </div>
