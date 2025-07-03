@@ -10,8 +10,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
-import { Calendar, Building, UserIcon, Target } from "lucide-react";
+import { Calendar, Building, UserIcon, Target, HelpCircle } from "lucide-react";
 import { Cycle, User, Team, Objective } from "@shared/schema";
 
 
@@ -150,7 +151,26 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
               <div className="space-y-4">
                 {/* Judul Goal */}
                 <div>
-                  <Label htmlFor="title">Judul Goal</Label>
+                  <Label htmlFor="title" className="flex items-center gap-2">
+                    Judul Goal
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button 
+                          type="button" 
+                          className="inline-flex items-center justify-center"
+                        >
+                          <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent side="right" className="max-w-xs">
+                        <p className="text-sm">
+                          Nama goal yang ingin dicapai. Gunakan bahasa yang inspiratif dan mudah dipahami oleh tim.
+                          <br /><br />
+                          <strong>Contoh:</strong> "Meningkatkan Kepuasan Pelanggan", "Memperluas Jangkauan Pasar", "Mengoptimalkan Efisiensi Operasional"
+                        </p>
+                      </PopoverContent>
+                    </Popover>
+                  </Label>
                   <Input
                     id="title"
                     placeholder="Masukkan judul goal yang jelas dan spesifik"
@@ -163,7 +183,26 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
 
                 {/* Deskripsi Goal */}
                 <div>
-                  <Label htmlFor="description">Deskripsi Goal</Label>
+                  <Label htmlFor="description" className="flex items-center gap-2">
+                    Deskripsi Goal
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button 
+                          type="button" 
+                          className="inline-flex items-center justify-center"
+                        >
+                          <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent side="right" className="max-w-xs">
+                        <p className="text-sm">
+                          Penjelasan detail tentang goal ini. Cantumkan konteks, alasan pentingnya, dan dampak yang diharapkan.
+                          <br /><br />
+                          <strong>Tips:</strong> Jelaskan "mengapa" goal ini penting dan "bagaimana" goal ini akan berdampak pada organisasi atau tim.
+                        </p>
+                      </PopoverContent>
+                    </Popover>
+                  </Label>
                   <Textarea
                     id="description"
                     placeholder="Jelaskan detail goal dan konteks yang ingin dicapai"
@@ -176,7 +215,26 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {/* Cycle */}
                   <div>
-                    <Label>Siklus</Label>
+                    <Label className="flex items-center gap-2">
+                      Siklus
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button 
+                            type="button" 
+                            className="inline-flex items-center justify-center"
+                          >
+                            <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent side="right" className="max-w-xs">
+                          <p className="text-sm">
+                            Periode waktu untuk mencapai goal ini. Pilih siklus yang sesuai dengan timeline dan prioritas bisnis.
+                            <br /><br />
+                            <strong>Contoh:</strong> Kuartal Q1 2024, Bulanan Januari, atau Tahunan 2024
+                          </p>
+                        </PopoverContent>
+                      </Popover>
+                    </Label>
                     <Select
                       value={form.watch("cycleId") || "none"}
                       onValueChange={(value) => form.setValue("cycleId", value === "none" ? undefined : value)}
@@ -197,7 +255,28 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
 
                   {/* Tipe Pemilik */}
                   <div>
-                    <Label>Tipe Pemilik</Label>
+                    <Label className="flex items-center gap-2">
+                      Tipe Pemilik
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button 
+                            type="button" 
+                            className="inline-flex items-center justify-center"
+                          >
+                            <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent side="right" className="max-w-xs">
+                          <p className="text-sm">
+                            Pilih siapa yang bertanggung jawab atas goal ini.
+                            <br /><br />
+                            <strong>Individual:</strong> Goal dipimpin oleh satu orang spesifik
+                            <br />
+                            <strong>Tim:</strong> Goal dipimpin oleh seluruh tim atau departemen
+                          </p>
+                        </PopoverContent>
+                      </Popover>
+                    </Label>
                     <Select
                       value={form.watch("ownerType")}
                       onValueChange={(value: "user" | "team") => {
@@ -221,7 +300,26 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
 
                   {/* Pemilik */}
                   <div>
-                    <Label>Pemilik</Label>
+                    <Label className="flex items-center gap-2">
+                      Pemilik
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button 
+                            type="button" 
+                            className="inline-flex items-center justify-center"
+                          >
+                            <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent side="right" className="max-w-xs">
+                          <p className="text-sm">
+                            Pilih siapa yang bertanggung jawab penuh atas pencapaian goal ini.
+                            <br /><br />
+                            <strong>Tips:</strong> Pastikan pemilik memiliki otoritas dan resources yang cukup untuk menggerakkan goal ini hingga selesai.
+                          </p>
+                        </PopoverContent>
+                      </Popover>
+                    </Label>
                     {ownerType === "user" ? (
                       <Select
                         value={form.watch("ownerId")}
@@ -276,7 +374,26 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
 
                 {/* Goal Induk */}
                 <div>
-                  <Label>Goal Induk (Opsional)</Label>
+                  <Label className="flex items-center gap-2">
+                    Goal Induk (Opsional)
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button 
+                          type="button" 
+                          className="inline-flex items-center justify-center"
+                        >
+                          <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent side="right" className="max-w-xs">
+                        <p className="text-sm">
+                          Pilih goal induk jika goal ini adalah bagian dari goal yang lebih besar.
+                          <br /><br />
+                          <strong>Contoh:</strong> Goal "Meningkatkan Konversi Website" bisa menjadi bagian dari goal induk "Meningkatkan Revenue Online"
+                        </p>
+                      </PopoverContent>
+                    </Popover>
+                  </Label>
                   <Select
                     value={form.watch("parentId") || "none"}
                     onValueChange={(value) => form.setValue("parentId", value === "none" ? undefined : value)}
