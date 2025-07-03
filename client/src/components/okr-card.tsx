@@ -521,11 +521,11 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
                         } else {
                           // increase_to type
                           if (kr.unit === 'Rp') {
-                            return `Rp ${currentVal.toLocaleString('id-ID')} → Rp ${targetVal.toLocaleString('id-ID')} (dari Rp ${baseVal.toLocaleString('id-ID')})`;
+                            return `Rp ${baseVal.toLocaleString('id-ID')} → Rp ${targetVal.toLocaleString('id-ID')} (capaian: Rp ${currentVal.toLocaleString('id-ID')})`;
                           } else if (kr.unit === '%') {
-                            return `${currentVal.toLocaleString('id-ID')}% → ${targetVal.toLocaleString('id-ID')}% (dari ${baseVal.toLocaleString('id-ID')}%)`;
+                            return `${baseVal.toLocaleString('id-ID')}% → ${targetVal.toLocaleString('id-ID')}% (capaian: ${currentVal.toLocaleString('id-ID')}%)`;
                           } else {
-                            return `${currentVal.toLocaleString('id-ID')} → ${targetVal.toLocaleString('id-ID')} ${kr.unit || ''} (dari ${baseVal.toLocaleString('id-ID')})`;
+                            return `${baseVal.toLocaleString('id-ID')} → ${targetVal.toLocaleString('id-ID')} ${kr.unit || ''} (capaian: ${currentVal.toLocaleString('id-ID')})`;
                           }
                         }
                       })()}
