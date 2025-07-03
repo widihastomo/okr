@@ -1185,14 +1185,14 @@ export default function GoalDetail() {
         {/* Rencana Tab */}
         <TabsContent value="initiatives" className="space-y-6">
           {/* Header with Description */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200">
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-lg border border-green-200">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
-                <h3 className="text-xl font-semibold text-blue-900 mb-2 flex items-center gap-2">
-                  <FileText className="w-6 h-6 text-blue-600" />
+                <h3 className="text-xl font-semibold text-green-900 mb-2 flex items-center gap-2">
+                  <FileText className="w-6 h-6 text-green-600" />
                   Rencana & Inisiatif
                 </h3>
-                <p className="text-blue-700 text-sm leading-relaxed">
+                <p className="text-green-700 text-sm leading-relaxed">
                   Rencana adalah langkah-langkah strategis untuk mencapai ukuran keberhasilan. Setiap rencana memiliki timeline, budget, dan PIC yang bertanggung jawab untuk eksekusi.
                 </p>
               </div>
@@ -1200,7 +1200,7 @@ export default function GoalDetail() {
             
             {/* Quick Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-4">
-              <div className="bg-white p-4 rounded-lg border border-blue-100">
+              <div className="bg-white p-4 rounded-lg border border-green-100">
                 <div className="flex items-center gap-2 mb-1">
                   <CheckCircle2 className="w-4 h-4 text-green-600" />
                   <span className="text-sm font-medium text-gray-700">Selesai</span>
@@ -1210,7 +1210,7 @@ export default function GoalDetail() {
                 </div>
               </div>
               
-              <div className="bg-white p-4 rounded-lg border border-blue-100">
+              <div className="bg-white p-4 rounded-lg border border-green-100">
                 <div className="flex items-center gap-2 mb-1">
                   <Clock className="w-4 h-4 text-blue-600" />
                   <span className="text-sm font-medium text-gray-700">Berlangsung</span>
@@ -1220,7 +1220,7 @@ export default function GoalDetail() {
                 </div>
               </div>
               
-              <div className="bg-white p-4 rounded-lg border border-blue-100">
+              <div className="bg-white p-4 rounded-lg border border-green-100">
                 <div className="flex items-center gap-2 mb-1">
                   <Building className="w-4 h-4 text-purple-600" />
                   <span className="text-sm font-medium text-gray-700">Total Budget</span>
@@ -1230,7 +1230,7 @@ export default function GoalDetail() {
                 </div>
               </div>
               
-              <div className="bg-white p-4 rounded-lg border border-blue-100">
+              <div className="bg-white p-4 rounded-lg border border-green-100">
                 <div className="flex items-center gap-2 mb-1">
                   <TrendingUp className="w-4 h-4 text-orange-600" />
                   <span className="text-sm font-medium text-gray-700">Rata-rata Progress</span>
@@ -1244,12 +1244,12 @@ export default function GoalDetail() {
             {/* Rencana List */}
             <div className="mt-6 space-y-4">
               {rencana.length === 0 ? (
-                <div className="border-2 border-dashed border-blue-200 bg-blue-50/50 rounded-lg p-8 text-center">
-                  <FileText className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-blue-900 mb-2">
+                <div className="border-2 border-dashed border-green-200 bg-green-50/50 rounded-lg p-8 text-center">
+                  <FileText className="w-12 h-12 text-green-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-green-900 mb-2">
                     Belum ada rencana
                   </h3>
-                  <p className="text-blue-700 mb-4">
+                  <p className="text-green-700 mb-4">
                     Mulai buat rencana untuk mencapai ukuran keberhasilan yang telah ditetapkan
                   </p>
                 </div>
@@ -1401,14 +1401,14 @@ export default function GoalDetail() {
         {/* Tugas Tab */}
         <TabsContent value="tasks" className="space-y-6">
           {/* Header with Description */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200">
+          <div className="bg-gradient-to-r from-purple-50 to-violet-50 p-6 rounded-lg border border-purple-200">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
-                <h3 className="text-xl font-semibold text-blue-900 mb-2 flex items-center gap-2">
-                  <CheckSquare className="w-6 h-6 text-blue-600" />
+                <h3 className="text-xl font-semibold text-purple-900 mb-2 flex items-center gap-2">
+                  <CheckSquare className="w-6 h-6 text-purple-600" />
                   Tugas & Aktivitas
                 </h3>
-                <p className="text-blue-700 text-sm leading-relaxed">
+                <p className="text-purple-700 text-sm leading-relaxed">
                   Tugas adalah aktivitas operasional yang mendukung pelaksanaan rencana. Setiap tugas memiliki PIC, deadline, dan tingkat prioritas untuk memastikan eksekusi yang efektif.
                 </p>
               </div>
@@ -1416,7 +1416,7 @@ export default function GoalDetail() {
             
             {/* Quick Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 mt-4">
-              <div className="bg-white p-4 rounded-lg border border-blue-100">
+              <div className="bg-white p-4 rounded-lg border border-purple-100">
                 <div className="flex items-center gap-2 mb-1">
                   <CheckCircle2 className="w-4 h-4 text-green-600" />
                   <span className="text-sm font-medium text-gray-700">Selesai</span>
@@ -1426,7 +1426,7 @@ export default function GoalDetail() {
                 </div>
               </div>
               
-              <div className="bg-white p-4 rounded-lg border border-blue-100">
+              <div className="bg-white p-4 rounded-lg border border-purple-100">
                 <div className="flex items-center gap-2 mb-1">
                   <Clock className="w-4 h-4 text-blue-600" />
                   <span className="text-sm font-medium text-gray-700">Berlangsung</span>
@@ -1436,7 +1436,7 @@ export default function GoalDetail() {
                 </div>
               </div>
               
-              <div className="bg-white p-4 rounded-lg border border-blue-100">
+              <div className="bg-white p-4 rounded-lg border border-purple-100">
                 <div className="flex items-center gap-2 mb-1">
                   <AlertTriangle className="w-4 h-4 text-red-600" />
                   <span className="text-sm font-medium text-gray-700">Terlambat</span>
@@ -1446,7 +1446,7 @@ export default function GoalDetail() {
                 </div>
               </div>
               
-              <div className="bg-white p-4 rounded-lg border border-blue-100">
+              <div className="bg-white p-4 rounded-lg border border-purple-100">
                 <div className="flex items-center gap-2 mb-1">
                   <TrendingUp className="w-4 h-4 text-orange-600" />
                   <span className="text-sm font-medium text-gray-700">Prioritas Tinggi</span>
@@ -1456,7 +1456,7 @@ export default function GoalDetail() {
                 </div>
               </div>
               
-              <div className="bg-white p-4 rounded-lg border border-blue-100">
+              <div className="bg-white p-4 rounded-lg border border-purple-100">
                 <div className="flex items-center gap-2 mb-1">
                   <UserIcon className="w-4 h-4 text-indigo-600" />
                   <span className="text-sm font-medium text-gray-700">Ditugaskan</span>
@@ -1470,12 +1470,12 @@ export default function GoalDetail() {
             {/* Tugas List */}
             <div className="mt-6 space-y-4">
               {tugas.length === 0 ? (
-                <div className="border-2 border-dashed border-blue-200 bg-blue-50/50 rounded-lg p-8 text-center">
-                  <CheckSquare className="w-12 h-12 mx-auto mb-4 text-blue-400" />
-                  <h3 className="text-lg font-medium text-blue-900 mb-2">
+                <div className="border-2 border-dashed border-purple-200 bg-purple-50/50 rounded-lg p-8 text-center">
+                  <CheckSquare className="w-12 h-12 mx-auto mb-4 text-purple-400" />
+                  <h3 className="text-lg font-medium text-purple-900 mb-2">
                     Belum ada tugas
                   </h3>
-                  <p className="text-blue-700 mb-4">
+                  <p className="text-purple-700 mb-4">
                     Tugas akan muncul ketika rencana dibuat dan dijabarkan ke aktivitas operasional.
                   </p>
                 </div>
