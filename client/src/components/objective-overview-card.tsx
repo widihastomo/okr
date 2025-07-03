@@ -157,21 +157,7 @@ export default function ObjectiveOverviewCard({
               </div>
             </div>
 
-            <div className="flex items-start sm:items-center gap-2">
-              {objective.ownerType === "team" ? (
-                <Building className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
-              ) : (
-                <UserIcon className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
-              )}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                <span className="font-medium break-words">
-                  {getOwnerDisplay()}
-                </span>
-                <span className="text-xs text-gray-400 capitalize">
-                  ({objective.ownerType === "team" ? "Tim" : "Individual"})
-                </span>
-              </div>
-            </div>
+
           </div>
         </div>
 
@@ -250,12 +236,25 @@ export default function ObjectiveOverviewCard({
                 : "Tidak ada deadline"}
             </span>
           </div>
-          {overallProgress < 50 && daysRemaining && daysRemaining < 30 && (
-            <div className="flex items-center gap-1 text-orange-600">
-              <AlertTriangle className="w-4 h-4" />
-              <span className="text-xs">Perlu perhatian</span>
+          <div className="flex items-center gap-4">
+            {overallProgress < 50 && daysRemaining && daysRemaining < 30 && (
+              <div className="flex items-center gap-1 text-orange-600">
+                <AlertTriangle className="w-4 h-4" />
+                <span className="text-xs">Perlu perhatian</span>
+              </div>
+            )}
+            {/* Owner Information */}
+            <div className="flex items-center gap-2">
+              {objective.ownerType === "team" ? (
+                <Building className="w-4 h-4 text-gray-500 flex-shrink-0" />
+              ) : (
+                <UserIcon className="w-4 h-4 text-gray-500 flex-shrink-0" />
+              )}
+              <span className="font-medium text-gray-700 text-sm">
+                {getOwnerDisplay()}
+              </span>
             </div>
-          )}
+          </div>
         </div>
 
         {/* Key Results Mini Preview */}
