@@ -24,6 +24,7 @@ import type {
 } from "@shared/schema";
 import { Link } from "wouter";
 import { calculateKeyResultProgress } from "@shared/progress-calculator";
+import { ObjectiveStatusBadge } from "./objective-status-badge";
 
 interface ObjectiveOverviewCardProps {
   objective: OKRWithKeyResults;
@@ -97,7 +98,9 @@ export default function ObjectiveOverviewCard({
 
   const overallProgress = calculateOverallProgress(objective.keyResults);
 
-  // Visual indicators
+
+
+  // Visual indicators for icon styling based on progress
   const getHealthColor = (progress: number) => {
     if (progress >= 80) return "text-green-600 bg-green-100";
     if (progress >= 60) return "text-yellow-600 bg-yellow-100";
@@ -125,9 +128,7 @@ export default function ObjectiveOverviewCard({
               </p>
             </div>
           </div>
-          <Badge className={getHealthColor(overallProgress)}>
-            {overallProgress}%
-          </Badge>
+          <ObjectiveStatusBadge status={objective.status} />
         </div>
 
         {/* Additional Info Section */}
