@@ -186,43 +186,6 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
 
       {/* Right side - Action buttons and notifications */}
       <div className="flex items-center space-x-3">
-        {/* Quick Action FAB */}
-        <div className="relative">
-          {/* Expanded Action Buttons */}
-          <div 
-            className={`absolute right-0 top-full mt-2 transition-all duration-300 ${
-              isExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
-            }`}
-          >
-            <div className="flex flex-col space-y-2">
-              <Button
-                onClick={handleCreateOKR}
-                className="h-8 px-3 bg-blue-600 hover:bg-blue-700 text-white text-sm whitespace-nowrap"
-              >
-                <Target className="h-4 w-4 mr-1" />
-                <span className="font-medium">Buat OKR</span>
-              </Button>
-              <Button
-                onClick={handleCreateTask}
-                className="h-8 px-3 bg-purple-600 hover:bg-purple-700 text-white text-sm whitespace-nowrap"
-              >
-                <FileText className="h-4 w-4 mr-1" />
-                <span className="font-medium">Buat Tugas</span>
-              </Button>
-            </div>
-          </div>
-
-          {/* Main FAB Button */}
-          <Button
-            onClick={toggleExpanded}
-            className={`h-8 w-8 rounded-full bg-orange-600 hover:bg-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 ${
-              isExpanded ? 'rotate-45' : 'rotate-0'
-            }`}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
-
         {/* Notification Bell */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -289,6 +252,43 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        {/* Quick Action FAB */}
+        <div className="relative">
+          {/* Expanded Action Buttons */}
+          <div 
+            className={`absolute right-0 top-full mt-2 transition-all duration-300 ${
+              isExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
+            }`}
+          >
+            <div className="flex flex-col space-y-2">
+              <Button
+                onClick={handleCreateOKR}
+                className="h-8 px-3 bg-blue-600 hover:bg-blue-700 text-white text-sm whitespace-nowrap"
+              >
+                <Target className="h-4 w-4 mr-1" />
+                <span className="font-medium">Buat OKR</span>
+              </Button>
+              <Button
+                onClick={handleCreateTask}
+                className="h-8 px-3 bg-purple-600 hover:bg-purple-700 text-white text-sm whitespace-nowrap"
+              >
+                <FileText className="h-4 w-4 mr-1" />
+                <span className="font-medium">Buat Tugas</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* Main FAB Button */}
+          <Button
+            onClick={toggleExpanded}
+            className={`h-8 w-8 rounded-full bg-orange-600 hover:bg-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 ${
+              isExpanded ? 'rotate-45' : 'rotate-0'
+            }`}
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       {/* Task Creation Modal */}
