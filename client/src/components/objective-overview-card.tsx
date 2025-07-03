@@ -67,9 +67,6 @@ export default function ObjectiveOverviewCard({
       <CardHeader className="pb-4">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-full ${getHealthColor(overallProgress)}`}>
-              <Target className="w-5 h-5" />
-            </div>
             <div>
               <CardTitle className="text-lg line-clamp-2">{objective.title}</CardTitle>
               <p className="text-sm text-gray-600 mt-1 line-clamp-2">{objective.description}</p>
