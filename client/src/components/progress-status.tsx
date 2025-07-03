@@ -216,16 +216,17 @@ export function SimpleProgressStatus({
 
   return (
     <div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
         <Badge 
           variant="secondary" 
-          className={`${config.color} text-white border-0 flex items-center gap-1`}
+          className={`${config.color} text-white border-0 flex items-center gap-1 shrink-0`}
         >
           <StatusIcon className="h-3 w-3" />
-          {config.label}
+          <span className="hidden sm:inline">{config.label}</span>
+          <span className="sm:hidden text-xs">{config.label.slice(0, 4)}</span>
         </Badge>
         <div 
-          className="flex-[3] relative group cursor-pointer"
+          className="flex-1 min-w-0 relative group cursor-pointer"
           title={`Progress: ${(progressPercentage || 0).toFixed(1)}% | Target ideal: ${Number(idealProgress).toFixed(1)}%`}
         >
           <div className="w-full bg-gray-200 rounded-full h-3 relative">
@@ -256,10 +257,10 @@ export function SimpleProgressStatus({
             <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
           </div>
         </div>
-        <span className="text-sm font-medium">{(progressPercentage || 0).toFixed(1)}%</span>
+        <span className="text-sm font-medium shrink-0 min-w-[3rem] text-right">{(progressPercentage || 0).toFixed(1)}%</span>
       </div>
       {/* Progress explanation */}
-      <div className="mt-2 text-xs text-gray-500 flex items-center gap-4">
+      <div className="mt-2 text-xs text-gray-500 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
         <div className="flex items-center gap-1">
           <div className={`w-3 h-1 rounded ${(() => {
             switch (status) {
@@ -275,7 +276,7 @@ export function SimpleProgressStatus({
         </div>
         <div className="flex items-center gap-1">
           <div className="w-0.5 h-3 bg-gray-400 opacity-70"></div>
-          <span>
+          <span className="text-xs">
             {now > cycleEnd 
               ? `Target capaian (100%)` 
               : Number(timeProgressPercentage) < 0 
