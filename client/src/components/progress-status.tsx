@@ -207,8 +207,28 @@ export function SimpleProgressStatus({
         <span className={`text-xs font-medium ${config.textColor}`}>
           {config.label}
         </span>
-        <span className="text-xs text-gray-500">
-          {(progressPercentage || 0)}%
+        {/* Mini progress bar for compact mode */}
+        <div className="flex-1 min-w-[60px] relative">
+          <div className="w-full bg-gray-200 rounded-full h-2 relative">
+            <div 
+              className={`h-2 transition-all duration-300 ${
+                (progressPercentage || 0) >= 100 ? 'rounded-full' : 'rounded-l-full'
+              } ${(() => {
+                switch (status) {
+                  case 'completed': return 'bg-green-500';
+                  case 'ahead': return 'bg-blue-500';
+                  case 'on_track': return 'bg-green-400';
+                  case 'at_risk': return 'bg-yellow-500';
+                  case 'behind': return 'bg-red-500';
+                  default: return 'bg-gray-400';
+                }
+              })()}`}
+              style={{ width: `${Math.min(100, Math.max(0, progressPercentage || 0))}%` }}
+            />
+          </div>
+        </div>
+        <span className="text-xs text-gray-600 font-medium min-w-[2.5rem] text-right">
+          {(progressPercentage || 0).toFixed(0)}%
         </span>
       </div>
     );
