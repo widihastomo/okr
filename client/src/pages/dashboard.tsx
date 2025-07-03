@@ -142,7 +142,7 @@ export default function Dashboard() {
     
     if (updates.tab !== undefined) url.searchParams.set('tab', updates.tab);
     if (updates.status !== undefined) {
-      // Always set status parameter, including "all" for "Pilih Semua"
+      // Always set status parameter, including "all" for "Semua Status"
       url.searchParams.set('status', updates.status);
     }
     if (updates.cycle !== undefined) {
@@ -151,7 +151,7 @@ export default function Dashboard() {
     }
     if (updates.user !== undefined) {
       if (updates.user === '' || updates.user === 'all') {
-        // Set "all" explicitly for "Pilih Semua User"
+        // Set "all" explicitly for "Semua User"
         url.searchParams.set('user', 'all');
       } else {
         url.searchParams.set('user', updates.user);
@@ -198,9 +198,13 @@ export default function Dashboard() {
       })
     : null;
   
-  // Initialize cycle filter with longest active cycle on first load only
+  // Initialize cycle filter with longest active cycle on first load only if no URL param exists
   useEffect(() => {
-    if (defaultCycle && cycleFilter === 'all' && cycles.length > 0 && !hasAutoSelected) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const cycleParam = urlParams.get('cycle');
+    
+    // Only auto-select if no URL parameter exists and filter is 'all'
+    if (defaultCycle && cycleFilter === 'all' && cycles.length > 0 && !hasAutoSelected && !cycleParam) {
       setCycleFilter(defaultCycle.id);
       setHasAutoSelected(true);
     }
