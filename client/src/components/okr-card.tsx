@@ -247,7 +247,7 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
           </div>
           
           {/* Progress and Menu - Desktop */}
-          <div className="hidden sm:flex items-start gap-2 sm:gap-3">
+          <div className="hidden sm:flex items-start gap-2 sm:gap-3 pr-10">
             <div className="flex flex-col items-end min-w-0">
               <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2 flex-wrap justify-end">
                 {(() => {
