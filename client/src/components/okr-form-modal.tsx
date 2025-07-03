@@ -755,10 +755,10 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                                   </Badge>
                                 </TableCell>
                                 <TableCell className="text-center">
-                                  {keyResult.keyResultType === 'achieve_or_not' ? '-' : (keyResult.baseValue || '0')}
+                                  {keyResult.keyResultType === 'achieve_or_not' ? '-' : formatNumberWithSeparator(keyResult.baseValue || '0')}
                                 </TableCell>
                                 <TableCell className="text-center">
-                                  {keyResult.keyResultType === 'achieve_or_not' ? '-' : (keyResult.targetValue || '0')}
+                                  {keyResult.keyResultType === 'achieve_or_not' ? '-' : formatNumberWithSeparator(keyResult.targetValue || '0')}
                                 </TableCell>
                                 <TableCell className="text-center">
                                   {keyResult.keyResultType === 'achieve_or_not' ? '-' : (keyResult.unit || '-')}
@@ -851,13 +851,13 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                                     <div className="text-center">
                                       <div className="text-xs font-medium text-gray-500 mb-0.5">Awal</div>
                                       <div className="text-xs font-semibold text-gray-900 bg-gray-50 rounded px-1 py-0.5">
-                                        {keyResult.baseValue || '0'}
+                                        {formatNumberWithSeparator(keyResult.baseValue || '0')}
                                       </div>
                                     </div>
                                     <div className="text-center">
                                       <div className="text-xs font-medium text-gray-500 mb-0.5">Target</div>
                                       <div className="text-xs font-semibold text-blue-600 bg-blue-50 rounded px-1 py-0.5">
-                                        {keyResult.targetValue || '0'}
+                                        {formatNumberWithSeparator(keyResult.targetValue || '0')}
                                       </div>
                                     </div>
                                     <div className="text-center">
@@ -995,16 +995,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
     },
   });
 
-  // Number formatting functions from commit: "Ensure proper display of input fields for different key result types"
-  const formatNumberInput = (value: string) => {
-    const number = parseFloat(value.replace(/[.,]/g, ''));
-    if (isNaN(number)) return value;
-    return new Intl.NumberFormat('id-ID').format(number);
-  };
-
-  const parseNumberInput = (value: string) => {
-    return value.replace(/[.,]/g, '');
-  };
+  // Use imported number formatting functions
 
   // Reset form when modal opens or when switching between create/edit modes
   useEffect(() => {
@@ -1384,7 +1375,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                             <Input 
                               placeholder="100" 
                               type="text" 
-                              value={formatNumberInput(field.value || "")}
+                              value={formatNumberWithSeparator(field.value || "")}
                               onChange={(e) => handleNumberInputChange(e.target.value, field.onChange)}
                               onBlur={field.onBlur}
                               name={field.name}
@@ -1422,7 +1413,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                             <Input 
                               placeholder="50" 
                               type="text" 
-                              value={formatNumberInput(field.value || "")}
+                              value={formatNumberWithSeparator(field.value || "")}
                               onChange={(e) => handleNumberInputChange(e.target.value, field.onChange)}
                               onBlur={field.onBlur}
                               name={field.name}
