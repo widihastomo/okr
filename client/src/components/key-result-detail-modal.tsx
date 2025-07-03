@@ -268,7 +268,7 @@ export function KeyResultDetailModal({ keyResultId, isOpen, onClose }: KeyResult
                         Progress History
                       </CardTitle>
                       <CardDescription>
-                        Check-in history and value changes
+                        Update history and value changes
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -303,8 +303,8 @@ export function KeyResultDetailModal({ keyResultId, isOpen, onClose }: KeyResult
                       ) : (
                         <div className="text-center py-8 text-gray-500">
                           <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                          <p>No check-in history yet</p>
-                          <p className="text-sm">Make your first check-in to see progress</p>
+                          <p>No update history yet</p>
+                          <p className="text-sm">Make your first update to see progress</p>
                         </div>
                       )}
                     </CardContent>
@@ -320,7 +320,7 @@ export function KeyResultDetailModal({ keyResultId, isOpen, onClose }: KeyResult
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">Total Check-ins</span>
+                        <span className="text-sm text-gray-600">Total Updates</span>
                         <span className="font-medium">
                           {keyResult.progressHistory?.length || 0}
                         </span>

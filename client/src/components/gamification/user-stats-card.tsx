@@ -132,7 +132,7 @@ export function UserStatsCard({ userId }: UserStatsCardProps) {
             <TrendingUp className="h-4 w-4 text-purple-500" />
             <div className="text-center flex-1">
               <div className="font-bold text-purple-600">{stats.checkInsCreated}</div>
-              <div className="text-xs text-gray-600">Check-ins</div>
+              <div className="text-xs text-gray-600">Updates</div>
             </div>
           </div>
           

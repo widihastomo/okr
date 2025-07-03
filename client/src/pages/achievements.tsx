@@ -50,7 +50,7 @@ export default function AchievementsPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-blue-800">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span>Update Key Result (Check-in): <strong>10 poin</strong></span>
+                      <span>Update Key Result (Update Progress): <strong>10 poin</strong></span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-blue-500 rounded-full"></div>

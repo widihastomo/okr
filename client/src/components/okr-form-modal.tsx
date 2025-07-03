@@ -1404,7 +1404,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                                 <p>
                                   <strong>Kondisi actual saat ini</strong>
                                   <br /><br />
-                                  Isikan nilai kondisi saat ini untuk dibandingkan dengan threshold target. Nilai ini akan diupdate melalui proses check-in regular.
+                                  Isikan nilai kondisi saat ini untuk dibandingkan dengan threshold target. Nilai ini akan diupdate melalui proses update progress regular.
                                   <br /><br />
                                   <strong>Contoh:</strong> Rating saat ini 4.2, biaya saat ini 45 juta, response time saat ini 2.8 detik
                                 </p>
@@ -1543,7 +1543,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                                   <br /><br />
                                   Masukkan nilai aktual saat ini yang akan menjadi starting point untuk tracking progress.
                                   <br /><br />
-                                  <strong>Tips:</strong> Biasanya dimulai dari nilai yang sama dengan "Nilai Awal" dan akan diupdate melalui check-in berkala.
+                                  <strong>Tips:</strong> Biasanya dimulai dari nilai yang sama dengan "Nilai Awal" dan akan diupdate melalui update progress berkala.
                                   <br /><br />
                                   <strong>Note:</strong> Nilai ini dapat diubah sewaktu-waktu melalui fitur update progress.
                                 </p>

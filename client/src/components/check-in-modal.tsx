@@ -77,7 +77,7 @@ export function CheckInModal({
     },
     onSuccess: () => {
       toast({
-        title: "Check-in berhasil",
+        title: "Update berhasil",
         description: "Progress telah diperbarui secara otomatis",
         className: "border-green-200 bg-green-50 text-green-800",
       });
@@ -94,7 +94,7 @@ export function CheckInModal({
     onError: (error) => {
       console.error("Check-in error:", error);
       toast({
-        title: "Gagal melakukan check-in",
+        title: "Gagal melakukan update",
         description: error instanceof Error ? error.message : "Terjadi kesalahan saat memperbarui progress",
         variant: "destructive",
       });
@@ -163,7 +163,7 @@ export function CheckInModal({
       <DialogTrigger asChild>
         <Button size="sm" className="flex items-center gap-2">
           <TrendingUp className="h-4 w-4" />
-          Check-in
+          Update
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -312,7 +312,7 @@ export function CheckInModal({
               Batal
             </Button>
             <Button type="submit" disabled={checkInMutation.isPending}>
-              {checkInMutation.isPending ? "Menyimpan..." : "Simpan Check-in"}
+              {checkInMutation.isPending ? "Menyimpan..." : "Simpan Update"}
             </Button>
           </div>
         </form>

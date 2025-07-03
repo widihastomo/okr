@@ -84,7 +84,7 @@ const getContextTitle = (context: string) => {
     case 'key_result_detail':
       return 'Analisis Key Result';
     case 'check_in':
-      return 'Panduan Check-in';
+      return 'Panduan Update';
     case 'create_okr':
       return 'Tips Pembuatan OKR';
     default:

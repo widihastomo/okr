@@ -1173,8 +1173,8 @@ export default function KeyResultDetailPage() {
                 ) : (
                   <div className="text-center py-8 text-gray-500">
                     <BarChart3 className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                    <p>No check-ins yet</p>
-                    <p className="text-sm">Add your first check-in to track progress over time.</p>
+                    <p>No updates yet</p>
+                    <p className="text-sm">Add your first update to track progress over time.</p>
                   </div>
                 )}
               </CardContent>
