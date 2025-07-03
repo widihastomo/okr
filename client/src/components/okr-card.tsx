@@ -153,7 +153,7 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplic
   return (
     <Card className="mb-3 sm:mb-6 shadow-lg border-0">
       <div className="bg-white text-gray-900 p-3 sm:p-6 rounded-t-lg border-b">
-        <div className="flex justify-between items-start gap-2">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1 sm:gap-2 mb-2">
               <Button
@@ -179,42 +179,10 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplic
                 )}
               </div>
             </div>
-            
-            <div className="flex items-center gap-4 text-sm text-gray-600">
-              <span className="flex items-center gap-2">
-                {okr.ownerType === 'team' ? (
-                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Users className="w-3 h-3 text-blue-600" />
-                  </div>
-                ) : (
-                  <Avatar className="w-6 h-6">
-                    <AvatarImage src="" alt={okr.owner} />
-                    <AvatarFallback className="text-xs bg-blue-600 text-white">
-                      {okr.owner.split(' ').map(n => n[0]).join('').toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                )}
-                {okr.owner}
-              </span>
-              
-              {cycle && (
-                <span className="flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  {cycle.name}
-                </span>
-              )}
-              
-              {daysRemaining !== null && (
-                <span className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  {daysRemaining > 0 ? `${daysRemaining} hari tersisa` : 'Berakhir'}
-                </span>
-              )}
-            </div>
           </div>
-          <div className="flex items-start gap-2 sm:gap-3">
+          
+          {/* Progress and Menu - Desktop */}
+          <div className="hidden sm:flex items-start gap-2 sm:gap-3">
             <div className="flex flex-col items-end min-w-0">
               <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2 flex-wrap justify-end">
                 {(() => {
@@ -292,8 +260,139 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplic
                   );
                 })()}
               </div>
-              
             </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => onDuplicate?.(okr)}>
+                  <Copy className="w-4 h-4 mr-2" />
+                  Duplikat
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => onDelete?.(okr.id)}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Hapus
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+        
+        {/* Full width container for owner, date, and remaining days on all screens */}
+        <div className="w-full flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-600 mt-2">
+          <span className="flex items-center gap-2">
+            {okr.ownerType === 'team' ? (
+              <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                <Users className="w-3 h-3 text-blue-600" />
+              </div>
+            ) : (
+              <Avatar className="w-6 h-6">
+                <AvatarImage src="" alt={okr.owner} />
+                <AvatarFallback className="text-xs bg-blue-600 text-white">
+                  {okr.owner.split(' ').map(n => n[0]).join('').toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+            )}
+            {okr.owner}
+          </span>
+          
+          {cycle && (
+            <span className="flex items-center gap-1">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              {cycle.name}
+            </span>
+          )}
+          
+          {daysRemaining !== null && (
+            <span className="flex items-center gap-1">
+              <Clock className="w-4 h-4" />
+              {daysRemaining > 0 ? `${daysRemaining} hari tersisa` : 'Berakhir'}
+            </span>
+          )}
+        </div>
+        
+        {/* Mobile Progress and Menu */}
+        <div className="sm:hidden flex items-center justify-between mt-3">
+          <div className="flex items-center gap-2">
+            {(() => {
+              const getProgressConfig = (status: string) => {
+                switch (status) {
+                  case 'on_track':
+                    return { bgColor: 'bg-green-100', textColor: 'text-green-800', dotColor: 'bg-green-500', label: 'On track' };
+                  case 'at_risk':
+                    return { bgColor: 'bg-orange-100', textColor: 'text-orange-800', dotColor: 'bg-orange-500', label: 'At risk' };
+                  case 'behind':
+                    return { bgColor: 'bg-red-100', textColor: 'text-red-800', dotColor: 'bg-red-500', label: 'Behind' };
+                  case 'completed':
+                    return { bgColor: 'bg-purple-100', textColor: 'text-purple-800', dotColor: 'bg-purple-500', label: 'Completed' };
+                  case 'in_progress':
+                    return { bgColor: 'bg-blue-100', textColor: 'text-blue-800', dotColor: 'bg-blue-500', label: 'In progress' };
+                  case 'not_started':
+                    return { bgColor: 'bg-gray-100', textColor: 'text-gray-800', dotColor: 'bg-gray-500', label: 'Not started' };
+                  case 'paused':
+                    return { bgColor: 'bg-yellow-100', textColor: 'text-yellow-800', dotColor: 'bg-yellow-500', label: 'Paused' };
+                  default:
+                    return { bgColor: 'bg-gray-100', textColor: 'text-gray-800', dotColor: 'bg-gray-500', label: 'Unknown' };
+                }
+              };
+              const config = getProgressConfig(okr.status);
+              return (
+                <div className={`flex items-center gap-1 px-2 py-0.5 ${config.bgColor} ${config.textColor} rounded-full text-xs font-medium whitespace-nowrap`}>
+                  <div className={`w-1.5 h-1.5 ${config.dotColor} rounded-full flex-shrink-0`}></div>
+                  <span className="truncate">{config.label}</span>
+                </div>
+              );
+            })()}
+            <span className="text-base font-semibold text-gray-900">{overallProgress.toFixed(1)}%</span>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <div 
+              className="w-24 bg-gray-200 rounded-full h-2 relative group cursor-pointer"
+              title={`Progress: ${overallProgress.toFixed(1)}% | Target ideal: ${idealProgress.toFixed(1)}%`}
+            >
+              {(() => {
+                const getProgressBarColor = (status: string) => {
+                  switch (status) {
+                    case 'on_track': return 'bg-green-500';
+                    case 'at_risk': return 'bg-orange-500';
+                    case 'behind': return 'bg-red-500';
+                    case 'completed': return 'bg-purple-500';
+                    case 'in_progress': return 'bg-blue-500';
+                    case 'not_started': return 'bg-gray-400';
+                    case 'paused': return 'bg-yellow-500';
+                    default: return 'bg-gray-400';
+                  }
+                };
+                
+                return (
+                  <>
+                    <div 
+                      className={`${getProgressBarColor(okr.status)} h-2 transition-all duration-300 ${
+                        overallProgress >= 100 ? 'rounded-full' : 'rounded-l-full'
+                      }`}
+                      style={{ width: `${Math.min(100, Math.max(0, overallProgress))}%` }}
+                    ></div>
+                    {/* Threshold indicator for ideal progress */}
+                    {idealProgress > 0 && idealProgress < 100 && (
+                      <div 
+                        className="absolute top-0 w-0.5 h-2 bg-gray-600 opacity-70"
+                        style={{ left: `${idealProgress}%` }}
+                      ></div>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+            
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm">
@@ -418,7 +517,7 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplic
                     status={kr.status}
                     progressPercentage={progress}
                     timeProgressPercentage={kr.timeProgressPercentage || 0}
-                    dueDate={kr.dueDate ? (typeof kr.dueDate === 'string' ? kr.dueDate : kr.dueDate.toISOString()) : null}
+                    dueDate={null}
                     startDate={cycleStartDate}
                   />
                   {kr.lastCheckIn && (

@@ -96,6 +96,14 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 03, 2025. Restructured OKR card layout for improved mobile responsive design:
+  * Made container for owner, date, and remaining days full width on all screens with flex-wrap layout
+  * Split progress section into separate desktop and mobile layouts for better space utilization
+  * Desktop: Progress and menu positioned in right sidebar area (hidden on mobile)
+  * Mobile: Progress and menu positioned below owner information with horizontal layout
+  * Owner, cycle, and time remaining information now spans full width with proper wrapping behavior
+  * Improved visual hierarchy with consistent spacing and positioning across all screen sizes
+  * Fixed TypeScript error by removing deprecated dueDate references from KeyResult components
 - July 03, 2025. Enhanced Key Result type icons and tooltips with improved positioning and z-index:
   * Added MoveUp icon for "should_stay_above" type with tooltip "Tetap Di Atas - Nilai harus tetap berada di atas ambang batas target"
   * Added MoveDown icon for "should_stay_below" type with tooltip "Tetap Di Bawah - Nilai harus tetap berada di bawah ambang batas target"
