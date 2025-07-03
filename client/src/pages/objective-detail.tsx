@@ -291,28 +291,16 @@ export default function GoalDetail() {
 
   return (
     <div className="p-4 sm:p-6 max-w-full">
-      {/* Page Header with Back Button */}
+      {/* Page Header with Back Button and Actions */}
       <div className="mb-6">
-        <Link href="/dashboard">
-          <Button variant="ghost" size="sm" className="mb-4">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Kembali ke Dashboard
-          </Button>
-        </Link>
-        
-        
-        
-        {/* Title and Actions */}
-        <div className="flex items-start justify-between gap-4 mb-6">
-          <div className="flex-1">
-            <div className="flex items-start gap-3 flex-wrap mb-2">
-              <h1 className="text-2xl font-bold text-gray-900">{goal.title}</h1>
-              <ObjectiveStatusBadge status={goal.status} />
-            </div>
-            {goal.description && (
-              <p className="text-gray-600">{goal.description}</p>
-            )}
-          </div>
+        {/* Back button and Actions in same row */}
+        <div className="flex items-center justify-between mb-4">
+          <Link href="/dashboard">
+            <Button variant="ghost" size="sm">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Kembali ke Dashboard
+            </Button>
+          </Link>
           
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm">
@@ -338,6 +326,15 @@ export default function GoalDetail() {
             </DropdownMenu>
           </div>
         </div>
+        
+        {/* Title and Status */}
+        <div className="flex items-start gap-3 flex-wrap mb-2">
+          <h1 className="text-2xl font-bold text-gray-900">{goal.title}</h1>
+          <ObjectiveStatusBadge status={goal.status} />
+        </div>
+        {goal.description && (
+          <p className="text-gray-600">{goal.description}</p>
+        )}
       </div>
 
       {/* Objective Information Card */}
