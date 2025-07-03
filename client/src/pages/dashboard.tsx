@@ -10,20 +10,93 @@ import EditKeyResultModal from "@/components/edit-key-result-modal";
 import { CascadeDeleteConfirmationModal } from "@/components/cascade-delete-confirmation-modal";
 import EditObjectiveModal from "@/components/edit-objective-modal";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
-import { Plus, Target, CheckSquare, Building2, Trophy } from "lucide-react";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Plus,
+  Search,
+  Filter,
+  Users,
+  Target,
+  TrendingUp,
+  Calendar,
+  CheckCircle2,
+  AlertCircle,
+  Clock,
+  FileText,
+  CheckSquare,
+  Building2,
+  User as UserIcon,
+  BarChart3,
+  Award,
+  Trophy,
+  Star,
+  Zap,
+  ArrowUp,
+  ArrowDown,
+  Minus,
+  Eye,
+  ExternalLink,
+  Lightbulb,
+  X,
+  RefreshCw,
+  ChevronRight,
+  TrendingDown,
+  AlertTriangle,
+  Flame,
+  Activity,
+  Users2,
+  BookOpen,
+  Sparkles,
+  GitPullRequest,
+  MessageSquare,
+  Clock3,
+  Calendar as CalendarIcon,
+  Download,
+  Upload,
+  Share2,
+  Settings,
+  HelpCircle,
+  Bell,
+  Home,
+  Layers,
+  PieChart,
+  MoreHorizontal,
+  PlayCircle,
+  PauseCircle,
+  StopCircle,
+  XCircle,
+  CheckCircle,
+  AlertCircle as AlertCircleIcon,
+  Info,
+  Loader2,
+  RefreshCcw,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
+import { Link, useLocation } from "wouter";
+import ObjectiveOverviewCard from "@/components/objective-overview-card";
+import ObjectiveHealthIndicator from "@/components/objective-health-indicator";
 import MyTugas from "@/components/my-tasks";
 import Rencana from "@/components/initiatives";
 import { useAuth } from "@/hooks/useAuth";
@@ -33,6 +106,7 @@ import AIHelpBubble from "@/components/ai-help-bubble";
 import { useLocation } from "wouter";
 import type { OKRWithKeyResults, KeyResult, Cycle, User } from "@shared/schema";
 
+import { calculateKeyResultProgress } from "@shared/progress-calculator";
 
 export default function Dashboard() {
   const { toast } = useToast();
@@ -89,7 +163,7 @@ export default function Dashboard() {
   // Fetch filtered tasks based on current user filter
   const showAllUsers = userFilter === 'all' || userFilter === '' || !userFilter;
   const targetUserId = showAllUsers ? null : userFilter;
-  
+
   const { data: filteredTasks = [] } = useQuery<any[]>({
     queryKey: showAllUsers ? ['/api/tasks'] : [`/api/users/${targetUserId}/tasks`],
     enabled: showAllUsers || !!targetUserId,
@@ -101,15 +175,15 @@ export default function Dashboard() {
 
   const overdueAndDueTodayCount = filteredTasks.filter((task: any) => {
     if (task.status === 'completed') return false;
-    
+
     if (!task.dueDate) return false;
-    
+
     const dueDate = new Date(task.dueDate);
     dueDate.setHours(0, 0, 0, 0);
-    
+
     // Include overdue tasks (due before today) and tasks due today
     const isUrgent = dueDate <= today;
-    
+
     return isUrgent;
   }).length;
 
@@ -118,25 +192,25 @@ export default function Dashboard() {
   // Initialize tab and filters from URL query parameters
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    
+
     // Initialize tab
     const tabParam = urlParams.get('tab');
     if (tabParam && ['objectives', 'initiatives', 'my-tasks'].includes(tabParam)) {
       setActiveTab(tabParam);
     }
-    
+
     // Initialize filters
     const statusParam = urlParams.get('status');
     if (statusParam) {
       setStatusFilter(statusParam);
     }
-    
+
     const cycleParam = urlParams.get('cycle');
     if (cycleParam) {
       setCycleFilter(cycleParam);
       setHasAutoSelected(true); // Prevent auto-selection when loading from URL
     }
-    
+
     const userParam = urlParams.get('user');
     if (userParam) {
       // Keep the actual parameter value including "all"
@@ -147,7 +221,7 @@ export default function Dashboard() {
   // Update URL when tab or filters change
   const updateURL = (updates: { tab?: string; status?: string; cycle?: string; user?: string }) => {
     const url = new URL(window.location.href);
-    
+
     if (updates.tab !== undefined) url.searchParams.set('tab', updates.tab);
     if (updates.status !== undefined) {
       // Always set status parameter, including "all" for "Semua Status"
@@ -165,7 +239,7 @@ export default function Dashboard() {
         url.searchParams.set('user', updates.user);
       }
     }
-    
+
     window.history.replaceState({}, '', url.toString());
   };
 
@@ -205,12 +279,12 @@ export default function Dashboard() {
         return currentDuration < shortestDuration ? current : shortest;
       })
     : null;
-  
+
   // Initialize cycle filter with longest active cycle on first load only if no URL param exists
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const cycleParam = urlParams.get('cycle');
-    
+
     // Only auto-select if no URL parameter exists and filter is 'all'
     if (defaultCycle && cycleFilter === 'all' && cycles.length > 0 && !hasAutoSelected && !cycleParam) {
       setCycleFilter(defaultCycle.id);
@@ -222,7 +296,7 @@ export default function Dashboard() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const userParam = urlParams.get('user');
-    
+
     // Only set to current user if no URL parameter exists and filter is empty
     if (currentUser && userFilter === '' && !userParam && typeof currentUser === 'object' && 'id' in currentUser) {
       setUserFilter((currentUser as any).id);
@@ -237,30 +311,30 @@ export default function Dashboard() {
   const isRelatedCycle = (okrCycleId: string | null, selectedCycleId: string) => {
     // Always return true for "all cycles" filter
     if (selectedCycleId === 'all') return true;
-    
+
     // Handle null cycleId (OKRs without cycles)
     if (!okrCycleId) return selectedCycleId === 'all';
-    
+
     // Direct match
     if (okrCycleId === selectedCycleId) return true;
-    
+
     // Find the selected cycle and OKR cycle
     const selectedCycle = cycles.find(c => c.id === selectedCycleId);
     const okrCycle = cycles.find(c => c.id === okrCycleId);
-    
+
     if (!selectedCycle || !okrCycle) return false;
-    
+
     // If selected cycle is quarterly, include monthly cycles within that quarter
     if (selectedCycle.type === 'quarterly' && okrCycle.type === 'monthly') {
       const selectedStart = new Date(selectedCycle.startDate);
       const selectedEnd = new Date(selectedCycle.endDate);
       const okrStart = new Date(okrCycle.startDate);
       const okrEnd = new Date(okrCycle.endDate);
-      
+
       // Check if monthly cycle falls within quarterly cycle period
       return okrStart >= selectedStart && okrEnd <= selectedEnd;
     }
-    
+
     return false;
   };
 
@@ -273,10 +347,10 @@ export default function Dashboard() {
   const okrs = allOkrs.filter(okr => {
     // Status filter
     const statusMatch = statusFilter === 'all' || okr.status === statusFilter;
-    
+
     // Cycle filter with related cycle logic
     const cycleMatch = isRelatedCycle(okr.cycleId, cycleFilter);
-    
+
     // User filter - show OKRs where:
     // 1. If userFilter is 'all' or empty, show all OKRs
     // 2. The user is the owner of the objective
@@ -284,7 +358,7 @@ export default function Dashboard() {
     let userMatch = true;
     if (userFilter && userFilter !== 'all' && userFilter !== '') {
       userMatch = false; // Start with false and set to true if conditions are met
-      
+
       // Check if user is the direct owner
       if (okr.ownerId === userFilter) {
         userMatch = true;
@@ -297,7 +371,7 @@ export default function Dashboard() {
         }
       }
     }
-    
+
     return statusMatch && cycleMatch && userMatch;
   });
 
@@ -467,7 +541,7 @@ export default function Dashboard() {
       // Get cascade deletion info
       const response = await fetch(`/api/objectives/${okrId}/cascade-info`);
       const data = await response.json();
-      
+
       setDeleteConfirmModal({ 
         open: true, 
         okrId, 
@@ -516,7 +590,7 @@ export default function Dashboard() {
               <CreateOKRButton />
             </div>
           </div>
-          
+
           {/* Filter Controls */}
           <div className="flex flex-col gap-2 sm:flex-row sm:gap-3 w-full">
             <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
@@ -537,7 +611,7 @@ export default function Dashboard() {
                 <SelectItem value="in_progress">In Progress</SelectItem>
               </SelectContent>
             </Select>
-            
+
             <Select value={cycleFilter} onValueChange={handleCycleFilterChange}>
               <SelectTrigger className="w-full sm:w-[150px] md:w-[180px] text-xs sm:text-sm h-8 sm:h-10">
                 <SelectValue placeholder="Pilih Cycle" />
@@ -567,7 +641,88 @@ export default function Dashboard() {
 
       {/* Stats Overview */}
       <StatsOverview okrs={okrs} isLoading={isLoading} />
-      
+
+       {/* Health Overview Section */}
+       {okrs.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
+          <div className="lg:col-span-2 xl:col-span-3">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="w-5 h-5" />
+                  Ringkasan Kesehatan OKR
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {okrs.slice(0, 3).map((objective) => {
+                    const objectiveInitiatives = okrs.filter(
+                      (initiative) =>
+                        objective.keyResults.some(
+                          (kr) => kr.id === initiative.keyResultId,
+                        ),
+                    );
+                    const objectiveTasks = okrs.filter((task) =>
+                      objectiveInitiatives.some(
+                        (initiative) => initiative.id === task.initiativeId,
+                      ),
+                    );
+
+                    // Calculate overall progress
+                    //const overallProgress = calculateOverallProgress(
+                    //  objective.keyResults,
+                    //);
+
+                    const overallProgress = 50;
+
+                    const completedKeyResults = objective.keyResults.filter((kr) => {
+                      const result = calculateKeyResultProgress(
+                        kr.currentValue,
+                        kr.targetValue,
+                        kr.keyResultType,
+                        kr.baseValue,
+                      );
+                      return result.progressPercentage >= 100;
+                    }).length;
+
+                    const completedTasks = objectiveTasks.filter(
+                      (t) => t.status === "completed",
+                    ).length;
+
+                    // Find cycle for this objective
+                    const objectiveCycle = cycles.find(
+                      (cycle) => cycle.id === objective.cycleId,
+                    );
+
+                    // Calculate days remaining
+                    const daysRemaining = objectiveCycle
+                      ? 10
+                      : undefined;
+
+                    const totalDays = objectiveCycle
+                      ? 90
+                      : 90;
+
+                    return (
+                      <ObjectiveHealthIndicator
+                        key={objective.id}
+                        overallProgress={overallProgress}
+                        daysRemaining={daysRemaining}
+                        totalDays={totalDays}
+                        keyResultsCompleted={completedKeyResults}
+                        totalKeyResults={objective.keyResults.length}
+                        tasksCompleted={completedTasks}
+                        totalTasks={objectiveTasks.length}
+                      />
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      )}
+
       {/* Tabbed Content */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-4 sm:mt-6 w-full">
         <TabsList className="grid w-full grid-cols-3 h-9 sm:h-12">
@@ -590,61 +745,65 @@ export default function Dashboard() {
                 {overdueAndDueTodayCount}
               </span>
             )}
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="objectives" className="space-y-6 mt-6">
-          {isLoading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-              <p className="text-gray-500 mt-2">Memuat Goals...</p>
-            </div>
-          ) : okrs.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Plus className="w-8 h-8 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Tidak ada Goal ditemukan</h3>
-              <p className="text-gray-500 mb-4">
-                {statusFilter !== "all" 
-                  ? "Tidak ada Goal yang sesuai dengan filter Anda. Coba sesuaikan kriteria pencarian."
-                  : "Mulai dengan membuat tujuan dan ukuran keberhasilan pertama Anda."
-                }
-              </p>
-              <CreateOKRButton />
-            </div>
+          </TabsList>
+
+        <TabsContent value="objectives" className="space-y-4">
+          {okrs.length === 0 ? (
+            <Card>
+              <CardContent className="p-6 text-center text-gray-500">
+                Tidak ada objectives yang ditemukan
+              </CardContent>
+            </Card>
           ) : (
-            okrs.map((okr, index) => {
-              // Find the cycle for this OKR to get start and end date
-              const cycle = cycles.find(c => c.id === okr.cycleId);
-              return (
-                <OKRCard
-                  key={okr.id}
-                  okr={okr}
-                  onEditProgress={handleEditProgress}
-                  onEditKeyResult={handleEditKeyResult}
-                  onDeleteKeyResult={handleDeleteKeyResult}
-                  onRefresh={refetch}
-                  onDuplicate={handleDuplicateOKR}
-                  onDelete={handleDeleteOKR}
-                  onEdit={handleEditObjective}
-                  cycleStartDate={cycle?.startDate}
-                  cycleEndDate={cycle?.endDate}
-                  cycle={cycle}
-                  index={index}
-                />
-              );
-            })
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              {okrs.map((okr, index) => {
+                const objectiveInitiatives = okrs.filter(
+                  (initiative) =>
+                    okr.keyResults.some(
+                      (kr) => kr.id === initiative.keyResultId,
+                    ),
+                );
+                const objectiveTasks = okrs.filter((task) =>
+                  objectiveInitiatives.some(
+                    (initiative) => initiative.id === task.initiativeId,
+                  ),
+                );
+
+                // Find cycle for this OKR to get start and end date
+                const cycle = cycles.find(c => c.id === okr.cycleId);
+
+                // Calculate days remaining
+                const daysRemaining = cycle
+                  ? 10
+                  : undefined;
+
+                // Get owner information
+                const owner = "Owner";
+
+                return (
+                  <div key={okr.id} className="space-y-4">
+                    <ObjectiveOverviewCard
+                      objective={okr}
+                      initiatives={objectiveInitiatives}
+                      tasks={objectiveTasks}
+                      daysRemaining={daysRemaining}
+                      cycle={cycle}
+                      owner={owner}
+                    />
+                  </div>
+                );
+              })}
+            </div>
           )}
         </TabsContent>
-        
+
         <TabsContent value="initiatives" className="mt-6">
           <Rencana 
             userFilter={userFilter} 
             filteredKeyResultIds={okrs.flatMap(okr => okr.keyResults.map(kr => kr.id))}
           />
         </TabsContent>
-        
+
         <TabsContent value="my-tasks" className="mt-6">
           <MyTugas 
             filteredKeyResultIds={okrs.flatMap(okr => okr.keyResults.map(kr => kr.id))}
