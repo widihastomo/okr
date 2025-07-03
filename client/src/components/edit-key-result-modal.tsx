@@ -147,6 +147,8 @@ export default function EditKeyResultModal({
   });
 
   const handleSubmit = (data: EditKeyResultFormData) => {
+    console.log("🚀 handleSubmit called with data:", data);
+    
     // Check if key result type is changing and there are existing check-ins
     const isTypeChanging = keyResult && data.keyResultType !== keyResult.keyResultType;
     const hasCheckIns = checkInData && checkInData.count > 0;
@@ -201,7 +203,14 @@ export default function EditKeyResultModal({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          <form 
+            onSubmit={(e) => {
+              console.log("Form onSubmit triggered");
+              e.preventDefault();
+              form.handleSubmit(handleSubmit)(e);
+            }} 
+            className="space-y-6"
+          >
             {/* Title */}
             <FormField
               control={form.control}
@@ -463,12 +472,7 @@ export default function EditKeyResultModal({
                 type="submit"
                 disabled={updateKeyResultMutation.isPending}
                 className="bg-blue-600 hover:bg-blue-700"
-                onClick={() => {
-                  console.log("Submit button clicked");
-                  console.log("Form errors:", form.formState.errors);
-                  console.log("Form values:", form.getValues());
-                  console.log("Form valid:", form.formState.isValid);
-                }}
+
               >
                 {updateKeyResultMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
               </Button>
