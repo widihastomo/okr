@@ -495,7 +495,7 @@ export default function GoalDetail() {
                           <TooltipTrigger>
                             {getKeyResultTypeIcon(kr.keyResultType)}
                           </TooltipTrigger>
-                          <TooltipContent>
+                          <TooltipContent side="right" align="center">
                             <p>{getKeyResultTypeTooltip(kr.keyResultType)}</p>
                           </TooltipContent>
                         </Tooltip>
