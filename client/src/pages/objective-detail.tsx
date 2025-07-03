@@ -489,51 +489,49 @@ export default function GoalDetail() {
       </div>
 
       {/* Objective Information */}
-      <div className="mb-6">
-        {/* Title and Status */}
-        <div className="flex items-start gap-3 flex-wrap mb-4 p-6 pb-0">
-          <h1 className="text-2xl font-bold text-gray-900">{goal.title}</h1>
-          <ObjectiveStatusBadge status={goal.status} />
+      {/* Title and Status */}
+      <div className="flex items-start gap-3 flex-wrap mb-4 p-6 pb-0">
+        <h1 className="text-2xl font-bold text-gray-900">{goal.title}</h1>
+        <ObjectiveStatusBadge status={goal.status} />
+      </div>
+
+      {/* Description */}
+      {goal.description && (
+        <p className="text-gray-600 mb-6 px-6">{goal.description}</p>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-6 pt-0">
+        <div>
+          <div className="flex items-center space-x-2 mb-2">
+            <CheckCircle2 className="w-4 h-4 text-gray-500" />
+            <span className="text-sm text-gray-500">
+              Ukuran Keberhasilan
+            </span>
+          </div>
+          <p className="font-medium">
+            {goal.keyResults?.length || 0} Ukuran Keberhasilan
+          </p>
+          <p className="text-xs text-gray-400">
+            {goal.keyResults?.filter(
+              (kr) =>
+                parseFloat(kr.currentValue) >= parseFloat(kr.targetValue),
+            ).length || 0}{" "}
+            tercapai
+          </p>
         </div>
 
-        {/* Description */}
-        {goal.description && (
-          <p className="text-gray-600 mb-6 px-6">{goal.description}</p>
-        )}
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-6 pt-0">
-          <div>
-            <div className="flex items-center space-x-2 mb-2">
-              <CheckCircle2 className="w-4 h-4 text-gray-500" />
-              <span className="text-sm text-gray-500">
-                Ukuran Keberhasilan
-              </span>
-            </div>
-            <p className="font-medium">
-              {goal.keyResults?.length || 0} Ukuran Keberhasilan
-            </p>
-            <p className="text-xs text-gray-400">
-              {goal.keyResults?.filter(
-                (kr) =>
-                  parseFloat(kr.currentValue) >= parseFloat(kr.targetValue),
-              ).length || 0}{" "}
-              tercapai
-            </p>
+        <div>
+          <div className="flex items-center space-x-2 mb-2">
+            <FileText className="w-4 h-4 text-gray-500" />
+            <span className="text-sm text-gray-500">Inisiatif</span>
           </div>
-
-          <div>
-            <div className="flex items-center space-x-2 mb-2">
-              <FileText className="w-4 h-4 text-gray-500" />
-              <span className="text-sm text-gray-500">Inisiatif</span>
-            </div>
-            <p className="font-medium">{rencana?.length || 0} Rencana</p>
-            <p className="text-xs text-gray-400">
-              {rencana?.filter(
-                (initiative) => initiative.status === "completed",
-              ).length || 0}{" "}
-              selesai
-            </p>
-          </div>
+          <p className="font-medium">{rencana?.length || 0} Rencana</p>
+          <p className="text-xs text-gray-400">
+            {rencana?.filter(
+              (initiative) => initiative.status === "completed",
+            ).length || 0}{" "}
+            selesai
+          </p>
         </div>
       </div>
       {/* Tabs Section */}
