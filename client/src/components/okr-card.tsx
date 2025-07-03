@@ -511,9 +511,9 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
                         if (kr.unit === 'Rp') {
                           return `Rp ${currentVal.toLocaleString('id-ID')} → Rp ${targetVal.toLocaleString('id-ID')} (dari Rp ${baseVal.toLocaleString('id-ID')})`;
                         } else if (kr.unit === '%') {
-                          return `${currentVal}% → ${targetVal}% (dari ${baseVal}%)`;
+                          return `${currentVal.toLocaleString('id-ID')}% → ${targetVal.toLocaleString('id-ID')}% (dari ${baseVal.toLocaleString('id-ID')}%)`;
                         } else {
-                          return `${currentVal} → ${targetVal} ${kr.unit || ''} (dari ${baseVal})`;
+                          return `${currentVal.toLocaleString('id-ID')} → ${targetVal.toLocaleString('id-ID')} ${kr.unit || ''} (dari ${baseVal.toLocaleString('id-ID')})`;
                         }
                       })()}
                     </div>
