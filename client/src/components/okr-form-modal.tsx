@@ -877,25 +877,25 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
             )}
 
             {/* Navigation Buttons */}
-            <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4">
-              {!isEditMode && currentStep > 1 && (
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={prevStep}
-                  className="border-blue-600 text-blue-600 hover:bg-blue-50 w-full sm:w-auto"
-                >
-                  <ChevronLeft className="w-4 h-4 mr-2" />
-                  Kembali
-                </Button>
-              )}
-              
-              <div className="flex flex-col sm:flex-row gap-2 sm:ml-auto w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                {!isEditMode && currentStep > 1 && (
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={prevStep}
+                    className="border-blue-600 text-blue-600 hover:bg-blue-50 w-full sm:w-auto order-3 sm:order-1"
+                  >
+                    <ChevronLeft className="w-4 h-4 mr-2" />
+                    Kembali
+                  </Button>
+                )}
+                
                 <Button 
                   type="button" 
                   variant="outline" 
                   onClick={() => onOpenChange(false)}
-                  className="w-full sm:w-auto order-2 sm:order-1"
+                  className="w-full sm:w-auto order-2"
                 >
                   Batal
                 </Button>
@@ -903,7 +903,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                 {!isEditMode && currentStep === 1 ? (
                   <Button 
                     type="submit"
-                    className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto order-1 sm:order-2"
+                    className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto order-1 sm:order-3"
                   >
                     Lanjut
                     <ChevronRight className="w-4 h-4 ml-2" />
@@ -912,7 +912,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                   <Button 
                     type="submit"
                     disabled={mutation.isPending}
-                    className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto order-1 sm:order-2"
+                    className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto order-1 sm:order-3"
                   >
                     {mutation.isPending 
                       ? (isEditMode ? "Memperbarui..." : "Membuat...") 
