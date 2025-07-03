@@ -361,7 +361,7 @@ export default function GoalDetail() {
             
             {/* Goal Induk Info */}
             {parentObjective && (
-              <div className="flex items-center gap-2 text-sm">
+              <div className="flex items-center gap-2 text-sm mb-3">
                 <Target className="w-4 h-4 text-gray-500" />
                 <span className="text-gray-500">Bagian dari:</span>
                 <Link href={`/objectives/${parentObjective.id}`}>
@@ -372,34 +372,32 @@ export default function GoalDetail() {
                 </Link>
               </div>
             )}
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div>
-              <div className="flex items-center space-x-2 mb-2">
-                <Calendar className="w-4 h-4 text-gray-500" />
-                <span className="text-sm text-gray-500">Periode</span>
-              </div>
-              <p className="font-medium">{cycle?.name || "Tidak ada cycle"}</p>
-              {cycle && (
-                <p className="text-xs text-gray-400">
-                  {new Date(cycle.startDate).toLocaleDateString('id-ID')} - {new Date(cycle.endDate).toLocaleDateString('id-ID')}
-                </p>
-              )}
-            </div>
             
-            <div>
-              <div className="flex items-center space-x-2 mb-2">
+            {/* Periode and Pemilik Info */}
+            <div className="flex items-center gap-4 text-sm mb-3">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-gray-500" />
+                <span className="font-medium">{cycle?.name || "Tidak ada cycle"}</span>
+                {cycle && (
+                  <span className="text-xs text-gray-400">
+                    ({new Date(cycle.startDate).toLocaleDateString('id-ID')} - {new Date(cycle.endDate).toLocaleDateString('id-ID')})
+                  </span>
+                )}
+              </div>
+              
+              <div className="flex items-center gap-2">
                 {goal.ownerType === 'team' ? (
                   <Building className="w-4 h-4 text-gray-500" />
                 ) : (
                   <UserIcon className="w-4 h-4 text-gray-500" />
                 )}
-                <span className="text-sm text-gray-500">Pemilik</span>
+                <span className="font-medium">{getOwnerDisplay()}</span>
+                <span className="text-xs text-gray-400 capitalize">({goal.ownerType === 'team' ? 'Tim' : 'Individual'})</span>
               </div>
-              <p className="font-medium">{getOwnerDisplay()}</p>
-              <p className="text-xs text-gray-400 capitalize">{goal.ownerType === 'team' ? 'Tim' : 'Individual'}</p>
             </div>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             
             <div>
               <div className="flex items-center space-x-2 mb-2">
