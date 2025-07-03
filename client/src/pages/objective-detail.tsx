@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Edit, Calendar, User as UserIcon, Clock, Plus, Target, BarChart3, TrendingUp, TrendingDown, CheckCircle2, MoreVertical, Building, ClipboardList, CheckSquare, Trash2, FileText } from "lucide-react";
+import { ArrowLeft, Edit, Calendar, User as UserIcon, Clock, Plus, Target, BarChart3, TrendingUp, TrendingDown, CheckCircle2, MoreVertical, Building, ClipboardList, CheckSquare, Trash2, FileText, Eye, MoveUp, MoveDown } from "lucide-react";
 import { Link } from "wouter";
 import { CheckInModal } from "@/components/check-in-modal";
 import EditKeyResultModal from "@/components/edit-key-result-modal";
@@ -485,120 +485,171 @@ export default function GoalDetail() {
               const progress = calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
               
               return (
-                <Card key={kr.id}>
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      {/* Ukuran Keberhasilan Header */}
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <h3 className="font-semibold text-gray-900">{kr.title}</h3>
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  {getKeyResultTypeIcon(kr.keyResultType)}
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>{getKeyResultTypeTooltip(kr.keyResultType)}</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </div>
-                          {kr.description && (
-                            <p className="text-sm text-gray-600 mb-3">{kr.description}</p>
-                          )}
-                        </div>
-                        
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleCheckIn(kr)}
-                            className="text-blue-600 hover:text-blue-700"
-                          >
-                            <Plus className="w-4 h-4 mr-1" />
-                            Update
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditKeyResult(kr)}
-                            className="text-primary hover:text-blue-700"
-                            title="Edit Ukuran Keberhasilan"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                        </div>
+                <div key={kr.id} className="p-3 sm:p-4 bg-gray-50 rounded-lg space-y-2 sm:space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Link 
+                          href={`/key-results/${kr.id}`}
+                          className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer text-left"
+                        >
+                          {kr.title}
+                        </Link>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <div className="relative group">
+                                {getKeyResultTypeIcon(kr.keyResultType)}
+                                <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap">
+                                  {getKeyResultTypeTooltip(kr.keyResultType)}
+                                  <div className="absolute right-full top-1/2 transform -translate-y-1/2 w-0 h-0 border-t-4 border-b-4 border-r-4 border-transparent border-r-black"></div>
+                                </div>
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{getKeyResultTypeTooltip(kr.keyResultType)}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </div>
-
-                      {/* Progress Section */}
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600">Progress</span>
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">{progress.toFixed(1)}%</span>
-                            {cycle && (
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <span className="text-xs text-gray-400 cursor-help">
-                                      (Target: {(() => {
-                                        const now = new Date();
-                                        const start = new Date(cycle.startDate);
-                                        const end = new Date(cycle.endDate);
-                                        const totalTime = end.getTime() - start.getTime();
-                                        const timePassed = now.getTime() - start.getTime();
-                                        const idealProgress = Math.max(0, Math.min(100, (timePassed / totalTime) * 100));
-                                        return idealProgress.toFixed(1);
-                                      })()}%)
-                                    </span>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>Capaian ideal berdasarkan waktu yang telah berlalu</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            )}
-                          </div>
-                        </div>
-                        <div className="relative">
-                          <Progress value={progress} className="h-2" />
-                          {cycle && (() => {
-                            const now = new Date();
-                            const start = new Date(cycle.startDate);
-                            const end = new Date(cycle.endDate);
-                            const totalTime = end.getTime() - start.getTime();
-                            const timePassed = now.getTime() - start.getTime();
-                            const idealProgress = Math.max(0, Math.min(100, (timePassed / totalTime) * 100));
+                      {kr.description && (
+                        <p className="text-sm text-gray-600 mb-2">{kr.description}</p>
+                      )}
+                      <div className="text-xs text-gray-500">
+                        {(() => {
+                          // Handle achieve_or_not type
+                          if (kr.keyResultType === 'achieve_or_not') {
+                            return progress >= 100 ? 'Status: Tercapai' : 'Status: Belum tercapai';
+                          }
+                          
+                          // Handle should_stay types  
+                          if (kr.keyResultType === 'should_stay_above' || kr.keyResultType === 'should_stay_below') {
+                            const currentVal = parseFloat(kr.currentValue);
+                            const targetVal = parseFloat(kr.targetValue);
+                            const unitDisplay = kr.unit === 'Rp' ? 'Rp ' : kr.unit === '%' ? '' : '';
+                            const unitSuffix = kr.unit === '%' ? '%' : '';
                             
-                            return (
-                              <div 
-                                className="absolute top-0 h-2 w-0.5 bg-gray-400 opacity-70"
-                                style={{ left: `${idealProgress}%` }}
-                                title={`Target ideal: ${idealProgress.toFixed(1)}%`}
-                              />
-                            );
-                          })()}
-                        </div>
-                        <div className="flex items-center justify-between text-xs text-gray-500">
-                          <span>Saat ini: {formatCurrency(kr.currentValue, kr.unit)}</span>
-                          <span>Target: {formatCurrency(kr.targetValue, kr.unit)}</span>
-                        </div>
-                      </div>
-
-                      {/* Status */}
-                      <div className="flex items-center justify-between">
-                        <SimpleProgressStatus
-                          status={kr.status}
-                          progressPercentage={progress}
-                          timeProgressPercentage={kr.timeProgressPercentage || 0}
-                          dueDate={null}
-                          startDate={cycle?.startDate || undefined}
-                        />
+                            return `Saat ini: ${unitDisplay}${currentVal.toLocaleString('id-ID')}${unitSuffix} | Threshold: ${unitDisplay}${targetVal.toLocaleString('id-ID')}${unitSuffix}`;
+                          }
+                          
+                          // Handle increase_to and decrease_to types
+                          const currentVal = parseFloat(kr.currentValue);
+                          const targetVal = parseFloat(kr.targetValue);
+                          const baseVal = kr.baseValue ? parseFloat(kr.baseValue) : 0;
+                          
+                          if (kr.keyResultType === 'decrease_to') {
+                            if (kr.unit === 'Rp') {
+                              return `Rp ${baseVal.toLocaleString('id-ID')} → Rp ${targetVal.toLocaleString('id-ID')} (capaian: Rp ${currentVal.toLocaleString('id-ID')})`;
+                            } else if (kr.unit === '%') {
+                              return `${baseVal.toLocaleString('id-ID')}% → ${targetVal.toLocaleString('id-ID')}% (capaian: ${currentVal.toLocaleString('id-ID')}%)`;
+                            } else {
+                              return `${baseVal.toLocaleString('id-ID')} → ${targetVal.toLocaleString('id-ID')} ${kr.unit || ''} (capaian: ${currentVal.toLocaleString('id-ID')})`;
+                            }
+                          } else {
+                            // increase_to type
+                            if (kr.unit === 'Rp') {
+                              return `Rp ${baseVal.toLocaleString('id-ID')} → Rp ${targetVal.toLocaleString('id-ID')} (capaian: Rp ${currentVal.toLocaleString('id-ID')})`;
+                            } else if (kr.unit === '%') {
+                              return `${baseVal.toLocaleString('id-ID')}% → ${targetVal.toLocaleString('id-ID')}% (capaian: ${currentVal.toLocaleString('id-ID')}%)`;
+                            } else {
+                              return `${baseVal.toLocaleString('id-ID')} → ${targetVal.toLocaleString('id-ID')} ${kr.unit || ''} (capaian: ${currentVal.toLocaleString('id-ID')})`;
+                            }
+                          }
+                        })()}
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleCheckIn(kr)}
+                        className="text-blue-600 hover:text-blue-700"
+                      >
+                        <Plus className="w-4 h-4 mr-1" />
+                        Update
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem onClick={() => window.location.href = `/key-results/${kr.id}`}>
+                            <Target className="mr-2 h-4 w-4" />
+                            Lihat Detail
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEditKeyResult(kr)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit Ukuran Keberhasilan
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+
+                  {/* Progress Section */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Progress</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{progress.toFixed(1)}%</span>
+                        {cycle && (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className="text-xs text-gray-400 cursor-help">
+                                  (Target: {(() => {
+                                    const now = new Date();
+                                    const start = new Date(cycle.startDate);
+                                    const end = new Date(cycle.endDate);
+                                    const totalTime = end.getTime() - start.getTime();
+                                    const timePassed = now.getTime() - start.getTime();
+                                    const idealProgress = Math.max(0, Math.min(100, (timePassed / totalTime) * 100));
+                                    return idealProgress.toFixed(1);
+                                  })()}%)
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Capaian ideal berdasarkan waktu yang telah berlalu</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
+                      </div>
+                    </div>
+                    <div className="relative">
+                      <Progress value={progress} className="h-2" />
+                      {cycle && (() => {
+                        const now = new Date();
+                        const start = new Date(cycle.startDate);
+                        const end = new Date(cycle.endDate);
+                        const totalTime = end.getTime() - start.getTime();
+                        const timePassed = now.getTime() - start.getTime();
+                        const idealProgress = Math.max(0, Math.min(100, (timePassed / totalTime) * 100));
+                        
+                        return (
+                          <div 
+                            className="absolute top-0 h-2 w-0.5 bg-gray-400 opacity-70"
+                            style={{ left: `${idealProgress}%` }}
+                            title={`Target ideal: ${idealProgress.toFixed(1)}%`}
+                          />
+                        );
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* Status */}
+                  <div className="flex items-center justify-between">
+                    <SimpleProgressStatus
+                      status={kr.status}
+                      progressPercentage={progress}
+                      timeProgressPercentage={kr.timeProgressPercentage || 0}
+                      dueDate={null}
+                      startDate={cycle?.startDate || undefined}
+                    />
+                  </div>
+                </div>
               );
             })
           )}
