@@ -518,15 +518,49 @@ export default function GoalDetail() {
 
       {/* Tabs Section */}
       <Tabs defaultValue="key-results" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="key-results">
-            Ukuran Keberhasilan ({goal.keyResults.length})
+        <div className="flex">
+          {/* Tab 1 - Arrow shape */}
+          <TabsTrigger 
+            value="key-results"
+            className="relative bg-white border border-gray-300 px-6 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 rounded-l-lg min-w-[200px]"
+            style={{
+              clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%)'
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <span className="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">1</span>
+              <span>Ukuran Keberhasilan ({goal.keyResults.length})</span>
+            </div>
           </TabsTrigger>
-          <TabsTrigger value="initiatives">
-            Rencana ({rencana.length})
+          
+          {/* Tab 2 - Arrow shape */}
+          <TabsTrigger 
+            value="initiatives"
+            className="relative bg-white border-t border-b border-gray-300 px-6 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 -ml-[15px] min-w-[200px]"
+            style={{
+              clipPath: 'polygon(15px 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0 50%)'
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <span className="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">2</span>
+              <span>Rencana ({rencana.length})</span>
+            </div>
           </TabsTrigger>
-          <TabsTrigger value="tasks">Tugas ({tugas.length})</TabsTrigger>
-        </TabsList>
+          
+          {/* Tab 3 - Arrow shape */}
+          <TabsTrigger 
+            value="tasks"
+            className="relative bg-white border border-gray-300 px-6 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 rounded-r-lg -ml-[15px] min-w-[200px]"
+            style={{
+              clipPath: 'polygon(15px 0, 100% 0, 100% 100%, 15px 100%, 0 50%)'
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <span className="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">3</span>
+              <span>Tugas ({tugas.length})</span>
+            </div>
+          </TabsTrigger>
+        </div>
 
         {/* Ukuran Keberhasilan Tab */}
         <TabsContent
