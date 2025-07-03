@@ -345,7 +345,6 @@ export default function GoalDetail() {
         </div>
         
       </div>
-
       {/* Objective Information Card */}
       <Card className="mb-6">
         <CardContent className="p-6">
@@ -456,7 +455,7 @@ export default function GoalDetail() {
             <div>
               <div className="flex items-center space-x-2 mb-2">
                 <CheckCircle2 className="w-4 h-4 text-gray-500" />
-                <span className="text-sm text-gray-500">Key Results</span>
+                <span className="text-sm text-gray-500">Ukuran Keberhasilan</span>
               </div>
               <p className="font-medium">{goal.keyResults?.length || 0} Ukuran Keberhasilan</p>
               <p className="text-xs text-gray-400">
@@ -477,9 +476,6 @@ export default function GoalDetail() {
           </div>
         </CardContent>
       </Card>
-
-
-
       {/* Tabs Section */}
       <Tabs defaultValue="key-results" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
@@ -1012,7 +1008,6 @@ export default function GoalDetail() {
           )}
         </TabsContent>
       </Tabs>
-
       {/* Modals */}
       {checkInModal.keyResult && (
         <CheckInModal
@@ -1024,13 +1019,11 @@ export default function GoalDetail() {
           keyResultType={checkInModal.keyResult.keyResultType}
         />
       )}
-
       <EditKeyResultModal
         open={editKeyResultModal.open}
         onOpenChange={(open) => setEditKeyResultModal({ open })}
         keyResult={editKeyResultModal.keyResult}
       />
-
       {/* Add Key Result Modal */}
       <Dialog open={addKeyResultModal.open} onOpenChange={(open) => setAddKeyResultModal({ open })}>
         <DialogContent className="max-w-2xl">
@@ -1160,7 +1153,6 @@ export default function GoalDetail() {
           </div>
         </DialogContent>
       </Dialog>
-
       {/* Edit Objective Modal */}
       {goal && (
         <EditObjectiveModal
@@ -1169,7 +1161,6 @@ export default function GoalDetail() {
           onOpenChange={setEditObjectiveModal}
         />
       )}
-
       {/* AI Help Bubble */}
       <AIHelpBubble 
         context="objective_detail" 
