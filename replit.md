@@ -96,6 +96,17 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 03, 2025. Implemented expandable key result cards with initiative display:
+  * Added expand/collapse functionality to key result cards using chevron buttons (ChevronRight/ChevronDown)
+  * Implemented state management with expandedKeyResults Set to track which cards are expanded
+  * Added toggleKeyResultExpand function to handle expand/collapse interactions
+  * Expandable section shows related initiatives filtered by keyResultId with complete information
+  * Initiative cards display status badges, priority, progress, due dates, and PIC information
+  * Added navigation links to initiative detail pages with "Detail" button
+  * Only shows expand button when key result has related initiatives (> 0)
+  * Enhanced mobile responsiveness with proper layout stacking for period and owner information
+  * Improved objective detail page layout by moving description above parent objective info
+  * Period and owner information now displayed horizontally with icons only (no labels)
 - July 03, 2025. Enhanced edit objective modal with comprehensive tooltip hints and UI improvements:
   * Added clickable Popover-based tooltip hints to all form fields matching create OKR modal functionality
   * Added proper label spacing (mb-2) for better visual hierarchy and user experience
