@@ -539,7 +539,7 @@ export default function GoalDetail() {
           {/* Tab 2 */}
           <TabsTrigger
             value="initiatives"
-            className="relative bg-gray-100 border border-gray-300 px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 flex items-center gap-3 justify-start flex-1"
+            className="relative bg-gray-100 border border-gray-300 px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-green-600 data-[state=active]:text-white data-[state=active]:border-green-600 flex items-center gap-3 justify-start flex-1"
             style={{
               clipPath:
                 "polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%)",
@@ -548,7 +548,7 @@ export default function GoalDetail() {
               zIndex: 2,
             }}
           >
-            <span className="bg-white text-blue-600 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
+            <span className="bg-white text-green-600 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
               2
             </span>
             <span>Rencana ({rencana.length})</span>
@@ -557,7 +557,7 @@ export default function GoalDetail() {
           {/* Tab 3 */}
           <TabsTrigger
             value="tasks"
-            className="relative bg-gray-100 border border-gray-300 px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 flex items-center gap-3 justify-start flex-1"
+            className="relative bg-gray-100 border border-gray-300 px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=active]:border-purple-600 flex items-center gap-3 justify-start flex-1"
             style={{
               clipPath:
                 "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
@@ -565,7 +565,7 @@ export default function GoalDetail() {
               zIndex: 1,
             }}
           >
-            <span className="bg-white text-blue-600 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
+            <span className="bg-white text-purple-600 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
               3
             </span>
             <span>Tugas ({tugas.length})</span>
