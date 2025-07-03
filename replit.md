@@ -96,6 +96,13 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 03, 2025. Fixed number parsing issue causing incorrect value storage (1000 saved as 100,000):
+  * Corrected double parseFloat() issue in form submissions - removed frontend parsing redundancy
+  * Updated edit key result modal to only clean separators before sending to server
+  * Updated OKR form modal and check-in modal for consistent number handling
+  * Server now handles single parseFloat() conversion properly without value corruption
+  * Fixed thousand separator removal logic to prevent numeric value multiplication errors
+  * All numeric inputs now save correctly: 1000 stays as 1000, not converted to 100,000
 - July 03, 2025. Implemented restriction on editing key result types when check-ins exist to maintain data integrity:
   * Disabled key result type editing when existing check-ins are present to prevent data confusion
   * Added automatic check-in count query to determine edit restrictions for type field

@@ -116,7 +116,7 @@ export function CheckInModal({
     }
     
     checkInMutation.mutate({
-      value: submitValue,
+      value: submitValue.replace(/[.,]/g, ''),
       notes,
     });
   };

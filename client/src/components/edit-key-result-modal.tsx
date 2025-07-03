@@ -181,9 +181,15 @@ export default function EditKeyResultModal({
   });
 
   const handleSubmit = (data: EditKeyResultFormData) => {
-    // Since type changing is now disabled when there are check-ins,
-    // we can directly proceed with the update
-    updateKeyResultMutation.mutate(data);
+    // Parse numeric values properly before submission
+    const parsedData = {
+      ...data,
+      baseValue: data.baseValue ? data.baseValue.replace(/[.,]/g, '') : undefined,
+      targetValue: data.targetValue ? data.targetValue.replace(/[.,]/g, '') : data.targetValue,
+      currentValue: data.currentValue ? data.currentValue.replace(/[.,]/g, '') : data.currentValue,
+    };
+    
+    updateKeyResultMutation.mutate(parsedData);
   };
 
   // Watch for key result type changes and clear validation errors

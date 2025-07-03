@@ -262,7 +262,12 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
           teamId: data.objective.teamId === undefined ? null : data.objective.teamId,
           parentId: data.objective.parentId === undefined ? null : data.objective.parentId,
         },
-        keyResults: data.keyResults || []
+        keyResults: data.keyResults?.map(kr => ({
+          ...kr,
+          baseValue: kr.baseValue ? kr.baseValue.toString().replace(/[.,]/g, '') : null,
+          targetValue: kr.targetValue ? kr.targetValue.toString().replace(/[.,]/g, '') : kr.targetValue,
+          currentValue: kr.currentValue ? kr.currentValue.toString().replace(/[.,]/g, '') : kr.currentValue,
+        })) || []
       };
 
       const response = isEditMode
