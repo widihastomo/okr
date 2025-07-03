@@ -138,22 +138,48 @@ export function CheckInModal({
     const target = parseFloat(targetValue);
     const base = parseFloat(currentValue);
     
-    if (keyResultType === "decrease_to") {
-      if (current < target) {
-        return "✅ Target tercapai!";
-      } else if (current < base) {
-        return "📈 Progress baik, terus turunkan";
-      } else {
-        return "⚠️ Perlu usaha lebih untuk menurunkan";
-      }
-    } else {
-      if (current >= target) {
-        return "✅ Target tercapai!";
-      } else if (current > base) {
-        return "📈 Progress baik, terus tingkatkan";
-      } else {
-        return "⚠️ Perlu usaha lebih untuk meningkatkan";
-      }
+    switch (keyResultType) {
+      case "increase_to":
+        if (current >= target) {
+          return "✅ Target tercapai! Nilai sudah mencapai atau melebihi target";
+        } else if (current > base) {
+          return "📈 Progress baik, terus tingkatkan untuk mencapai target";
+        } else {
+          return "⚠️ Perlu usaha lebih untuk meningkatkan nilai dari baseline";
+        }
+        
+      case "decrease_to":
+        if (current <= target) {
+          return "✅ Target tercapai! Nilai sudah turun sesuai atau lebih baik dari target";
+        } else if (current < base) {
+          return "📈 Progress baik, terus turunkan untuk mencapai target";
+        } else {
+          return "⚠️ Perlu usaha lebih untuk menurunkan nilai dari baseline";
+        }
+        
+      case "should_stay_above":
+        if (achieved) {
+          return "✅ Berhasil mempertahankan nilai di atas ambang batas target";
+        } else {
+          return "⚠️ Nilai berada di bawah ambang batas - perlu perbaikan segera";
+        }
+        
+      case "should_stay_below":
+        if (achieved) {
+          return "✅ Berhasil mempertahankan nilai di bawah ambang batas target";
+        } else {
+          return "⚠️ Nilai melebihi ambang batas - perlu optimasi segera";
+        }
+        
+      case "achieve_or_not":
+        if (achieved) {
+          return "✅ Target berhasil dicapai - milestone tercapai!";
+        } else {
+          return "📋 Belum tercapai - lanjutkan usaha untuk mencapai milestone";
+        }
+        
+      default:
+        return "📊 Update progress untuk melacak perkembangan";
     }
   };
 
