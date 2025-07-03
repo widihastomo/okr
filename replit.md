@@ -96,6 +96,15 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 03, 2025. Implemented comprehensive cascading deletion functionality for objectives:
+  * Created deleteObjectiveWithCascade function that removes all related data (key results, initiatives, tasks, check-ins, members, documents, notes)
+  * Added /api/objectives/:id/cascade-info endpoint to fetch counts of related data before deletion
+  * Built CascadeDeleteConfirmationModal component with detailed warning about data that will be deleted
+  * Modal shows exact counts of key results, initiatives, and tasks to be removed with visual warning design
+  * Updated dashboard delete functionality to use new cascading deletion with informative confirmation
+  * Enhanced success message to reflect complete data removal: "Goal beserta semua ukuran keberhasilan, rencana, dan tugas terkait telah dihapus secara permanen"
+  * Fixed DOM nesting validation errors in AlertDialog components using asChild prop
+  * System now prevents accidental data loss with clear confirmation showing scope of deletion
 - July 03, 2025. Fixed "should stay" Key Result input fields with consistent structure approach:
   * Changed to disable only "Nilai Awal" field for "should stay above/below" types while keeping same 3-column layout
   * "Nilai Awal" shows "-" with tooltip explaining baseline not needed for threshold tracking
