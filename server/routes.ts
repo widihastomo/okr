@@ -625,13 +625,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create key results
       const keyResults = [];
       for (const krData of validatedData.keyResults) {
-        // Handle empty numeric values - convert empty strings to null for database
+        // Handle empty numeric values - use appropriate defaults based on key result type
         const processedKrData = {
           ...krData,
           objectiveId: objective.id,
           baseValue: krData.baseValue === "" ? null : krData.baseValue,
-          targetValue: krData.targetValue === "" ? null : krData.targetValue,
-          currentValue: krData.currentValue === "" ? null : krData.currentValue
+          // Schema requires targetValue and currentValue to be non-null, use "0" as default
+          targetValue: krData.targetValue === "" ? "0" : krData.targetValue,
+          currentValue: krData.currentValue === "" ? "0" : krData.currentValue
         };
         const keyResult = await storage.createKeyResult(processedKrData);
         keyResults.push(keyResult);

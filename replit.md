@@ -96,6 +96,12 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 03, 2025. Fixed create OKR database validation errors for empty numeric fields:
+  * Resolved "invalid input syntax for type numeric" error by converting empty strings to "0" for required fields
+  * Fixed "null value violates not-null constraint" error for currentValue and targetValue fields
+  * Enhanced server-side processing to handle achieve_or_not and should_stay key result types properly
+  * All key result types now create successfully without database constraint violations
+  * Updated field validation to align with database schema requirements (targetValue and currentValue must be non-null)
 - July 03, 2025. Implemented comprehensive cascading deletion functionality for objectives:
   * Created deleteObjectiveWithCascade function that removes all related data (key results, initiatives, tasks, check-ins, members, documents, notes)
   * Added /api/objectives/:id/cascade-info endpoint to fetch counts of related data before deletion
