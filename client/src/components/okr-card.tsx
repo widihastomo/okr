@@ -509,6 +509,10 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => window.location.href = `/key-result/${kr.id}`}>
+                          <Eye className="w-4 h-4 mr-2" />
+                          Lihat Detail
+                        </DropdownMenuItem>
                         {onEditKeyResult && (
                           <DropdownMenuItem onClick={() => onEditKeyResult(kr)}>
                             <Settings className="w-4 h-4 mr-2" />
