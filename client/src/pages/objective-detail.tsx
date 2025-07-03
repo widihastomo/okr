@@ -522,7 +522,7 @@ export default function GoalDetail() {
           {/* Tab 1 */}
           <TabsTrigger
             value="key-results"
-            className="relative bg-gray-100 border border-gray-300 px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 flex items-center gap-3 justify-start"
+            className="relative bg-gray-100 border border-gray-300 px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 flex items-center gap-3 justify-start flex-1"
             style={{
               clipPath:
                 "polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%)",
@@ -539,7 +539,7 @@ export default function GoalDetail() {
           {/* Tab 2 */}
           <TabsTrigger
             value="initiatives"
-            className="relative bg-gray-100 border border-gray-300 px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 flex items-center gap-3 justify-start"
+            className="relative bg-gray-100 border border-gray-300 px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 flex items-center gap-3 justify-start flex-1"
             style={{
               clipPath:
                 "polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%)",
@@ -556,7 +556,7 @@ export default function GoalDetail() {
           {/* Tab 3 */}
           <TabsTrigger
             value="tasks"
-            className="relative bg-gray-100 border border-gray-300 px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 flex items-center gap-3 justify-start"
+            className="relative bg-gray-100 border border-gray-300 px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 flex items-center gap-3 justify-start flex-1"
             style={{
               clipPath:
                 "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
