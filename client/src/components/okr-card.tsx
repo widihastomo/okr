@@ -412,15 +412,19 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplic
                       keyResultType={kr.keyResultType}
                     />
                     {onEditKeyResult && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onEditKeyResult(kr)}
-                        className="text-primary hover:text-blue-700"
-                        title="Edit Key Result"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem onClick={() => onEditKeyResult(kr)}>
+                            <Edit className="w-4 h-4 mr-2" />
+                            Edit Ukuran Keberhasilan
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     )}
                   </div>
                 </div>
