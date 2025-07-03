@@ -61,7 +61,7 @@ export function CheckInModal({
   const [value, setValue] = useState(currentValue);
   const [achieved, setAchieved] = useState(parseFloat(currentValue) >= parseFloat(targetValue));
   const [notes, setNotes] = useState("");
-  const [confidence, setConfidence] = useState([5]);
+
   const [showNumberWarning, setShowNumberWarning] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -72,7 +72,7 @@ export function CheckInModal({
   }, [currentValue]);
 
   const checkInMutation = useMutation({
-    mutationFn: async (data: { value: string; notes: string; confidence: number }) => {
+    mutationFn: async (data: { value: string; notes: string }) => {
       return await apiRequest("POST", `/api/key-results/${keyResultId}/check-ins`, data);
     },
     onSuccess: () => {
@@ -89,7 +89,7 @@ export function CheckInModal({
       setValue(currentValue);
       setAchieved(parseFloat(currentValue) >= parseFloat(targetValue));
       setNotes("");
-      setConfidence([5]);
+
     },
     onError: (error) => {
       console.error("Check-in error:", error);
@@ -118,7 +118,6 @@ export function CheckInModal({
     checkInMutation.mutate({
       value: submitValue,
       notes,
-      confidence: confidence[0],
     });
   };
 
@@ -270,24 +269,7 @@ export function CheckInModal({
             </div>
           )}
 
-          <div>
-            <Label htmlFor="confidence" className="text-sm font-medium">
-              Tingkat Keyakinan: {confidence[0]}/10
-            </Label>
-            <Slider
-              id="confidence"
-              min={1}
-              max={10}
-              step={1}
-              value={confidence}
-              onValueChange={setConfidence}
-              className="mt-2"
-            />
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
-              <span>Tidak yakin</span>
-              <span>Sangat yakin</span>
-            </div>
-          </div>
+
 
           <div>
             <Label htmlFor="notes" className="text-sm font-medium">
