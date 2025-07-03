@@ -349,19 +349,22 @@ export default function GoalDetail() {
       {/* Objective Information Card */}
       <Card className="mb-6">
         <CardContent className="p-6">
-          {/* Title, Status, and Description */}
-          <div className="mb-6 pb-6 border-b border-gray-200">
-            <div className="flex items-start gap-3 flex-wrap mb-3">
-              <h1 className="text-2xl font-bold text-gray-900">{goal.title}</h1>
-              <ObjectiveStatusBadge status={goal.status} />
-            </div>
-            {goal.description && (
-              <p className="text-gray-600 mb-4">{goal.description}</p>
-            )}
-            
+          {/* Title and Status */}
+          <div className="flex items-start gap-3 flex-wrap mb-4">
+            <h1 className="text-2xl font-bold text-gray-900">{goal.title}</h1>
+            <ObjectiveStatusBadge status={goal.status} />
+          </div>
+          
+          {/* Description */}
+          {goal.description && (
+            <p className="text-gray-600 mb-4">{goal.description}</p>
+          )}
+          
+          {/* Additional Info Section */}
+          <div className="mb-6 pb-6 border-b border-gray-200 space-y-3">
             {/* Goal Induk Info */}
             {parentObjective && (
-              <div className="flex items-center gap-2 text-sm mb-3">
+              <div className="flex items-center gap-2 text-sm">
                 <Target className="w-4 h-4 text-gray-500" />
                 <span className="text-gray-500">Bagian dari:</span>
                 <Link href={`/objectives/${parentObjective.id}`}>
@@ -374,7 +377,7 @@ export default function GoalDetail() {
             )}
             
             {/* Periode and Pemilik Info */}
-            <div className="flex items-center gap-4 text-sm mb-3">
+            <div className="flex items-center gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-gray-500" />
                 <span className="font-medium">{cycle?.name || "Tidak ada cycle"}</span>
