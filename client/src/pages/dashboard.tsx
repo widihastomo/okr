@@ -131,7 +131,8 @@ export default function Dashboard() {
     
     const userParam = urlParams.get('user');
     if (userParam) {
-      setUserFilter(userParam);
+      // Handle "all" explicitly for user filter
+      setUserFilter(userParam === 'all' ? '' : userParam);
     }
   }, []);
 
@@ -141,22 +142,17 @@ export default function Dashboard() {
     
     if (updates.tab !== undefined) url.searchParams.set('tab', updates.tab);
     if (updates.status !== undefined) {
-      if (updates.status === 'all') {
-        url.searchParams.delete('status');
-      } else {
-        url.searchParams.set('status', updates.status);
-      }
+      // Always set status parameter, including "all" for "Pilih Semua"
+      url.searchParams.set('status', updates.status);
     }
     if (updates.cycle !== undefined) {
-      if (updates.cycle === 'all') {
-        url.searchParams.delete('cycle');
-      } else {
-        url.searchParams.set('cycle', updates.cycle);
-      }
+      // Always set cycle parameter, including "all" for "Semua Cycle"
+      url.searchParams.set('cycle', updates.cycle);
     }
     if (updates.user !== undefined) {
-      if (updates.user === 'all' || updates.user === '') {
-        url.searchParams.delete('user');
+      if (updates.user === '' || updates.user === 'all') {
+        // Set "all" explicitly for "Pilih Semua User"
+        url.searchParams.set('user', 'all');
       } else {
         url.searchParams.set('user', updates.user);
       }
