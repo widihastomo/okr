@@ -544,6 +544,7 @@ export default function GoalDetail() {
               clipPath:
                 "polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%)",
               marginRight: "-20px",
+              paddingLeft: "32px",
               zIndex: 2,
             }}
           >
@@ -560,6 +561,7 @@ export default function GoalDetail() {
             style={{
               clipPath:
                 "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
+              paddingLeft: "32px",
               zIndex: 1,
             }}
           >
