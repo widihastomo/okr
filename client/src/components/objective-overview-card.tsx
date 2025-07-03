@@ -166,7 +166,8 @@ export default function ObjectiveOverviewCard({
           </h4>
           <div className="space-y-1">
             {objective.keyResults.slice(0, 2).map((kr) => {
-              const progress = calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
+              const result = calculateKeyResultProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
+              const progress = result.progressPercentage;
               return (
                 <div key={kr.id} className="flex items-center justify-between text-xs">
                   <span className="truncate flex-1 mr-2">{kr.title}</span>
