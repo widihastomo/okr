@@ -518,45 +518,54 @@ export default function GoalDetail() {
 
       {/* Tabs Section */}
       <Tabs defaultValue="key-results" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 h-auto p-0 bg-transparent gap-0 rounded-none mb-6">
-          {/* Tab 1 - Arrow shape */}
-          <TabsTrigger 
+        <TabsList className="flex w-full h-auto p-0 bg-transparent gap-0 rounded-none mb-6 relative">
+          {/* Tab 1 */}
+          <TabsTrigger
             value="key-results"
             className="relative bg-gray-100 border border-gray-300 px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 flex items-center gap-3 justify-start"
             style={{
-              clipPath: 'polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%)',
-              marginRight: '-20px',
-              zIndex: 1
+              clipPath:
+                "polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%)",
+              marginRight: "-20px",
+              zIndex: 3,
             }}
           >
-            <span className="bg-white text-blue-600 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">1</span>
+            <span className="bg-white text-blue-600 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
+              1
+            </span>
             <span>Ukuran Keberhasilan ({goal.keyResults.length})</span>
           </TabsTrigger>
-          
-          {/* Tab 2 - Arrow shape with straight left border */}
-          <TabsTrigger 
+
+          {/* Tab 2 */}
+          <TabsTrigger
             value="initiatives"
             className="relative bg-gray-100 border border-gray-300 px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 flex items-center gap-3 justify-start"
             style={{
-              clipPath: 'polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%)',
-              marginRight: '-20px',
-              zIndex: 2
+              clipPath:
+                "polygon(20px 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0 50%)",
+              marginRight: "-20px",
+              zIndex: 2,
             }}
           >
-            <span className="bg-white text-blue-600 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">2</span>
+            <span className="bg-white text-blue-600 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
+              2
+            </span>
             <span>Rencana ({rencana.length})</span>
           </TabsTrigger>
-          
-          {/* Tab 3 - Arrow shape */}
-          <TabsTrigger 
+
+          {/* Tab 3 */}
+          <TabsTrigger
             value="tasks"
             className="relative bg-gray-100 border border-gray-300 px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-blue-600 flex items-center gap-3 justify-start"
             style={{
-              clipPath: 'polygon(20px 0, 100% 0, 100% 100%, 20px 100%, 0 50%)',
-              zIndex: 3
+              clipPath:
+                "polygon(20px 0, 100% 0, 100% 100%, 20px 100%, 0 50%)",
+              zIndex: 1,
             }}
           >
-            <span className="bg-white text-blue-600 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold ml-5">3</span>
+            <span className="bg-white text-blue-600 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
+              3
+            </span>
             <span>Tugas ({tugas.length})</span>
           </TabsTrigger>
         </TabsList>
