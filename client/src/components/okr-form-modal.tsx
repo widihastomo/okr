@@ -1057,6 +1057,11 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
   // Watch for keyResultType changes and clear inappropriate fields
   const currentKeyResultType = keyResultForm.watch("keyResultType");
   useEffect(() => {
+    // Clear validation errors when type changes
+    keyResultForm.clearErrors("baseValue");
+    keyResultForm.clearErrors("targetValue");
+    keyResultForm.clearErrors("currentValue");
+    
     if (currentKeyResultType === "achieve_or_not") {
       // Clear target, base, and current values for achieve_or_not type
       keyResultForm.setValue("targetValue", "");

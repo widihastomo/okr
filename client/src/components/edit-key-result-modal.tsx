@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -203,6 +203,15 @@ export default function EditKeyResultModal({
     setShowWarning(false);
     setPendingFormData(null);
   };
+
+  // Watch for key result type changes and clear validation errors
+  const watchedKeyResultType = form.watch("keyResultType");
+  useEffect(() => {
+    // Clear validation errors when type changes
+    form.clearErrors("baseValue");
+    form.clearErrors("targetValue");
+    form.clearErrors("currentValue");
+  }, [watchedKeyResultType, form]);
 
   const formatNumberInput = (value: string | undefined) => {
     if (!value) return '';
