@@ -871,14 +871,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                     </div>
                   )}
                   
-                  {/* Tombol Tambah Ukuran Keberhasilan */}
-                  <div className="pt-4 border-t">
-                    <Button type="button" onClick={addKeyResult} variant="outline" className="w-full border-blue-600 text-blue-600 hover:bg-blue-50">
-                      <Plus className="w-4 h-4 mr-2" />
-                      <span className="hidden sm:inline">Tambah Ukuran Keberhasilan</span>
-                      <span className="sm:hidden">Tambah</span>
-                    </Button>
-                  </div>
+
                 </CardContent>
               </Card>
             )}
@@ -929,6 +922,24 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                 )}
               </div>
             </div>
+
+            {/* Tombol Tambah Ukuran Keberhasilan - di bawah navigation buttons */}
+            {(currentStep === 2 || isEditMode) && (
+              <div className="pt-4 border-t">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Button 
+                    type="button" 
+                    onClick={addKeyResult} 
+                    variant="outline" 
+                    className="w-full sm:w-auto border-blue-600 text-blue-600 hover:bg-blue-50"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    <span className="hidden sm:inline">Tambah Ukuran Keberhasilan</span>
+                    <span className="sm:hidden">Tambah</span>
+                  </Button>
+                </div>
+              </div>
+            )}
           </form>
         </Form>
       </DialogContent>
