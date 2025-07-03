@@ -45,7 +45,7 @@ const editKeyResultSchema = z.object({
   baseValue: z.string().optional(),
   unit: z.string().optional(),
   keyResultType: z.enum(["increase_to", "decrease_to", "achieve_or_not", "should_stay_above", "should_stay_below"]),
-  status: z.enum(["on_track", "at_risk", "behind", "completed", "in_progress"]),
+  status: z.enum(["on_track", "at_risk", "behind", "completed", "in_progress", "ahead", "not_started"]),
 }).refine((data) => {
   // Dynamic validation based on key result type
   if (data.keyResultType === "achieve_or_not") {
@@ -453,13 +453,7 @@ export default function EditKeyResultModal({
                 type="submit"
                 disabled={updateKeyResultMutation.isPending}
                 className="bg-blue-600 hover:bg-blue-700"
-                onClick={(e) => {
-                  console.log("Button clicked, form state:", {
-                    isValid: form.formState.isValid,
-                    errors: form.formState.errors,
-                    values: form.getValues()
-                  });
-                }}
+
               >
                 {updateKeyResultMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
               </Button>
