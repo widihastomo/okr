@@ -374,7 +374,7 @@ export default function GoalDetail() {
             )}
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <div>
               <div className="flex items-center space-x-2 mb-2">
                 <Calendar className="w-4 h-4 text-gray-500" />
@@ -460,6 +460,17 @@ export default function GoalDetail() {
               <p className="font-medium">{goal.keyResults?.length || 0} Ukuran Keberhasilan</p>
               <p className="text-xs text-gray-400">
                 {goal.keyResults?.filter(kr => parseFloat(kr.currentValue) >= parseFloat(kr.targetValue)).length || 0} tercapai
+              </p>
+            </div>
+            
+            <div>
+              <div className="flex items-center space-x-2 mb-2">
+                <FileText className="w-4 h-4 text-gray-500" />
+                <span className="text-sm text-gray-500">Inisiatif</span>
+              </div>
+              <p className="font-medium">{rencana?.length || 0} Rencana</p>
+              <p className="text-xs text-gray-400">
+                {rencana?.filter(initiative => initiative.status === 'completed').length || 0} selesai
               </p>
             </div>
           </div>
