@@ -226,14 +226,15 @@ export default function ObjectiveOverviewCard({
 
         {/* Time & Status Indicators */}
         <div className="flex items-center justify-between text-sm">
+          {/* Owner Information */}
           <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-gray-500" />
-            <span className="text-gray-600">
-              {daysRemaining !== undefined
-                ? daysRemaining > 0
-                  ? `${daysRemaining} hari tersisa`
-                  : "Berakhir"
-                : "Tidak ada deadline"}
+            {objective.ownerType === "team" ? (
+              <Building className="w-4 h-4 text-gray-500 flex-shrink-0" />
+            ) : (
+              <UserIcon className="w-4 h-4 text-gray-500 flex-shrink-0" />
+            )}
+            <span className="font-medium text-gray-700 text-sm">
+              {getOwnerDisplay()}
             </span>
           </div>
           <div className="flex items-center gap-4">
@@ -243,15 +244,14 @@ export default function ObjectiveOverviewCard({
                 <span className="text-xs">Perlu perhatian</span>
               </div>
             )}
-            {/* Owner Information */}
             <div className="flex items-center gap-2">
-              {objective.ownerType === "team" ? (
-                <Building className="w-4 h-4 text-gray-500 flex-shrink-0" />
-              ) : (
-                <UserIcon className="w-4 h-4 text-gray-500 flex-shrink-0" />
-              )}
-              <span className="font-medium text-gray-700 text-sm">
-                {getOwnerDisplay()}
+              <Calendar className="w-4 h-4 text-gray-500" />
+              <span className="text-gray-600">
+                {daysRemaining !== undefined
+                  ? daysRemaining > 0
+                    ? `${daysRemaining} hari tersisa`
+                    : "Berakhir"
+                  : "Tidak ada deadline"}
               </span>
             </div>
           </div>
