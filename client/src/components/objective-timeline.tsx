@@ -150,78 +150,53 @@ export default function ObjectiveTimeline({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {timelineItems.map((item, index) => (
-            <div key={item.id} className="flex items-start gap-4">
+        <div className="space-y-3">
+          {timelineItems.slice(0, 8).map((item, index) => (
+            <div key={item.id} className="flex items-center gap-3">
               {/* Timeline connector */}
               <div className="flex flex-col items-center">
-                <div className={`p-2 rounded-full ${getTypeColor(item.type)}`}>
+                <div className={`p-1.5 rounded-full ${getTypeColor(item.type)}`}>
                   {getTypeIcon(item.type)}
                 </div>
-                {index < timelineItems.length - 1 && (
-                  <div className="w-0.5 h-8 bg-gray-200 mt-2"></div>
+                {index < timelineItems.slice(0, 8).length - 1 && (
+                  <div className="w-0.5 h-6 bg-gray-200 mt-1"></div>
                 )}
               </div>
 
               {/* Content */}
               <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 line-clamp-1">{item.title}</h4>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge variant="secondary" className="text-xs capitalize">
-                        {item.type.replace('_', ' ')}
-                      </Badge>
+                <div className="flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="font-medium text-gray-900 truncate text-sm">{item.title}</h4>
                       <Badge className={`text-xs ${getStatusColor(item.status, item.progress || 0)}`}>
                         {item.status.replace('_', ' ')}
                       </Badge>
-                      {item.updateType && (
-                        <Badge variant="outline" className="text-xs text-blue-600 border-blue-200">
-                          {item.updateType === 'check_in' ? 'Check-in' : 
-                           item.updateType === 'status_change' ? 'Status Update' :
-                           item.updateType === 'progress_update' ? 'Progress Update' :
-                           item.updateType === 'completed' ? 'Completed' : 'Created'}
-                        </Badge>
-                      )}
                     </div>
-                    {/* Update Information */}
-                    <div className="mt-2 text-xs text-gray-500 space-y-1">
-                      {item.lastUpdated && (
-                        <div>Terakhir diperbarui: {new Date(item.lastUpdated).toLocaleString('id-ID')}</div>
-                      )}
-                      {item.type === 'key_result' && item.currentValue && item.targetValue && (
-                        <div>Nilai: {parseFloat(item.currentValue).toLocaleString('id-ID')} / {parseFloat(item.targetValue).toLocaleString('id-ID')} {item.unit}</div>
-                      )}
-                      {item.type === 'initiative' && item.budget && (
-                        <div>Budget: Rp {parseFloat(item.budget).toLocaleString('id-ID')}</div>
-                      )}
-                    </div>
+                    {item.lastUpdated && (
+                      <div className="text-xs text-gray-500">
+                        {new Date(item.lastUpdated).toLocaleDateString('id-ID')} • {item.updateType === 'check_in' ? 'Check-in' : 
+                         item.updateType === 'status_change' ? 'Status Update' :
+                         item.updateType === 'progress_update' ? 'Progress Update' :
+                         item.updateType === 'completed' ? 'Selesai' : 'Dibuat'}
+                      </div>
+                    )}
                   </div>
                   
-                  <div className="text-right ml-4">
-                    <div className="text-lg font-bold text-gray-900">
+                  <div className="text-right ml-3">
+                    <div className="text-sm font-bold text-gray-900">
                       {item.progress || 0}%
                     </div>
-                    {(item as any).dueDate && (
-                      <div className="text-xs text-gray-500">
-                        Due: {new Date((item as any).dueDate).toLocaleDateString('id-ID')}
-                      </div>
-                    )}
-                    {(item as any).completedAt && (
-                      <div className="text-xs text-green-600">
-                        Selesai: {new Date((item as any).completedAt).toLocaleDateString('id-ID')}
-                      </div>
-                    )}
                   </div>
-                </div>
-
-                {/* Progress bar */}
-                <div className="w-full">
-                  <Progress value={item.progress || 0} className="h-2" />
                 </div>
               </div>
             </div>
           ))}
+          {timelineItems.length > 8 && (
+            <div className="text-center text-xs text-gray-400 mt-3">
+              +{timelineItems.length - 8} update lainnya
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
