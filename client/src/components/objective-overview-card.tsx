@@ -14,6 +14,7 @@ import {
   Calendar
 } from "lucide-react";
 import type { OKRWithKeyResults, Initiative, Task } from "@shared/schema";
+import { calculateKeyResultProgress } from "@shared/progress-calculator";
 
 interface ObjectiveOverviewCardProps {
   objective: OKRWithKeyResults;
@@ -28,11 +29,21 @@ export default function ObjectiveOverviewCard({
   tasks = [],
   daysRemaining 
 }: ObjectiveOverviewCardProps) {
+  // Helper function for calculating overall progress
+  const calculateOverallProgress = (keyResults: any[]): number => {
+    if (!keyResults || keyResults.length === 0) return 0;
+    const progressSum = keyResults.reduce((sum, kr) => {
+      const result = calculateKeyResultProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
+      return sum + result.progressPercentage;
+    }, 0);
+    return Math.round(progressSum / keyResults.length);
+  };
+
   // Calculate statistics
   const totalKeyResults = objective.keyResults.length;
   const completedKeyResults = objective.keyResults.filter(kr => {
-    const progress = calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
-    return progress >= 100;
+    const result = calculateKeyResultProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
+    return result.progressPercentage >= 100;
   }).length;
 
   const totalInitiatives = initiatives.length;
@@ -49,34 +60,6 @@ export default function ObjectiveOverviewCard({
     if (progress >= 60) return 'text-yellow-600 bg-yellow-100';
     if (progress >= 40) return 'text-orange-600 bg-orange-100';
     return 'text-red-600 bg-red-100';
-  };
-
-  const calculateProgress = (current: string, target: string, keyResultType: string, baseValue?: string | null): number => {
-    const currentNum = parseFloat(current) || 0;
-    const targetNum = parseFloat(target) || 0;
-    const baseNum = baseValue ? parseFloat(baseValue) : 0;
-    
-    switch (keyResultType) {
-      case "increase_to":
-        if (targetNum <= baseNum) return 0;
-        return Math.min(100, Math.max(0, ((currentNum - baseNum) / (targetNum - baseNum)) * 100));
-      case "decrease_to":
-        if (baseNum <= targetNum) return 0;
-        return Math.min(100, Math.max(0, ((baseNum - currentNum) / (baseNum - targetNum)) * 100));
-      case "achieve_or_not":
-        return currentNum >= targetNum ? 100 : 0;
-      default:
-        return 0;
-    }
-  };
-
-  const calculateOverallProgress = (keyResults: any[]): number => {
-    if (!keyResults || keyResults.length === 0) return 0;
-    const progressSum = keyResults.reduce((sum, kr) => {
-      const progress = calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
-      return sum + progress;
-    }, 0);
-    return Math.round(progressSum / keyResults.length);
   };
 
   return (
