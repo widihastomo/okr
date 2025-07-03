@@ -8,6 +8,7 @@ import { CreateOKRButton } from "@/components/okr-form-modal";
 import EditProgressModal from "@/components/edit-progress-modal";
 import EditKeyResultModal from "@/components/edit-key-result-modal";
 import { CascadeDeleteConfirmationModal } from "@/components/cascade-delete-confirmation-modal";
+import EditObjectiveModal from "@/components/edit-objective-modal";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -66,6 +67,13 @@ export default function Dashboard() {
   const [deleteKeyResultModal, setDeleteKeyResultModal] = useState<{ 
     open: boolean; 
     keyResult?: KeyResult; 
+  }>({
+    open: false
+  });
+
+  const [editObjectiveModal, setEditObjectiveModal] = useState<{ 
+    open: boolean; 
+    objective?: OKRWithKeyResults; 
   }>({
     open: false
   });
@@ -451,6 +459,10 @@ export default function Dashboard() {
     duplicateOKRMutation.mutate(okr);
   };
 
+  const handleEditObjective = (okr: OKRWithKeyResults) => {
+    setEditObjectiveModal({ open: true, objective: okr });
+  };
+
   const handleDeleteOKR = async (okrId: string) => {
     try {
       // Get cascade deletion info
@@ -616,6 +628,7 @@ export default function Dashboard() {
                   onRefresh={refetch}
                   onDuplicate={handleDuplicateOKR}
                   onDelete={handleDeleteOKR}
+                  onEdit={handleEditObjective}
                   cycleStartDate={cycle?.startDate}
                   cycleEndDate={cycle?.endDate}
                   cycle={cycle}
@@ -658,7 +671,11 @@ export default function Dashboard() {
         keyResult={editKeyResultModal.keyResult}
       />
 
-
+      <EditObjectiveModal
+        open={editObjectiveModal.open}
+        onOpenChange={(open) => setEditObjectiveModal({ open, objective: open ? editObjectiveModal.objective : undefined })}
+        objective={editObjectiveModal.objective}
+      />
 
       {/* Cascade Delete Confirmation Modal */}
       <CascadeDeleteConfirmationModal

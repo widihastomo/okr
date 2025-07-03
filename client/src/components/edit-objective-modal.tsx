@@ -33,7 +33,7 @@ const editObjectiveSchema = z.object({
 type EditObjectiveFormData = z.infer<typeof editObjectiveSchema>;
 
 interface EditObjectiveModalProps {
-  objective: Objective;
+  objective?: Objective;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -51,15 +51,15 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
   const form = useForm<EditObjectiveFormData>({
     resolver: zodResolver(editObjectiveSchema),
     defaultValues: {
-      title: objective.title,
-      description: objective.description || "",
-      owner: objective.owner,
-      ownerType: (objective.ownerType === "individual" ? "user" : objective.ownerType) as "user" | "team",
-      ownerId: objective.ownerId,
-      status: objective.status as any,
-      cycleId: objective.cycleId || undefined,
-      teamId: objective.teamId || undefined,
-      parentId: objective.parentId || undefined,
+      title: objective?.title || "",
+      description: objective?.description || "",
+      owner: objective?.owner || "",
+      ownerType: objective ? (objective.ownerType === "individual" ? "user" : objective.ownerType) as "user" | "team" : "user",
+      ownerId: objective?.ownerId || "",
+      status: objective?.status as any || "not_started",
+      cycleId: objective?.cycleId || undefined,
+      teamId: objective?.teamId || undefined,
+      parentId: objective?.parentId || undefined,
     },
   });
 
@@ -87,7 +87,8 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
         keyResults: [], // Empty array since we're only editing objective
       };
 
-      const response = await fetch(`/api/okrs/${objective.id}`, {
+      if (!objective?.id) throw new Error("Objective not found");
+      const response = await fetch(`/api/okrs/${objective?.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -109,7 +110,6 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
       });
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
-      queryClient.invalidateQueries({ queryKey: [`/api/okrs/${objective.id}`] });
       onOpenChange(false);
     },
     onError: (error: Error) => {
@@ -128,7 +128,7 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
   const ownerType = form.watch("ownerType");
 
   // Filter parent objectives (tidak boleh pilih diri sendiri)
-  const availableParentObjectives = objectives?.filter(obj => obj.id !== objective.id) || [];
+  const availableParentObjectives = objectives?.filter(obj => obj.id !== objective?.id) || [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

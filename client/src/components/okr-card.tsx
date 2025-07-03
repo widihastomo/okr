@@ -21,13 +21,14 @@ interface OKRCardProps {
   onRefresh: () => void;
   onDuplicate?: (okr: OKRWithKeyResults) => void;
   onDelete?: (okrId: string) => void;
+  onEdit?: (okr: OKRWithKeyResults) => void;
   cycleStartDate?: string;
   cycleEndDate?: string;
   cycle?: { id: string; name: string; type: string; startDate: string; endDate: string; status: string; description: string | null; };
   index?: number;
 }
 
-export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDeleteKeyResult, onDuplicate, onDelete, cycleStartDate, cycleEndDate, cycle, index = 0 }: OKRCardProps) {
+export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDeleteKeyResult, onDuplicate, onDelete, onEdit, cycleStartDate, cycleEndDate, cycle, index = 0 }: OKRCardProps) {
   const [isExpanded, setIsExpanded] = useState(index === 0);
   
   const calculateProgress = (current: string, target: string, keyResultType: string, baseValue?: string | null): number => {
@@ -169,6 +170,10 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
                   Lihat Detail
                 </Link>
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onEdit?.(okr)}>
+                <Settings className="w-4 h-4 mr-2" />
+                Edit Goal
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onDuplicate?.(okr)}>
                 <Copy className="w-4 h-4 mr-2" />
                 Duplikat
@@ -226,6 +231,10 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
                             <Eye className="w-4 h-4 mr-2" />
                             Lihat Detail
                           </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onEdit?.(okr)}>
+                          <Settings className="w-4 h-4 mr-2" />
+                          Edit Goal
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onDuplicate?.(okr)}>
                           <Copy className="w-4 h-4 mr-2" />
