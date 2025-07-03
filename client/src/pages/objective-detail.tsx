@@ -354,11 +354,25 @@ export default function GoalDetail() {
               <ObjectiveStatusBadge status={goal.status} />
             </div>
             {goal.description && (
-              <p className="text-gray-600">{goal.description}</p>
+              <p className="text-gray-600 mb-4">{goal.description}</p>
+            )}
+            
+            {/* Goal Induk Info */}
+            {parentObjective && (
+              <div className="flex items-center gap-2 text-sm">
+                <Target className="w-4 h-4 text-gray-500" />
+                <span className="text-gray-500">Bagian dari:</span>
+                <Link href={`/objectives/${parentObjective.id}`}>
+                  <span className="font-medium text-blue-600 hover:text-blue-800 hover:underline cursor-pointer flex items-center gap-1">
+                    {parentObjective.title}
+                    <ExternalLink className="w-3 h-3" />
+                  </span>
+                </Link>
+              </div>
             )}
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <div className="flex items-center space-x-2 mb-2">
                 <Calendar className="w-4 h-4 text-gray-500" />
@@ -445,29 +459,6 @@ export default function GoalDetail() {
               <p className="text-xs text-gray-400">
                 {goal.keyResults?.filter(kr => parseFloat(kr.currentValue) >= parseFloat(kr.targetValue)).length || 0} tercapai
               </p>
-            </div>
-            
-            <div>
-              <div className="flex items-center space-x-2 mb-2">
-                <Target className="w-4 h-4 text-gray-500" />
-                <span className="text-sm text-gray-500">Goal Induk</span>
-              </div>
-              {parentObjective ? (
-                <div className="space-y-1">
-                  <Link href={`/objectives/${parentObjective.id}`}>
-                    <p className="font-medium text-blue-600 hover:text-blue-800 hover:underline cursor-pointer flex items-center gap-1">
-                      {parentObjective.title}
-                      <ExternalLink className="w-3 h-3" />
-                    </p>
-                  </Link>
-                  <p className="text-xs text-gray-400">Bagian dari goal yang lebih besar</p>
-                </div>
-              ) : (
-                <div className="space-y-1">
-                  <p className="font-medium text-gray-500">Tidak ada goal induk</p>
-                  <p className="text-xs text-gray-400">Goal ini berdiri sendiri</p>
-                </div>
-              )}
             </div>
           </div>
         </CardContent>
