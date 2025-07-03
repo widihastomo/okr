@@ -80,7 +80,7 @@ export function SearchableUserSelect({
         <Command>
           <CommandInput placeholder="Cari user..." />
           <div 
-            className="max-h-[200px] overflow-y-auto overscroll-contain"
+            className="max-h-[250px] overflow-y-auto overscroll-contain"
             style={{ 
               WebkitOverflowScrolling: 'touch',
               scrollbarWidth: 'thin',
@@ -134,19 +134,20 @@ export function SearchableUserSelect({
                       onValueChange(user.id);
                       setOpen(false);
                     }}
+                    className="flex items-center py-2"
                   >
                     <Check
                       className={cn(
-                        "mr-2 h-4 w-4",
+                        "mr-2 h-4 w-4 flex-shrink-0",
                         value === user.id ? "opacity-100" : "opacity-0"
                       )}
                     />
-                    <User className="mr-2 h-4 w-4 text-blue-600" />
-                    <div className="flex flex-col">
-                      <span className="font-medium">
+                    <User className="mr-2 h-4 w-4 flex-shrink-0 text-blue-600" />
+                    <div className="flex flex-col min-w-0 flex-1">
+                      <span className="font-medium truncate">
                         {`${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email}
                       </span>
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-gray-500 truncate">
                         {user.email}
                       </span>
                     </div>
