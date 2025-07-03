@@ -291,84 +291,118 @@ export default function GoalDetail() {
 
   return (
     <div className="p-4 sm:p-6 max-w-full">
-      {/* Page Header */}
-      <div className="mb-6 bg-white rounded-lg shadow-sm border p-4 sm:p-6">
-        <div className="flex items-start justify-between gap-4">
+      {/* Page Header with Back Button */}
+      <div className="mb-6">
+        <Link href="/dashboard">
+          <Button variant="ghost" size="sm" className="mb-4">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Kembali ke Dashboard
+          </Button>
+        </Link>
+        
+        {/* Breadcrumb */}
+        <div className="text-sm text-gray-500 mb-2">
+          Dashboard &gt; Goals &gt; {goal.title}
+        </div>
+        
+        {/* Title and Actions */}
+        <div className="flex items-start justify-between gap-4 mb-6">
           <div className="flex-1">
-            <Link href="/dashboard">
-              <Button variant="ghost" size="sm" className="mb-4">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Kembali ke Dashboard
-              </Button>
-            </Link>
-            
-            <div className="space-y-2">
-              <div className="flex items-start gap-3 flex-wrap">
-                <h1 className="text-2xl font-bold text-gray-900">{goal.title}</h1>
-                <ObjectiveStatusBadge status={goal.status} />
-              </div>
-              {goal.description && (
-                <p className="text-gray-600">{goal.description}</p>
-              )}
+            <div className="flex items-start gap-3 flex-wrap mb-2">
+              <h1 className="text-2xl font-bold text-gray-900">{goal.title}</h1>
+              <ObjectiveStatusBadge status={goal.status} />
             </div>
+            {goal.description && (
+              <p className="text-gray-600">{goal.description}</p>
+            )}
           </div>
           
-          <Button variant="outline" size="sm">
-            <Edit className="w-4 h-4 mr-2" />
-            Ubah
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm">
+              <Edit className="w-4 h-4 mr-2" />
+              Ubah Goal
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem>
+                  <FileText className="w-4 h-4 mr-2" />
+                  Duplikat Goal
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-red-600 hover:text-red-700">
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Hapus Goal
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
 
-      {/* Objective Overview Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2 mb-2">
-              <Calendar className="w-4 h-4 text-gray-500" />
-              <span className="text-sm text-gray-500">Periode</span>
-            </div>
-            <p className="font-medium">{cycle?.name || "Tidak ada cycle"}</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2 mb-2">
-              {goal.ownerType === 'team' ? (
-                <Building className="w-4 h-4 text-gray-500" />
-              ) : (
-                <UserIcon className="w-4 h-4 text-gray-500" />
+      {/* Objective Information Card */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="w-5 h-5" />
+            Informasi Goal
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <div className="flex items-center space-x-2 mb-2">
+                <Calendar className="w-4 h-4 text-gray-500" />
+                <span className="text-sm text-gray-500">Periode</span>
+              </div>
+              <p className="font-medium">{cycle?.name || "Tidak ada cycle"}</p>
+              {cycle && (
+                <p className="text-xs text-gray-400">
+                  {new Date(cycle.startDate).toLocaleDateString('id-ID')} - {new Date(cycle.endDate).toLocaleDateString('id-ID')}
+                </p>
               )}
-              <span className="text-sm text-gray-500">Pemilik</span>
             </div>
-            <p className="font-medium">{getOwnerDisplay()}</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2 mb-2">
-              <Target className="w-4 h-4 text-gray-500" />
-              <span className="text-sm text-gray-500">Hasil Utama</span>
+            
+            <div>
+              <div className="flex items-center space-x-2 mb-2">
+                {goal.ownerType === 'team' ? (
+                  <Building className="w-4 h-4 text-gray-500" />
+                ) : (
+                  <UserIcon className="w-4 h-4 text-gray-500" />
+                )}
+                <span className="text-sm text-gray-500">Pemilik</span>
+              </div>
+              <p className="font-medium">{getOwnerDisplay()}</p>
+              <p className="text-xs text-gray-400 capitalize">{goal.ownerType === 'team' ? 'Tim' : 'Individual'}</p>
             </div>
-            <p className="font-medium">{goal.keyResults.length}</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2 mb-2">
-              <BarChart3 className="w-4 h-4 text-gray-500" />
-              <span className="text-sm text-gray-500">Progress Keseluruhan</span>
+            
+            <div>
+              <div className="flex items-center space-x-2 mb-2">
+                <BarChart3 className="w-4 h-4 text-gray-500" />
+                <span className="text-sm text-gray-500">Progress</span>
+              </div>
+              <p className="font-medium">{overallProgress.toFixed(1)}%</p>
+              <Progress value={overallProgress} className="h-2 mt-1" />
             </div>
-            <div className="flex items-center gap-2">
-              <p className="font-medium">{overallProgress}%</p>
-              <Progress value={overallProgress} className="flex-1 h-2" />
+            
+            <div>
+              <div className="flex items-center space-x-2 mb-2">
+                <CheckCircle2 className="w-4 h-4 text-gray-500" />
+                <span className="text-sm text-gray-500">Key Results</span>
+              </div>
+              <p className="font-medium">{goal.keyResults?.length || 0} Ukuran Keberhasilan</p>
+              <p className="text-xs text-gray-400">
+                {goal.keyResults?.filter(kr => parseFloat(kr.currentValue) >= parseFloat(kr.targetValue)).length || 0} tercapai
+              </p>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
+
+
 
       {/* Tabs Section */}
       <Tabs defaultValue="key-results" className="space-y-6">
