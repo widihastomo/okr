@@ -159,7 +159,9 @@ export default function QuickActionFAB() {
 
   return (
     <>
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end space-y-3">
+      <div className={`fixed bottom-6 right-6 z-50 flex flex-col items-end space-y-3 ${
+        !isExpanded ? 'pointer-events-none' : ''
+      }`}>
         {/* Action Options - appear when expanded */}
         <div className={`flex flex-col space-y-3 transition-all duration-300 ease-out ${
           isExpanded 
@@ -188,7 +190,7 @@ export default function QuickActionFAB() {
         {/* Main FAB Button */}
         <Button
           onClick={toggleExpanded}
-          className={`w-14 h-14 rounded-full bg-orange-600 hover:bg-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 ${
+          className={`w-14 h-14 rounded-full bg-orange-600 hover:bg-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 pointer-events-auto ${
             isExpanded ? 'rotate-45' : 'rotate-0'
           }`}
         >
