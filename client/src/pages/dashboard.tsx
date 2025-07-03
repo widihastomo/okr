@@ -11,6 +11,16 @@ import { CascadeDeleteConfirmationModal } from "@/components/cascade-delete-conf
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 import { Plus, Target, CheckSquare, Building2, Trophy } from "lucide-react";
 import MyTugas from "@/components/my-tasks";
@@ -48,6 +58,13 @@ export default function Dashboard() {
     keyResultsCount?: number;
     initiativesCount?: number;
     tasksCount?: number;
+  }>({
+    open: false
+  });
+
+  const [deleteKeyResultModal, setDeleteKeyResultModal] = useState<{ 
+    open: boolean; 
+    keyResult?: KeyResult; 
   }>({
     open: false
   });
@@ -303,6 +320,36 @@ export default function Dashboard() {
     },
   });
 
+  // Mutation for deleting Key Result
+  const deleteKeyResultMutation = useMutation({
+    mutationFn: async (keyResultId: string) => {
+      const response = await fetch(`/api/key-results/${keyResultId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete key result');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Ukuran Keberhasilan berhasil dihapus",
+        description: "Data telah dihapus secara permanen",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
+      setDeleteKeyResultModal({ open: false });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal menghapus Ukuran Keberhasilan",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Mutation for duplicating OKR
   const duplicateOKRMutation = useMutation({
     mutationFn: async (okr: OKRWithKeyResults) => {
@@ -384,6 +431,10 @@ export default function Dashboard() {
 
   const handleEditKeyResult = (keyResult: KeyResult) => {
     setEditKeyResultModal({ open: true, keyResult });
+  };
+
+  const handleDeleteKeyResult = (keyResult: KeyResult) => {
+    setDeleteKeyResultModal({ open: true, keyResult });
   };
 
   // Key result click now navigates to dedicated page via Link in OKRCard
@@ -553,6 +604,7 @@ export default function Dashboard() {
                   okr={okr}
                   onEditProgress={handleEditProgress}
                   onEditKeyResult={handleEditKeyResult}
+                  onDeleteKeyResult={handleDeleteKeyResult}
                   onRefresh={refetch}
                   onDuplicate={handleDuplicateOKR}
                   onDelete={handleDeleteOKR}
@@ -610,6 +662,33 @@ export default function Dashboard() {
         initiativesCount={deleteConfirmModal.initiativesCount || 0}
         tasksCount={deleteConfirmModal.tasksCount || 0}
       />
+
+      {/* Delete Key Result Confirmation Modal */}
+      <AlertDialog open={deleteKeyResultModal.open} onOpenChange={(open) => setDeleteKeyResultModal({ open })}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Ukuran Keberhasilan</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus ukuran keberhasilan "{deleteKeyResultModal.keyResult?.title}"? 
+              Semua data terkait termasuk rencana dan tugas akan ikut terhapus secara permanen. 
+              Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (deleteKeyResultModal.keyResult) {
+                  deleteKeyResultMutation.mutate(deleteKeyResultModal.keyResult.id);
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

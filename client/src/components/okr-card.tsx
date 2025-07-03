@@ -17,6 +17,7 @@ interface OKRCardProps {
   okr: OKRWithKeyResults;
   onEditProgress: (keyResult: KeyResult) => void;
   onEditKeyResult?: (keyResult: KeyResult) => void;
+  onDeleteKeyResult?: (keyResult: KeyResult) => void;
   onRefresh: () => void;
   onDuplicate?: (okr: OKRWithKeyResults) => void;
   onDelete?: (okrId: string) => void;
@@ -26,7 +27,7 @@ interface OKRCardProps {
   index?: number;
 }
 
-export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplicate, onDelete, cycleStartDate, cycleEndDate, cycle, index = 0 }: OKRCardProps) {
+export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDeleteKeyResult, onDuplicate, onDelete, cycleStartDate, cycleEndDate, cycle, index = 0 }: OKRCardProps) {
   const [isExpanded, setIsExpanded] = useState(index === 0);
   
   const calculateProgress = (current: string, target: string, keyResultType: string, baseValue?: string | null): number => {
@@ -512,6 +513,15 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplic
                           <DropdownMenuItem onClick={() => onEditKeyResult(kr)}>
                             <Settings className="w-4 h-4 mr-2" />
                             Edit Ukuran Keberhasilan
+                          </DropdownMenuItem>
+                        )}
+                        {onDeleteKeyResult && (
+                          <DropdownMenuItem 
+                            onClick={() => onDeleteKeyResult(kr)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Hapus Ukuran Keberhasilan
                           </DropdownMenuItem>
                         )}
                       </DropdownMenuContent>
