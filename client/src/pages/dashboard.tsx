@@ -508,9 +508,9 @@ export default function Dashboard() {
                 <h1 className="text-lg sm:text-2xl font-semibold text-gray-900">OKR Dashboard</h1>
                 <p className="text-gray-600 mt-0.5 sm:mt-1 text-xs sm:text-base">Track your objectives and key results</p>
               </div>
-              {currentUser && (
-                <DashboardHelpBubble userId={currentUser.id as string} />
-              )}
+              {currentUser && (currentUser as any).id ? (
+                <DashboardHelpBubble userId={(currentUser as any).id as string} />
+              ) : null}
             </div>
             <div className="flex-shrink-0">
               <CreateOKRButton />
