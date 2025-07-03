@@ -896,6 +896,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (updateData.targetValue) updateData.targetValue = parseFloat(updateData.targetValue).toString();
       if (updateData.baseValue) updateData.baseValue = updateData.baseValue ? parseFloat(updateData.baseValue).toString() : null;
       
+      // Ensure unit field is never null - set default if missing or null
+      if (!updateData.unit || updateData.unit === null) {
+        updateData.unit = "number";
+      }
+      
 
 
       const updatedKeyResult = await storage.updateKeyResult(keyResultId, updateData);

@@ -96,6 +96,15 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 03, 2025. Added delete key result functionality to OKR card dropdown menus:
+  * Added "Hapus Ukuran Keberhasilan" menu item to three-dot dropdown in OKR cards alongside existing edit option
+  * Created delete key result mutation with proper API call to DELETE /api/key-results/:id endpoint
+  * Added confirmation dialog with clear warning about permanent deletion of key result and related data
+  * Implemented proper error handling and success notifications with Indonesian text
+  * Fixed key result update error where unit field was being set to null violating database constraint
+  * Added validation in server routes to ensure unit field defaults to "number" when missing or null
+  * Delete functionality now available in both OKR card dropdowns and key result detail page
+  * Enhanced user experience with consistent action grouping and confirmation patterns
 - July 03, 2025. Created action dropdown menus for key results in detail page, grouping check-in and edit buttons:
   * Grouped CheckInModal button and dropdown menu into action area in key result detail page header
   * CheckInModal button positioned alongside dropdown menu containing edit functionality 
