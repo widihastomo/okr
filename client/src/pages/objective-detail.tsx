@@ -646,9 +646,10 @@ export default function GoalDetail() {
 
           </div>
 
-          {goal.keyResults.length === 0 ? (
-            <Card className="border-2 border-dashed border-blue-200 bg-blue-50/50">
-              <CardContent className="p-8 text-center">
+          {/* Key Results Container with Blue Background */}
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200 space-y-4">
+            {goal.keyResults.length === 0 ? (
+              <div className="border-2 border-dashed border-blue-200 bg-blue-50/50 rounded-lg p-8 text-center">
                 <Target className="w-12 h-12 text-blue-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-blue-900 mb-2">
                   Belum ada Ukuran Keberhasilan
@@ -664,10 +665,9 @@ export default function GoalDetail() {
                   <Plus className="w-4 h-4 mr-2" />
                   Tambah Ukuran Keberhasilan Pertama
                 </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            goal.keyResults.map((kr) => {
+              </div>
+            ) : (
+              goal.keyResults.map((kr) => {
               const progress = calculateProgress(
                 kr.currentValue,
                 kr.targetValue,
@@ -1179,6 +1179,7 @@ export default function GoalDetail() {
               );
             })
           )}
+          </div>
         </TabsContent>
 
         {/* Rencana Tab */}
