@@ -487,10 +487,35 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
                     </div>
                     <p className="text-sm text-gray-600 mb-2">{kr.description}</p>
                     <div className="text-xs text-gray-500">
-                      {kr.unit === "currency" ? 
-                        `Rp ${parseFloat(kr.currentValue).toLocaleString('id-ID')} / Rp ${parseFloat(kr.targetValue).toLocaleString('id-ID')}` : 
-                       kr.unit === "percentage" ? `${kr.currentValue}% / ${kr.targetValue}%` :
-                       `${kr.currentValue} / ${kr.targetValue}`}
+                      {(() => {
+                        // Handle achieve_or_not type
+                        if (kr.keyResultType === 'achieve_or_not') {
+                          return progress >= 100 ? 'Status: Tercapai' : 'Status: Belum tercapai';
+                        }
+                        
+                        // Handle should_stay types  
+                        if (kr.keyResultType === 'should_stay_above' || kr.keyResultType === 'should_stay_below') {
+                          const currentVal = parseFloat(kr.currentValue);
+                          const targetVal = parseFloat(kr.targetValue);
+                          const unitDisplay = kr.unit === 'Rp' ? 'Rp ' : kr.unit === '%' ? '' : '';
+                          const unitSuffix = kr.unit === '%' ? '%' : '';
+                          
+                          return `Saat ini: ${unitDisplay}${currentVal.toLocaleString('id-ID')}${unitSuffix} | Threshold: ${unitDisplay}${targetVal.toLocaleString('id-ID')}${unitSuffix}`;
+                        }
+                        
+                        // Handle increase_to and decrease_to types
+                        const currentVal = parseFloat(kr.currentValue);
+                        const targetVal = parseFloat(kr.targetValue);
+                        const baseVal = kr.baseValue ? parseFloat(kr.baseValue) : 0;
+                        
+                        if (kr.unit === 'Rp') {
+                          return `Rp ${currentVal.toLocaleString('id-ID')} → Rp ${targetVal.toLocaleString('id-ID')} (dari Rp ${baseVal.toLocaleString('id-ID')})`;
+                        } else if (kr.unit === '%') {
+                          return `${currentVal}% → ${targetVal}% (dari ${baseVal}%)`;
+                        } else {
+                          return `${currentVal} → ${targetVal} ${kr.unit || ''} (dari ${baseVal})`;
+                        }
+                      })()}
                     </div>
                   </div>
                   <div className="flex items-center gap-1">
