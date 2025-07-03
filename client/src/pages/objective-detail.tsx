@@ -23,6 +23,8 @@ import { Label } from "@/components/ui/label";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import AIHelpBubble from "@/components/ai-help-bubble";
+import ObjectiveOverviewCard from "@/components/objective-overview-card";
+import ObjectiveTimeline from "@/components/objective-timeline";
 import type { OKRWithKeyResults, KeyResult, Initiative, Task, Cycle, User, Team } from "@shared/schema";
 
 // Type for tasks with initiative info
@@ -358,6 +360,25 @@ export default function GoalDetail() {
         </div>
         
       </div>
+      {/* Visual Overview Section for easy understanding */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="lg:col-span-2">
+          <ObjectiveOverviewCard 
+            objective={goal}
+            initiatives={rencana}
+            tasks={tugas}
+            daysRemaining={daysRemaining}
+          />
+        </div>
+        <div className="lg:col-span-1">
+          <ObjectiveTimeline 
+            objective={goal}
+            initiatives={rencana}
+            tasks={tugas.slice(0, 5)}
+          />
+        </div>
+      </div>
+
       {/* Objective Information Card */}
       <Card className="mb-6">
         <CardContent className="p-6">
