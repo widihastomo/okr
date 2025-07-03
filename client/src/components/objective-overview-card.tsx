@@ -102,6 +102,30 @@ export default function ObjectiveOverviewCard({
   return (
     <Card className="hover:shadow-lg transition-shadow">
       <CardHeader className="pb-4">
+        {/* Progress Bar with Visual Indicators - Moved to top */}
+        <div className="space-y-2 mb-6">
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium text-gray-700">
+              Progress Keseluruhan
+            </span>
+            <span className="text-2xl font-bold text-gray-900">{overallProgress}%</span>
+          </div>
+          <div className="relative">
+            <Progress value={overallProgress} className="h-4" />
+            {/* Add milestone markers */}
+            <div className="absolute top-0 left-1/4 w-0.5 h-4 bg-gray-300 opacity-50"></div>
+            <div className="absolute top-0 left-1/2 w-0.5 h-4 bg-gray-300 opacity-50"></div>
+            <div className="absolute top-0 left-3/4 w-0.5 h-4 bg-gray-300 opacity-50"></div>
+          </div>
+          <div className="flex justify-between text-xs text-gray-400">
+            <span>0%</span>
+            <span>25%</span>
+            <span>50%</span>
+            <span>75%</span>
+            <span>100%</span>
+          </div>
+        </div>
+
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-full ${getHealthColor(overallProgress)}`}>
@@ -176,29 +200,6 @@ export default function ObjectiveOverviewCard({
       </CardHeader>
 
       <CardContent className="space-y-6">
-        {/* Progress Bar with Visual Indicators */}
-        <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-gray-700">
-              Progress Keseluruhan
-            </span>
-            <span className="text-sm text-gray-500">{overallProgress}%</span>
-          </div>
-          <div className="relative">
-            <Progress value={overallProgress} className="h-3" />
-            {/* Add milestone markers */}
-            <div className="absolute top-0 left-1/4 w-0.5 h-3 bg-gray-300 opacity-50"></div>
-            <div className="absolute top-0 left-1/2 w-0.5 h-3 bg-gray-300 opacity-50"></div>
-            <div className="absolute top-0 left-3/4 w-0.5 h-3 bg-gray-300 opacity-50"></div>
-          </div>
-          <div className="flex justify-between text-xs text-gray-400">
-            <span>0%</span>
-            <span>25%</span>
-            <span>50%</span>
-            <span>75%</span>
-            <span>100%</span>
-          </div>
-        </div>
 
         {/* Quick Stats Grid */}
         <div className="grid grid-cols-3 gap-4">
