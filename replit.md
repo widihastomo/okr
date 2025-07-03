@@ -96,6 +96,13 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 03, 2025. Enhanced edit objective modal with comprehensive tooltip hints and UI improvements:
+  * Added clickable Popover-based tooltip hints to all form fields matching create OKR modal functionality
+  * Added proper label spacing (mb-2) for better visual hierarchy and user experience
+  * Replaced user selection dropdown with SearchableUserSelect for consistency with create OKR form
+  * Tooltip hints include detailed Indonesian explanations with practical examples for each field
+  * All help icons use consistent blue color scheme (text-blue-500) matching application theme
+  * Enhanced mobile UX with click-based tooltip interactions instead of hover for touch devices
 - July 03, 2025. Implemented auto-login for development mode to eliminate repeated login requirements:
   * Extended session TTL from 7 days to 30 days for development convenience
   * Added automatic session creation in development mode using admin user ID

@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 import { useToast } from "@/hooks/use-toast";
 import { Calendar, Building, UserIcon, Target, HelpCircle } from "lucide-react";
 import { Cycle, User, Team, Objective } from "@shared/schema";
@@ -151,7 +152,7 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
               <div className="space-y-4">
                 {/* Judul Goal */}
                 <div>
-                  <Label htmlFor="title" className="flex items-center gap-2">
+                  <Label htmlFor="title" className="flex items-center gap-2 mb-2">
                     Judul Goal
                     <Popover>
                       <PopoverTrigger asChild>
@@ -183,7 +184,7 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
 
                 {/* Deskripsi Goal */}
                 <div>
-                  <Label htmlFor="description" className="flex items-center gap-2">
+                  <Label htmlFor="description" className="flex items-center gap-2 mb-2">
                     Deskripsi Goal
                     <Popover>
                       <PopoverTrigger asChild>
@@ -215,7 +216,7 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {/* Cycle */}
                   <div>
-                    <Label className="flex items-center gap-2">
+                    <Label className="flex items-center gap-2 mb-2">
                       Siklus
                       <Popover>
                         <PopoverTrigger asChild>
@@ -255,7 +256,7 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
 
                   {/* Tipe Pemilik */}
                   <div>
-                    <Label className="flex items-center gap-2">
+                    <Label className="flex items-center gap-2 mb-2">
                       Tipe Pemilik
                       <Popover>
                         <PopoverTrigger asChild>
@@ -300,7 +301,7 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
 
                   {/* Pemilik */}
                   <div>
-                    <Label className="flex items-center gap-2">
+                    <Label className="flex items-center gap-2 mb-2">
                       Pemilik
                       <Popover>
                         <PopoverTrigger asChild>
@@ -321,7 +322,8 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
                       </Popover>
                     </Label>
                     {ownerType === "user" ? (
-                      <Select
+                      <SearchableUserSelect
+                        users={users || []}
                         value={form.watch("ownerId")}
                         onValueChange={(value) => {
                           form.setValue("ownerId", value);
@@ -330,18 +332,9 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
                             form.setValue("owner", `${selectedUser.firstName} ${selectedUser.lastName}`);
                           }
                         }}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih user" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {users?.map((user) => (
-                            <SelectItem key={user.id} value={user.id}>
-                              {user.firstName} {user.lastName}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        placeholder="Pilih pemilik"
+                        emptyMessage="Tidak ada user ditemukan"
+                      />
                     ) : (
                       <Select
                         value={form.watch("ownerId")}
@@ -374,7 +367,7 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
 
                 {/* Goal Induk */}
                 <div>
-                  <Label className="flex items-center gap-2">
+                  <Label className="flex items-center gap-2 mb-2">
                     Goal Induk (Opsional)
                     <Popover>
                       <PopoverTrigger asChild>
