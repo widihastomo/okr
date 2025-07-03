@@ -76,76 +76,78 @@ export function SearchableUserSelect({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0" align="start">
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={4}>
         <Command>
           <CommandInput placeholder="Cari user..." />
-          <CommandList className="max-h-64 overflow-auto">
-            <CommandEmpty>{emptyMessage}</CommandEmpty>
-            <CommandGroup>
-              {allowAll && (
-                <CommandItem
-                  value="all"
-                  onSelect={() => {
-                    onValueChange("all");
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === "all" ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  <Users className="mr-2 h-4 w-4 text-green-600" />
-                  Semua User
-                </CommandItem>
-              )}
-              {allowUnassigned && (
-                <CommandItem
-                  value="unassigned"
-                  onSelect={() => {
-                    onValueChange("unassigned");
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === "unassigned" ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  <User className="mr-2 h-4 w-4 text-gray-400" />
-                  Belum Ditugaskan
-                </CommandItem>
-              )}
-              {users.map((user) => (
-                <CommandItem
-                  key={user.id}
-                  value={`${user.firstName || ''} ${user.lastName || ''} ${user.email}`}
-                  onSelect={() => {
-                    onValueChange(user.id);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === user.id ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  <User className="mr-2 h-4 w-4 text-blue-600" />
-                  <div className="flex flex-col">
-                    <span className="font-medium">
-                      {`${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email}
-                    </span>
-                    <span className="text-sm text-gray-500">
-                      {user.email}
-                    </span>
-                  </div>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
+          <div className="max-h-[200px] overflow-y-auto">
+            <CommandList>
+              <CommandEmpty>{emptyMessage}</CommandEmpty>
+              <CommandGroup>
+                {allowAll && (
+                  <CommandItem
+                    value="all"
+                    onSelect={() => {
+                      onValueChange("all");
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === "all" ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    <Users className="mr-2 h-4 w-4 text-green-600" />
+                    Semua User
+                  </CommandItem>
+                )}
+                {allowUnassigned && (
+                  <CommandItem
+                    value="unassigned"
+                    onSelect={() => {
+                      onValueChange("unassigned");
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === "unassigned" ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    <User className="mr-2 h-4 w-4 text-gray-400" />
+                    Belum Ditugaskan
+                  </CommandItem>
+                )}
+                {users.map((user) => (
+                  <CommandItem
+                    key={user.id}
+                    value={`${user.firstName || ''} ${user.lastName || ''} ${user.email}`}
+                    onSelect={() => {
+                      onValueChange(user.id);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === user.id ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    <User className="mr-2 h-4 w-4 text-blue-600" />
+                    <div className="flex flex-col">
+                      <span className="font-medium">
+                        {`${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email}
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        {user.email}
+                      </span>
+                    </div>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </div>
         </Command>
       </PopoverContent>
     </Popover>
