@@ -96,6 +96,14 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 03, 2025. Created arrow-shaped tabs with sequential numbers and proper navigation flow:
+  * Implemented CSS clip-path arrow design for visual step progression (1→2→3)
+  * Tab 1: Arrow pointing right with number badge "1" for Ukuran Keberhasilan
+  * Tab 2: Straight left border, arrow pointing right with number badge "2" for Rencana
+  * Tab 3: Angled left border (receives arrow from tab 2) with number badge "3" for Tugas
+  * Fixed Radix Tabs structure with proper TabsList wrapper to prevent RovingFocusGroup errors
+  * Enhanced visual hierarchy with blue active states and white circular number badges
+  * Overlapping design with z-index layering creates seamless arrow flow between tabs
 - July 03, 2025. Implemented expandable key result cards with initiative display:
   * Added expand/collapse functionality to key result cards using chevron buttons (ChevronRight/ChevronDown)
   * Implemented state management with expandedKeyResults Set to track which cards are expanded
