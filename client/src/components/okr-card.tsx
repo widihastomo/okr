@@ -65,6 +65,43 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplic
   
   const overallProgress = calculateOverallProgress(okr.keyResults);
 
+  // Calculate ideal progress based on key result types and time
+  const calculateIdealProgress = (keyResults: typeof okr.keyResults): number => {
+    if (keyResults.length === 0) return 0;
+    
+    const now = new Date();
+    const cycleStart = cycleStartDate ? new Date(cycleStartDate) : new Date();
+    const cycleEnd = cycleEndDate ? new Date(cycleEndDate) : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
+    const totalTime = cycleEnd.getTime() - cycleStart.getTime();
+    const timePassed = Math.max(0, now.getTime() - cycleStart.getTime());
+    const timeProgressRatio = Math.min(1, timePassed / totalTime);
+    
+    const totalIdealProgress = keyResults.reduce((sum, kr) => {
+      switch (kr.keyResultType) {
+        case "increase_to":
+        case "decrease_to":
+          // Linear progress based on time: 0% at start, 100% at end
+          return sum + (timeProgressRatio * 100);
+        
+        case "achieve_or_not":
+          // Binary achievement: 0% until near end (last 20% of time), then 100%
+          return sum + (timeProgressRatio > 0.8 ? 100 : 0);
+        
+        case "should_stay_above":
+        case "should_stay_below":
+          // Consistency target: should be 100% throughout the entire period
+          return sum + 100;
+        
+        default:
+          return sum + (timeProgressRatio * 100);
+      }
+    }, 0);
+    
+    return totalIdealProgress / keyResults.length;
+  };
+
+  const idealProgress = calculateIdealProgress(okr.keyResults);
+
   // Calculate days remaining based on cycle end date
   const calculateDaysRemaining = () => {
     const today = new Date();
@@ -213,15 +250,7 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplic
               </div>
               <div 
                 className="w-24 sm:w-32 lg:w-40 bg-gray-200 rounded-full h-2 mb-1 relative group cursor-pointer"
-                title={(() => {
-                  const now = new Date();
-                  const cycleStart = cycleStartDate ? new Date(cycleStartDate) : new Date();
-                  const cycleEnd = cycleEndDate ? new Date(cycleEndDate) : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
-                  const totalTime = cycleEnd.getTime() - cycleStart.getTime();
-                  const timePassed = Math.max(0, now.getTime() - cycleStart.getTime());
-                  const idealProgress = Math.min(100, (timePassed / totalTime) * 100);
-                  return `Progress: ${overallProgress.toFixed(1)}% | Target ideal: ${idealProgress.toFixed(1)}%`;
-                })()}
+                title={`Progress: ${overallProgress.toFixed(1)}% | Target ideal: ${idealProgress.toFixed(1)}%`}
               >
                 {(() => {
                   const getProgressBarColor = (status: string) => {
@@ -237,13 +266,7 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplic
                     }
                   };
                   
-                  // Calculate ideal progress based on time passed
-                  const now = new Date();
-                  const cycleStart = cycleStartDate ? new Date(cycleStartDate) : new Date();
-                  const cycleEnd = cycleEndDate ? new Date(cycleEndDate) : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
-                  const totalTime = cycleEnd.getTime() - cycleStart.getTime();
-                  const timePassed = Math.max(0, now.getTime() - cycleStart.getTime());
-                  const idealProgress = Math.min(100, (timePassed / totalTime) * 100);
+                  // Use pre-calculated ideal progress
                   
                   return (
                     <>

@@ -104,6 +104,13 @@ Changelog:
   * Fixed z-index from z-20/z-10 to z-50 to ensure tooltips appear above sidebar and other elements
   * Updated tooltip arrows to point left instead of up for consistent right-side positioning
   * All 5 key result types now have distinct visual indicators with informative Indonesian tooltips
+- July 03, 2025. Fixed target ideal calculations to match Key Result types with intelligent progress expectations:
+  * increase_to/decrease_to types: Linear ideal progress (0% at start → 100% at end based on timeline)
+  * achieve_or_not type: Binary ideal expectation (0% until last 20% of period, then 100%)
+  * should_stay_above/should_stay_below types: Consistency expectation (100% throughout entire period)
+  * Created calculateIdealProgress function that considers individual Key Result types instead of uniform time-based calculation
+  * Enhanced progress bar threshold indicators to reflect realistic expectations for each measurement approach
+  * Improved tooltip accuracy showing contextually appropriate ideal targets for different Key Result calculation methods
 - July 03, 2025. Fixed create OKR database validation errors for empty numeric fields:
   * Resolved "invalid input syntax for type numeric" error by converting empty strings to "0" for required fields
   * Fixed "null value violates not-null constraint" error for currentValue and targetValue fields
