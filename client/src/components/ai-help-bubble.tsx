@@ -310,11 +310,17 @@ export function AIHelpBubble({
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      onClick={() => refetch()}
+                      onClick={() => {
+                        // Reset dismissed insights
+                        setDismissedInsights([]);
+                        // Try to refetch from API
+                        refetch();
+                      }}
+                      disabled={isLoading}
                       className="w-full text-xs"
                     >
-                      <Sparkles className="w-3 h-3 mr-1" />
-                      Muat Insight Baru
+                      <Sparkles className={`w-3 h-3 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
+                      {isLoading ? 'Memuat...' : 'Muat Insight Baru'}
                     </Button>
                   </div>
                 </div>
