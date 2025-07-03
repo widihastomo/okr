@@ -1018,6 +1018,29 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
     }, {
       message: "Unit harus diisi",
       path: ["unit"]
+    }).refine((data) => {
+      // Logical validation based on key result type
+      if (data.keyResultType === "increase_to" && data.baseValue && data.targetValue) {
+        const baseVal = parseFloat(data.baseValue.replace(/[.,]/g, ''));
+        const targetVal = parseFloat(data.targetValue.replace(/[.,]/g, ''));
+        if (!isNaN(baseVal) && !isNaN(targetVal) && baseVal >= targetVal) {
+          return false;
+        }
+      }
+      
+      if (data.keyResultType === "decrease_to" && data.baseValue && data.targetValue) {
+        const baseVal = parseFloat(data.baseValue.replace(/[.,]/g, ''));
+        const targetVal = parseFloat(data.targetValue.replace(/[.,]/g, ''));
+        if (!isNaN(baseVal) && !isNaN(targetVal) && baseVal <= targetVal) {
+          return false;
+        }
+      }
+
+      // For should_stay types, no specific logical validation needed
+      return true;
+    }, {
+      message: "Nilai tidak logis: untuk 'Naik ke Target' nilai awal harus lebih kecil dari target, untuk 'Turun ke Target' nilai awal harus lebih besar dari target",
+      path: ["baseValue"]
     })),
     defaultValues: {
       title: "",

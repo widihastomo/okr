@@ -96,6 +96,14 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 03, 2025. Completed comprehensive validation system for key result forms with logical business rules:
+  * Added logical validation for "Naik ke Target" (increase_to) requiring initial value < target value
+  * Added logical validation for "Turun ke Target" (decrease_to) requiring initial value > target value
+  * Implemented validation reset functionality when key result type changes to prevent stale error messages
+  * Enhanced error messages to use Indonesian labels matching UI terminology instead of technical enum values
+  * Applied consistent validation logic across both OKR form modal (create) and edit key result modal
+  * Fixed schema validation by including missing "ahead" and "not_started" status values in enum
+  * Validation automatically clears when users change key result type for smooth user experience
 - July 03, 2025. Fixed edit key result modal stuck issue and enhanced progress bar mobile visibility:
   * Resolved button stuck issue by fixing schema validation - added missing "ahead" and "not_started" status values to enum
   * Fixed TypeScript errors for optional fields (currentValue, targetValue, baseValue) in edit key result schema
