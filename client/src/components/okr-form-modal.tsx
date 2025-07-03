@@ -1314,8 +1314,6 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
             {/* Conditional Value Fields */}
             {(() => {
               const keyResultType = keyResultForm.watch("keyResultType");
-              console.log("Current keyResultType:", keyResultType);
-              console.log("Current form values:", keyResultForm.getValues());
               
               if (keyResultType === "achieve_or_not") {
                 return null; // Don't show any value fields
@@ -1323,8 +1321,41 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
               
               if (keyResultType === "should_stay_above" || keyResultType === "should_stay_below") {
                 return (
-                  <div className="grid grid-cols-1 gap-4">
-                    {/* Target Value Only */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Base Value - Disabled */}
+                    <FormField
+                      control={keyResultForm.control}
+                      name="baseValue"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            Nilai Awal
+                            <Popover>
+                              <PopoverTrigger>
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              </PopoverTrigger>
+                              <PopoverContent side="right" className="max-w-xs">
+                                <p>
+                                  <strong>Tidak diperlukan untuk tipe threshold</strong>
+                                  <br /><br />
+                                  Untuk Key Result tipe "tetap di atas/bawah", nilai awal tidak diperlukan karena fokusnya adalah mempertahankan nilai di atas atau di bawah threshold tertentu.
+                                </p>
+                              </PopoverContent>
+                            </Popover>
+                          </FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Tidak diperlukan" 
+                              disabled
+                              value="-"
+                              className="bg-gray-50 text-gray-500 cursor-not-allowed"
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Target Value */}
                     <FormField
                       control={keyResultForm.control}
                       name="targetValue"
@@ -1352,29 +1383,45 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                           <FormControl>
                             <Input 
                               placeholder="100" 
-                              type="text" 
-                              value={field.value || ""} 
-                              onChange={(e) => {
-                                const inputValue = e.target.value;
-                                // Allow direct input without complex formatting for these types
-                                if (inputValue === "" || /^\d*\.?\d*$/.test(inputValue)) {
-                                  field.onChange(inputValue);
-                                }
-                              }}
-                              onBlur={(e) => {
-                                // Format only on blur to maintain input experience
-                                const value = e.target.value;
-                                if (value && !isNaN(Number(value))) {
-                                  handleNumberInputChange(value, (formattedValue) => {
-                                    field.onChange(formattedValue);
-                                  });
-                                }
-                                field.onBlur();
-                              }}
-                              name={field.name}
+                              type="number" 
+                              step="0.1"
+                              {...field}
                             />
                           </FormControl>
                           <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Current Value - Disabled */}
+                    <FormField
+                      control={keyResultForm.control}
+                      name="currentValue"
+                      render={({ field }) => (
+                        <FormItem className="sm:col-span-2">
+                          <FormLabel className="flex items-center gap-2">
+                            Kondisi Saat Ini
+                            <Popover>
+                              <PopoverTrigger>
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              </PopoverTrigger>
+                              <PopoverContent side="right" className="max-w-xs">
+                                <p>
+                                  <strong>Akan diupdate melalui check-in</strong>
+                                  <br /><br />
+                                  Untuk Key Result tipe threshold, kondisi saat ini akan diupdate melalui proses check-in dengan format ya/tidak (tercapai/tidak tercapai).
+                                </p>
+                              </PopoverContent>
+                            </Popover>
+                          </FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Update via check-in" 
+                              disabled
+                              value="Belum tercapai"
+                              className="bg-gray-50 text-gray-500 cursor-not-allowed"
+                            />
+                          </FormControl>
                         </FormItem>
                       )}
                     />

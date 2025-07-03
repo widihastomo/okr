@@ -96,6 +96,15 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 03, 2025. Fixed "should stay" Key Result input fields with disabled approach for better UX:
+  * Changed from hiding to disabling "Nilai Awal" and "Kondisi Saat Ini" fields for "should stay above/below" types
+  * Added explanatory tooltips for disabled fields explaining why they're not needed for threshold types
+  * Implemented responsive grid layout (1 column mobile, 2 columns desktop) for better space utilization
+  * "Nilai Awal" shows "-" with explanation that baseline not needed for threshold tracking
+  * "Kondisi Saat Ini" shows "Belum tercapai" with explanation about check-in updates
+  * Target field now works properly with type="number" and field spread operator
+  * Enhanced visual styling with gray backgrounds and disabled cursor for non-editable fields
+  * Removed console debugging logs for cleaner production code
 - July 02, 2025. Enhanced OKR form layout with improved button styling and streamlined interface:
   * Removed descriptive text below "Ukuran Keberhasilan" title for cleaner interface
   * Moved "Tambah Ukuran Keberhasilan" button to be aligned with section title in header
