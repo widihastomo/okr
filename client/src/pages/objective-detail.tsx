@@ -375,8 +375,50 @@ export default function GoalDetail() {
                 <BarChart3 className="w-4 h-4 text-gray-500" />
                 <span className="text-sm text-gray-500">Progress</span>
               </div>
-              <p className="font-medium">{overallProgress.toFixed(1)}%</p>
-              <Progress value={overallProgress} className="h-2 mt-1" />
+              <div className="flex items-center justify-between mb-1">
+                <p className="font-medium">{overallProgress.toFixed(1)}%</p>
+                {cycle && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="text-xs text-gray-400 cursor-help">
+                          Target: {(() => {
+                            const now = new Date();
+                            const start = new Date(cycle.startDate);
+                            const end = new Date(cycle.endDate);
+                            const totalTime = end.getTime() - start.getTime();
+                            const timePassed = now.getTime() - start.getTime();
+                            const idealProgress = Math.max(0, Math.min(100, (timePassed / totalTime) * 100));
+                            return idealProgress.toFixed(1);
+                          })()}%
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Capaian ideal berdasarkan waktu yang telah berlalu</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+              </div>
+              <div className="relative">
+                <Progress value={overallProgress} className="h-2" />
+                {cycle && (() => {
+                  const now = new Date();
+                  const start = new Date(cycle.startDate);
+                  const end = new Date(cycle.endDate);
+                  const totalTime = end.getTime() - start.getTime();
+                  const timePassed = now.getTime() - start.getTime();
+                  const idealProgress = Math.max(0, Math.min(100, (timePassed / totalTime) * 100));
+                  
+                  return (
+                    <div 
+                      className="absolute top-0 h-2 w-0.5 bg-gray-400 opacity-70"
+                      style={{ left: `${idealProgress}%` }}
+                      title={`Target ideal: ${idealProgress.toFixed(1)}%`}
+                    />
+                  );
+                })()}
+              </div>
             </div>
             
             <div>
@@ -493,9 +535,51 @@ export default function GoalDetail() {
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-gray-600">Progress</span>
-                          <span className="font-medium">{progress.toFixed(1)}%</span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{progress.toFixed(1)}%</span>
+                            {cycle && (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <span className="text-xs text-gray-400 cursor-help">
+                                      (Target: {(() => {
+                                        const now = new Date();
+                                        const start = new Date(cycle.startDate);
+                                        const end = new Date(cycle.endDate);
+                                        const totalTime = end.getTime() - start.getTime();
+                                        const timePassed = now.getTime() - start.getTime();
+                                        const idealProgress = Math.max(0, Math.min(100, (timePassed / totalTime) * 100));
+                                        return idealProgress.toFixed(1);
+                                      })()}%)
+                                    </span>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Capaian ideal berdasarkan waktu yang telah berlalu</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            )}
+                          </div>
                         </div>
-                        <Progress value={progress} className="h-2" />
+                        <div className="relative">
+                          <Progress value={progress} className="h-2" />
+                          {cycle && (() => {
+                            const now = new Date();
+                            const start = new Date(cycle.startDate);
+                            const end = new Date(cycle.endDate);
+                            const totalTime = end.getTime() - start.getTime();
+                            const timePassed = now.getTime() - start.getTime();
+                            const idealProgress = Math.max(0, Math.min(100, (timePassed / totalTime) * 100));
+                            
+                            return (
+                              <div 
+                                className="absolute top-0 h-2 w-0.5 bg-gray-400 opacity-70"
+                                style={{ left: `${idealProgress}%` }}
+                                title={`Target ideal: ${idealProgress.toFixed(1)}%`}
+                              />
+                            );
+                          })()}
+                        </div>
                         <div className="flex items-center justify-between text-xs text-gray-500">
                           <span>Saat ini: {formatCurrency(kr.currentValue, kr.unit)}</span>
                           <span>Target: {formatCurrency(kr.targetValue, kr.unit)}</span>

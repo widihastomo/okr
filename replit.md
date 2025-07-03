@@ -101,6 +101,10 @@ Changelog:
   * Removed unnecessary card header from objective information card and standardized padding to p-6
   * Enhanced page layout with back button, breadcrumb navigation, action buttons, and organized information cards
   * Applied consistent CardContent padding (p-6) across all components for unified spacing design
+  * Added ideal achievement information ("Target" percentage) in progress section with threshold indicators and tooltips
+  * Progress bars now show visual threshold indicators (gray lines) marking ideal progress based on timeline
+  * Enhanced both overall objective progress and individual key result progress with "capaian ideal" display
+  * Tooltips explain ideal achievement as "Capaian ideal berdasarkan waktu yang telah berlalu"
   * Objective detail page now follows same professional structure as key result detail page
   * Layout includes: back button → breadcrumb → title with status badge → action buttons → information card → tabs
   * Maintained all functionality while improving visual consistency and user experience
