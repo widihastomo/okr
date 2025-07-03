@@ -168,6 +168,10 @@ export default function GoalDetail() {
     enabled: !!goal?.parentId,
   });
 
+  // Separate owner data by type
+  const userOwner = goal?.ownerType === "user" || goal?.ownerType === "individual" ? (owner as User) : undefined;
+  const teamOwner = goal?.ownerType === "team" ? (owner as Team) : undefined;
+
   // Fetch rencana for this goal
   const { data: rencana = [] } = useQuery<Initiative[]>({
     queryKey: [`/api/initiatives/objective/${id}`],
@@ -472,7 +476,7 @@ export default function GoalDetail() {
             cycle={cycle}
             parentObjective={parentObjective}
             owner={owner}
-            team={team}
+            team={undefined}
           />
         </div>
         <div className="lg:col-span-1">

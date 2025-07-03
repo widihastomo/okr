@@ -26,7 +26,7 @@ interface ObjectiveOverviewCardProps {
   daysRemaining?: number;
   cycle?: Cycle;
   parentObjective?: OKRWithKeyResults;
-  owner?: User;
+  owner?: User | any; // Can be User or Team
   team?: any;
 }
 
@@ -43,9 +43,14 @@ export default function ObjectiveOverviewCard({
   // Helper function for displaying owner information
   const getOwnerDisplay = () => {
     if (objective.ownerType === "team") {
-      return team?.name || "Tim tidak ditemukan";
+      // Handle team owner - check if owner has name property (Team type)
+      return (owner as any)?.name || "Tim tidak ditemukan";
     } else {
-      return owner ? `${owner.firstName} ${owner.lastName}` : "User tidak ditemukan";
+      // Handle user owner - check if owner has firstName/lastName properties (User type)
+      const userOwner = owner as any;
+      return userOwner?.firstName && userOwner?.lastName 
+        ? `${userOwner.firstName} ${userOwner.lastName}` 
+        : userOwner?.email || "User tidak ditemukan";
     }
   };
 
