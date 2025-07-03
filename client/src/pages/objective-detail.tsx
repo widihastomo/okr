@@ -10,6 +10,7 @@ import { ArrowLeft, Edit, Calendar, User as UserIcon, Clock, Plus, Target, BarCh
 import { Link } from "wouter";
 import { CheckInModal } from "@/components/check-in-modal";
 import EditKeyResultModal from "@/components/edit-key-result-modal";
+import EditObjectiveModal from "@/components/edit-objective-modal";
 import { SimpleProgressStatus } from "@/components/progress-status";
 import { ObjectiveStatusBadge } from "@/components/objective-status-badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -45,6 +46,7 @@ export default function GoalDetail() {
   const [addKeyResultModal, setAddKeyResultModal] = useState<{ open: boolean }>({
     open: false
   });
+  const [editObjectiveModal, setEditObjectiveModal] = useState(false);
   const [shouldHighlight, setShouldHighlight] = useState(false);
   const [keyResultForm, setKeyResultForm] = useState({
     title: '',
@@ -304,7 +306,11 @@ export default function GoalDetail() {
           </Link>
           
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setEditObjectiveModal(true)}
+            >
               <Edit className="w-4 h-4 mr-2" />
               Ubah Goal
             </Button>
@@ -1109,6 +1115,15 @@ export default function GoalDetail() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Objective Modal */}
+      {goal && (
+        <EditObjectiveModal
+          objective={goal}
+          open={editObjectiveModal}
+          onOpenChange={setEditObjectiveModal}
+        />
+      )}
 
       {/* AI Help Bubble */}
       <AIHelpBubble 

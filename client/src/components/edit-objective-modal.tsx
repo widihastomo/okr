@@ -1,296 +1,349 @@
-import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import type { Objective, Cycle, Team, User } from "@shared/schema";
-import { Edit } from "lucide-react";
+import { Calendar, Building, UserIcon, Target } from "lucide-react";
+import { Cycle, User, Team, Objective } from "@shared/schema";
 
+
+// Schema untuk edit objective (tanpa key results)
 const editObjectiveSchema = z.object({
-  title: z.string().min(1, "Judul objective harus diisi"),
+  title: z.string().min(1, "Judul goal wajib diisi"),
   description: z.string().optional(),
-  cycleId: z.string().min(1, "Cycle harus dipilih"),
-  ownerType: z.enum(["individual", "team"]),
-  ownerId: z.string().min(1, "Owner harus dipilih"),
+  ownerType: z.enum(["user", "team"]),
+  ownerId: z.string().min(1, "Pemilik wajib dipilih"),
+  owner: z.string().min(1, "Nama pemilik wajib diisi"),
+  cycleId: z.string().optional(),
   teamId: z.string().optional(),
+  parentId: z.string().optional(),
+  status: z.enum(["not_started", "in_progress", "on_track", "at_risk", "behind", "paused", "canceled", "completed", "partially_achieved", "not_achieved"]),
 });
 
 type EditObjectiveFormData = z.infer<typeof editObjectiveSchema>;
 
 interface EditObjectiveModalProps {
   objective: Objective;
-  trigger?: React.ReactNode;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function EditObjectiveModal({ objective, trigger }: EditObjectiveModalProps) {
-  const [open, setOpen] = useState(false);
+export default function EditObjectiveModal({ objective, open, onOpenChange }: EditObjectiveModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch required data
-  const { data: cycles = [] } = useQuery<Cycle[]>({
-    queryKey: ["/api/cycles"],
-  });
-
-  const { data: teams = [] } = useQuery<Team[]>({
-    queryKey: ["/api/teams"],
-  });
-
-  const { data: users = [] } = useQuery<User[]>({
-    queryKey: ["/api/users"],
-  });
+  // Fetch data yang diperlukan
+  const { data: cycles } = useQuery<Cycle[]>({ queryKey: ["/api/cycles"] });
+  const { data: users } = useQuery<User[]>({ queryKey: ["/api/users"] });
+  const { data: teams } = useQuery<Team[]>({ queryKey: ["/api/teams"] });
+  const { data: objectives } = useQuery<Objective[]>({ queryKey: ["/api/objectives"] });
 
   const form = useForm<EditObjectiveFormData>({
     resolver: zodResolver(editObjectiveSchema),
     defaultValues: {
       title: objective.title,
       description: objective.description || "",
-      cycleId: objective.cycleId || "",
-      ownerType: objective.ownerType as "individual" | "team",
+      owner: objective.owner,
+      ownerType: objective.ownerType as "user" | "team",
       ownerId: objective.ownerId,
-      teamId: objective.teamId || "none",
+      status: objective.status as any,
+      cycleId: objective.cycleId || undefined,
+      teamId: objective.teamId || undefined,
+      parentId: objective.parentId || undefined,
     },
   });
 
-  const updateMutation = useMutation({
+  // Reset form when objective changes or dialog opens
+  useEffect(() => {
+    if (open && objective) {
+      form.reset({
+        title: objective.title,
+        description: objective.description || "",
+        owner: objective.owner,
+        ownerType: objective.ownerType as "user" | "team",
+        ownerId: objective.ownerId,
+        status: objective.status as any,
+        cycleId: objective.cycleId || undefined,
+        teamId: objective.teamId || undefined,
+        parentId: objective.parentId || undefined,
+      });
+    }
+  }, [open, objective, form]);
+
+  const updateObjectiveMutation = useMutation({
     mutationFn: async (data: EditObjectiveFormData) => {
-      return await apiRequest(`/api/objectives/${objective.id}`, "PATCH", data);
+      const payload = {
+        objective: data,
+        keyResults: [], // Empty array since we're only editing objective
+      };
+
+      const response = await fetch(`/api/okrs/${objective.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`Failed to update objective: ${errorData}`);
+      }
+
+      return await response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
-      
       toast({
-        title: "Berhasil",
-        description: "Objective berhasil diperbarui",
+        title: "Success",
+        description: "Goal berhasil diperbarui",
+        variant: "default",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
-      
-      setOpen(false);
-      form.reset();
+      queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/okrs/${objective.id}`] });
+      onOpenChange(false);
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
-        description: error.message || "Gagal memperbarui objective",
+        description: `Failed to update objective: ${error.message}`,
         variant: "destructive",
       });
     },
   });
 
   const onSubmit = (data: EditObjectiveFormData) => {
-    // Convert "none" to undefined for teamId
-    const submitData: EditObjectiveFormData = {
-      ...data,
-      teamId: data.teamId === "none" ? undefined : (data.teamId || undefined),
-    };
-    updateMutation.mutate(submitData);
+    updateObjectiveMutation.mutate(data);
   };
 
   const ownerType = form.watch("ownerType");
 
+  // Filter parent objectives (tidak boleh pilih diri sendiri)
+  const availableParentObjectives = objectives?.filter(obj => obj.id !== objective.id) || [];
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <div onClick={() => setOpen(true)} className="cursor-pointer">
-        {trigger || (
-          <Button variant="ghost" size="sm">
-            <Edit className="w-4 h-4" />
-          </Button>
-        )}
-      </div>
-      
-      <DialogContent className="max-w-2xl">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit Objective</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <Target className="w-5 h-5 text-blue-600" />
+            Ubah Goal
+          </DialogTitle>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Judul Objective *</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Masukkan judul objective" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {/* Informasi Goal */}
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-2 mb-4">
+                <Target className="w-5 h-5 text-gray-500" />
+                <h3 className="text-lg font-semibold">Informasi Goal</h3>
+              </div>
+              
+              <div className="space-y-4">
+                {/* Judul Goal */}
+                <div>
+                  <Label htmlFor="title">Judul Goal</Label>
+                  <Input
+                    id="title"
+                    placeholder="Masukkan judul goal yang jelas dan spesifik"
+                    {...form.register("title")}
+                  />
+                  {form.formState.errors.title && (
+                    <p className="text-sm text-red-600 mt-1">{form.formState.errors.title.message}</p>
+                  )}
+                </div>
 
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Deskripsi</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder="Masukkan deskripsi objective"
-                      rows={3}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                {/* Deskripsi Goal */}
+                <div>
+                  <Label htmlFor="description">Deskripsi Goal</Label>
+                  <Textarea
+                    id="description"
+                    placeholder="Jelaskan detail goal dan konteks yang ingin dicapai"
+                    rows={3}
+                    {...form.register("description")}
+                  />
+                </div>
 
-            <FormField
-              control={form.control}
-              name="cycleId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Cycle *</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
+                {/* Row untuk Cycle, Owner Type, dan Owner */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {/* Cycle */}
+                  <div>
+                    <Label>Siklus</Label>
+                    <Select
+                      value={form.watch("cycleId") || ""}
+                      onValueChange={(value) => form.setValue("cycleId", value || undefined)}
+                    >
                       <SelectTrigger>
-                        <SelectValue placeholder="Pilih cycle" />
+                        <SelectValue placeholder="Pilih siklus" />
                       </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {cycles.map((cycle) => (
-                        <SelectItem key={cycle.id} value={cycle.id}>
-                          {cycle.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="ownerType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tipe Owner *</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih tipe owner" />
-                        </SelectTrigger>
-                      </FormControl>
                       <SelectContent>
-                        <SelectItem value="individual">Individual</SelectItem>
-                        <SelectItem value="team">Team</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="ownerId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Owner *</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih owner" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {ownerType === "team"
-                          ? teams.map((team) => (
-                              <SelectItem key={team.id} value={team.id}>
-                                {team.name}
-                              </SelectItem>
-                            ))
-                          : users.map((user) => (
-                              <SelectItem key={user.id} value={user.id}>
-                                {user.firstName} {user.lastName} ({user.email})
-                              </SelectItem>
-                            ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {ownerType === "individual" && (
-              <FormField
-                control={form.control}
-                name="teamId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Team (Opsional)</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || ""}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih team" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="none">Tidak ada team</SelectItem>
-                        {teams.map((team) => (
-                          <SelectItem key={team.id} value={team.id}>
-                            {team.name}
+                        <SelectItem value="">Tidak ada siklus</SelectItem>
+                        {cycles?.map((cycle) => (
+                          <SelectItem key={cycle.id} value={cycle.id}>
+                            {cycle.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
+                  </div>
 
-            <div className="flex justify-end space-x-4">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => setOpen(false)}
-                disabled={updateMutation.isPending}
-              >
-                Batal
-              </Button>
-              <Button 
-                type="submit" 
-                disabled={updateMutation.isPending}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                {updateMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
-              </Button>
-            </div>
-          </form>
-        </Form>
+                  {/* Tipe Pemilik */}
+                  <div>
+                    <Label>Tipe Pemilik</Label>
+                    <Select
+                      value={form.watch("ownerType")}
+                      onValueChange={(value: "user" | "team") => {
+                        form.setValue("ownerType", value);
+                        form.setValue("ownerId", "");
+                        form.setValue("owner", "");
+                        if (value === "user") {
+                          form.setValue("teamId", undefined);
+                        }
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="user">Individual</SelectItem>
+                        <SelectItem value="team">Tim</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Pemilik */}
+                  <div>
+                    <Label>Pemilik</Label>
+                    {ownerType === "user" ? (
+                      <Select
+                        value={form.watch("ownerId")}
+                        onValueChange={(value) => {
+                          form.setValue("ownerId", value);
+                          const selectedUser = users?.find(u => u.id === value);
+                          if (selectedUser) {
+                            form.setValue("owner", `${selectedUser.firstName} ${selectedUser.lastName}`);
+                          }
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih user" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {users?.map((user) => (
+                            <SelectItem key={user.id} value={user.id}>
+                              {user.firstName} {user.lastName}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Select
+                        value={form.watch("ownerId")}
+                        onValueChange={(value) => {
+                          form.setValue("ownerId", value);
+                          const selectedTeam = teams?.find(t => t.id === value);
+                          if (selectedTeam) {
+                            form.setValue("owner", selectedTeam.name);
+                            form.setValue("teamId", selectedTeam.id);
+                          }
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih tim" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {teams?.map((team) => (
+                            <SelectItem key={team.id} value={team.id}>
+                              {team.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                    {form.formState.errors.ownerId && (
+                      <p className="text-sm text-red-600 mt-1">{form.formState.errors.ownerId.message}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Goal Induk dan Status */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Goal Induk */}
+                  <div>
+                    <Label>Goal Induk (Opsional)</Label>
+                    <Select
+                      value={form.watch("parentId") || ""}
+                      onValueChange={(value) => form.setValue("parentId", value || undefined)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih goal induk" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">Tidak ada goal induk</SelectItem>
+                        {availableParentObjectives.map((obj) => (
+                          <SelectItem key={obj.id} value={obj.id}>
+                            {obj.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Status */}
+                  <div>
+                    <Label>Status</Label>
+                    <Select
+                      value={form.watch("status")}
+                      onValueChange={(value) => form.setValue("status", value as any)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="not_started">Belum Dimulai</SelectItem>
+                        <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
+                        <SelectItem value="on_track">Sesuai Target</SelectItem>
+                        <SelectItem value="at_risk">Berisiko</SelectItem>
+                        <SelectItem value="behind">Tertinggal</SelectItem>
+                        <SelectItem value="paused">Dijeda</SelectItem>
+                        <SelectItem value="canceled">Dibatalkan</SelectItem>
+                        <SelectItem value="completed">Selesai</SelectItem>
+                        <SelectItem value="partially_achieved">Tercapai Sebagian</SelectItem>
+                        <SelectItem value="not_achieved">Tidak Tercapai</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Navigation Buttons */}
+          <div className="flex justify-end gap-3">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => onOpenChange(false)}
+            >
+              Batal
+            </Button>
+            <Button 
+              type="submit" 
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              disabled={updateObjectiveMutation.isPending}
+            >
+              {updateObjectiveMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );
