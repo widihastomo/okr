@@ -147,28 +147,16 @@ export default function EditKeyResultModal({
   });
 
   const handleSubmit = (data: EditKeyResultFormData) => {
-    console.log("🚀 handleSubmit called with data:", data);
-    
     // Check if key result type is changing and there are existing check-ins
     const isTypeChanging = keyResult && data.keyResultType !== keyResult.keyResultType;
     const hasCheckIns = checkInData && checkInData.count > 0;
     
-    console.log("Edit Key Result Submit Debug:", {
-      keyResult: keyResult?.keyResultType,
-      newType: data.keyResultType,
-      isTypeChanging,
-      hasCheckIns,
-      checkInCount: checkInData?.count
-    });
-    
     if (isTypeChanging && hasCheckIns) {
       // Show warning dialog
-      console.log("Showing warning dialog");
       setPendingFormData(data);
       setShowWarning(true);
     } else {
       // Proceed directly with update
-      console.log("Proceeding with direct update");
       updateKeyResultMutation.mutate(data);
     }
   };
@@ -203,14 +191,7 @@ export default function EditKeyResultModal({
         </DialogHeader>
 
         <Form {...form}>
-          <form 
-            onSubmit={(e) => {
-              console.log("Form onSubmit triggered");
-              e.preventDefault();
-              form.handleSubmit(handleSubmit)(e);
-            }} 
-            className="space-y-6"
-          >
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
             {/* Title */}
             <FormField
               control={form.control}
