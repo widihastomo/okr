@@ -800,7 +800,7 @@ export default function KeyResultDetailPage() {
           Back
         </Button>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <CheckInModal 
             keyResultId={keyResult.id}
             keyResultTitle={keyResult.title}
@@ -809,10 +809,19 @@ export default function KeyResultDetailPage() {
             unit={keyResult.unit}
             keyResultType={keyResult.keyResultType}
           />
-          <Button variant="outline" size="sm">
-            <Edit className="h-4 w-4 mr-2" />
-            Edit Ukuran Keberhasilan
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                <MoreHorizontal className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem>
+                <Edit className="w-4 h-4 mr-2" />
+                Edit Ukuran Keberhasilan
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
