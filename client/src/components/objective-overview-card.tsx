@@ -1,17 +1,16 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Target, 
-  CheckCircle2, 
-  Clock, 
-  Users, 
+import {
+  Target,
+  CheckCircle2,
+  Clock,
+  Users,
   TrendingUp,
   FileText,
   CheckSquare,
   AlertTriangle,
-  Calendar
+  Calendar,
 } from "lucide-react";
 import type { OKRWithKeyResults, Initiative, Task } from "@shared/schema";
 import { calculateKeyResultProgress } from "@shared/progress-calculator";
@@ -23,17 +22,22 @@ interface ObjectiveOverviewCardProps {
   daysRemaining?: number;
 }
 
-export default function ObjectiveOverviewCard({ 
-  objective, 
-  initiatives = [], 
+export default function ObjectiveOverviewCard({
+  objective,
+  initiatives = [],
   tasks = [],
-  daysRemaining 
+  daysRemaining,
 }: ObjectiveOverviewCardProps) {
   // Helper function for calculating overall progress
   const calculateOverallProgress = (keyResults: any[]): number => {
     if (!keyResults || keyResults.length === 0) return 0;
     const progressSum = keyResults.reduce((sum, kr) => {
-      const result = calculateKeyResultProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
+      const result = calculateKeyResultProgress(
+        kr.currentValue,
+        kr.targetValue,
+        kr.keyResultType,
+        kr.baseValue,
+      );
       return sum + result.progressPercentage;
     }, 0);
     return Math.round(progressSum / keyResults.length);
@@ -41,25 +45,32 @@ export default function ObjectiveOverviewCard({
 
   // Calculate statistics
   const totalKeyResults = objective.keyResults.length;
-  const completedKeyResults = objective.keyResults.filter(kr => {
-    const result = calculateKeyResultProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
+  const completedKeyResults = objective.keyResults.filter((kr) => {
+    const result = calculateKeyResultProgress(
+      kr.currentValue,
+      kr.targetValue,
+      kr.keyResultType,
+      kr.baseValue,
+    );
     return result.progressPercentage >= 100;
   }).length;
 
   const totalInitiatives = initiatives.length;
-  const completedInitiatives = initiatives.filter(i => i.status === 'completed').length;
-  
+  const completedInitiatives = initiatives.filter(
+    (i) => i.status === "completed",
+  ).length;
+
   const totalTasks = tasks.length;
-  const completedTasks = tasks.filter(t => t.status === 'completed').length;
+  const completedTasks = tasks.filter((t) => t.status === "completed").length;
 
   const overallProgress = calculateOverallProgress(objective.keyResults);
 
   // Visual indicators
   const getHealthColor = (progress: number) => {
-    if (progress >= 80) return 'text-green-600 bg-green-100';
-    if (progress >= 60) return 'text-yellow-600 bg-yellow-100';
-    if (progress >= 40) return 'text-orange-600 bg-orange-100';
-    return 'text-red-600 bg-red-100';
+    if (progress >= 80) return "text-green-600 bg-green-100";
+    if (progress >= 60) return "text-yellow-600 bg-yellow-100";
+    if (progress >= 40) return "text-orange-600 bg-orange-100";
+    return "text-red-600 bg-red-100";
   };
 
   return (
@@ -67,9 +78,16 @@ export default function ObjectiveOverviewCard({
       <CardHeader className="pb-4">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-full ${getHealthColor(overallProgress)}`}>
+              <Target className="w-5 h-5" />
+            </div>
             <div>
-              <CardTitle className="text-lg line-clamp-2">{objective.title}</CardTitle>
-              <p className="text-sm text-gray-600 mt-1 line-clamp-2">{objective.description}</p>
+              <CardTitle className="text-lg line-clamp-2">
+                {objective.title}
+              </CardTitle>
+              <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                {objective.description}
+              </p>
             </div>
           </div>
           <Badge className={getHealthColor(overallProgress)}>
@@ -82,7 +100,9 @@ export default function ObjectiveOverviewCard({
         {/* Progress Bar with Visual Indicators */}
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-gray-700">Progress Keseluruhan</span>
+            <span className="text-sm font-medium text-gray-700">
+              Progress Keseluruhan
+            </span>
             <span className="text-sm text-gray-500">{overallProgress}%</span>
           </div>
           <div className="relative">
@@ -142,9 +162,11 @@ export default function ObjectiveOverviewCard({
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-gray-500" />
             <span className="text-gray-600">
-              {daysRemaining !== undefined ? (
-                daysRemaining > 0 ? `${daysRemaining} hari tersisa` : 'Berakhir'
-              ) : 'Tidak ada deadline'}
+              {daysRemaining !== undefined
+                ? daysRemaining > 0
+                  ? `${daysRemaining} hari tersisa`
+                  : "Berakhir"
+                : "Tidak ada deadline"}
             </span>
           </div>
           {overallProgress < 50 && daysRemaining && daysRemaining < 30 && (
@@ -163,19 +185,29 @@ export default function ObjectiveOverviewCard({
           </h4>
           <div className="space-y-1">
             {objective.keyResults.slice(0, 2).map((kr) => {
-              const result = calculateKeyResultProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
+              const result = calculateKeyResultProgress(
+                kr.currentValue,
+                kr.targetValue,
+                kr.keyResultType,
+                kr.baseValue,
+              );
               const progress = result.progressPercentage;
               return (
-                <div key={kr.id} className="flex items-center justify-between text-xs">
+                <div
+                  key={kr.id}
+                  className="flex items-center justify-between text-xs"
+                >
                   <span className="truncate flex-1 mr-2">{kr.title}</span>
                   <div className="flex items-center gap-2">
                     <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                      <div 
+                      <div
                         className="h-full bg-blue-500 transition-all duration-300"
                         style={{ width: `${Math.min(100, progress)}%` }}
                       />
                     </div>
-                    <span className="text-gray-500 min-w-8">{Math.round(progress)}%</span>
+                    <span className="text-gray-500 min-w-8">
+                      {Math.round(progress)}%
+                    </span>
                   </div>
                 </div>
               );

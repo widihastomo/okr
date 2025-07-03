@@ -2,21 +2,73 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Edit, Calendar, User as UserIcon, Clock, Plus, Target, BarChart3, TrendingUp, TrendingDown, CheckCircle2, MoreVertical, Building, ClipboardList, CheckSquare, Trash2, FileText, Eye, MoveUp, MoveDown, Settings, ExternalLink, ChevronDown, ChevronRight } from "lucide-react";
+import {
+  ArrowLeft,
+  Edit,
+  Calendar,
+  User as UserIcon,
+  Clock,
+  Plus,
+  Target,
+  BarChart3,
+  TrendingUp,
+  TrendingDown,
+  CheckCircle2,
+  MoreVertical,
+  Building,
+  ClipboardList,
+  CheckSquare,
+  Trash2,
+  FileText,
+  Eye,
+  MoveUp,
+  MoveDown,
+  Settings,
+  ExternalLink,
+  ChevronDown,
+  ChevronRight,
+} from "lucide-react";
 import { Link } from "wouter";
 import { CheckInModal } from "@/components/check-in-modal";
 import EditKeyResultModal from "@/components/edit-key-result-modal";
 import EditObjectiveModal from "@/components/edit-objective-modal";
 import { SimpleProgressStatus } from "@/components/progress-status";
 import { ObjectiveStatusBadge } from "@/components/objective-status-badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -25,7 +77,15 @@ import { useToast } from "@/hooks/use-toast";
 import AIHelpBubble from "@/components/ai-help-bubble";
 import ObjectiveOverviewCard from "@/components/objective-overview-card";
 import ObjectiveTimeline from "@/components/objective-timeline";
-import type { OKRWithKeyResults, KeyResult, Initiative, Task, Cycle, User, Team } from "@shared/schema";
+import type {
+  OKRWithKeyResults,
+  KeyResult,
+  Initiative,
+  Task,
+  Cycle,
+  User,
+  Team,
+} from "@shared/schema";
 
 // Type for tasks with initiative info
 type TaskWithInitiative = Task & {
@@ -39,38 +99,48 @@ export default function GoalDetail() {
   const { id } = useParams();
   const [location] = useLocation();
   const { toast } = useToast();
-  const [checkInModal, setCheckInModal] = useState<{ open: boolean; keyResult?: KeyResult }>({
-    open: false
+  const [checkInModal, setCheckInModal] = useState<{
+    open: boolean;
+    keyResult?: KeyResult;
+  }>({
+    open: false,
   });
-  const [editKeyResultModal, setEditKeyResultModal] = useState<{ open: boolean; keyResult?: KeyResult }>({
-    open: false
+  const [editKeyResultModal, setEditKeyResultModal] = useState<{
+    open: boolean;
+    keyResult?: KeyResult;
+  }>({
+    open: false,
   });
-  const [addKeyResultModal, setAddKeyResultModal] = useState<{ open: boolean }>({
-    open: false
-  });
+  const [addKeyResultModal, setAddKeyResultModal] = useState<{ open: boolean }>(
+    {
+      open: false,
+    },
+  );
   const [editObjectiveModal, setEditObjectiveModal] = useState(false);
   const [shouldHighlight, setShouldHighlight] = useState(false);
-  const [expandedKeyResults, setExpandedKeyResults] = useState<Set<string>>(new Set());
+  const [expandedKeyResults, setExpandedKeyResults] = useState<Set<string>>(
+    new Set(),
+  );
   const [keyResultForm, setKeyResultForm] = useState({
-    title: '',
-    description: '',
-    keyResultType: 'increase_to',
-    baseValue: '',
-    targetValue: '',
-    currentValue: '',
-    unit: 'number'
+    title: "",
+    description: "",
+    keyResultType: "increase_to",
+    baseValue: "",
+    targetValue: "",
+    currentValue: "",
+    unit: "number",
   });
 
   // Check for highlight parameter in URL
   useEffect(() => {
-    const urlParams = new URLSearchParams(location.split('?')[1] || '');
-    if (urlParams.get('highlight') === 'keyresults') {
+    const urlParams = new URLSearchParams(location.split("?")[1] || "");
+    if (urlParams.get("highlight") === "keyresults") {
       setShouldHighlight(true);
       // Remove highlight after animation
       setTimeout(() => setShouldHighlight(false), 3000);
     }
   }, [location]);
-  
+
   // Fetch goal data
   const { data: goal, isLoading } = useQuery<OKRWithKeyResults>({
     queryKey: [`/api/okrs/${id}`],
@@ -85,9 +155,10 @@ export default function GoalDetail() {
 
   // Fetch owner data
   const { data: owner } = useQuery<User | Team>({
-    queryKey: (goal?.ownerType === 'user' || goal?.ownerType === 'individual')
-      ? [`/api/users/${goal?.ownerId}`]
-      : [`/api/teams/${goal?.ownerId}`],
+    queryKey:
+      goal?.ownerType === "user" || goal?.ownerType === "individual"
+        ? [`/api/users/${goal?.ownerId}`]
+        : [`/api/teams/${goal?.ownerId}`],
     enabled: !!goal?.ownerId && !!goal?.ownerType,
   });
 
@@ -108,12 +179,12 @@ export default function GoalDetail() {
     queryKey: [`/api/tasks/objective/${id}`],
     enabled: !!id,
   });
-  
+
   // Fetch users for name display
   const { data: users = [] } = useQuery<User[]>({
-    queryKey: ['/api/users'],
+    queryKey: ["/api/users"],
   });
-  
+
   // Helper function to get user name
   const getUserName = (userId: string): string => {
     if (!users) return userId;
@@ -127,14 +198,14 @@ export default function GoalDetail() {
   // Calculate days remaining based on cycle end date
   const calculateDaysRemaining = () => {
     const today = new Date();
-    
+
     if (cycle?.endDate) {
       const endDate = new Date(cycle.endDate);
       const diffTime = endDate.getTime() - today.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       return diffDays;
     }
-    
+
     return undefined;
   };
 
@@ -143,10 +214,10 @@ export default function GoalDetail() {
   // Mutation for creating new Key Result
   const createKeyResultMutation = useMutation({
     mutationFn: async (keyResultData: any) => {
-      const response = await apiRequest('POST', '/api/key-results', {
+      const response = await apiRequest("POST", "/api/key-results", {
         ...keyResultData,
         objectiveId: id,
-        currentValue: keyResultData.currentValue || keyResultData.baseValue
+        currentValue: keyResultData.currentValue || keyResultData.baseValue,
       });
 
       return response.json();
@@ -161,13 +232,13 @@ export default function GoalDetail() {
       queryClient.invalidateQueries({ queryKey: [`/api/okrs/${id}`] });
       setAddKeyResultModal({ open: false });
       setKeyResultForm({
-        title: '',
-        description: '',
-        keyResultType: 'increase_to',
-        baseValue: '',
-        targetValue: '',
-        currentValue: '',
-        unit: 'number'
+        title: "",
+        description: "",
+        keyResultType: "increase_to",
+        baseValue: "",
+        targetValue: "",
+        currentValue: "",
+        unit: "number",
       });
     },
     onError: (error: Error) => {
@@ -176,7 +247,7 @@ export default function GoalDetail() {
         description: error.message || "Gagal membuat Ukuran Keberhasilan",
         variant: "destructive",
       });
-    }
+    },
   });
 
   const getKeyResultTypeIcon = (type: string) => {
@@ -206,43 +277,50 @@ export default function GoalDetail() {
   };
 
   const formatCurrency = (value: string | number, unit: string) => {
-    if (unit?.toLowerCase() === 'rp' || unit?.toLowerCase() === 'rupiah') {
-      const numValue = typeof value === 'string' ? parseFloat(value) : value;
-      return `Rp ${numValue.toLocaleString('id-ID')}`;
+    if (unit?.toLowerCase() === "rp" || unit?.toLowerCase() === "rupiah") {
+      const numValue = typeof value === "string" ? parseFloat(value) : value;
+      return `Rp ${numValue.toLocaleString("id-ID")}`;
     }
-    return `${value} ${unit || ''}`.trim();
+    return `${value} ${unit || ""}`.trim();
   };
 
-  const calculateProgress = (current: string, target: string, keyResultType: string, baseValue?: string | null): number => {
+  const calculateProgress = (
+    current: string,
+    target: string,
+    keyResultType: string,
+    baseValue?: string | null,
+  ): number => {
     const currentNum = parseFloat(current) || 0;
     const targetNum = parseFloat(target) || 0;
     const baseNum = baseValue ? parseFloat(baseValue) : 0;
-    
+
     switch (keyResultType) {
       case "increase_to":
         // Formula: (Current - Base) / (Target - Base) * 100%
         if (targetNum <= baseNum) return 0; // Invalid configuration
-        const increaseProgress = ((currentNum - baseNum) / (targetNum - baseNum)) * 100;
+        const increaseProgress =
+          ((currentNum - baseNum) / (targetNum - baseNum)) * 100;
         return Math.min(100, Math.max(0, increaseProgress));
-        
+
       case "decrease_to":
         // Formula: (Base - Current) / (Base - Target) * 100%
         if (baseNum <= targetNum) return 0; // Invalid configuration
-        const decreaseProgress = ((baseNum - currentNum) / (baseNum - targetNum)) * 100;
+        const decreaseProgress =
+          ((baseNum - currentNum) / (baseNum - targetNum)) * 100;
         return Math.min(100, Math.max(0, decreaseProgress));
-        
+
       case "should_stay_above":
         // Binary: 100% if current >= target, 0% otherwise
         return currentNum >= targetNum ? 100 : 0;
-        
+
       case "should_stay_below":
         // Binary: 100% if current <= target, 0% otherwise
         return currentNum <= targetNum ? 100 : 0;
-        
+
       case "achieve_or_not":
         // Binary: 100% if current >= target, 0% otherwise
         return currentNum >= targetNum ? 100 : 0;
-        
+
       default:
         return 0;
     }
@@ -250,12 +328,17 @@ export default function GoalDetail() {
 
   const calculateOverallProgress = (keyResults: KeyResult[]): number => {
     if (!keyResults || keyResults.length === 0) return 0;
-    
+
     const progressSum = keyResults.reduce((sum, kr) => {
-      const progress = calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
+      const progress = calculateProgress(
+        kr.currentValue,
+        kr.targetValue,
+        kr.keyResultType,
+        kr.baseValue,
+      );
       return sum + progress;
     }, 0);
-    
+
     return Math.round(progressSum / keyResults.length);
   };
 
@@ -268,7 +351,7 @@ export default function GoalDetail() {
   };
 
   const toggleKeyResultExpand = (keyResultId: string) => {
-    setExpandedKeyResults(prev => {
+    setExpandedKeyResults((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(keyResultId)) {
         newSet.delete(keyResultId);
@@ -283,10 +366,13 @@ export default function GoalDetail() {
     if (!owner) {
       return "Memuat...";
     }
-    
-    if (goal?.ownerType === 'user' || goal?.ownerType === 'individual') {
+
+    if (goal?.ownerType === "user" || goal?.ownerType === "individual") {
       const userOwner = owner as User;
-      return `${userOwner.firstName || ''} ${userOwner.lastName || ''}`.trim() || userOwner.email;
+      return (
+        `${userOwner.firstName || ""} ${userOwner.lastName || ""}`.trim() ||
+        userOwner.email
+      );
     } else {
       const teamOwner = owner as Team;
       return teamOwner.name;
@@ -309,7 +395,7 @@ export default function GoalDetail() {
   };
 
   const getTugasByRencana = (rencanaId: string) => {
-    return tugas.filter(task => task.initiativeId === rencanaId);
+    return tugas.filter((task) => task.initiativeId === rencanaId);
   };
 
   if (isLoading) {
@@ -337,18 +423,18 @@ export default function GoalDetail() {
       <div className="mb-6">
         {/* Back button and Actions in same row */}
         <div className="flex items-center justify-between mb-4">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size="sm"
             onClick={() => window.history.back()}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Kembali
           </Button>
-          
+
           <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               onClick={() => setEditObjectiveModal(true)}
             >
@@ -374,12 +460,11 @@ export default function GoalDetail() {
             </DropdownMenu>
           </div>
         </div>
-        
       </div>
       {/* Visual Overview Section for easy understanding */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-2">
-          <ObjectiveOverviewCard 
+          <ObjectiveOverviewCard
             objective={goal}
             initiatives={rencana}
             tasks={tugas}
@@ -387,7 +472,7 @@ export default function GoalDetail() {
           />
         </div>
         <div className="lg:col-span-1">
-          <ObjectiveTimeline 
+          <ObjectiveTimeline
             objective={goal}
             initiatives={rencana}
             tasks={tugas.slice(0, 5)}
@@ -403,71 +488,21 @@ export default function GoalDetail() {
             <h1 className="text-2xl font-bold text-gray-900">{goal.title}</h1>
             <ObjectiveStatusBadge status={goal.status} />
           </div>
-          
+
           {/* Description */}
           {goal.description && (
             <p className="text-gray-600 mb-6">{goal.description}</p>
           )}
-          
-          {/* Progress Keseluruhan Section */}
-          <div className="mb-6">
-            <div className="flex items-center space-x-2 mb-3">
-              <BarChart3 className="w-5 h-5 text-gray-500" />
-              <span className="text-lg font-medium text-gray-700">Progress Keseluruhan</span>
-            </div>
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-2xl font-bold">{overallProgress.toFixed(1)}%</p>
-              {cycle && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span className="text-sm text-gray-400 cursor-help">
-                        Target: {(() => {
-                          const now = new Date();
-                          const start = new Date(cycle.startDate);
-                          const end = new Date(cycle.endDate);
-                          const totalTime = end.getTime() - start.getTime();
-                          const timePassed = now.getTime() - start.getTime();
-                          const idealProgress = Math.max(0, Math.min(100, (timePassed / totalTime) * 100));
-                          return idealProgress.toFixed(1);
-                        })()}%
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Capaian ideal berdasarkan waktu yang telah berlalu</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-            <div className="relative">
-              <Progress value={overallProgress} className="h-4" />
-              {cycle && (() => {
-                const now = new Date();
-                const start = new Date(cycle.startDate);
-                const end = new Date(cycle.endDate);
-                const totalTime = end.getTime() - start.getTime();
-                const timePassed = now.getTime() - start.getTime();
-                const idealProgress = Math.max(0, Math.min(100, (timePassed / totalTime) * 100));
-                
-                return (
-                  <div 
-                    className="absolute top-0 h-4 w-0.5 bg-gray-400 opacity-70"
-                    style={{ left: `${idealProgress}%` }}
-                    title={`Target ideal: ${idealProgress.toFixed(1)}%`}
-                  />
-                );
-              })()}
-            </div>
-          </div>
-          
+
           {/* Additional Info Section */}
           <div className="mb-6 pb-6 border-b border-gray-200 space-y-3">
             {/* Goal Induk Info */}
             {parentObjective && (
               <div className="flex items-start sm:items-center gap-2 text-sm">
                 <Target className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
-                <span className="text-gray-500 flex-shrink-0">Bagian dari:</span>
+                <span className="text-gray-500 flex-shrink-0">
+                  Bagian dari:
+                </span>
                 <Link href={`/objectives/${parentObjective.id}`}>
                   <span className="font-medium text-blue-600 hover:text-blue-800 hover:underline cursor-pointer flex items-start sm:items-center gap-1 break-words">
                     {parentObjective.title}
@@ -476,48 +511,62 @@ export default function GoalDetail() {
                 </Link>
               </div>
             )}
-            
+
             {/* Periode and Pemilik Info - Stack on mobile */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 text-sm">
               <div className="flex items-start sm:items-center gap-2">
                 <Calendar className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                  <span className="font-medium">{cycle?.name || "Tidak ada cycle"}</span>
+                  <span className="font-medium">
+                    {cycle?.name || "Tidak ada cycle"}
+                  </span>
                   {cycle && (
                     <span className="text-xs text-gray-400 block sm:inline">
-                      ({new Date(cycle.startDate).toLocaleDateString('id-ID')} - {new Date(cycle.endDate).toLocaleDateString('id-ID')})
+                      ({new Date(cycle.startDate).toLocaleDateString("id-ID")} -{" "}
+                      {new Date(cycle.endDate).toLocaleDateString("id-ID")})
                     </span>
                   )}
                 </div>
               </div>
-              
+
               <div className="flex items-start sm:items-center gap-2">
-                {goal.ownerType === 'team' ? (
+                {goal.ownerType === "team" ? (
                   <Building className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
                 ) : (
                   <UserIcon className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
                 )}
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                  <span className="font-medium break-words">{getOwnerDisplay()}</span>
-                  <span className="text-xs text-gray-400 capitalize">({goal.ownerType === 'team' ? 'Tim' : 'Individual'})</span>
+                  <span className="font-medium break-words">
+                    {getOwnerDisplay()}
+                  </span>
+                  <span className="text-xs text-gray-400 capitalize">
+                    ({goal.ownerType === "team" ? "Tim" : "Individual"})
+                  </span>
                 </div>
               </div>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            
             <div>
               <div className="flex items-center space-x-2 mb-2">
                 <CheckCircle2 className="w-4 h-4 text-gray-500" />
-                <span className="text-sm text-gray-500">Ukuran Keberhasilan</span>
+                <span className="text-sm text-gray-500">
+                  Ukuran Keberhasilan
+                </span>
               </div>
-              <p className="font-medium">{goal.keyResults?.length || 0} Ukuran Keberhasilan</p>
+              <p className="font-medium">
+                {goal.keyResults?.length || 0} Ukuran Keberhasilan
+              </p>
               <p className="text-xs text-gray-400">
-                {goal.keyResults?.filter(kr => parseFloat(kr.currentValue) >= parseFloat(kr.targetValue)).length || 0} tercapai
+                {goal.keyResults?.filter(
+                  (kr) =>
+                    parseFloat(kr.currentValue) >= parseFloat(kr.targetValue),
+                ).length || 0}{" "}
+                tercapai
               </p>
             </div>
-            
+
             <div>
               <div className="flex items-center space-x-2 mb-2">
                 <FileText className="w-4 h-4 text-gray-500" />
@@ -525,7 +574,10 @@ export default function GoalDetail() {
               </div>
               <p className="font-medium">{rencana?.length || 0} Rencana</p>
               <p className="text-xs text-gray-400">
-                {rencana?.filter(initiative => initiative.status === 'completed').length || 0} selesai
+                {rencana?.filter(
+                  (initiative) => initiative.status === "completed",
+                ).length || 0}{" "}
+                selesai
               </p>
             </div>
           </div>
@@ -534,21 +586,27 @@ export default function GoalDetail() {
       {/* Tabs Section */}
       <Tabs defaultValue="key-results" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="key-results">Ukuran Keberhasilan ({goal.keyResults.length})</TabsTrigger>
-          <TabsTrigger value="initiatives">Rencana ({rencana.length})</TabsTrigger>
+          <TabsTrigger value="key-results">
+            Ukuran Keberhasilan ({goal.keyResults.length})
+          </TabsTrigger>
+          <TabsTrigger value="initiatives">
+            Rencana ({rencana.length})
+          </TabsTrigger>
           <TabsTrigger value="tasks">Tugas ({tugas.length})</TabsTrigger>
         </TabsList>
 
         {/* Ukuran Keberhasilan Tab */}
-        <TabsContent 
-          value="key-results" 
+        <TabsContent
+          value="key-results"
           className={`space-y-4 transition-all duration-1000 ${
-            shouldHighlight ? 'ring-4 ring-blue-300 ring-opacity-50 bg-blue-50/30 rounded-lg p-4' : ''
+            shouldHighlight
+              ? "ring-4 ring-blue-300 ring-opacity-50 bg-blue-50/30 rounded-lg p-4"
+              : ""
           }`}
         >
           {/* Add Ukuran Keberhasilan Button */}
           <div className="flex justify-end">
-            <Button 
+            <Button
               onClick={() => setAddKeyResultModal({ open: true })}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
@@ -556,16 +614,19 @@ export default function GoalDetail() {
               Tambah Ukuran Keberhasilan
             </Button>
           </div>
-          
+
           {goal.keyResults.length === 0 ? (
             <Card className="border-2 border-dashed border-blue-200 bg-blue-50/50">
               <CardContent className="p-8 text-center">
                 <Target className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-blue-900 mb-2">Belum ada Ukuran Keberhasilan</h3>
+                <h3 className="text-lg font-medium text-blue-900 mb-2">
+                  Belum ada Ukuran Keberhasilan
+                </h3>
                 <p className="text-blue-700 mb-4">
-                  Mulai tambahkan Ukuran Keberhasilan untuk mengukur progress goal ini
+                  Mulai tambahkan Ukuran Keberhasilan untuk mengukur progress
+                  goal ini
                 </p>
-                <Button 
+                <Button
                   onClick={() => setAddKeyResultModal({ open: true })}
                   className="bg-blue-600 hover:bg-blue-700 text-white"
                 >
@@ -576,39 +637,49 @@ export default function GoalDetail() {
             </Card>
           ) : (
             goal.keyResults.map((kr) => {
-              const progress = calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
-              
+              const progress = calculateProgress(
+                kr.currentValue,
+                kr.targetValue,
+                kr.keyResultType,
+                kr.baseValue,
+              );
+
               const getKeyResultTypeIcon = (type: string) => {
                 switch (type) {
                   case "increase_to":
                     return {
                       icon: TrendingUp,
-                      tooltip: "Target Peningkatan - Progress dihitung dari nilai awal ke target"
+                      tooltip:
+                        "Target Peningkatan - Progress dihitung dari nilai awal ke target",
                     };
                   case "decrease_to":
                     return {
                       icon: TrendingDown,
-                      tooltip: "Target Penurunan - Progress dihitung mundur dari nilai awal ke target"
+                      tooltip:
+                        "Target Penurunan - Progress dihitung mundur dari nilai awal ke target",
                     };
                   case "should_stay_above":
                     return {
                       icon: MoveUp,
-                      tooltip: "Tetap Di Atas - Nilai harus tetap berada di atas ambang batas target"
+                      tooltip:
+                        "Tetap Di Atas - Nilai harus tetap berada di atas ambang batas target",
                     };
                   case "should_stay_below":
                     return {
                       icon: MoveDown,
-                      tooltip: "Tetap Di Bawah - Nilai harus tetap berada di bawah ambang batas target"
+                      tooltip:
+                        "Tetap Di Bawah - Nilai harus tetap berada di bawah ambang batas target",
                     };
                   case "achieve_or_not":
                     return {
                       icon: Target,
-                      tooltip: "Target Binary - 100% jika tercapai, 0% jika tidak"
+                      tooltip:
+                        "Target Binary - 100% jika tercapai, 0% jika tidak",
                     };
                   default:
                     return {
                       icon: Target,
-                      tooltip: "Tipe target tidak diketahui"
+                      tooltip: "Tipe target tidak diketahui",
                     };
                 }
               };
@@ -616,10 +687,15 @@ export default function GoalDetail() {
               const typeConfig = getKeyResultTypeIcon(kr.keyResultType);
               const IconComponent = typeConfig.icon;
               const isExpanded = expandedKeyResults.has(kr.id);
-              const krInitiatives = rencana.filter(r => r.keyResultId === kr.id);
-              
+              const krInitiatives = rencana.filter(
+                (r) => r.keyResultId === kr.id,
+              );
+
               return (
-                <div key={kr.id} className="p-3 sm:p-4 bg-white border border-gray-200 rounded-lg space-y-2 sm:space-y-3">
+                <div
+                  key={kr.id}
+                  className="p-3 sm:p-4 bg-white border border-gray-200 rounded-lg space-y-2 sm:space-y-3"
+                >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
@@ -638,70 +714,86 @@ export default function GoalDetail() {
                             )}
                           </Button>
                         )}
-                        <Link 
+                        <Link
                           href={`/key-results/${kr.id}`}
                           className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer text-left"
                         >
                           {kr.title}
                         </Link>
                         <div className="relative group">
-                          <IconComponent 
-                            className="w-4 h-4 text-gray-500 hover:text-gray-700 cursor-help" 
-                          />
+                          <IconComponent className="w-4 h-4 text-gray-500 hover:text-gray-700 cursor-help" />
                           <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap">
                             {typeConfig.tooltip}
                             <div className="absolute right-full top-1/2 transform -translate-y-1/2 w-0 h-0 border-t-4 border-b-4 border-r-4 border-transparent border-r-black"></div>
                           </div>
                         </div>
                       </div>
-                      <p className="text-sm text-gray-600 mb-2">{kr.description}</p>
-                      
+                      <p className="text-sm text-gray-600 mb-2">
+                        {kr.description}
+                      </p>
+
                       {/* Initiative count for this key result */}
                       <div className="text-xs text-blue-600 mb-2 flex items-center gap-1">
                         <FileText className="w-3 h-3" />
                         <span>
-                          {rencana.filter(r => r.keyResultId === kr.id).length} inisiatif terkait
+                          {
+                            rencana.filter((r) => r.keyResultId === kr.id)
+                              .length
+                          }{" "}
+                          inisiatif terkait
                         </span>
                       </div>
-                      
+
                       <div className="text-xs text-gray-500">
                         {(() => {
                           // Handle achieve_or_not type
-                          if (kr.keyResultType === 'achieve_or_not') {
-                            return progress >= 100 ? 'Status: Tercapai' : 'Status: Belum tercapai';
+                          if (kr.keyResultType === "achieve_or_not") {
+                            return progress >= 100
+                              ? "Status: Tercapai"
+                              : "Status: Belum tercapai";
                           }
-                          
-                          // Handle should_stay types  
-                          if (kr.keyResultType === 'should_stay_above' || kr.keyResultType === 'should_stay_below') {
+
+                          // Handle should_stay types
+                          if (
+                            kr.keyResultType === "should_stay_above" ||
+                            kr.keyResultType === "should_stay_below"
+                          ) {
                             const currentVal = parseFloat(kr.currentValue);
                             const targetVal = parseFloat(kr.targetValue);
-                            const unitDisplay = kr.unit === 'Rp' ? 'Rp ' : kr.unit === '%' ? '' : '';
-                            const unitSuffix = kr.unit === '%' ? '%' : '';
-                            
-                            return `Saat ini: ${unitDisplay}${currentVal.toLocaleString('id-ID')}${unitSuffix} | Threshold: ${unitDisplay}${targetVal.toLocaleString('id-ID')}${unitSuffix}`;
+                            const unitDisplay =
+                              kr.unit === "Rp"
+                                ? "Rp "
+                                : kr.unit === "%"
+                                  ? ""
+                                  : "";
+                            const unitSuffix = kr.unit === "%" ? "%" : "";
+
+                            return `Saat ini: ${unitDisplay}${currentVal.toLocaleString("id-ID")}${unitSuffix} | Threshold: ${unitDisplay}${targetVal.toLocaleString("id-ID")}${unitSuffix}`;
                           }
-                          
+
                           // Handle increase_to and decrease_to types
                           const currentVal = parseFloat(kr.currentValue);
                           const targetVal = parseFloat(kr.targetValue);
-                          const baseVal = kr.baseValue ? parseFloat(kr.baseValue) : 0;
-                          
-                          if (kr.keyResultType === 'decrease_to') {
-                            if (kr.unit === 'Rp') {
-                              return `Rp ${baseVal.toLocaleString('id-ID')} → Rp ${targetVal.toLocaleString('id-ID')} (capaian: Rp ${currentVal.toLocaleString('id-ID')})`;
-                            } else if (kr.unit === '%') {
-                              return `${baseVal.toLocaleString('id-ID')}% → ${targetVal.toLocaleString('id-ID')}% (capaian: ${currentVal.toLocaleString('id-ID')}%)`;
+                          const baseVal = kr.baseValue
+                            ? parseFloat(kr.baseValue)
+                            : 0;
+
+                          if (kr.keyResultType === "decrease_to") {
+                            if (kr.unit === "Rp") {
+                              return `Rp ${baseVal.toLocaleString("id-ID")} → Rp ${targetVal.toLocaleString("id-ID")} (capaian: Rp ${currentVal.toLocaleString("id-ID")})`;
+                            } else if (kr.unit === "%") {
+                              return `${baseVal.toLocaleString("id-ID")}% → ${targetVal.toLocaleString("id-ID")}% (capaian: ${currentVal.toLocaleString("id-ID")}%)`;
                             } else {
-                              return `${baseVal.toLocaleString('id-ID')} → ${targetVal.toLocaleString('id-ID')} ${kr.unit || ''} (capaian: ${currentVal.toLocaleString('id-ID')})`;
+                              return `${baseVal.toLocaleString("id-ID")} → ${targetVal.toLocaleString("id-ID")} ${kr.unit || ""} (capaian: ${currentVal.toLocaleString("id-ID")})`;
                             }
                           } else {
                             // increase_to type
-                            if (kr.unit === 'Rp') {
-                              return `Rp ${baseVal.toLocaleString('id-ID')} → Rp ${targetVal.toLocaleString('id-ID')} (capaian: Rp ${currentVal.toLocaleString('id-ID')})`;
-                            } else if (kr.unit === '%') {
-                              return `${baseVal.toLocaleString('id-ID')}% → ${targetVal.toLocaleString('id-ID')}% (capaian: ${currentVal.toLocaleString('id-ID')}%)`;
+                            if (kr.unit === "Rp") {
+                              return `Rp ${baseVal.toLocaleString("id-ID")} → Rp ${targetVal.toLocaleString("id-ID")} (capaian: Rp ${currentVal.toLocaleString("id-ID")})`;
+                            } else if (kr.unit === "%") {
+                              return `${baseVal.toLocaleString("id-ID")}% → ${targetVal.toLocaleString("id-ID")}% (capaian: ${currentVal.toLocaleString("id-ID")}%)`;
                             } else {
-                              return `${baseVal.toLocaleString('id-ID')} → ${targetVal.toLocaleString('id-ID')} ${kr.unit || ''} (capaian: ${currentVal.toLocaleString('id-ID')})`;
+                              return `${baseVal.toLocaleString("id-ID")} → ${targetVal.toLocaleString("id-ID")} ${kr.unit || ""} (capaian: ${currentVal.toLocaleString("id-ID")})`;
                             }
                           }
                         })()}
@@ -719,16 +811,26 @@ export default function GoalDetail() {
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                          >
                             <MoreVertical className="w-4 h-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                          <DropdownMenuItem onClick={() => window.location.href = `/key-results/${kr.id}`}>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              (window.location.href = `/key-results/${kr.id}`)
+                            }
+                          >
                             <Eye className="w-4 h-4 mr-2" />
                             Lihat Detail
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleEditKeyResult(kr)}>
+                          <DropdownMenuItem
+                            onClick={() => handleEditKeyResult(kr)}
+                          >
                             <Settings className="w-4 h-4 mr-2" />
                             Edit Ukuran Keberhasilan
                           </DropdownMenuItem>
@@ -736,49 +838,56 @@ export default function GoalDetail() {
                       </DropdownMenu>
                     </div>
                   </div>
-                  
+
                   {/* Progress section - using same structure as dashboard */}
                   <div className="space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
                     <div className="w-full sm:flex-1 sm:mr-4">
                       <div className="flex items-center gap-2 mb-2">
-                        <Badge 
-                          variant="secondary" 
+                        <Badge
+                          variant="secondary"
                           className="bg-blue-500 text-white hover:bg-blue-600 flex items-center gap-1"
                         >
                           <TrendingUp className="w-3 h-3" />
                           Lebih Cepat
                         </Badge>
                       </div>
-                      
+
                       <div className="flex items-center gap-3">
                         <div className="flex-1 relative">
                           <Progress value={progress} className="h-2" />
-                          {cycle && (() => {
-                            const now = new Date();
-                            const start = new Date(cycle.startDate);
-                            const end = new Date(cycle.endDate);
-                            const totalTime = end.getTime() - start.getTime();
-                            const timePassed = now.getTime() - start.getTime();
-                            const idealProgress = Math.max(0, Math.min(100, (timePassed / totalTime) * 100));
-                            
-                            return (
-                              <div 
-                                className="absolute top-0 h-2 w-0.5 bg-gray-400 opacity-70"
-                                style={{ left: `${idealProgress}%` }}
-                                title={`Target ideal: ${idealProgress.toFixed(1)}%`}
-                              />
-                            );
-                          })()}
+                          {cycle &&
+                            (() => {
+                              const now = new Date();
+                              const start = new Date(cycle.startDate);
+                              const end = new Date(cycle.endDate);
+                              const totalTime = end.getTime() - start.getTime();
+                              const timePassed =
+                                now.getTime() - start.getTime();
+                              const idealProgress = Math.max(
+                                0,
+                                Math.min(100, (timePassed / totalTime) * 100),
+                              );
+
+                              return (
+                                <div
+                                  className="absolute top-0 h-2 w-0.5 bg-gray-400 opacity-70"
+                                  style={{ left: `${idealProgress}%` }}
+                                  title={`Target ideal: ${idealProgress.toFixed(1)}%`}
+                                />
+                              );
+                            })()}
                         </div>
-                        <div className="text-lg font-semibold text-gray-900">{progress.toFixed(0)}%</div>
+                        <div className="text-lg font-semibold text-gray-900">
+                          {progress.toFixed(0)}%
+                        </div>
                       </div>
                     </div>
-                    
+
                     <div className="text-xs text-gray-500 sm:text-right sm:ml-4 sm:shrink-0">
                       Terakhir update: 3 Jul 2025
                     </div>
                   </div>
-                  
+
                   {/* Expanded Initiatives Section */}
                   {isExpanded && krInitiatives.length > 0 && (
                     <div className="mt-4 pt-4 border-t border-gray-100">
@@ -788,28 +897,46 @@ export default function GoalDetail() {
                       </h4>
                       <div className="space-y-2">
                         {krInitiatives.map((initiative) => (
-                          <div key={initiative.id} className="p-3 bg-gray-50 rounded-md border border-gray-200">
+                          <div
+                            key={initiative.id}
+                            className="p-3 bg-gray-50 rounded-md border border-gray-200"
+                          >
                             <div className="flex items-start justify-between mb-2">
                               <div className="flex gap-2">
-                                <Badge className={
-                                  initiative.status === "completed" ? "bg-green-100 text-green-800" :
-                                  initiative.status === "in_progress" ? "bg-blue-100 text-blue-800" :
-                                  initiative.status === "on_hold" ? "bg-yellow-100 text-yellow-800" :
-                                  "bg-gray-100 text-gray-800"
-                                }>
-                                  {initiative.status?.replace("_", " ") || "pending"}
+                                <Badge
+                                  className={
+                                    initiative.status === "completed"
+                                      ? "bg-green-100 text-green-800"
+                                      : initiative.status === "in_progress"
+                                        ? "bg-blue-100 text-blue-800"
+                                        : initiative.status === "on_hold"
+                                          ? "bg-yellow-100 text-yellow-800"
+                                          : "bg-gray-100 text-gray-800"
+                                  }
+                                >
+                                  {initiative.status?.replace("_", " ") ||
+                                    "pending"}
                                 </Badge>
-                                <Badge className={
-                                  initiative.priority === "critical" ? "bg-red-100 text-red-800" :
-                                  initiative.priority === "high" ? "bg-orange-100 text-orange-800" :
-                                  initiative.priority === "medium" ? "bg-yellow-100 text-yellow-800" :
-                                  "bg-green-100 text-green-800"
-                                }>
+                                <Badge
+                                  className={
+                                    initiative.priority === "critical"
+                                      ? "bg-red-100 text-red-800"
+                                      : initiative.priority === "high"
+                                        ? "bg-orange-100 text-orange-800"
+                                        : initiative.priority === "medium"
+                                          ? "bg-yellow-100 text-yellow-800"
+                                          : "bg-green-100 text-green-800"
+                                  }
+                                >
                                   {initiative.priority || "medium"}
                                 </Badge>
                               </div>
                               <Link href={`/initiatives/${initiative.id}`}>
-                                <Button variant="ghost" size="sm" className="h-6 px-2 text-xs text-blue-600 hover:text-blue-800">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-6 px-2 text-xs text-blue-600 hover:text-blue-800"
+                                >
                                   <Eye className="w-3 h-3 mr-1" />
                                   Detail
                                 </Button>
@@ -822,20 +949,36 @@ export default function GoalDetail() {
                                 </h5>
                               </Link>
                               {initiative.description && (
-                                <p className="text-xs text-gray-600 mt-1 line-clamp-2">{initiative.description}</p>
+                                <p className="text-xs text-gray-600 mt-1 line-clamp-2">
+                                  {initiative.description}
+                                </p>
                               )}
                             </div>
                             <div className="flex items-center justify-between text-xs text-gray-500">
                               <div className="flex items-center gap-4">
-                                <span>Progress: {initiative.progressPercentage || 0}%</span>
+                                <span>
+                                  Progress: {initiative.progressPercentage || 0}
+                                  %
+                                </span>
                                 {initiative.dueDate && (
-                                  <span className={new Date(initiative.dueDate) < new Date() ? "text-red-600" : ""}>
-                                    Due: {new Date(initiative.dueDate).toLocaleDateString('id-ID')}
+                                  <span
+                                    className={
+                                      new Date(initiative.dueDate) < new Date()
+                                        ? "text-red-600"
+                                        : ""
+                                    }
+                                  >
+                                    Due:{" "}
+                                    {new Date(
+                                      initiative.dueDate,
+                                    ).toLocaleDateString("id-ID")}
                                   </span>
                                 )}
                               </div>
                               {initiative.picId && (
-                                <span>PIC: {getUserName(initiative.picId)}</span>
+                                <span>
+                                  PIC: {getUserName(initiative.picId)}
+                                </span>
                               )}
                             </div>
                           </div>
@@ -860,30 +1003,47 @@ export default function GoalDetail() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {rencana.map((initiative) => (
-                <Card key={initiative.id} className="hover:shadow-lg transition-shadow">
+                <Card
+                  key={initiative.id}
+                  className="hover:shadow-lg transition-shadow"
+                >
                   <CardHeader>
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex gap-2">
-                        <Badge className={
-                          initiative.status === "completed" ? "bg-green-100 text-green-800" :
-                          initiative.status === "in_progress" ? "bg-blue-100 text-blue-800" :
-                          initiative.status === "on_hold" ? "bg-yellow-100 text-yellow-800" :
-                          "bg-gray-100 text-gray-800"
-                        }>
+                        <Badge
+                          className={
+                            initiative.status === "completed"
+                              ? "bg-green-100 text-green-800"
+                              : initiative.status === "in_progress"
+                                ? "bg-blue-100 text-blue-800"
+                                : initiative.status === "on_hold"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : "bg-gray-100 text-gray-800"
+                          }
+                        >
                           {initiative.status?.replace("_", " ") || "pending"}
                         </Badge>
-                        <Badge className={
-                          initiative.priority === "critical" ? "bg-red-100 text-red-800" :
-                          initiative.priority === "high" ? "bg-orange-100 text-orange-800" :
-                          initiative.priority === "medium" ? "bg-yellow-100 text-yellow-800" :
-                          "bg-green-100 text-green-800"
-                        }>
+                        <Badge
+                          className={
+                            initiative.priority === "critical"
+                              ? "bg-red-100 text-red-800"
+                              : initiative.priority === "high"
+                                ? "bg-orange-100 text-orange-800"
+                                : initiative.priority === "medium"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : "bg-green-100 text-green-800"
+                          }
+                        >
                           {initiative.priority || "medium"}
                         </Badge>
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 p-0"
+                          >
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -932,14 +1092,21 @@ export default function GoalDetail() {
                       <div className="flex items-center gap-2 text-sm">
                         <Calendar className="w-4 h-4 text-gray-500" />
                         <span className="text-gray-600">Tenggat:</span>
-                        <span className={`font-medium ${
-                          new Date(initiative.dueDate) < new Date() ? "text-red-600" : ""
-                        }`}>
-                          {new Date(initiative.dueDate).toLocaleDateString('id-ID', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric'
-                          })}
+                        <span
+                          className={`font-medium ${
+                            new Date(initiative.dueDate) < new Date()
+                              ? "text-red-600"
+                              : ""
+                          }`}
+                        >
+                          {new Date(initiative.dueDate).toLocaleDateString(
+                            "id-ID",
+                            {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            },
+                          )}
                         </span>
                       </div>
                     )}
@@ -961,7 +1128,10 @@ export default function GoalDetail() {
                         <Building className="w-4 h-4 text-gray-500" />
                         <span className="text-gray-600">Anggaran:</span>
                         <span className="font-medium">
-                          Rp {parseFloat(initiative.budget).toLocaleString('id-ID')}
+                          Rp{" "}
+                          {parseFloat(initiative.budget).toLocaleString(
+                            "id-ID",
+                          )}
                         </span>
                       </div>
                     )}
@@ -993,13 +1163,27 @@ export default function GoalDetail() {
                   <table className="w-full">
                     <thead className="bg-gray-50 border-b">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kesehatan</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tugas</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prioritas</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tenggat</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ditugaskan</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Kesehatan
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Tugas
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Prioritas
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Tenggat
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Ditugaskan
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Aksi
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
@@ -1007,50 +1191,61 @@ export default function GoalDetail() {
                         // Calculate task health score
                         const calculateHealthScore = (task: any) => {
                           let score = 100;
-                          
+
                           // Status impact
-                          if (task.status === 'completed') score = 100;
-                          else if (task.status === 'cancelled') score = 0;
-                          else if (task.status === 'in_progress') score = 70;
+                          if (task.status === "completed") score = 100;
+                          else if (task.status === "cancelled") score = 0;
+                          else if (task.status === "in_progress") score = 70;
                           else score = 40; // not_started
-                          
+
                           // Due date impact
                           if (task.dueDate) {
                             const now = new Date();
                             const due = new Date(task.dueDate);
-                            const daysDiff = Math.ceil((due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-                            
-                            if (daysDiff < 0) score = Math.max(0, score - 30); // Overdue
-                            else if (daysDiff <= 1) score = Math.max(0, score - 20); // Due today/tomorrow
-                            else if (daysDiff <= 3) score = Math.max(0, score - 10); // Due soon
+                            const daysDiff = Math.ceil(
+                              (due.getTime() - now.getTime()) /
+                                (1000 * 60 * 60 * 24),
+                            );
+
+                            if (daysDiff < 0)
+                              score = Math.max(0, score - 30); // Overdue
+                            else if (daysDiff <= 1)
+                              score = Math.max(0, score - 20); // Due today/tomorrow
+                            else if (daysDiff <= 3)
+                              score = Math.max(0, score - 10); // Due soon
                           }
-                          
+
                           // Priority impact
-                          if (task.priority === 'high' && task.status !== 'completed') {
+                          if (
+                            task.priority === "high" &&
+                            task.status !== "completed"
+                          ) {
                             score = Math.max(0, score - 15);
                           }
-                          
+
                           return Math.max(0, Math.min(100, score));
                         };
 
                         const healthScore = calculateHealthScore(task);
                         const getHealthColor = (score: number) => {
-                          if (score >= 80) return 'bg-green-500';
-                          if (score >= 60) return 'bg-yellow-500';
-                          if (score >= 40) return 'bg-orange-500';
-                          return 'bg-red-500';
+                          if (score >= 80) return "bg-green-500";
+                          if (score >= 60) return "bg-yellow-500";
+                          if (score >= 40) return "bg-orange-500";
+                          return "bg-red-500";
                         };
 
                         return (
                           <tr key={task.id} className="hover:bg-gray-50">
                             <td className="px-4 py-4">
-                              <div 
+                              <div
                                 className={`w-3 h-3 rounded-full ${getHealthColor(healthScore)}`}
                                 title={`Health Score: ${healthScore}%`}
                               />
                             </td>
                             <td className="px-4 py-4">
-                              <div className="font-medium text-gray-900">{task.title}</div>
+                              <div className="font-medium text-gray-900">
+                                {task.title}
+                              </div>
                               {task.initiative && (
                                 <div className="text-sm text-gray-500">
                                   Inisiatif: {task.initiative.title}
@@ -1062,40 +1257,66 @@ export default function GoalDetail() {
                                 value={task.status}
                                 onValueChange={(newStatus) => {
                                   // Handle status update here
-                                  console.log('Update status:', task.id, newStatus);
+                                  console.log(
+                                    "Update status:",
+                                    task.id,
+                                    newStatus,
+                                  );
                                 }}
                               >
                                 <SelectTrigger className="w-32">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="not_started">Belum Dimulai</SelectItem>
-                                  <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
-                                  <SelectItem value="completed">Selesai</SelectItem>
-                                  <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                                  <SelectItem value="not_started">
+                                    Belum Dimulai
+                                  </SelectItem>
+                                  <SelectItem value="in_progress">
+                                    Sedang Berjalan
+                                  </SelectItem>
+                                  <SelectItem value="completed">
+                                    Selesai
+                                  </SelectItem>
+                                  <SelectItem value="cancelled">
+                                    Dibatalkan
+                                  </SelectItem>
                                 </SelectContent>
                               </Select>
                             </td>
                             <td className="px-4 py-4">
-                              <Badge className={
-                                task.priority === "high" ? "bg-red-100 text-red-800" :
-                                task.priority === "medium" ? "bg-yellow-100 text-yellow-800" :
-                                "bg-green-100 text-green-800"
-                              }>
-                                {task.priority === 'high' ? 'Tinggi' :
-                                 task.priority === 'medium' ? 'Sedang' : 'Rendah'}
+                              <Badge
+                                className={
+                                  task.priority === "high"
+                                    ? "bg-red-100 text-red-800"
+                                    : task.priority === "medium"
+                                      ? "bg-yellow-100 text-yellow-800"
+                                      : "bg-green-100 text-green-800"
+                                }
+                              >
+                                {task.priority === "high"
+                                  ? "Tinggi"
+                                  : task.priority === "medium"
+                                    ? "Sedang"
+                                    : "Rendah"}
                               </Badge>
                             </td>
                             <td className="px-4 py-4">
                               {task.dueDate ? (
-                                <span className={`text-sm ${
-                                  new Date(task.dueDate) < new Date() ? "text-red-600 font-medium" : "text-gray-900"
-                                }`}>
-                                  {new Date(task.dueDate).toLocaleDateString('id-ID', {
-                                    day: '2-digit',
-                                    month: 'short',
-                                    year: 'numeric'
-                                  })}
+                                <span
+                                  className={`text-sm ${
+                                    new Date(task.dueDate) < new Date()
+                                      ? "text-red-600 font-medium"
+                                      : "text-gray-900"
+                                  }`}
+                                >
+                                  {new Date(task.dueDate).toLocaleDateString(
+                                    "id-ID",
+                                    {
+                                      day: "2-digit",
+                                      month: "short",
+                                      year: "numeric",
+                                    },
+                                  )}
                                 </span>
                               ) : (
                                 <span className="text-gray-400">-</span>
@@ -1105,20 +1326,31 @@ export default function GoalDetail() {
                               {task.assignedTo ? (
                                 <div className="flex items-center gap-2">
                                   <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                                    {getUserName(task.assignedTo).split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                                    {getUserName(task.assignedTo)
+                                      .split(" ")
+                                      .map((n) => n[0])
+                                      .join("")
+                                      .substring(0, 2)
+                                      .toUpperCase()}
                                   </div>
                                   <span className="text-sm font-medium text-gray-900">
                                     {getUserName(task.assignedTo)}
                                   </span>
                                 </div>
                               ) : (
-                                <span className="text-gray-400">Belum Ditugaskan</span>
+                                <span className="text-gray-400">
+                                  Belum Ditugaskan
+                                </span>
                               )}
                             </td>
                             <td className="px-4 py-4">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 p-0"
+                                  >
                                     <MoreVertical className="h-4 w-4" />
                                   </Button>
                                 </DropdownMenuTrigger>
@@ -1162,12 +1394,15 @@ export default function GoalDetail() {
         keyResult={editKeyResultModal.keyResult}
       />
       {/* Add Key Result Modal */}
-      <Dialog open={addKeyResultModal.open} onOpenChange={(open) => setAddKeyResultModal({ open })}>
+      <Dialog
+        open={addKeyResultModal.open}
+        onOpenChange={(open) => setAddKeyResultModal({ open })}
+      >
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Tambah Ukuran Keberhasilan Baru</DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div className="grid grid-cols-1 gap-4">
               <div>
@@ -1175,48 +1410,77 @@ export default function GoalDetail() {
                 <Input
                   id="title"
                   value={keyResultForm.title}
-                  onChange={(e) => setKeyResultForm({ ...keyResultForm, title: e.target.value })}
+                  onChange={(e) =>
+                    setKeyResultForm({
+                      ...keyResultForm,
+                      title: e.target.value,
+                    })
+                  }
                   placeholder="Contoh: Meningkatkan pendapatan bulanan menjadi 100 juta"
                   required
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="description">Deskripsi</Label>
                 <Textarea
                   id="description"
                   value={keyResultForm.description}
-                  onChange={(e) => setKeyResultForm({ ...keyResultForm, description: e.target.value })}
+                  onChange={(e) =>
+                    setKeyResultForm({
+                      ...keyResultForm,
+                      description: e.target.value,
+                    })
+                  }
                   placeholder="Deskripsi detail tentang Ukuran Keberhasilan ini"
                   rows={3}
                 />
               </div>
-              
+
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="keyResultType">Tipe Ukuran Keberhasilan *</Label>
-                  <Select 
-                    value={keyResultForm.keyResultType} 
-                    onValueChange={(value) => setKeyResultForm({ ...keyResultForm, keyResultType: value })}
+                  <Label htmlFor="keyResultType">
+                    Tipe Ukuran Keberhasilan *
+                  </Label>
+                  <Select
+                    value={keyResultForm.keyResultType}
+                    onValueChange={(value) =>
+                      setKeyResultForm({
+                        ...keyResultForm,
+                        keyResultType: value,
+                      })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="increase_to">Naik ke (Increase To)</SelectItem>
-                      <SelectItem value="decrease_to">Turun ke (Decrease To)</SelectItem>
-                      <SelectItem value="should_stay_above">Harus tetap di atas (Stay Above)</SelectItem>
-                      <SelectItem value="should_stay_below">Harus tetap di bawah (Stay Below)</SelectItem>
-                      <SelectItem value="achieve_or_not">Ya/Tidak (Achieve or Not)</SelectItem>
+                      <SelectItem value="increase_to">
+                        Naik ke (Increase To)
+                      </SelectItem>
+                      <SelectItem value="decrease_to">
+                        Turun ke (Decrease To)
+                      </SelectItem>
+                      <SelectItem value="should_stay_above">
+                        Harus tetap di atas (Stay Above)
+                      </SelectItem>
+                      <SelectItem value="should_stay_below">
+                        Harus tetap di bawah (Stay Below)
+                      </SelectItem>
+                      <SelectItem value="achieve_or_not">
+                        Ya/Tidak (Achieve or Not)
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div>
                   <Label htmlFor="unit">Unit *</Label>
-                  <Select 
-                    value={keyResultForm.unit} 
-                    onValueChange={(value) => setKeyResultForm({ ...keyResultForm, unit: value })}
+                  <Select
+                    value={keyResultForm.unit}
+                    onValueChange={(value) =>
+                      setKeyResultForm({ ...keyResultForm, unit: value })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -1228,10 +1492,8 @@ export default function GoalDetail() {
                     </SelectContent>
                   </Select>
                 </div>
-                
-
               </div>
-              
+
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="baseValue">Nilai Awal *</Label>
@@ -1239,52 +1501,74 @@ export default function GoalDetail() {
                     id="baseValue"
                     type="number"
                     value={keyResultForm.baseValue}
-                    onChange={(e) => setKeyResultForm({ ...keyResultForm, baseValue: e.target.value })}
+                    onChange={(e) =>
+                      setKeyResultForm({
+                        ...keyResultForm,
+                        baseValue: e.target.value,
+                      })
+                    }
                     placeholder="0"
                     required
                   />
                 </div>
-                
+
                 <div>
                   <Label htmlFor="targetValue">Target *</Label>
                   <Input
                     id="targetValue"
                     type="number"
                     value={keyResultForm.targetValue}
-                    onChange={(e) => setKeyResultForm({ ...keyResultForm, targetValue: e.target.value })}
+                    onChange={(e) =>
+                      setKeyResultForm({
+                        ...keyResultForm,
+                        targetValue: e.target.value,
+                      })
+                    }
                     placeholder="100"
                     required
                   />
                 </div>
-                
+
                 <div>
                   <Label htmlFor="currentValue">Nilai Saat Ini</Label>
                   <Input
                     id="currentValue"
                     type="number"
                     value={keyResultForm.currentValue}
-                    onChange={(e) => setKeyResultForm({ ...keyResultForm, currentValue: e.target.value })}
+                    onChange={(e) =>
+                      setKeyResultForm({
+                        ...keyResultForm,
+                        currentValue: e.target.value,
+                      })
+                    }
                     placeholder="Akan otomatis sama dengan nilai awal"
                   />
                 </div>
               </div>
             </div>
-            
+
             <div className="flex justify-end gap-2 pt-4">
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => setAddKeyResultModal({ open: false })}
               >
                 Batal
               </Button>
-              <Button 
-                type="button" 
+              <Button
+                type="button"
                 onClick={() => createKeyResultMutation.mutate(keyResultForm)}
-                disabled={createKeyResultMutation.isPending || !keyResultForm.title || !keyResultForm.baseValue || !keyResultForm.targetValue}
+                disabled={
+                  createKeyResultMutation.isPending ||
+                  !keyResultForm.title ||
+                  !keyResultForm.baseValue ||
+                  !keyResultForm.targetValue
+                }
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
-                {createKeyResultMutation.isPending ? "Menyimpan..." : "Buat Ukuran Keberhasilan"}
+                {createKeyResultMutation.isPending
+                  ? "Menyimpan..."
+                  : "Buat Ukuran Keberhasilan"}
               </Button>
             </div>
           </div>
@@ -1299,13 +1583,13 @@ export default function GoalDetail() {
         />
       )}
       {/* AI Help Bubble */}
-      <AIHelpBubble 
-        context="objective_detail" 
-        data={{ 
+      <AIHelpBubble
+        context="objective_detail"
+        data={{
           objective: goal,
           keyResults: goal?.keyResults || [],
           cycleId: goal?.cycleId,
-          cycleName: cycle?.name
+          cycleName: cycle?.name,
         }}
         position="bottom-right"
       />
