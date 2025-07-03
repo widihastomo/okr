@@ -532,17 +532,34 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
                     </DropdownMenu>
                   </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <SimpleProgressStatus
-                    status={kr.status}
-                    progressPercentage={progress}
-                    timeProgressPercentage={kr.timeProgressPercentage || 0}
-                    dueDate={null}
-                    startDate={cycleStartDate}
-                  />
+                {/* Mobile: Vertical layout, Desktop: Horizontal layout */}
+                <div className="space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
+                  <div className="w-full sm:flex-1 sm:mr-4">
+                    {/* Mobile: Use compact mode, Desktop: Use full progress bar */}
+                    <div className="block sm:hidden">
+                      <SimpleProgressStatus
+                        status={kr.status}
+                        progressPercentage={progress}
+                        timeProgressPercentage={kr.timeProgressPercentage || 0}
+                        dueDate={null}
+                        startDate={cycleStartDate}
+                        compact={true}
+                      />
+                    </div>
+                    <div className="hidden sm:block">
+                      <SimpleProgressStatus
+                        status={kr.status}
+                        progressPercentage={progress}
+                        timeProgressPercentage={kr.timeProgressPercentage || 0}
+                        dueDate={null}
+                        startDate={cycleStartDate}
+                        compact={false}
+                      />
+                    </div>
+                  </div>
                   {kr.lastCheckIn && (
-                    <div className="text-xs text-gray-500 text-right ml-4">
-                      <div className="flex items-center gap-1 justify-end">
+                    <div className="text-xs text-gray-500 sm:text-right sm:ml-4 sm:shrink-0">
+                      <div className="flex items-center gap-1 sm:justify-end">
                         <span className="text-gray-400">Terakhir update:</span>
                         <span className="text-gray-600">
                           {kr.lastCheckIn.createdAt && new Date(kr.lastCheckIn.createdAt).toLocaleDateString('id-ID', {
@@ -553,9 +570,9 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
                         </span>
                       </div>
                       {kr.lastCheckIn.notes && (
-                        <div className="relative group">
+                        <div className="relative group mt-1">
                           <div 
-                            className="text-gray-400 italic text-xs max-w-xs truncate text-right cursor-help"
+                            className="text-gray-400 italic text-xs max-w-xs truncate sm:text-right cursor-help"
                           >
                             "{kr.lastCheckIn.notes}"
                           </div>
