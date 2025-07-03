@@ -122,7 +122,65 @@ export function AIHelpBubble({
     setDismissedInsights(prev => [...prev, `${context}-${index}`]);
   };
 
-  const activeInsights = insights?.filter((_, index) => 
+  // Fallback insights when API is unavailable
+  const getFallbackInsights = (): AIInsight[] => {
+    switch (context) {
+      case 'dashboard':
+        return [
+          {
+            type: 'tip',
+            title: 'Tip Dashboard',
+            message: 'Gunakan filter status dan siklus untuk fokus pada OKR yang perlu perhatian khusus.',
+            confidence: 0.9,
+            actionable: true,
+            context: 'dashboard_navigation'
+          },
+          {
+            type: 'suggestion',
+            title: 'Saran Produktivitas',
+            message: 'Lakukan check-in rutin setiap minggu untuk memantau kemajuan Key Results.',
+            confidence: 0.8,
+            actionable: true,
+            context: 'progress_tracking'
+          }
+        ];
+      case 'objective_detail':
+        return [
+          {
+            type: 'tip',
+            title: 'Tip Key Results',
+            message: 'Pastikan setiap Key Result memiliki target yang spesifik dan terukur.',
+            confidence: 0.9,
+            actionable: true,
+            context: 'key_results_best_practice'
+          },
+          {
+            type: 'suggestion',
+            title: 'Saran Initiative',
+            message: 'Buat initiative yang konkret untuk mencapai setiap Key Result.',
+            confidence: 0.8,
+            actionable: true,
+            context: 'initiative_planning'
+          }
+        ];
+      default:
+        return [
+          {
+            type: 'tip',
+            title: 'Tip OKR',
+            message: 'Sistem OKR membantu meningkatkan fokus dan alignment dalam tim.',
+            confidence: 0.8,
+            actionable: false,
+            context: 'general_okr'
+          }
+        ];
+    }
+  };
+
+  // Use API insights if available, otherwise use fallback
+  const displayInsights = (insights && insights.length > 0) ? insights : getFallbackInsights();
+  
+  const activeInsights = displayInsights?.filter((_, index) => 
     !dismissedInsights.includes(`${context}-${index}`)
   ) || [];
 
