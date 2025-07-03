@@ -73,6 +73,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import AIHelpBubble from "@/components/ai-help-bubble";
@@ -95,6 +106,19 @@ type TaskWithInitiative = Task & {
     title: string;
   };
 };
+
+// Key Result Form Schema
+const keyResultSchema = z.object({
+  title: z.string().min(1, "Judul wajib diisi"),
+  description: z.string().optional(),
+  keyResultType: z.enum(["increase_to", "decrease_to", "should_stay_above", "should_stay_below", "achieve_or_not"]),
+  baseValue: z.string().optional(),
+  targetValue: z.string().optional(),
+  currentValue: z.string().optional(),
+  unit: z.enum(["number", "percentage", "currency"]),
+});
+
+type KeyResultFormData = z.infer<typeof keyResultSchema>;
 
 export default function GoalDetail() {
   const { id } = useParams();
@@ -122,14 +146,18 @@ export default function GoalDetail() {
   const [expandedKeyResults, setExpandedKeyResults] = useState<Set<string>>(
     new Set(),
   );
-  const [keyResultForm, setKeyResultForm] = useState({
-    title: "",
-    description: "",
-    keyResultType: "increase_to",
-    baseValue: "",
-    targetValue: "",
-    currentValue: "",
-    unit: "number",
+  // Key Result Form
+  const keyResultForm = useForm<KeyResultFormData>({
+    resolver: zodResolver(keyResultSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      keyResultType: "increase_to",
+      baseValue: "",
+      targetValue: "",
+      currentValue: "",
+      unit: "number",
+    },
   });
 
   // Check for highlight parameter in URL
@@ -221,7 +249,7 @@ export default function GoalDetail() {
 
   // Mutation for creating new Key Result
   const createKeyResultMutation = useMutation({
-    mutationFn: async (keyResultData: any) => {
+    mutationFn: async (keyResultData: KeyResultFormData) => {
       const response = await apiRequest("POST", "/api/key-results", {
         ...keyResultData,
         objectiveId: id,
@@ -239,15 +267,7 @@ export default function GoalDetail() {
       });
       queryClient.invalidateQueries({ queryKey: [`/api/okrs/${id}`] });
       setAddKeyResultModal({ open: false });
-      setKeyResultForm({
-        title: "",
-        description: "",
-        keyResultType: "increase_to",
-        baseValue: "",
-        targetValue: "",
-        currentValue: "",
-        unit: "number",
-      });
+      keyResultForm.reset();
     },
     onError: (error: Error) => {
       toast({
@@ -257,6 +277,10 @@ export default function GoalDetail() {
       });
     },
   });
+
+  const handleCreateKeyResult = (data: KeyResultFormData) => {
+    createKeyResultMutation.mutate(data);
+  };
 
   const getKeyResultTypeIcon = (type: string) => {
     switch (type) {
@@ -1505,179 +1529,187 @@ export default function GoalDetail() {
         open={addKeyResultModal.open}
         onOpenChange={(open) => setAddKeyResultModal({ open })}
       >
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Tambah Ukuran Keberhasilan Baru</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5" />
+              Tambah Ukuran Keberhasilan Baru
+            </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-4">
-              <div>
-                <Label htmlFor="title">Judul Ukuran Keberhasilan *</Label>
-                <Input
-                  id="title"
-                  value={keyResultForm.title}
-                  onChange={(e) =>
-                    setKeyResultForm({
-                      ...keyResultForm,
-                      title: e.target.value,
-                    })
-                  }
-                  placeholder="Contoh: Meningkatkan pendapatan bulanan menjadi 100 juta"
-                  required
-                />
-              </div>
+          <div className="mt-6 space-y-6">
+            <Form {...keyResultForm}>
+              <form onSubmit={keyResultForm.handleSubmit(handleCreateKeyResult)} className="space-y-6">
+                {/* Key Result Information Section */}
+                <div className="bg-gray-50 p-4 rounded-lg space-y-4">
+                  <h3 className="font-medium text-gray-900">Informasi Ukuran Keberhasilan</h3>
+                  
+                  {/* Title */}
+                  <FormField
+                    control={keyResultForm.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium text-gray-700">
+                          Judul Ukuran Keberhasilan *
+                        </FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Contoh: Meningkatkan pendapatan bulanan menjadi 100 juta" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <div>
-                <Label htmlFor="description">Deskripsi</Label>
-                <Textarea
-                  id="description"
-                  value={keyResultForm.description}
-                  onChange={(e) =>
-                    setKeyResultForm({
-                      ...keyResultForm,
-                      description: e.target.value,
-                    })
-                  }
-                  placeholder="Deskripsi detail tentang Ukuran Keberhasilan ini"
-                  rows={3}
-                />
-              </div>
+                  {/* Description */}
+                  <FormField
+                    control={keyResultForm.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium text-gray-700">
+                          Deskripsi
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            {...field} 
+                            placeholder="Deskripsi detail tentang Ukuran Keberhasilan ini"
+                            className="min-h-[80px]"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="keyResultType">
-                    Tipe Ukuran Keberhasilan *
-                  </Label>
-                  <Select
-                    value={keyResultForm.keyResultType}
-                    onValueChange={(value) =>
-                      setKeyResultForm({
-                        ...keyResultForm,
-                        keyResultType: value,
-                      })
-                    }
+                  {/* Type and Unit */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={keyResultForm.control}
+                      name="keyResultType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium text-gray-700">
+                            Tipe Ukuran Keberhasilan *
+                          </FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih tipe" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="increase_to">Naik ke (Increase To)</SelectItem>
+                              <SelectItem value="decrease_to">Turun ke (Decrease To)</SelectItem>
+                              <SelectItem value="should_stay_above">Harus tetap di atas (Stay Above)</SelectItem>
+                              <SelectItem value="should_stay_below">Harus tetap di bawah (Stay Below)</SelectItem>
+                              <SelectItem value="achieve_or_not">Ya/Tidak (Achieve or Not)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={keyResultForm.control}
+                      name="unit"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium text-gray-700">
+                            Unit *
+                          </FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih unit" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="number">Angka</SelectItem>
+                              <SelectItem value="percentage">Persentase (%)</SelectItem>
+                              <SelectItem value="currency">Mata Uang (Rp)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Values */}
+                  <div className="grid grid-cols-3 gap-4">
+                    <FormField
+                      control={keyResultForm.control}
+                      name="baseValue"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium text-gray-700">
+                            Nilai Awal *
+                          </FormLabel>
+                          <FormControl>
+                            <Input {...field} type="number" placeholder="0" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={keyResultForm.control}
+                      name="targetValue"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium text-gray-700">
+                            Target *
+                          </FormLabel>
+                          <FormControl>
+                            <Input {...field} type="number" placeholder="100" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={keyResultForm.control}
+                      name="currentValue"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium text-gray-700">
+                            Nilai Saat Ini
+                          </FormLabel>
+                          <FormControl>
+                            <Input {...field} type="number" placeholder="Akan otomatis sama dengan nilai awal" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-end gap-2 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setAddKeyResultModal({ open: false })}
                   >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="increase_to">
-                        Naik ke (Increase To)
-                      </SelectItem>
-                      <SelectItem value="decrease_to">
-                        Turun ke (Decrease To)
-                      </SelectItem>
-                      <SelectItem value="should_stay_above">
-                        Harus tetap di atas (Stay Above)
-                      </SelectItem>
-                      <SelectItem value="should_stay_below">
-                        Harus tetap di bawah (Stay Below)
-                      </SelectItem>
-                      <SelectItem value="achieve_or_not">
-                        Ya/Tidak (Achieve or Not)
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="unit">Unit *</Label>
-                  <Select
-                    value={keyResultForm.unit}
-                    onValueChange={(value) =>
-                      setKeyResultForm({ ...keyResultForm, unit: value })
-                    }
+                    Batal
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={createKeyResultMutation.isPending}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
                   >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="number">Angka</SelectItem>
-                      <SelectItem value="percentage">Persentase (%)</SelectItem>
-                      <SelectItem value="currency">Mata Uang (Rp)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    {createKeyResultMutation.isPending
+                      ? "Menyimpan..."
+                      : "Buat Ukuran Keberhasilan"}
+                  </Button>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="baseValue">Nilai Awal *</Label>
-                  <Input
-                    id="baseValue"
-                    type="number"
-                    value={keyResultForm.baseValue}
-                    onChange={(e) =>
-                      setKeyResultForm({
-                        ...keyResultForm,
-                        baseValue: e.target.value,
-                      })
-                    }
-                    placeholder="0"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="targetValue">Target *</Label>
-                  <Input
-                    id="targetValue"
-                    type="number"
-                    value={keyResultForm.targetValue}
-                    onChange={(e) =>
-                      setKeyResultForm({
-                        ...keyResultForm,
-                        targetValue: e.target.value,
-                      })
-                    }
-                    placeholder="100"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="currentValue">Nilai Saat Ini</Label>
-                  <Input
-                    id="currentValue"
-                    type="number"
-                    value={keyResultForm.currentValue}
-                    onChange={(e) =>
-                      setKeyResultForm({
-                        ...keyResultForm,
-                        currentValue: e.target.value,
-                      })
-                    }
-                    placeholder="Akan otomatis sama dengan nilai awal"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-2 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setAddKeyResultModal({ open: false })}
-              >
-                Batal
-              </Button>
-              <Button
-                type="button"
-                onClick={() => createKeyResultMutation.mutate(keyResultForm)}
-                disabled={
-                  createKeyResultMutation.isPending ||
-                  !keyResultForm.title ||
-                  !keyResultForm.baseValue ||
-                  !keyResultForm.targetValue
-                }
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                {createKeyResultMutation.isPending
-                  ? "Menyimpan..."
-                  : "Buat Ukuran Keberhasilan"}
-              </Button>
-            </div>
+              </form>
+            </Form>
           </div>
         </DialogContent>
       </Dialog>
