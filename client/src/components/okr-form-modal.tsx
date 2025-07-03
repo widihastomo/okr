@@ -1612,21 +1612,3 @@ export function CreateOKRButton() {
   );
 }
 
-// Component untuk tombol Edit OKR
-export function EditOKRButton({ okr }: { okr: OKRWithKeyResults }) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => setOpen(true)}
-        className="text-gray-600 hover:text-gray-800"
-      >
-        <Edit className="w-4 h-4" />
-      </Button>
-      <OKRFormModal okr={okr} open={open} onOpenChange={setOpen} />
-    </>
-  );
-}

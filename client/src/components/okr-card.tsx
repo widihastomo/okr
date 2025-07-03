@@ -11,7 +11,7 @@ import { CheckInModal } from "./check-in-modal";
 import { SimpleProgressStatus } from "./progress-status";
 import { useState } from "react";
 
-import { EditOKRButton } from "./okr-form-modal";
+
 
 interface OKRCardProps {
   okr: OKRWithKeyResults;
@@ -294,7 +294,6 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplic
               </div>
               <p className="text-sm text-gray-500 text-right">Overall Progress</p>
             </div>
-            <EditOKRButton okr={okr} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm">
