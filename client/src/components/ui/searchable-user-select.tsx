@@ -79,7 +79,14 @@ export function SearchableUserSelect({
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={4}>
         <Command>
           <CommandInput placeholder="Cari user..." />
-          <div className="max-h-[200px] overflow-y-auto">
+          <div 
+            className="max-h-[200px] overflow-y-auto overscroll-contain"
+            style={{ 
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'thin',
+              scrollbarColor: '#CBD5E0 #F7FAFC'
+            }}
+          >
             <CommandList>
               <CommandEmpty>{emptyMessage}</CommandEmpty>
               <CommandGroup>
