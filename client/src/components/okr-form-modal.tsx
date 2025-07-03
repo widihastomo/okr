@@ -871,31 +871,38 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                     </div>
                   )}
                   
-
+                  {/* Tombol Tambah Ukuran Keberhasilan */}
+                  <div className="pt-4 border-t">
+                    <Button type="button" onClick={addKeyResult} variant="outline" className="w-full border-blue-600 text-blue-600 hover:bg-blue-50">
+                      <Plus className="w-4 h-4 mr-2" />
+                      <span className="hidden sm:inline">Tambah Ukuran Keberhasilan</span>
+                      <span className="sm:hidden">Tambah</span>
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             )}
 
             {/* Navigation Buttons */}
-            <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
-              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                {!isEditMode && currentStep > 1 && (
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={prevStep}
-                    className="border-blue-600 text-blue-600 hover:bg-blue-50 w-full sm:w-auto order-3 sm:order-1"
-                  >
-                    <ChevronLeft className="w-4 h-4 mr-2" />
-                    Kembali
-                  </Button>
-                )}
-                
+            <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4">
+              {!isEditMode && currentStep > 1 && (
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={prevStep}
+                  className="border-blue-600 text-blue-600 hover:bg-blue-50 w-full sm:w-auto"
+                >
+                  <ChevronLeft className="w-4 h-4 mr-2" />
+                  Kembali
+                </Button>
+              )}
+              
+              <div className="flex flex-col sm:flex-row gap-2 sm:ml-auto w-full sm:w-auto">
                 <Button 
                   type="button" 
                   variant="outline" 
                   onClick={() => onOpenChange(false)}
-                  className="w-full sm:w-auto order-2"
+                  className="w-full sm:w-auto order-2 sm:order-1"
                 >
                   Batal
                 </Button>
@@ -903,7 +910,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                 {!isEditMode && currentStep === 1 ? (
                   <Button 
                     type="submit"
-                    className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto order-1 sm:order-3"
+                    className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto order-1 sm:order-2"
                   >
                     Lanjut
                     <ChevronRight className="w-4 h-4 ml-2" />
@@ -912,7 +919,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                   <Button 
                     type="submit"
                     disabled={mutation.isPending}
-                    className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto order-1 sm:order-3"
+                    className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto order-1 sm:order-2"
                   >
                     {mutation.isPending 
                       ? (isEditMode ? "Memperbarui..." : "Membuat...") 
@@ -922,24 +929,6 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                 )}
               </div>
             </div>
-
-            {/* Tombol Tambah Ukuran Keberhasilan - di bawah navigation buttons */}
-            {(currentStep === 2 || isEditMode) && (
-              <div className="pt-4 border-t">
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <Button 
-                    type="button" 
-                    onClick={addKeyResult} 
-                    variant="outline" 
-                    className="w-full sm:w-auto border-blue-600 text-blue-600 hover:bg-blue-50"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    <span className="hidden sm:inline">Tambah Ukuran Keberhasilan</span>
-                    <span className="sm:hidden">Tambah</span>
-                  </Button>
-                </div>
-              </div>
-            )}
           </form>
         </Form>
       </DialogContent>
