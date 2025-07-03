@@ -972,6 +972,47 @@ export default function GoalDetail() {
                               <div className="absolute right-full top-1/2 transform -translate-y-1/2 w-0 h-0 border-t-4 border-b-4 border-r-4 border-transparent border-r-black"></div>
                             </div>
                           </div>
+                          
+                          {/* Progress text below bar - like in dashboard */}
+                          <div className="mt-2 text-xs text-gray-600 flex items-center gap-2">
+                            <span>→ Progress saat ini</span>
+                            <span className="text-gray-400">|</span>
+                            <span>
+                              Target ideal ({(() => {
+                                if (!cycle) return "0.0";
+                                
+                                const now = new Date();
+                                const start = new Date(cycle.startDate);
+                                const end = new Date(cycle.endDate);
+                                const totalTime = end.getTime() - start.getTime();
+                                const timePassed = Math.max(0, now.getTime() - start.getTime());
+                                const timeProgressRatio = Math.min(1, timePassed / totalTime);
+                                
+                                const idealProgress = goal?.keyResults ? (() => {
+                                  if (goal.keyResults.length === 0) return 0;
+                                  
+                                  const totalIdealProgress = goal.keyResults.reduce((sum, kr) => {
+                                    switch (kr.keyResultType) {
+                                      case "increase_to":
+                                      case "decrease_to":
+                                        return sum + (timeProgressRatio * 100);
+                                      case "achieve_or_not":
+                                        return sum + (timeProgressRatio > 0.8 ? 100 : 0);
+                                      case "should_stay_above":
+                                      case "should_stay_below":
+                                        return sum + 100;
+                                      default:
+                                        return sum + (timeProgressRatio * 100);
+                                    }
+                                  }, 0);
+                                  
+                                  return totalIdealProgress / goal.keyResults.length;
+                                })() : timeProgressRatio * 100;
+                                
+                                return idealProgress.toFixed(1);
+                              })()}%)
+                            </span>
+                          </div>
                         </div>
                         <div className="text-lg font-semibold text-gray-900">
                           {progress.toFixed(0)}%
