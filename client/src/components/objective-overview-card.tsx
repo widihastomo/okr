@@ -15,13 +15,7 @@ import {
   User as UserIcon,
   ExternalLink,
 } from "lucide-react";
-import type {
-  OKRWithKeyResults,
-  Initiative,
-  Task,
-  User,
-  Cycle,
-} from "@shared/schema";
+import type { OKRWithKeyResults, Initiative, Task, User, Cycle } from "@shared/schema";
 import { Link } from "wouter";
 import { calculateKeyResultProgress } from "@shared/progress-calculator";
 
@@ -54,8 +48,8 @@ export default function ObjectiveOverviewCard({
     } else {
       // Handle user owner - check if owner has firstName/lastName properties (User type)
       const userOwner = owner as any;
-      return userOwner?.firstName && userOwner?.lastName
-        ? `${userOwner.firstName} ${userOwner.lastName}`
+      return userOwner?.firstName && userOwner?.lastName 
+        ? `${userOwner.firstName} ${userOwner.lastName}` 
         : userOwner?.email || "User tidak ditemukan";
     }
   };
@@ -111,9 +105,7 @@ export default function ObjectiveOverviewCard({
         {/* Title and Description - Moved to top */}
         <div className="flex items-start justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div
-              className={`p-2 rounded-full ${getHealthColor(overallProgress)}`}
-            >
+            <div className={`p-2 rounded-full ${getHealthColor(overallProgress)}`}>
               <Target className="w-5 h-5" />
             </div>
             <div>
@@ -136,7 +128,9 @@ export default function ObjectiveOverviewCard({
           {parentObjective && (
             <div className="flex items-start sm:items-center gap-2 text-sm">
               <Target className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
-              <span className="text-gray-500 flex-shrink-0">Bagian dari:</span>
+              <span className="text-gray-500 flex-shrink-0">
+                Bagian dari:
+              </span>
               <Link href={`/objectives/${parentObjective.id}`}>
                 <span className="font-medium text-blue-600 hover:text-blue-800 hover:underline cursor-pointer flex items-start sm:items-center gap-1 break-words">
                   {parentObjective.title}
@@ -163,40 +157,7 @@ export default function ObjectiveOverviewCard({
               </div>
             </div>
 
-            <div className="flex items-start sm:items-center gap-2">
-              {objective.ownerType === "team" ? (
-                <Building className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
-              ) : (
-                <UserIcon className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
-              )}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                <span className="font-medium break-words">
-                  {getOwnerDisplay()}
-                </span>
-                <span className="text-xs text-gray-400 capitalize">
-                  ({objective.ownerType === "team" ? "Tim" : "Individual"})
-                </span>
-              </div>
-            </div>
-            {/* Time & Status Indicators */}
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-gray-500" />
-                <span className="text-gray-600">
-                  {daysRemaining !== undefined
-                    ? daysRemaining > 0
-                      ? `${daysRemaining} hari tersisa`
-                      : "Berakhir"
-                    : "Tidak ada deadline"}
-                </span>
-              </div>
-              {overallProgress < 50 && daysRemaining && daysRemaining < 30 && (
-                <div className="flex items-center gap-1 text-orange-600">
-                  <AlertTriangle className="w-4 h-4" />
-                  <span className="text-xs">Perlu perhatian</span>
-                </div>
-              )}
-            </div>
+
           </div>
         </div>
 
@@ -206,9 +167,7 @@ export default function ObjectiveOverviewCard({
             <span className="text-sm font-medium text-gray-700">
               Progress Keseluruhan
             </span>
-            <span className="text-2xl font-bold text-gray-900">
-              {overallProgress}%
-            </span>
+            <span className="text-2xl font-bold text-gray-900">{overallProgress}%</span>
           </div>
           <div className="relative">
             <Progress value={overallProgress} className="h-4" />
@@ -228,6 +187,7 @@ export default function ObjectiveOverviewCard({
       </CardHeader>
 
       <CardContent className="space-y-6">
+
         {/* Quick Stats Grid */}
         <div className="grid grid-cols-3 gap-4">
           {/* Key Results */}
@@ -261,6 +221,39 @@ export default function ObjectiveOverviewCard({
               {completedTasks}/{totalTasks}
             </div>
             <div className="text-xs text-purple-700">Tugas</div>
+          </div>
+        </div>
+
+        {/* Time & Status Indicators */}
+        <div className="flex items-center justify-between text-sm">
+          {/* Owner Information */}
+          <div className="flex items-center gap-2">
+            {objective.ownerType === "team" ? (
+              <Building className="w-4 h-4 text-gray-500 flex-shrink-0" />
+            ) : (
+              <UserIcon className="w-4 h-4 text-gray-500 flex-shrink-0" />
+            )}
+            <span className="font-medium text-gray-700 text-sm">
+              {getOwnerDisplay()}
+            </span>
+          </div>
+          <div className="flex items-center gap-4">
+            {overallProgress < 50 && daysRemaining && daysRemaining < 30 && (
+              <div className="flex items-center gap-1 text-orange-600">
+                <AlertTriangle className="w-4 h-4" />
+                <span className="text-xs">Perlu perhatian</span>
+              </div>
+            )}
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-gray-500" />
+              <span className="text-gray-600">
+                {daysRemaining !== undefined
+                  ? daysRemaining > 0
+                    ? `${daysRemaining} hari tersisa`
+                    : "Berakhir"
+                  : "Tidak ada deadline"}
+              </span>
+            </div>
           </div>
         </div>
 
