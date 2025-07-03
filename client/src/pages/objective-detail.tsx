@@ -586,6 +586,15 @@ export default function GoalDetail() {
                         </div>
                       </div>
                       <p className="text-sm text-gray-600 mb-2">{kr.description}</p>
+                      
+                      {/* Initiative count for this key result */}
+                      <div className="text-xs text-blue-600 mb-2 flex items-center gap-1">
+                        <FileText className="w-3 h-3" />
+                        <span>
+                          {rencana.filter(r => r.keyResultId === kr.id).length} inisiatif terkait
+                        </span>
+                      </div>
+                      
                       <div className="text-xs text-gray-500">
                         {(() => {
                           // Handle achieve_or_not type
