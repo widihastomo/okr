@@ -96,6 +96,14 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 03, 2025. Implemented comprehensive key result type change warning system for data integrity:
+  * Created KeyResultTypeChangeWarning component with detailed impact explanation for users
+  * Added check-in count API endpoint (/api/key-results/:id/check-ins/count) to determine impact scope
+  * Enhanced edit key result modal to detect type changes and warn users about existing check-in data
+  * Warning dialog explains specific conversion impacts (numeric to binary, binary to numeric, formula changes)
+  * System prevents accidental data interpretation changes by requiring explicit user confirmation
+  * Intelligent warnings show exact number of affected updates and explain progress recalculation consequences
+  * Users can now safely change key result types with full understanding of impact on historical data
 - July 03, 2025. Fixed key result type calculation inconsistency in edit progress modal:
   * Corrected "increase_to" type formula in edit-progress-modal.tsx from (current/target)*100 to (current-base)/(target-base)*100
   * Ensured all progress calculation functions use consistent base-value formulas across the entire system

@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import type { KeyResult } from "@shared/schema";
+import { KeyResultTypeChangeWarning } from "./key-result-type-change-warning";
 
 // Unit options for Key Results
 const unitOptions = [
@@ -60,8 +62,21 @@ export default function EditKeyResultModal({
   onOpenChange,
   keyResult,
 }: EditKeyResultModalProps) {
+  const [showWarning, setShowWarning] = useState(false);
+  const [pendingFormData, setPendingFormData] = useState<EditKeyResultFormData | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Get check-in count for this key result
+  const { data: checkInData } = useQuery({
+    queryKey: ["/api/key-results", keyResult?.id, "check-ins", "count"],
+    queryFn: async () => {
+      if (!keyResult?.id) return { count: 0 };
+      const response = await apiRequest("GET", `/api/key-results/${keyResult.id}/check-ins/count`);
+      return response.json();
+    },
+    enabled: !!keyResult?.id,
+  });
 
   const form = useForm<EditKeyResultFormData>({
     resolver: zodResolver(editKeyResultSchema),
@@ -117,7 +132,26 @@ export default function EditKeyResultModal({
   });
 
   const handleSubmit = (data: EditKeyResultFormData) => {
-    updateKeyResultMutation.mutate(data);
+    // Check if key result type is changing and there are existing check-ins
+    const isTypeChanging = keyResult && data.keyResultType !== keyResult.keyResultType;
+    const hasCheckIns = checkInData && checkInData.count > 0;
+    
+    if (isTypeChanging && hasCheckIns) {
+      // Show warning dialog
+      setPendingFormData(data);
+      setShowWarning(true);
+    } else {
+      // Proceed directly with update
+      updateKeyResultMutation.mutate(data);
+    }
+  };
+
+  const handleConfirmTypeChange = () => {
+    if (pendingFormData) {
+      updateKeyResultMutation.mutate(pendingFormData);
+    }
+    setShowWarning(false);
+    setPendingFormData(null);
   };
 
   const formatNumberInput = (value: string) => {
@@ -410,6 +444,18 @@ export default function EditKeyResultModal({
           </form>
         </Form>
       </DialogContent>
+      
+      {/* Type Change Warning Dialog */}
+      {keyResult && (
+        <KeyResultTypeChangeWarning
+          open={showWarning}
+          onOpenChange={setShowWarning}
+          onConfirm={handleConfirmTypeChange}
+          currentType={keyResult.keyResultType}
+          newType={pendingFormData?.keyResultType || ""}
+          checkInCount={checkInData?.count || 0}
+        />
+      )}
     </Dialog>
   );
 }

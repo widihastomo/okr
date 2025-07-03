@@ -1501,6 +1501,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get Key Result Check-in Count
+  app.get("/api/key-results/:id/check-ins/count", async (req, res) => {
+    try {
+      const keyResultId = req.params.id;
+      const checkIns = await storage.getCheckInsByKeyResultId(keyResultId);
+      res.json({ count: checkIns.length });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch check-in count" });
+    }
+  });
+
   // Get key result details with progress history
   app.get("/api/key-results/:id", async (req, res) => {
     try {
