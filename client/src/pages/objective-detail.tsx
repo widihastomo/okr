@@ -82,7 +82,7 @@ export default function GoalDetail() {
 
   // Fetch owner data
   const { data: owner } = useQuery<User | Team>({
-    queryKey: goal?.ownerType === 'user' 
+    queryKey: (goal?.ownerType === 'user' || goal?.ownerType === 'individual')
       ? [`/api/users/${goal?.ownerId}`]
       : [`/api/teams/${goal?.ownerId}`],
     enabled: !!goal?.ownerId && !!goal?.ownerType,
@@ -243,20 +243,15 @@ export default function GoalDetail() {
   };
 
   const getOwnerDisplay = () => {
-    console.log('getOwnerDisplay debug:', { goal, owner, ownerType: goal?.ownerType, ownerId: goal?.ownerId });
-    
     if (!owner) {
-      console.log('No owner data found');
       return "Memuat...";
     }
     
-    if (goal?.ownerType === 'user') {
+    if (goal?.ownerType === 'user' || goal?.ownerType === 'individual') {
       const userOwner = owner as User;
-      console.log('User owner:', userOwner);
       return `${userOwner.firstName || ''} ${userOwner.lastName || ''}`.trim() || userOwner.email;
     } else {
       const teamOwner = owner as Team;
-      console.log('Team owner:', teamOwner);
       return teamOwner.name;
     }
   };
