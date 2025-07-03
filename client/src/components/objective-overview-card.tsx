@@ -123,7 +123,7 @@ export default function ObjectiveOverviewCard({
         </div>
 
         {/* Additional Info Section */}
-        <div className="mt-4 pt-4 border-t border-gray-200 space-y-3 mb-6">
+        <div className="mt-4 space-y-3 mb-6 pb-4 border-b border-gray-200">
           {/* Goal Induk Info */}
           {parentObjective && (
             <div className="flex items-start sm:items-center gap-2 text-sm">
