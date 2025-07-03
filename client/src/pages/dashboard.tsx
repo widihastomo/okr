@@ -260,8 +260,9 @@ export default function Dashboard() {
     const cycleMatch = isRelatedCycle(okr.cycleId, cycleFilter);
     
     // User filter - show OKRs where:
-    // 1. The user is the owner of the objective
-    // 2. The user is a member/owner of the team that owns the objective
+    // 1. If userFilter is 'all' or empty, show all OKRs
+    // 2. The user is the owner of the objective
+    // 3. The user is a member/owner of the team that owns the objective
     let userMatch = true;
     if (userFilter && userFilter !== 'all' && userFilter !== '') {
       userMatch = false; // Start with false and set to true if conditions are met
@@ -279,7 +280,11 @@ export default function Dashboard() {
       }
     }
     
-    return statusMatch && cycleMatch && userMatch;
+    const result = statusMatch && cycleMatch && userMatch;
+    // Debug logging
+    console.log(`OKR ${okr.title}: status=${statusMatch}(${okr.status} vs ${statusFilter}), cycle=${cycleMatch}(${okr.cycleId} vs ${cycleFilter}), user=${userMatch}(${okr.ownerId} vs ${userFilter}), result=${result}`);
+    
+    return result;
   });
 
   // Mutation for deleting OKR
