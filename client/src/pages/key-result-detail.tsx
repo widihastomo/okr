@@ -112,6 +112,7 @@ export default function KeyResultDetailPage() {
   const [addingTaskToInitiative, setAddingTaskToInitiative] = useState<string | null>(null);
   const [addTaskOpen, setAddTaskOpen] = useState(false);
   const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set());
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   // Task form for editing/adding
   const taskForm = useForm<TaskFormData>({
@@ -235,6 +236,35 @@ export default function KeyResultDetailPage() {
       toast({
         title: "Error",
         description: error.message || "Gagal membuat task",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete key result mutation
+  const deleteKeyResultMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`/api/key-results/${keyResultId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete key result');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Ukuran Keberhasilan berhasil dihapus",
+        description: "Data telah dihapus secara permanen",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+      // Navigate back to the objective detail page
+      window.history.back();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal menghapus Ukuran Keberhasilan",
         variant: "destructive",
       });
     },
@@ -819,6 +849,13 @@ export default function KeyResultDetailPage() {
               <DropdownMenuItem>
                 <Edit className="w-4 h-4 mr-2" />
                 Edit Ukuran Keberhasilan
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="text-red-600 hover:text-red-700"
+                onClick={() => setShowDeleteConfirmation(true)}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Hapus Ukuran Keberhasilan
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -2020,6 +2057,32 @@ export default function KeyResultDetailPage() {
         )}
       </SheetContent>
     </Sheet>
+
+    {/* Delete Key Result Confirmation Dialog */}
+    <AlertDialog open={showDeleteConfirmation} onOpenChange={setShowDeleteConfirmation}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Hapus Ukuran Keberhasilan</AlertDialogTitle>
+          <AlertDialogDescription>
+            Apakah Anda yakin ingin menghapus ukuran keberhasilan "{keyResult?.title}"? 
+            Semua data terkait termasuk rencana dan tugas akan ikut terhapus secara permanen. 
+            Tindakan ini tidak dapat dibatalkan.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Batal</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => {
+              deleteKeyResultMutation.mutate();
+              setShowDeleteConfirmation(false);
+            }}
+            className="bg-red-600 hover:bg-red-700"
+          >
+            Hapus
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
     </>
   );
 }
