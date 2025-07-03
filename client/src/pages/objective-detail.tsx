@@ -836,29 +836,142 @@ export default function GoalDetail() {
                           <TrendingUp className="w-3 h-3" />
                           Lebih Cepat
                         </Badge>
-                        <div className="flex-1 relative">
-                          <Progress value={progress} className="h-2" />
-                          {cycle &&
-                            (() => {
+                        <div className="flex-1 relative group">
+                          <div 
+                            className="bg-gray-200 rounded-full h-2 relative cursor-pointer"
+                            title={(() => {
+                              if (!cycle) return `Progress: ${progress.toFixed(1)}%`;
+                              
                               const now = new Date();
                               const start = new Date(cycle.startDate);
                               const end = new Date(cycle.endDate);
                               const totalTime = end.getTime() - start.getTime();
-                              const timePassed =
-                                now.getTime() - start.getTime();
-                              const idealProgress = Math.max(
-                                0,
-                                Math.min(100, (timePassed / totalTime) * 100),
-                              );
-
-                              return (
-                                <div
-                                  className="absolute top-0 h-2 w-0.5 bg-gray-400 opacity-70"
-                                  style={{ left: `${idealProgress}%` }}
-                                  title={`Target ideal: ${idealProgress.toFixed(1)}%`}
-                                />
-                              );
+                              const timePassed = Math.max(0, now.getTime() - start.getTime());
+                              const timeProgressRatio = Math.min(1, timePassed / totalTime);
+                              
+                              // Calculate ideal progress based on key result types
+                              const idealProgress = goal?.keyResults ? (() => {
+                                if (goal.keyResults.length === 0) return 0;
+                                
+                                const totalIdealProgress = goal.keyResults.reduce((sum, kr) => {
+                                  switch (kr.keyResultType) {
+                                    case "increase_to":
+                                    case "decrease_to":
+                                      // Linear progress based on time: 0% at start, 100% at end
+                                      return sum + (timeProgressRatio * 100);
+                                    case "achieve_or_not":
+                                      // Binary expectation: 0% until last 20% of period, then 100%
+                                      return sum + (timeProgressRatio > 0.8 ? 100 : 0);
+                                    case "should_stay_above":
+                                    case "should_stay_below":
+                                      // Consistency expectation: 100% throughout entire period
+                                      return sum + 100;
+                                    default:
+                                      return sum + (timeProgressRatio * 100);
+                                  }
+                                }, 0);
+                                
+                                return totalIdealProgress / goal.keyResults.length;
+                              })() : timeProgressRatio * 100;
+                              
+                              return `Progress: ${progress.toFixed(1)}% | Target ideal: ${idealProgress.toFixed(1)}%`;
                             })()}
+                          >
+                            <div 
+                              className={`h-2 transition-all duration-300 ${
+                                progress >= 100 ? 'rounded-full' : 'rounded-l-full'
+                              } ${
+                                goal?.status === 'on_track' ? 'bg-green-500' :
+                                goal?.status === 'at_risk' ? 'bg-orange-500' :
+                                goal?.status === 'behind' ? 'bg-red-500' :
+                                goal?.status === 'completed' ? 'bg-green-600' :
+                                goal?.status === 'ahead' ? 'bg-blue-500' :
+                                'bg-gray-400'
+                              }`}
+                              style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
+                            ></div>
+                            
+                            {/* Threshold indicator for ideal progress */}
+                            {cycle &&
+                              (() => {
+                                const now = new Date();
+                                const start = new Date(cycle.startDate);
+                                const end = new Date(cycle.endDate);
+                                const totalTime = end.getTime() - start.getTime();
+                                const timePassed = Math.max(0, now.getTime() - start.getTime());
+                                const timeProgressRatio = Math.min(1, timePassed / totalTime);
+                                
+                                // Calculate ideal progress based on key result types
+                                const idealProgress = goal?.keyResults ? (() => {
+                                  if (goal.keyResults.length === 0) return 0;
+                                  
+                                  const totalIdealProgress = goal.keyResults.reduce((sum, kr) => {
+                                    switch (kr.keyResultType) {
+                                      case "increase_to":
+                                      case "decrease_to":
+                                        return sum + (timeProgressRatio * 100);
+                                      case "achieve_or_not":
+                                        return sum + (timeProgressRatio > 0.8 ? 100 : 0);
+                                      case "should_stay_above":
+                                      case "should_stay_below":
+                                        return sum + 100;
+                                      default:
+                                        return sum + (timeProgressRatio * 100);
+                                    }
+                                  }, 0);
+                                  
+                                  return totalIdealProgress / goal.keyResults.length;
+                                })() : timeProgressRatio * 100;
+
+                                if (idealProgress > 0 && idealProgress < 100) {
+                                  return (
+                                    <div 
+                                      className="absolute top-0 w-0.5 h-2 bg-gray-600 opacity-70 hover:opacity-100 transition-opacity"
+                                      style={{ left: `${idealProgress}%` }}
+                                    ></div>
+                                  );
+                                }
+                                return null;
+                              })()}
+                              
+                            {/* Enhanced tooltip on hover */}
+                            <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                              {(() => {
+                                if (!cycle) return `Progress: ${progress.toFixed(1)}%`;
+                                
+                                const now = new Date();
+                                const start = new Date(cycle.startDate);
+                                const end = new Date(cycle.endDate);
+                                const totalTime = end.getTime() - start.getTime();
+                                const timePassed = Math.max(0, now.getTime() - start.getTime());
+                                const timeProgressRatio = Math.min(1, timePassed / totalTime);
+                                
+                                const idealProgress = goal?.keyResults ? (() => {
+                                  if (goal.keyResults.length === 0) return 0;
+                                  
+                                  const totalIdealProgress = goal.keyResults.reduce((sum, kr) => {
+                                    switch (kr.keyResultType) {
+                                      case "increase_to":
+                                      case "decrease_to":
+                                        return sum + (timeProgressRatio * 100);
+                                      case "achieve_or_not":
+                                        return sum + (timeProgressRatio > 0.8 ? 100 : 0);
+                                      case "should_stay_above":
+                                      case "should_stay_below":
+                                        return sum + 100;
+                                      default:
+                                        return sum + (timeProgressRatio * 100);
+                                    }
+                                  }, 0);
+                                  
+                                  return totalIdealProgress / goal.keyResults.length;
+                                })() : timeProgressRatio * 100;
+                                
+                                return `Progress: ${progress.toFixed(1)}% | Target ideal: ${idealProgress.toFixed(1)}%`;
+                              })()}
+                              <div className="absolute right-full top-1/2 transform -translate-y-1/2 w-0 h-0 border-t-4 border-b-4 border-r-4 border-transparent border-r-black"></div>
+                            </div>
+                          </div>
                         </div>
                         <div className="text-lg font-semibold text-gray-900">
                           {progress.toFixed(0)}%
