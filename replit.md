@@ -96,6 +96,13 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 03, 2025. Created action dropdown menus for key results, grouping check-in and edit buttons:
+  * Grouped CheckInModal button and dropdown menu into action area for each key result
+  * CheckInModal button positioned alongside dropdown menu containing edit functionality
+  * Dropdown menu contains "Edit Ukuran Keberhasilan" action with Settings icon
+  * Clean action layout with gap-1 spacing between check-in button and dropdown trigger
+  * Removed scattered action buttons in favor of organized action menu structure
+  * Enhanced user experience with consolidated action controls for key result management
 - July 03, 2025. Repositioned dropdown menu to title area and enhanced with "Lihat Detail" action:
   * Moved three-dot (MoreVertical) dropdown menu from progress area to top right next to goal title
   * Added "Lihat Detail" (View Details) action as first menu item with Eye icon linking to objective detail page

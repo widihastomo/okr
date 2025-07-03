@@ -492,7 +492,7 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplic
                        `${kr.currentValue} / ${kr.targetValue}`}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     <CheckInModal
                       keyResultId={kr.id}
                       keyResultTitle={kr.title}
@@ -501,7 +501,21 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplic
                       unit={kr.unit}
                       keyResultType={kr.keyResultType}
                     />
-                    
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        {onEditKeyResult && (
+                          <DropdownMenuItem onClick={() => onEditKeyResult(kr)}>
+                            <Settings className="w-4 h-4 mr-2" />
+                            Edit Ukuran Keberhasilan
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
