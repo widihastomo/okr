@@ -1588,6 +1588,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get initiatives by objective ID
+  app.get("/api/initiatives/objective/:id", async (req, res) => {
+    try {
+      const objectiveId = req.params.id;
+      const initiatives = await storage.getInitiativesByObjectiveId(objectiveId);
+      res.json(initiatives);
+    } catch (error) {
+      console.error("Error fetching initiatives for objective:", error);
+      res.status(500).json({ message: "Failed to fetch initiatives" });
+    }
+  });
+
   app.post("/api/initiatives", async (req, res) => {
     try {
       const result = insertInitiativeSchema.safeParse(req.body);
