@@ -171,7 +171,7 @@ export function CheckInModal({
             <Calendar className="h-5 w-5" />
             Update Progress
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-sm text-muted-foreground text-left">
             Update nilai progress untuk key result ini dan tambahkan catatan jika diperlukan.
           </DialogDescription>
         </DialogHeader>
