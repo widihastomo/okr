@@ -411,21 +411,7 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplic
                       unit={kr.unit}
                       keyResultType={kr.keyResultType}
                     />
-                    {onEditKeyResult && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreVertical className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem onClick={() => onEditKeyResult(kr)}>
-                            <Edit className="w-4 h-4 mr-2" />
-                            Edit Ukuran Keberhasilan
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
+                    
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
