@@ -97,15 +97,23 @@ export function SearchableUserSelect({
                       onValueChange("all");
                       setOpen(false);
                     }}
+                    className={cn(
+                      "flex items-center py-2",
+                      value === "all" 
+                        ? "bg-green-50 border-l-2 border-green-500" 
+                        : "hover:bg-gray-50"
+                    )}
                   >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        value === "all" ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    <Users className="mr-2 h-4 w-4 text-green-600" />
-                    Semua User
+                    <Users className={cn(
+                      "mr-3 h-4 w-4 flex-shrink-0",
+                      value === "all" ? "text-green-600" : "text-gray-400"
+                    )} />
+                    <span className={cn(
+                      "font-medium",
+                      value === "all" ? "text-green-900" : "text-gray-900"
+                    )}>
+                      Semua User
+                    </span>
                   </CommandItem>
                 )}
                 {allowUnassigned && (
@@ -115,15 +123,23 @@ export function SearchableUserSelect({
                       onValueChange("unassigned");
                       setOpen(false);
                     }}
+                    className={cn(
+                      "flex items-center py-2",
+                      value === "unassigned" 
+                        ? "bg-gray-50 border-l-2 border-gray-500" 
+                        : "hover:bg-gray-50"
+                    )}
                   >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        value === "unassigned" ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    <User className="mr-2 h-4 w-4 text-gray-400" />
-                    Belum Ditugaskan
+                    <User className={cn(
+                      "mr-3 h-4 w-4 flex-shrink-0",
+                      value === "unassigned" ? "text-gray-600" : "text-gray-400"
+                    )} />
+                    <span className={cn(
+                      "font-medium",
+                      value === "unassigned" ? "text-gray-900" : "text-gray-900"
+                    )}>
+                      Belum Ditugaskan
+                    </span>
                   </CommandItem>
                 )}
                 {users.map((user) => (
@@ -134,20 +150,28 @@ export function SearchableUserSelect({
                       onValueChange(user.id);
                       setOpen(false);
                     }}
-                    className="flex items-center py-2"
+                    className={cn(
+                      "flex items-center py-2",
+                      value === user.id 
+                        ? "bg-blue-50 border-l-2 border-blue-500" 
+                        : "hover:bg-gray-50"
+                    )}
                   >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4 flex-shrink-0",
-                        value === user.id ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    <User className="mr-2 h-4 w-4 flex-shrink-0 text-blue-600" />
+                    <User className={cn(
+                      "mr-3 h-4 w-4 flex-shrink-0",
+                      value === user.id ? "text-blue-600" : "text-gray-400"
+                    )} />
                     <div className="flex flex-col min-w-0 flex-1">
-                      <span className="font-medium truncate">
+                      <span className={cn(
+                        "font-medium truncate",
+                        value === user.id ? "text-blue-900" : "text-gray-900"
+                      )}>
                         {`${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email}
                       </span>
-                      <span className="text-sm text-gray-500 truncate">
+                      <span className={cn(
+                        "text-sm truncate",
+                        value === user.id ? "text-blue-600" : "text-gray-500"
+                      )}>
                         {user.email}
                       </span>
                     </div>
