@@ -11,8 +11,12 @@ import {
   CheckSquare,
   AlertTriangle,
   Calendar,
+  Building,
+  User as UserIcon,
+  ExternalLink,
 } from "lucide-react";
-import type { OKRWithKeyResults, Initiative, Task } from "@shared/schema";
+import type { OKRWithKeyResults, Initiative, Task, User, Cycle } from "@shared/schema";
+import { Link } from "wouter";
 import { calculateKeyResultProgress } from "@shared/progress-calculator";
 
 interface ObjectiveOverviewCardProps {
@@ -20,6 +24,10 @@ interface ObjectiveOverviewCardProps {
   initiatives?: Initiative[];
   tasks?: Task[];
   daysRemaining?: number;
+  cycle?: Cycle;
+  parentObjective?: OKRWithKeyResults;
+  owner?: User;
+  team?: any;
 }
 
 export default function ObjectiveOverviewCard({
@@ -27,7 +35,20 @@ export default function ObjectiveOverviewCard({
   initiatives = [],
   tasks = [],
   daysRemaining,
+  cycle,
+  parentObjective,
+  owner,
+  team,
 }: ObjectiveOverviewCardProps) {
+  // Helper function for displaying owner information
+  const getOwnerDisplay = () => {
+    if (objective.ownerType === "team") {
+      return team?.name || "Tim tidak ditemukan";
+    } else {
+      return owner ? `${owner.firstName} ${owner.lastName}` : "User tidak ditemukan";
+    }
+  };
+
   // Helper function for calculating overall progress
   const calculateOverallProgress = (keyResults: any[]): number => {
     if (!keyResults || keyResults.length === 0) return 0;
@@ -88,6 +109,59 @@ export default function ObjectiveOverviewCard({
               <p className="text-sm text-gray-600 mt-1 line-clamp-2">
                 {objective.description}
               </p>
+
+              {/* Additional Info Section */}
+              <div className="mt-4 pt-4 border-t border-gray-200 space-y-3">
+                {/* Goal Induk Info */}
+                {parentObjective && (
+                  <div className="flex items-start sm:items-center gap-2 text-sm">
+                    <Target className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
+                    <span className="text-gray-500 flex-shrink-0">
+                      Bagian dari:
+                    </span>
+                    <Link href={`/objectives/${parentObjective.id}`}>
+                      <span className="font-medium text-blue-600 hover:text-blue-800 hover:underline cursor-pointer flex items-start sm:items-center gap-1 break-words">
+                        {parentObjective.title}
+                        <ExternalLink className="w-3 h-3 flex-shrink-0 mt-0.5 sm:mt-0" />
+                      </span>
+                    </Link>
+                  </div>
+                )}
+
+                {/* Periode and Pemilik Info - Stack on mobile */}
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 text-sm">
+                  <div className="flex items-start sm:items-center gap-2">
+                    <Calendar className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                      <span className="font-medium">
+                        {cycle?.name || "Tidak ada cycle"}
+                      </span>
+                      {cycle && (
+                        <span className="text-xs text-gray-400 block sm:inline">
+                          ({new Date(cycle.startDate).toLocaleDateString("id-ID")} -{" "}
+                          {new Date(cycle.endDate).toLocaleDateString("id-ID")})
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-start sm:items-center gap-2">
+                    {objective.ownerType === "team" ? (
+                      <Building className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
+                    ) : (
+                      <UserIcon className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
+                    )}
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                      <span className="font-medium break-words">
+                        {getOwnerDisplay()}
+                      </span>
+                      <span className="text-xs text-gray-400 capitalize">
+                        ({objective.ownerType === "team" ? "Tim" : "Individual"})
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <Badge className={getHealthColor(overallProgress)}>

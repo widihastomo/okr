@@ -469,6 +469,10 @@ export default function GoalDetail() {
             initiatives={rencana}
             tasks={tugas}
             daysRemaining={daysRemaining}
+            cycle={cycle}
+            parentObjective={parentObjective}
+            owner={owner}
+            team={team}
           />
         </div>
         <div className="lg:col-span-1">
@@ -493,59 +497,6 @@ export default function GoalDetail() {
           {goal.description && (
             <p className="text-gray-600 mb-6">{goal.description}</p>
           )}
-
-          {/* Additional Info Section */}
-          <div className="mb-6 pb-6 border-b border-gray-200 space-y-3">
-            {/* Goal Induk Info */}
-            {parentObjective && (
-              <div className="flex items-start sm:items-center gap-2 text-sm">
-                <Target className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
-                <span className="text-gray-500 flex-shrink-0">
-                  Bagian dari:
-                </span>
-                <Link href={`/objectives/${parentObjective.id}`}>
-                  <span className="font-medium text-blue-600 hover:text-blue-800 hover:underline cursor-pointer flex items-start sm:items-center gap-1 break-words">
-                    {parentObjective.title}
-                    <ExternalLink className="w-3 h-3 flex-shrink-0 mt-0.5 sm:mt-0" />
-                  </span>
-                </Link>
-              </div>
-            )}
-
-            {/* Periode and Pemilik Info - Stack on mobile */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 text-sm">
-              <div className="flex items-start sm:items-center gap-2">
-                <Calendar className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
-                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                  <span className="font-medium">
-                    {cycle?.name || "Tidak ada cycle"}
-                  </span>
-                  {cycle && (
-                    <span className="text-xs text-gray-400 block sm:inline">
-                      ({new Date(cycle.startDate).toLocaleDateString("id-ID")} -{" "}
-                      {new Date(cycle.endDate).toLocaleDateString("id-ID")})
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-start sm:items-center gap-2">
-                {goal.ownerType === "team" ? (
-                  <Building className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
-                ) : (
-                  <UserIcon className="w-4 h-4 text-gray-500 mt-0.5 sm:mt-0 flex-shrink-0" />
-                )}
-                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                  <span className="font-medium break-words">
-                    {getOwnerDisplay()}
-                  </span>
-                  <span className="text-xs text-gray-400 capitalize">
-                    ({goal.ownerType === "team" ? "Tim" : "Individual"})
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
