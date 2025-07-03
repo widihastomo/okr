@@ -155,14 +155,14 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
     <Card className="mb-3 sm:mb-6 shadow-lg border-0">
       <div className="bg-white text-gray-900 p-3 sm:p-6 rounded-t-lg border-b relative">
         {/* Three-dot menu positioned at top right corner on desktop */}
-        <div className="hidden sm:block absolute top-3 right-3">
+        <div className="hidden sm:block absolute top-3 right-6">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-gray-100">
                 <MoreVertical className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent align="end">
               <DropdownMenuItem asChild>
                 <Link href={`/objectives/${okr.id}`} className="flex items-center w-full">
                   <Eye className="w-4 h-4 mr-2" />
