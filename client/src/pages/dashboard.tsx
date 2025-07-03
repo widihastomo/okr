@@ -395,15 +395,16 @@ export default function Dashboard() {
   const handleDeleteOKR = async (okrId: string) => {
     try {
       // Get cascade deletion info
-      const response = await apiRequest(`/api/objectives/${okrId}/cascade-info`);
+      const response = await fetch(`/api/objectives/${okrId}/cascade-info`);
+      const data = await response.json();
       
       setDeleteConfirmModal({ 
         open: true, 
         okrId, 
-        okrTitle: response.objective.title,
-        keyResultsCount: response.counts.keyResults,
-        initiativesCount: response.counts.initiatives,
-        tasksCount: response.counts.tasks
+        okrTitle: data.objective.title,
+        keyResultsCount: data.counts.keyResults,
+        initiativesCount: data.counts.initiatives,
+        tasksCount: data.counts.tasks
       });
     } catch (error) {
       // Fallback to basic deletion if cascade info fails

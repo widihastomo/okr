@@ -50,23 +50,25 @@ export function CascadeDeleteConfirmationModal({
           </div>
         </AlertDialogHeader>
         
-        <AlertDialogDescription className="space-y-4">
-          <p className="text-gray-600">
-            Anda akan menghapus goal <strong>"{objectiveTitle}"</strong> beserta semua data terkait:
-          </p>
-          
-          <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-            <h4 className="font-medium text-red-900 mb-2">Data yang akan dihapus:</h4>
-            <ul className="space-y-1 text-sm text-red-800">
-              <li>• {keyResultsCount} Ukuran Keberhasilan dan semua check-in progress</li>
-              <li>• {initiativesCount} Rencana beserta semua member dan dokumen</li>
-              <li>• {tasksCount} Tugas dan semua aktivitas terkait</li>
-            </ul>
+        <AlertDialogDescription asChild>
+          <div className="space-y-4">
+            <p className="text-gray-600">
+              Anda akan menghapus goal <strong>"{objectiveTitle}"</strong> beserta semua data terkait:
+            </p>
+            
+            <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+              <div className="font-medium text-red-900 mb-2">Data yang akan dihapus:</div>
+              <ul className="space-y-1 text-sm text-red-800">
+                <li>• {keyResultsCount} Ukuran Keberhasilan dan semua check-in progress</li>
+                <li>• {initiativesCount} Rencana beserta semua member dan dokumen</li>
+                <li>• {tasksCount} Tugas dan semua aktivitas terkait</li>
+              </ul>
+            </div>
+            
+            <div className="text-red-600 font-medium">
+              ⚠️ Tindakan ini tidak dapat dibatalkan!
+            </div>
           </div>
-          
-          <p className="text-red-600 font-medium">
-            ⚠️ Tindakan ini tidak dapat dibatalkan!
-          </p>
         </AlertDialogDescription>
         
         <AlertDialogFooter className="gap-2">
