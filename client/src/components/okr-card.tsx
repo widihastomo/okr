@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Calendar, User, Users, Clock, Edit, MoreVertical, Copy, Trash2, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Target, Settings, MoveUp, MoveDown } from "lucide-react";
+import { Calendar, User, Users, Clock, Edit, MoreVertical, Copy, Trash2, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Target, Settings, MoveUp, MoveDown, Eye } from "lucide-react";
 import type { OKRWithKeyResults, KeyResult } from "@shared/schema";
 import { Link } from "wouter";
 import { CheckInModal } from "./check-in-modal";
@@ -169,14 +169,46 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplic
                 )}
               </Button>
               <div className="flex-1 min-w-0">
-                <Link href={`/objectives/${okr.id}`}>
-                  <h3 className="text-lg sm:text-xl font-bold hover:underline cursor-pointer leading-tight">
-                    {okr.title}
-                  </h3>
-                </Link>
-                {okr.description && (
-                  <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">{okr.description}</p>
-                )}
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <Link href={`/objectives/${okr.id}`}>
+                      <h3 className="text-lg sm:text-xl font-bold hover:underline cursor-pointer leading-tight">
+                        {okr.title}
+                      </h3>
+                    </Link>
+                    {okr.description && (
+                      <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">{okr.description}</p>
+                    )}
+                  </div>
+                  
+                  {/* Three-dot menu positioned next to title */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <MoreVertical className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem asChild>
+                        <Link href={`/objectives/${okr.id}`} className="flex items-center w-full">
+                          <Eye className="w-4 h-4 mr-2" />
+                          Lihat Detail
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onDuplicate?.(okr)}>
+                        <Copy className="w-4 h-4 mr-2" />
+                        Duplikat
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => onDelete?.(okr.id)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Hapus
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </div>
             </div>
           </div>
@@ -261,26 +293,6 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplic
                 })()}
               </div>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <MoreVertical className="w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => onDuplicate?.(okr)}>
-                  <Copy className="w-4 h-4 mr-2" />
-                  Duplikat
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => onDelete?.(okr.id)}
-                  className="text-red-600 hover:text-red-700"
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Hapus
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </div>
         
@@ -392,27 +404,7 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDuplic
                 );
               })()}
             </div>
-            
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <MoreVertical className="w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => onDuplicate?.(okr)}>
-                  <Copy className="w-4 h-4 mr-2" />
-                  Duplikat
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => onDelete?.(okr.id)}
-                  className="text-red-600 hover:text-red-700"
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Hapus
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+
           </div>
         </div>
       </div>

@@ -96,6 +96,13 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 03, 2025. Repositioned dropdown menu to title area and enhanced with "Lihat Detail" action:
+  * Moved three-dot (MoreVertical) dropdown menu from progress area to top right next to goal title
+  * Added "Lihat Detail" (View Details) action as first menu item with Eye icon linking to objective detail page
+  * Removed duplicate dropdown menus from desktop and mobile progress sections
+  * Dropdown menu now positioned consistently at title level with compact 6x6 button styling
+  * Enhanced navigation with clear visual hierarchy - menu next to title for immediate access
+  * Menu items: Lihat Detail, Duplikat, Hapus with appropriate icons and styling
 - July 03, 2025. Restructured OKR card layout for improved mobile responsive design:
   * Made container for owner, date, and remaining days full width on all screens with flex-wrap layout
   * Split progress section into separate desktop and mobile layouts for better space utilization
