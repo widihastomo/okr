@@ -409,6 +409,58 @@ export default function GoalDetail() {
             <p className="text-gray-600 mb-4">{goal.description}</p>
           )}
           
+          {/* Progress Keseluruhan Section */}
+          <div className="mb-6 pb-6 border-b border-gray-200">
+            <div className="flex items-center space-x-2 mb-3">
+              <BarChart3 className="w-5 h-5 text-gray-500" />
+              <span className="text-lg font-medium text-gray-700">Progress Keseluruhan</span>
+            </div>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xl font-semibold">{overallProgress.toFixed(1)}%</p>
+              {cycle && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="text-sm text-gray-400 cursor-help">
+                        Target: {(() => {
+                          const now = new Date();
+                          const start = new Date(cycle.startDate);
+                          const end = new Date(cycle.endDate);
+                          const totalTime = end.getTime() - start.getTime();
+                          const timePassed = now.getTime() - start.getTime();
+                          const idealProgress = Math.max(0, Math.min(100, (timePassed / totalTime) * 100));
+                          return idealProgress.toFixed(1);
+                        })()}%
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Capaian ideal berdasarkan waktu yang telah berlalu</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
+            <div className="relative">
+              <Progress value={overallProgress} className="h-3" />
+              {cycle && (() => {
+                const now = new Date();
+                const start = new Date(cycle.startDate);
+                const end = new Date(cycle.endDate);
+                const totalTime = end.getTime() - start.getTime();
+                const timePassed = now.getTime() - start.getTime();
+                const idealProgress = Math.max(0, Math.min(100, (timePassed / totalTime) * 100));
+                
+                return (
+                  <div 
+                    className="absolute top-0 h-3 w-0.5 bg-gray-400 opacity-70"
+                    style={{ left: `${idealProgress}%` }}
+                    title={`Target ideal: ${idealProgress.toFixed(1)}%`}
+                  />
+                );
+              })()}
+            </div>
+          </div>
+          
           {/* Additional Info Section */}
           <div className="mb-6 pb-6 border-b border-gray-200 space-y-3">
             {/* Goal Induk Info */}
@@ -453,58 +505,7 @@ export default function GoalDetail() {
             </div>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            
-            <div>
-              <div className="flex items-center space-x-2 mb-2">
-                <BarChart3 className="w-4 h-4 text-gray-500" />
-                <span className="text-sm text-gray-500">Progress</span>
-              </div>
-              <div className="flex items-center justify-between mb-1">
-                <p className="font-medium">{overallProgress.toFixed(1)}%</p>
-                {cycle && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span className="text-xs text-gray-400 cursor-help">
-                          Target: {(() => {
-                            const now = new Date();
-                            const start = new Date(cycle.startDate);
-                            const end = new Date(cycle.endDate);
-                            const totalTime = end.getTime() - start.getTime();
-                            const timePassed = now.getTime() - start.getTime();
-                            const idealProgress = Math.max(0, Math.min(100, (timePassed / totalTime) * 100));
-                            return idealProgress.toFixed(1);
-                          })()}%
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Capaian ideal berdasarkan waktu yang telah berlalu</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
-              </div>
-              <div className="relative">
-                <Progress value={overallProgress} className="h-2" />
-                {cycle && (() => {
-                  const now = new Date();
-                  const start = new Date(cycle.startDate);
-                  const end = new Date(cycle.endDate);
-                  const totalTime = end.getTime() - start.getTime();
-                  const timePassed = now.getTime() - start.getTime();
-                  const idealProgress = Math.max(0, Math.min(100, (timePassed / totalTime) * 100));
-                  
-                  return (
-                    <div 
-                      className="absolute top-0 h-2 w-0.5 bg-gray-400 opacity-70"
-                      style={{ left: `${idealProgress}%` }}
-                      title={`Target ideal: ${idealProgress.toFixed(1)}%`}
-                    />
-                  );
-                })()}
-              </div>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             
             <div>
               <div className="flex items-center space-x-2 mb-2">
