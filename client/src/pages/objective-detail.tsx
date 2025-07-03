@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Edit, Calendar, User as UserIcon, Clock, Plus, Target, BarChart3, TrendingUp, TrendingDown, CheckCircle2, MoreVertical, Building, ClipboardList, CheckSquare, Trash2, FileText, Eye, MoveUp, MoveDown } from "lucide-react";
+import { ArrowLeft, Edit, Calendar, User as UserIcon, Clock, Plus, Target, BarChart3, TrendingUp, TrendingDown, CheckCircle2, MoreVertical, Building, ClipboardList, CheckSquare, Trash2, FileText, Eye, MoveUp, MoveDown, Settings } from "lucide-react";
 import { Link } from "wouter";
 import { CheckInModal } from "@/components/check-in-modal";
 import EditKeyResultModal from "@/components/edit-key-result-modal";
@@ -481,65 +481,67 @@ export default function GoalDetail() {
             goal.keyResults.map((kr) => {
               const progress = calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
               
+              const getKeyResultTypeIcon = (type: string) => {
+                switch (type) {
+                  case "increase_to":
+                    return {
+                      icon: TrendingUp,
+                      tooltip: "Target Peningkatan - Progress dihitung dari nilai awal ke target"
+                    };
+                  case "decrease_to":
+                    return {
+                      icon: TrendingDown,
+                      tooltip: "Target Penurunan - Progress dihitung mundur dari nilai awal ke target"
+                    };
+                  case "should_stay_above":
+                    return {
+                      icon: MoveUp,
+                      tooltip: "Tetap Di Atas - Nilai harus tetap berada di atas ambang batas target"
+                    };
+                  case "should_stay_below":
+                    return {
+                      icon: MoveDown,
+                      tooltip: "Tetap Di Bawah - Nilai harus tetap berada di bawah ambang batas target"
+                    };
+                  case "achieve_or_not":
+                    return {
+                      icon: Target,
+                      tooltip: "Target Binary - 100% jika tercapai, 0% jika tidak"
+                    };
+                  default:
+                    return {
+                      icon: Target,
+                      tooltip: "Tipe target tidak diketahui"
+                    };
+                }
+              };
+
+              const typeConfig = getKeyResultTypeIcon(kr.keyResultType);
+              const IconComponent = typeConfig.icon;
+              
               return (
-                <div key={kr.id} className="border border-gray-200 rounded-lg bg-white shadow-sm">
-                  {/* Mobile optimized layout */}
-                  <div className="p-4">
-                    {/* Header with title, icon and actions */}
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-2 flex-1">
-                        <h3 className="font-medium text-gray-900 text-base">{kr.title}</h3>
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger>
-                              {getKeyResultTypeIcon(kr.keyResultType)}
-                            </TooltipTrigger>
-                            <TooltipContent side="right" align="center">
-                              <p>{getKeyResultTypeTooltip(kr.keyResultType)}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </div>
-                      <div className="flex items-center gap-1 flex-shrink-0">
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={() => handleCheckIn(kr)}
-                          className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-sm"
+                <div key={kr.id} className="p-3 sm:p-4 bg-gray-50 rounded-lg space-y-2 sm:space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Link 
+                          href={`/key-results/${kr.id}`}
+                          className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer text-left"
                         >
-                          <TrendingUp className="w-3 h-3 mr-1" />
-                          Update
-                        </Button>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <MoreVertical className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem onClick={() => window.location.href = `/key-results/${kr.id}`}>
-                              <Target className="mr-2 h-4 w-4" />
-                              Lihat Detail
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleEditKeyResult(kr)}>
-                              <Edit className="mr-2 h-4 w-4" />
-                              Edit Ukuran Keberhasilan
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                          {kr.title}
+                        </Link>
+                        <div className="relative group">
+                          <IconComponent 
+                            className="w-4 h-4 text-gray-500 hover:text-gray-700 cursor-help" 
+                          />
+                          <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap">
+                            {typeConfig.tooltip}
+                            <div className="absolute right-full top-1/2 transform -translate-y-1/2 w-0 h-0 border-t-4 border-b-4 border-r-4 border-transparent border-r-black"></div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-
-                    {/* Description */}
-                    {kr.description && (
-                      <div className="mb-3">
-                        <p className="text-sm text-gray-600">{kr.description}</p>
-                      </div>
-                    )}
-
-                    {/* Values line */}
-                    <div className="mb-3">
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 mb-2">{kr.description}</p>
+                      <div className="text-xs text-gray-500">
                         {(() => {
                           // Handle achieve_or_not type
                           if (kr.keyResultType === 'achieve_or_not') {
@@ -563,7 +565,7 @@ export default function GoalDetail() {
                           
                           if (kr.keyResultType === 'decrease_to') {
                             if (kr.unit === 'Rp') {
-                              return `${baseVal.toLocaleString('id-ID')} → ${targetVal.toLocaleString('id-ID')} Rupiah (capaian: ${currentVal.toLocaleString('id-ID')})`;
+                              return `Rp ${baseVal.toLocaleString('id-ID')} → Rp ${targetVal.toLocaleString('id-ID')} (capaian: Rp ${currentVal.toLocaleString('id-ID')})`;
                             } else if (kr.unit === '%') {
                               return `${baseVal.toLocaleString('id-ID')}% → ${targetVal.toLocaleString('id-ID')}% (capaian: ${currentVal.toLocaleString('id-ID')}%)`;
                             } else {
@@ -572,7 +574,7 @@ export default function GoalDetail() {
                           } else {
                             // increase_to type
                             if (kr.unit === 'Rp') {
-                              return `${baseVal.toLocaleString('id-ID')} → ${targetVal.toLocaleString('id-ID')} Rupiah (capaian: ${currentVal.toLocaleString('id-ID')})`;
+                              return `Rp ${baseVal.toLocaleString('id-ID')} → Rp ${targetVal.toLocaleString('id-ID')} (capaian: Rp ${currentVal.toLocaleString('id-ID')})`;
                             } else if (kr.unit === '%') {
                               return `${baseVal.toLocaleString('id-ID')}% → ${targetVal.toLocaleString('id-ID')}% (capaian: ${currentVal.toLocaleString('id-ID')}%)`;
                             } else {
@@ -580,22 +582,51 @@ export default function GoalDetail() {
                             }
                           }
                         })()}
-                      </p>
+                      </div>
                     </div>
-
-                    {/* Badge */}
-                    <div className="mb-3">
-                      <Badge 
-                        variant="secondary" 
-                        className="bg-blue-500 text-white hover:bg-blue-600 flex items-center gap-1 w-fit"
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => handleCheckIn(kr)}
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
                       >
-                        <TrendingUp className="w-3 h-3" />
-                        Lebih Cepat
-                      </Badge>
+                        <TrendingUp className="w-4 h-4 mr-1" />
+                        Update
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem onClick={() => window.location.href = `/key-results/${kr.id}`}>
+                            <Eye className="w-4 h-4 mr-2" />
+                            Lihat Detail
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEditKeyResult(kr)}>
+                            <Settings className="w-4 h-4 mr-2" />
+                            Edit Ukuran Keberhasilan
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
-                    
-                    {/* Progress bar and percentage */}
-                    <div className="mb-3">
+                  </div>
+                  
+                  {/* Progress section - using same structure as dashboard */}
+                  <div className="space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
+                    <div className="w-full sm:flex-1 sm:mr-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge 
+                          variant="secondary" 
+                          className="bg-blue-500 text-white hover:bg-blue-600 flex items-center gap-1"
+                        >
+                          <TrendingUp className="w-3 h-3" />
+                          Lebih Cepat
+                        </Badge>
+                      </div>
+                      
                       <div className="flex items-center gap-3">
                         <div className="flex-1 relative">
                           <Progress value={progress} className="h-2" />
@@ -616,14 +647,11 @@ export default function GoalDetail() {
                             );
                           })()}
                         </div>
-                        <div className="text-lg font-semibold text-gray-900">
-                          {progress.toFixed(0)}%
-                        </div>
+                        <div className="text-lg font-semibold text-gray-900">{progress.toFixed(0)}%</div>
                       </div>
                     </div>
                     
-                    {/* Last update */}
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-500 sm:text-right sm:ml-4 sm:shrink-0">
                       Terakhir update: 3 Jul 2025
                     </div>
                   </div>
