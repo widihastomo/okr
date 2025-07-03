@@ -122,32 +122,8 @@ export default function ObjectiveOverviewCard({
           </Badge>
         </div>
 
-        {/* Progress Bar with Visual Indicators */}
-        <div className="space-y-2 mb-6">
-          <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-gray-700">
-              Progress Keseluruhan
-            </span>
-            <span className="text-2xl font-bold text-gray-900">{overallProgress}%</span>
-          </div>
-          <div className="relative">
-            <Progress value={overallProgress} className="h-4" />
-            {/* Add milestone markers */}
-            <div className="absolute top-0 left-1/4 w-0.5 h-4 bg-gray-300 opacity-50"></div>
-            <div className="absolute top-0 left-1/2 w-0.5 h-4 bg-gray-300 opacity-50"></div>
-            <div className="absolute top-0 left-3/4 w-0.5 h-4 bg-gray-300 opacity-50"></div>
-          </div>
-          <div className="flex justify-between text-xs text-gray-400">
-            <span>0%</span>
-            <span>25%</span>
-            <span>50%</span>
-            <span>75%</span>
-            <span>100%</span>
-          </div>
-        </div>
-
         {/* Additional Info Section */}
-        <div className="mt-4 pt-4 border-t border-gray-200 space-y-3">
+        <div className="mt-4 pt-4 border-t border-gray-200 space-y-3 mb-6">
           {/* Goal Induk Info */}
           {parentObjective && (
             <div className="flex items-start sm:items-center gap-2 text-sm">
@@ -196,6 +172,30 @@ export default function ObjectiveOverviewCard({
                 </span>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Progress Bar with Visual Indicators */}
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium text-gray-700">
+              Progress Keseluruhan
+            </span>
+            <span className="text-2xl font-bold text-gray-900">{overallProgress}%</span>
+          </div>
+          <div className="relative">
+            <Progress value={overallProgress} className="h-4" />
+            {/* Add milestone markers */}
+            <div className="absolute top-0 left-1/4 w-0.5 h-4 bg-gray-300 opacity-50"></div>
+            <div className="absolute top-0 left-1/2 w-0.5 h-4 bg-gray-300 opacity-50"></div>
+            <div className="absolute top-0 left-3/4 w-0.5 h-4 bg-gray-300 opacity-50"></div>
+          </div>
+          <div className="flex justify-between text-xs text-gray-400">
+            <span>0%</span>
+            <span>25%</span>
+            <span>50%</span>
+            <span>75%</span>
+            <span>100%</span>
           </div>
         </div>
       </CardHeader>
