@@ -79,7 +79,7 @@ export function SearchableUserSelect({
       <PopoverContent className="w-full p-0" align="start">
         <Command>
           <CommandInput placeholder="Cari user..." />
-          <CommandList>
+          <CommandList className="max-h-64 overflow-auto">
             <CommandEmpty>{emptyMessage}</CommandEmpty>
             <CommandGroup>
               {allowAll && (
