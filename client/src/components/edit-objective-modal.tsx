@@ -280,14 +280,14 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
                   <div>
                     <Label>Goal Induk (Opsional)</Label>
                     <Select
-                      value={form.watch("parentId") || ""}
-                      onValueChange={(value) => form.setValue("parentId", value || undefined)}
+                      value={form.watch("parentId") || "none"}
+                      onValueChange={(value) => form.setValue("parentId", value === "none" ? undefined : value)}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Pilih goal induk" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Tidak ada goal induk</SelectItem>
+                        <SelectItem value="none">Tidak ada goal induk</SelectItem>
                         {availableParentObjectives.map((obj) => (
                           <SelectItem key={obj.id} value={obj.id}>
                             {obj.title}
