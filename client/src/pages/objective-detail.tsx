@@ -518,7 +518,7 @@ export default function GoalDetail() {
 
       {/* Tabs Section */}
       <Tabs defaultValue="key-results" className="space-y-6">
-        <div className="flex">
+        <TabsList className="bg-transparent p-0 h-auto flex">
           {/* Tab 1 - Arrow shape */}
           <TabsTrigger 
             value="key-results"
@@ -528,7 +528,7 @@ export default function GoalDetail() {
             }}
           >
             <div className="flex items-center gap-2">
-              <span className="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">1</span>
+              <span className="bg-blue-100 text-blue-600 data-[state=active]:bg-white data-[state=active]:text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">1</span>
               <span>Ukuran Keberhasilan ({goal.keyResults.length})</span>
             </div>
           </TabsTrigger>
@@ -542,7 +542,7 @@ export default function GoalDetail() {
             }}
           >
             <div className="flex items-center gap-2">
-              <span className="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">2</span>
+              <span className="bg-blue-100 text-blue-600 data-[state=active]:bg-white data-[state=active]:text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">2</span>
               <span>Rencana ({rencana.length})</span>
             </div>
           </TabsTrigger>
@@ -556,11 +556,11 @@ export default function GoalDetail() {
             }}
           >
             <div className="flex items-center gap-2">
-              <span className="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">3</span>
+              <span className="bg-blue-100 text-blue-600 data-[state=active]:bg-white data-[state=active]:text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">3</span>
               <span>Tugas ({tugas.length})</span>
             </div>
           </TabsTrigger>
-        </div>
+        </TabsList>
 
         {/* Ukuran Keberhasilan Tab */}
         <TabsContent
