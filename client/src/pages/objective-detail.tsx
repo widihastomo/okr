@@ -828,17 +828,14 @@ export default function GoalDetail() {
                   {/* Progress section - using same structure as dashboard */}
                   <div className="space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
                     <div className="w-full sm:flex-1 sm:mr-4">
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-3">
                         <Badge
                           variant="secondary"
-                          className="bg-blue-500 text-white hover:bg-blue-600 flex items-center gap-1"
+                          className="bg-blue-500 text-white hover:bg-blue-600 flex items-center gap-1 shrink-0"
                         >
                           <TrendingUp className="w-3 h-3" />
                           Lebih Cepat
                         </Badge>
-                      </div>
-
-                      <div className="flex items-center gap-3">
                         <div className="flex-1 relative">
                           <Progress value={progress} className="h-2" />
                           {cycle &&
