@@ -153,7 +153,37 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
 
   return (
     <Card className="mb-3 sm:mb-6 shadow-lg border-0">
-      <div className="bg-white text-gray-900 p-3 sm:p-6 rounded-t-lg border-b">
+      <div className="bg-white text-gray-900 p-3 sm:p-6 rounded-t-lg border-b relative">
+        {/* Three-dot menu positioned at top right corner on desktop */}
+        <div className="hidden sm:block absolute top-3 right-3">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-gray-100">
+                <MoreVertical className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem asChild>
+                <Link href={`/objectives/${okr.id}`} className="flex items-center w-full">
+                  <Eye className="w-4 h-4 mr-2" />
+                  Lihat Detail
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onDuplicate?.(okr)}>
+                <Copy className="w-4 h-4 mr-2" />
+                Duplikat
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => onDelete?.(okr.id)}
+                className="text-red-600 hover:text-red-700"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Hapus
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1 sm:gap-2 mb-2">
@@ -171,7 +201,7 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
               </Button>
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 pr-8 sm:pr-0">
                     <Link href={`/objectives/${okr.id}`}>
                       <h3 className="text-lg sm:text-xl font-bold hover:underline cursor-pointer leading-tight">
                         {okr.title}
@@ -182,33 +212,35 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
                     )}
                   </div>
                   
-                  {/* Three-dot menu positioned next to title */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <MoreVertical className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/objectives/${okr.id}`} className="flex items-center w-full">
-                          <Eye className="w-4 h-4 mr-2" />
-                          Lihat Detail
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onDuplicate?.(okr)}>
-                        <Copy className="w-4 h-4 mr-2" />
-                        Duplikat
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => onDelete?.(okr.id)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        Hapus
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  {/* Three-dot menu positioned next to title - Mobile only */}
+                  <div className="sm:hidden">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem asChild>
+                          <Link href={`/objectives/${okr.id}`} className="flex items-center w-full">
+                            <Eye className="w-4 h-4 mr-2" />
+                            Lihat Detail
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onDuplicate?.(okr)}>
+                          <Copy className="w-4 h-4 mr-2" />
+                          Duplikat
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => onDelete?.(okr.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Hapus
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
               </div>
             </div>
