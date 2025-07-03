@@ -96,6 +96,12 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 03, 2025. Fixed key result type calculation inconsistency in edit progress modal:
+  * Corrected "increase_to" type formula in edit-progress-modal.tsx from (current/target)*100 to (current-base)/(target-base)*100
+  * Ensured all progress calculation functions use consistent base-value formulas across the entire system
+  * Fixed issue where changing key result types would result in incorrect progress calculations
+  * Added proper base value handling with null safety and invalid configuration detection
+  * Progress calculations now remain accurate when key result types are modified through editing interface
 - July 03, 2025. Added delete key result functionality to OKR card dropdown menus:
   * Added "Hapus Ukuran Keberhasilan" menu item to three-dot dropdown in OKR cards alongside existing edit option
   * Created delete key result mutation with proper API call to DELETE /api/key-results/:id endpoint

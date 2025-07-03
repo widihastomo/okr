@@ -92,15 +92,16 @@ export default function EditProgressModal({
     
     switch (keyResultType) {
       case "increase_to":
-        // Progress = (current / target) * 100, capped at 100%
-        if (targetNum === 0) return 0;
-        return Math.min(100, Math.max(0, (currentNum / targetNum) * 100));
+        // Formula: (Current - Base) / (Target - Base) * 100%
+        const baseNum = baseValue ? parseFloat(baseValue) : 0;
+        if (targetNum <= baseNum) return 0; // Invalid configuration
+        return Math.min(100, Math.max(0, ((currentNum - baseNum) / (targetNum - baseNum)) * 100));
         
       case "decrease_to":
         // Progress = ((Base Value - Current) / (Base Value - Target)) * 100%
-        const baseNum = baseValue && baseValue !== null ? parseFloat(baseValue) : targetNum * 2; // Default base value if not provided
-        if (baseNum <= targetNum) return currentNum <= targetNum ? 100 : 0; // Invalid base value case
-        const decreaseProgress = ((baseNum - currentNum) / (baseNum - targetNum)) * 100;
+        const decreaseBaseNum = baseValue && baseValue !== null ? parseFloat(baseValue) : targetNum * 2; // Default base value if not provided
+        if (decreaseBaseNum <= targetNum) return currentNum <= targetNum ? 100 : 0; // Invalid base value case
+        const decreaseProgress = ((decreaseBaseNum - currentNum) / (decreaseBaseNum - targetNum)) * 100;
         return Math.min(100, Math.max(0, decreaseProgress));
         
       case "should_stay_above":
