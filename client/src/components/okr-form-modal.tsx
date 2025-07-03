@@ -1383,9 +1383,11 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                           <FormControl>
                             <Input 
                               placeholder="100" 
-                              type="number" 
-                              step="0.1"
-                              {...field}
+                              type="text" 
+                              value={formatNumberInput(field.value || "")}
+                              onChange={(e) => handleNumberInputChange(e.target.value, field.onChange)}
+                              onBlur={field.onBlur}
+                              name={field.name}
                             />
                           </FormControl>
                           <FormMessage />
@@ -1419,9 +1421,11 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                           <FormControl>
                             <Input 
                               placeholder="50" 
-                              type="number" 
-                              step="0.1"
-                              {...field}
+                              type="text" 
+                              value={formatNumberInput(field.value || "")}
+                              onChange={(e) => handleNumberInputChange(e.target.value, field.onChange)}
+                              onBlur={field.onBlur}
+                              name={field.name}
                             />
                           </FormControl>
                           <FormMessage />
