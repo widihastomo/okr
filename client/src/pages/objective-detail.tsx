@@ -895,7 +895,6 @@ export default function GoalDetail() {
           <ActivityLogCard objectiveId={goal.id} />
         </div>
       </div>
-
       {/* Mission Card - Show when not all missions completed */}
       {goal && !(goal.keyResults.length > 0 && rencana.length > 0 && tugas.length > 0) && (
         <MissionCard
@@ -934,7 +933,6 @@ export default function GoalDetail() {
           className="mb-6"
         />
       )}
-
       {/* Tabs Section */}
       <Tabs defaultValue="key-results" className="space-y-6">
         <TabsList className="flex w-full h-auto p-0 bg-transparent gap-0 rounded-none mb-4 sm:mb-6 relative tour-tabs">
@@ -1012,11 +1010,7 @@ export default function GoalDetail() {
                   <Target className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 shrink-0" />
                   Angka Target
                 </h3>
-                <p className="text-blue-700 text-sm leading-relaxed">
-                  Angka target menentukan bagaimana objective ini akan diukur.
-                  Setiap angka target memiliki target yang spesifik dan dapat
-                  diukur untuk memastikan pencapaian yang objektif.
-                </p>
+                <p className="text-blue-700 text-sm leading-relaxed">Angka target menentukan bagaimana goal ini akan diukur. Setiap angka target memiliki target yang spesifik dan dapat diukur untuk memastikan pencapaian yang objektif.</p>
               </div>
               <Button
                 onClick={() => setAddKeyResultModal({ open: true })}
@@ -2238,8 +2232,6 @@ export default function GoalDetail() {
         onSubmit={(data) => handleCreateKeyResult(data as any)}
         users={users}
       />
-
-
       {/* AI Help Bubble */}
       <AIHelpBubble
         context="objective_detail"
@@ -2251,7 +2243,6 @@ export default function GoalDetail() {
         }}
         position="bottom-right"
       />
-
       {/* Delete Key Result Confirmation Dialog */}
       <AlertDialog
         open={deleteKeyResultModal.open}
