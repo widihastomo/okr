@@ -41,6 +41,12 @@ import {
   ChevronDown,
   ChevronRight,
   AlertTriangle,
+  Rocket,
+  Trophy,
+  Zap,
+  Star,
+  Flag,
+  Sparkles,
 } from "lucide-react";
 import { Link } from "wouter";
 import { CheckInModal } from "@/components/check-in-modal";
@@ -138,6 +144,153 @@ const keyResultSchema = z.object({
 
 type KeyResultFormData = z.infer<typeof keyResultSchema>;
 
+// Mission Card Component for Gamification
+interface MissionCardProps {
+  missions: Array<{
+    id: string;
+    title: string;
+    description: string;
+    icon: React.ReactNode;
+    action: () => void;
+    isCompleted: boolean;
+    points: number;
+    difficulty: 'easy' | 'medium' | 'hard';
+  }>;
+  className?: string;
+}
+
+function MissionCard({ missions, className }: MissionCardProps) {
+  const completedMissions = missions.filter(m => m.isCompleted).length;
+  const totalMissions = missions.length;
+  
+  return (
+    <div className={className}>
+      <Card className="border-2 border-dashed border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50 shadow-lg">
+        <CardHeader className="pb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-orange-100 rounded-full">
+              <Rocket className="h-6 w-6 text-orange-600" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg font-bold text-orange-800 flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-yellow-500" />
+                Misi Aktivasi Goal
+              </CardTitle>
+              <CardDescription className="text-orange-600 mt-1">
+                Selesaikan misi berikut untuk mengaktifkan goal Anda secara penuh
+              </CardDescription>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-orange-600">
+                {completedMissions}/{totalMissions}
+              </div>
+              <div className="text-xs text-orange-500">Selesai</div>
+            </div>
+          </div>
+          
+          {/* Progress Bar */}
+          <div className="mt-4">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium text-orange-700">
+                Progress Misi
+              </span>
+              <span className="text-sm text-orange-600">
+                {Math.round((completedMissions / totalMissions) * 100)}%
+              </span>
+            </div>
+            <Progress 
+              value={(completedMissions / totalMissions) * 100} 
+              className="h-2 bg-orange-100"
+            />
+          </div>
+        </CardHeader>
+        
+        <CardContent className="space-y-3">
+          {missions.map((mission) => (
+            <div
+              key={mission.id}
+              className={`p-4 rounded-lg border-2 transition-all duration-200 hover:shadow-md ${
+                mission.isCompleted 
+                  ? "bg-green-50 border-green-200 opacity-75" 
+                  : "bg-white border-orange-200 hover:border-orange-300 cursor-pointer"
+              }`}
+              onClick={() => !mission.isCompleted && mission.action()}
+            >
+              <div className="flex items-start gap-3">
+                <div className={`p-2 rounded-full flex-shrink-0 ${
+                  mission.isCompleted 
+                    ? "bg-green-100 text-green-600" 
+                    : "bg-orange-100 text-orange-600"
+                }`}>
+                  {mission.isCompleted ? (
+                    <CheckCircle2 className="h-5 w-5" />
+                  ) : (
+                    mission.icon
+                  )}
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className={`font-semibold text-sm ${
+                      mission.isCompleted ? "text-green-700 line-through" : "text-gray-800"
+                    }`}>
+                      {mission.title}
+                    </h4>
+                    <Badge 
+                      variant={mission.difficulty === 'easy' ? 'secondary' : mission.difficulty === 'medium' ? 'default' : 'destructive'}
+                      className="text-xs"
+                    >
+                      {mission.difficulty === 'easy' ? 'Mudah' : mission.difficulty === 'medium' ? 'Sedang' : 'Sulit'}
+                    </Badge>
+                  </div>
+                  <p className={`text-sm mb-2 ${
+                    mission.isCompleted ? "text-green-600" : "text-gray-600"
+                  }`}>
+                    {mission.description}
+                  </p>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Star className="h-4 w-4 text-yellow-500" />
+                      <span className="text-sm font-medium text-gray-700">
+                        {mission.points} poin
+                      </span>
+                    </div>
+                    
+                    {!mission.isCompleted && (
+                      <Button 
+                        size="sm" 
+                        className="bg-orange-500 hover:bg-orange-600 text-white"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          mission.action();
+                        }}
+                      >
+                        Mulai
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+          
+          {/* Completion Celebration */}
+          {completedMissions === totalMissions && (
+            <div className="mt-4 p-4 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-lg border-2 border-yellow-300 text-center">
+              <Trophy className="h-8 w-8 text-yellow-600 mx-auto mb-2" />
+              <h3 className="font-bold text-yellow-800 mb-1">Selamat!</h3>
+              <p className="text-sm text-yellow-700">
+                Semua misi telah selesai! Goal Anda sudah siap untuk dipantau dan dikelola.
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 export default function GoalDetail() {
   const { id } = useParams();
   const [location] = useLocation();
@@ -170,6 +323,7 @@ export default function GoalDetail() {
     new Set(),
   );
   const [showInitiativeFormModal, setShowInitiativeFormModal] = useState(false);
+  const [showTaskModal, setShowTaskModal] = useState(false);
   const [tourStep, setTourStep] = useState<number>(0);
   const [showTour, setShowTour] = useState(false);
   const [tourForceUpdate, setTourForceUpdate] = useState(0);
@@ -673,6 +827,45 @@ export default function GoalDetail() {
           <ActivityLogCard objectiveId={goal.id} />
         </div>
       </div>
+
+      {/* Mission Card - Only show when objective is empty */}
+      {goal && goal.keyResults.length === 0 && rencana.length === 0 && tugas.length === 0 && (
+        <MissionCard
+          missions={[
+            {
+              id: 'add-key-result',
+              title: 'Tambahkan Angka Target Pertama',
+              description: 'Buat minimal 1 angka target untuk mengukur kemajuan goal ini. Angka target yang jelas akan membantu tracking progress.',
+              icon: <Target className="h-5 w-5" />,
+              action: () => setAddKeyResultModal({ open: true }),
+              isCompleted: goal.keyResults.length > 0,
+              points: 25,
+              difficulty: 'easy'
+            },
+            {
+              id: 'add-initiative',
+              title: 'Buat Rencana Aksi',
+              description: 'Tambahkan rencana atau inisiatif untuk mencapai goal ini. Rencana yang konkret akan memudahkan eksekusi.',
+              icon: <Flag className="h-5 w-5" />,
+              action: () => setShowInitiativeFormModal(true),
+              isCompleted: rencana.length > 0,
+              points: 30,
+              difficulty: 'medium'
+            },
+            {
+              id: 'add-task',
+              title: 'Buat Tugas Pertama',
+              description: 'Tambahkan tugas konkret yang bisa dikerjakan hari ini. Task yang spesifik akan mendorong action nyata.',
+              icon: <CheckSquare className="h-5 w-5" />,
+              action: () => setShowTaskModal(true),
+              isCompleted: tugas.length > 0,
+              points: 20,
+              difficulty: 'easy'
+            }
+          ]}
+          className="mb-6"
+        />
+      )}
 
       {/* Tabs Section */}
       <Tabs defaultValue="key-results" className="space-y-6">
@@ -2205,6 +2398,59 @@ export default function GoalDetail() {
           }}
         />
       )}
+
+      {/* Simple Task Creation Dialog */}
+      <Dialog open={showTaskModal} onOpenChange={setShowTaskModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckSquare className="h-5 w-5 text-purple-600" />
+              Tambah Tugas Baru
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="task-title">Judul Tugas</Label>
+              <Input
+                id="task-title"
+                placeholder="Apa yang perlu dikerjakan?"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="task-description">Deskripsi (opsional)</Label>
+              <Textarea
+                id="task-description"
+                placeholder="Detail atau catatan tambahan..."
+                className="mt-1"
+                rows={3}
+              />
+            </div>
+            <div className="flex justify-end gap-2 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowTaskModal(false)}
+              >
+                Batal
+              </Button>
+              <Button
+                className="bg-purple-600 hover:bg-purple-700 text-white"
+                onClick={() => {
+                  // For now, just close the modal
+                  // In real implementation, would create task via API
+                  setShowTaskModal(false);
+                  toast({
+                    title: "Task akan ditambahkan",
+                    description: "Fitur ini akan segera diimplementasikan",
+                  });
+                }}
+              >
+                Buat Tugas
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Initiative Form Modal with Success Metrics */}
       <InitiativeFormModal
