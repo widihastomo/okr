@@ -11,7 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { ChevronsUpDown, Check, HelpCircle } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { ChevronsUpDown, Check, HelpCircle, Target } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
@@ -258,265 +259,91 @@ export default function EditKeyResultModal({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            {/* Title */}
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2 mb-2">
-                    Judul Ukuran Keberhasilan
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <button type="button" className="inline-flex">
-                          <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                        </button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
-                        <div className="text-sm">
-                          <p className="font-medium mb-2">Judul Ukuran Keberhasilan</p>
-                          <p>Buat judul yang spesifik dan terukur. Contoh: "Meningkatkan pendapatan bulanan menjadi 100 juta", "Menurunkan biaya operasional ke 50 juta", "Mencapai 90% kepuasan pelanggan".</p>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                  </FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder="Contoh: Meningkatkan pendapatan bulanan"
-                      {...field} 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Description */}
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2 mb-2">
-                    Deskripsi (Opsional)
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <button type="button" className="inline-flex">
-                          <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                        </button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
-                        <div className="text-sm">
-                          <p className="font-medium mb-2">Deskripsi Ukuran Keberhasilan</p>
-                          <p>Jelaskan konteks dan detail penting tentang ukuran keberhasilan ini. Apa yang akan diukur, bagaimana cara mengukurnya, dan mengapa ini penting untuk mencapai goal.</p>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Deskripsi detail tentang Ukuran Keberhasilan ini..."
-                      rows={3}
-                      {...field} 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Tipe Ukuran Keberhasilan dan Nilai */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="keyResultType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2 mb-2">
-                      Tipe Ukuran Keberhasilan
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <button type="button" className="inline-flex">
-                            <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                          </button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
-                          <div className="text-sm">
-                            <p className="font-medium mb-2">Tipe Ukuran Keberhasilan</p>
-                            <p className="mb-2">Pilih tipe sesuai cara pengukuran:</p>
-                            <ul className="list-disc list-inside space-y-1 text-xs">
-                              <li><strong>Naik ke Target:</strong> Nilai meningkat dari baseline ke target</li>
-                              <li><strong>Turun ke Target:</strong> Nilai menurun dari baseline ke target</li>
-                              <li><strong>Tetap Di Atas:</strong> Nilai harus selalu di atas threshold</li>
-                              <li><strong>Tetap Di Bawah:</strong> Nilai harus selalu di bawah threshold</li>
-                              <li><strong>Ya/Tidak:</strong> Target tercapai atau tidak (binary)</li>
-                            </ul>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                    </FormLabel>
-                    {(checkInData?.count || 0) > 0 ? (
-                      <div className="space-y-2">
-                        <Input
-                          value={
-                            field.value === "increase_to" ? "Naik ke (Increase To)" :
-                            field.value === "decrease_to" ? "Turun ke (Decrease To)" :
-                            field.value === "should_stay_above" ? "Harus tetap di atas (Stay Above)" :
-                            field.value === "should_stay_below" ? "Harus tetap di bawah (Stay Below)" :
-                            field.value === "achieve_or_not" ? "Ya/Tidak (Achieve or Not)" :
-                            field.value
-                          }
-                          disabled
-                          className="bg-gray-100 text-gray-500"
-                        />
-                        <p className="text-xs text-gray-500">
-                          Tipe tidak dapat diubah karena sudah ada {checkInData.count} check-in yang tercatat.
-                        </p>
-                      </div>
-                    ) : (
-                      <Select onValueChange={field.onChange} value={field.value}>
+            {/* Informasi Ukuran Keberhasilan */}
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-2 mb-4">
+                  <Target className="w-5 h-5 text-gray-500" />
+                  <h3 className="text-lg font-semibold">Informasi Ukuran Keberhasilan</h3>
+                </div>
+                
+                <div className="space-y-4">
+                  {/* Title */}
+                  <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2 mb-2">
+                          Judul Ukuran Keberhasilan
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button type="button" className="inline-flex">
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
+                              <div className="text-sm">
+                                <p className="font-medium mb-2">Judul Ukuran Keberhasilan</p>
+                                <p>Buat judul yang spesifik dan terukur. Contoh: "Meningkatkan pendapatan bulanan menjadi 100 juta", "Menurunkan biaya operasional ke 50 juta", "Mencapai 90% kepuasan pelanggan".</p>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        </FormLabel>
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih tipe" />
-                          </SelectTrigger>
+                          <Input 
+                            placeholder="Contoh: Meningkatkan pendapatan bulanan"
+                            {...field} 
+                          />
                         </FormControl>
-                        <SelectContent>
-                          <SelectItem value="increase_to">Naik ke (Increase To)</SelectItem>
-                          <SelectItem value="decrease_to">Turun ke (Decrease To)</SelectItem>
-                          <SelectItem value="should_stay_above">Harus tetap di atas (Stay Above)</SelectItem>
-                          <SelectItem value="should_stay_below">Harus tetap di bawah (Stay Below)</SelectItem>
-                          <SelectItem value="achieve_or_not">Ya/Tidak (Achieve or Not)</SelectItem>
-                        </SelectContent>
-                      </Select>
+                        <FormMessage />
+                      </FormItem>
                     )}
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  />
 
-              {/* Unit - Hide for achieve_or_not type */}
-              {form.watch("keyResultType") !== "achieve_or_not" && (
-                <FormField
-                  control={form.control}
-                  name="unit"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2 mb-2">
-                        Unit (Opsional)
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <button type="button" className="inline-flex">
-                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                            </button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
-                            <div className="text-sm">
-                              <p className="font-medium mb-2">Unit Pengukuran</p>
-                              <p className="mb-2">Pilih unit yang sesuai dengan nilai yang diukur:</p>
-                              <ul className="list-disc list-inside space-y-1 text-xs">
-                                <li><strong>Rp:</strong> Untuk nilai uang/finansial</li>
-                                <li><strong>%:</strong> Untuk persentase</li>
-                                <li><strong>orang:</strong> Untuk jumlah orang</li>
-                                <li><strong>rating/skor:</strong> Untuk penilaian</li>
-                                <li><strong>unit/buah:</strong> Untuk hitungan item</li>
-                                <li>Atau ketik unit custom lainnya</li>
-                              </ul>
-                            </div>
-                          </PopoverContent>
-                        </Popover>
-                      </FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              className={cn(
-                                "w-full justify-between",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value || "Pilih atau ketik unit..."}
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-full p-0">
-                          <Command>
-                            <CommandInput 
-                              placeholder="Cari atau ketik unit baru..." 
-                              onValueChange={(value: string) => {
-                                if (value && !unitOptions.includes(value)) {
-                                  field.onChange(value);
-                                }
-                              }}
-                            />
-                            <CommandList>
-                              <CommandEmpty>
-                                <Button
-                                  variant="ghost"
-                                  className="w-full text-left justify-start h-auto p-2"
-                                  onClick={() => {
-                                    const input = document.querySelector('[placeholder="Cari atau ketik unit baru..."]') as HTMLInputElement;
-                                    if (input && input.value) {
-                                      field.onChange(input.value);
-                                    }
-                                  }}
-                                >
-                                  Tambah unit baru
-                                </Button>
-                              </CommandEmpty>
-                              <CommandGroup>
-                                {unitOptions.map((unit: string) => (
-                                  <CommandItem
-                                    value={unit}
-                                    key={unit}
-                                    onSelect={() => {
-                                      field.onChange(unit);
-                                    }}
-                                  >
-                                    <Check
-                                      className={cn(
-                                        "mr-2 h-4 w-4",
-                                        unit === field.value
-                                          ? "opacity-100"
-                                          : "opacity-0"
-                                      )}
-                                    />
-                                    {unit}
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-            </div>
+                  {/* Description */}
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2 mb-2">
+                          Deskripsi (Opsional)
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button type="button" className="inline-flex">
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
+                              <div className="text-sm">
+                                <p className="font-medium mb-2">Deskripsi Ukuran Keberhasilan</p>
+                                <p>Jelaskan konteks dan detail penting tentang ukuran keberhasilan ini. Apa yang akan diukur, bagaimana cara mengukurnya, dan mengapa ini penting untuk mencapai goal.</p>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Deskripsi detail tentang Ukuran Keberhasilan ini..."
+                            rows={3}
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-            {/* Conditional Value Fields */}
-            {(() => {
-              const keyResultType = form.watch("keyResultType");
-              
-              if (keyResultType === "achieve_or_not") {
-                return null; // Don't show any value fields
-              }
-              
-              if (keyResultType === "should_stay_above" || keyResultType === "should_stay_below") {
-                return (
-                  <div className="grid grid-cols-1 gap-4">
-                    {/* Target Value Only */}
+                  {/* Tipe Ukuran Keberhasilan dan Nilai */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
-                      name="targetValue"
+                      name="keyResultType"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="flex items-center gap-2 mb-2">
-                            Target
+                            Tipe Ukuran Keberhasilan
                             <Popover>
                               <PopoverTrigger asChild>
                                 <button type="button" className="inline-flex">
@@ -525,39 +352,222 @@ export default function EditKeyResultModal({
                               </PopoverTrigger>
                               <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
                                 <div className="text-sm">
-                                  <p className="font-medium mb-2">Target (Threshold)</p>
-                                  <p>Nilai ambang batas yang harus dipertahankan. Untuk "tetap di atas", nilai harus selalu ≥ target. Untuk "tetap di bawah", nilai harus selalu ≤ target.</p>
+                                  <p className="font-medium mb-2">Tipe Ukuran Keberhasilan</p>
+                                  <p className="mb-2">Pilih tipe sesuai cara pengukuran:</p>
+                                  <ul className="list-disc list-inside space-y-1 text-xs">
+                                    <li><strong>Naik ke Target:</strong> Nilai meningkat dari baseline ke target</li>
+                                    <li><strong>Turun ke Target:</strong> Nilai menurun dari baseline ke target</li>
+                                    <li><strong>Tetap Di Atas:</strong> Nilai harus selalu di atas threshold</li>
+                                    <li><strong>Tetap Di Bawah:</strong> Nilai harus selalu di bawah threshold</li>
+                                    <li><strong>Ya/Tidak:</strong> Target tercapai atau tidak (binary)</li>
+                                  </ul>
                                 </div>
                               </PopoverContent>
                             </Popover>
                           </FormLabel>
-                          <FormControl>
-                            <Input 
-                              placeholder="100"
-                              required
-                              value={formatNumberInput(field.value || '')}
-                              onChange={(e) => field.onChange(parseNumberInput(e.target.value) || '')}
-                              step="0.1"
-                            />
-                          </FormControl>
+                          {(checkInData?.count || 0) > 0 ? (
+                            <div className="space-y-2">
+                              <Input
+                                value={
+                                  field.value === "increase_to" ? "Naik ke (Increase To)" :
+                                  field.value === "decrease_to" ? "Turun ke (Decrease To)" :
+                                  field.value === "should_stay_above" ? "Harus tetap di atas (Stay Above)" :
+                                  field.value === "should_stay_below" ? "Harus tetap di bawah (Stay Below)" :
+                                  field.value === "achieve_or_not" ? "Ya/Tidak (Achieve or Not)" :
+                                  field.value
+                                }
+                                disabled
+                                className="bg-gray-100 text-gray-500"
+                              />
+                              <p className="text-xs text-gray-500">
+                                Tipe tidak dapat diubah karena sudah ada {checkInData.count} check-in yang tercatat.
+                              </p>
+                            </div>
+                          ) : (
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Pilih tipe" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="increase_to">Naik ke (Increase To)</SelectItem>
+                                <SelectItem value="decrease_to">Turun ke (Decrease To)</SelectItem>
+                                <SelectItem value="should_stay_above">Harus tetap di atas (Stay Above)</SelectItem>
+                                <SelectItem value="should_stay_below">Harus tetap di bawah (Stay Below)</SelectItem>
+                                <SelectItem value="achieve_or_not">Ya/Tidak (Achieve or Not)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          )}
                           <FormMessage />
                         </FormItem>
                       )}
                     />
+
+                    {/* Unit - Hide for achieve_or_not type */}
+                    {form.watch("keyResultType") !== "achieve_or_not" && (
+                      <FormField
+                        control={form.control}
+                        name="unit"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex items-center gap-2 mb-2">
+                              Unit (Opsional)
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <button type="button" className="inline-flex">
+                                    <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
+                                  <div className="text-sm">
+                                    <p className="font-medium mb-2">Unit Pengukuran</p>
+                                    <p className="mb-2">Pilih unit yang sesuai dengan nilai yang diukur:</p>
+                                    <ul className="list-disc list-inside space-y-1 text-xs">
+                                      <li><strong>Rp:</strong> Untuk nilai uang/finansial</li>
+                                      <li><strong>%:</strong> Untuk persentase</li>
+                                      <li><strong>orang:</strong> Untuk jumlah orang</li>
+                                      <li><strong>rating/skor:</strong> Untuk penilaian</li>
+                                      <li><strong>unit/buah:</strong> Untuk hitungan item</li>
+                                      <li>Atau ketik unit custom lainnya</li>
+                                    </ul>
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
+                            </FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant="outline"
+                                    role="combobox"
+                                    className={cn(
+                                      "w-full justify-between",
+                                      !field.value && "text-muted-foreground"
+                                    )}
+                                  >
+                                    {field.value || "Pilih atau ketik unit..."}
+                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-full p-0">
+                                <Command>
+                                  <CommandInput 
+                                    placeholder="Cari atau ketik unit baru..." 
+                                    onValueChange={(value: string) => {
+                                      if (value && !unitOptions.includes(value)) {
+                                        field.onChange(value);
+                                      }
+                                    }}
+                                  />
+                                  <CommandList>
+                                    <CommandEmpty>
+                                      <Button
+                                        variant="ghost"
+                                        className="w-full text-left justify-start h-auto p-2"
+                                        onClick={() => {
+                                          const input = document.querySelector('[placeholder="Cari atau ketik unit baru..."]') as HTMLInputElement;
+                                          if (input && input.value) {
+                                            field.onChange(input.value);
+                                          }
+                                        }}
+                                      >
+                                        Tambah unit baru
+                                      </Button>
+                                    </CommandEmpty>
+                                    <CommandGroup>
+                                      {unitOptions.map((unit: string) => (
+                                        <CommandItem
+                                          value={unit}
+                                          key={unit}
+                                          onSelect={() => {
+                                            field.onChange(unit);
+                                          }}
+                                        >
+                                          <Check
+                                            className={cn(
+                                              "mr-2 h-4 w-4",
+                                              unit === field.value
+                                                ? "opacity-100"
+                                                : "opacity-0"
+                                            )}
+                                          />
+                                          {unit}
+                                        </CommandItem>
+                                      ))}
+                                    </CommandGroup>
+                                  </CommandList>
+                                </Command>
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
                   </div>
-                );
-              }
-              
-              // For increase_to and decrease_to types
-              return (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="baseValue"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center gap-2 mb-2">
-                          Nilai Awal
+
+                  {/* Conditional Value Fields */}
+                  {(() => {
+                    const keyResultType = form.watch("keyResultType");
+                    
+                    if (keyResultType === "achieve_or_not") {
+                      return null; // Don't show any value fields
+                    }
+                    
+                    if (keyResultType === "should_stay_above" || keyResultType === "should_stay_below") {
+                      return (
+                        <div className="grid grid-cols-1 gap-4">
+                          {/* Target Value Only */}
+                          <FormField
+                            control={form.control}
+                            name="targetValue"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="flex items-center gap-2 mb-2">
+                                  Target
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <button type="button" className="inline-flex">
+                                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                      </button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
+                                      <div className="text-sm">
+                                        <p className="font-medium mb-2">Target (Threshold)</p>
+                                        <p>Nilai ambang batas yang harus dipertahankan. Untuk "tetap di atas", nilai harus selalu ≥ target. Untuk "tetap di bawah", nilai harus selalu ≤ target.</p>
+                                      </div>
+                                    </PopoverContent>
+                                  </Popover>
+                                </FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    placeholder="100"
+                                    required
+                                    value={formatNumberInput(field.value || '')}
+                                    onChange={(e) => field.onChange(parseNumberInput(e.target.value) || '')}
+                                    step="0.1"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      );
+                    }
+                    
+                    // For increase_to and decrease_to types
+                    return (
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="baseValue"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="flex items-center gap-2 mb-2">
+                                Nilai Awal
                           <Popover>
                             <PopoverTrigger asChild>
                               <button type="button" className="inline-flex">
@@ -660,6 +670,10 @@ export default function EditKeyResultModal({
 
             
 
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Submit Button */}
             <div className="flex justify-end gap-2 pt-4">
               <Button
@@ -674,18 +688,14 @@ export default function EditKeyResultModal({
                 type="submit"
                 disabled={updateKeyResultMutation.isPending}
                 className="bg-blue-600 hover:bg-blue-700"
-
               >
                 {updateKeyResultMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
               </Button>
             </div>
-            
 
           </form>
         </Form>
       </DialogContent>
-      
-
     </Dialog>
   );
 }
