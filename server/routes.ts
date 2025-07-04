@@ -634,7 +634,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           baseValue: krData.baseValue === "" ? null : krData.baseValue,
           // Schema requires targetValue and currentValue to be non-null, use "0" as default
           targetValue: krData.targetValue === "" ? "0" : krData.targetValue,
-          currentValue: krData.currentValue === "" ? "0" : krData.currentValue
+          currentValue: krData.currentValue === "" ? "0" : krData.currentValue,
+          // Handle empty assignedTo field - convert empty string to null
+          assignedTo: krData.assignedTo === "" ? null : krData.assignedTo
         };
         const keyResult = await storage.createKeyResult(processedKrData);
         keyResults.push(keyResult);
@@ -698,7 +700,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Handle empty baseValue - convert empty string to null for database
         const processedKrData = {
           ...krData,
-          baseValue: krData.baseValue === "" ? null : krData.baseValue
+          baseValue: krData.baseValue === "" ? null : krData.baseValue,
+          // Handle empty assignedTo field - convert empty string to null
+          assignedTo: krData.assignedTo === "" ? null : krData.assignedTo
         };
         
         if (krData.id) {
@@ -712,7 +716,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               ...processedKrData,
               objectiveId: id,
               title: krData.title,
-              targetValue: krData.targetValue
+              targetValue: krData.targetValue,
+              // Ensure numeric fields have proper defaults
+              currentValue: krData.currentValue === "" ? "0" : krData.currentValue || "0"
             });
             keyResults.push(created);
           }
