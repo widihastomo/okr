@@ -43,6 +43,7 @@ import { Link } from "wouter";
 import { CheckInModal } from "@/components/check-in-modal";
 import EditKeyResultModal from "@/components/edit-key-result-modal";
 import EditObjectiveModal from "@/components/edit-objective-modal";
+import InitiativeModal from "@/components/initiative-modal";
 import { SimpleProgressStatus } from "@/components/progress-status";
 import { ObjectiveStatusBadge } from "@/components/objective-status-badge";
 import {
@@ -137,6 +138,11 @@ export default function GoalDetail() {
     open: false,
   });
   const [addKeyResultModal, setAddKeyResultModal] = useState<{ open: boolean }>(
+    {
+      open: false,
+    },
+  );
+  const [addInitiativeModal, setAddInitiativeModal] = useState<{ open: boolean }>(
     {
       open: false,
     },
@@ -1020,18 +1026,26 @@ export default function GoalDetail() {
 
         {/* Rencana Tab */}
         <TabsContent value="initiatives" className="space-y-6">
-          {/* Header with Description */}
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-lg border border-green-200">
-            <div className="flex items-start justify-between mb-4">
+          {/* Header with Description and Add Button */}
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 sm:p-6 rounded-lg border border-green-200">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-3 sm:gap-4">
               <div className="flex-1">
-                <h3 className="text-xl font-semibold text-green-900 mb-2 flex items-center gap-2">
-                  <FileText className="w-6 h-6 text-green-600" />
+                <h3 className="text-lg sm:text-xl font-semibold text-green-900 mb-2 flex items-center gap-2">
+                  <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 shrink-0" />
                   Rencana & Inisiatif
                 </h3>
                 <p className="text-green-700 text-sm leading-relaxed">
                   Rencana adalah langkah-langkah strategis untuk mencapai ukuran keberhasilan. Setiap rencana memiliki timeline, budget, dan PIC yang bertanggung jawab untuk eksekusi.
                 </p>
               </div>
+              <Button
+                onClick={() => setAddInitiativeModal({ open: true })}
+                className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto sm:ml-4 shrink-0"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                <span className="sm:hidden">Tambah</span>
+                <span className="hidden sm:inline">Tambah Rencana</span>
+              </Button>
             </div>
             
             {/* Quick Stats */}
@@ -1765,6 +1779,20 @@ export default function GoalDetail() {
           onOpenChange={setEditObjectiveModal}
         />
       )}
+
+      {/* Add Initiative Modal */}
+      {goal?.keyResults && goal.keyResults.length > 0 && (
+        <InitiativeModal
+          keyResultId={goal.keyResults[0].id}
+          open={addInitiativeModal.open}
+          onClose={() => setAddInitiativeModal({ open: false })}
+          onSuccess={() => {
+            setAddInitiativeModal({ open: false });
+            window.location.reload();
+          }}
+        />
+      )}
+
       {/* AI Help Bubble */}
       <AIHelpBubble
         context="objective_detail"
