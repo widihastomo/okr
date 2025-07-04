@@ -729,7 +729,7 @@ export default function GoalDetail() {
                   key={kr.id}
                   className="p-3 sm:p-4 bg-white border border-gray-200 rounded-lg space-y-2 sm:space-y-3"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+                  <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         {/* Expand/Collapse Button */}
@@ -832,12 +832,14 @@ export default function GoalDetail() {
                         })()}
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 mt-2 sm:mt-0">
+                    
+                    {/* Action Buttons - Top Right */}
+                    <div className="flex items-center gap-1 shrink-0">
                       <Button
                         variant="default"
                         size="sm"
                         onClick={() => handleCheckIn(kr)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white flex-1 sm:flex-none"
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
                       >
                         <TrendingUp className="w-4 h-4 mr-1" />
                         <span className="sm:hidden">Update</span>
