@@ -96,6 +96,15 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 04, 2025. Implemented assignee/responsible person functionality for Key Results:
+  * Added assignedTo field to key_results database table with UUID foreign key to users table
+  * Enhanced edit-key-result-modal.tsx with SearchableUserSelect component for assignee selection
+  * Added comprehensive tooltip guidance explaining responsible person assignment purpose
+  * Updated form validation schema to include optional assignedTo field
+  * Server endpoints already supported assignedTo field through existing update mechanisms
+  * Field is optional (allowUnassigned=true) to maintain flexibility in Key Result assignment
+  * Added proper form initialization to load existing assignedTo values for editing
+  * Integrated with existing user management system for seamless assignee selection
 - July 04, 2025. Created optimized build scripts to address slow build performance:
   * Identified build performance issue: 409MB node_modules with 95 packages causing slow builds
   * Created build-optimized.js script with TypeScript compilation optimizations (--skipLibCheck --incremental)
