@@ -146,7 +146,7 @@ export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
       </CardHeader>
       <CardContent className="flex flex-col">
         {activities.length > 0 ? (
-          <div className="space-y-3 overflow-y-auto max-h-64">
+          <div className="space-y-3 overflow-y-auto max-h-80">
             {activities.slice(0, 10).map((activity) => (
               <div key={`${activity.type}-${activity.id}`} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
                 <TooltipProvider>
