@@ -598,7 +598,7 @@ export default function GoalDetail() {
               </div>
               <Button
                 onClick={() => setAddKeyResultModal({ open: true })}
-                className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto sm:ml-4 shrink-0"
+                className="hover:bg-blue-700 text-white bg-[#2095f4] w-full sm:w-auto sm:ml-4 shrink-0"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 <span className="sm:hidden">Tambah</span>
