@@ -16,7 +16,7 @@ const progressVariants = cva(
         info: "bg-blue-500",
         ahead: "bg-blue-600",
         "on-track": "bg-green-500",
-        "at-risk": "bg-yellow-500",
+        "at-risk": "bg-orange-500",
         behind: "bg-red-500",
         completed: "bg-green-600",
       },

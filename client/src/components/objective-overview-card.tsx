@@ -24,6 +24,7 @@ import type {
 } from "@shared/schema";
 import { Link } from "wouter";
 import { calculateKeyResultProgress } from "@shared/progress-calculator";
+import { calculateIdealProgress, getProgressStatus, getStatusColor } from "@shared/status-helper";
 import { ObjectiveStatusBadge } from "./objective-status-badge";
 
 interface ObjectiveOverviewCardProps {
@@ -377,14 +378,21 @@ export default function ObjectiveOverviewCard({
                   <span className="truncate flex-1 mr-2">{kr.title}</span>
                   <div className="flex items-center gap-2">
                     <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full transition-all duration-300 ${
-                          progress >= 100 ? "bg-green-600" :
-                          progress >= 80 ? "bg-green-500" :
-                          progress >= 60 ? "bg-yellow-500" : "bg-red-500"
-                        }`}
-                        style={{ width: `${Math.min(100, progress)}%` }}
-                      />
+                      {(() => {
+                        // Calculate ideal progress and status
+                        const cycleStart = cycle?.startDate ? new Date(cycle.startDate) : new Date();
+                        const cycleEnd = cycle?.endDate ? new Date(cycle.endDate) : new Date();
+                        const idealProgress = calculateIdealProgress(cycleStart, cycleEnd);
+                        const status = getProgressStatus(progress, idealProgress);
+                        const colorClass = getStatusColor(status);
+                        
+                        return (
+                          <div
+                            className={`h-full transition-all duration-300 ${colorClass}`}
+                            style={{ width: `${Math.min(100, progress)}%` }}
+                          />
+                        );
+                      })()}
                     </div>
                     <span className="text-gray-500 min-w-8">
                       {Math.round(progress)}%

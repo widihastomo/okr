@@ -100,6 +100,7 @@ import type {
   User,
   Team,
 } from "@shared/schema";
+import { calculateIdealProgress, getProgressStatus, getStatusColor } from "@shared/status-helper";
 
 // Type for tasks with initiative info
 type TaskWithInitiative = Task & {
@@ -899,13 +900,14 @@ export default function GoalDetail() {
                             <div 
                               className={`h-2 transition-all duration-300 ${
                                 progress >= 100 ? 'rounded-full' : 'rounded-l-full'
-                              } ${
-                                progress >= 100 ? 'bg-green-600' :
-                                progress >= 80 ? 'bg-green-500' :
-                                progress >= 60 ? 'bg-yellow-500' :
-                                progress >= 40 ? 'bg-orange-500' :
-                                'bg-red-500'
-                              }`}
+                              } ${(() => {
+                                // Calculate ideal progress and status
+                                const cycleStart = cycle?.startDate ? new Date(cycle.startDate) : new Date();
+                                const cycleEnd = cycle?.endDate ? new Date(cycle.endDate) : new Date();
+                                const idealProgress = calculateIdealProgress(cycleStart, cycleEnd);
+                                const status = getProgressStatus(progress, idealProgress);
+                                return getStatusColor(status);
+                              })()}`}
                               style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
                             ></div>
                           </div>
@@ -1200,11 +1202,14 @@ export default function GoalDetail() {
                                 <div className="flex items-center gap-2">
                                   <div className="w-16 bg-gray-200 rounded-full h-2">
                                     <div
-                                      className={`h-2 rounded-full ${
-                                        (initiative.progressPercentage || 0) >= 100 ? "bg-green-600" :
-                                        (initiative.progressPercentage || 0) >= 80 ? "bg-green-500" :
-                                        (initiative.progressPercentage || 0) >= 60 ? "bg-yellow-500" : "bg-red-500"
-                                      }`}
+                                      className={`h-2 rounded-full ${(() => {
+                                        const progress = initiative.progressPercentage || 0;
+                                        // For initiatives, use simpler status logic since they may not be tied to specific cycles
+                                        if (progress >= 100) return 'bg-green-600';
+                                        if (progress >= 80) return 'bg-green-500';
+                                        if (progress >= 60) return 'bg-orange-500';
+                                        return 'bg-red-500';
+                                      })()}`}
                                       style={{ width: `${initiative.progressPercentage || 0}%` }}
                                     ></div>
                                   </div>
