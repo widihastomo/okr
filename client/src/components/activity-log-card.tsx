@@ -164,13 +164,7 @@ export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
                   <div className="text-xs text-gray-600 mb-1 font-medium">
                     {activity.entityTitle}
                   </div>
-                  {activity.notes && (
-                    <div className="mt-1">
-                      <p className="text-sm text-gray-600 line-clamp-2">
-                        {activity.notes}
-                      </p>
-                    </div>
-                  )}
+                  
                   {activity.confidence && activity.type === 'key_result_checkin' && (
                     <div className="flex items-center gap-2 mt-2">
                       <div className="space-y-1">
