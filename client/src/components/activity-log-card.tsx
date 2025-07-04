@@ -158,7 +158,7 @@ export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
                       
                     </div>
                     <p className="text-xs text-gray-500">
-                      {activity.createdAt ? format(new Date(activity.createdAt), "MMM dd") : "Unknown"}
+                      {activity.createdAt ? format(new Date(activity.createdAt), "MMM dd HH:mm") : "Unknown"}
                     </p>
                   </div>
                   <div className="text-xs text-gray-600 mb-1 font-medium">
