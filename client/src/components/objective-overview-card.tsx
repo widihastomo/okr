@@ -449,7 +449,7 @@ export default function ObjectiveOverviewCard({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6 flex flex-col lg:h-64">
+      <CardContent className="space-y-6">
         {/* Quick Stats Grid */}
         <div className="grid grid-cols-3 gap-4">
           {/* Key Results */}
