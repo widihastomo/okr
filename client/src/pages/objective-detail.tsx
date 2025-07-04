@@ -1911,7 +1911,7 @@ export default function GoalDetail() {
         isOpen={showInitiativeFormModal}
         onClose={() => setShowInitiativeFormModal(false)}
         onSubmit={createInitiativeWithMetricsMutation.mutate}
-        keyResultId={goal?.keyResults?.[0]?.id || null}
+        keyResultId={goal?.keyResults?.[0]?.id || ''}
         users={users || []}
         isLoading={createInitiativeWithMetricsMutation.isPending}
       />

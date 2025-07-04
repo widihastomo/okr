@@ -216,10 +216,30 @@ export default function InitiativeFormModal({
           </DialogTitle>
         </DialogHeader>
 
+        {/* Penjelasan Konsep Initiative */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+          <h3 className="font-semibold text-blue-900 mb-2">💡 Apa itu Rencana (Initiative)?</h3>
+          <p className="text-sm text-blue-800 mb-3">
+            Rencana adalah tindakan konkret yang akan Anda lakukan untuk mencapai tujuan (Goal). 
+            Setiap rencana harus memiliki <strong>indikator keberhasilan yang terukur</strong> agar Anda bisa melacak apakah rencana tersebut benar-benar efektif.
+          </p>
+          <div className="text-sm text-blue-700">
+            <strong>Contoh:</strong> Jika goal Anda adalah "Meningkatkan penjualan produk", maka rencana bisa berupa:
+            <ul className="list-disc list-inside mt-1 ml-2">
+              <li>"Kampanye media sosial" dengan target 10.000 engagement</li>
+              <li>"Program referral pelanggan" dengan target 100 referral baru</li>
+              <li>"Pelatihan tim sales" dengan target 90% completion rate</li>
+            </ul>
+          </div>
+        </div>
+
         {currentStep === 1 && (
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Informasi Rencana</CardTitle>
+              <p className="text-sm text-gray-600 mt-1">
+                Isi informasi dasar tentang rencana yang akan Anda buat. Rencana yang baik memiliki tujuan yang jelas, timeline yang realistis, dan PIC yang bertanggung jawab.
+              </p>
             </CardHeader>
             <CardContent>
               <Form {...initiativeForm}>
@@ -308,7 +328,7 @@ export default function InitiativeFormModal({
                       name="picId"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>PIC</FormLabel>
+                          <FormLabel>PIC (Person In Charge)</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
@@ -323,6 +343,9 @@ export default function InitiativeFormModal({
                               ))}
                             </SelectContent>
                           </Select>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Orang yang bertanggung jawab menjalankan rencana ini
+                          </p>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -430,6 +453,9 @@ export default function InitiativeFormModal({
                               }}
                             />
                           </FormControl>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Perkiraan anggaran yang dibutuhkan (contoh: 5.000.000)
+                          </p>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -460,6 +486,19 @@ export default function InitiativeFormModal({
                     {successMetrics.length} metrik ditambahkan
                   </Badge>
                 </CardTitle>
+                {/* Penjelasan Success Metrics */}
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-3">
+                  <h4 className="font-semibold text-green-900 mb-2">📊 Mengapa Perlu Metrik Keberhasilan?</h4>
+                  <p className="text-sm text-green-800 mb-2">
+                    Metrik keberhasilan adalah cara untuk mengukur apakah rencana Anda benar-benar efektif dalam mencapai tujuan. 
+                    Tanpa metrik, Anda tidak akan tahu apakah rencana berhasil atau gagal.
+                  </p>
+                  <div className="text-sm text-green-700">
+                    <strong>Tips:</strong> Buat minimal 1-3 metrik per rencana dengan target yang spesifik dan terukur.
+                    <br />
+                    <strong>Contoh:</strong> Untuk rencana "Kampanye Media Sosial" → Metrik "Jumlah Engagement" target 10.000
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
                 <Form {...metricForm}>
@@ -471,7 +510,7 @@ export default function InitiativeFormModal({
                         <FormItem>
                           <FormLabel>Judul Metrik *</FormLabel>
                           <FormControl>
-                            <Input placeholder="Masukkan judul metrik..." {...field} />
+                            <Input placeholder="Contoh: Jumlah Engagement, Jumlah Lead, Tingkat Konversi..." {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
