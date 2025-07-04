@@ -1017,7 +1017,7 @@ export default function GoalDetail() {
                     {/* Initiative count - Right */}
                     <div className="text-xs text-gray-500 flex items-center gap-1">
                       <Building2 className="w-3 h-3" />
-                      <span>{relatedInitiatives.length}</span>
+                      <span>{rencana.filter((r) => r.keyResultId === kr.id).length}</span>
                       <span className="hidden sm:inline">
                         inisiatif terkait
                       </span>
