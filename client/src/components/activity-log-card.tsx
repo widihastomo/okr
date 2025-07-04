@@ -189,15 +189,11 @@ export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
                             {activity.confidence}/10
                           </span>
                         </div>
-                        <div className="text-xs text-gray-500">
-                          <span className="font-medium">
-                            {activity.confidence >= 8 ? 'Tinggi' :
-                             activity.confidence >= 6 ? 'Sedang' : 'Rendah'}
-                          </span> - {' '}
-                          {activity.confidence >= 8 ? 'Sangat yakin target tercapai' :
-                           activity.confidence >= 6 ? 'Cukup optimis dengan progress' :
-                           'Butuh perhatian lebih untuk mencapai target'}
-                        </div>
+                        {activity.metadata?.notes && (
+                          <div className="text-xs text-gray-500 italic mt-1">
+                            "{activity.metadata.notes}"
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
