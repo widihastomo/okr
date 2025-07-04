@@ -85,6 +85,16 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -328,6 +338,12 @@ export default function GoalDetail() {
       open: false,
     },
   );
+  const [deleteKeyResultModal, setDeleteKeyResultModal] = useState<{
+    open: boolean;
+    keyResult?: KeyResult;
+  }>({
+    open: false,
+  });
   const [addInitiativeModal, setAddInitiativeModal] = useState<{
     open: boolean;
   }>({
@@ -463,11 +479,18 @@ export default function GoalDetail() {
     },
   });
 
-  const handleCreateKeyResult = (data: KeyResultFormData) => {
-    // Ensure unit has a valid default value
+  const handleCreateKeyResult = (data: any) => {
+    // Ensure unit has a valid default value and proper type conversion
     const processedData = {
-      ...data,
-      unit: data.unit || "number"
+      title: data.title,
+      description: data.description,
+      keyResultType: data.keyResultType,
+      baseValue: data.baseValue,
+      targetValue: data.targetValue,
+      currentValue: data.currentValue,
+      unit: data.unit || "number",
+      assignedTo: data.assignedTo,
+      objectiveId: goal?.id || ""
     };
     createKeyResultMutation.mutate(processedData);
   };
@@ -498,8 +521,13 @@ export default function GoalDetail() {
   });
 
   const handleDeleteKeyResult = (keyResult: KeyResult) => {
-    if (window.confirm(`Apakah Anda yakin ingin menghapus Angka Target "${keyResult.title}"?\n\nTindakan ini tidak dapat dibatalkan dan akan menghapus semua data terkait.`)) {
-      deleteKeyResultMutation.mutate(keyResult.id);
+    setDeleteKeyResultModal({ open: true, keyResult });
+  };
+
+  const confirmDeleteKeyResult = () => {
+    if (deleteKeyResultModal.keyResult) {
+      deleteKeyResultMutation.mutate(deleteKeyResultModal.keyResult.id);
+      setDeleteKeyResultModal({ open: false });
     }
   };
 
@@ -2207,7 +2235,7 @@ export default function GoalDetail() {
       <KeyResultModal
         open={addKeyResultModal.open}
         onOpenChange={(open) => setAddKeyResultModal({ open })}
-        onSubmit={handleCreateKeyResult}
+        onSubmit={(data) => handleCreateKeyResult(data as any)}
         users={users}
       />
 
@@ -2223,6 +2251,39 @@ export default function GoalDetail() {
         }}
         position="bottom-right"
       />
+
+      {/* Delete Key Result Confirmation Dialog */}
+      <AlertDialog
+        open={deleteKeyResultModal.open}
+        onOpenChange={(open) => setDeleteKeyResultModal({ open, keyResult: deleteKeyResultModal.keyResult })}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Angka Target</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus Angka Target "{deleteKeyResultModal.keyResult?.title}"?
+              <br />
+              <br />
+              Tindakan ini tidak dapat dibatalkan dan akan menghapus:
+              <br />
+              • Data Angka Target
+              <br />
+              • Semua check-in terkait
+              <br />
+              • Riwayat progress
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteKeyResult}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
