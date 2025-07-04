@@ -162,130 +162,135 @@ interface MissionCardProps {
 function MissionCard({ missions, className }: MissionCardProps) {
   const completedMissions = missions.filter(m => m.isCompleted).length;
   const totalMissions = missions.length;
+  const [isExpanded, setIsExpanded] = useState(false);
   
   return (
     <div className={className}>
       <Card className="border-2 border-dashed border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50 shadow-lg">
-        <CardHeader className="pb-4">
+        <CardHeader 
+          className="pb-3 cursor-pointer"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
           <div className="flex items-center gap-3">
             <div className="p-2 bg-orange-100 rounded-full">
-              <Rocket className="h-6 w-6 text-orange-600" />
+              <Rocket className="h-5 w-5 text-orange-600" />
             </div>
             <div className="flex-1">
-              <CardTitle className="text-lg font-bold text-orange-800 flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-yellow-500" />
+              <CardTitle className="text-base font-bold text-orange-800 flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-yellow-500" />
                 Misi Aktivasi Goal
+                <Badge variant="outline" className="text-xs bg-orange-100 text-orange-700 border-orange-300">
+                  {completedMissions}/{totalMissions}
+                </Badge>
               </CardTitle>
-              <CardDescription className="text-orange-600 mt-1">
-                Selesaikan misi berikut untuk mengaktifkan goal Anda secara penuh
-              </CardDescription>
-            </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-orange-600">
-                {completedMissions}/{totalMissions}
+              <div className="flex items-center gap-3 mt-2">
+                <Progress 
+                  value={(completedMissions / totalMissions) * 100} 
+                  className="h-1.5 bg-orange-100 flex-1"
+                />
+                <span className="text-xs text-orange-600 font-medium">
+                  {Math.round((completedMissions / totalMissions) * 100)}%
+                </span>
               </div>
-              <div className="text-xs text-orange-500">Selesai</div>
             </div>
-          </div>
-          
-          {/* Progress Bar */}
-          <div className="mt-4">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium text-orange-700">
-                Progress Misi
-              </span>
-              <span className="text-sm text-orange-600">
-                {Math.round((completedMissions / totalMissions) * 100)}%
-              </span>
-            </div>
-            <Progress 
-              value={(completedMissions / totalMissions) * 100} 
-              className="h-2 bg-orange-100"
-            />
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="text-orange-600 hover:bg-orange-100 p-1"
+            >
+              {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+            </Button>
           </div>
         </CardHeader>
         
-        <CardContent className="space-y-3">
-          {missions.map((mission) => (
-            <div
-              key={mission.id}
-              className={`p-4 rounded-lg border-2 transition-all duration-200 hover:shadow-md ${
-                mission.isCompleted 
-                  ? "bg-green-50 border-green-200 opacity-75" 
-                  : "bg-white border-orange-200 hover:border-orange-300 cursor-pointer"
-              }`}
-              onClick={() => !mission.isCompleted && mission.action()}
-            >
-              <div className="flex items-start gap-3">
-                <div className={`p-2 rounded-full flex-shrink-0 ${
+        {isExpanded && (
+          <CardContent className="space-y-3 pt-0">
+            {missions.map((mission) => (
+              <div
+                key={mission.id}
+                className={`p-3 rounded-lg border transition-all duration-200 hover:shadow-sm ${
                   mission.isCompleted 
-                    ? "bg-green-100 text-green-600" 
-                    : "bg-orange-100 text-orange-600"
-                }`}>
-                  {mission.isCompleted ? (
-                    <CheckCircle2 className="h-5 w-5" />
-                  ) : (
-                    mission.icon
-                  )}
-                </div>
-                
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className={`font-semibold text-sm ${
-                      mission.isCompleted ? "text-green-700 line-through" : "text-gray-800"
-                    }`}>
-                      {mission.title}
-                    </h4>
-                    <Badge 
-                      variant={mission.difficulty === 'easy' ? 'secondary' : mission.difficulty === 'medium' ? 'default' : 'destructive'}
-                      className="text-xs"
-                    >
-                      {mission.difficulty === 'easy' ? 'Mudah' : mission.difficulty === 'medium' ? 'Sedang' : 'Sulit'}
-                    </Badge>
-                  </div>
-                  <p className={`text-sm mb-2 ${
-                    mission.isCompleted ? "text-green-600" : "text-gray-600"
+                    ? "bg-green-50 border-green-200 opacity-75" 
+                    : "bg-white border-orange-200 hover:border-orange-300 cursor-pointer"
+                }`}
+                onClick={() => !mission.isCompleted && mission.action()}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`p-1.5 rounded-full flex-shrink-0 ${
+                    mission.isCompleted 
+                      ? "bg-green-100 text-green-600" 
+                      : "bg-orange-100 text-orange-600"
                   }`}>
-                    {mission.description}
-                  </p>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Star className="h-4 w-4 text-yellow-500" />
-                      <span className="text-sm font-medium text-gray-700">
-                        {mission.points} poin
-                      </span>
-                    </div>
-                    
-                    {!mission.isCompleted && (
-                      <Button 
-                        size="sm" 
-                        className="bg-orange-500 hover:bg-orange-600 text-white"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          mission.action();
-                        }}
-                      >
-                        Mulai
-                      </Button>
+                    {mission.isCompleted ? (
+                      <CheckCircle2 className="h-4 w-4" />
+                    ) : (
+                      mission.icon
                     )}
                   </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className={`font-medium text-sm ${
+                        mission.isCompleted ? "text-green-700 line-through" : "text-gray-800"
+                      }`}>
+                        {mission.title}
+                      </h4>
+                      <Badge 
+                        variant={mission.difficulty === 'easy' ? 'secondary' : mission.difficulty === 'medium' ? 'default' : 'destructive'}
+                        className="text-xs px-1.5 py-0.5"
+                      >
+                        {mission.points} poin
+                      </Badge>
+                    </div>
+                    <p className={`text-xs ${
+                      mission.isCompleted ? "text-green-600" : "text-gray-600"
+                    }`}>
+                      {mission.description}
+                    </p>
+                  </div>
+                  
+                  {!mission.isCompleted && (
+                    <Button 
+                      size="sm" 
+                      className="bg-orange-500 hover:bg-orange-600 text-white text-xs px-3 py-1 h-7"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        mission.action();
+                      }}
+                    >
+                      Mulai
+                    </Button>
+                  )}
                 </div>
               </div>
+            ))}
+            
+            {/* Completion Celebration */}
+            {completedMissions === totalMissions && (
+              <div className="mt-3 p-3 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-lg border border-yellow-300 text-center">
+                <Trophy className="h-6 w-6 text-yellow-600 mx-auto mb-1" />
+                <h3 className="font-semibold text-yellow-800 text-sm mb-1">Selamat!</h3>
+                <p className="text-xs text-yellow-700">
+                  Semua misi selesai! Goal siap dipantau.
+                </p>
+              </div>
+            )}
+          </CardContent>
+        )}
+        
+        {/* Compact Summary when collapsed */}
+        {!isExpanded && (
+          <CardContent className="pt-0 pb-3">
+            <div className="flex justify-between items-center text-xs text-orange-600">
+              <span>
+                {totalMissions - completedMissions} misi tersisa
+              </span>
+              <span className="text-orange-500">
+                Klik untuk melihat detail
+              </span>
             </div>
-          ))}
-          
-          {/* Completion Celebration */}
-          {completedMissions === totalMissions && (
-            <div className="mt-4 p-4 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-lg border-2 border-yellow-300 text-center">
-              <Trophy className="h-8 w-8 text-yellow-600 mx-auto mb-2" />
-              <h3 className="font-bold text-yellow-800 mb-1">Selamat!</h3>
-              <p className="text-sm text-yellow-700">
-                Semua misi telah selesai! Goal Anda sudah siap untuk dipantau dan dikelola.
-              </p>
-            </div>
-          )}
-        </CardContent>
+          </CardContent>
+        )}
       </Card>
     </div>
   );
