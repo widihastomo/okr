@@ -917,6 +917,28 @@ export default function GoalDetail() {
                         </div>
                       </div>
                     </div>
+
+                    {/* Last Check-in Info */}
+                    {kr.lastCheckIn && (
+                      <div className="flex items-start gap-2 text-xs text-gray-500 bg-gray-50 p-2 rounded">
+                        <Calendar className="w-3 h-3 mt-0.5 shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <span className="font-medium">Update terakhir:</span>
+                          <span className="ml-1">
+                            {new Date(kr.lastCheckIn.createdAt).toLocaleDateString('id-ID', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric'
+                            })}
+                          </span>
+                          {kr.lastCheckIn.notes && (
+                            <div className="mt-1 text-gray-600 line-clamp-2">
+                              {kr.lastCheckIn.notes}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Expanded Initiatives Section */}
