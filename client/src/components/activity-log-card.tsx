@@ -165,8 +165,7 @@ export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
         </CardTitle>
       </CardHeader>
       <CardContent
-        className="flex flex-col pt-0 pb-0"
-        style={{ minHeight: "150px" }}
+        className="flex flex-col pt-0 pb-0 p-6 h-[150px]"
       >
         {activities.length > 0 ? (
           <div className="space-y-3 overflow-y-auto max-h-80">
