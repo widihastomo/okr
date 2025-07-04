@@ -103,9 +103,29 @@ export default function EditObjectiveFormModal({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
+      // Invalidate specific objective data
+      if (objective?.id) {
+        queryClient.invalidateQueries({ queryKey: [`/api/okrs/${objective.id}`] });
+      }
+      // Invalidate cycle data if cycleId exists
+      if (objective?.cycleId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/cycles/${objective.cycleId}`] });
+      }
+      // Invalidate owner data if ownerId exists
+      if (objective?.ownerId && objective?.ownerType) {
+        const ownerEndpoint = objective.ownerType === "user" || objective.ownerType === "individual" 
+          ? `/api/users/${objective.ownerId}` 
+          : `/api/teams/${objective.ownerId}`;
+        queryClient.invalidateQueries({ queryKey: [ownerEndpoint] });
+      }
+      // Invalidate parent objective if parentId exists
+      if (objective?.parentId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/okrs/${objective.parentId}`] });
+      }
       toast({
         title: "Berhasil",
         description: "Objective berhasil diperbarui",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       onOpenChange(false);
       form.reset();

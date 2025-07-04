@@ -110,6 +110,25 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
       });
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
+      // Invalidate specific objective data
+      if (objective?.id) {
+        queryClient.invalidateQueries({ queryKey: [`/api/okrs/${objective.id}`] });
+      }
+      // Invalidate cycle data if cycleId exists
+      if (objective?.cycleId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/cycles/${objective.cycleId}`] });
+      }
+      // Invalidate owner data if ownerId exists
+      if (objective?.ownerId && objective?.ownerType) {
+        const ownerEndpoint = objective.ownerType === "user" || objective.ownerType === "individual" 
+          ? `/api/users/${objective.ownerId}` 
+          : `/api/teams/${objective.ownerId}`;
+        queryClient.invalidateQueries({ queryKey: [ownerEndpoint] });
+      }
+      // Invalidate parent objective if parentId exists
+      if (objective?.parentId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/okrs/${objective.parentId}`] });
+      }
       onOpenChange(false);
     },
     onError: (error: Error) => {
