@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Target,
   CheckCircle2,
@@ -109,6 +110,12 @@ export default function ObjectiveOverviewCard({
     return "text-red-600 bg-red-100";
   };
 
+  // Helper function to truncate text with character limit
+  const truncateText = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + "...";
+  };
+
   return (
     <Card className="hover:shadow-lg transition-shadow">
       <CardHeader className="pb-4">
@@ -121,12 +128,30 @@ export default function ObjectiveOverviewCard({
               <Target className="w-5 h-5" />
             </div>
             <div>
-              <CardTitle className="text-lg line-clamp-2">
-                {objective.title}
-              </CardTitle>
-              <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                {objective.description}
-              </p>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <CardTitle className="text-lg cursor-help truncate">
+                      {truncateText(objective.title, 50)}
+                    </CardTitle>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p>{objective.title}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <p className="text-sm text-gray-600 mt-1 cursor-help truncate">
+                      {truncateText(objective.description, 60)}
+                    </p>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-sm">
+                    <p>{objective.description}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
           {(() => {
