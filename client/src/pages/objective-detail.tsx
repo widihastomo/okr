@@ -883,60 +883,57 @@ export default function GoalDetail() {
                     </div>
                   </div>
 
-                  {/* Progress section - optimized for mobile */}
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <Badge
-                        variant="secondary"
-                        className="bg-blue-500 text-white hover:bg-blue-600 flex items-center gap-1 shrink-0 text-xs"
-                      >
-                        <TrendingUp className="w-3 h-3" />
-                        <span className="hidden sm:inline">Lebih Cepat</span>
-                        <span className="sm:hidden">↗</span>
-                      </Badge>
-                      <div className="flex-1 min-h-[2rem] flex items-center gap-3">
-                        <div className="flex-1 relative group">
-                          <div className="bg-gray-200 rounded-full h-2 relative cursor-pointer">
-                            <div 
-                              className={`h-2 transition-all duration-300 ${
-                                progress >= 100 ? 'rounded-full' : 'rounded-l-full'
-                              } ${(() => {
-                                // Calculate ideal progress and status
-                                const cycleStart = cycle?.startDate ? new Date(cycle.startDate) : new Date();
-                                const cycleEnd = cycle?.endDate ? new Date(cycle.endDate) : new Date();
-                                const idealProgress = calculateIdealProgress(cycleStart, cycleEnd);
-                                const status = getProgressStatus(progress, idealProgress);
-                                return getStatusColor(status);
-                              })()}`}
-                              style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                        <div className="text-sm font-semibold text-gray-900 shrink-0">
-                          {progress.toFixed(0)}%
-                        </div>
+                  {/* Progress section with last check-in - consistent with dashboard */}
+                  <div className="space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
+                    <div className="w-full sm:flex-1 sm:mr-4">
+                      {/* Mobile: Use compact mode, Desktop: Use full progress bar */}
+                      <div className="block sm:hidden">
+                        <SimpleProgressStatus
+                          status={kr.status}
+                          progressPercentage={progress}
+                          timeProgressPercentage={kr.timeProgressPercentage || 0}
+                          dueDate={null}
+                          startDate={cycle?.startDate}
+                          compact={true}
+                        />
+                      </div>
+                      <div className="hidden sm:block">
+                        <SimpleProgressStatus
+                          status={kr.status}
+                          progressPercentage={progress}
+                          timeProgressPercentage={kr.timeProgressPercentage || 0}
+                          dueDate={null}
+                          startDate={cycle?.startDate}
+                          compact={false}
+                        />
                       </div>
                     </div>
-
-                    {/* Last Check-in Info */}
                     {kr.lastCheckIn && (
-                      <div className="flex items-start gap-2 text-xs text-gray-500 bg-gray-50 p-2 rounded">
-                        <Calendar className="w-3 h-3 mt-0.5 shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <span className="font-medium">Update terakhir:</span>
-                          <span className="ml-1">
-                            {new Date(kr.lastCheckIn.createdAt).toLocaleDateString('id-ID', {
+                      <div className="text-xs text-gray-500 sm:text-right sm:ml-4 sm:shrink-0">
+                        <div className="flex items-center gap-1 sm:justify-end">
+                          <span className="text-gray-400">Terakhir update:</span>
+                          <span className="text-gray-600">
+                            {kr.lastCheckIn.createdAt && new Date(kr.lastCheckIn.createdAt).toLocaleDateString('id-ID', {
                               day: 'numeric',
                               month: 'short',
                               year: 'numeric'
                             })}
                           </span>
-                          {kr.lastCheckIn.notes && (
-                            <div className="mt-1 text-gray-600 line-clamp-2">
-                              {kr.lastCheckIn.notes}
-                            </div>
-                          )}
                         </div>
+                        {kr.lastCheckIn.notes && (
+                          <div className="relative group mt-1">
+                            <div 
+                              className="text-gray-400 italic text-xs max-w-xs truncate sm:text-right cursor-help"
+                            >
+                              "{kr.lastCheckIn.notes}"
+                            </div>
+                            {/* Custom tooltip */}
+                            <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 max-w-sm min-w-0 break-words">
+                              {kr.lastCheckIn.notes}
+                              <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
