@@ -216,22 +216,7 @@ export default function InitiativeFormModal({
           </DialogTitle>
         </DialogHeader>
 
-        {/* Penjelasan Konsep Initiative */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-          <h3 className="font-semibold text-blue-900 mb-2">💡 Apa itu Rencana (Initiative)?</h3>
-          <p className="text-sm text-blue-800 mb-3">
-            Rencana adalah tindakan konkret yang akan Anda lakukan untuk mencapai tujuan (Goal). 
-            Setiap rencana harus memiliki <strong>indikator keberhasilan yang terukur</strong> agar Anda bisa melacak apakah rencana tersebut benar-benar efektif.
-          </p>
-          <div className="text-sm text-blue-700">
-            <strong>Contoh:</strong> Jika goal Anda adalah "Meningkatkan penjualan produk", maka rencana bisa berupa:
-            <ul className="list-disc list-inside mt-1 ml-2">
-              <li>"Kampanye media sosial" dengan target 10.000 engagement</li>
-              <li>"Program referral pelanggan" dengan target 100 referral baru</li>
-              <li>"Pelatihan tim sales" dengan target 90% completion rate</li>
-            </ul>
-          </div>
-        </div>
+        
 
         {currentStep === 1 && (
           <Card>
