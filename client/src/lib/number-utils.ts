@@ -85,3 +85,23 @@ export function getNumberValueForSubmission(formattedValue: string): string {
   const numericValue = parseFormattedNumber(formattedValue);
   return numericValue.toString();
 }
+
+/**
+ * Format input value with Indonesian thousand separators for display in input fields
+ */
+export function formatNumberInput(value: string): string {
+  if (!value) return "";
+  
+  // Remove all non-digit and non-comma characters
+  let cleaned = value.replace(/[^\d,]/g, "");
+  
+  // Handle comma for decimals
+  const commaIndex = cleaned.indexOf(',');
+  if (commaIndex !== -1) {
+    const integerPart = cleaned.substring(0, commaIndex);
+    const decimalPart = cleaned.substring(commaIndex + 1).replace(/,/g, ''); // Remove additional commas
+    cleaned = integerPart + (decimalPart ? ',' + decimalPart : '');
+  }
+  
+  return formatNumberWithSeparator(cleaned);
+}

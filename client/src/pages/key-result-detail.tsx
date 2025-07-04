@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Calendar, Target, TrendingUp, Users, Clock, BarChart3, Edit, Trash2, ChevronRight, Home, ChevronDown, User, Check, CheckCircle2, MoreHorizontal, RefreshCw, MessageSquare, Paperclip, Send, AtSign, Plus } from "lucide-react";
 import { CheckInModal } from "@/components/check-in-modal";
 import InitiativeModal from "@/components/initiative-modal";
+import InitiativeFormModal from "@/components/initiative-form-modal";
 import { ProgressStatus } from "@/components/progress-status";
 import { format } from "date-fns";
 import type { KeyResultWithDetails } from "@shared/schema";
@@ -113,6 +114,7 @@ export default function KeyResultDetailPage() {
   const [addTaskOpen, setAddTaskOpen] = useState(false);
   const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set());
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [showInitiativeFormModal, setShowInitiativeFormModal] = useState(false);
 
   // Task form for editing/adding
   const taskForm = useForm<TaskFormData>({
@@ -346,6 +348,43 @@ export default function KeyResultDetailPage() {
       toast({
         title: "Gagal menghapus initiative",
         description: error.message || "Terjadi kesalahan saat menghapus initiative",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Create initiative with success metrics mutation
+  const createInitiativeWithMetricsMutation = useMutation({
+    mutationFn: async (data: { initiative: any; successMetrics: any[] }) => {
+      const response = await fetch(`/api/initiatives/with-metrics`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          keyResultId,
+          initiative: data.initiative,
+          successMetrics: data.successMetrics,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to create initiative');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/key-results/${keyResultId}/initiatives`] });
+      setShowInitiativeFormModal(false);
+      toast({
+        title: "Rencana berhasil dibuat",
+        description: "Rencana dengan ukuran keberhasilan telah ditambahkan",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal membuat rencana",
         variant: "destructive",
       });
     },
@@ -1195,7 +1234,13 @@ export default function KeyResultDetailPage() {
                   </CardDescription>
                 </div>
                 <div className="flex gap-2">
-                  <InitiativeModal keyResultId={keyResult.id} onSuccess={handleInitiativeSuccess} />
+                  <Button 
+                    onClick={() => setShowInitiativeFormModal(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Tambah Rencana
+                  </Button>
                 </div>
               </div>
             </CardHeader>
@@ -1493,6 +1538,16 @@ export default function KeyResultDetailPage() {
         onClose={() => setEditingInitiative(null)}
       />
     )}
+
+    {/* Initiative Form Modal with Success Metrics */}
+    <InitiativeFormModal
+      isOpen={showInitiativeFormModal}
+      onClose={() => setShowInitiativeFormModal(false)}
+      onSubmit={createInitiativeWithMetricsMutation.mutate}
+      keyResultId={keyResultId}
+      users={users || []}
+      isLoading={createInitiativeWithMetricsMutation.isPending}
+    />
 
     {/* Edit Task Modal */}
     <Dialog open={editTaskOpen} onOpenChange={setEditTaskOpen}>

@@ -152,6 +152,34 @@ export const initiativeDocuments = pgTable("initiative_documents", {
   uploadedAt: timestamp("uploaded_at").defaultNow(),
 });
 
+// Success metrics for initiatives to track impact and outcomes
+export const initiativeSuccessMetrics = pgTable("initiative_success_metrics", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  initiativeId: uuid("initiative_id").references(() => initiatives.id).notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  type: text("type").notNull().default("increase_to"), // "increase_to", "decrease_to", "achieve_or_not", "should_stay_above", "should_stay_below"
+  baseValue: decimal("base_value", { precision: 15, scale: 2 }),
+  targetValue: decimal("target_value", { precision: 15, scale: 2 }).notNull(),
+  currentValue: decimal("current_value", { precision: 15, scale: 2 }).default("0"),
+  unit: text("unit").notNull().default("number"), // "number", "percentage", "currency", "days", etc.
+  status: text("status").notNull().default("not_started"), // "not_started", "on_track", "at_risk", "behind", "completed", "ahead"
+  dueDate: timestamp("due_date"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Updates/check-ins for success metrics
+export const successMetricUpdates = pgTable("success_metric_updates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  metricId: uuid("metric_id").references(() => initiativeSuccessMetrics.id).notNull(),
+  value: decimal("value", { precision: 15, scale: 2 }).notNull(),
+  notes: text("notes"),
+  confidence: integer("confidence").notNull().default(5), // 1-10 scale
+  createdAt: timestamp("created_at").defaultNow(),
+  createdBy: uuid("created_by").notNull(), // user ID
+});
+
 // Initiative notes for updates, budget allocations, and other information
 export const initiativeNotes = pgTable("initiative_notes", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -229,6 +257,17 @@ export const insertInitiativeNoteSchema = createInsertSchema(initiativeNotes).om
   id: true,
   createdAt: true,
   updatedAt: true,
+});
+
+export const insertSuccessMetricSchema = createInsertSchema(initiativeSuccessMetrics).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertSuccessMetricUpdateSchema = createInsertSchema(successMetricUpdates).omit({
+  id: true,
+  createdAt: true,
 });
 
 // Gamification Tables
@@ -426,6 +465,29 @@ export const initiativesRelations = relations(initiatives, ({ one, many }) => ({
     references: [users.id],
   }),
   tasks: many(tasks),
+  successMetrics: many(initiativeSuccessMetrics),
+  members: many(initiativeMembers),
+  documents: many(initiativeDocuments),
+  notes: many(initiativeNotes),
+}));
+
+export const successMetricsRelations = relations(initiativeSuccessMetrics, ({ one, many }) => ({
+  initiative: one(initiatives, {
+    fields: [initiativeSuccessMetrics.initiativeId],
+    references: [initiatives.id],
+  }),
+  updates: many(successMetricUpdates),
+}));
+
+export const successMetricUpdatesRelations = relations(successMetricUpdates, ({ one }) => ({
+  metric: one(initiativeSuccessMetrics, {
+    fields: [successMetricUpdates.metricId],
+    references: [initiativeSuccessMetrics.id],
+  }),
+  creator: one(users, {
+    fields: [successMetricUpdates.createdBy],
+    references: [users.id],
+  }),
 }));
 
 export const tasksRelations = relations(tasks, ({ one }) => ({
@@ -532,4 +594,22 @@ export type CycleWithOKRs = Cycle & {
   totalObjectives: number;
   completedObjectives: number;
   avgProgress: number;
+};
+
+// Types for success metrics
+export type SuccessMetric = typeof initiativeSuccessMetrics.$inferSelect;
+export type InsertSuccessMetric = z.infer<typeof insertSuccessMetricSchema>;
+export type SuccessMetricUpdate = typeof successMetricUpdates.$inferSelect;
+export type InsertSuccessMetricUpdate = z.infer<typeof insertSuccessMetricUpdateSchema>;
+
+export type SuccessMetricWithUpdates = SuccessMetric & {
+  updates: SuccessMetricUpdate[];
+  latestUpdate?: SuccessMetricUpdate | null;
+  progressPercentage: number;
+};
+
+export type InitiativeWithSuccessMetrics = Initiative & {
+  successMetrics: SuccessMetricWithUpdates[];
+  members: (InitiativeMember & { user: User })[];
+  tasks: Task[];
 };

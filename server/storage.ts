@@ -1,12 +1,13 @@
 import { 
   cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives, tasks,
-  initiativeMembers, initiativeDocuments, initiativeNotes,
+  initiativeMembers, initiativeDocuments, initiativeNotes, initiativeSuccessMetrics, successMetricUpdates,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
   type CheckIn, type Initiative, type Task, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
   type InitiativeNote, type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
   type InsertUser, type UpsertUser, type InsertTeam, type InsertTeamMember,
   type InsertCheckIn, type InsertInitiative, type InsertInitiativeMember, type InsertInitiativeDocument, type InsertTask,
-  type InsertInitiativeNote, type OKRWithKeyResults, type CycleWithOKRs, type UpdateKeyResultProgress, type CreateOKRFromTemplate 
+  type InsertInitiativeNote, type OKRWithKeyResults, type CycleWithOKRs, type UpdateKeyResultProgress, type CreateOKRFromTemplate,
+  type SuccessMetric, type InsertSuccessMetric, type SuccessMetricUpdate, type InsertSuccessMetricUpdate
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc } from "drizzle-orm";
@@ -102,6 +103,14 @@ export interface IStorage {
   createInitiativeNote(note: InsertInitiativeNote): Promise<InitiativeNote>;
   updateInitiativeNote(id: string, note: Partial<InsertInitiativeNote>): Promise<InitiativeNote | undefined>;
   deleteInitiativeNote(id: string): Promise<boolean>;
+  
+  // Success Metrics
+  getSuccessMetricsByInitiativeId(initiativeId: string): Promise<SuccessMetric[]>;
+  createSuccessMetric(metric: InsertSuccessMetric): Promise<SuccessMetric>;
+  updateSuccessMetric(id: string, metric: Partial<InsertSuccessMetric>): Promise<SuccessMetric | undefined>;
+  deleteSuccessMetric(id: string): Promise<boolean>;
+  getSuccessMetricUpdates(metricId: string): Promise<SuccessMetricUpdate[]>;
+  createSuccessMetricUpdate(update: InsertSuccessMetricUpdate): Promise<SuccessMetricUpdate>;
   
   // Tasks
   getTasks(): Promise<Task[]>;
@@ -1181,6 +1190,51 @@ export class DatabaseStorage implements IStorage {
         } : undefined
       } : undefined
     }));
+  }
+
+  // Success Metrics
+  async getSuccessMetricsByInitiativeId(initiativeId: string): Promise<SuccessMetric[]> {
+    return await db
+      .select()
+      .from(initiativeSuccessMetrics)
+      .where(eq(initiativeSuccessMetrics.initiativeId, initiativeId))
+      .orderBy(desc(initiativeSuccessMetrics.createdAt));
+  }
+
+  async createSuccessMetric(metric: InsertSuccessMetric): Promise<SuccessMetric> {
+    const [newMetric] = await db.insert(initiativeSuccessMetrics).values(metric).returning();
+    return newMetric;
+  }
+
+  async updateSuccessMetric(id: string, metric: Partial<InsertSuccessMetric>): Promise<SuccessMetric | undefined> {
+    const [updatedMetric] = await db
+      .update(initiativeSuccessMetrics)
+      .set({ ...metric, updatedAt: new Date() })
+      .where(eq(initiativeSuccessMetrics.id, id))
+      .returning();
+    return updatedMetric || undefined;
+  }
+
+  async deleteSuccessMetric(id: string): Promise<boolean> {
+    // First delete all related updates
+    await db.delete(successMetricUpdates).where(eq(successMetricUpdates.metricId, id));
+    
+    // Then delete the metric itself
+    const result = await db.delete(initiativeSuccessMetrics).where(eq(initiativeSuccessMetrics.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getSuccessMetricUpdates(metricId: string): Promise<SuccessMetricUpdate[]> {
+    return await db
+      .select()
+      .from(successMetricUpdates)
+      .where(eq(successMetricUpdates.metricId, metricId))
+      .orderBy(desc(successMetricUpdates.createdAt));
+  }
+
+  async createSuccessMetricUpdate(update: InsertSuccessMetricUpdate): Promise<SuccessMetricUpdate> {
+    const [newUpdate] = await db.insert(successMetricUpdates).values(update).returning();
+    return newUpdate;
   }
 }
 

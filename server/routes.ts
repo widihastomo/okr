@@ -5,6 +5,7 @@ import {
   insertCycleSchema, insertTemplateSchema, insertObjectiveSchema, insertKeyResultSchema, 
   insertCheckInSchema, insertInitiativeSchema, insertInitiativeMemberSchema, insertInitiativeDocumentSchema, 
   insertTaskSchema, insertInitiativeNoteSchema, updateKeyResultProgressSchema, createOKRFromTemplateSchema,
+  insertSuccessMetricSchema, insertSuccessMetricUpdateSchema,
   type User
 } from "@shared/schema";
 import { z } from "zod";
@@ -1393,6 +1394,111 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Success Metrics endpoints
+  app.get("/api/initiatives/:initiativeId/success-metrics", async (req, res) => {
+    try {
+      const initiativeId = req.params.initiativeId;
+      const metrics = await storage.getSuccessMetricsByInitiativeId(initiativeId);
+      res.json(metrics);
+    } catch (error) {
+      console.error("Error fetching success metrics:", error);
+      res.status(500).json({ message: "Failed to fetch success metrics" });
+    }
+  });
+
+  app.post("/api/initiatives/:initiativeId/success-metrics", requireAuth, async (req, res) => {
+    try {
+      const initiativeId = req.params.initiativeId;
+      const result = insertSuccessMetricSchema.safeParse({
+        ...req.body,
+        initiativeId
+      });
+      
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid success metric data", errors: result.error.errors });
+      }
+
+      const metric = await storage.createSuccessMetric(result.data);
+      res.status(201).json(metric);
+    } catch (error) {
+      console.error("Error creating success metric:", error);
+      res.status(500).json({ message: "Failed to create success metric" });
+    }
+  });
+
+  app.patch("/api/success-metrics/:id", requireAuth, async (req, res) => {
+    try {
+      const id = req.params.id;
+      const updatedMetric = await storage.updateSuccessMetric(id, req.body);
+      
+      if (!updatedMetric) {
+        return res.status(404).json({ message: "Success metric not found" });
+      }
+      
+      res.json(updatedMetric);
+    } catch (error) {
+      console.error("Error updating success metric:", error);
+      res.status(500).json({ message: "Failed to update success metric" });
+    }
+  });
+
+  app.delete("/api/success-metrics/:id", requireAuth, async (req, res) => {
+    try {
+      const id = req.params.id;
+      const deleted = await storage.deleteSuccessMetric(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Success metric not found" });
+      }
+      
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting success metric:", error);
+      res.status(500).json({ message: "Failed to delete success metric" });
+    }
+  });
+
+  // Success Metric Updates endpoints
+  app.get("/api/success-metrics/:metricId/updates", async (req, res) => {
+    try {
+      const metricId = req.params.metricId;
+      const updates = await storage.getSuccessMetricUpdates(metricId);
+      res.json(updates);
+    } catch (error) {
+      console.error("Error fetching success metric updates:", error);
+      res.status(500).json({ message: "Failed to fetch success metric updates" });
+    }
+  });
+
+  app.post("/api/success-metrics/:metricId/updates", requireAuth, async (req, res) => {
+    try {
+      const metricId = req.params.metricId;
+      const currentUser = req.user as User;
+      
+      const result = insertSuccessMetricUpdateSchema.safeParse({
+        ...req.body,
+        metricId,
+        createdBy: currentUser.id
+      });
+      
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid update data", errors: result.error.errors });
+      }
+
+      const update = await storage.createSuccessMetricUpdate(result.data);
+      
+      // Update the metric's current value
+      await storage.updateSuccessMetric(metricId, {
+        currentValue: result.data.value
+      });
+      
+      res.status(201).json(update);
+    } catch (error) {
+      console.error("Error creating success metric update:", error);
+      res.status(500).json({ message: "Failed to create success metric update" });
+    }
+  });
+
   // Update task
   app.put("/api/tasks/:id", async (req, res) => {
     try {
@@ -1707,6 +1813,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error creating initiative:", error);
       res.status(500).json({ message: "Failed to create initiative" });
+    }
+  });
+
+  // Create initiative with success metrics
+  app.post("/api/initiatives/with-metrics", requireAuth, async (req, res) => {
+    try {
+      const { initiative, successMetrics } = req.body;
+      const currentUser = req.user as User;
+
+      // Add auth fields to initiative
+      const initiativeData = {
+        ...initiative,
+        keyResultId: req.body.keyResultId,
+        createdBy: currentUser.id,
+      };
+
+      // Validate initiative data
+      const initiativeResult = insertInitiativeSchema.safeParse(initiativeData);
+      if (!initiativeResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid initiative data", 
+          errors: initiativeResult.error.errors 
+        });
+      }
+
+      // Create the initiative
+      const newInitiative = await storage.createInitiative(initiativeResult.data);
+
+      // Create success metrics if provided
+      if (successMetrics && successMetrics.length > 0) {
+        const metricPromises = successMetrics.map((metric: any) => {
+          const metricData = {
+            ...metric,
+            initiativeId: newInitiative.id,
+          };
+          return storage.createSuccessMetric(metricData);
+        });
+
+        await Promise.all(metricPromises);
+      }
+
+      res.status(201).json(newInitiative);
+    } catch (error) {
+      console.error("Error creating initiative with metrics:", error);
+      res.status(500).json({ message: "Failed to create initiative with metrics" });
     }
   });
 
