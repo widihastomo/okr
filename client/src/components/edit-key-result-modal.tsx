@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { ChevronsUpDown, Check } from "lucide-react";
+import { ChevronsUpDown, Check, HelpCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
@@ -264,7 +264,20 @@ export default function EditKeyResultModal({
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Judul Ukuran Keberhasilan</FormLabel>
+                  <FormLabel className="flex items-center gap-2 mb-2">
+                    Judul Ukuran Keberhasilan
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                      </PopoverTrigger>
+                      <PopoverContent className="w-80">
+                        <div className="text-sm">
+                          <p className="font-medium mb-2">Judul Ukuran Keberhasilan</p>
+                          <p>Buat judul yang spesifik dan terukur. Contoh: "Meningkatkan pendapatan bulanan menjadi 100 juta", "Menurunkan biaya operasional ke 50 juta", "Mencapai 90% kepuasan pelanggan".</p>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </FormLabel>
                   <FormControl>
                     <Input 
                       placeholder="Contoh: Meningkatkan pendapatan bulanan"
@@ -282,7 +295,20 @@ export default function EditKeyResultModal({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Deskripsi (Opsional)</FormLabel>
+                  <FormLabel className="flex items-center gap-2 mb-2">
+                    Deskripsi (Opsional)
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                      </PopoverTrigger>
+                      <PopoverContent className="w-80">
+                        <div className="text-sm">
+                          <p className="font-medium mb-2">Deskripsi Ukuran Keberhasilan</p>
+                          <p>Jelaskan konteks dan detail penting tentang ukuran keberhasilan ini. Apa yang akan diukur, bagaimana cara mengukurnya, dan mengapa ini penting untuk mencapai goal.</p>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </FormLabel>
                   <FormControl>
                     <Textarea 
                       placeholder="Deskripsi detail tentang Ukuran Keberhasilan ini..."
@@ -302,7 +328,27 @@ export default function EditKeyResultModal({
                 name="keyResultType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tipe Ukuran Keberhasilan</FormLabel>
+                    <FormLabel className="flex items-center gap-2 mb-2">
+                      Tipe Ukuran Keberhasilan
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80">
+                          <div className="text-sm">
+                            <p className="font-medium mb-2">Tipe Ukuran Keberhasilan</p>
+                            <p className="mb-2">Pilih tipe sesuai cara pengukuran:</p>
+                            <ul className="list-disc list-inside space-y-1 text-xs">
+                              <li><strong>Naik ke Target:</strong> Nilai meningkat dari baseline ke target</li>
+                              <li><strong>Turun ke Target:</strong> Nilai menurun dari baseline ke target</li>
+                              <li><strong>Tetap Di Atas:</strong> Nilai harus selalu di atas threshold</li>
+                              <li><strong>Tetap Di Bawah:</strong> Nilai harus selalu di bawah threshold</li>
+                              <li><strong>Ya/Tidak:</strong> Target tercapai atau tidak (binary)</li>
+                            </ul>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </FormLabel>
                     {(checkInData?.count || 0) > 0 ? (
                       <div className="space-y-2">
                         <Input
@@ -349,7 +395,28 @@ export default function EditKeyResultModal({
                   name="unit"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Unit (Opsional)</FormLabel>
+                      <FormLabel className="flex items-center gap-2 mb-2">
+                        Unit (Opsional)
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                          </PopoverTrigger>
+                          <PopoverContent className="w-80">
+                            <div className="text-sm">
+                              <p className="font-medium mb-2">Unit Pengukuran</p>
+                              <p className="mb-2">Pilih unit yang sesuai dengan nilai yang diukur:</p>
+                              <ul className="list-disc list-inside space-y-1 text-xs">
+                                <li><strong>Rp:</strong> Untuk nilai uang/finansial</li>
+                                <li><strong>%:</strong> Untuk persentase</li>
+                                <li><strong>orang:</strong> Untuk jumlah orang</li>
+                                <li><strong>rating/skor:</strong> Untuk penilaian</li>
+                                <li><strong>unit/buah:</strong> Untuk hitungan item</li>
+                                <li>Atau ketik unit custom lainnya</li>
+                              </ul>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -440,7 +507,20 @@ export default function EditKeyResultModal({
                       name="targetValue"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Target</FormLabel>
+                          <FormLabel className="flex items-center gap-2 mb-2">
+                            Target
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              </PopoverTrigger>
+                              <PopoverContent className="w-80">
+                                <div className="text-sm">
+                                  <p className="font-medium mb-2">Target (Threshold)</p>
+                                  <p>Nilai ambang batas yang harus dipertahankan. Untuk "tetap di atas", nilai harus selalu ≥ target. Untuk "tetap di bawah", nilai harus selalu ≤ target.</p>
+                                </div>
+                              </PopoverContent>
+                            </Popover>
+                          </FormLabel>
                           <FormControl>
                             <Input 
                               placeholder="100"
@@ -466,7 +546,20 @@ export default function EditKeyResultModal({
                     name="baseValue"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nilai Awal</FormLabel>
+                        <FormLabel className="flex items-center gap-2 mb-2">
+                          Nilai Awal
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80">
+                              <div className="text-sm">
+                                <p className="font-medium mb-2">Nilai Awal (Baseline)</p>
+                                <p>Titik awal pengukuran sebelum periode dimulai. Contoh: jika target meningkatkan penjualan dari 50 juta ke 100 juta, maka 50 juta adalah nilai awal.</p>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        </FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="0"
@@ -485,7 +578,20 @@ export default function EditKeyResultModal({
                     name="targetValue"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Target</FormLabel>
+                        <FormLabel className="flex items-center gap-2 mb-2">
+                          Target
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80">
+                              <div className="text-sm">
+                                <p className="font-medium mb-2">Target</p>
+                                <p>Nilai yang ingin dicapai di akhir periode. Harus ambisius namun realistis. Contoh: meningkatkan penjualan ke 100 juta, menurunkan biaya ke 30 juta, atau mencapai 95% kepuasan pelanggan.</p>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        </FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="100"
@@ -505,7 +611,20 @@ export default function EditKeyResultModal({
                     name="currentValue"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nilai Saat Ini</FormLabel>
+                        <FormLabel className="flex items-center gap-2 mb-2">
+                          Nilai Saat Ini
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80">
+                              <div className="text-sm">
+                                <p className="font-medium mb-2">Nilai Saat Ini</p>
+                                <p>Nilai terkini dari pengukuran ini. Akan terus diperbarui melalui check-in berkala untuk melacak kemajuan menuju target.</p>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        </FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="50"
