@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Calendar, User, Users, Clock, Edit, MoreVertical, Copy, Trash2, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Target, Settings, MoveUp, MoveDown, Eye } from "lucide-react";
 import type { OKRWithKeyResults, KeyResult } from "@shared/schema";
 import { Link } from "wouter";
@@ -30,6 +31,14 @@ interface OKRCardProps {
 
 export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDeleteKeyResult, onDuplicate, onDelete, onEdit, cycleStartDate, cycleEndDate, cycle, index = 0 }: OKRCardProps) {
   const [isExpanded, setIsExpanded] = useState(index === 0);
+
+  // Helper function to truncate text with character limit (responsive)
+  const truncateText = (text: string, maxLength: number, mobileLength?: number) => {
+    // Use shorter length for mobile if provided
+    const effectiveLength = window.innerWidth < 768 && mobileLength ? mobileLength : maxLength;
+    if (text.length <= effectiveLength) return text;
+    return text.substring(0, effectiveLength) + "...";
+  };
   
   const calculateProgress = (current: string, target: string, keyResultType: string, baseValue?: string | null): number => {
     const currentNum = parseFloat(current) || 0;
@@ -207,13 +216,37 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0 pr-8 sm:pr-0">
-                    <Link href={`/objectives/${okr.id}`}>
-                      <h3 className="text-lg sm:text-xl font-bold hover:underline cursor-pointer leading-tight">
-                        {okr.title}
-                      </h3>
-                    </Link>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Link href={`/objectives/${okr.id}`}>
+                            <h3 className="text-lg sm:text-xl font-bold hover:underline cursor-pointer leading-tight truncate max-w-full cursor-help">
+                              {truncateText(okr.title, 50, 30)}
+                            </h3>
+                          </Link>
+                        </TooltipTrigger>
+                        {okr.title.length > (window.innerWidth < 768 ? 30 : 50) && (
+                          <TooltipContent className="max-w-xs">
+                            <p>{okr.title}</p>
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
+                    </TooltipProvider>
                     {okr.description && (
-                      <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">{okr.description}</p>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <p className="text-xs sm:text-sm text-gray-600 mt-1 truncate max-w-full cursor-help">
+                              {truncateText(okr.description, 60, 40)}
+                            </p>
+                          </TooltipTrigger>
+                          {okr.description.length > (window.innerWidth < 768 ? 40 : 60) && (
+                            <TooltipContent className="max-w-sm">
+                              <p>{okr.description}</p>
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
+                      </TooltipProvider>
                     )}
                   </div>
                   
