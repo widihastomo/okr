@@ -27,10 +27,21 @@ interface OKRCardProps {
   cycleEndDate?: string;
   cycle?: { id: string; name: string; type: string; startDate: string; endDate: string; status: string; description: string | null; };
   index?: number;
+  users?: any[];
 }
 
-export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDeleteKeyResult, onDuplicate, onDelete, onEdit, cycleStartDate, cycleEndDate, cycle, index = 0 }: OKRCardProps) {
+export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDeleteKeyResult, onDuplicate, onDelete, onEdit, cycleStartDate, cycleEndDate, cycle, index = 0, users = [] }: OKRCardProps) {
   const [isExpanded, setIsExpanded] = useState(index === 0);
+
+  // Helper function to get user name
+  const getUserName = (userId: string): string => {
+    if (!users) return userId;
+    const user = users.find((u: any) => u.id === userId);
+    if (user && user.firstName && user.lastName) {
+      return `${user.firstName} ${user.lastName}`;
+    }
+    return user?.email || userId;
+  };
 
   // Helper function to truncate text with character limit (responsive)
   const truncateText = (text: string, maxLength: number, mobileLength?: number) => {
@@ -697,6 +708,39 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
                       )}
                     </div>
                   )}
+                </div>
+                
+                {/* Assignee information - Bottom of key result */}
+                <div className="mt-3 pt-2 border-t border-gray-100 flex items-center justify-between">
+                  {/* Assignee - Left */}
+                  <div className="relative group text-xs text-gray-600 flex items-center gap-2">
+                    {kr.assignedTo ? (
+                      <>
+                        <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium cursor-help">
+                          {getUserName(kr.assignedTo)?.charAt(0).toUpperCase() || '?'}
+                        </div>
+                        <span className="font-medium text-gray-800 hidden sm:inline">
+                          {getUserName(kr.assignedTo)}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-5 h-5 bg-gray-300 rounded-full flex items-center justify-center cursor-help">
+                          <User className="w-3 h-3 text-gray-500" />
+                        </div>
+                        <span className="text-gray-500 italic hidden sm:inline">Belum ditentukan</span>
+                      </>
+                    )}
+                    
+                    {/* Tooltip for assignee info */}
+                    <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap">
+                      {kr.assignedTo 
+                        ? `Penanggung jawab: ${getUserName(kr.assignedTo)} - Bertanggung jawab untuk memantau dan melaporkan progress angka target ini`
+                        : "Belum ada penanggung jawab - Assign seseorang untuk memantau progress angka target ini"
+                      }
+                      <div className="absolute top-full left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             );

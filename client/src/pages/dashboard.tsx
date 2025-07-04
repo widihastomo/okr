@@ -632,6 +632,7 @@ export default function Dashboard() {
                   cycleEndDate={cycle?.endDate}
                   cycle={cycle}
                   index={index}
+                  users={users}
                 />
               );
             })
