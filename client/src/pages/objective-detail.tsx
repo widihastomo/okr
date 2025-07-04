@@ -25,6 +25,7 @@ import {
   TrendingDown,
   CheckCircle2,
   MoreVertical,
+  MoreHorizontal,
   Building,
   ClipboardList,
   CheckSquare,
@@ -1104,144 +1105,177 @@ export default function GoalDetail() {
                   </p>
                 </div>
               ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {rencana.map((initiative) => (
-                <Card
-                  key={initiative.id}
-                  className="hover:shadow-lg transition-shadow"
-                >
-                  <CardHeader>
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="flex gap-2">
-                        <Badge
-                          className={
-                            initiative.status === "completed"
-                              ? "bg-green-100 text-green-800"
-                              : initiative.status === "in_progress"
-                                ? "bg-blue-100 text-blue-800"
-                                : initiative.status === "on_hold"
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : "bg-gray-100 text-gray-800"
-                          }
-                        >
-                          {initiative.status?.replace("_", " ") || "pending"}
-                        </Badge>
-                        <Badge
-                          className={
-                            initiative.priority === "critical"
-                              ? "bg-red-100 text-red-800"
-                              : initiative.priority === "high"
-                                ? "bg-orange-100 text-orange-800"
-                                : initiative.priority === "medium"
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : "bg-green-100 text-green-800"
-                          }
-                        >
-                          {initiative.priority || "medium"}
-                        </Badge>
-                      </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 p-0"
-                          >
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Ubah
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-red-600">
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Hapus
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                <Card>
+                  <CardContent className="p-0">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className="bg-gray-50 border-b">
+                          <tr>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Rencana
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Status
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Prioritas
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Progress
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Tenggat
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              PIC
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Aksi
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {rencana.map((initiative) => (
+                            <tr key={initiative.id} className="hover:bg-gray-50">
+                              <td className="px-4 py-4">
+                                <div>
+                                  <Link href={`/initiatives/${initiative.id}`}>
+                                    <div className="font-medium text-gray-900 hover:text-blue-600 cursor-pointer">
+                                      {initiative.title}
+                                    </div>
+                                  </Link>
+                                  {initiative.description && (
+                                    <div className="text-sm text-gray-500 line-clamp-1">
+                                      {initiative.description}
+                                    </div>
+                                  )}
+                                  {initiative.budget && (
+                                    <div className="text-sm text-gray-500 mt-1">
+                                      Budget: Rp {parseFloat(initiative.budget).toLocaleString('id-ID')}
+                                    </div>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="px-4 py-4">
+                                <Select
+                                  value={initiative.status || 'not_started'}
+                                  onValueChange={(newStatus) => {
+                                    // Handle status update here
+                                    console.log('Update initiative status:', initiative.id, newStatus);
+                                  }}
+                                >
+                                  <SelectTrigger className="w-32">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="not_started">Belum Dimulai</SelectItem>
+                                    <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
+                                    <SelectItem value="completed">Selesai</SelectItem>
+                                    <SelectItem value="on_hold">Ditahan</SelectItem>
+                                    <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </td>
+                              <td className="px-4 py-4">
+                                <Badge
+                                  className={
+                                    initiative.priority === "critical"
+                                      ? "bg-red-100 text-red-800"
+                                      : initiative.priority === "high"
+                                        ? "bg-orange-100 text-orange-800"
+                                        : initiative.priority === "medium"
+                                          ? "bg-yellow-100 text-yellow-800"
+                                          : "bg-green-100 text-green-800"
+                                  }
+                                >
+                                  {initiative.priority === "critical"
+                                    ? "Kritis"
+                                    : initiative.priority === "high"
+                                      ? "Tinggi"
+                                      : initiative.priority === "medium"
+                                        ? "Sedang"
+                                        : "Rendah"}
+                                </Badge>
+                              </td>
+                              <td className="px-4 py-4">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-16 bg-gray-200 rounded-full h-2">
+                                    <div
+                                      className="bg-green-600 h-2 rounded-full"
+                                      style={{ width: `${initiative.progressPercentage || 0}%` }}
+                                    ></div>
+                                  </div>
+                                  <span className="text-sm font-medium text-gray-900">
+                                    {initiative.progressPercentage || 0}%
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="px-4 py-4">
+                                {initiative.dueDate ? (
+                                  <span
+                                    className={`text-sm ${
+                                      new Date(initiative.dueDate) < new Date()
+                                        ? "text-red-600 font-medium"
+                                        : "text-gray-900"
+                                    }`}
+                                  >
+                                    {new Date(initiative.dueDate).toLocaleDateString(
+                                      "id-ID",
+                                      {
+                                        day: "numeric",
+                                        month: "short",
+                                        year: "numeric",
+                                      },
+                                    )}
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400 text-sm">-</span>
+                                )}
+                              </td>
+                              <td className="px-4 py-4">
+                                {initiative.picId ? (
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                                      {getUserName(initiative.picId)?.split(' ').map(n => n[0]).join('').toUpperCase() || '?'}
+                                    </div>
+                                    <span className="text-sm text-gray-900 truncate">
+                                      {getUserName(initiative.picId)}
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <span className="text-gray-400 text-sm">Tidak ditugaskan</span>
+                                )}
+                              </td>
+                              <td className="px-4 py-4">
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8 p-0"
+                                    >
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem>
+                                      <Edit className="mr-2 h-4 w-4" />
+                                      Ubah
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className="text-red-600">
+                                      <Trash2 className="mr-2 h-4 w-4" />
+                                      Hapus
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
-                    <CardTitle className="text-lg">
-                      <Link href={`/initiatives/${initiative.id}`}>
-                        <span className="hover:text-blue-600 cursor-pointer">
-                          {initiative.title}
-                        </span>
-                      </Link>
-                    </CardTitle>
-                    {initiative.description && (
-                      <CardDescription className="line-clamp-2">
-                        {initiative.description}
-                      </CardDescription>
-                    )}
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {/* Progress */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Kemajuan</span>
-                        <span className="font-medium">
-                          {initiative.progressPercentage || 0}%
-                        </span>
-                      </div>
-                      <Progress
-                        value={initiative.progressPercentage || 0}
-                        className="h-2"
-                      />
-                    </div>
-
-                    {/* Due Date */}
-                    {initiative.dueDate && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Calendar className="w-4 h-4 text-gray-500" />
-                        <span className="text-gray-600">Tenggat:</span>
-                        <span
-                          className={`font-medium ${
-                            new Date(initiative.dueDate) < new Date()
-                              ? "text-red-600"
-                              : ""
-                          }`}
-                        >
-                          {new Date(initiative.dueDate).toLocaleDateString(
-                            "id-ID",
-                            {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            },
-                          )}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* PIC */}
-                    {initiative.picId && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <UserIcon className="w-4 h-4 text-gray-500" />
-                        <span className="text-gray-600">PIC:</span>
-                        <span className="font-medium truncate">
-                          {getUserName(initiative.picId)}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Budget */}
-                    {initiative.budget && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Building className="w-4 h-4 text-gray-500" />
-                        <span className="text-gray-600">Anggaran:</span>
-                        <span className="font-medium">
-                          Rp{" "}
-                          {parseFloat(initiative.budget).toLocaleString(
-                            "id-ID",
-                          )}
-                        </span>
-                      </div>
-                    )}
                   </CardContent>
                 </Card>
-              ))}
-            </div>
               )}
             </div>
 
