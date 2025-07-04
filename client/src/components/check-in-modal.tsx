@@ -58,7 +58,6 @@ export function CheckInModal({
   keyResultType 
 }: CheckInModalProps) {
   const [open, setOpen] = useState(false);
-  console.log('CheckInModal rendered with props:', { keyResultId, keyResultTitle, currentValue, targetValue, unit, keyResultType });
   const [value, setValue] = useState(currentValue);
   const [achieved, setAchieved] = useState(parseFloat(currentValue) >= parseFloat(targetValue));
   const [notes, setNotes] = useState("");
@@ -123,15 +122,27 @@ export function CheckInModal({
   };
 
   const getUnitDisplay = (unit: string) => {
-    switch (unit) {
+    switch (unit.toLowerCase()) {
       case "percentage":
+      case "persen":
         return "%";
       case "currency":
+      case "rupiah":
+      case "rp":
         return "Rp";
       case "number":
+      case "angka":
       default:
         return "";
     }
+  };
+
+  const isCurrencyUnit = (unit: string) => {
+    return ["currency", "rupiah", "rp"].includes(unit.toLowerCase());
+  };
+
+  const isPercentageUnit = (unit: string) => {
+    return ["percentage", "persen"].includes(unit.toLowerCase());
   };
 
   const getProgressHint = () => {
@@ -238,8 +249,8 @@ export function CheckInModal({
                 required
               />
               <div className="text-xs text-gray-500 mt-1">
-                Target: {unit === "currency" ? `Rp ${formatNumberWithCommas(targetValue)}` : 
-                         unit === "percentage" ? `${formatNumberWithCommas(targetValue)}%` :
+                Target: {isCurrencyUnit(unit) ? `Rp ${formatNumberWithCommas(targetValue)}` : 
+                         isPercentageUnit(unit) ? `${formatNumberWithCommas(targetValue)}%` :
                          `${formatNumberWithCommas(targetValue)} ${getUnitDisplay(unit)}`}
               </div>
               {showNumberWarning && (
@@ -269,8 +280,8 @@ export function CheckInModal({
               </div>
               <div className="text-xs text-gray-500 mt-1">
                 Target: {keyResultType === "should_stay_above" ? "Tetap di atas" : "Tetap di bawah"} {" "}
-                {unit === "currency" ? `Rp ${formatNumberWithCommas(targetValue)}` : 
-                 unit === "percentage" ? `${formatNumberWithCommas(targetValue)}%` :
+                {isCurrencyUnit(unit) ? `Rp ${formatNumberWithCommas(targetValue)}` : 
+                 isPercentageUnit(unit) ? `${formatNumberWithCommas(targetValue)}%` :
                  `${formatNumberWithCommas(targetValue)} ${getUnitDisplay(unit)}`}
               </div>
             </div>
