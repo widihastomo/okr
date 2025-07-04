@@ -1198,40 +1198,17 @@ export default function GoalDetail() {
                                 </Badge>
                               </td>
                               <td className="px-4 py-4">
-                                {(() => {
-                                  const currentDate = new Date();
-                                  const startDate = initiative.startDate ? new Date(initiative.startDate) : currentDate;
-                                  const endDate = initiative.dueDate ? new Date(initiative.dueDate) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-                                  
-                                  const totalDuration = endDate.getTime() - startDate.getTime();
-                                  const elapsed = Math.max(0, currentDate.getTime() - startDate.getTime());
-                                  const idealProgress = Math.min(100, (elapsed / totalDuration) * 100);
-                                  
-                                  return (
-                                    <div 
-                                      className="flex items-center gap-2"
-                                      title={`Progress Aktual: ${initiative.progressPercentage || 0}% | Target Ideal: ${idealProgress.toFixed(1)}% | Capaian ideal berdasarkan waktu yang telah berlalu`}
-                                    >
-                                      <div className="w-16 bg-gray-200 rounded-full h-2 relative">
-                                        {/* Progress Bar */}
-                                        <div
-                                          className="bg-green-600 h-2 rounded-full"
-                                          style={{ width: `${initiative.progressPercentage || 0}%` }}
-                                        ></div>
-                                        {/* Ideal Progress Threshold */}
-                                        {idealProgress > 0 && idealProgress < 100 && (
-                                          <div
-                                            className="absolute top-0 w-px h-2 bg-gray-400"
-                                            style={{ left: `${idealProgress}%` }}
-                                          ></div>
-                                        )}
-                                      </div>
-                                      <span className="text-sm font-medium text-gray-900">
-                                        {initiative.progressPercentage || 0}%
-                                      </span>
-                                    </div>
-                                  );
-                                })()}
+                                <div className="flex items-center gap-2">
+                                  <div className="w-16 bg-gray-200 rounded-full h-2">
+                                    <div
+                                      className="bg-green-600 h-2 rounded-full"
+                                      style={{ width: `${initiative.progressPercentage || 0}%` }}
+                                    ></div>
+                                  </div>
+                                  <span className="text-sm font-medium text-gray-900">
+                                    {initiative.progressPercentage || 0}%
+                                  </span>
+                                </div>
                               </td>
                               <td className="px-4 py-4">
                                 {initiative.dueDate ? (
