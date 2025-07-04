@@ -464,7 +464,12 @@ export default function GoalDetail() {
   });
 
   const handleCreateKeyResult = (data: KeyResultFormData) => {
-    createKeyResultMutation.mutate(data);
+    // Ensure unit has a valid default value
+    const processedData = {
+      ...data,
+      unit: data.unit || "number"
+    };
+    createKeyResultMutation.mutate(processedData);
   };
 
   // Create initiative with success metrics mutation

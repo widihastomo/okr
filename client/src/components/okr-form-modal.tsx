@@ -122,7 +122,7 @@ const objectiveFormSchema = z.object({
 });
 
 type ObjectiveFormData = z.infer<typeof objectiveFormSchema>;
-type KeyResultFormData = z.infer<typeof keyResultSchema>;
+export type KeyResultFormData = z.infer<typeof keyResultSchema>;
 
 
 
@@ -1286,6 +1286,9 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
           <DialogTitle>
             {isEditing ? "Edit Angka Target" : "Tambah Angka Target"}
           </DialogTitle>
+          <DialogDescription>
+            {isEditing ? "Ubah informasi angka target untuk mengukur pencapaian goal." : "Buat angka target baru dengan metrik yang spesifik dan terukur."}
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...keyResultForm}>

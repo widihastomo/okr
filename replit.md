@@ -96,6 +96,15 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 04, 2025. Successfully replaced manual add key result form with reusable KeyResultModal component:
+  * Removed corrupted manual form implementation from objective-detail.tsx file
+  * Integrated existing KeyResultModal component for consistent add key result functionality
+  * Fixed DialogDescription accessibility warnings by adding proper dialog descriptions
+  * Exported KeyResultFormData type for proper TypeScript integration
+  * Ensured handleCreateKeyResult provides default unit value to prevent validation errors
+  * Maintained all existing functionality while improving code maintainability through component reuse
+  * Add key result functionality now uses same modal as create OKR form for UI consistency
+  * Form includes all fields: title, description, type, values, unit, assignee with proper validation
 - July 04, 2025. Completed comprehensive assignee/responsible person functionality for Key Results:
   * Added assignedTo field to key_results database table with UUID foreign key to users table
   * Enhanced edit-key-result-modal.tsx with SearchableUserSelect component for assignee selection
