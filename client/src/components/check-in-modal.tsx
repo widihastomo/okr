@@ -172,13 +172,6 @@ export function CheckInModal({
       ? submitValue 
       : submitValue.replace(/[.,]/g, '');
     
-    console.log('Check-in debug:', { 
-      keyResultType, 
-      achieved, 
-      submitValue, 
-      cleanValue 
-    });
-    
     checkInMutation.mutate({
       value: cleanValue,
       notes,
