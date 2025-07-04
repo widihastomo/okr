@@ -167,8 +167,20 @@ export function CheckInModal({
       submitValue = value;
     }
     
+    // Clean value only for numeric inputs, not for binary types
+    const cleanValue = (keyResultType === "achieve_or_not") 
+      ? submitValue 
+      : submitValue.replace(/[.,]/g, '');
+    
+    console.log('Check-in debug:', { 
+      keyResultType, 
+      achieved, 
+      submitValue, 
+      cleanValue 
+    });
+    
     checkInMutation.mutate({
-      value: submitValue.replace(/[.,]/g, ''),
+      value: cleanValue,
       notes,
     });
   };
