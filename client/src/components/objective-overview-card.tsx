@@ -241,9 +241,27 @@ export default function ObjectiveOverviewCard({
             <span className="text-sm font-medium text-gray-700">
               Progress Keseluruhan
             </span>
-            <span className="text-2xl font-bold text-gray-900">
-              {overallProgress}%
-            </span>
+            <div className="text-right">
+              <span className="text-2xl font-bold text-gray-900">
+                {overallProgress}%
+              </span>
+              {cycle && (
+                <div className="text-xs text-gray-500">
+                  Target: {(() => {
+                    // Calculate ideal progress based on time passed
+                    const cycleStart = new Date(cycle.startDate);
+                    const cycleEnd = new Date(cycle.endDate);
+                    const now = new Date();
+                    
+                    const totalDuration = cycleEnd.getTime() - cycleStart.getTime();
+                    const timePassed = Math.max(0, now.getTime() - cycleStart.getTime());
+                    const idealProgress = Math.min(100, Math.max(0, (timePassed / totalDuration) * 100));
+                    
+                    return Math.round(idealProgress);
+                  })()}%
+                </div>
+              )}
+            </div>
           </div>
           <div className="relative">
             <Progress value={overallProgress} className="h-4" />
@@ -251,6 +269,25 @@ export default function ObjectiveOverviewCard({
             <div className="absolute top-0 left-1/4 w-0.5 h-4 bg-gray-300 opacity-50"></div>
             <div className="absolute top-0 left-1/2 w-0.5 h-4 bg-gray-300 opacity-50"></div>
             <div className="absolute top-0 left-3/4 w-0.5 h-4 bg-gray-300 opacity-50"></div>
+            
+            {/* Ideal progress threshold indicator */}
+            {cycle && (() => {
+              const cycleStart = new Date(cycle.startDate);
+              const cycleEnd = new Date(cycle.endDate);
+              const now = new Date();
+              
+              const totalDuration = cycleEnd.getTime() - cycleStart.getTime();
+              const timePassed = Math.max(0, now.getTime() - cycleStart.getTime());
+              const idealProgress = Math.min(100, Math.max(0, (timePassed / totalDuration) * 100));
+              
+              return (
+                <div 
+                  className="absolute top-0 w-0.5 h-4 bg-blue-500 opacity-75"
+                  style={{ left: `${idealProgress}%` }}
+                  title={`Capaian ideal berdasarkan waktu: ${Math.round(idealProgress)}%`}
+                ></div>
+              );
+            })()}
           </div>
           <div className="flex justify-between text-xs text-gray-400">
             <span>0%</span>
@@ -259,6 +296,14 @@ export default function ObjectiveOverviewCard({
             <span>75%</span>
             <span>100%</span>
           </div>
+          {cycle && (
+            <div className="text-xs text-gray-500 text-center">
+              <span className="inline-flex items-center gap-1">
+                <div className="w-2 h-0.5 bg-blue-500 opacity-75"></div>
+                Capaian ideal berdasarkan waktu yang telah berlalu
+              </span>
+            </div>
+          )}
         </div>
       </CardHeader>
 
