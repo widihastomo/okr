@@ -1617,6 +1617,8 @@ export default function GoalDetail() {
           targetValue={checkInModal.keyResult.targetValue}
           unit={checkInModal.keyResult.unit}
           keyResultType={checkInModal.keyResult.keyResultType}
+          open={checkInModal.open}
+          onOpenChange={(open) => setCheckInModal({ open, keyResult: open ? checkInModal.keyResult : undefined })}
         />
       )}
       <EditKeyResultModal

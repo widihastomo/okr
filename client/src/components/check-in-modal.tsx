@@ -47,6 +47,8 @@ interface CheckInModalProps {
   targetValue: string;
   unit: string;
   keyResultType: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function CheckInModal({ 
@@ -55,9 +57,10 @@ export function CheckInModal({
   currentValue, 
   targetValue, 
   unit,
-  keyResultType 
+  keyResultType,
+  open,
+  onOpenChange
 }: CheckInModalProps) {
-  const [open, setOpen] = useState(false);
   const [value, setValue] = useState(currentValue);
   const [achieved, setAchieved] = useState(parseFloat(currentValue) >= parseFloat(targetValue));
   const [notes, setNotes] = useState("");
@@ -85,7 +88,7 @@ export function CheckInModal({
       queryClient.invalidateQueries({
         queryKey: [`/api/key-results/${keyResultId}`],
       });
-      setOpen(false);
+      onOpenChange(false);
       setValue(currentValue);
       setAchieved(parseFloat(currentValue) >= parseFloat(targetValue));
       setNotes("");
@@ -196,13 +199,7 @@ export function CheckInModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" className="flex items-center gap-2">
-          <TrendingUp className="h-4 w-4" />
-          Update
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -327,7 +324,7 @@ export function CheckInModal({
             <Button
               type="button"
               variant="outline"
-              onClick={() => setOpen(false)}
+              onClick={() => onOpenChange(false)}
             >
               Batal
             </Button>
