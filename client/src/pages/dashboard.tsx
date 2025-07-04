@@ -732,7 +732,7 @@ export default function Dashboard() {
         open={habitWizardOpen}
         onOpenChange={setHabitWizardOpen}
         objectives={okrs}
-        userId={currentUser?.id || ""}
+        userId={(currentUser as any)?.id || ""}
       />
 
       {/* AI Help Bubble */}

@@ -39,14 +39,12 @@ import {
 
 // Schema for step 1 - Initiative info
 const initiativeInfoSchema = z.object({
-  title: z.string().min(1, "Judul rencana harus diisi"),
-  description: z.string().optional(),
-  status: z.enum(["not_started", "in_progress", "completed", "on_hold", "cancelled"]).default("not_started"),
-  priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
-  picId: z.string().optional(),
-  startDate: z.date().optional(),
-  dueDate: z.date().optional(),
-  budget: z.string().optional(),
+  title: z.string().min(1, "Nama inisiatif harus diisi"),
+  description: z.string().min(1, "Tujuan inisiatif harus diisi"),
+  targetContribution: z.string().optional(),
+  picId: z.string().min(1, "Penanggung jawab harus dipilih"),
+  startDate: z.date({ required_error: "Tanggal mulai harus diisi" }),
+  dueDate: z.date({ required_error: "Tanggal selesai harus diisi" }),
 });
 
 // Schema for step 2 - Success metrics
@@ -125,8 +123,10 @@ export default function InitiativeFormModal({
   const initiativeForm = useForm<InitiativeInfoData>({
     resolver: zodResolver(initiativeInfoSchema),
     defaultValues: {
-      status: "not_started",
-      priority: "medium",
+      title: "",
+      description: "",
+      targetContribution: "",
+      picId: "",
     },
   });
 
@@ -162,13 +162,14 @@ export default function InitiativeFormModal({
     const processedInitiative = {
       title: initiativeData.title,
       description: initiativeData.description || null,
-      status: initiativeData.status,
-      priority: initiativeData.priority,
+      status: "not_started",
+      priority: "medium",
       picId: initiativeData.picId || null,
       startDate: initiativeData.startDate || null,
       dueDate: initiativeData.dueDate || null,
-      budget: initiativeData.budget || null,
+      budget: initiativeData.targetContribution || null,
       progressPercentage: 0,
+      keyResultId,
     };
 
     const processedMetrics = successMetrics.map(metric => ({
@@ -221,9 +222,9 @@ export default function InitiativeFormModal({
         {currentStep === 1 && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Informasi Rencana</CardTitle>
+              <CardTitle className="text-lg">Informasi Inisiatif</CardTitle>
               <p className="text-sm text-gray-600 mt-1">
-                Isi informasi dasar tentang rencana yang akan Anda buat. Rencana yang baik memiliki tujuan yang jelas, timeline yang realistis, dan PIC yang bertanggung jawab.
+                Isi informasi dasar tentang inisiatif yang akan Anda buat.
               </p>
             </CardHeader>
             <CardContent>
@@ -234,9 +235,9 @@ export default function InitiativeFormModal({
                     name="title"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Judul Rencana *</FormLabel>
+                        <FormLabel>Nama Inisiatif *</FormLabel>
                         <FormControl>
-                          <Input placeholder="Masukkan judul rencana..." {...field} />
+                          <Input placeholder="Masukkan nama inisiatif..." {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -248,102 +249,72 @@ export default function InitiativeFormModal({
                     name="description"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Deskripsi</FormLabel>
+                        <FormLabel>Tujuan Inisiatif *</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Deskripsi rencana..." {...field} />
+                          <Textarea placeholder="Jelaskan tujuan inisiatif ini..." {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <FormField
-                      control={initiativeForm.control}
-                      name="status"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Status</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Pilih status" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {statusOptions.map((option) => (
-                                <SelectItem key={option.value} value={option.value}>
-                                  {option.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                  <FormField
+                    control={initiativeForm.control}
+                    name="targetContribution"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Target Kontribusi Ke Angka Target</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Masukkan kontribusi target..."
+                            {...field}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              field.onChange(value);
+                              // Show difference calculation here if needed
+                            }}
+                          />
+                        </FormControl>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Berapa kontribusi inisiatif ini terhadap pencapaian angka target
+                        </p>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                    <FormField
-                      control={initiativeForm.control}
-                      name="priority"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Prioritas</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Pilih prioritas" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {priorityOptions.map((option) => (
-                                <SelectItem key={option.value} value={option.value}>
-                                  {option.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                  <FormField
+                    control={initiativeForm.control}
+                    name="picId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Penanggung Jawab *</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih penanggung jawab" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {users.map((user) => (
+                              <SelectItem key={user.id} value={user.id}>
+                                {user.firstName} {user.lastName}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                    <FormField
-                      control={initiativeForm.control}
-                      name="picId"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>PIC (Person In Charge)</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Pilih PIC" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {users.map((user) => (
-                                <SelectItem key={user.id} value={user.id}>
-                                  {user.firstName} {user.lastName}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <p className="text-xs text-gray-500 mt-1">
-                            Orang yang bertanggung jawab menjalankan rencana ini
-                          </p>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={initiativeForm.control}
                       name="startDate"
                       render={({ field }) => (
                         <FormItem className="flex flex-col">
-                          <FormLabel>Tanggal Mulai</FormLabel>
+                          <FormLabel>Tanggal Mulai *</FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
                               <FormControl>
@@ -357,7 +328,7 @@ export default function InitiativeFormModal({
                                   {field.value ? (
                                     format(field.value, "dd/MM/yyyy")
                                   ) : (
-                                    <span>Pilih tanggal</span>
+                                    <span>Pilih tanggal mulai</span>
                                   )}
                                   <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                 </Button>
@@ -385,7 +356,7 @@ export default function InitiativeFormModal({
                       name="dueDate"
                       render={({ field }) => (
                         <FormItem className="flex flex-col">
-                          <FormLabel>Tanggal Target</FormLabel>
+                          <FormLabel>Tanggal Selesai *</FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
                               <FormControl>
@@ -399,7 +370,7 @@ export default function InitiativeFormModal({
                                   {field.value ? (
                                     format(field.value, "dd/MM/yyyy")
                                   ) : (
-                                    <span>Pilih tanggal</span>
+                                    <span>Pilih tanggal selesai</span>
                                   )}
                                   <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                 </Button>
@@ -417,30 +388,6 @@ export default function InitiativeFormModal({
                               />
                             </PopoverContent>
                           </Popover>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={initiativeForm.control}
-                      name="budget"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Anggaran</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="0"
-                              {...field}
-                              onChange={(e) => {
-                                const formatted = formatNumberInput(e.target.value);
-                                field.onChange(formatted);
-                              }}
-                            />
-                          </FormControl>
-                          <p className="text-xs text-gray-500 mt-1">
-                            Perkiraan anggaran yang dibutuhkan (contoh: 5.000.000)
-                          </p>
                           <FormMessage />
                         </FormItem>
                       )}
