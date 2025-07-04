@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { HelpCircle, Plus, Edit, ChevronRight, ChevronLeft, Target, Trash2, TrendingUp, TrendingDown, ChevronsUpDown, Check } from "lucide-react";
+import { HelpCircle, Plus, Edit, ChevronRight, ChevronLeft, Target, Trash2, TrendingUp, TrendingDown, MoveUp, MoveDown, ChevronsUpDown, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
@@ -781,13 +781,53 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                                   </div>
                                 </TableCell>
                                 <TableCell>
-                                  <Badge variant="outline" className="text-xs">
-                                    {keyResult.keyResultType === 'increase_to' && 'Naik ke'}
-                                    {keyResult.keyResultType === 'decrease_to' && 'Turun ke'}
-                                    {keyResult.keyResultType === 'achieve_or_not' && 'Ya/Tidak'}
-                                    {keyResult.keyResultType === 'should_stay_above' && 'Tetap di atas'}
-                                    {keyResult.keyResultType === 'should_stay_below' && 'Tetap di bawah'}
-                                  </Badge>
+                                  <div className="flex justify-center">
+                                    <Popover>
+                                      <PopoverTrigger>
+                                        <div className="cursor-pointer">
+                                          {keyResult.keyResultType === 'increase_to' && <TrendingUp className="w-4 h-4 text-green-600" />}
+                                          {keyResult.keyResultType === 'decrease_to' && <TrendingDown className="w-4 h-4 text-red-600" />}
+                                          {keyResult.keyResultType === 'achieve_or_not' && <Target className="w-4 h-4 text-blue-600" />}
+                                          {keyResult.keyResultType === 'should_stay_above' && <MoveUp className="w-4 h-4 text-orange-600" />}
+                                          {keyResult.keyResultType === 'should_stay_below' && <MoveDown className="w-4 h-4 text-purple-600" />}
+                                        </div>
+                                      </PopoverTrigger>
+                                      <PopoverContent side="top" className="max-w-xs z-50">
+                                        <div className="text-sm">
+                                          {keyResult.keyResultType === 'increase_to' && (
+                                            <div>
+                                              <strong>Naik ke Target</strong>
+                                              <p>Nilai harus ditingkatkan dari baseline menuju target yang lebih tinggi</p>
+                                            </div>
+                                          )}
+                                          {keyResult.keyResultType === 'decrease_to' && (
+                                            <div>
+                                              <strong>Turun ke Target</strong>
+                                              <p>Nilai harus diturunkan dari baseline menuju target yang lebih rendah</p>
+                                            </div>
+                                          )}
+                                          {keyResult.keyResultType === 'achieve_or_not' && (
+                                            <div>
+                                              <strong>Ya/Tidak</strong>
+                                              <p>Target bersifat binary - tercapai atau tidak tercapai</p>
+                                            </div>
+                                          )}
+                                          {keyResult.keyResultType === 'should_stay_above' && (
+                                            <div>
+                                              <strong>Tetap Di Atas</strong>
+                                              <p>Nilai harus tetap berada di atas ambang batas target</p>
+                                            </div>
+                                          )}
+                                          {keyResult.keyResultType === 'should_stay_below' && (
+                                            <div>
+                                              <strong>Tetap Di Bawah</strong>
+                                              <p>Nilai harus tetap berada di bawah ambang batas target</p>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </PopoverContent>
+                                    </Popover>
+                                  </div>
                                 </TableCell>
                                 <TableCell className="text-center">
                                   {keyResult.keyResultType === 'achieve_or_not' ? '-' : formatNumberWithSeparator(keyResult.baseValue || '0')}
@@ -887,13 +927,76 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                             <div className="space-y-2">
                               <div className="flex justify-between items-center p-1.5 bg-white rounded-md">
                                 <span className="text-xs font-medium text-gray-600">Tipe:</span>
-                                <Badge variant="outline" className="text-xs border-blue-200 text-blue-700">
-                                  {keyResult.keyResultType === 'increase_to' && 'Naik ke'}
-                                  {keyResult.keyResultType === 'decrease_to' && 'Turun ke'}
-                                  {keyResult.keyResultType === 'achieve_or_not' && 'Ya/Tidak'}
-                                  {keyResult.keyResultType === 'should_stay_above' && 'Tetap di atas'}
-                                  {keyResult.keyResultType === 'should_stay_below' && 'Tetap di bawah'}
-                                </Badge>
+                                <Popover>
+                                  <PopoverTrigger>
+                                    <div className="cursor-pointer flex items-center gap-1">
+                                      {keyResult.keyResultType === 'increase_to' && (
+                                        <>
+                                          <TrendingUp className="w-4 h-4 text-green-600" />
+                                          <span className="text-xs font-medium text-green-600">Naik ke</span>
+                                        </>
+                                      )}
+                                      {keyResult.keyResultType === 'decrease_to' && (
+                                        <>
+                                          <TrendingDown className="w-4 h-4 text-red-600" />
+                                          <span className="text-xs font-medium text-red-600">Turun ke</span>
+                                        </>
+                                      )}
+                                      {keyResult.keyResultType === 'achieve_or_not' && (
+                                        <>
+                                          <Target className="w-4 h-4 text-blue-600" />
+                                          <span className="text-xs font-medium text-blue-600">Ya/Tidak</span>
+                                        </>
+                                      )}
+                                      {keyResult.keyResultType === 'should_stay_above' && (
+                                        <>
+                                          <MoveUp className="w-4 h-4 text-orange-600" />
+                                          <span className="text-xs font-medium text-orange-600">Tetap di atas</span>
+                                        </>
+                                      )}
+                                      {keyResult.keyResultType === 'should_stay_below' && (
+                                        <>
+                                          <MoveDown className="w-4 h-4 text-purple-600" />
+                                          <span className="text-xs font-medium text-purple-600">Tetap di bawah</span>
+                                        </>
+                                      )}
+                                    </div>
+                                  </PopoverTrigger>
+                                  <PopoverContent side="top" className="max-w-xs z-50">
+                                    <div className="text-sm">
+                                      {keyResult.keyResultType === 'increase_to' && (
+                                        <div>
+                                          <strong>Naik ke Target</strong>
+                                          <p>Nilai harus ditingkatkan dari baseline menuju target yang lebih tinggi</p>
+                                        </div>
+                                      )}
+                                      {keyResult.keyResultType === 'decrease_to' && (
+                                        <div>
+                                          <strong>Turun ke Target</strong>
+                                          <p>Nilai harus diturunkan dari baseline menuju target yang lebih rendah</p>
+                                        </div>
+                                      )}
+                                      {keyResult.keyResultType === 'achieve_or_not' && (
+                                        <div>
+                                          <strong>Ya/Tidak</strong>
+                                          <p>Target bersifat binary - tercapai atau tidak tercapai</p>
+                                        </div>
+                                      )}
+                                      {keyResult.keyResultType === 'should_stay_above' && (
+                                        <div>
+                                          <strong>Tetap Di Atas</strong>
+                                          <p>Nilai harus tetap berada di atas ambang batas target</p>
+                                        </div>
+                                      )}
+                                      {keyResult.keyResultType === 'should_stay_below' && (
+                                        <div>
+                                          <strong>Tetap Di Bawah</strong>
+                                          <p>Nilai harus tetap berada di bawah ambang batas target</p>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </PopoverContent>
+                                </Popover>
                               </div>
                               
                               {keyResult.keyResultType !== 'achieve_or_not' && (
