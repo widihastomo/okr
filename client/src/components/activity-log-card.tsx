@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
+import { useState } from "react";
 import { 
   TrendingUp, 
   BarChart3, 
@@ -34,6 +35,8 @@ interface ActivityLogCardProps {
 }
 
 export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
+  const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set());
+  
   const { data: activities = [], isLoading } = useQuery<ActivityLogEntry[]>({
     queryKey: ['/api/objectives', objectiveId, 'activity-log'],
     queryFn: async () => {
@@ -46,6 +49,21 @@ export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
   const { data: users = [] } = useQuery<any[]>({
     queryKey: ['/api/users'],
   });
+
+  const toggleNoteExpansion = (activityId: string) => {
+    const newExpanded = new Set(expandedNotes);
+    if (newExpanded.has(activityId)) {
+      newExpanded.delete(activityId);
+    } else {
+      newExpanded.add(activityId);
+    }
+    setExpandedNotes(newExpanded);
+  };
+
+  const truncateText = (text: string, limit: number = 100) => {
+    if (text.length <= limit) return text;
+    return text.substring(0, limit) + "...";
+  };
 
   const formatValue = (value: string, unit: string) => {
     const num = parseFloat(value);
@@ -186,7 +204,15 @@ export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
                         </div>
                         {activity.notes && (
                           <div className="text-xs text-gray-500 italic mt-1">
-                            "{activity.notes}"
+                            "{expandedNotes.has(activity.id) ? activity.notes : truncateText(activity.notes)}"
+                            {activity.notes.length > 100 && (
+                              <button
+                                onClick={() => toggleNoteExpansion(activity.id)}
+                                className="ml-1 text-blue-500 hover:text-blue-700 font-medium"
+                              >
+                                {expandedNotes.has(activity.id) ? "sembunyikan" : "lihat selengkapnya"}
+                              </button>
+                            )}
                           </div>
                         )}
                       </div>
