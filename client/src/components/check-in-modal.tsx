@@ -216,7 +216,23 @@ export function CheckInModal({
       {/* Show trigger button only in standalone mode */}
       {!isControlled && (
         <DialogTrigger asChild>
-          <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+          <Button 
+            variant="default" 
+            size="sm" 
+            className="text-white"
+            style={{ 
+              backgroundColor: '#2095F4',
+              borderColor: '#2095F4'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#1976D2';
+              e.currentTarget.style.borderColor = '#1976D2';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#2095F4';
+              e.currentTarget.style.borderColor = '#2095F4';
+            }}
+          >
             <TrendingUp className="w-4 h-4 mr-1" />
             <span className="sm:hidden">Update</span>
             <span className="hidden sm:inline">Update</span>
