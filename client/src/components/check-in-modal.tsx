@@ -98,7 +98,7 @@ export function CheckInModal({
         className: "border-green-200 bg-green-50 text-green-800",
       });
       
-      // Invalidate general lists
+      // Invalidate general lists first
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
       
@@ -107,22 +107,35 @@ export function CheckInModal({
         queryKey: [`/api/key-results/${keyResultId}`],
       });
       
-      // Find and invalidate specific objective data
-      // We need to get the objective ID from the key result
+      // If we have objectiveId from response, invalidate all related queries
       if (response?.objectiveId) {
-        queryClient.invalidateQueries({ queryKey: [`/api/okrs/${response.objectiveId}`] });
-        queryClient.invalidateQueries({ queryKey: [`/api/objectives/${response.objectiveId}/activity-log`] });
+        // Invalidate the main objective detail query (most important)
+        queryClient.invalidateQueries({ 
+          queryKey: [`/api/okrs/${response.objectiveId}`] 
+        });
+        
+        // Invalidate activity log
+        queryClient.invalidateQueries({ 
+          queryKey: [`/api/objectives/${response.objectiveId}/activity-log`] 
+        });
+        
+        // Invalidate initiatives and tasks for this objective
+        queryClient.invalidateQueries({ 
+          queryKey: [`/api/initiatives/objective/${response.objectiveId}`] 
+        });
+        queryClient.invalidateQueries({ 
+          queryKey: [`/api/tasks/objective/${response.objectiveId}`] 
+        });
       }
       
-      // Invalidate all objective-specific queries that might be affected
+      // Force refetch all OKR-related queries with invalidateQueries using refetchType: 'active'
       queryClient.invalidateQueries({ 
         predicate: (query) => {
           const queryKey = query.queryKey[0] as string;
           return queryKey?.includes('/api/okrs/') || 
-                 queryKey?.includes('/api/objectives/') ||
-                 queryKey?.includes('/api/initiatives/objective/') ||
-                 queryKey?.includes('/api/tasks/objective/');
-        }
+                 queryKey?.includes('/api/objectives/');
+        },
+        refetchType: 'active'
       });
       
       handleOpenChange(false);
