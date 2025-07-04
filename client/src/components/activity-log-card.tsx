@@ -171,14 +171,6 @@ export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
                       </p>
                     </div>
                   )}
-                  {activity.createdBy && (
-                    <div className="flex items-center gap-2 text-xs text-gray-500 mt-2">
-                      <div className={`w-6 h-6 ${getTypeColor(activity.type)} rounded-full flex items-center justify-center text-white text-xs font-medium`}>
-                        {getUserName(activity.createdBy).charAt(0).toUpperCase()}
-                      </div>
-                      <span>{getUserName(activity.createdBy)}</span>
-                    </div>
-                  )}
                   {activity.confidence && activity.type === 'key_result_checkin' && (
                     <div className="flex items-center gap-2 mt-2">
                       <div className="space-y-1">
@@ -207,6 +199,14 @@ export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
                            'Butuh perhatian lebih untuk mencapai target'}
                         </div>
                       </div>
+                    </div>
+                  )}
+                  {activity.createdBy && (
+                    <div className="flex items-center gap-2 text-xs text-gray-500 mt-2">
+                      <div className={`w-6 h-6 ${getTypeColor(activity.type)} rounded-full flex items-center justify-center text-white text-xs font-medium`}>
+                        {getUserName(activity.createdBy).charAt(0).toUpperCase()}
+                      </div>
+                      <span>{getUserName(activity.createdBy)}</span>
                     </div>
                   )}
                 </div>

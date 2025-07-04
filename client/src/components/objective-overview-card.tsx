@@ -1,7 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Target,
   CheckCircle2,
@@ -25,7 +30,11 @@ import type {
 } from "@shared/schema";
 import { Link } from "wouter";
 import { calculateKeyResultProgress } from "@shared/progress-calculator";
-import { calculateIdealProgress, getProgressStatus, getStatusColor } from "@shared/status-helper";
+import {
+  calculateIdealProgress,
+  getProgressStatus,
+  getStatusColor,
+} from "@shared/status-helper";
 import { ObjectiveStatusBadge } from "./objective-status-badge";
 
 interface ObjectiveOverviewCardProps {
@@ -100,8 +109,6 @@ export default function ObjectiveOverviewCard({
 
   const overallProgress = calculateOverallProgress(objective.keyResults);
 
-
-
   // Visual indicators for icon styling based on progress
   const getHealthColor = (progress: number) => {
     if (progress >= 80) return "text-green-600 bg-green-100";
@@ -111,9 +118,14 @@ export default function ObjectiveOverviewCard({
   };
 
   // Helper function to truncate text with character limit (responsive)
-  const truncateText = (text: string, maxLength: number, mobileLength?: number) => {
+  const truncateText = (
+    text: string,
+    maxLength: number,
+    mobileLength?: number,
+  ) => {
     // Use shorter length for mobile if provided
-    const effectiveLength = window.innerWidth < 768 && mobileLength ? mobileLength : maxLength;
+    const effectiveLength =
+      window.innerWidth < 768 && mobileLength ? mobileLength : maxLength;
     if (text.length <= effectiveLength) return text;
     return text.substring(0, effectiveLength) + "...";
   };
@@ -129,7 +141,7 @@ export default function ObjectiveOverviewCard({
             >
               <Target className="w-5 h-5" />
             </div>
-            <div className="min-w-0 flex-1 sm:ml-0 -ml-2">
+            <div className="min-w-0 flex-1 sm:ml-0 -ml-1">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -159,34 +171,93 @@ export default function ObjectiveOverviewCard({
           {(() => {
             const getProgressConfig = (status: string) => {
               switch (status) {
-                case 'on_track':
-                  return { bgColor: 'bg-green-100', textColor: 'text-green-800', dotColor: 'bg-green-500', label: 'Sesuai Target' };
-                case 'at_risk':
-                  return { bgColor: 'bg-orange-100', textColor: 'text-orange-800', dotColor: 'bg-orange-500', label: 'Berisiko' };
-                case 'behind':
-                  return { bgColor: 'bg-red-100', textColor: 'text-red-800', dotColor: 'bg-red-500', label: 'Tertinggal' };
-                case 'completed':
-                  return { bgColor: 'bg-purple-100', textColor: 'text-purple-800', dotColor: 'bg-purple-500', label: 'Selesai' };
-                case 'in_progress':
-                  return { bgColor: 'bg-blue-100', textColor: 'text-blue-800', dotColor: 'bg-blue-500', label: 'Berlangsung' };
-                case 'not_started':
-                  return { bgColor: 'bg-gray-100', textColor: 'text-gray-800', dotColor: 'bg-gray-500', label: 'Belum Dimulai' };
-                case 'paused':
-                  return { bgColor: 'bg-yellow-100', textColor: 'text-yellow-800', dotColor: 'bg-yellow-500', label: 'Dijeda' };
-                case 'canceled':
-                  return { bgColor: 'bg-red-100', textColor: 'text-red-800', dotColor: 'bg-red-500', label: 'Dibatalkan' };
-                case 'partially_achieved':
-                  return { bgColor: 'bg-amber-100', textColor: 'text-amber-800', dotColor: 'bg-amber-500', label: 'Tercapai Sebagian' };
-                case 'not_achieved':
-                  return { bgColor: 'bg-red-100', textColor: 'text-red-800', dotColor: 'bg-red-500', label: 'Tidak Tercapai' };
+                case "on_track":
+                  return {
+                    bgColor: "bg-green-100",
+                    textColor: "text-green-800",
+                    dotColor: "bg-green-500",
+                    label: "Sesuai Target",
+                  };
+                case "at_risk":
+                  return {
+                    bgColor: "bg-orange-100",
+                    textColor: "text-orange-800",
+                    dotColor: "bg-orange-500",
+                    label: "Berisiko",
+                  };
+                case "behind":
+                  return {
+                    bgColor: "bg-red-100",
+                    textColor: "text-red-800",
+                    dotColor: "bg-red-500",
+                    label: "Tertinggal",
+                  };
+                case "completed":
+                  return {
+                    bgColor: "bg-purple-100",
+                    textColor: "text-purple-800",
+                    dotColor: "bg-purple-500",
+                    label: "Selesai",
+                  };
+                case "in_progress":
+                  return {
+                    bgColor: "bg-blue-100",
+                    textColor: "text-blue-800",
+                    dotColor: "bg-blue-500",
+                    label: "Berlangsung",
+                  };
+                case "not_started":
+                  return {
+                    bgColor: "bg-gray-100",
+                    textColor: "text-gray-800",
+                    dotColor: "bg-gray-500",
+                    label: "Belum Dimulai",
+                  };
+                case "paused":
+                  return {
+                    bgColor: "bg-yellow-100",
+                    textColor: "text-yellow-800",
+                    dotColor: "bg-yellow-500",
+                    label: "Dijeda",
+                  };
+                case "canceled":
+                  return {
+                    bgColor: "bg-red-100",
+                    textColor: "text-red-800",
+                    dotColor: "bg-red-500",
+                    label: "Dibatalkan",
+                  };
+                case "partially_achieved":
+                  return {
+                    bgColor: "bg-amber-100",
+                    textColor: "text-amber-800",
+                    dotColor: "bg-amber-500",
+                    label: "Tercapai Sebagian",
+                  };
+                case "not_achieved":
+                  return {
+                    bgColor: "bg-red-100",
+                    textColor: "text-red-800",
+                    dotColor: "bg-red-500",
+                    label: "Tidak Tercapai",
+                  };
                 default:
-                  return { bgColor: 'bg-gray-100', textColor: 'text-gray-800', dotColor: 'bg-gray-500', label: 'Tidak Diketahui' };
+                  return {
+                    bgColor: "bg-gray-100",
+                    textColor: "text-gray-800",
+                    dotColor: "bg-gray-500",
+                    label: "Tidak Diketahui",
+                  };
               }
             };
             const config = getProgressConfig(objective.status);
             return (
-              <div className={`flex items-center gap-1 px-2 py-0.5 ${config.bgColor} ${config.textColor} rounded-full text-xs font-medium whitespace-nowrap`}>
-                <div className={`w-1.5 h-1.5 ${config.dotColor} rounded-full flex-shrink-0`}></div>
+              <div
+                className={`flex items-center gap-1 px-2 py-0.5 ${config.bgColor} ${config.textColor} rounded-full text-xs font-medium whitespace-nowrap`}
+              >
+                <div
+                  className={`w-1.5 h-1.5 ${config.dotColor} rounded-full flex-shrink-0`}
+                ></div>
                 <span className="truncate">{config.label}</span>
               </div>
             );
@@ -275,57 +346,73 @@ export default function ObjectiveOverviewCard({
               </span>
               {cycle && (
                 <div className="text-xs text-gray-500">
-                  Target: {(() => {
+                  Target:{" "}
+                  {(() => {
                     // Calculate ideal progress based on time passed
                     const cycleStart = new Date(cycle.startDate);
                     const cycleEnd = new Date(cycle.endDate);
                     const now = new Date();
-                    
-                    const totalDuration = cycleEnd.getTime() - cycleStart.getTime();
-                    const timePassed = Math.max(0, now.getTime() - cycleStart.getTime());
-                    const idealProgress = Math.min(100, Math.max(0, (timePassed / totalDuration) * 100));
-                    
+
+                    const totalDuration =
+                      cycleEnd.getTime() - cycleStart.getTime();
+                    const timePassed = Math.max(
+                      0,
+                      now.getTime() - cycleStart.getTime(),
+                    );
+                    const idealProgress = Math.min(
+                      100,
+                      Math.max(0, (timePassed / totalDuration) * 100),
+                    );
+
                     return Math.round(idealProgress);
-                  })()}%
+                  })()}
+                  %
                 </div>
               )}
             </div>
           </div>
           <div className="relative">
-            <Progress 
-              value={overallProgress} 
-              className="h-4" 
+            <Progress
+              value={overallProgress}
+              className="h-4"
               variant={(() => {
                 // Determine color based on status and progress
                 if (overallProgress >= 100) return "completed";
                 if (overallProgress >= 80) return "on-track";
                 if (overallProgress >= 60) return "at-risk";
                 return "behind";
-              })()} 
+              })()}
             />
             {/* Add milestone markers */}
             <div className="absolute top-0 left-1/4 w-0.5 h-4 bg-gray-300 opacity-50"></div>
             <div className="absolute top-0 left-1/2 w-0.5 h-4 bg-gray-300 opacity-50"></div>
             <div className="absolute top-0 left-3/4 w-0.5 h-4 bg-gray-300 opacity-50"></div>
-            
+
             {/* Ideal progress threshold indicator */}
-            {cycle && (() => {
-              const cycleStart = new Date(cycle.startDate);
-              const cycleEnd = new Date(cycle.endDate);
-              const now = new Date();
-              
-              const totalDuration = cycleEnd.getTime() - cycleStart.getTime();
-              const timePassed = Math.max(0, now.getTime() - cycleStart.getTime());
-              const idealProgress = Math.min(100, Math.max(0, (timePassed / totalDuration) * 100));
-              
-              return (
-                <div 
-                  className="absolute top-0 w-0.5 h-4 bg-blue-500 opacity-75"
-                  style={{ left: `${idealProgress}%` }}
-                  title={`Capaian ideal berdasarkan waktu: ${Math.round(idealProgress)}%`}
-                ></div>
-              );
-            })()}
+            {cycle &&
+              (() => {
+                const cycleStart = new Date(cycle.startDate);
+                const cycleEnd = new Date(cycle.endDate);
+                const now = new Date();
+
+                const totalDuration = cycleEnd.getTime() - cycleStart.getTime();
+                const timePassed = Math.max(
+                  0,
+                  now.getTime() - cycleStart.getTime(),
+                );
+                const idealProgress = Math.min(
+                  100,
+                  Math.max(0, (timePassed / totalDuration) * 100),
+                );
+
+                return (
+                  <div
+                    className="absolute top-0 w-0.5 h-4 bg-blue-500 opacity-75"
+                    style={{ left: `${idealProgress}%` }}
+                    title={`Capaian ideal berdasarkan waktu: ${Math.round(idealProgress)}%`}
+                  ></div>
+                );
+              })()}
           </div>
           <div className="flex justify-between text-xs text-gray-400">
             <span>0%</span>
@@ -381,8 +468,6 @@ export default function ObjectiveOverviewCard({
             <div className="text-xs text-purple-700">Tugas</div>
           </div>
         </div>
-
-        
       </CardContent>
     </Card>
   );
