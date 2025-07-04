@@ -165,22 +165,23 @@ export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
                     {activity.entityTitle}
                   </div>
                   
-                  {activity.confidence && activity.type === 'key_result_checkin' && (
+                  {activity.value && activity.type === 'key_result_checkin' && (
                     <div className="flex items-center gap-2 mt-2">
                       <div className="space-y-1">
                         <div className="flex items-center gap-1">
                           <div className="w-16 bg-gray-200 rounded-full h-2">
                             <div 
                               className={`h-2 rounded-full ${
-                                activity.confidence >= 8 ? 'bg-green-500' :
-                                activity.confidence >= 6 ? 'bg-yellow-500' :
+                                parseFloat(activity.value) >= 100 ? 'bg-green-500' :
+                                parseFloat(activity.value) >= 75 ? 'bg-blue-500' :
+                                parseFloat(activity.value) >= 50 ? 'bg-yellow-500' :
                                 'bg-red-500'
                               }`}
-                              style={{ width: `${(activity.confidence / 10) * 100}%` }}
+                              style={{ width: `${Math.min(100, Math.max(0, parseFloat(activity.value)))}%` }}
                             ></div>
                           </div>
                           <span className="text-xs text-gray-600 font-medium">
-                            {activity.confidence}/10
+                            {formatValue(activity.value, activity.unit || '')}
                           </span>
                         </div>
                         {activity.notes && (

@@ -16,6 +16,7 @@ import { updateCycleStatuses } from "./cycle-status-updater";
 import { gamificationService } from "./gamification";
 import { populateGamificationData } from "./gamification-data";
 import { registerAIRoutes } from "./ai-routes";
+import { calculateKeyResultProgress } from "@shared/progress-calculator";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
@@ -752,14 +753,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (const kr of objective.keyResults) {
         const checkIns = await storage.getCheckInsByKeyResultId(kr.id);
         for (const checkIn of checkIns) {
+          // Calculate progress percentage based on Key Result type
+          const progressResult = calculateKeyResultProgress(
+            checkIn.value,
+            kr.targetValue,
+            kr.keyResultType,
+            kr.baseValue
+          );
+          
           activities.push({
             id: checkIn.id,
             type: 'key_result_checkin',
             entityId: kr.id,
             entityTitle: kr.title,
             action: 'update',
-            value: checkIn.value,
-            unit: kr.unit,
+            value: progressResult.progressPercentage.toString(),
+            unit: '%',
             notes: checkIn.notes,
             confidence: checkIn.confidence,
             createdAt: checkIn.createdAt,
