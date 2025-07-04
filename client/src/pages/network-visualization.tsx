@@ -189,7 +189,7 @@ function ObjectiveTreeNode({ objective, initiatives, tasks, showProgress, onNode
     objective.keyResults?.some((kr: any) => kr.id === init.keyResultId)
   );
 
-  console.log('Objective:', objective.title, 'KeyResults:', objective.keyResults?.length || 0);
+
 
   return (
     <div className="bg-white border-2 border-gray-200 rounded-xl p-6 shadow-sm">
@@ -265,7 +265,7 @@ interface KeyResultTreeNodeProps {
 }
 
 function KeyResultTreeNode({ keyResult, initiatives, showProgress, onNodeClick, isFirst, isLast, totalCount }: KeyResultTreeNodeProps) {
-  console.log('KeyResult:', keyResult.title, 'Progress:', keyResult.progress);
+
   return (
     <div className="relative">
       {/* Vertical line from horizontal connector */}
@@ -283,16 +283,16 @@ function KeyResultTreeNode({ keyResult, initiatives, showProgress, onNodeClick, 
           <h4 className="font-medium text-gray-900">{keyResult.title}</h4>
         </div>
         
-        {showProgress && keyResult.progress !== undefined && (
+        {showProgress && (
           <div className="mb-3">
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs text-gray-500">Progress</span>
-              <span className="text-sm font-medium text-gray-900">{keyResult.progress}%</span>
+              <span className="text-sm font-medium text-gray-900">{keyResult.progress || 0}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div 
                 className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${keyResult.progress}%` }}
+                style={{ width: `${keyResult.progress || 0}%` }}
               ></div>
             </div>
           </div>
@@ -330,11 +330,8 @@ interface InitiativeTreeNodeProps {
 }
 
 function InitiativeTreeNode({ initiative, showProgress, onNodeClick, isLast }: InitiativeTreeNodeProps) {
-  // Mock tasks data for demonstration - in real app would come from API
-  const mockTasks = [
-    { id: '1', title: `Task ${initiative.title.slice(-3)}.1`, progress: 100, status: 'completed' },
-    { id: '2', title: `Task ${initiative.title.slice(-3)}.2`, progress: 50, status: 'in_progress' }
-  ];
+  // For now, we'll show initiatives without tasks until we implement task fetching
+  const tasks = initiative.tasks || [];
 
   return (
     <div className="relative">
@@ -353,41 +350,23 @@ function InitiativeTreeNode({ initiative, showProgress, onNodeClick, isLast }: I
           <h5 className="font-medium text-gray-900 text-sm">{initiative.title}</h5>
         </div>
         
-        {showProgress && initiative.progress !== undefined && (
+        {showProgress && (
           <div className="mb-2">
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs text-gray-500">Progress</span>
-              <span className="text-xs font-medium text-gray-900">{initiative.progress}%</span>
+              <span className="text-xs font-medium text-gray-900">{initiative.progress || 0}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-1.5">
               <div 
                 className="bg-green-500 h-1.5 rounded-full transition-all duration-300"
-                style={{ width: `${initiative.progress}%` }}
+                style={{ width: `${initiative.progress || 0}%` }}
               ></div>
             </div>
           </div>
         )}
       </div>
 
-      {/* Tasks */}
-      {mockTasks.length > 0 && (
-        <div className="relative mt-3 ml-6">
-          {/* Vertical line from initiative */}
-          <div className="absolute left-6 top-0 w-0.5 h-3 bg-gray-300"></div>
-          
-          <div className="pt-3 space-y-2">
-            {mockTasks.map((task: any, index: number) => (
-              <TaskTreeNode 
-                key={task.id}
-                task={task}
-                showProgress={showProgress}
-                onNodeClick={onNodeClick}
-                isLast={index === mockTasks.length - 1}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Tasks - To be implemented later */}
     </div>
   );
 }
