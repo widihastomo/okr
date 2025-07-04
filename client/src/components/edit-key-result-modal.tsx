@@ -68,31 +68,39 @@ const editKeyResultSchema = z.object({
     return true; // No numerical validation needed for binary type
   }
 
-  const current = parseFloat(data.currentValue || "0");
-  const target = parseFloat(data.targetValue || "0");
-  const base = parseFloat(data.baseValue || "0");
+  // Skip validation for should_stay types  
+  if (data.keyResultType === "should_stay_above" || data.keyResultType === "should_stay_below") {
+    return true;
+  }
+
+  // Only validate if both base and target values exist and are not empty
+  if (!data.baseValue || !data.targetValue || data.baseValue.trim() === '' || data.targetValue.trim() === '') {
+    return true; // Skip validation if values are missing
+  }
+
+  // Parse numbers after removing thousand separators
+  const base = parseFloat(data.baseValue.replace(/[.,]/g, ''));
+  const target = parseFloat(data.targetValue.replace(/[.,]/g, ''));
+
+  // Skip validation if parsing fails
+  if (isNaN(base) || isNaN(target)) {
+    return true;
+  }
 
   if (data.keyResultType === "increase_to") {
     // For increase_to: base < target (we want to increase from base to target)
-    if (data.baseValue && data.targetValue) {
-      if (base >= target) {
-        return false; // Base should be less than target for increase
-      }
+    if (base >= target) {
+      return false; // Base should be less than target for increase
     }
-    return true;
   }
 
   if (data.keyResultType === "decrease_to") {
     // For decrease_to: base > target (we want to decrease from base to target)
-    if (data.baseValue && data.targetValue) {
-      if (base <= target) {
-        return false; // Base should be greater than target for decrease
-      }
+    if (base <= target) {
+      return false; // Base should be greater than target for decrease
     }
-    return true;
   }
 
-  // For should_stay types, no specific logical validation needed
   return true;
 }, {
   message: "Nilai tidak logis: untuk 'Naik ke Target' nilai awal harus lebih kecil dari target, untuk 'Turun ke Target' nilai awal harus lebih besar dari target",
