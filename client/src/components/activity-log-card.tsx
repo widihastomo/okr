@@ -120,13 +120,13 @@ export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
 
   return (
     <Card className="h-full">
-      <CardHeader className="pb-4">
+      <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
           <TrendingUp className="h-5 w-5" />
           Riwayat Aktivitas
         </CardTitle>
       </CardHeader>
-      <CardContent className="h-[calc(100%-6rem)] flex flex-col">
+      <CardContent className="h-96 flex flex-col">
         {activities.length > 0 ? (
           <div className="space-y-3 flex-1 overflow-y-auto">
             {activities.slice(0, 10).map((activity) => (
