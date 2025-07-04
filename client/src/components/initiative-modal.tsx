@@ -283,14 +283,6 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      {!actualEditingInitiative && (
-        <DialogTrigger asChild>
-          <Button size="sm" className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Tambah Initiative
-          </Button>
-        </DialogTrigger>
-      )}
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
