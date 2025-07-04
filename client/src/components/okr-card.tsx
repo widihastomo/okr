@@ -741,6 +741,12 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
                       <div className="absolute top-full left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
                     </div>
                   </div>
+
+                  {/* Initiative count - Right */}
+                  <div className="text-xs text-gray-500 flex items-center gap-1">
+                    <Target className="w-3 h-3" />
+                    <span>{kr.relatedInitiatives?.length || 0} rencana</span>
+                  </div>
                 </div>
               </div>
             );
