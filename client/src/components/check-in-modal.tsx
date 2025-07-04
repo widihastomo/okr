@@ -58,6 +58,7 @@ export function CheckInModal({
   keyResultType 
 }: CheckInModalProps) {
   const [open, setOpen] = useState(false);
+  console.log('CheckInModal rendered with props:', { keyResultId, keyResultTitle, currentValue, targetValue, unit, keyResultType });
   const [value, setValue] = useState(currentValue);
   const [achieved, setAchieved] = useState(parseFloat(currentValue) >= parseFloat(targetValue));
   const [notes, setNotes] = useState("");

@@ -383,6 +383,7 @@ export default function GoalDetail() {
   };
 
   const handleCheckIn = (keyResult: KeyResult) => {
+    console.log('HandleCheckIn called with:', keyResult);
     setCheckInModal({ open: true, keyResult });
   };
 
