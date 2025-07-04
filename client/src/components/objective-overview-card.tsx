@@ -355,59 +355,7 @@ export default function ObjectiveOverviewCard({
           </div>
         </div>
 
-        {/* Key Results Mini Preview */}
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium text-gray-700 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4" />
-            Key Results Teratas
-          </h4>
-          <div className="space-y-1">
-            {objective.keyResults.slice(0, 2).map((kr) => {
-              const result = calculateKeyResultProgress(
-                kr.currentValue,
-                kr.targetValue,
-                kr.keyResultType,
-                kr.baseValue,
-              );
-              const progress = result.progressPercentage;
-              return (
-                <div
-                  key={kr.id}
-                  className="flex items-center justify-between text-xs"
-                >
-                  <span className="truncate flex-1 mr-2">{kr.title}</span>
-                  <div className="flex items-center gap-2">
-                    <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                      {(() => {
-                        // Calculate ideal progress and status
-                        const cycleStart = cycle?.startDate ? new Date(cycle.startDate) : new Date();
-                        const cycleEnd = cycle?.endDate ? new Date(cycle.endDate) : new Date();
-                        const idealProgress = calculateIdealProgress(cycleStart, cycleEnd);
-                        const status = getProgressStatus(progress, idealProgress);
-                        const colorClass = getStatusColor(status);
-                        
-                        return (
-                          <div
-                            className={`h-full transition-all duration-300 ${colorClass}`}
-                            style={{ width: `${Math.min(100, progress)}%` }}
-                          />
-                        );
-                      })()}
-                    </div>
-                    <span className="text-gray-500 min-w-8">
-                      {Math.round(progress)}%
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-            {objective.keyResults.length > 2 && (
-              <div className="text-xs text-gray-400 text-center pt-1">
-                +{objective.keyResults.length - 2} key results lainnya
-              </div>
-            )}
-          </div>
-        </div>
+        
       </CardContent>
     </Card>
   );
