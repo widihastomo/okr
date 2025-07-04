@@ -8,6 +8,12 @@ import {
   FileText,
   CheckSquare
 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ActivityLogEntry {
   id: string;
@@ -54,10 +60,19 @@ export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'key_result_checkin': return <TrendingUp className="w-4 h-4" />;
-      case 'initiative': return <FileText className="w-4 h-4" />;
-      case 'task': return <CheckSquare className="w-4 h-4" />;
-      default: return <Target className="w-4 h-4" />;
+      case 'key_result_checkin': return <TrendingUp className="w-3 h-3" />;
+      case 'initiative': return <FileText className="w-3 h-3" />;
+      case 'task': return <CheckSquare className="w-3 h-3" />;
+      default: return <Target className="w-3 h-3" />;
+    }
+  };
+
+  const getTypeHint = (type: string) => {
+    switch (type) {
+      case 'key_result_checkin': return 'Update progress pada ukuran keberhasilan';
+      case 'initiative': return 'Update status atau progress rencana/inisiatif';
+      case 'task': return 'Update status atau completion tugas';
+      default: return 'Update aktivitas';
     }
   };
 
@@ -116,9 +131,18 @@ export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
           <div className="space-y-3 max-h-80 overflow-y-auto">
             {activities.slice(0, 10).map((activity) => (
               <div key={`${activity.type}-${activity.id}`} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-                <div className={`w-8 h-8 ${getTypeColor(activity.type)} rounded-full flex items-center justify-center text-white`}>
-                  {getTypeIcon(activity.type)}
-                </div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className={`w-6 h-6 ${getTypeColor(activity.type)} rounded-full flex items-center justify-center text-white cursor-help`}>
+                        {getTypeIcon(activity.type)}
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{getTypeHint(activity.type)}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
