@@ -25,12 +25,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
-import { Plus, Target, CheckSquare, Building2, Trophy } from "lucide-react";
+import { Plus, Target, CheckSquare, Building2, Trophy, Zap } from "lucide-react";
 import MyTugas from "@/components/my-tasks";
 import Rencana from "@/components/initiatives";
 import { useAuth } from "@/hooks/useAuth";
 import { DashboardHelpBubble } from "@/components/help-bubble";
 import AIHelpBubble from "@/components/ai-help-bubble";
+import { HabitAlignmentWizard } from "@/components/habit-alignment-wizard";
 
 import { useLocation } from "wouter";
 import type { OKRWithKeyResults, KeyResult, Cycle, User } from "@shared/schema";
@@ -79,6 +80,8 @@ export default function Dashboard() {
   }>({
     open: false
   });
+
+  const [habitWizardOpen, setHabitWizardOpen] = useState(false);
 
   const { data: cycles = [] } = useQuery<Cycle[]>({
     queryKey: ['/api/cycles'],
@@ -514,7 +517,16 @@ export default function Dashboard() {
                 <DashboardHelpBubble userId={(currentUser as any).id as string} />
               ) : null}
             </div>
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 flex gap-2">
+              <Button
+                onClick={() => setHabitWizardOpen(true)}
+                variant="outline"
+                className="flex items-center space-x-2 border-blue-200 text-blue-700 hover:bg-blue-50"
+              >
+                <Zap className="h-4 w-4" />
+                <span className="hidden sm:inline">Habit Wizard</span>
+                <span className="sm:hidden">Habit</span>
+              </Button>
               <CreateOKRButton />
             </div>
           </div>
@@ -714,6 +726,14 @@ export default function Dashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Habit Alignment Wizard */}
+      <HabitAlignmentWizard
+        open={habitWizardOpen}
+        onOpenChange={setHabitWizardOpen}
+        objectives={okrs}
+        userId={currentUser?.id || ""}
+      />
 
       {/* AI Help Bubble */}
       <AIHelpBubble 
