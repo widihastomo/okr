@@ -221,28 +221,31 @@ function ObjectiveTreeNode({ objective, initiatives, tasks, showProgress, onNode
         </div>
       </div>
 
-      {/* Connecting Lines and Key Results */}
+      {/* Key Results */}
       {objective.keyResults && objective.keyResults.length > 0 && (
-        <div className="relative">
-          {/* Vertical line from objective */}
-          <div className="absolute left-6 top-0 w-0.5 h-8 bg-gray-300"></div>
+        <div className="mt-6">
+          {/* Connecting line */}
+          <div className="flex justify-center mb-4">
+            <div className="w-0.5 h-6 bg-gray-300"></div>
+          </div>
           
-          {/* Horizontal line */}
-          <div className="absolute left-6 top-8 h-0.5 bg-gray-300" style={{ width: `${Math.min(objective.keyResults.length * 320, 960)}px` }}></div>
-          
-          {/* Key Results */}
-          <div className="pt-8 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {/* Key Results Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {objective.keyResults.map((keyResult: any, index: number) => (
-              <KeyResultTreeNode 
-                key={keyResult.id}
-                keyResult={keyResult}
-                initiatives={objectiveInitiatives.filter((init: any) => init.keyResultId === keyResult.id)}
-                showProgress={showProgress}
-                onNodeClick={onNodeClick}
-                isFirst={index === 0}
-                isLast={index === objective.keyResults.length - 1}
-                totalCount={objective.keyResults.length}
-              />
+              <div key={keyResult.id} className="relative">
+                {/* Connecting line from above */}
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 h-6 bg-gray-300 -mt-6"></div>
+                
+                <KeyResultTreeNode 
+                  keyResult={keyResult}
+                  initiatives={objectiveInitiatives.filter((init: any) => init.keyResultId === keyResult.id)}
+                  showProgress={showProgress}
+                  onNodeClick={onNodeClick}
+                  isFirst={index === 0}
+                  isLast={index === objective.keyResults.length - 1}
+                  totalCount={objective.keyResults.length}
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -262,6 +265,7 @@ interface KeyResultTreeNodeProps {
 }
 
 function KeyResultTreeNode({ keyResult, initiatives, showProgress, onNodeClick, isFirst, isLast, totalCount }: KeyResultTreeNodeProps) {
+  console.log('KeyResult:', keyResult.title, 'Progress:', keyResult.progress);
   return (
     <div className="relative">
       {/* Vertical line from horizontal connector */}
