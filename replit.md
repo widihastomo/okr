@@ -96,6 +96,12 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 04, 2025. Cleaned up edit modal interface and enhanced dialog accessibility:
+  * Removed redundant icon-title div from edit key result modal Card content for cleaner layout
+  * Added DialogDescription to both edit objective and edit key result modals for better accessibility
+  * Removed Target icon from edit objective modal DialogTitle for consistent minimalist design
+  * Enhanced dialog warnings compliance by providing proper description context for screen readers
+  * Improved visual hierarchy by focusing on content rather than decorative elements
 - July 04, 2025. Standardized terminologi bahasa Indonesia untuk Key Result menjadi "Ukuran Keberhasilan":
   * Updated CheckInModal untuk menggunakan "Ukuran Keberhasilan" mengganti "Key Result"
   * Updated dialog description untuk konsistensi terminologi bahasa Indonesia

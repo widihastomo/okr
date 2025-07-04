@@ -262,7 +262,6 @@ export default function EditKeyResultModal({
             {/* Informasi Ukuran Keberhasilan */}
             <Card>
               <CardContent className="p-6">
-                
                 <div className="space-y-4">
                   {/* Title */}
                   <FormField
