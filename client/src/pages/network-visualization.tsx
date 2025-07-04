@@ -77,31 +77,37 @@ export default function NetworkVisualization() {
     queryKey: ['/api/initiatives'],
   });
 
-  const isLoading = objectivesLoading || usersLoading || teamsLoading || initiativesLoading;
+  const { data: tasks = [], isLoading: tasksLoading } = useQuery({
+    queryKey: ['/api/tasks'],
+  });
+
+  const isLoading = objectivesLoading || usersLoading || teamsLoading || initiativesLoading || tasksLoading;
 
   // Transform data for grid visualization
   const visualizationData = React.useMemo(() => {
-    if (isLoading) return { teams: [], objectives: [], keyResults: [], initiatives: [], users: [] };
+    if (isLoading) return { teams: [], objectives: [], keyResults: [], initiatives: [], users: [], tasks: [] };
 
     const typedTeams = teams as any[];
     const typedUsers = users as any[];
     const typedObjectives = objectives as any[];
     const typedInitiatives = initiatives as any[];
+    const typedTasks = tasks as any[];
 
     return {
       teams: typedTeams,
       users: typedUsers,
       objectives: typedObjectives,
       initiatives: typedInitiatives,
+      tasks: typedTasks,
       keyResults: typedObjectives.flatMap((obj: any) => 
         obj.keyResults ? obj.keyResults.map((kr: any) => ({ ...kr, objectiveId: obj.id, objectiveTitle: obj.title })) : []
       )
     };
-  }, [objectives, users, teams, initiatives, isLoading]);
+  }, [objectives, users, teams, initiatives, tasks, isLoading]);
 
   // Filter data based on search and filter criteria
   const filteredData = React.useMemo(() => {
-    let { teams, users, objectives, keyResults, initiatives } = visualizationData;
+    let { teams, users, objectives, keyResults, initiatives, tasks } = visualizationData;
 
     // Apply type filter
     if (selectedFilter !== "all") {
@@ -110,6 +116,7 @@ export default function NetworkVisualization() {
       objectives = selectedFilter === "objectives" ? objectives : [];
       keyResults = selectedFilter === "key_results" ? keyResults : [];
       initiatives = selectedFilter === "initiatives" ? initiatives : [];
+      tasks = selectedFilter === "tasks" ? tasks : [];
     }
 
     // Apply search filter
@@ -128,9 +135,12 @@ export default function NetworkVisualization() {
       initiatives = initiatives.filter((i: any) => 
         i.title?.toLowerCase().includes(term)
       );
+      tasks = tasks.filter((t: any) => 
+        t.title?.toLowerCase().includes(term)
+      );
     }
 
-    return { teams, users, objectives, keyResults, initiatives };
+    return { teams, users, objectives, keyResults, initiatives, tasks };
   }, [visualizationData, selectedFilter, searchTerm]);
 
   // Get node type color
@@ -164,6 +174,268 @@ export default function NetworkVisualization() {
       default: return 'Belum Dimulai';
     }
   };
+
+// Tree Node Components
+interface ObjectiveTreeNodeProps {
+  objective: any;
+  initiatives: any[];
+  tasks: any[];
+  showProgress: boolean;
+  onNodeClick: (node: any) => void;
+}
+
+function ObjectiveTreeNode({ objective, initiatives, tasks, showProgress, onNodeClick }: ObjectiveTreeNodeProps) {
+  const objectiveInitiatives = initiatives.filter((init: any) => 
+    objective.keyResults?.some((kr: any) => kr.id === init.keyResultId)
+  );
+
+  return (
+    <div className="bg-white border-2 border-gray-200 rounded-xl p-6 shadow-sm">
+      {/* Objective/Goal Header */}
+      <div 
+        className="flex items-center gap-4 mb-6 cursor-pointer hover:bg-gray-50 p-4 rounded-lg -m-4 mb-2"
+        onClick={() => onNodeClick({ ...objective, type: 'objective' })}
+      >
+        <div className="flex items-center justify-center w-12 h-12 bg-red-100 rounded-full">
+          <Target className="h-6 w-6 text-red-600" />
+        </div>
+        <div className="flex-1">
+          <h3 className="text-xl font-semibold text-gray-900">{objective.title}</h3>
+          <p className="text-sm text-gray-600 mt-1">{objective.description}</p>
+          {showProgress && objective.overallProgress !== undefined && (
+            <div className="mt-3 max-w-xs">
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-xs text-gray-500">Progress</span>
+                <span className="text-xs font-medium">{objective.overallProgress}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div 
+                  className="bg-green-500 h-3 rounded-full transition-all duration-300"
+                  style={{ width: `${objective.overallProgress}%` }}
+                ></div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Connecting Lines and Key Results */}
+      {objective.keyResults && objective.keyResults.length > 0 && (
+        <div className="relative">
+          {/* Vertical line from objective */}
+          <div className="absolute left-6 top-0 w-0.5 h-8 bg-gray-300"></div>
+          
+          {/* Horizontal line */}
+          <div className="absolute left-6 top-8 h-0.5 bg-gray-300" style={{ width: `${Math.min(objective.keyResults.length * 320, 960)}px` }}></div>
+          
+          {/* Key Results */}
+          <div className="pt-8 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {objective.keyResults.map((keyResult: any, index: number) => (
+              <KeyResultTreeNode 
+                key={keyResult.id}
+                keyResult={keyResult}
+                initiatives={objectiveInitiatives.filter((init: any) => init.keyResultId === keyResult.id)}
+                showProgress={showProgress}
+                onNodeClick={onNodeClick}
+                isFirst={index === 0}
+                isLast={index === objective.keyResults.length - 1}
+                totalCount={objective.keyResults.length}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface KeyResultTreeNodeProps {
+  keyResult: any;
+  initiatives: any[];
+  showProgress: boolean;
+  onNodeClick: (node: any) => void;
+  isFirst: boolean;
+  isLast: boolean;
+  totalCount: number;
+}
+
+function KeyResultTreeNode({ keyResult, initiatives, showProgress, onNodeClick, isFirst, isLast, totalCount }: KeyResultTreeNodeProps) {
+  return (
+    <div className="relative">
+      {/* Vertical line from horizontal connector */}
+      <div className="absolute left-6 -top-8 w-0.5 h-8 bg-gray-300"></div>
+      
+      {/* Key Result Card */}
+      <div 
+        className="bg-gray-50 border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition-colors"
+        onClick={() => onNodeClick({ ...keyResult, type: 'key_result' })}
+      >
+        <div className="flex items-center gap-3 mb-3">
+          <div className="flex items-center justify-center w-8 h-8 bg-yellow-100 rounded-full">
+            <CircleDot className="h-4 w-4 text-yellow-600" />
+          </div>
+          <h4 className="font-medium text-gray-900">{keyResult.title}</h4>
+        </div>
+        
+        {showProgress && keyResult.progress !== undefined && (
+          <div className="mb-3">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-xs text-gray-500">Progress</span>
+              <span className="text-sm font-medium text-gray-900">{keyResult.progress}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div 
+                className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${keyResult.progress}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Initiatives */}
+      {initiatives.length > 0 && (
+        <div className="relative mt-4">
+          {/* Vertical line from key result */}
+          <div className="absolute left-6 top-0 w-0.5 h-4 bg-gray-300"></div>
+          
+          <div className="pt-4 space-y-3">
+            {initiatives.map((initiative: any, index: number) => (
+              <InitiativeTreeNode 
+                key={initiative.id}
+                initiative={initiative}
+                showProgress={showProgress}
+                onNodeClick={onNodeClick}
+                isLast={index === initiatives.length - 1}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface InitiativeTreeNodeProps {
+  initiative: any;
+  showProgress: boolean;
+  onNodeClick: (node: any) => void;
+  isLast: boolean;
+}
+
+function InitiativeTreeNode({ initiative, showProgress, onNodeClick, isLast }: InitiativeTreeNodeProps) {
+  // Mock tasks data for demonstration - in real app would come from API
+  const mockTasks = [
+    { id: '1', title: `Task ${initiative.title.slice(-3)}.1`, progress: 100, status: 'completed' },
+    { id: '2', title: `Task ${initiative.title.slice(-3)}.2`, progress: 50, status: 'in_progress' }
+  ];
+
+  return (
+    <div className="relative">
+      {/* Vertical line from key result */}
+      <div className="absolute left-6 -top-4 w-0.5 h-4 bg-gray-300"></div>
+      
+      {/* Initiative Card */}
+      <div 
+        className="bg-orange-50 border border-orange-200 rounded-lg p-3 cursor-pointer hover:bg-orange-100 transition-colors ml-6"
+        onClick={() => onNodeClick({ ...initiative, type: 'initiative' })}
+      >
+        <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center justify-center w-6 h-6 bg-orange-200 rounded">
+            <Lightbulb className="h-3 w-3 text-orange-600" />
+          </div>
+          <h5 className="font-medium text-gray-900 text-sm">{initiative.title}</h5>
+        </div>
+        
+        {showProgress && initiative.progress !== undefined && (
+          <div className="mb-2">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-xs text-gray-500">Progress</span>
+              <span className="text-xs font-medium text-gray-900">{initiative.progress}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-1.5">
+              <div 
+                className="bg-green-500 h-1.5 rounded-full transition-all duration-300"
+                style={{ width: `${initiative.progress}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Tasks */}
+      {mockTasks.length > 0 && (
+        <div className="relative mt-3 ml-6">
+          {/* Vertical line from initiative */}
+          <div className="absolute left-6 top-0 w-0.5 h-3 bg-gray-300"></div>
+          
+          <div className="pt-3 space-y-2">
+            {mockTasks.map((task: any, index: number) => (
+              <TaskTreeNode 
+                key={task.id}
+                task={task}
+                showProgress={showProgress}
+                onNodeClick={onNodeClick}
+                isLast={index === mockTasks.length - 1}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface TaskTreeNodeProps {
+  task: any;
+  showProgress: boolean;
+  onNodeClick: (node: any) => void;
+  isLast: boolean;
+}
+
+function TaskTreeNode({ task, showProgress, onNodeClick, isLast }: TaskTreeNodeProps) {
+  return (
+    <div className="relative">
+      {/* Vertical line from initiative */}
+      <div className="absolute left-6 -top-3 w-0.5 h-3 bg-gray-300"></div>
+      
+      {/* Horizontal line */}
+      <div className="absolute left-6 top-0 w-4 h-0.5 bg-gray-300"></div>
+      
+      {/* Task Card */}
+      <div 
+        className="bg-blue-50 border border-blue-200 rounded p-2 cursor-pointer hover:bg-blue-100 transition-colors ml-10"
+        onClick={() => onNodeClick({ ...task, type: 'task' })}
+      >
+        <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center justify-center w-4 h-4 bg-blue-200 rounded">
+            {task.status === 'completed' ? (
+              <CheckCircle2 className="h-2.5 w-2.5 text-green-600" />
+            ) : (
+              <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+            )}
+          </div>
+          <h6 className="font-medium text-gray-900 text-xs">{task.title}</h6>
+        </div>
+        
+        {showProgress && (
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-xs text-gray-500">Progress</span>
+              <span className="text-xs font-medium text-gray-900">{task.progress}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-1">
+              <div 
+                className="bg-green-500 h-1 rounded-full transition-all duration-300"
+                style={{ width: `${task.progress}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
   if (isLoading) {
     return (
@@ -381,206 +653,29 @@ export default function NetworkVisualization() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-8">
-                {/* Teams Section */}
-                {filteredData.teams.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                      <Users className="h-5 w-5 text-purple-500" />
-                      Tim ({filteredData.teams.length})
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {filteredData.teams.map((team: any) => (
-                        <div
-                          key={team.id}
-                          className="p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
-                          onClick={() => setSelectedNode({ ...team, type: 'team' })}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className={`w-4 h-4 rounded-full ${getNodeColor('team')}`}></div>
-                            <div>
-                              <p className="font-medium">{team.name}</p>
-                              <p className="text-sm text-gray-500">{team.description || 'Tidak ada deskripsi'}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+              <div className="space-y-6">
+                {/* Tree View Visualization */}
+                {filteredData.objectives.length > 0 ? (
+                  <div className="space-y-8">
+                    {filteredData.objectives.map((objective: any) => (
+                      <ObjectiveTreeNode 
+                        key={objective.id}
+                        objective={objective}
+                        initiatives={filteredData.initiatives}
+                        tasks={filteredData.tasks}
+                        showProgress={showProgress}
+                        onNodeClick={setSelectedNode}
+                      />
+                    ))}
                   </div>
-                )}
-
-                {/* Objectives Section */}
-                {filteredData.objectives.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                      <Target className="h-5 w-5 text-green-500" />
-                      Goal ({filteredData.objectives.length})
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {filteredData.objectives.map((objective: any) => (
-                        <div
-                          key={objective.id}
-                          className="p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
-                          onClick={() => setSelectedNode({ ...objective, type: 'objective' })}
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className={`w-4 h-4 rounded-full mt-1 ${getNodeColor('objective', objective.status)}`}></div>
-                            <div className="flex-1">
-                              <p className="font-medium">{objective.title}</p>
-                              <p className="text-sm text-gray-500 mt-1">{objective.description}</p>
-                              {showProgress && objective.overallProgress !== undefined && (
-                                <div className="mt-3">
-                                  <div className="flex justify-between items-center mb-1">
-                                    <span className="text-xs text-gray-500">Progress</span>
-                                    <span className="text-xs font-medium">{objective.overallProgress}%</span>
-                                  </div>
-                                  <div className="w-full bg-gray-200 rounded-full h-2">
-                                    <div 
-                                      className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                                      style={{ width: `${objective.overallProgress}%` }}
-                                    ></div>
-                                  </div>
-                                </div>
-                              )}
-                              {objective.status && (
-                                <Badge variant="outline" className="mt-2 text-xs">
-                                  {getStatusLabel(objective.status)}
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Key Results Section */}
-                {filteredData.keyResults.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                      <CircleDot className="h-5 w-5 text-yellow-500" />
-                      Angka Target ({filteredData.keyResults.length})
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {filteredData.keyResults.map((keyResult: any) => (
-                        <div
-                          key={keyResult.id}
-                          className="p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
-                          onClick={() => setSelectedNode({ ...keyResult, type: 'key_result' })}
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className={`w-4 h-4 rounded-full mt-1 ${getNodeColor('key_result', keyResult.status)}`}></div>
-                            <div className="flex-1">
-                              <p className="font-medium">{keyResult.title}</p>
-                              <p className="text-sm text-gray-400 mt-1">Goal: {keyResult.objectiveTitle}</p>
-                              {showProgress && keyResult.progress !== undefined && (
-                                <div className="mt-3">
-                                  <div className="flex justify-between items-center mb-1">
-                                    <span className="text-xs text-gray-500">Progress</span>
-                                    <span className="text-xs font-medium">{keyResult.progress}%</span>
-                                  </div>
-                                  <div className="w-full bg-gray-200 rounded-full h-2">
-                                    <div 
-                                      className="bg-yellow-500 h-2 rounded-full transition-all duration-300"
-                                      style={{ width: `${keyResult.progress}%` }}
-                                    ></div>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Initiatives Section */}
-                {filteredData.initiatives.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                      <Lightbulb className="h-5 w-5 text-red-500" />
-                      Rencana ({filteredData.initiatives.length})
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {filteredData.initiatives.map((initiative: any) => (
-                        <div
-                          key={initiative.id}
-                          className="p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
-                          onClick={() => setSelectedNode({ ...initiative, type: 'initiative' })}
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className={`w-4 h-4 rounded-full mt-1 ${getNodeColor('initiative', initiative.status)}`}></div>
-                            <div className="flex-1">
-                              <p className="font-medium">{initiative.title}</p>
-                              <p className="text-sm text-gray-500 mt-1">{initiative.description}</p>
-                              {showProgress && initiative.progress !== undefined && (
-                                <div className="mt-3">
-                                  <div className="flex justify-between items-center mb-1">
-                                    <span className="text-xs text-gray-500">Progress</span>
-                                    <span className="text-xs font-medium">{initiative.progress}%</span>
-                                  </div>
-                                  <div className="w-full bg-gray-200 rounded-full h-2">
-                                    <div 
-                                      className="bg-red-500 h-2 rounded-full transition-all duration-300"
-                                      style={{ width: `${initiative.progress}%` }}
-                                    ></div>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Users Section */}
-                {filteredData.users.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                      <Users className="h-5 w-5 text-blue-500" />
-                      Pengguna ({filteredData.users.length})
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {filteredData.users.map((user: any) => (
-                        <div
-                          key={user.id}
-                          className="p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
-                          onClick={() => setSelectedNode({ ...user, type: 'user' })}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className={`w-4 h-4 rounded-full ${getNodeColor('user')}`}></div>
-                            <div>
-                              <p className="font-medium">{user.firstName} {user.lastName}</p>
-                              <p className="text-sm text-gray-500">{user.email}</p>
-                              <Badge variant="outline" className="mt-1 text-xs">
-                                {user.role === 'admin' ? 'Admin' : 
-                                 user.role === 'manager' ? 'Manager' : 'Member'}
-                              </Badge>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Empty State */}
-                {filteredData.teams.length === 0 && 
-                 filteredData.objectives.length === 0 && 
-                 filteredData.keyResults.length === 0 && 
-                 filteredData.initiatives.length === 0 && 
-                 filteredData.users.length === 0 && (
+                ) : (
                   <div className="text-center py-12">
-                    <Network className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <Target className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 mb-2">Tidak Ada Data</h3>
                     <p className="text-gray-500">
                       {searchTerm ? 
                         `Tidak ada hasil untuk pencarian "${searchTerm}"` : 
-                        'Tidak ada data yang tersedia untuk filter yang dipilih'
+                        'Tidak ada goal yang tersedia untuk filter yang dipilih'
                       }
                     </p>
                   </div>
