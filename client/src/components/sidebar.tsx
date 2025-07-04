@@ -11,7 +11,8 @@ import {
   User,
   Settings,
   X,
-  Trophy
+  Trophy,
+  Network
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -73,6 +74,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       icon: BarChart3,
       path: "/analytics",
       active: location === "/analytics"
+    },
+    {
+      label: "Jaringan",
+      icon: Network,
+      path: "/network",
+      active: location === "/network"
     }
   ];
 

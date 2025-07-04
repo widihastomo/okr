@@ -25,6 +25,7 @@ import Profile from "@/pages/profile";
 import NotFound from "@/pages/not-found";
 import AnalyticsPage from "@/pages/analytics";
 import AchievementsPage from "@/pages/achievements";
+import NetworkVisualization from "@/pages/network-visualization";
 
 
 
@@ -94,6 +95,7 @@ function Router() {
             <Route path="/users" component={UsersPage} />
             <Route path="/achievements" component={AchievementsPage} />
             <Route path="/analytics" component={AnalyticsPage} />
+            <Route path="/network" component={NetworkVisualization} />
             <Route component={NotFound} />
           </Switch>
         </div>
