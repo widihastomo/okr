@@ -144,11 +144,11 @@ export default function ObjectiveOverviewCard({
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <p className="text-sm text-gray-600 mt-1 cursor-help truncate">
-                      {truncateText(objective.description, 60)}
+                      {truncateText(objective.description || "", 60)}
                     </p>
                   </TooltipTrigger>
                   <TooltipContent className="max-w-sm">
-                    <p>{objective.description}</p>
+                    <p>{objective.description || ""}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

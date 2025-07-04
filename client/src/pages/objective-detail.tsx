@@ -504,7 +504,7 @@ export default function GoalDetail() {
         </div>
       </div>
       {/* Visual Overview Section for easy understanding */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-2">
           <ObjectiveOverviewCard
             objective={goal}
