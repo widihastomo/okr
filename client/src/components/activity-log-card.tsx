@@ -116,7 +116,9 @@ export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
           <div className="space-y-3 max-h-80 overflow-y-auto">
             {activities.slice(0, 10).map((activity) => (
               <div key={`${activity.type}-${activity.id}`} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-                <div className={`w-2 h-2 ${getTypeColor(activity.type)} rounded-full mt-2`}></div>
+                <div className={`w-8 h-8 ${getTypeColor(activity.type)} rounded-full flex items-center justify-center text-white`}>
+                  {getTypeIcon(activity.type)}
+                </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
