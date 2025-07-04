@@ -822,26 +822,7 @@ export default function GoalDetail() {
                         </span>
                       </div>
 
-                      {/* Assignee information */}
-                      <div className="text-xs text-gray-600 mb-2 flex items-center gap-2">
-                        {kr.assignedTo ? (
-                          <>
-                            <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                              {getUserName(kr.assignedTo).charAt(0).toUpperCase()}
-                            </div>
-                            <span className="font-medium text-gray-800">
-                              {getUserName(kr.assignedTo)}
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            <div className="w-5 h-5 bg-gray-300 rounded-full flex items-center justify-center">
-                              <UserIcon className="w-3 h-3 text-gray-500" />
-                            </div>
-                            <span className="text-gray-500 italic">Belum ditentukan</span>
-                          </>
-                        )}
-                      </div>
+
 
                       <div className="text-xs text-gray-500">
                         {(() => {
@@ -1005,6 +986,27 @@ export default function GoalDetail() {
                           </div>
                         )}
                       </div>
+                    )}
+                  </div>
+
+                  {/* Assignee information - Bottom left */}
+                  <div className="text-xs text-gray-600 flex items-center gap-2">
+                    {kr.assignedTo ? (
+                      <>
+                        <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                          {getUserName(kr.assignedTo).charAt(0).toUpperCase()}
+                        </div>
+                        <span className="font-medium text-gray-800">
+                          {getUserName(kr.assignedTo)}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-5 h-5 bg-gray-300 rounded-full flex items-center justify-center">
+                          <UserIcon className="w-3 h-3 text-gray-500" />
+                        </div>
+                        <span className="text-gray-500 italic">Belum ditentukan</span>
+                      </>
                     )}
                   </div>
 
