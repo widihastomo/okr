@@ -143,8 +143,9 @@ export function CheckInModal({
       setAchieved(parseFloat(currentValue) >= parseFloat(targetValue));
       setNotes("");
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error("Check-in error:", error);
+      console.error("Error details:", error);
       toast({
         title: "Gagal melakukan update",
         description: error instanceof Error ? error.message : "Terjadi kesalahan saat memperbarui progress",
@@ -171,6 +172,15 @@ export function CheckInModal({
     const cleanValue = (keyResultType === "achieve_or_not") 
       ? submitValue 
       : submitValue.replace(/[.,]/g, '');
+    
+    console.log('Check-in data:', { 
+      keyResultId,
+      keyResultType, 
+      achieved, 
+      submitValue, 
+      cleanValue,
+      notes 
+    });
     
     checkInMutation.mutate({
       value: cleanValue,
