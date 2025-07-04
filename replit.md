@@ -96,6 +96,15 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 04, 2025. Created optimized build scripts to address slow build performance:
+  * Identified build performance issue: 409MB node_modules with 95 packages causing slow builds
+  * Created build-optimized.js script with TypeScript compilation optimizations (--skipLibCheck --incremental)
+  * Created build-fast.js script with parallel processing for frontend and server builds
+  * Created build-production.js script with comprehensive build verification and esbuild optimization
+  * Added build file verification, metadata generation, and size reporting
+  * Optimized external dependencies exclusion for smaller server bundle
+  * Build scripts now provide detailed timing information and error handling
+  * Enhanced production deployment with minimal dependency footprint
 - July 04, 2025. Completed comprehensive terminology change from "Ukuran Keberhasilan" to "Angka Target":
   * Updated all remaining occurrences in objective-detail.tsx including tabs, headers, descriptions, and empty states
   * Updated terminology in check-in modal (CheckInModal component) for dialog description and label text
