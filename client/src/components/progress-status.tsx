@@ -57,10 +57,10 @@ export function ProgressStatus({
         };
       case 'at_risk':
         return {
-          color: 'bg-yellow-500',
-          textColor: 'text-yellow-700',
-          bgColor: 'bg-yellow-50',
-          borderColor: 'border-yellow-200',
+          color: 'bg-orange-500',
+          textColor: 'text-orange-700',
+          bgColor: 'bg-orange-50',
+          borderColor: 'border-orange-200',
           icon: AlertTriangle,
           label: 'Berisiko'
         };
@@ -218,7 +218,7 @@ export function SimpleProgressStatus({
                   case 'completed': return 'bg-green-500';
                   case 'ahead': return 'bg-blue-500';
                   case 'on_track': return 'bg-green-400';
-                  case 'at_risk': return 'bg-yellow-500';
+                  case 'at_risk': return 'bg-orange-500';
                   case 'behind': return 'bg-red-500';
                   default: return 'bg-gray-400';
                 }
@@ -258,7 +258,7 @@ export function SimpleProgressStatus({
                   case 'completed': return 'bg-green-500';
                   case 'ahead': return 'bg-blue-500';
                   case 'on_track': return 'bg-green-400';
-                  case 'at_risk': return 'bg-yellow-500';
+                  case 'at_risk': return 'bg-orange-500';
                   case 'behind': return 'bg-red-500';
                   default: return 'bg-gray-400';
                 }
@@ -287,7 +287,7 @@ export function SimpleProgressStatus({
               case 'completed': return 'bg-green-500';
               case 'ahead': return 'bg-blue-500';
               case 'on_track': return 'bg-green-400';
-              case 'at_risk': return 'bg-yellow-500';
+              case 'at_risk': return 'bg-orange-500';
               case 'behind': return 'bg-red-500';
               default: return 'bg-gray-400';
             }
@@ -341,10 +341,10 @@ function getStatusConfig(status: string) {
       };
     case 'at_risk':
       return {
-        color: 'bg-yellow-500',
-        textColor: 'text-yellow-700',
-        bgColor: 'bg-yellow-50',
-        borderColor: 'border-yellow-200',
+        color: 'bg-orange-500',
+        textColor: 'text-orange-700',
+        bgColor: 'bg-orange-50',
+        borderColor: 'border-orange-200',
         icon: AlertTriangle,
         label: 'Berisiko'
       };
