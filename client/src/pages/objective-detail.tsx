@@ -28,6 +28,7 @@ import {
   MoreVertical,
   MoreHorizontal,
   Building,
+  Building2,
   ClipboardList,
   CheckSquare,
   Trash2,
