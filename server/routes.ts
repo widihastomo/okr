@@ -901,6 +901,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create standalone key result
+  app.post("/api/key-results", requireAuth, async (req, res) => {
+    try {
+      const keyResultData = insertKeyResultSchema.parse({
+        ...req.body,
+        // Ensure proper defaults for required fields
+        currentValue: req.body.currentValue === "" ? "0" : req.body.currentValue || "0",
+        targetValue: req.body.targetValue === "" ? "0" : req.body.targetValue,
+        baseValue: req.body.baseValue === "" ? "0" : req.body.baseValue,
+        unit: req.body.unit || "number",
+        status: req.body.status || "in_progress",
+        assignedTo: req.body.assignedTo === "" ? null : req.body.assignedTo
+      });
+
+      const keyResult = await storage.createKeyResult(keyResultData);
+      
+      // Update objective progress and status after adding key result
+      if (keyResult.objectiveId) {
+        await updateObjectiveWithAutoStatus(keyResult.objectiveId);
+      }
+
+      res.status(201).json(keyResult);
+    } catch (error) {
+      console.error("Error creating key result:", error);
+      if (error instanceof z.ZodError) {
+        console.error("Validation errors:", error.errors);
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create key result", error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
   // Check-ins for progress tracking
   app.post("/api/key-results/:id/check-ins", async (req, res) => {
     try {
