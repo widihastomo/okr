@@ -155,9 +155,7 @@ export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
                           {formatValue(activity.value, activity.unit || "")}
                         </p>
                       )}
-                      <span className="text-xs px-2 py-1 bg-gray-200 text-gray-600 rounded-full">
-                        {getTypeLabel(activity.type)}
-                      </span>
+                      
                     </div>
                     <p className="text-xs text-gray-500">
                       {activity.createdAt ? format(new Date(activity.createdAt), "MMM dd") : "Unknown"}
