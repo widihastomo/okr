@@ -47,8 +47,8 @@ interface CheckInModalProps {
   targetValue: string;
   unit: string;
   keyResultType: string;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export function CheckInModal({ 
@@ -61,6 +61,19 @@ export function CheckInModal({
   open,
   onOpenChange
 }: CheckInModalProps) {
+  // Internal state for standalone mode
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = open !== undefined && onOpenChange !== undefined;
+  const modalOpen = isControlled ? open : internalOpen;
+  
+  const handleOpenChange = (newOpen: boolean) => {
+    if (isControlled && onOpenChange) {
+      onOpenChange(newOpen);
+    } else {
+      setInternalOpen(newOpen);
+    }
+  };
+
   const [value, setValue] = useState(currentValue);
   const [achieved, setAchieved] = useState(parseFloat(currentValue) >= parseFloat(targetValue));
   const [notes, setNotes] = useState("");
@@ -88,7 +101,7 @@ export function CheckInModal({
       queryClient.invalidateQueries({
         queryKey: [`/api/key-results/${keyResultId}`],
       });
-      onOpenChange(false);
+      handleOpenChange(false);
       setValue(currentValue);
       setAchieved(parseFloat(currentValue) >= parseFloat(targetValue));
       setNotes("");
@@ -199,7 +212,17 @@ export function CheckInModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={modalOpen} onOpenChange={handleOpenChange}>
+      {/* Show trigger button only in standalone mode */}
+      {!isControlled && (
+        <DialogTrigger asChild>
+          <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+            <TrendingUp className="w-4 h-4 mr-1" />
+            <span className="sm:hidden">Update</span>
+            <span className="hidden sm:inline">Update</span>
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -324,7 +347,7 @@ export function CheckInModal({
             <Button
               type="button"
               variant="outline"
-              onClick={() => onOpenChange(false)}
+              onClick={() => handleOpenChange(false)}
             >
               Batal
             </Button>

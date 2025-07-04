@@ -847,7 +847,7 @@ export default function GoalDetail() {
                         variant="default"
                         size="sm"
                         onClick={() => handleCheckIn(kr)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                        className="bg-green-600 hover:bg-green-700 text-white"
                       >
                         <TrendingUp className="w-4 h-4 mr-1" />
                         <span className="sm:hidden">Update</span>
