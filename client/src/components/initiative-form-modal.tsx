@@ -20,7 +20,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, ChevronLeft, ChevronRight, Plus, Trash2, Target, TrendingUp, TrendingDown, MoveUp, MoveDown } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { CalendarIcon, ChevronLeft, ChevronRight, Plus, Trash2, Target, TrendingUp, TrendingDown, MoveUp, MoveDown, HelpCircle } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { formatNumberInput, parseFormattedNumber } from "@/lib/number-utils";
@@ -41,6 +42,7 @@ import {
 const initiativeInfoSchema = z.object({
   title: z.string().min(1, "Nama inisiatif harus diisi"),
   description: z.string().min(1, "Tujuan inisiatif harus diisi"),
+  keyResultId: z.string().min(1, "Key result harus dipilih"),
   targetContribution: z.string().optional(),
   picId: z.string().min(1, "Penanggung jawab harus dipilih"),
   startDate: z.date({ required_error: "Tanggal mulai harus diisi" }),
@@ -70,6 +72,7 @@ interface InitiativeFormModalProps {
   }) => void;
   keyResultId: string;
   users: User[];
+  keyResults?: Array<{ id: string; title: string; currentValue: number; targetValue: number; unit: string }>;
   isLoading?: boolean;
 }
 
@@ -113,6 +116,7 @@ export default function InitiativeFormModal({
   onSubmit,
   keyResultId,
   users,
+  keyResults = [],
   isLoading = false,
 }: InitiativeFormModalProps) {
   const [currentStep, setCurrentStep] = useState(1);
@@ -125,6 +129,7 @@ export default function InitiativeFormModal({
     defaultValues: {
       title: "",
       description: "",
+      keyResultId: keyResultId || "",
       targetContribution: "",
       picId: "",
     },
@@ -228,93 +233,198 @@ export default function InitiativeFormModal({
               </p>
             </CardHeader>
             <CardContent>
-              <Form {...initiativeForm}>
-                <form onSubmit={initiativeForm.handleSubmit(handleStep1Submit)} className="space-y-4">
-                  <FormField
-                    control={initiativeForm.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Nama Inisiatif *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Masukkan nama inisiatif..." {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={initiativeForm.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Tujuan Inisiatif *</FormLabel>
-                        <FormControl>
-                          <Textarea placeholder="Jelaskan tujuan inisiatif ini..." {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={initiativeForm.control}
-                    name="targetContribution"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Target Kontribusi Ke Angka Target</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="Masukkan kontribusi target..."
-                            {...field}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              field.onChange(value);
-                              // Show difference calculation here if needed
-                            }}
-                          />
-                        </FormControl>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Berapa kontribusi inisiatif ini terhadap pencapaian angka target
-                        </p>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={initiativeForm.control}
-                    name="picId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Penanggung Jawab *</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pilih penanggung jawab" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {users.map((user) => (
-                              <SelectItem key={user.id} value={user.id}>
-                                {user.firstName} {user.lastName}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <TooltipProvider>
+                <Form {...initiativeForm}>
+                  <form onSubmit={initiativeForm.handleSubmit(handleStep1Submit)} className="space-y-4">
                     <FormField
                       control={initiativeForm.control}
-                      name="startDate"
+                      name="title"
                       render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                          <FormLabel>Tanggal Mulai *</FormLabel>
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            Nama Inisiatif *
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <HelpCircle className="h-4 w-4 text-blue-500 cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p className="max-w-xs">
+                                  Berikan nama yang jelas dan spesifik untuk inisiatif ini. 
+                                  Contoh: "Kampanye Media Sosial Q3", "Program Pelatihan Karyawan"
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </FormLabel>
+                          <FormControl>
+                            <Input placeholder="Masukkan nama inisiatif..." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={initiativeForm.control}
+                      name="keyResultId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            Pilih Angka Target *
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <HelpCircle className="h-4 w-4 text-blue-500 cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p className="max-w-xs">
+                                  Pilih angka target yang akan didukung oleh inisiatif ini. 
+                                  Inisiatif harus berkontribusi langsung pada pencapaian angka target.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih angka target" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {keyResults.map((keyResult) => (
+                                <SelectItem key={keyResult.id} value={keyResult.id}>
+                                  <div className="flex flex-col">
+                                    <span className="font-medium">{keyResult.title}</span>
+                                    <span className="text-xs text-gray-500">
+                                      Target: {keyResult.targetValue?.toLocaleString('id-ID') || 0} {keyResult.unit}
+                                    </span>
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={initiativeForm.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            Tujuan Inisiatif *
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <HelpCircle className="h-4 w-4 text-blue-500 cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p className="max-w-xs">
+                                  Jelaskan secara detail apa yang ingin dicapai dengan inisiatif ini. 
+                                  Hubungkan dengan angka target yang dipilih di atas.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea placeholder="Jelaskan tujuan inisiatif ini..." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={initiativeForm.control}
+                      name="targetContribution"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            Target Kontribusi Ke Angka Target
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <HelpCircle className="h-4 w-4 text-blue-500 cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p className="max-w-xs">
+                                  Seberapa banyak inisiatif ini akan berkontribusi untuk mencapai angka target. 
+                                  Contoh: "Meningkatkan 20% dari target", "Menambah 500 unit dari target total"
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Masukkan kontribusi target..."
+                              {...field}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                field.onChange(value);
+                                // Show difference calculation here if needed
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={initiativeForm.control}
+                      name="picId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            Penanggung Jawab *
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <HelpCircle className="h-4 w-4 text-blue-500 cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p className="max-w-xs">
+                                  Pilih orang yang bertanggung jawab untuk menjalankan dan mengawasi inisiatif ini. 
+                                  Penanggung jawab akan memastikan inisiatif berjalan sesuai rencana.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih penanggung jawab" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {users.map((user) => (
+                                <SelectItem key={user.id} value={user.id}>
+                                  {user.firstName} {user.lastName}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={initiativeForm.control}
+                        name="startDate"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                            <FormLabel className="flex items-center gap-2">
+                              Tanggal Mulai *
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <HelpCircle className="h-4 w-4 text-blue-500 cursor-help" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p className="max-w-xs">
+                                    Tanggal dimulainya inisiatif ini. Pastikan memberikan waktu yang cukup untuk persiapan.
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
                               <FormControl>
@@ -351,12 +461,24 @@ export default function InitiativeFormModal({
                       )}
                     />
 
-                    <FormField
-                      control={initiativeForm.control}
-                      name="dueDate"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                          <FormLabel>Tanggal Selesai *</FormLabel>
+                      <FormField
+                        control={initiativeForm.control}
+                        name="dueDate"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                            <FormLabel className="flex items-center gap-2">
+                              Tanggal Selesai *
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <HelpCircle className="h-4 w-4 text-blue-500 cursor-help" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p className="max-w-xs">
+                                    Tanggal target selesainya inisiatif ini. Pastikan realistis dengan waktu yang dibutuhkan.
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
                               <FormControl>
@@ -404,6 +526,7 @@ export default function InitiativeFormModal({
                   </div>
                 </form>
               </Form>
+              </TooltipProvider>
             </CardContent>
           </Card>
         )}

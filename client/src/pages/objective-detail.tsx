@@ -2247,6 +2247,13 @@ export default function GoalDetail() {
         }}
         keyResultId={goal?.keyResults?.[0]?.id || ""}
         users={users || []}
+        keyResults={goal?.keyResults?.map(kr => ({
+          id: kr.id,
+          title: kr.title,
+          currentValue: Number(kr.currentValue) || 0,
+          targetValue: Number(kr.targetValue) || 0,
+          unit: kr.unit || 'number'
+        })) || []}
       />
 
       {/* AI Help Bubble */}

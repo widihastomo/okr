@@ -1531,6 +1531,13 @@ export default function KeyResultDetailPage() {
       onSubmit={createInitiativeWithMetricsMutation.mutate}
       keyResultId={keyResultId}
       users={users || []}
+      keyResults={keyResult ? [{
+        id: keyResult.id,
+        title: keyResult.title,
+        currentValue: Number(keyResult.currentValue) || 0,
+        targetValue: Number(keyResult.targetValue) || 0,
+        unit: keyResult.unit || 'number'
+      }] : []}
       isLoading={createInitiativeWithMetricsMutation.isPending}
     />
 
