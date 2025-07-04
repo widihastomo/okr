@@ -758,6 +758,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                               <TableHead className="text-center">Nilai Awal</TableHead>
                               <TableHead className="text-center">Target</TableHead>
                               <TableHead className="text-center">Unit</TableHead>
+                              <TableHead className="text-center">Penanggung Jawab</TableHead>
                               <TableHead className="text-center">Aksi</TableHead>
                             </TableRow>
                           </TableHeader>
@@ -796,6 +797,22 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                                 </TableCell>
                                 <TableCell className="text-center">
                                   {keyResult.keyResultType === 'achieve_or_not' ? '-' : (keyResult.unit || '-')}
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  {keyResult.assignedTo ? (
+                                    <div className="flex items-center justify-center gap-2">
+                                      <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
+                                        <span className="text-xs font-medium text-blue-600">
+                                          {users?.find(u => u.id === keyResult.assignedTo)?.firstName?.charAt(0) || '?'}
+                                        </span>
+                                      </div>
+                                      <span className="text-sm text-gray-600 truncate max-w-20">
+                                        {users?.find(u => u.id === keyResult.assignedTo)?.firstName || 'Unknown'}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    <span className="text-sm text-gray-400">-</span>
+                                  )}
                                 </TableCell>
                                 <TableCell className="text-center">
                                   <div className="flex justify-center gap-1">
@@ -904,6 +921,24 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                                 </div>
                               )}
 
+                              {/* Penanggung Jawab */}
+                              <div className="flex justify-between items-center p-1.5 bg-white rounded-md">
+                                <span className="text-xs font-medium text-gray-600">Penanggung Jawab:</span>
+                                {keyResult.assignedTo ? (
+                                  <div className="flex items-center gap-1">
+                                    <div className="w-4 h-4 rounded-full bg-blue-100 flex items-center justify-center">
+                                      <span className="text-xs font-medium text-blue-600">
+                                        {users?.find(u => u.id === keyResult.assignedTo)?.firstName?.charAt(0) || '?'}
+                                      </span>
+                                    </div>
+                                    <span className="text-xs font-semibold text-gray-700">
+                                      {users?.find(u => u.id === keyResult.assignedTo)?.firstName || 'Unknown'}
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <span className="text-xs text-gray-400">Belum ditentukan</span>
+                                )}
+                              </div>
                               
                             </div>
                           </div>
