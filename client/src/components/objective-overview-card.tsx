@@ -324,12 +324,29 @@ export default function ObjectiveOverviewCard({
                     : "Tidak ada deadline"}
                 </span>
               </div>
-              {overallProgress < 50 && daysRemaining && daysRemaining < 30 && (
-                <div className="flex items-center gap-1 text-orange-600">
-                  <AlertTriangle className="w-4 h-4" />
-                  <span className="text-xs">Perlu perhatian</span>
-                </div>
-              )}
+              {(() => {
+                if (!cycle || !daysRemaining) return null;
+                
+                // Calculate ideal progress based on time passed
+                const cycleStart = new Date(cycle.startDate);
+                const cycleEnd = new Date(cycle.endDate);
+                const now = new Date();
+
+                const totalDuration = cycleEnd.getTime() - cycleStart.getTime();
+                const timePassed = Math.max(0, now.getTime() - cycleStart.getTime());
+                const idealProgress = Math.min(100, Math.max(0, (timePassed / totalDuration) * 100));
+                
+                // Show warning if actual progress is significantly behind ideal progress AND deadline is approaching
+                const progressGap = idealProgress - overallProgress;
+                const shouldShowWarning = progressGap > 20 && daysRemaining < 45;
+                
+                return shouldShowWarning ? (
+                  <div className="flex items-center gap-1 text-orange-600">
+                    <AlertTriangle className="w-4 h-4" />
+                    <span className="text-xs">Perlu perhatian</span>
+                  </div>
+                ) : null;
+              })()}
             </div>
           </div>
         </div>

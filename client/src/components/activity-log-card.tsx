@@ -189,9 +189,9 @@ export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
                             {activity.confidence}/10
                           </span>
                         </div>
-                        {activity.metadata?.notes && (
+                        {activity.notes && (
                           <div className="text-xs text-gray-500 italic mt-1">
-                            "{activity.metadata.notes}"
+                            "{activity.notes}"
                           </div>
                         )}
                       </div>
