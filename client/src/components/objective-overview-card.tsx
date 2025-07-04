@@ -110,10 +110,12 @@ export default function ObjectiveOverviewCard({
     return "text-red-600 bg-red-100";
   };
 
-  // Helper function to truncate text with character limit
-  const truncateText = (text: string, maxLength: number) => {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + "...";
+  // Helper function to truncate text with character limit (responsive)
+  const truncateText = (text: string, maxLength: number, mobileLength?: number) => {
+    // Use shorter length for mobile if provided
+    const effectiveLength = window.innerWidth < 768 && mobileLength ? mobileLength : maxLength;
+    if (text.length <= effectiveLength) return text;
+    return text.substring(0, effectiveLength) + "...";
   };
 
   return (
@@ -121,18 +123,18 @@ export default function ObjectiveOverviewCard({
       <CardHeader className="pb-4">
         {/* Title and Description - Moved to top */}
         <div className="flex items-start justify-between mb-6">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
             <div
-              className={`p-2 rounded-full ${getHealthColor(overallProgress)}`}
+              className={`p-2 rounded-full ${getHealthColor(overallProgress)} flex-shrink-0`}
             >
               <Target className="w-5 h-5" />
             </div>
-            <div>
+            <div className="min-w-0 flex-1">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <CardTitle className="text-lg cursor-help truncate">
-                      {truncateText(objective.title, 50)}
+                    <CardTitle className="text-lg cursor-help truncate max-w-full">
+                      {truncateText(objective.title, 50, 30)}
                     </CardTitle>
                   </TooltipTrigger>
                   <TooltipContent className="max-w-xs">
@@ -143,8 +145,8 @@ export default function ObjectiveOverviewCard({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <p className="text-sm text-gray-600 mt-1 cursor-help truncate">
-                      {truncateText(objective.description || "", 60)}
+                    <p className="text-sm text-gray-600 mt-1 cursor-help truncate max-w-full">
+                      {truncateText(objective.description || "", 60, 40)}
                     </p>
                   </TooltipTrigger>
                   <TooltipContent className="max-w-sm">
