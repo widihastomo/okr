@@ -171,46 +171,44 @@ export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
                       </p>
                     </div>
                   )}
-                  <div className="flex items-center justify-between mt-2">
-                    {activity.confidence && activity.type === 'key_result_checkin' && (
-                      <div className="flex items-center gap-2">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-1">
-                            <div className="w-16 bg-gray-200 rounded-full h-2">
-                              <div 
-                                className={`h-2 rounded-full ${
-                                  activity.confidence >= 8 ? 'bg-green-500' :
-                                  activity.confidence >= 6 ? 'bg-yellow-500' :
-                                  'bg-red-500'
-                                }`}
-                                style={{ width: `${(activity.confidence / 10) * 100}%` }}
-                              ></div>
-                            </div>
-                            <span className="text-xs text-gray-600 font-medium">
-                              {activity.confidence}/10
-                            </span>
+                  {activity.createdBy && (
+                    <div className="flex items-center gap-2 text-xs text-gray-500 mt-2">
+                      <div className={`w-6 h-6 ${getTypeColor(activity.type)} rounded-full flex items-center justify-center text-white text-xs font-medium`}>
+                        {getUserName(activity.createdBy).charAt(0).toUpperCase()}
+                      </div>
+                      <span>{getUserName(activity.createdBy)}</span>
+                    </div>
+                  )}
+                  {activity.confidence && activity.type === 'key_result_checkin' && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1">
+                          <div className="w-16 bg-gray-200 rounded-full h-2">
+                            <div 
+                              className={`h-2 rounded-full ${
+                                activity.confidence >= 8 ? 'bg-green-500' :
+                                activity.confidence >= 6 ? 'bg-yellow-500' :
+                                'bg-red-500'
+                              }`}
+                              style={{ width: `${(activity.confidence / 10) * 100}%` }}
+                            ></div>
                           </div>
-                          <div className="text-xs text-gray-500">
-                            <span className="font-medium">
-                              {activity.confidence >= 8 ? 'Tinggi' :
-                               activity.confidence >= 6 ? 'Sedang' : 'Rendah'}
-                            </span> - {' '}
-                            {activity.confidence >= 8 ? 'Sangat yakin target tercapai' :
-                             activity.confidence >= 6 ? 'Cukup optimis dengan progress' :
-                             'Butuh perhatian lebih untuk mencapai target'}
-                          </div>
+                          <span className="text-xs text-gray-600 font-medium">
+                            {activity.confidence}/10
+                          </span>
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          <span className="font-medium">
+                            {activity.confidence >= 8 ? 'Tinggi' :
+                             activity.confidence >= 6 ? 'Sedang' : 'Rendah'}
+                          </span> - {' '}
+                          {activity.confidence >= 8 ? 'Sangat yakin target tercapai' :
+                           activity.confidence >= 6 ? 'Cukup optimis dengan progress' :
+                           'Butuh perhatian lebih untuk mencapai target'}
                         </div>
                       </div>
-                    )}
-                    {activity.createdBy && (
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <div className={`w-6 h-6 ${getTypeColor(activity.type)} rounded-full flex items-center justify-center text-white text-xs font-medium`}>
-                          {getUserName(activity.createdBy).charAt(0).toUpperCase()}
-                        </div>
-                        <span>{getUserName(activity.createdBy)}</span>
-                      </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
