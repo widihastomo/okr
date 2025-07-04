@@ -91,21 +91,44 @@ export function CheckInModal({
     mutationFn: async (data: { value: string; notes: string }) => {
       return await apiRequest("POST", `/api/key-results/${keyResultId}/check-ins`, data);
     },
-    onSuccess: () => {
+    onSuccess: (response: any) => {
       toast({
         title: "Update berhasil",
         description: "Progress telah diperbarui secara otomatis",
         className: "border-green-200 bg-green-50 text-green-800",
       });
+      
+      // Invalidate general lists
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
+      
+      // Invalidate specific key result data
       queryClient.invalidateQueries({
         queryKey: [`/api/key-results/${keyResultId}`],
       });
+      
+      // Find and invalidate specific objective data
+      // We need to get the objective ID from the key result
+      if (response?.objectiveId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/okrs/${response.objectiveId}`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/objectives/${response.objectiveId}/activity-log`] });
+      }
+      
+      // Invalidate all objective-specific queries that might be affected
+      queryClient.invalidateQueries({ 
+        predicate: (query) => {
+          const queryKey = query.queryKey[0] as string;
+          return queryKey?.includes('/api/okrs/') || 
+                 queryKey?.includes('/api/objectives/') ||
+                 queryKey?.includes('/api/initiatives/objective/') ||
+                 queryKey?.includes('/api/tasks/objective/');
+        }
+      });
+      
       handleOpenChange(false);
       setValue(currentValue);
       setAchieved(parseFloat(currentValue) >= parseFloat(targetValue));
       setNotes("");
-
     },
     onError: (error) => {
       console.error("Check-in error:", error);

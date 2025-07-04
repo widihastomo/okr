@@ -929,7 +929,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Don't fail the check-in creation if gamification fails
       }
       
-      res.status(201).json(checkIn);
+      // Get the key result to include objectiveId in response for cache invalidation
+      const keyResult = await storage.getKeyResult(keyResultId);
+      
+      res.status(201).json({
+        ...checkIn,
+        objectiveId: keyResult?.objectiveId
+      });
     } catch (error) {
       console.error("Check-in creation error:", error);
       res.status(500).json({ 
