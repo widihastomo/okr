@@ -92,6 +92,7 @@ import { useToast } from "@/hooks/use-toast";
 import AIHelpBubble from "@/components/ai-help-bubble";
 import ObjectiveOverviewCard from "@/components/objective-overview-card";
 import ObjectiveTimeline from "@/components/objective-timeline";
+import ActivityLogCard from "@/components/activity-log-card";
 import type {
   OKRWithKeyResults,
   KeyResult,
@@ -517,118 +518,7 @@ export default function GoalDetail() {
           />
         </div>
         <div className="lg:col-span-1">
-          {/* Progress History - matching key result detail design */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Riwayat Update
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {(() => {
-                // Collect all check-ins from all key results
-                const allCheckIns = goal.keyResults.flatMap(kr => 
-                  (kr.lastCheckIn ? [{ ...kr.lastCheckIn, keyResultTitle: kr.title, keyResultId: kr.id, keyResultUnit: kr.unit }] : [])
-                );
-                
-                // Sort by most recent
-                const sortedCheckIns = allCheckIns.sort((a, b) => 
-                  new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
-                );
-
-                const formatValue = (value: string, unit: string) => {
-                  const num = parseFloat(value);
-                  if (unit === "Rp") {
-                    return `Rp ${num.toLocaleString("id-ID")}`;
-                  } else if (unit === "%") {
-                    return `${num.toLocaleString("id-ID")}%`;
-                  } else {
-                    return `${num.toLocaleString("id-ID")} ${unit}`;
-                  }
-                };
-
-                return sortedCheckIns.length > 0 ? (
-                  <div className="space-y-3 max-h-80 overflow-y-auto">
-                    {sortedCheckIns.slice(0, 8).map((checkIn) => (
-                      <div key={checkIn.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <p className="font-semibold text-blue-600">
-                              {formatValue(checkIn.value, checkIn.keyResultUnit || "")}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {checkIn.createdAt ? format(new Date(checkIn.createdAt), "MMM dd") : "Unknown"}
-                            </p>
-                          </div>
-                          <div className="text-xs text-gray-600 mb-1">
-                            {checkIn.keyResultTitle}
-                          </div>
-                          {checkIn.notes && (
-                            <div className="mt-1">
-                              <p className="text-sm text-gray-600 line-clamp-2">
-                                {checkIn.notes}
-                              </p>
-                            </div>
-                          )}
-                          <div className="flex items-center justify-between mt-2">
-                            {checkIn.confidence && (
-                              <div className="flex items-center gap-2">
-                                <div className="space-y-1">
-                                  <div className="flex items-center gap-1">
-                                    <div className="w-16 bg-gray-200 rounded-full h-2">
-                                      <div 
-                                        className={`h-2 rounded-full ${
-                                          checkIn.confidence >= 8 ? 'bg-green-500' :
-                                          checkIn.confidence >= 6 ? 'bg-yellow-500' :
-                                          'bg-red-500'
-                                        }`}
-                                        style={{ width: `${(checkIn.confidence / 10) * 100}%` }}
-                                      ></div>
-                                    </div>
-                                    <span className="text-xs text-gray-600 font-medium">
-                                      {checkIn.confidence}/10
-                                    </span>
-                                  </div>
-                                  <div className="text-xs text-gray-500">
-                                    <span className="font-medium">
-                                      {checkIn.confidence >= 8 ? 'Tinggi' :
-                                       checkIn.confidence >= 6 ? 'Sedang' : 'Rendah'}
-                                    </span> - {' '}
-                                    {checkIn.confidence >= 8 ? 'Sangat yakin target tercapai' :
-                                     checkIn.confidence >= 6 ? 'Cukup optimis dengan progress' :
-                                     'Butuh perhatian lebih untuk mencapai target'}
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                            {checkIn.createdBy && (
-                              <div className="flex items-center gap-2 text-xs text-gray-500">
-                                <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                                  {(users.find(u => u.id === checkIn.createdBy)?.firstName?.charAt(0) || 'U').toUpperCase()}
-                                </div>
-                                <span>
-                                  {users.find(u => u.id === checkIn.createdBy)?.firstName || 'Unknown'} {' '}
-                                  {users.find(u => u.id === checkIn.createdBy)?.lastName || ''}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <BarChart3 className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                    <p>Belum ada update</p>
-                    <p className="text-sm">Tambahkan update pertama untuk melacak progress dari waktu ke waktu.</p>
-                  </div>
-                );
-              })()}
-            </CardContent>
-          </Card>
+          <ActivityLogCard objectiveId={goal.id} />
         </div>
       </div>
 

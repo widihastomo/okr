@@ -734,6 +734,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get comprehensive activity log for an objective
+  app.get("/api/objectives/:id/activity-log", async (req, res) => {
+    try {
+      const objectiveId = req.params.id;
+      
+      // Get objective with key results
+      const objective = await storage.getOKRWithKeyResults(objectiveId);
+      if (!objective) {
+        return res.status(404).json({ message: "Objective not found" });
+      }
+
+      // Collect all activities
+      const activities = [];
+
+      // 1. Key Result check-ins
+      for (const kr of objective.keyResults) {
+        const checkIns = await storage.getCheckInsByKeyResultId(kr.id);
+        for (const checkIn of checkIns) {
+          activities.push({
+            id: checkIn.id,
+            type: 'key_result_checkin',
+            entityId: kr.id,
+            entityTitle: kr.title,
+            action: 'update',
+            value: checkIn.value,
+            unit: kr.unit,
+            notes: checkIn.notes,
+            confidence: checkIn.confidence,
+            createdAt: checkIn.createdAt,
+            createdBy: checkIn.createdBy,
+          });
+        }
+      }
+
+      // 2. Initiative updates (from initiatives related to key results)
+      const initiatives = await storage.getInitiativesByObjectiveId(objectiveId);
+      for (const initiative of initiatives) {
+        activities.push({
+          id: initiative.id,
+          type: 'initiative',
+          entityId: initiative.id,
+          entityTitle: initiative.title,
+          action: 'update',
+          value: initiative.progressPercentage?.toString(),
+          unit: '%',
+          notes: `Status: ${initiative.status}, Priority: ${initiative.priority}`,
+          createdAt: initiative.updatedAt || initiative.createdAt,
+          createdBy: initiative.picId,
+        });
+
+        // 3. Task updates (from tasks related to initiatives)
+        const tasks = await storage.getTasksByInitiativeId(initiative.id);
+        for (const task of tasks) {
+          activities.push({
+            id: task.id,
+            type: 'task',
+            entityId: task.id,
+            entityTitle: task.title,
+            action: task.status === 'completed' ? 'completed' : 'update',
+            value: task.status === 'completed' ? '100' : task.status === 'in_progress' ? '50' : '0',
+            unit: '%',
+            notes: `Status: ${task.status}, Priority: ${task.priority}`,
+            createdAt: task.createdAt,
+            createdBy: task.assignedTo,
+          });
+        }
+      }
+
+      // Sort by most recent
+      activities.sort((a, b) => 
+        new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+      );
+
+      res.json(activities);
+    } catch (error) {
+      console.error("Error fetching activity log:", error);
+      res.status(500).json({ message: "Failed to fetch activity log" });
+    }
+  });
+
   // Update objective
   app.patch("/api/objectives/:id", async (req, res) => {
     try {
