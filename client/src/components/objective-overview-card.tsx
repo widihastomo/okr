@@ -129,7 +129,7 @@ export default function ObjectiveOverviewCard({
             >
               <Target className="w-5 h-5" />
             </div>
-            <div className="min-w-0 flex-1 sm:ml-0 -ml-3">
+            <div className="min-w-0 flex-1 sm:ml-0 -ml-2">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
