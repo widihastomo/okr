@@ -829,6 +829,13 @@ export default function GoalDetail() {
       </div>
 
       {/* Mission Card - Only show when objective is empty */}
+      {console.log('Debug Mission Card:', { 
+        goal: !!goal, 
+        keyResults: goal?.keyResults?.length || 0, 
+        rencana: rencana.length, 
+        tugas: tugas.length,
+        shouldShow: goal && goal.keyResults.length === 0 && rencana.length === 0 && tugas.length === 0
+      })}
       {goal && goal.keyResults.length === 0 && rencana.length === 0 && tugas.length === 0 && (
         <MissionCard
           missions={[
