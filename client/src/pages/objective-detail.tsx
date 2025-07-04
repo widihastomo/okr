@@ -580,10 +580,10 @@ export default function GoalDetail() {
   // Force re-render tour overlay when step changes
   useEffect(() => {
     if (showTour) {
-      // Small delay to ensure DOM is updated
+      // Force re-render by triggering state change
       const timeout = setTimeout(() => {
         setTourForceUpdate(prev => prev + 1);
-      }, 50);
+      }, 100);
       return () => clearTimeout(timeout);
     }
   }, [tourStep, showTour]);
@@ -2218,22 +2218,9 @@ export default function GoalDetail() {
 
       {/* Feature Tour Overlay */}
       {showTour && (
-        <div className="fixed inset-0 z-50">
-          {/* Backdrop with cutout for highlighted element */}
-          <div 
-            className="absolute inset-0 bg-black bg-opacity-60"
-            style={{
-              clipPath: (() => {
-                const element = document.querySelector(tourSteps[tourStep]?.target);
-                if (element) {
-                  const rect = element.getBoundingClientRect();
-                  const padding = 8;
-                  return `polygon(0% 0%, 0% 100%, ${rect.left - padding}px 100%, ${rect.left - padding}px ${rect.top - padding}px, ${rect.right + padding}px ${rect.top - padding}px, ${rect.right + padding}px ${rect.bottom + padding}px, ${rect.left - padding}px ${rect.bottom + padding}px, ${rect.left - padding}px 100%, 100% 100%, 100% 0%)`;
-                }
-                return 'polygon(0% 0%, 0% 100%, 100% 100%, 100% 0%)';
-              })()
-            }}
-          ></div>
+        <div key={`tour-${tourStep}-${tourForceUpdate}`} className="fixed inset-0 z-50">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black bg-opacity-60"></div>
           
           {/* Highlight Ring for Active Element */}
           <div 
@@ -2255,45 +2242,8 @@ export default function GoalDetail() {
             })()}
           ></div>
           
-          {/* Tour Content - Positioned smartly */}
-          <div 
-            className="absolute bg-white rounded-lg shadow-xl max-w-sm p-6 z-60"
-            style={(() => {
-              const element = document.querySelector(tourSteps[tourStep]?.target);
-              if (element) {
-                const rect = element.getBoundingClientRect();
-                const windowHeight = window.innerHeight;
-                const windowWidth = window.innerWidth;
-                
-                // Try to position next to the highlighted element
-                let left = rect.right + 20;
-                let top = rect.top;
-                
-                // If too far right, position on left
-                if (left + 350 > windowWidth) {
-                  left = rect.left - 370;
-                }
-                
-                // If still off screen, position below
-                if (left < 20) {
-                  left = Math.max(20, rect.left);
-                  top = rect.bottom + 20;
-                }
-                
-                // If too far down, position above
-                if (top + 200 > windowHeight) {
-                  top = rect.top - 220;
-                }
-                
-                // Ensure minimum margins
-                left = Math.max(20, Math.min(left, windowWidth - 370));
-                top = Math.max(20, Math.min(top, windowHeight - 220));
-                
-                return { left: `${left}px`, top: `${top}px` };
-              }
-              return { left: '50%', top: '50%', transform: 'translate(-50%, -50%)' };
-            })()}
-          >
+          {/* Tour Content */}
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl max-w-md p-6">
             <div className="mb-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 {tourSteps[tourStep].title}
@@ -2368,3 +2318,7 @@ export default function GoalDetail() {
     </div>
   );
 }
+
+
+
+
