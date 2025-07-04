@@ -268,9 +268,11 @@ export default function EditKeyResultModal({
                     Judul Ukuran Keberhasilan
                     <Popover>
                       <PopoverTrigger asChild>
-                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                        <button type="button" className="inline-flex">
+                          <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                        </button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-80">
+                      <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
                         <div className="text-sm">
                           <p className="font-medium mb-2">Judul Ukuran Keberhasilan</p>
                           <p>Buat judul yang spesifik dan terukur. Contoh: "Meningkatkan pendapatan bulanan menjadi 100 juta", "Menurunkan biaya operasional ke 50 juta", "Mencapai 90% kepuasan pelanggan".</p>
@@ -299,9 +301,11 @@ export default function EditKeyResultModal({
                     Deskripsi (Opsional)
                     <Popover>
                       <PopoverTrigger asChild>
-                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                        <button type="button" className="inline-flex">
+                          <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                        </button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-80">
+                      <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
                         <div className="text-sm">
                           <p className="font-medium mb-2">Deskripsi Ukuran Keberhasilan</p>
                           <p>Jelaskan konteks dan detail penting tentang ukuran keberhasilan ini. Apa yang akan diukur, bagaimana cara mengukurnya, dan mengapa ini penting untuk mencapai goal.</p>
@@ -332,9 +336,11 @@ export default function EditKeyResultModal({
                       Tipe Ukuran Keberhasilan
                       <Popover>
                         <PopoverTrigger asChild>
-                          <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                          <button type="button" className="inline-flex">
+                            <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                          </button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-80">
+                        <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
                           <div className="text-sm">
                             <p className="font-medium mb-2">Tipe Ukuran Keberhasilan</p>
                             <p className="mb-2">Pilih tipe sesuai cara pengukuran:</p>
@@ -399,9 +405,11 @@ export default function EditKeyResultModal({
                         Unit (Opsional)
                         <Popover>
                           <PopoverTrigger asChild>
-                            <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                            <button type="button" className="inline-flex">
+                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                            </button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-80">
+                          <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
                             <div className="text-sm">
                               <p className="font-medium mb-2">Unit Pengukuran</p>
                               <p className="mb-2">Pilih unit yang sesuai dengan nilai yang diukur:</p>
@@ -511,9 +519,11 @@ export default function EditKeyResultModal({
                             Target
                             <Popover>
                               <PopoverTrigger asChild>
-                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                <button type="button" className="inline-flex">
+                                  <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                </button>
                               </PopoverTrigger>
-                              <PopoverContent className="w-80">
+                              <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
                                 <div className="text-sm">
                                   <p className="font-medium mb-2">Target (Threshold)</p>
                                   <p>Nilai ambang batas yang harus dipertahankan. Untuk "tetap di atas", nilai harus selalu ≥ target. Untuk "tetap di bawah", nilai harus selalu ≤ target.</p>
@@ -550,9 +560,11 @@ export default function EditKeyResultModal({
                           Nilai Awal
                           <Popover>
                             <PopoverTrigger asChild>
-                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              <button type="button" className="inline-flex">
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              </button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-80">
+                            <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
                               <div className="text-sm">
                                 <p className="font-medium mb-2">Nilai Awal (Baseline)</p>
                                 <p>Titik awal pengukuran sebelum periode dimulai. Contoh: jika target meningkatkan penjualan dari 50 juta ke 100 juta, maka 50 juta adalah nilai awal.</p>
@@ -582,9 +594,11 @@ export default function EditKeyResultModal({
                           Target
                           <Popover>
                             <PopoverTrigger asChild>
-                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              <button type="button" className="inline-flex">
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              </button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-80">
+                            <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
                               <div className="text-sm">
                                 <p className="font-medium mb-2">Target</p>
                                 <p>Nilai yang ingin dicapai di akhir periode. Harus ambisius namun realistis. Contoh: meningkatkan penjualan ke 100 juta, menurunkan biaya ke 30 juta, atau mencapai 95% kepuasan pelanggan.</p>
@@ -615,9 +629,11 @@ export default function EditKeyResultModal({
                           Nilai Saat Ini
                           <Popover>
                             <PopoverTrigger asChild>
-                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              <button type="button" className="inline-flex">
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              </button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-80">
+                            <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
                               <div className="text-sm">
                                 <p className="font-medium mb-2">Nilai Saat Ini</p>
                                 <p>Nilai terkini dari pengukuran ini. Akan terus diperbarui melalui check-in berkala untuk melacak kemajuan menuju target.</p>
