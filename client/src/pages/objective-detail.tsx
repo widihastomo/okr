@@ -505,7 +505,7 @@ export default function GoalDetail() {
       </div>
       {/* Visual Overview Section for easy understanding */}
       <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6 mb-6">
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 h-full">
           <ObjectiveOverviewCard
             objective={goal}
             initiatives={rencana}
@@ -517,7 +517,7 @@ export default function GoalDetail() {
             team={undefined}
           />
         </div>
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 h-full">
           <ActivityLogCard objectiveId={goal.id} />
         </div>
       </div>

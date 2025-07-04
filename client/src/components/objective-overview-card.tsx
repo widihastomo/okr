@@ -131,7 +131,7 @@ export default function ObjectiveOverviewCard({
   };
 
   return (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card className="hover:shadow-lg transition-shadow h-full">
       <CardHeader className="pb-4">
         {/* Title and Description - Moved to top */}
         <div className="flex items-start justify-between mb-6">
@@ -449,7 +449,7 @@ export default function ObjectiveOverviewCard({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 flex flex-col lg:h-96">
         {/* Quick Stats Grid */}
         <div className="grid grid-cols-3 gap-4">
           {/* Key Results */}
