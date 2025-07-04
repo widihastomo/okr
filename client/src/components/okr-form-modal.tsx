@@ -54,6 +54,7 @@ const keyResultSchema = z.object({
   currentValue: z.string().default("0"),
   unit: z.string().optional(),
   status: z.string().default("in_progress"),
+  assignedTo: z.string().optional(), // Penanggung jawab
   dueDate: z.string().optional().nullable(),
 }).refine((data) => {
   // Target wajib diisi untuk semua tipe kecuali achieve_or_not yang tidak memiliki target
@@ -980,6 +981,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
         onSubmit={handleAddKeyResult}
         editingKeyResult={editingKeyResultIndex !== null ? keyResults[editingKeyResultIndex] : undefined}
         isEditing={editingKeyResultIndex !== null}
+        users={users}
       />
     </Dialog>
   );
@@ -992,9 +994,10 @@ interface KeyResultModalProps {
   onSubmit: (keyResult: KeyResultFormData) => void;
   editingKeyResult?: KeyResultFormData;
   isEditing?: boolean;
+  users?: User[];
 }
 
-function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEditing }: KeyResultModalProps) {
+function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEditing, users }: KeyResultModalProps) {
   const keyResultForm = useForm<KeyResultFormData>({
     resolver: zodResolver(z.object({
       title: z.string().min(1, "Judul harus diisi"),
@@ -1005,6 +1008,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
       currentValue: z.string().optional(),
       unit: z.string().optional(),
       status: z.string().optional(),
+      assignedTo: z.string().optional(),
     }).refine((data) => {
       // Target wajib diisi untuk semua tipe kecuali achieve_or_not
       if (data.keyResultType !== "achieve_or_not" && !data.targetValue) {
@@ -1056,7 +1060,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
       currentValue: "0",
       unit: "",
       status: "in_progress",
-
+      assignedTo: "",
     },
   });
 
@@ -1077,6 +1081,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
           currentValue: "0",
           unit: "",
           status: "in_progress",
+          assignedTo: "",
         });
       }
     }
@@ -1211,6 +1216,47 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                   </FormLabel>
                   <FormControl>
                     <Textarea placeholder="Deskripsi detail tentang Angka Target ini" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Penanggung Jawab */}
+            <FormField
+              control={keyResultForm.control}
+              name="assignedTo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2">
+                    Penanggung Jawab
+                    
+                      <Popover>
+                        <PopoverTrigger>
+                          <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                        </PopoverTrigger>
+                        <PopoverContent side="right" className="max-w-xs">
+                          <p>
+                            <strong>Pilih orang yang bertanggung jawab</strong>
+                            <br /><br />
+                            Tentukan siapa yang akan bertanggung jawab untuk memantau dan mencapai Angka Target ini.
+                            <br /><br />
+                            <strong>Tips:</strong> Pilih orang yang memiliki akses dan kontrol langsung terhadap metrik yang diukur.
+                            <br /><br />
+                            <strong>Opsional:</strong> Bisa dikosongkan jika belum ada penanggung jawab yang ditentukan.
+                          </p>
+                        </PopoverContent>
+                      </Popover>
+                    
+                  </FormLabel>
+                  <FormControl>
+                    <SearchableUserSelect
+                      users={users || []}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      placeholder="Pilih penanggung jawab..."
+                      allowUnassigned={true}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

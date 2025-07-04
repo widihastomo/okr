@@ -92,6 +92,7 @@ export const keyResults = pgTable("key_results", {
     enum: ["increase_to", "decrease_to", "achieve_or_not", "should_stay_above", "should_stay_below"] 
   }).notNull().default("increase_to"),
   status: text("status").notNull().default("on_track"), // "on_track", "at_risk", "behind", "completed"
+  assignedTo: uuid("assigned_to").references(() => users.id), // Penanggung jawab angka target
 
   lastUpdated: timestamp("last_updated").defaultNow(),
   confidence: integer("confidence").default(5), // 1-10 scale for confidence level

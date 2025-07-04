@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import type { KeyResult } from "@shared/schema";
+import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 
 
 // Unit options for Key Results
@@ -47,6 +48,7 @@ const editKeyResultSchema = z.object({
   unit: z.string().optional(),
   keyResultType: z.enum(["increase_to", "decrease_to", "achieve_or_not", "should_stay_above", "should_stay_below"]),
   status: z.enum(["on_track", "at_risk", "behind", "completed", "in_progress", "ahead", "not_started"]),
+  assignedTo: z.string().optional(),
 }).refine((data) => {
   // Dynamic validation based on key result type
   if (data.keyResultType === "achieve_or_not") {
@@ -127,7 +129,14 @@ export default function EditKeyResultModal({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-
+  // Get users for assignee selection
+  const { data: users } = useQuery({
+    queryKey: ["/api/users"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/users");
+      return response.json();
+    },
+  });
 
   // Get check-in count for this key result
   const { data: checkInData } = useQuery({
@@ -151,6 +160,7 @@ export default function EditKeyResultModal({
       unit: keyResult.unit || "",
       keyResultType: keyResult.keyResultType as "increase_to" | "decrease_to" | "achieve_or_not" | "should_stay_above" | "should_stay_below",
       status: keyResult.status as "on_track" | "at_risk" | "behind" | "completed" | "in_progress",
+      assignedTo: keyResult.assignedTo || undefined,
 
     } : undefined,
   });
@@ -325,6 +335,40 @@ export default function EditKeyResultModal({
                             {...field} 
                           />
                         </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Penanggung Jawab */}
+                  <FormField
+                    control={form.control}
+                    name="assignedTo"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2 mb-2">
+                          Penanggung Jawab (Opsional)
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button type="button" className="inline-flex">
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
+                              <div className="text-sm">
+                                <p className="font-medium mb-2">Penanggung Jawab</p>
+                                <p>Pilih orang yang bertanggung jawab untuk mencapai Angka Target ini. Penanggung jawab akan menerima notifikasi dan update terkait progress.</p>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        </FormLabel>
+                        <SearchableUserSelect
+                          users={users || []}
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          placeholder="Pilih penanggung jawab"
+                          allowUnassigned={true}
+                        />
                         <FormMessage />
                       </FormItem>
                     )}
