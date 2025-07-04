@@ -9,6 +9,8 @@ import EditProgressModal from "@/components/edit-progress-modal";
 import EditKeyResultModal from "@/components/edit-key-result-modal";
 import { CascadeDeleteConfirmationModal } from "@/components/cascade-delete-confirmation-modal";
 import EditObjectiveModal from "@/components/edit-objective-modal";
+import { OKRGridSkeleton } from "@/components/skeletons/okr-card-skeleton";
+import { StatsOverviewSkeleton, FiltersSkeleton } from "@/components/skeletons/dashboard-skeleton";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -595,10 +597,7 @@ export default function Dashboard() {
         
         <TabsContent value="objectives" className="space-y-6 mt-6">
           {isLoading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-              <p className="text-gray-500 mt-2">Memuat Goals...</p>
-            </div>
+            <OKRGridSkeleton count={6} />
           ) : okrs.length === 0 ? (
             <div className="text-center py-12">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">

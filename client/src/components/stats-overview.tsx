@@ -3,6 +3,7 @@ import { Target, CheckCircle, AlertTriangle, TrendingUp, Clock, Trophy } from "l
 import type { OKRWithKeyResults } from "@shared/schema";
 import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { StatsOverviewSkeleton } from "@/components/skeletons/dashboard-skeleton";
 
 interface StatsOverviewProps {
   okrs: OKRWithKeyResults[];
@@ -68,28 +69,28 @@ export default function StatsOverview({ okrs, isLoading }: StatsOverviewProps) {
   const statCards = [
     {
       title: "Total OKRs",
-      value: isLoading ? "..." : stats.totalOKRs.toString(),
+      value: stats.totalOKRs.toString(),
       icon: Target,
       iconBg: "bg-blue-100",
       iconColor: "text-blue-600"
     },
     {
       title: "Completed",
-      value: isLoading ? "..." : stats.completed.toString(),
+      value: stats.completed.toString(),
       icon: CheckCircle,
       iconBg: "bg-green-100",
       iconColor: "text-green-600"
     },
     {
       title: "Behind",
-      value: isLoading ? "..." : stats.behind.toString(),
+      value: stats.behind.toString(),
       icon: AlertTriangle,
       iconBg: "bg-red-100",
       iconColor: "text-red-600"
     },
     {
       title: "Avg Progress",
-      value: isLoading ? "..." : `${stats.avgProgress}%`,
+      value: `${stats.avgProgress}%`,
       icon: TrendingUp,
       iconBg: "bg-purple-100",
       iconColor: "text-purple-600"
@@ -159,6 +160,10 @@ export default function StatsOverview({ okrs, isLoading }: StatsOverviewProps) {
       });
     }
   };
+
+  if (isLoading) {
+    return <StatsOverviewSkeleton />;
+  }
 
   return (
     <>

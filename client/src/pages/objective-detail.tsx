@@ -50,6 +50,7 @@ import InitiativeModal from "@/components/initiative-modal";
 import InitiativeFormModal from "@/components/initiative-form-modal";
 import { SimpleProgressStatus } from "@/components/progress-status";
 import { ObjectiveStatusBadge } from "@/components/objective-status-badge";
+import { ObjectiveDetailSkeleton } from "@/components/skeletons/detail-page-skeleton";
 import {
   Tooltip,
   TooltipContent,
@@ -493,12 +494,7 @@ export default function GoalDetail() {
   };
 
   if (isLoading) {
-    return (
-      <div className="p-6">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-        <p className="text-center text-gray-500 mt-2">Memuat goal...</p>
-      </div>
-    );
+    return <ObjectiveDetailSkeleton />;
   }
 
   if (!goal) {
