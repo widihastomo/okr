@@ -46,6 +46,7 @@ import { CheckInModal } from "@/components/check-in-modal";
 import EditKeyResultModal from "@/components/edit-key-result-modal";
 import EditObjectiveModal from "@/components/edit-objective-modal";
 import InitiativeModal from "@/components/initiative-modal";
+import InitiativeFormModal from "@/components/initiative-form-modal";
 import { SimpleProgressStatus } from "@/components/progress-status";
 import { ObjectiveStatusBadge } from "@/components/objective-status-badge";
 import {
@@ -156,6 +157,7 @@ export default function GoalDetail() {
   const [expandedKeyResults, setExpandedKeyResults] = useState<Set<string>>(
     new Set(),
   );
+  const [showInitiativeFormModal, setShowInitiativeFormModal] = useState(false);
   // Key Result Form
   const keyResultForm = useForm<KeyResultFormData>({
     resolver: zodResolver(keyResultSchema),
@@ -291,6 +293,43 @@ export default function GoalDetail() {
   const handleCreateKeyResult = (data: KeyResultFormData) => {
     createKeyResultMutation.mutate(data);
   };
+
+  // Create initiative with success metrics mutation
+  const createInitiativeWithMetricsMutation = useMutation({
+    mutationFn: async (data: { initiative: any; successMetrics: any[] }) => {
+      const response = await fetch(`/api/initiatives/with-metrics`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          objectiveId: id,
+          initiative: data.initiative,
+          successMetrics: data.successMetrics,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to create initiative');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/objective/${id}`] });
+      setShowInitiativeFormModal(false);
+      toast({
+        title: "Rencana berhasil dibuat",
+        description: "Rencana dengan ukuran keberhasilan telah ditambahkan",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal membuat rencana",
+        variant: "destructive",
+      });
+    },
+  });
 
   const getKeyResultTypeIcon = (type: string) => {
     switch (type) {
@@ -1070,7 +1109,7 @@ export default function GoalDetail() {
                 </p>
               </div>
               <Button
-                onClick={() => setAddInitiativeModal({ open: true })}
+                onClick={() => setShowInitiativeFormModal(true)}
                 className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto sm:ml-4 shrink-0"
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -1866,6 +1905,16 @@ export default function GoalDetail() {
           }}
         />
       )}
+
+      {/* Initiative Form Modal with Success Metrics */}
+      <InitiativeFormModal
+        isOpen={showInitiativeFormModal}
+        onClose={() => setShowInitiativeFormModal(false)}
+        onSubmit={createInitiativeWithMetricsMutation.mutate}
+        keyResultId={goal?.keyResults?.[0]?.id || null}
+        users={users || []}
+        isLoading={createInitiativeWithMetricsMutation.isPending}
+      />
 
       {/* AI Help Bubble */}
       <AIHelpBubble
