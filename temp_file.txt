@@ -2167,7 +2167,105 @@ export default function GoalDetail() {
         onSubmit={handleCreateKeyResult}
         users={users}
       />
+              <Card>
 
+      {/* Initiative Form Modal with Success Metrics */}
+      <InitiativeFormModal
+        isOpen={showInitiativeFormModal}
+        onClose={() => setShowInitiativeFormModal(false)}
+        onSubmit={createInitiativeWithMetricsMutation.mutate}
+        keyResultId={goal?.keyResults?.[0]?.id || ""}
+        users={users || []}
+        isLoading={createInitiativeWithMetricsMutation.isPending}
+      />
+
+      {/* Feature Tour Overlay */}
+      {showTour && (
+        <div key={`tour-${tourStep}-${tourForceUpdate}`} className="fixed inset-0 z-50">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black bg-opacity-60"></div>
+          
+          {/* Highlight Ring for Active Element */}
+          <div 
+            className="absolute pointer-events-none border-4 border-blue-400 rounded-lg shadow-lg animate-pulse"
+            style={(() => {
+              const element = document.querySelector(tourSteps[tourStep]?.target);
+              if (element) {
+                const rect = element.getBoundingClientRect();
+                const padding = 4;
+                return {
+                  left: rect.left - padding,
+                  top: rect.top - padding,
+                  width: rect.width + padding * 2,
+                  height: rect.height + padding * 2,
+                  boxShadow: '0 0 0 4px rgba(59, 130, 246, 0.3)',
+                };
+              }
+              return { display: 'none' };
+            })()}
+          ></div>
+          
+          {/* Tour Content */}
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl max-w-md p-6">
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {tourSteps[tourStep].title}
+              </h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                {tourSteps[tourStep].description}
+              </p>
+            </div>
+            
+            {/* Progress Indicator */}
+            <div className="mb-4">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs text-gray-500">
+                  Langkah {tourStep + 1} dari {tourSteps.length}
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${((tourStep + 1) / tourSteps.length) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="flex justify-between">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={prevTourStep}
+                disabled={tourStep === 0}
+                className="text-gray-500"
+              >
+                Sebelumnya
+              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setShowTour(false);
+                    setTourStep(0);
+                  }}
+                  className="text-gray-500"
+                >
+                  Lewati
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={nextTourStep}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  {tourStep === tourSteps.length - 1 ? 'Selesai' : 'Selanjutnya'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* AI Help Bubble */}
       <AIHelpBubble

@@ -2167,23 +2167,4 @@ export default function GoalDetail() {
         onSubmit={handleCreateKeyResult}
         users={users}
       />
-
-
-      {/* AI Help Bubble */}
-      <AIHelpBubble
-        context="objective_detail"
-        data={{
-          objective: goal,
-          keyResults: goal?.keyResults || [],
-          cycleId: goal?.cycleId,
-          cycleName: cycle?.name,
-        }}
-        position="bottom-right"
-      />
-    </div>
-  );
-}
-
-
-
-
+              <Card>

@@ -1126,7 +1126,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
 }
 
 // Component untuk KeyResult Modal
-interface KeyResultModalProps {
+export interface KeyResultModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (keyResult: KeyResultFormData) => void;
@@ -1135,7 +1135,7 @@ interface KeyResultModalProps {
   users?: User[];
 }
 
-function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEditing, users }: KeyResultModalProps) {
+export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEditing, users }: KeyResultModalProps) {
   const keyResultForm = useForm<KeyResultFormData>({
     resolver: zodResolver(z.object({
       title: z.string().min(1, "Judul harus diisi"),
