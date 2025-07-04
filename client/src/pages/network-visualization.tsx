@@ -62,7 +62,7 @@ export default function NetworkVisualization() {
   
   // Fetch data for visualization
   const { data: objectives = [], isLoading: objectivesLoading } = useQuery({
-    queryKey: ['/api/objectives'],
+    queryKey: ['/api/okrs'],
   });
 
   const { data: users = [], isLoading: usersLoading } = useQuery({
@@ -188,6 +188,8 @@ function ObjectiveTreeNode({ objective, initiatives, tasks, showProgress, onNode
   const objectiveInitiatives = initiatives.filter((init: any) => 
     objective.keyResults?.some((kr: any) => kr.id === init.keyResultId)
   );
+
+  console.log('Objective:', objective.title, 'KeyResults:', objective.keyResults?.length || 0);
 
   return (
     <div className="bg-white border-2 border-gray-200 rounded-xl p-6 shadow-sm">
