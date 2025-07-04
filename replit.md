@@ -96,7 +96,7 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
-- July 04, 2025. Implemented assignee/responsible person functionality for Key Results:
+- July 04, 2025. Completed comprehensive assignee/responsible person functionality for Key Results:
   * Added assignedTo field to key_results database table with UUID foreign key to users table
   * Enhanced edit-key-result-modal.tsx with SearchableUserSelect component for assignee selection
   * Added comprehensive tooltip guidance explaining responsible person assignment purpose
@@ -105,6 +105,9 @@ Changelog:
   * Field is optional (allowUnassigned=true) to maintain flexibility in Key Result assignment
   * Added proper form initialization to load existing assignedTo values for editing
   * Integrated with existing user management system for seamless assignee selection
+  * Added "Penanggung Jawab" column to OKR form modal table view showing avatar and name
+  * Enhanced mobile card view with assignee information display
+  * Shows "Belum ditentukan" when no assignee is selected
 - July 04, 2025. Created optimized build scripts to address slow build performance:
   * Identified build performance issue: 409MB node_modules with 95 packages causing slow builds
   * Created build-optimized.js script with TypeScript compilation optimizations (--skipLibCheck --incremental)
