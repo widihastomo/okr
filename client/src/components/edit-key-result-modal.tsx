@@ -262,10 +262,6 @@ export default function EditKeyResultModal({
             {/* Informasi Ukuran Keberhasilan */}
             <Card>
               <CardContent className="p-6">
-                <div className="flex items-center space-x-2 mb-4">
-                  <Target className="w-5 h-5 text-gray-500" />
-                  <h3 className="text-lg font-semibold">Informasi Ukuran Keberhasilan</h3>
-                </div>
                 
                 <div className="space-y-4">
                   {/* Title */}
