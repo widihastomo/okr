@@ -96,6 +96,14 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 04, 2025. Added delete key result functionality to dropdown menu:
+  * Created DELETE /api/key-results/:id endpoint with proper authentication and validation
+  * Added deleteKeyResultMutation with error handling and success notifications
+  * Integrated handleDeleteKeyResult function with confirmation dialog for safe deletion
+  * Added "Hapus Angka Target" menu item to three-dot dropdown with red styling
+  * Automatic objective progress and status recalculation after key result deletion
+  * Comprehensive toast notifications for success and error feedback
+  * Cascade deletion handling for related data integrity
 - July 04, 2025. Successfully replaced manual add key result form with reusable KeyResultModal component:
   * Removed corrupted manual form implementation from objective-detail.tsx file
   * Integrated existing KeyResultModal component for consistent add key result functionality

@@ -472,6 +472,37 @@ export default function GoalDetail() {
     createKeyResultMutation.mutate(processedData);
   };
 
+  // Mutation for deleting key result
+  const deleteKeyResultMutation = useMutation({
+    mutationFn: async (keyResultId: string) => {
+      const response = await apiRequest("DELETE", `/api/key-results/${keyResultId}`);
+      return response;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Angka Target berhasil dihapus",
+        variant: "default",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/okrs", id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal menghapus Angka Target",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDeleteKeyResult = (keyResult: KeyResult) => {
+    if (window.confirm(`Apakah Anda yakin ingin menghapus Angka Target "${keyResult.title}"?\n\nTindakan ini tidak dapat dibatalkan dan akan menghapus semua data terkait.`)) {
+      deleteKeyResultMutation.mutate(keyResult.id);
+    }
+  };
+
   // Create initiative with success metrics mutation
   const createInitiativeWithMetricsMutation = useMutation({
     mutationFn: async (data: { initiative: any; successMetrics: any[] }) => {
@@ -1254,6 +1285,13 @@ export default function GoalDetail() {
                               >
                                 <Settings className="w-4 h-4 mr-2" />
                                 Edit Angka Target
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleDeleteKeyResult(kr)}
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Hapus Angka Target
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>

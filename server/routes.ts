@@ -933,6 +933,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete key result
+  app.delete("/api/key-results/:id", requireAuth, async (req, res) => {
+    try {
+      const id = req.params.id;
+      
+      // Get key result info before deletion for objective update
+      const keyResult = await storage.getKeyResult(id);
+      const objectiveId = keyResult?.objectiveId;
+      
+      // Delete the key result (cascade deletion should handle related check-ins)
+      const deleted = await storage.deleteKeyResult(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Key result not found" });
+      }
+      
+      // Update objective progress and status after key result deletion
+      if (objectiveId) {
+        await updateObjectiveWithAutoStatus(objectiveId);
+      }
+      
+      res.json({ message: "Key result deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting key result:", error);
+      res.status(500).json({ message: "Failed to delete key result", error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
   // Check-ins for progress tracking
   app.post("/api/key-results/:id/check-ins", async (req, res) => {
     try {
