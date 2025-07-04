@@ -96,6 +96,14 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 04, 2025. Standardized terminologi bahasa Indonesia untuk Key Result menjadi "Ukuran Keberhasilan":
+  * Updated CheckInModal untuk menggunakan "Ukuran Keberhasilan" mengganti "Key Result"
+  * Updated dialog description untuk konsistensi terminologi bahasa Indonesia
+  * Memastikan konsistensi terminologi di seluruh aplikasi sesuai standar bahasa yang telah ditetapkan
+- July 04, 2025. Diperbaiki warna button update untuk konsistensi antara dashboard dan objective-detail:
+  * Mengubah warna button update ke #2095F4 dengan hover effect #1976D2
+  * Updated CheckInModal trigger button dan button di objective-detail menggunakan warna yang sama
+  * Ditambahkan inline style untuk memastikan konsistensi warna di seluruh aplikasi
 - July 03, 2025. Created arrow-shaped tabs with sequential numbers and proper navigation flow:
   * Implemented CSS clip-path arrow design for visual step progression (1→2→3)
   * Tab 1: Arrow pointing right with number badge "1" for Ukuran Keberhasilan
