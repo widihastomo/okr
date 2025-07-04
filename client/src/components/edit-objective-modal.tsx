@@ -163,11 +163,6 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
           {/* Informasi Goal */}
           <Card>
             <CardContent className="p-6">
-              <div className="flex items-center space-x-2 mb-4">
-                <Target className="w-5 h-5 text-gray-500" />
-                <h3 className="text-lg font-semibold">Informasi Goal</h3>
-              </div>
-              
               <div className="space-y-4">
                 {/* Judul Goal */}
                 <div>
