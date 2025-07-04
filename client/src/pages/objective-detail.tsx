@@ -1654,6 +1654,7 @@ export default function GoalDetail() {
         open={editKeyResultModal.open}
         onOpenChange={(open) => setEditKeyResultModal({ open })}
         keyResult={editKeyResultModal.keyResult}
+        objectiveId={id}
       />
       {/* Add Key Result Modal */}
       <Dialog

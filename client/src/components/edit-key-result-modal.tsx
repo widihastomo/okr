@@ -105,12 +105,14 @@ interface EditKeyResultModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   keyResult?: KeyResult;
+  objectiveId?: string;
 }
 
 export default function EditKeyResultModal({
   open,
   onOpenChange,
   keyResult,
+  objectiveId,
 }: EditKeyResultModalProps) {
 
   const { toast } = useToast();
@@ -179,9 +181,11 @@ export default function EditKeyResultModal({
       }
       
       // If we have objective ID, invalidate the specific OKR detail query
-      if (keyResult?.objectiveId) {
-        queryClient.invalidateQueries({ queryKey: ["/api/okrs", keyResult.objectiveId] });
-        queryClient.invalidateQueries({ queryKey: ["/api/objectives", keyResult.objectiveId, "activity-log"] });
+      const targetObjectiveId = keyResult?.objectiveId || objectiveId;
+      if (targetObjectiveId) {
+        queryClient.invalidateQueries({ queryKey: ["/api/okrs", targetObjectiveId] });
+        queryClient.invalidateQueries({ queryKey: ["/api/objectives", targetObjectiveId, "activity-log"] });
+        queryClient.invalidateQueries({ queryKey: [`/api/okrs/${targetObjectiveId}`] });
       }
       
       // Force refetch with active type

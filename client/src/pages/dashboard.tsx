@@ -668,6 +668,7 @@ export default function Dashboard() {
         open={editKeyResultModal.open}
         onOpenChange={(open) => setEditKeyResultModal({ open, keyResult: open ? editKeyResultModal.keyResult : undefined })}
         keyResult={editKeyResultModal.keyResult}
+        objectiveId={editKeyResultModal.keyResult?.objectiveId}
       />
 
       <EditObjectiveModal
