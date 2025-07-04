@@ -822,6 +822,19 @@ export default function GoalDetail() {
                         </span>
                       </div>
 
+                      {/* Assignee information */}
+                      <div className="text-xs text-gray-600 mb-2 flex items-center gap-1">
+                        <UserIcon className="w-3 h-3" />
+                        <span>Penanggung jawab: </span>
+                        {kr.assignedTo ? (
+                          <span className="font-medium text-gray-800">
+                            {getUserName(kr.assignedTo)}
+                          </span>
+                        ) : (
+                          <span className="text-gray-500 italic">Belum ditentukan</span>
+                        )}
+                      </div>
+
                       <div className="text-xs text-gray-500">
                         {(() => {
                           // Handle achieve_or_not type
