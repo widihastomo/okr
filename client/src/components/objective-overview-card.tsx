@@ -264,7 +264,17 @@ export default function ObjectiveOverviewCard({
             </div>
           </div>
           <div className="relative">
-            <Progress value={overallProgress} className="h-4" />
+            <Progress 
+              value={overallProgress} 
+              className="h-4" 
+              variant={(() => {
+                // Determine color based on status and progress
+                if (overallProgress >= 100) return "completed";
+                if (overallProgress >= 80) return "on-track";
+                if (overallProgress >= 60) return "at-risk";
+                return "behind";
+              })()} 
+            />
             {/* Add milestone markers */}
             <div className="absolute top-0 left-1/4 w-0.5 h-4 bg-gray-300 opacity-50"></div>
             <div className="absolute top-0 left-1/2 w-0.5 h-4 bg-gray-300 opacity-50"></div>
@@ -368,7 +378,11 @@ export default function ObjectiveOverviewCard({
                   <div className="flex items-center gap-2">
                     <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-blue-500 transition-all duration-300"
+                        className={`h-full transition-all duration-300 ${
+                          progress >= 100 ? "bg-green-600" :
+                          progress >= 80 ? "bg-green-500" :
+                          progress >= 60 ? "bg-yellow-500" : "bg-red-500"
+                        }`}
                         style={{ width: `${Math.min(100, progress)}%` }}
                       />
                     </div>
