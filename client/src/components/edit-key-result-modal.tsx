@@ -174,7 +174,7 @@ export default function EditKeyResultModal({
     },
     onSuccess: () => {
       toast({
-        title: "Ukuran Keberhasilan berhasil diperbarui",
+        title: "Angka Target berhasil diperbarui",
         description: "Perubahan telah disimpan.",
         variant: "default",
         className: "border-green-200 bg-green-50 text-green-800",
@@ -208,8 +208,8 @@ export default function EditKeyResultModal({
     },
     onError: (error: any) => {
       toast({
-        title: "Gagal memperbarui Ukuran Keberhasilan",
-        description: error.message || "Terjadi kesalahan saat memperbarui Ukuran Keberhasilan.",
+        title: "Gagal memperbarui Angka Target",
+        description: error.message || "Terjadi kesalahan saat memperbarui Angka Target.",
         variant: "destructive",
       });
     },
@@ -251,15 +251,15 @@ export default function EditKeyResultModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit Ukuran Keberhasilan</DialogTitle>
+          <DialogTitle>Edit Angka Target</DialogTitle>
           <DialogDescription>
-            Ubah detail Ukuran Keberhasilan termasuk target, status, dan informasi lainnya.
+            Ubah detail Angka Target termasuk target, status, dan informasi lainnya.
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            {/* Informasi Ukuran Keberhasilan */}
+            {/* Informasi Angka Target */}
             <Card>
               <CardContent className="p-6">
                 <div className="space-y-4">
@@ -270,7 +270,7 @@ export default function EditKeyResultModal({
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="flex items-center gap-2 mb-2">
-                          Judul Ukuran Keberhasilan
+                          Judul Angka Target
                           <Popover>
                             <PopoverTrigger asChild>
                               <button type="button" className="inline-flex">
@@ -279,7 +279,7 @@ export default function EditKeyResultModal({
                             </PopoverTrigger>
                             <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
                               <div className="text-sm">
-                                <p className="font-medium mb-2">Judul Ukuran Keberhasilan</p>
+                                <p className="font-medium mb-2">Judul Angka Target</p>
                                 <p>Buat judul yang spesifik dan terukur. Contoh: "Meningkatkan pendapatan bulanan menjadi 100 juta", "Menurunkan biaya operasional ke 50 juta", "Mencapai 90% kepuasan pelanggan".</p>
                               </div>
                             </PopoverContent>
@@ -312,7 +312,7 @@ export default function EditKeyResultModal({
                             </PopoverTrigger>
                             <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
                               <div className="text-sm">
-                                <p className="font-medium mb-2">Deskripsi Ukuran Keberhasilan</p>
+                                <p className="font-medium mb-2">Deskripsi Angka Target</p>
                                 <p>Jelaskan konteks dan detail penting tentang ukuran keberhasilan ini. Apa yang akan diukur, bagaimana cara mengukurnya, dan mengapa ini penting untuk mencapai goal.</p>
                               </div>
                             </PopoverContent>
@@ -320,7 +320,7 @@ export default function EditKeyResultModal({
                         </FormLabel>
                         <FormControl>
                           <Textarea 
-                            placeholder="Deskripsi detail tentang Ukuran Keberhasilan ini..."
+                            placeholder="Deskripsi detail tentang Angka Target ini..."
                             rows={3}
                             {...field} 
                           />
@@ -330,7 +330,7 @@ export default function EditKeyResultModal({
                     )}
                   />
 
-                  {/* Tipe Ukuran Keberhasilan dan Nilai */}
+                  {/* Tipe Angka Target dan Nilai */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
@@ -338,7 +338,7 @@ export default function EditKeyResultModal({
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="flex items-center gap-2 mb-2">
-                            Tipe Ukuran Keberhasilan
+                            Tipe Angka Target
                             <Popover>
                               <PopoverTrigger asChild>
                                 <button type="button" className="inline-flex">
@@ -347,7 +347,7 @@ export default function EditKeyResultModal({
                               </PopoverTrigger>
                               <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
                                 <div className="text-sm">
-                                  <p className="font-medium mb-2">Tipe Ukuran Keberhasilan</p>
+                                  <p className="font-medium mb-2">Tipe Angka Target</p>
                                   <p className="mb-2">Pilih tipe sesuai cara pengukuran:</p>
                                   <ul className="list-disc list-inside space-y-1 text-xs">
                                     <li><strong>Naik ke Target:</strong> Nilai meningkat dari baseline ke target</li>

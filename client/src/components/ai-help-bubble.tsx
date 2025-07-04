@@ -108,7 +108,7 @@ export function AIHelpBubble({
       case 'objective_detail':
         return 'Bantuan Goal';
       case 'key_result_detail':
-        return 'Bantuan Ukuran Keberhasilan';
+        return 'Bantuan Angka Target';
       case 'check_in':
         return 'Bantuan Check-in';
       case 'create_okr':

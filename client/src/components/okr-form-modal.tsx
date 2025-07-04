@@ -46,7 +46,7 @@ const unitOptions = [
 
 const keyResultSchema = z.object({
   id: z.string().optional(), // untuk edit mode
-  title: z.string().min(1, "Judul Ukuran Keberhasilan wajib diisi"),
+  title: z.string().min(1, "Judul Angka Target wajib diisi"),
   description: z.string().optional(),
   keyResultType: z.enum(["increase_to", "decrease_to", "achieve_or_not", "should_stay_above", "should_stay_below"]).default("increase_to"),
   baseValue: z.string().optional(),
@@ -415,7 +415,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
             <span className={`ml-2 text-sm font-medium ${
               currentStep >= 2 ? 'text-blue-600' : 'text-gray-500'
             }`}>
-              Ukuran Keberhasilan
+              Angka Target
             </span>
           </div>
         </div>
@@ -432,10 +432,10 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
           </DialogTitle>
           <DialogDescription>
             {isEditMode 
-              ? 'Update goal ini dan Ukuran Keberhasilan' 
+              ? 'Update goal ini dan Angka Target' 
               : currentStep === 1 
                 ? 'Langkah 1: Tentukan informasi dasar goal Anda'
-                : 'Langkah 2: Tambahkan Ukuran Keberhasilan untuk mengukur progress'
+                : 'Langkah 2: Tambahkan Angka Target untuk mengukur progress'
             }
           </DialogDescription>
         </DialogHeader>
@@ -734,7 +734,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Target className="w-5 h-5" />
-                    Ukuran Keberhasilan
+                    Angka Target
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -742,7 +742,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                   {keyResults.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
                       <Target className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                      <p>Belum ada Ukuran Keberhasilan</p>
+                      <p>Belum ada Angka Target</p>
                       <p className="text-sm">Klik tombol di atas untuk menambahkan</p>
                     </div>
                   ) : (
@@ -752,7 +752,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                         <Table>
                           <TableHeader>
                             <TableRow>
-                              <TableHead>Ukuran Keberhasilan</TableHead>
+                              <TableHead>Angka Target</TableHead>
                               <TableHead>Tipe</TableHead>
                               <TableHead className="text-center">Nilai Awal</TableHead>
                               <TableHead className="text-center">Target</TableHead>
@@ -768,7 +768,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                                     <Target className="w-4 h-4 text-blue-600" />
                                     <div>
                                       <p className="font-medium">
-                                        {keyResult.title || `Ukuran Keberhasilan ${index + 1}`}
+                                        {keyResult.title || `Angka Target ${index + 1}`}
                                       </p>
                                       {keyResult.description && (
                                         <p className="text-sm text-gray-500 mt-1">
@@ -835,7 +835,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <h4 className="font-semibold text-sm text-gray-900 leading-tight mb-0.5">
-                                    {keyResult.title || `Ukuran Keberhasilan ${index + 1}`}
+                                    {keyResult.title || `Angka Target ${index + 1}`}
                                   </h4>
                                   {keyResult.description && (
                                     <p className="text-xs text-gray-600 leading-snug">
@@ -911,11 +911,11 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                     </div>
                   )}
                   
-                  {/* Tombol Tambah Ukuran Keberhasilan */}
+                  {/* Tombol Tambah Angka Target */}
                   <div className="pt-4 border-t">
                     <Button type="button" onClick={addKeyResult} variant="outline" className="w-full border-blue-600 text-blue-600 hover:bg-blue-50">
                       <Plus className="w-4 h-4 mr-2" />
-                      <span className="hidden sm:inline">Tambah Ukuran Keberhasilan</span>
+                      <span className="hidden sm:inline">Tambah Angka Target</span>
                       <span className="sm:hidden">Tambah</span>
                     </Button>
                   </div>
@@ -1141,7 +1141,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {isEditing ? "Edit Ukuran Keberhasilan" : "Tambah Ukuran Keberhasilan"}
+            {isEditing ? "Edit Angka Target" : "Tambah Angka Target"}
           </DialogTitle>
         </DialogHeader>
 
@@ -1154,7 +1154,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-2">
-                    Judul Ukuran Keberhasilan*
+                    Judul Angka Target*
                     
                       <Popover>
                         <PopoverTrigger>
@@ -1210,7 +1210,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                     
                   </FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Deskripsi detail tentang Ukuran Keberhasilan ini" {...field} />
+                    <Textarea placeholder="Deskripsi detail tentang Angka Target ini" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -1225,7 +1225,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-2">
-                      Tipe Ukuran Keberhasilan
+                      Tipe Angka Target
                       
                         <Popover>
                           <PopoverTrigger>
@@ -1652,7 +1652,7 @@ function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult, isEdit
                 type="submit"
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
-                Simpan Ukuran Keberhasilan
+                Simpan Angka Target
               </Button>
             </div>
           </form>

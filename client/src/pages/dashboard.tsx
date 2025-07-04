@@ -349,7 +349,7 @@ export default function Dashboard() {
     },
     onSuccess: () => {
       toast({
-        title: "Ukuran Keberhasilan berhasil dihapus",
+        title: "Angka Target berhasil dihapus",
         description: "Data telah dihapus secara permanen",
         className: "border-green-200 bg-green-50 text-green-800",
       });
@@ -360,7 +360,7 @@ export default function Dashboard() {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Gagal menghapus Ukuran Keberhasilan",
+        description: error.message || "Gagal menghapus Angka Target",
         variant: "destructive",
       });
     },
@@ -692,9 +692,9 @@ export default function Dashboard() {
       <AlertDialog open={deleteKeyResultModal.open} onOpenChange={(open) => setDeleteKeyResultModal({ open })}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Ukuran Keberhasilan</AlertDialogTitle>
+            <AlertDialogTitle>Hapus Angka Target</AlertDialogTitle>
             <AlertDialogDescription>
-              Apakah Anda yakin ingin menghapus ukuran keberhasilan "{deleteKeyResultModal.keyResult?.title}"? 
+              Apakah Anda yakin ingin menghapus angka target "{deleteKeyResultModal.keyResult?.title}"? 
               Semua data terkait termasuk rencana dan tugas akan ikut terhapus secara permanen. 
               Tindakan ini tidak dapat dibatalkan.
             </AlertDialogDescription>

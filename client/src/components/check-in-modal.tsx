@@ -282,13 +282,13 @@ export function CheckInModal({
             Update Progress
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground text-left">
-            Update nilai progress untuk ukuran keberhasilan ini dan tambahkan catatan jika diperlukan.
+            Update nilai progress untuk angka target ini dan tambahkan catatan jika diperlukan.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label className="text-sm font-medium text-gray-700">
-              Ukuran Keberhasilan
+              Angka Target
             </Label>
             <p className="text-sm text-gray-600 mt-1">{keyResultTitle}</p>
           </div>

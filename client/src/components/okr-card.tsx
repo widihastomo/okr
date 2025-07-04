@@ -484,10 +484,10 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
         </div>
       </div>
 
-      {/* Ukuran Keberhasilan */}
+      {/* Angka Target */}
       {isExpanded && (
         <CardContent className="p-3 sm:p-6">
-          <h4 className="text-sm font-semibold text-gray-700 mb-3 sm:mb-4">Ukuran Keberhasilan</h4>
+          <h4 className="text-sm font-semibold text-gray-700 mb-3 sm:mb-4">Angka Target</h4>
         <div className="space-y-3 sm:space-y-4">
           {okr.keyResults.map((kr) => {
             const progress = calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
@@ -628,7 +628,7 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
                         {onEditKeyResult && (
                           <DropdownMenuItem onClick={() => onEditKeyResult(kr)}>
                             <Settings className="w-4 h-4 mr-2" />
-                            Edit Ukuran Keberhasilan
+                            Edit Angka Target
                           </DropdownMenuItem>
                         )}
                         {onDeleteKeyResult && (
@@ -637,7 +637,7 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
                             className="text-red-600 hover:text-red-700"
                           >
                             <Trash2 className="w-4 h-4 mr-2" />
-                            Hapus Ukuran Keberhasilan
+                            Hapus Angka Target
                           </DropdownMenuItem>
                         )}
                       </DropdownMenuContent>

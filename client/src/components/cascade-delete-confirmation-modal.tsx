@@ -59,7 +59,7 @@ export function CascadeDeleteConfirmationModal({
             <div className="bg-red-50 p-4 rounded-lg border border-red-200">
               <div className="font-medium text-red-900 mb-2">Data yang akan dihapus:</div>
               <ul className="space-y-1 text-sm text-red-800">
-                <li>• {keyResultsCount} Ukuran Keberhasilan dan semua progress updates</li>
+                <li>• {keyResultsCount} Angka Target dan semua progress updates</li>
                 <li>• {initiativesCount} Rencana beserta semua member dan dokumen</li>
                 <li>• {tasksCount} Tugas dan semua aktivitas terkait</li>
               </ul>

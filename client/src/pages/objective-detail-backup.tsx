@@ -261,7 +261,7 @@ export default function GoalDetail() {
     onSuccess: () => {
       toast({
         title: "Success",
-        description: "Ukuran Keberhasilan berhasil dibuat",
+        description: "Angka Target berhasil dibuat",
         variant: "default",
         className: "border-green-200 bg-green-50 text-green-800",
       });
@@ -272,7 +272,7 @@ export default function GoalDetail() {
     onError: (error: Error) => {
       toast({
         title: "Error",
-        description: error.message || "Gagal membuat Ukuran Keberhasilan",
+        description: error.message || "Gagal membuat Angka Target",
         variant: "destructive",
       });
     },
@@ -533,7 +533,7 @@ export default function GoalDetail() {
             <span className="bg-white text-blue-600 rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-xs sm:text-sm font-bold shrink-0">
               1
             </span>
-            <span className="hidden sm:inline">Ukuran Keberhasilan ({goal.keyResults.length})</span>
+            <span className="hidden sm:inline">Angka Target ({goal.keyResults.length})</span>
             <span className="sm:hidden">Ukuran ({goal.keyResults.length})</span>
           </TabsTrigger>
 
@@ -575,7 +575,7 @@ export default function GoalDetail() {
           </TabsTrigger>
         </TabsList>
 
-        {/* Ukuran Keberhasilan Tab */}
+        {/* Angka Target Tab */}
         <TabsContent
           value="key-results"
           className={`space-y-6 transition-all duration-1000 ${
@@ -590,10 +590,10 @@ export default function GoalDetail() {
               <div className="flex-1">
                 <h3 className="text-lg sm:text-xl font-semibold text-blue-900 mb-2 flex items-center gap-2">
                   <Target className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 shrink-0" />
-                  Ukuran Keberhasilan
+                  Angka Target
                 </h3>
                 <p className="text-blue-700 text-sm leading-relaxed">
-                  Ukuran keberhasilan menentukan bagaimana objective ini akan diukur. Setiap ukuran keberhasilan memiliki target yang spesifik dan dapat diukur untuk memastikan pencapaian yang objektif.
+                  Angka target menentukan bagaimana objective ini akan diukur. Setiap angka target memiliki target yang spesifik dan dapat diukur untuk memastikan pencapaian yang objektif.
                 </p>
               </div>
               <Button
@@ -654,10 +654,10 @@ export default function GoalDetail() {
                 <div className="border-2 border-dashed border-blue-200 bg-blue-50/50 rounded-lg p-8 text-center">
                   <Target className="w-12 h-12 text-blue-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-blue-900 mb-2">
-                    Belum ada Ukuran Keberhasilan
+                    Belum ada Angka Target
                   </h3>
                   <p className="text-blue-700 mb-4">
-                    Mulai tambahkan Ukuran Keberhasilan untuk mengukur progress
+                    Mulai tambahkan Angka Target untuk mengukur progress
                     goal ini
                   </p>
                   <Button
@@ -665,7 +665,7 @@ export default function GoalDetail() {
                     className="bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     <Plus className="w-4 h-4 mr-2" />
-                    Tambah Ukuran Keberhasilan Pertama
+                    Tambah Angka Target Pertama
                   </Button>
                 </div>
               ) : (
@@ -866,7 +866,7 @@ export default function GoalDetail() {
                             onClick={() => handleEditKeyResult(kr)}
                           >
                             <Settings className="w-4 h-4 mr-2" />
-                            Edit Ukuran Keberhasilan
+                            Edit Angka Target
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -1575,7 +1575,7 @@ export default function GoalDetail() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Target className="h-5 w-5" />
-              Tambah Ukuran Keberhasilan Baru
+              Tambah Angka Target Baru
             </DialogTitle>
           </DialogHeader>
 
@@ -1584,7 +1584,7 @@ export default function GoalDetail() {
               <form onSubmit={keyResultForm.handleSubmit(handleCreateKeyResult)} className="space-y-6">
                 {/* Key Result Information Section */}
                 <div className="bg-gray-50 p-4 rounded-lg space-y-4">
-                  <h3 className="font-medium text-gray-900">Informasi Ukuran Keberhasilan</h3>
+                  <h3 className="font-medium text-gray-900">Informasi Angka Target</h3>
                   
                   {/* Title */}
                   <FormField
@@ -1593,7 +1593,7 @@ export default function GoalDetail() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-sm font-medium text-gray-700">
-                          Judul Ukuran Keberhasilan *
+                          Judul Angka Target *
                         </FormLabel>
                         <FormControl>
                           <Input {...field} placeholder="Contoh: Meningkatkan pendapatan bulanan menjadi 100 juta" />
@@ -1615,7 +1615,7 @@ export default function GoalDetail() {
                         <FormControl>
                           <Textarea 
                             {...field} 
-                            placeholder="Deskripsi detail tentang Ukuran Keberhasilan ini"
+                            placeholder="Deskripsi detail tentang Angka Target ini"
                             className="min-h-[80px]"
                           />
                         </FormControl>
@@ -1632,7 +1632,7 @@ export default function GoalDetail() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-sm font-medium text-gray-700">
-                            Tipe Ukuran Keberhasilan *
+                            Tipe Angka Target *
                           </FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
@@ -1747,7 +1747,7 @@ export default function GoalDetail() {
                   >
                     {createKeyResultMutation.isPending
                       ? "Menyimpan..."
-                      : "Buat Ukuran Keberhasilan"}
+                      : "Buat Angka Target"}
                   </Button>
                 </div>
               </form>

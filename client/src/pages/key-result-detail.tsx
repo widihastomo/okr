@@ -256,7 +256,7 @@ export default function KeyResultDetailPage() {
     },
     onSuccess: () => {
       toast({
-        title: "Ukuran Keberhasilan berhasil dihapus",
+        title: "Angka Target berhasil dihapus",
         description: "Data telah dihapus secara permanen",
         className: "border-green-200 bg-green-50 text-green-800",
       });
@@ -266,7 +266,7 @@ export default function KeyResultDetailPage() {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Gagal menghapus Ukuran Keberhasilan",
+        description: error.message || "Gagal menghapus Angka Target",
         variant: "destructive",
       });
     },
@@ -810,8 +810,8 @@ export default function KeyResultDetailPage() {
     return (
       <div className="p-6">
         <div className="text-center py-12">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Ukuran Keberhasilan tidak ditemukan</h2>
-          <p className="text-gray-600 mb-4">Ukuran Keberhasilan yang Anda cari tidak dapat ditemukan.</p>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Angka Target tidak ditemukan</h2>
+          <p className="text-gray-600 mb-4">Angka Target yang Anda cari tidak dapat ditemukan.</p>
           <Button onClick={() => setLocation("/")}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Kembali ke Dashboard
@@ -887,14 +887,14 @@ export default function KeyResultDetailPage() {
             <DropdownMenuContent>
               <DropdownMenuItem>
                 <Edit className="w-4 h-4 mr-2" />
-                Edit Ukuran Keberhasilan
+                Edit Angka Target
               </DropdownMenuItem>
               <DropdownMenuItem 
                 className="text-red-600 hover:text-red-700"
                 onClick={() => setShowDeleteConfirmation(true)}
               >
                 <Trash2 className="w-4 h-4 mr-2" />
-                Hapus Ukuran Keberhasilan
+                Hapus Angka Target
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -909,7 +909,7 @@ export default function KeyResultDetailPage() {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Target className="h-5 w-5" />
-                Ukuran Keberhasilan Overview
+                Angka Target Overview
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -2117,9 +2117,9 @@ export default function KeyResultDetailPage() {
     <AlertDialog open={showDeleteConfirmation} onOpenChange={setShowDeleteConfirmation}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Hapus Ukuran Keberhasilan</AlertDialogTitle>
+          <AlertDialogTitle>Hapus Angka Target</AlertDialogTitle>
           <AlertDialogDescription>
-            Apakah Anda yakin ingin menghapus ukuran keberhasilan "{keyResult?.title}"? 
+            Apakah Anda yakin ingin menghapus angka target "{keyResult?.title}"? 
             Semua data terkait termasuk rencana dan tugas akan ikut terhapus secara permanen. 
             Tindakan ini tidak dapat dibatalkan.
           </AlertDialogDescription>

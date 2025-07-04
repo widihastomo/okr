@@ -120,7 +120,7 @@ export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
   const getTypeLabel = (type: string) => {
     switch (type) {
       case "key_result_checkin":
-        return "Ukuran Keberhasilan";
+        return "Angka Target";
       case "initiative":
         return "Rencana";
       case "task":

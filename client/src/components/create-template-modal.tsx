@@ -328,7 +328,7 @@ function ObjectiveTemplate({ objIndex, form, onRemove, canRemove }: {
           {keyResults.map((keyResult, krIndex) => (
             <div key={keyResult.id} className="border rounded-lg p-4 bg-gray-50 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Ukuran Keberhasilan {krIndex + 1}</span>
+                <span className="text-sm font-medium">Angka Target {krIndex + 1}</span>
                 {keyResults.length > 1 && (
                   <Button
                     type="button"

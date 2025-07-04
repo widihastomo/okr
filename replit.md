@@ -96,6 +96,13 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 04, 2025. Completed comprehensive terminology change from "Ukuran Keberhasilan" to "Angka Target":
+  * Updated all remaining occurrences in objective-detail.tsx including tabs, headers, descriptions, and empty states
+  * Updated terminology in check-in modal (CheckInModal component) for dialog description and label text
+  * Updated key-result-detail.tsx error messages to use "Angka Target" instead of "Ukuran Keberhasilan"
+  * Updated create-template-modal.tsx to use "Angka Target" terminology for template creation
+  * Ensured complete consistency across entire application for this business terminology update
+  * All user-facing text now consistently uses "Angka Target" terminology as requested
 - July 04, 2025. Cleaned up edit modal interface and enhanced dialog accessibility:
   * Removed redundant icon-title div from edit key result modal Card content for cleaner layout
   * Added DialogDescription to both edit objective and edit key result modals for better accessibility
