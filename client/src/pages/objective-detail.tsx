@@ -508,7 +508,7 @@ export default function GoalDetail() {
         variant: "default",
         className: "border-green-200 bg-green-50 text-green-800",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/okrs", id] });
+      queryClient.invalidateQueries({ queryKey: [`/api/okrs/${id}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
     },
     onError: (error: Error) => {
