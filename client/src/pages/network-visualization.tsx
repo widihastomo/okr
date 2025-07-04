@@ -59,6 +59,8 @@ export default function NetworkVisualization() {
   const [selectedNode, setSelectedNode] = useState<any>(null);
   const [showLabels, setShowLabels] = useState(true);
   const [showProgress, setShowProgress] = useState(true);
+  const [tourStep, setTourStep] = useState<number>(0);
+  const [showTour, setShowTour] = useState(false);
   
   // Fetch data for visualization
   const { data: objectives = [], isLoading: objectivesLoading } = useQuery({
@@ -142,6 +144,49 @@ export default function NetworkVisualization() {
 
     return { teams, users, objectives, keyResults, initiatives, tasks };
   }, [visualizationData, selectedFilter, searchTerm]);
+
+  // Tour functionality
+  const tourSteps = [
+    {
+      target: '.tour-objectives',
+      title: 'Goals (Objectives)',
+      description: 'Setiap goal menampilkan judul, deskripsi, owner, dan progress keseluruhan. Goal adalah tingkat tertinggi dalam hierarki OKR.'
+    },
+    {
+      target: '.tour-keyresults',
+      title: 'Key Results (Angka Target)',
+      description: 'Di bawah setiap goal terdapat key results yang menunjukkan metrik terukur dengan progress bar untuk tracking pencapaian.'
+    },
+    {
+      target: '.tour-initiatives',
+      title: 'Initiatives (Rencana)',
+      description: 'Initiatives adalah rencana konkret untuk mencapai key results, menampilkan progress dan status pelaksanaan.'
+    },
+    {
+      target: '.tour-connecting-lines',
+      title: 'Connecting Lines',
+      description: 'Garis penghubung menunjukkan hubungan hierarkis antara Goals → Key Results → Initiatives → Tasks.'
+    },
+    {
+      target: '.tour-filters',
+      title: 'Filter & Search',
+      description: 'Gunakan filter status dan pencarian untuk fokus pada goal tertentu. Toggle progress dan label sesuai kebutuhan.'
+    }
+  ];
+
+  const startTour = () => {
+    setShowTour(true);
+    setTourStep(0);
+  };
+
+  const nextTourStep = () => {
+    if (tourStep < tourSteps.length - 1) {
+      setTourStep(tourStep + 1);
+    } else {
+      setShowTour(false);
+      setTourStep(0);
+    }
+  };
 
   // Get node type color
   const getNodeColor = (type: string, status?: string) => {
