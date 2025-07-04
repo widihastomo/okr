@@ -168,8 +168,28 @@ export default function EditKeyResultModal({
         variant: "default",
         className: "border-green-200 bg-green-50 text-green-800",
       });
+      
+      // Invalidate all related queries
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
+      
+      // Invalidate specific key result query
+      if (keyResult?.id) {
+        queryClient.invalidateQueries({ queryKey: ["/api/key-results", keyResult.id] });
+      }
+      
+      // If we have objective ID, invalidate the specific OKR detail query
+      if (keyResult?.objectiveId) {
+        queryClient.invalidateQueries({ queryKey: ["/api/okrs", keyResult.objectiveId] });
+        queryClient.invalidateQueries({ queryKey: ["/api/objectives", keyResult.objectiveId, "activity-log"] });
+      }
+      
+      // Force refetch with active type
+      queryClient.invalidateQueries({ 
+        queryKey: ["/api/okrs"], 
+        refetchType: 'active' 
+      });
+      
       onOpenChange(false);
       form.reset();
     },
