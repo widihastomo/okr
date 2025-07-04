@@ -170,6 +170,8 @@ export default function GoalDetail() {
     new Set(),
   );
   const [showInitiativeFormModal, setShowInitiativeFormModal] = useState(false);
+  const [tourStep, setTourStep] = useState<number>(0);
+  const [showTour, setShowTour] = useState(false);
   // Key Result Form
   const keyResultForm = useForm<KeyResultFormData>({
     resolver: zodResolver(keyResultSchema),
@@ -493,6 +495,60 @@ export default function GoalDetail() {
     return tugas.filter((task) => task.initiativeId === rencanaId);
   };
 
+  // Tour functionality
+  const tourSteps = [
+    {
+      target: '.tour-objective-info',
+      title: 'Informasi Goal',
+      description: 'Kartu ini menampilkan detail lengkap goal termasuk deskripsi, pemilik, siklus waktu, dan progress keseluruhan dengan indikator threshold ideal.'
+    },
+    {
+      target: '.tour-tabs',
+      title: 'Navigasi Tab',
+      description: 'Tab berbentuk panah dengan nomor urut: 1) Angka Target untuk melihat key results, 2) Rencana untuk initiatives, 3) Tugas untuk task management.'
+    },
+    {
+      target: '.tour-key-results',
+      title: 'Angka Target (Key Results)',
+      description: 'Setiap key result menampilkan progress bar, nilai saat ini vs target, dan dapat diperluas untuk melihat initiatives terkait.'
+    },
+    {
+      target: '.tour-check-in',
+      title: 'Update Progress',
+      description: 'Tombol "Update" memungkinkan Anda mencatat progress terbaru untuk setiap key result dengan penjelasan dan catatan.'
+    },
+    {
+      target: '.tour-initiatives',
+      title: 'Rencana (Initiatives)',
+      description: 'Tab Rencana menampilkan semua initiatives dalam bentuk kartu dengan status, prioritas, progress, dan anggota tim.'
+    },
+    {
+      target: '.tour-tasks',
+      title: 'Tugas (Tasks)',
+      description: 'Tab Tugas mengorganisir semua tasks dalam tabel dengan health score, status, prioritas, dan assignee untuk tracking detail.'
+    }
+  ];
+
+  const startTour = () => {
+    setShowTour(true);
+    setTourStep(0);
+  };
+
+  const nextTourStep = () => {
+    if (tourStep < tourSteps.length - 1) {
+      setTourStep(tourStep + 1);
+    } else {
+      setShowTour(false);
+      setTourStep(0);
+    }
+  };
+
+  const prevTourStep = () => {
+    if (tourStep > 0) {
+      setTourStep(tourStep - 1);
+    }
+  };
+
   if (isLoading) {
     return <ObjectiveDetailSkeleton />;
   }
@@ -526,6 +582,15 @@ export default function GoalDetail() {
             <Button
               variant="outline"
               size="sm"
+              onClick={startTour}
+              className="text-blue-600 border-blue-600 hover:bg-blue-50"
+            >
+              <Target className="w-4 h-4 mr-2" />
+              Tour Fitur
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => setEditObjectiveModal(true)}
             >
               <Edit className="w-4 h-4 mr-2" />
@@ -553,7 +618,7 @@ export default function GoalDetail() {
       </div>
       {/* Visual Overview Section for easy understanding */}
       <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6 mb-6">
-        <div className="lg:col-span-2 h-full">
+        <div className="lg:col-span-2 h-full tour-objective-info">
           <ObjectiveOverviewCard
             objective={goal}
             initiatives={rencana}
@@ -572,7 +637,7 @@ export default function GoalDetail() {
 
       {/* Tabs Section */}
       <Tabs defaultValue="key-results" className="space-y-6">
-        <TabsList className="flex w-full h-auto p-0 bg-transparent gap-0 rounded-none mb-4 sm:mb-6 relative">
+        <TabsList className="flex w-full h-auto p-0 bg-transparent gap-0 rounded-none mb-4 sm:mb-6 relative tour-tabs">
           {/* Tab 1 */}
           <TabsTrigger
             value="key-results"
@@ -633,7 +698,7 @@ export default function GoalDetail() {
         {/* Angka Target Tab */}
         <TabsContent
           value="key-results"
-          className={`space-y-6 transition-all duration-1000 ${
+          className={`space-y-6 transition-all duration-1000 tour-key-results ${
             shouldHighlight
               ? "ring-4 ring-blue-300 ring-opacity-50 bg-blue-50/30 rounded-lg p-4"
               : ""
@@ -906,7 +971,7 @@ export default function GoalDetail() {
                             variant="default"
                             size="sm"
                             onClick={() => handleCheckIn(kr)}
-                            className="text-white"
+                            className="text-white tour-check-in"
                             style={{
                               backgroundColor: "#2095F4",
                               borderColor: "#2095F4",
@@ -1172,7 +1237,7 @@ export default function GoalDetail() {
         </TabsContent>
 
         {/* Rencana Tab */}
-        <TabsContent value="initiatives" className="space-y-6">
+        <TabsContent value="initiatives" className="space-y-6 tour-initiatives">
           {/* Header with Description and Add Button */}
           <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 sm:p-6 rounded-lg border border-green-200">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-3 sm:gap-4">
@@ -1490,7 +1555,7 @@ export default function GoalDetail() {
         </TabsContent>
 
         {/* Tugas Tab */}
-        <TabsContent value="tasks" className="space-y-6">
+        <TabsContent value="tasks" className="space-y-6 tour-tasks">
           {/* Header with Description */}
           <div className="bg-gradient-to-r from-purple-50 to-violet-50 p-6 rounded-lg border border-purple-200">
             <div className="flex items-start justify-between mb-4">
@@ -2111,6 +2176,74 @@ export default function GoalDetail() {
         users={users || []}
         isLoading={createInitiativeWithMetricsMutation.isPending}
       />
+
+      {/* Feature Tour Overlay */}
+      {showTour && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+          
+          {/* Tour Content */}
+          <div className="relative bg-white rounded-lg shadow-xl max-w-md mx-4 p-6">
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {tourSteps[tourStep].title}
+              </h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                {tourSteps[tourStep].description}
+              </p>
+            </div>
+            
+            {/* Progress Indicator */}
+            <div className="mb-4">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs text-gray-500">
+                  Langkah {tourStep + 1} dari {tourSteps.length}
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${((tourStep + 1) / tourSteps.length) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="flex justify-between">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={prevTourStep}
+                disabled={tourStep === 0}
+                className="text-gray-500"
+              >
+                Sebelumnya
+              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setShowTour(false);
+                    setTourStep(0);
+                  }}
+                  className="text-gray-500"
+                >
+                  Lewati
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={nextTourStep}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  {tourStep === tourSteps.length - 1 ? 'Selesai' : 'Selanjutnya'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* AI Help Bubble */}
       <AIHelpBubble
