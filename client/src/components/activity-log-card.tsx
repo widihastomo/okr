@@ -164,7 +164,10 @@ export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
           Riwayat Aktivitas
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-6 flex flex-col pt-0 pb-0" style={{ minHeight: '140px' }}>
+      <CardContent
+        className="flex flex-col pt-0 pb-0"
+        style={{ minHeight: "150px" }}
+      >
         {activities.length > 0 ? (
           <div className="space-y-3 overflow-y-auto max-h-80">
             {activities.slice(0, 10).map((activity) => (
