@@ -119,16 +119,16 @@ export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
   }
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
           <TrendingUp className="h-5 w-5" />
           Riwayat Aktivitas
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="h-96 flex flex-col">
         {activities.length > 0 ? (
-          <div className="space-y-3 max-h-80 overflow-y-auto">
+          <div className="space-y-3 flex-1 overflow-y-auto">
             {activities.slice(0, 10).map((activity) => (
               <div key={`${activity.type}-${activity.id}`} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
                 <TooltipProvider>
@@ -216,7 +216,7 @@ export default function ActivityLogCard({ objectiveId }: ActivityLogCardProps) {
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-500">
+          <div className="flex-1 flex flex-col items-center justify-center text-gray-500">
             <BarChart3 className="h-12 w-12 mx-auto mb-4 text-gray-300" />
             <p>Belum ada aktivitas</p>
             <p className="text-sm">Aktivitas akan muncul ketika ada update pada ukuran keberhasilan, rencana, atau tugas.</p>
