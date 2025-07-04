@@ -160,11 +160,11 @@ export function CheckInModal({
     
     // Handle different key result types
     if (keyResultType === "achieve_or_not") {
-      // For binary type, use target value if achieved, otherwise 0
-      submitValue = achieved ? targetValue : "0";
+      // For binary type, use 1 if achieved, otherwise 0
+      submitValue = achieved ? "1" : "0";
     } else if (keyResultType === "should_stay_above" || keyResultType === "should_stay_below") {
-      // For threshold types, use target value if achieved, otherwise current value
-      submitValue = achieved ? targetValue : value;
+      // For threshold types, use current value from input
+      submitValue = value;
     }
     
     checkInMutation.mutate({
