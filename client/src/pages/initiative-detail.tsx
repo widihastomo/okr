@@ -45,6 +45,7 @@ import InitiativeModal from "@/components/initiative-modal";
 import { InitiativeNotes } from "@/components/initiative-notes";
 import { InitiativeMetricsDashboard } from "@/components/initiative-metrics-dashboard";
 import { MetricUpdateModal } from "@/components/metric-update-modal";
+import SuccessMetricsModal from "@/components/success-metrics-modal";
 import type { SuccessMetricWithUpdates } from "@shared/schema";
 
 export default function InitiativeDetailPage() {
@@ -63,6 +64,8 @@ export default function InitiativeDetailPage() {
   // State for metrics management
   const [isMetricUpdateModalOpen, setIsMetricUpdateModalOpen] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState<SuccessMetricWithUpdates | null>(null);
+  const [isSuccessMetricsModalOpen, setIsSuccessMetricsModalOpen] = useState(false);
+  const [editingMetric, setEditingMetric] = useState<any>(null);
 
   // Fetch initiative details with all related data (PIC, members, key result)
   const { data: initiative, isLoading: initiativeLoading } = useQuery({
@@ -75,6 +78,8 @@ export default function InitiativeDetailPage() {
     queryKey: [`/api/initiatives/${id}/tasks`],
     enabled: !!id,
   });
+
+
 
   // Fetch related initiatives from the same key result
   const { data: relatedInitiatives } = useQuery({
@@ -384,7 +389,7 @@ export default function InitiativeDetailPage() {
     if (score >= 60) return "At Risk";
     if (score >= 40) return "Warning";
     return "Critical";
-  };;
+  };
 
   // Task helper functions
   const getTaskStatusColor = (status: string) => {
@@ -452,6 +457,39 @@ export default function InitiativeDetailPage() {
   const handleDeleteTask = (taskId: string) => {
     if (confirm("Apakah Anda yakin ingin menghapus task ini?")) {
       deleteTaskMutation.mutate(taskId);
+    }
+  };
+
+  // Success metrics handlers
+  const deleteSuccessMetricMutation = useMutation({
+    mutationFn: async (metricId: string) => {
+      return apiRequest("DELETE", `/api/success-metrics/${metricId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/success-metrics`] });
+      toast({
+        title: "Berhasil",
+        description: "Metrik keberhasilan berhasil dihapus",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal menghapus metrik keberhasilan",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleEditSuccessMetric = (metric: any) => {
+    setEditingMetric(metric);
+    setIsSuccessMetricsModalOpen(true);
+  };
+
+  const handleDeleteSuccessMetric = (metricId: string) => {
+    if (confirm("Apakah Anda yakin ingin menghapus metrik keberhasilan ini?")) {
+      deleteSuccessMetricMutation.mutate(metricId);
     }
   };
 
@@ -660,12 +698,125 @@ export default function InitiativeDetailPage() {
             </CardContent>
           </Card>
 
-          {/* Success Metrics Dashboard */}
-          <InitiativeMetricsDashboard
-            metrics={successMetrics}
-            onUpdateMetric={handleUpdateMetric}
-            className="mt-6"
-          />
+          {/* Success Metrics Management Section */}
+          <Card className="mt-6">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="h-5 w-5" />
+                  Metrik Keberhasilan
+                </CardTitle>
+                <Button 
+                  onClick={() => {
+                    setEditingMetric(null);
+                    setIsSuccessMetricsModalOpen(true);
+                  }}
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  Tambah Metrik
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {successMetrics.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <Target className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                  <p className="text-sm">Belum ada metrik keberhasilan</p>
+                  <p className="text-xs mt-1">Tambahkan metrik untuk mengukur pencapaian inisiatif</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {successMetrics.map((metric: any) => (
+                    <div key={metric.id} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h4 className="font-medium text-gray-900">{metric.title}</h4>
+                            <Badge variant="outline" className="text-xs">
+                              {metric.type === 'increase_to' && 'Naik ke Target'}
+                              {metric.type === 'decrease_to' && 'Turun ke Target'}
+                              {metric.type === 'achieve_or_not' && 'Tercapai/Tidak'}
+                              {metric.type === 'should_stay_above' && 'Tetap di Atas'}
+                              {metric.type === 'should_stay_below' && 'Tetap di Bawah'}
+                            </Badge>
+                          </div>
+                          {metric.description && (
+                            <p className="text-sm text-gray-600 mb-3">{metric.description}</p>
+                          )}
+                          
+                          {/* Progress Display */}
+                          <div className="flex items-center gap-4 text-sm">
+                            {metric.type !== 'achieve_or_not' && (
+                              <>
+                                {(metric.type === 'increase_to' || metric.type === 'decrease_to') && metric.baseValue && (
+                                  <span className="text-gray-600">
+                                    Awal: <span className="font-medium">{metric.baseValue}</span>
+                                  </span>
+                                )}
+                                <span className="text-gray-600">
+                                  Current: <span className="font-medium">{metric.currentValue || 0}</span>
+                                </span>
+                                <span className="text-gray-600">
+                                  Target: <span className="font-medium">{metric.targetValue}</span>
+                                </span>
+                                <span className="text-gray-600">
+                                  Unit: <span className="font-medium">{metric.unit}</span>
+                                </span>
+                              </>
+                            )}
+                            {metric.type === 'achieve_or_not' && (
+                              <span className="text-gray-600">
+                                Status: <span className={`font-medium ${metric.currentValue >= metric.targetValue ? 'text-green-600' : 'text-red-600'}`}>
+                                  {metric.currentValue >= metric.targetValue ? 'Tercapai' : 'Belum Tercapai'}
+                                </span>
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Progress Bar for non-binary metrics */}
+                          {metric.type !== 'achieve_or_not' && (
+                            <div className="mt-3">
+                              <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
+                                <span>Progress</span>
+                                <span>{calculateMetricProgress(metric).toFixed(1)}%</span>
+                              </div>
+                              <Progress 
+                                value={Math.min(100, Math.max(0, calculateMetricProgress(metric)))} 
+                                className="h-2"
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Action Buttons */}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEditSuccessMetric(metric)}>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit Metrik
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => handleDeleteSuccessMetric(metric.id)}
+                              className="text-red-600"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Hapus Metrik
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Task Management Section */}
           <Card>
@@ -991,6 +1142,19 @@ export default function InitiativeDetailPage() {
         onSubmit={handleMetricSubmit}
         metric={selectedMetric}
         isLoading={updateMetricMutation.isPending}
+      />
+
+      {/* Success Metrics CRUD Modal */}
+      <SuccessMetricsModal
+        open={isSuccessMetricsModalOpen}
+        onOpenChange={(open) => {
+          setIsSuccessMetricsModalOpen(open);
+          if (!open) {
+            setEditingMetric(null);
+          }
+        }}
+        initiativeId={id!}
+        metric={editingMetric}
       />
     </div>
   );
