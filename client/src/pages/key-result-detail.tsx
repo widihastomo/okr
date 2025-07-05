@@ -1528,17 +1528,8 @@ export default function KeyResultDetailPage() {
     <InitiativeFormModal
       isOpen={showInitiativeFormModal}
       onClose={() => setShowInitiativeFormModal(false)}
-      onSubmit={createInitiativeWithMetricsMutation.mutate}
       keyResultId={keyResultId}
-      users={users || []}
-      keyResults={keyResult ? [{
-        id: keyResult.id,
-        title: keyResult.title,
-        currentValue: Number(keyResult.currentValue) || 0,
-        targetValue: Number(keyResult.targetValue) || 0,
-        unit: keyResult.unit || 'number'
-      }] : []}
-      isLoading={createInitiativeWithMetricsMutation.isPending}
+      objectiveId={keyResult?.objectiveId}
     />
 
     {/* Edit Task Modal */}

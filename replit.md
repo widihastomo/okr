@@ -112,6 +112,13 @@ Changelog:
   * Database tables now support all 5 metric types: increase_to, decrease_to, achieve_or_not, should_stay_above, should_stay_below
   * Tables include proper foreign key relationships and default values for seamless integration
   * Success metrics system now ready for comprehensive initiative progress measurement and tracking
+- July 05, 2025. Implemented objective-based filtering for key results in initiative creation:
+  * Added objectiveId prop to SearchableKeyResultSelect component for context-aware filtering
+  * Updated InitiativeFormModal to accept and pass objectiveId parameter to filter key results
+  * Enhanced objective detail page and key result detail page to provide objective context
+  * When creating initiatives from objective detail page, only key results from that objective are shown
+  * Improved user experience by reducing irrelevant options and focusing on relevant key results
+  * Fixed cache invalidation issues with comprehensive query invalidation for proper UI refresh
 - July 05, 2025. Implemented comprehensive animated scroll progress indicator system for searchable dropdowns:
   * Created ScrollProgressIndicator component with smooth animations and real-time scroll position tracking
   * Added useScrollProgress hook with scroll state management (isAtTop, isAtBottom, scrollProgress, canScroll)

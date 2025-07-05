@@ -2237,23 +2237,8 @@ export default function GoalDetail() {
       <InitiativeFormModal
         isOpen={showInitiativeFormModal}
         onClose={() => setShowInitiativeFormModal(false)}
-        onSubmit={(data) => {
-          // Handle initiative submission
-          console.log("Initiative data submitted:", data);
-          setShowInitiativeFormModal(false);
-          // Refresh data
-          queryClient.invalidateQueries({ queryKey: [`/api/okrs/${id}`] });
-          queryClient.invalidateQueries({ queryKey: [`/api/initiatives/objective/${id}`] });
-        }}
         keyResultId={goal?.keyResults?.[0]?.id || ""}
-        users={users || []}
-        keyResults={goal?.keyResults?.map(kr => ({
-          id: kr.id,
-          title: kr.title,
-          currentValue: Number(kr.currentValue) || 0,
-          targetValue: Number(kr.targetValue) || 0,
-          unit: kr.unit || 'number'
-        })) || []}
+        objectiveId={id}
       />
 
       {/* AI Help Bubble */}

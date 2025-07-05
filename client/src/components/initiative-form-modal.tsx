@@ -51,9 +51,10 @@ interface InitiativeFormModalProps {
   onClose: () => void;
   keyResultId?: string;
   initiative?: Initiative;
+  objectiveId?: string; // Filter key results by objective
 }
 
-export default function InitiativeFormModal({ isOpen, onClose, keyResultId, initiative }: InitiativeFormModalProps) {
+export default function InitiativeFormModal({ isOpen, onClose, keyResultId, initiative, objectiveId }: InitiativeFormModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -368,6 +369,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                           value={field.value || ""}
                           onValueChange={field.onChange}
                           placeholder="Pilih angka target"
+                          objectiveId={objectiveId}
                         />
                       </FormControl>
                       <FormMessage />

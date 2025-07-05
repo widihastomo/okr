@@ -13,6 +13,7 @@ interface SearchableKeyResultSelectProps {
   onValueChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  objectiveId?: string; // Filter key results by objective
 }
 
 export function SearchableKeyResultSelect({
@@ -20,13 +21,19 @@ export function SearchableKeyResultSelect({
   value,
   onValueChange,
   placeholder = "Pilih angka target",
-  className
+  className,
+  objectiveId
 }: SearchableKeyResultSelectProps) {
   const [open, setOpen] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const scrollState = useScrollProgress(scrollContainerRef);
 
-  const selectedKeyResult = keyResults.find(kr => kr.id === value);
+  // Filter key results by objective if objectiveId is provided
+  const filteredKeyResults = objectiveId 
+    ? keyResults.filter(kr => kr.objectiveId === objectiveId)
+    : keyResults;
+    
+  const selectedKeyResult = filteredKeyResults.find(kr => kr.id === value);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -65,7 +72,7 @@ export function SearchableKeyResultSelect({
               <CommandList className="py-1">
                 <CommandEmpty>Tidak ada angka target ditemukan</CommandEmpty>
                 <CommandGroup>
-                  {keyResults.map((keyResult) => (
+                  {filteredKeyResults.map((keyResult) => (
                     <CommandItem
                       key={keyResult.id}
                       value={keyResult.title}
