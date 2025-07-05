@@ -1,57 +1,246 @@
-import { useParams, Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useParams } from "wouter";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import {
   ArrowLeft,
   Calendar,
-  Flag,
   DollarSign,
+  Flag,
+  Target,
   User,
   Users,
-  CheckCircle2,
   Clock,
   FileText,
-  MessageSquare,
-  Paperclip,
+  Check,
+  MoreVertical,
   Edit,
   Trash2,
-  Plus,
+  Info,
+  ChevronDown,
 } from "lucide-react";
+import { Link } from "wouter";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+
+// UI Components
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
-
-import { DeleteConfirmationModal } from "@/components/delete-confirmation-modal";
-import { useMutation } from "@tanstack/react-query";
-import { queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import TaskModal from "@/components/task-modal";
+import InitiativeModal from "@/components/initiative-modal";
+import { InitiativeNotes } from "@/components/initiative-notes";
+import { InitiativeMetricsDashboard } from "@/components/initiative-metrics-dashboard";
+import { MetricUpdateModal } from "@/components/metric-update-modal";
+import SuccessMetricsModal from "@/components/success-metrics-modal";
+import type { SuccessMetricWithUpdates } from "@shared/schema";
 
 export default function InitiativeDetailPage() {
   const { id } = useParams();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  // State for task modals
+  const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
+  const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<any>(null);
+  
+  // State for initiative editing
+  const [isEditInitiativeModalOpen, setIsEditInitiativeModalOpen] = useState(false);
+  
+  // State for metrics management
+  const [isMetricUpdateModalOpen, setIsMetricUpdateModalOpen] = useState(false);
+  const [selectedMetric, setSelectedMetric] = useState<SuccessMetricWithUpdates | null>(null);
+  const [isSuccessMetricsModalOpen, setIsSuccessMetricsModalOpen] = useState(false);
+  const [editingMetric, setEditingMetric] = useState<any>(null);
 
-
-  // Fetch initiative details with all related data (PIC, members, tasks, documents)
+  // Fetch initiative details with all related data (PIC, members, key result)
   const { data: initiative, isLoading: initiativeLoading } = useQuery({
     queryKey: [`/api/initiatives/${id}`],
     enabled: !!id,
   });
 
+  // Fetch tasks for this initiative
+  const { data: tasks = [] } = useQuery<any[]>({
+    queryKey: [`/api/initiatives/${id}/tasks`],
+    enabled: !!id,
+  });
+
+
+
+  // Fetch related initiatives from the same key result
+  const { data: relatedInitiatives } = useQuery({
+    queryKey: ['/api/initiatives'],
+    enabled: !!initiative,
+    select: (data: any[]) => {
+      const initiativeData = initiative as any;
+      const keyResult = initiativeData?.keyResult;
+      return data?.filter(init => 
+        init.keyResultId === keyResult?.id && init.id !== id
+      ) || [];
+    },
+  });
+
+  // Helper function to calculate metric progress
+  const calculateMetricProgress = (metric: any): number => {
+    const current = Number(metric.currentValue) || 0;
+    const target = Number(metric.targetValue) || 0;
+    const base = Number(metric.baseValue) || 0;
+
+    if (metric.type === "achieve_or_not") {
+      return current >= target ? 100 : 0;
+    }
+
+    if (metric.type === "increase_to" && target > base) {
+      return Math.min(Math.max(((current - base) / (target - base)) * 100, 0), 100);
+    }
+
+    if (metric.type === "decrease_to" && base > target) {
+      return Math.min(Math.max(((base - current) / (base - target)) * 100, 0), 100);
+    }
+
+    if (metric.type === "should_stay_above") {
+      return current >= target ? 100 : 0;
+    }
+
+    if (metric.type === "should_stay_below") {
+      return current <= target ? 100 : 0;
+    }
+
+    return 0;
+  };
+
+  // Fetch success metrics for this initiative
+  const { data: successMetrics = [], isLoading: metricsLoading } = useQuery<SuccessMetricWithUpdates[]>({
+    queryKey: [`/api/initiatives/${id}/success-metrics`],
+    enabled: !!id,
+    select: (data: any[]) => {
+      // Transform the data to include updates and calculate progress
+      return data.map((metric: any) => ({
+        ...metric,
+        updates: [],
+        progressPercentage: calculateMetricProgress(metric)
+      }));
+    }
+  });
+
+  // Task mutation
+  const deleteTaskMutation = useMutation({
+    mutationFn: async (taskId: string) => {
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('Failed to delete task');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/tasks`], refetchType: 'active' });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`], refetchType: 'active' });
+      queryClient.invalidateQueries({ queryKey: ['/api/initiatives'], refetchType: 'active' });
+      toast({
+        title: "Task berhasil dihapus",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Gagal menghapus task",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateTaskStatusMutation = useMutation({
+    mutationFn: async ({ taskId, status }: { taskId: string; status: string }) => {
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (!response.ok) throw new Error("Failed to update task status");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/tasks`], refetchType: 'active' });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`], refetchType: 'active' });
+      toast({
+        description: "Status task berhasil diupdate",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        description: "Gagal mengupdate status task",
+      });
+    },
+  });
+
+  // Metric update mutation
+  const updateMetricMutation = useMutation({
+    mutationFn: async (data: { metricId: string; value: string; notes?: string; confidence: number }) => {
+      const response = await fetch(`/api/success-metrics/${data.metricId}/updates`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          value: data.value,
+          notes: data.notes,
+          confidence: data.confidence
+        })
+      });
+      if (!response.ok) throw new Error('Failed to update metric');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/success-metrics`] });
+      setIsMetricUpdateModalOpen(false);
+      setSelectedMetric(null);
+      toast({
+        title: "Metrik berhasil diupdate",
+        description: "Progress metrik kesuksesan telah diperbarui",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal update metrik",
+        description: error.message || "Terjadi kesalahan saat mengupdate metrik",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Handlers for metrics management
+  const handleUpdateMetric = (metricId: string) => {
+    const metric = successMetrics.find(m => m.id === metricId);
+    if (metric) {
+      setSelectedMetric(metric);
+      setIsMetricUpdateModalOpen(true);
+    }
+  };
+
+  const handleMetricSubmit = (data: { metricId: string; value: string; notes?: string; confidence: number }) => {
+    updateMetricMutation.mutate(data);
+  };
+
   // Extract data from the comprehensive initiative object with proper typing
   const initiativeData = initiative as any;
   const members = initiativeData?.members || [];
   const pic = initiativeData?.pic;
-
-
+  const keyResult = initiativeData?.keyResult;
 
   if (initiativeLoading) {
     return (
@@ -61,10 +250,10 @@ export default function InitiativeDetailPage() {
     );
   }
 
-  if (!initiative) {
+  if (!initiativeData) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-gray-500">Initiative not found</div>
+        <div className="text-red-500">Initiative not found</div>
       </div>
     );
   }
@@ -72,384 +261,744 @@ export default function InitiativeDetailPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 text-green-800 border-green-200";
       case "in_progress":
-        return "bg-blue-100 text-blue-800";
+        return "bg-blue-100 text-blue-800 border-blue-200";
       case "on_hold":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "cancelled":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
+        return "bg-red-100 text-red-800 border-red-200";
       case "not_started":
-        return "Belum Dimulai";
-      case "in_progress":
-        return "Sedang Berjalan";
-      case "completed":
-        return "Selesai";
-      case "on_hold":
-        return "Ditahan";
-      case "cancelled":
-        return "Dibatalkan";
+        return "bg-gray-100 text-gray-800 border-gray-200";
       default:
-        return status;
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "critical":
-        return "text-red-600";
+        return "bg-red-100 text-red-800 border-red-200";
       case "high":
-        return "text-red-500";
+        return "bg-orange-100 text-orange-800 border-orange-200";
       case "medium":
-        return "text-yellow-500";
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "low":
-        return "text-gray-500";
+        return "bg-green-100 text-green-800 border-green-200";
       default:
-        return "text-gray-500";
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "not_started": return "Belum Dimulai";
+      case "in_progress": return "Sedang Berjalan";
+      case "completed": return "Selesai";
+      case "on_hold": return "Ditahan";
+      case "cancelled": return "Dibatalkan";
+      default: return status;
     }
   };
 
   const getPriorityLabel = (priority: string) => {
     switch (priority) {
-      case "low":
-        return "Rendah";
-      case "medium":
-        return "Sedang";
-      case "high":
-        return "Tinggi";
-      case "critical":
-        return "Kritis";
-      default:
-        return priority;
+      case "low": return "Rendah";
+      case "medium": return "Sedang";
+      case "high": return "Tinggi";
+      case "critical": return "Kritis";
+      default: return priority;
     }
   };
 
+  const formatCurrency = (amount: string | number | null) => {
+    if (!amount) return "Tidak ada budget";
+    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(numAmount);
+  };
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return "Tidak ditentukan";
+    try {
+      return new Date(dateString).toLocaleDateString('id-ID', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      return "Tanggal tidak valid";
+    }
+  };
+
+  const calculateProgress = () => {
+    if (!tasks || tasks.length === 0) return initiativeData.progress || 0;
+    const completedTasks = tasks.filter((task: any) => task.status === "completed");
+    return Math.round((completedTasks.length / tasks.length) * 100);
+  }
+
+  const calculateTaskHealthScore = (task: any) => {
+    let score = 100;
+    const now = new Date();
+    const dueDate = new Date(task.dueDate);
+    const daysUntilDue = Math.floor((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    
+    // Status impact
+    if (task.status === 'completed') {
+      return 100;
+    } else if (task.status === 'cancelled') {
+      return 0;
+    } else if (task.status === 'not_started' && daysUntilDue < 3) {
+      score -= 40; // Heavy penalty for not started tasks close to due date
+    } else if (task.status === 'in_progress' && daysUntilDue < 0) {
+      score -= 30; // Overdue in progress
+    }
+    
+    // Due date impact
+    if (daysUntilDue < 0) {
+      score -= 30; // Overdue
+    } else if (daysUntilDue < 3) {
+      score -= 20; // Due soon
+    } else if (daysUntilDue < 7) {
+      score -= 10; // Due this week
+    }
+    
+    // Priority impact
+    if (task.priority === 'high' && task.status === 'not_started') {
+      score -= 20; // High priority not started
+    } else if (task.priority === 'critical' && task.status !== 'completed') {
+      score -= 30; // Critical tasks not completed
+    }
+    
+    return Math.max(0, Math.min(100, score));
+  };
+
+  const getTaskHealthColor = (score: number) => {
+    if (score >= 80) return "text-green-600 bg-green-50 border-green-200";
+    if (score >= 60) return "text-yellow-600 bg-yellow-50 border-yellow-200";
+    if (score >= 40) return "text-orange-600 bg-orange-50 border-orange-200";
+    return "text-red-600 bg-red-50 border-red-200";
+  };
+
+  const getTaskHealthLabel = (score: number) => {
+    if (score >= 80) return "Healthy";
+    if (score >= 60) return "At Risk";
+    if (score >= 40) return "Warning";
+    return "Critical";
+  };
+
+  // Task helper functions
   const getTaskStatusColor = (status: string) => {
     switch (status) {
       case "completed":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 text-green-800 border-green-200";
       case "in_progress":
-        return "bg-blue-100 text-blue-800";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "not_started":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "cancelled":
+        return "bg-red-100 text-red-800 border-red-200";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
   const getTaskStatusLabel = (status: string) => {
     switch (status) {
-      case "pending":
-        return "Menunggu";
-      case "in_progress":
-        return "Sedang Dikerjakan";
       case "completed":
         return "Selesai";
+      case "in_progress":
+        return "Berlangsung";
+      case "not_started":
+        return "Belum Dimulai";
+      case "cancelled":
+        return "Dibatalkan";
       default:
-        return status;
+        return "Tidak Diketahui";
     }
   };
 
-  const completedTasks = tasks.filter(
-    (task: any) => task.status === "completed",
-  );
-  const progressPercentage =
-    tasks.length > 0
-      ? Math.round((completedTasks.length / tasks.length) * 100)
-      : 0;
+  const getTaskPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "medium":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "low":
+        return "bg-green-100 text-green-800 border-green-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const getTaskPriorityLabel = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return "Tinggi";
+      case "medium":
+        return "Sedang";
+      case "low":
+        return "Rendah";
+      default:
+        return "Tidak Diketahui";
+    }
+  };
+
+  // Task handlers
+  const handleEditTask = (task: any) => {
+    setSelectedTask(task);
+    setIsEditTaskModalOpen(true);
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    if (confirm("Apakah Anda yakin ingin menghapus task ini?")) {
+      deleteTaskMutation.mutate(taskId);
+    }
+  };
+
+  // Success metrics handlers
+  const deleteSuccessMetricMutation = useMutation({
+    mutationFn: async (metricId: string) => {
+      return apiRequest("DELETE", `/api/success-metrics/${metricId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/success-metrics`] });
+      toast({
+        title: "Berhasil",
+        description: "Metrik keberhasilan berhasil dihapus",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal menghapus metrik keberhasilan",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleEditSuccessMetric = (metric: any) => {
+    setEditingMetric(metric);
+    setIsSuccessMetricsModalOpen(true);
+  };
+
+  const handleDeleteSuccessMetric = (metricId: string) => {
+    if (confirm("Apakah Anda yakin ingin menghapus metrik keberhasilan ini?")) {
+      deleteSuccessMetricMutation.mutate(metricId);
+    }
+  };
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
+    <div className="min-h-screen bg-gray-50 p-6">
       {/* Header */}
-      <div className="mb-6">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => window.history.back()}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </Button>
-
-
+      <div className="flex items-center justify-between mb-6">
+        <Link href="/dashboard?tab=initiatives">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+        </Link>
+        
+        <div className="flex items-center gap-3">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => setIsEditInitiativeModalOpen(true)}
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            Edit Initiative
+          </Button>
+        </div>
       </div>
 
+      {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Content */}
+        {/* Left Column - Main Content */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Overview Card */}
+          {/* Initiative Overview */}
           <Card>
             <CardHeader>
-              <CardTitle>Overview</CardTitle>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Target className="h-5 w-5" />
+                Initiative Overview
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Title and Description */}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <h2 className="text-xl font-bold text-gray-900">
-                    {initiativeData.title}
-                  </h2>
-                  <Badge className={getStatusColor(initiativeData.status)}>
+                <h1 className="text-xl font-bold text-gray-900 mb-2">{initiativeData.title}</h1>
+                {initiativeData.description && (
+                  <p className="text-sm text-gray-600 leading-relaxed">{initiativeData.description}</p>
+                )}
+              </div>
+              
+              {/* Initiative Details Row */}
+              <div className="flex flex-wrap items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-1.5" title="Status Initiative">
+                  <Flag className="h-3 w-3 text-gray-600" />
+                  <Badge className={`${getStatusColor(initiativeData.status)} border-0 py-0 text-xs`}>
                     {getStatusLabel(initiativeData.status)}
                   </Badge>
                 </div>
-                {initiativeData.description && (
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    {initiativeData.description}
-                  </p>
-                )}
-              </div>
-
-              <Separator />
-
-              {/* Progress */}
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Progress</span>
-                  <span className="text-sm text-gray-600">
-                    {progressPercentage}%
+                
+                <div className="flex items-center gap-1.5" title="Priority Initiative">
+                  <Target className="h-3 w-3 text-gray-600" />
+                  {(() => {
+                    // Calculate priority level from score
+                    const score = parseFloat(initiativeData.priorityScore || "0");
+                    let level: string;
+                    let color: string;
+                    let label: string;
+                    
+                    if (score >= 4.5) {
+                      level = "critical";
+                      color = "bg-red-100 text-red-800";
+                      label = "Kritis";
+                    } else if (score >= 3.5) {
+                      level = "high";
+                      color = "bg-orange-100 text-orange-800";
+                      label = "Tinggi";
+                    } else if (score >= 2.5) {
+                      level = "medium";
+                      color = "bg-yellow-100 text-yellow-800";
+                      label = "Sedang";
+                    } else {
+                      level = "low";
+                      color = "bg-green-100 text-green-800";
+                      label = "Rendah";
+                    }
+                    
+                    return (
+                      <div className="flex items-center gap-2">
+                        <Badge className={`${color} border-0 py-0 text-xs`}>
+                          {label}
+                        </Badge>
+                        <span className="text-xs text-gray-500">
+                          {score.toFixed(1)}/5.0
+                        </span>
+                      </div>
+                    );
+                  })()}
+                </div>
+                
+                <div className="flex items-center gap-1.5" title="Budget yang Dialokasikan">
+                  <DollarSign className="h-3 w-3 text-gray-600" />
+                  <span className="text-sm font-semibold text-gray-900">{formatCurrency(initiativeData.budget)}</span>
+                </div>
+                
+                <div className="flex items-center gap-1.5" title="Timeline Initiative">
+                  <Calendar className="h-3 w-3 text-gray-600" />
+                  <span className="text-sm font-semibold text-gray-900">
+                    {formatDate(initiativeData.startDate)} - {formatDate(initiativeData.dueDate)}
                   </span>
                 </div>
-                <Progress value={progressPercentage} className="h-2" />
-                <p className="text-xs text-gray-500 mt-1">
-                  {completedTasks.length} dari {tasks.length} task selesai
-                </p>
               </div>
 
-              <Separator />
-
-              {/* Details Grid */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                    <Calendar className="h-4 w-4" />
-                    Tanggal Mulai
+              {/* Progress and Health Summary */}
+              <div className="space-y-3">
+                {/* Overall Progress */}
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-700">Overall Progress</span>
+                    <span className={`text-lg font-bold ${
+                      calculateProgress() === 100 ? 'text-green-600' : 
+                      calculateProgress() >= 75 ? 'text-blue-600' : 
+                      calculateProgress() >= 50 ? 'text-yellow-600' : 
+                      'text-orange-600'
+                    }`}>{calculateProgress()}%</span>
                   </div>
-                  <p className="font-medium">
-                    {initiativeData.startDate
-                      ? new Date(initiativeData.startDate).toLocaleDateString(
-                          "id-ID",
-                        )
-                      : "-"}
-                  </p>
+                  <div className="relative">
+                    <Progress value={calculateProgress()} className="h-3" />
+                    <div className={`absolute inset-0 h-3 rounded-full ${
+                      calculateProgress() === 100 ? 'bg-green-500' : 
+                      calculateProgress() >= 75 ? 'bg-blue-500' : 
+                      calculateProgress() >= 50 ? 'bg-yellow-500' : 
+                      'bg-orange-500'
+                    }`} style={{ width: `${calculateProgress()}%` }} />
+                  </div>
                 </div>
 
-                <div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                    <Calendar className="h-4 w-4" />
-                    Tenggat Waktu
-                  </div>
-                  <p className="font-medium">
-                    {initiativeData.dueDate
-                      ? new Date(initiativeData.dueDate).toLocaleDateString(
-                          "id-ID",
-                        )
-                      : "-"}
-                  </p>
-                </div>
-
-                <div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                    <Flag
-                      className={`h-4 w-4 ${getPriorityColor(initiativeData.priority)}`}
-                    />
-                    Prioritas
-                  </div>
-                  <p className="font-medium">
-                    {getPriorityLabel(initiativeData.priority)}
-                  </p>
-                </div>
-
-                <div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                    <DollarSign className="h-4 w-4" />
-                    Budget
-                  </div>
-                  <p className="font-medium">
-                    {initiativeData.budget
-                      ? `Rp ${parseInt(initiativeData.budget).toLocaleString("id-ID")}`
-                      : "-"}
-                  </p>
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Key Result Information */}
-              {initiativeData.keyResult && (
-                <div>
-                  <p className="text-sm text-gray-600 mb-3">Key Result Terkait</p>
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <Link
-                          href={`/key-result/${initiativeData.keyResultId}`}
-                          className="text-blue-600 hover:text-blue-700 hover:underline font-medium"
-                        >
-                          {initiativeData.keyResult.title}
-                        </Link>
-                        {initiativeData.keyResult.description && (
-                          <p className="text-sm text-gray-600 mt-1">
-                            {initiativeData.keyResult.description}
-                          </p>
-                        )}
-                        <div className="flex items-center gap-4 mt-3 text-sm">
-                          <div className="flex items-center gap-1">
-                            <span className="text-gray-500">Progress:</span>
-                            <span className="font-medium">
-                              {Math.round(((Number(initiativeData.keyResult.currentValue) - Number(initiativeData.keyResult.baseValue || 0)) / 
-                                (Number(initiativeData.keyResult.targetValue) - Number(initiativeData.keyResult.baseValue || 0))) * 100) || 0}%
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <span className="text-gray-500">Current:</span>
-                            <span className="font-medium">
-                              {Number(initiativeData.keyResult.currentValue).toLocaleString('id-ID')} {initiativeData.keyResult.unit}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <span className="text-gray-500">Target:</span>
-                            <span className="font-medium">
-                              {Number(initiativeData.keyResult.targetValue).toLocaleString('id-ID')} {initiativeData.keyResult.unit}
-                            </span>
-                          </div>
+                {/* Task Health Summary */}
+                {tasks && tasks.length > 0 && (
+                  <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-sm font-medium text-blue-900">Task Health Overview</div>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="w-4 h-4 text-blue-600 cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-sm">
+                            <div className="space-y-2 text-xs">
+                              <div className="font-medium">Health Score Calculation:</div>
+                              <div className="space-y-1">
+                                <div className="text-gray-600">• <span className="font-medium">Status Impact:</span> Completed (100%), Cancelled (0%), Not Started near due date (-40%), Overdue in progress (-30%)</div>
+                                <div className="text-gray-600">• <span className="font-medium">Due Date Impact:</span> Overdue (-30%), Due in 3 days (-20%), Due this week (-10%)</div>
+                                <div className="text-gray-600">• <span className="font-medium">Priority Impact:</span> High priority not started (-20%), Critical not completed (-30%)</div>
+                              </div>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                    <div className="grid grid-cols-4 gap-2 text-xs">
+                      <div className="text-center">
+                        <div className="font-semibold text-green-600">
+                          {tasks.filter((t: any) => calculateTaskHealthScore(t) >= 80).length}
                         </div>
+                        <div className="text-gray-600">Healthy</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-semibold text-yellow-600">
+                          {tasks.filter((t: any) => calculateTaskHealthScore(t) >= 60 && calculateTaskHealthScore(t) < 80).length}
+                        </div>
+                        <div className="text-gray-600">At Risk</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-semibold text-orange-600">
+                          {tasks.filter((t: any) => calculateTaskHealthScore(t) >= 40 && calculateTaskHealthScore(t) < 60).length}
+                        </div>
+                        <div className="text-gray-600">Warning</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-semibold text-red-600">
+                          {tasks.filter((t: any) => calculateTaskHealthScore(t) < 40).length}
+                        </div>
+                        <div className="text-gray-600">Critical</div>
                       </div>
                     </div>
                   </div>
+                )}
+              </div>
+
+              {/* Key Result Information - Simplified */}
+              {keyResult && (
+                <div className="border border-blue-200 bg-blue-50 p-3 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <Link href={`/key-results/${keyResult.id}`}>
+                      <span className="text-sm font-semibold text-blue-900 hover:text-blue-700">
+                        Key Result: {keyResult.title}
+                      </span>
+                    </Link>
+                    <span className="text-xs font-bold text-blue-900">{(keyResult.progress || 0).toFixed(1)}%</span>
+                  </div>
+                </div>
+              )}
+
+
+            </CardContent>
+          </Card>
+
+          {/* Success Metrics Management Section */}
+          <Card className="mt-6">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="h-5 w-5" />
+                  Metrik Keberhasilan
+                </CardTitle>
+                <Button 
+                  onClick={() => {
+                    setEditingMetric(null);
+                    setIsSuccessMetricsModalOpen(true);
+                  }}
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  Tambah Metrik
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {successMetrics.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <Target className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                  <p className="text-sm">Belum ada metrik keberhasilan</p>
+                  <p className="text-xs mt-1">Tambahkan metrik untuk mengukur pencapaian inisiatif</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {successMetrics.map((metric: any) => (
+                    <div key={metric.id} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h4 className="font-medium text-gray-900">{metric.title}</h4>
+                            <Badge variant="outline" className="text-xs">
+                              {metric.type === 'increase_to' && 'Naik ke Target'}
+                              {metric.type === 'decrease_to' && 'Turun ke Target'}
+                              {metric.type === 'achieve_or_not' && 'Tercapai/Tidak'}
+                              {metric.type === 'should_stay_above' && 'Tetap di Atas'}
+                              {metric.type === 'should_stay_below' && 'Tetap di Bawah'}
+                            </Badge>
+                          </div>
+                          {metric.description && (
+                            <p className="text-sm text-gray-600 mb-3">{metric.description}</p>
+                          )}
+                          
+                          {/* Progress Display */}
+                          <div className="flex items-center gap-4 text-sm">
+                            {metric.type !== 'achieve_or_not' && (
+                              <>
+                                {(metric.type === 'increase_to' || metric.type === 'decrease_to') && metric.baseValue && (
+                                  <span className="text-gray-600">
+                                    Awal: <span className="font-medium">{metric.baseValue}</span>
+                                  </span>
+                                )}
+                                <span className="text-gray-600">
+                                  Current: <span className="font-medium">{metric.currentValue || 0}</span>
+                                </span>
+                                <span className="text-gray-600">
+                                  Target: <span className="font-medium">{metric.targetValue}</span>
+                                </span>
+                                <span className="text-gray-600">
+                                  Unit: <span className="font-medium">{metric.unit}</span>
+                                </span>
+                              </>
+                            )}
+                            {metric.type === 'achieve_or_not' && (
+                              <span className="text-gray-600">
+                                Status: <span className={`font-medium ${metric.currentValue >= metric.targetValue ? 'text-green-600' : 'text-red-600'}`}>
+                                  {metric.currentValue >= metric.targetValue ? 'Tercapai' : 'Belum Tercapai'}
+                                </span>
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Progress Bar for non-binary metrics */}
+                          {metric.type !== 'achieve_or_not' && (
+                            <div className="mt-3">
+                              <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
+                                <span>Progress</span>
+                                <span>{calculateMetricProgress(metric).toFixed(1)}%</span>
+                              </div>
+                              <Progress 
+                                value={Math.min(100, Math.max(0, calculateMetricProgress(metric)))} 
+                                className="h-2"
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Action Buttons */}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEditSuccessMetric(metric)}>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit Metrik
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => handleDeleteSuccessMetric(metric.id)}
+                              className="text-red-600"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Hapus Metrik
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </CardContent>
           </Card>
 
-          {/* Tasks Card */}
+          {/* Task Management Section */}
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5" />
-                  Tasks ({tasks.length})
+                  <FileText className="h-5 w-5" />
+                  Manajemen Task
                 </CardTitle>
-                <Button
+                <Button 
+                  onClick={() => setIsAddTaskModalOpen(true)}
                   size="sm"
                   className="bg-blue-600 hover:bg-blue-700"
-                  onClick={() => {
-                    setIsAddingTask(true);
-                    setSelectedTask(null);
-                    setIsTaskModalOpen(true);
-                  }}
                 >
-                  <Plus className="h-4 w-4 mr-1" />
                   Tambah Task
                 </Button>
               </div>
             </CardHeader>
             <CardContent>
               {tasks.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">Belum ada task</p>
+                <div className="text-center py-8 text-gray-500">
+                  <FileText className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                  <p className="text-sm">Belum ada task</p>
+                </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {tasks.map((task: any) => (
-                    <div
-                      key={task.id}
-                      className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <button
-                              onClick={() => {
-                                setSelectedTask(task);
-                                setIsTaskModalOpen(true);
-                                setIsAddingTask(false);
-                              }}
-                              className="font-medium hover:text-blue-600 text-left"
-                            >
-                              {task.title}
-                            </button>
-                            <Badge className={getTaskStatusColor(task.status)}>
-                              {getTaskStatusLabel(task.status)}
-                            </Badge>
-                            <Badge
-                              variant="outline"
-                              className={`${getPriorityColor(task.priority)} border-current`}
-                            >
-                              <Flag className="h-3 w-3 mr-1" />
-                              {getPriorityLabel(task.priority)}
-                            </Badge>
-                          </div>
-
-                          {task.description && (
-                            <p className="text-sm text-gray-600 mb-2">
-                              {task.description}
-                            </p>
-                          )}
-
-                          <div className="flex items-center gap-4 text-sm text-gray-500">
-                            {task.assignedTo && (
-                              <div className="flex items-center gap-1">
-                                <User className="h-4 w-4" />
-                                <span>{`${task.assignedTo.firstName} ${task.assignedTo.lastName}`}</span>
+                    <div key={task.id} className="flex items-center justify-between p-3 hover:bg-gray-50 transition-colors group">
+                      <div className="flex items-center gap-3 flex-1">
+                        {/* Task Health Score Dot */}
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className={`w-2 h-2 rounded-full cursor-help ${
+                                calculateTaskHealthScore(task) >= 80 ? 'bg-green-500' :
+                                calculateTaskHealthScore(task) >= 60 ? 'bg-yellow-500' :
+                                calculateTaskHealthScore(task) >= 40 ? 'bg-orange-500' :
+                                'bg-red-500'
+                              }`} />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs">
+                              <div className="space-y-2 text-xs">
+                                <div className="font-medium">Task Health Score: {getTaskHealthLabel(calculateTaskHealthScore(task))} ({calculateTaskHealthScore(task)}%)</div>
+                                <div className="space-y-1 text-gray-600">
+                                  <div>• Status: {getTaskStatusLabel(task.status)}</div>
+                                  <div>• Priority: {getTaskPriorityLabel(task.priority)}</div>
+                                  <div>• Due Date: {formatDate(task.dueDate)}</div>
+                                  {(() => {
+                                    const daysUntilDue = Math.floor((new Date(task.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                                    if (daysUntilDue < 0) return <div className="text-red-600">• Overdue by {Math.abs(daysUntilDue)} days</div>;
+                                    if (daysUntilDue === 0) return <div className="text-orange-600">• Due today</div>;
+                                    if (daysUntilDue <= 3) return <div className="text-yellow-600">• Due in {daysUntilDue} days</div>;
+                                    return <div>• Due in {daysUntilDue} days</div>;
+                                  })()}
+                                </div>
                               </div>
-                            )}
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+
+                        {/* Task Title and Info */}
+                        <div className="flex-1">
+                          <Link href={`/tasks/${task.id}`}>
+                            <span className="font-medium text-gray-900 cursor-pointer hover:text-blue-600 transition-colors">
+                              {task.title}
+                            </span>
+                          </Link>
+                          
+                          {/* Due Date Info */}
+                          <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
                             {task.dueDate && (
                               <div className="flex items-center gap-1">
-                                <Calendar className="h-4 w-4" />
-                                <span>
-                                  {new Date(task.dueDate).toLocaleDateString(
-                                    "id-ID",
-                                  )}
-                                </span>
+                                <Calendar className={`h-3 w-3 ${
+                                  new Date(task.dueDate) < new Date() ? 'text-red-600' : ''
+                                }`} />
+                                <span className={
+                                  new Date(task.dueDate) < new Date() ? 'text-red-600 font-medium' : ''
+                                }>{formatDate(task.dueDate)}</span>
                               </div>
                             )}
                           </div>
                         </div>
+                      </div>
 
+                      <div className="flex items-center gap-2">
+                        {/* Status Badge */}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button 
+                              className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
+                            >
+                              {getTaskStatusLabel(task.status)}
+                              <ChevronDown className="h-3 w-3" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => updateTaskStatusMutation.mutate({ taskId: task.id, status: 'not_started' })}
+                              className="cursor-pointer"
+                            >
+                              <div className="flex items-center gap-2">
+                                {task.status === 'not_started' && <Check className="h-3 w-3" />}
+                                <span>Belum Dimulai</span>
+                              </div>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => updateTaskStatusMutation.mutate({ taskId: task.id, status: 'in_progress' })}
+                              className="cursor-pointer"
+                            >
+                              <div className="flex items-center gap-2">
+                                {task.status === 'in_progress' && <Check className="h-3 w-3" />}
+                                <span>Sedang Dikerjakan</span>
+                              </div>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => updateTaskStatusMutation.mutate({ taskId: task.id, status: 'completed' })}
+                              className="cursor-pointer"
+                            >
+                              <div className="flex items-center gap-2">
+                                {task.status === 'completed' && <Check className="h-3 w-3" />}
+                                <span>Selesai</span>
+                              </div>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => updateTaskStatusMutation.mutate({ taskId: task.id, status: 'cancelled' })}
+                              className="cursor-pointer"
+                            >
+                              <div className="flex items-center gap-2">
+                                {task.status === 'cancelled' && <Check className="h-3 w-3" />}
+                                <span>Dibatalkan</span>
+                              </div>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+
+                        {/* Priority Badge */}
+                        <Badge className={`${getTaskPriorityColor(task.priority)} text-xs px-2 py-1`}>
+                          {getTaskPriorityLabel(task.priority)}
+                        </Badge>
+
+                        {/* Assigned User Avatars */}
+                        {task.assignedTo && task.assignedUser && (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="flex -space-x-2">
+                                  <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white cursor-help">
+                                    {task.assignedUser.firstName?.charAt(0)}{task.assignedUser.lastName?.charAt(0)}
+                                  </div>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <div className="text-xs">
+                                  {task.assignedUser.firstName} {task.assignedUser.lastName}
+                                </div>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
+
+                        {/* Action Menu */}
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 w-8 p-0"
+                              className="h-6 w-6 p-0"
                             >
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem
-                              onClick={() => {
-                                setSelectedTask(task);
-                                setIsTaskModalOpen(true);
-                                setIsAddingTask(false);
-                              }}
+                              onClick={() => handleEditTask(task)}
+                              className="cursor-pointer"
                             >
                               <Edit className="h-4 w-4 mr-2" />
                               Edit
                             </DropdownMenuItem>
-                            {task.status !== "completed" && (
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  updateTaskStatusMutation.mutate({
-                                    taskId: task.id,
-                                    status: "completed",
-                                  })
-                                }
-                              >
-                                <CheckCircle2 className="h-4 w-4 mr-2" />
-                                Mark as Complete
-                              </DropdownMenuItem>
-                            )}
                             <DropdownMenuItem
-                              onClick={() => setDeletingTask(task)}
-                              className="text-red-600"
+                              onClick={() => handleDeleteTask(task.id)}
+                              className="cursor-pointer text-red-600"
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
                               Delete
@@ -463,129 +1012,150 @@ export default function InitiativeDetailPage() {
               )}
             </CardContent>
           </Card>
+
         </div>
 
-        {/* Sidebar */}
+        {/* Right Column - Team and Recent Activity */}
         <div className="space-y-6">
-          {/* Team Card */}
+          {/* Team Members */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Tim & PIC
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* PIC Section */}
+          <CardHeader>
+            <CardTitle>
+              Tim
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* PIC */}
+            {pic && (
               <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <User className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm font-medium text-gray-700">
-                    PIC (Penanggung Jawab)
-                  </span>
+                <div className="text-sm font-medium text-gray-700 mb-2">
+                  PIC (Person in Charge)
                 </div>
-                {pic ? (
-                  <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-                    <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium">
-                      {pic.firstName?.charAt(0)}
-                      {pic.lastName?.charAt(0)}
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                    {pic.firstName?.charAt(0)}{pic.lastName?.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="font-medium text-gray-900">
+                      {pic.firstName} {pic.lastName}
                     </div>
-                    <div>
-                      <p className="font-medium">{`${pic.firstName} ${pic.lastName}`}</p>
-                      <p className="text-sm text-gray-600">{pic.email}</p>
+                    <div className="text-sm text-gray-500">
+                      {pic.email}
                     </div>
                   </div>
-                ) : (
-                  <p className="text-gray-500 text-sm">Tidak ada PIC</p>
-                )}
+                </div>
               </div>
+            )}
 
-              <Separator />
-
-              {/* Members Section */}
+            {/* Members */}
+            {members.length > 0 && (
               <div>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm font-medium text-gray-700">
-                      Anggota Tim
-                    </span>
-                  </div>
-                  <span className="text-xs text-gray-500">
-                    ({members.length})
-                  </span>
+                <div className="text-sm font-medium text-gray-700 mb-2">
+                  Anggota Tim ({members.length})
                 </div>
-                {members.length === 0 ? (
-                  <p className="text-gray-500 text-sm">Tidak ada anggota tim</p>
-                ) : (
-                  <div className="space-y-3">
-                    {members.map((member: any) => (
-                      <div
-                        key={member.userId}
-                        className="flex items-center gap-3"
-                      >
-                        <div className="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                          {member.user.firstName?.charAt(0)}
-                          {member.user.lastName?.charAt(0)}
+                <div className="space-y-2">
+                  {members.map((member: any) => (
+                    <div key={member.id} className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                        {member.user?.firstName?.charAt(0)}{member.user?.lastName?.charAt(0)}
+                      </div>
+                      <div>
+                        <div className="font-medium text-gray-900">
+                          {member.user?.firstName} {member.user?.lastName}
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">
-                            {`${member.user.firstName} ${member.user.lastName}`}
-                          </p>
-                          <p className="text-xs text-gray-600 truncate">
-                            {member.user.email}
-                          </p>
+                        <div className="text-sm text-gray-500">
+                          {member.user?.email}
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </CardContent>
-          </Card>
+            )}
 
-          {/* Activity Card */}
+            {!pic && members.length === 0 && (
+              <div className="text-center py-4 text-gray-500">
+                <p className="text-sm">Belum ada anggota tim</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Initiative Notes */}
+        <InitiativeNotes initiativeId={id!} />
+
+          {/* Recent Activity Placeholder */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5" />
-                Recent Activity
+              <CardTitle>
+                Aktivitas Terbaru
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500 text-center py-4">
-                No recent activity
-              </p>
+              <div className="text-center py-4 text-gray-500">
+                <p className="text-sm">Belum ada aktivitas</p>
+              </div>
             </CardContent>
           </Card>
         </div>
       </div>
 
-      {/* Task Modal */}
-      {isTaskModalOpen && (
-        <TaskModal
-          open={isTaskModalOpen}
-          onClose={() => {
-            setIsTaskModalOpen(false);
-            setSelectedTask(null);
-            setIsAddingTask(false);
+      {/* Add Task Modal */}
+      <TaskModal
+        open={isAddTaskModalOpen}
+        onClose={() => setIsAddTaskModalOpen(false)}
+        initiativeId={id!}
+        isAdding={true}
+      />
+
+      {/* Edit Task Modal */}
+      <TaskModal
+        open={isEditTaskModalOpen}
+        onClose={() => setIsEditTaskModalOpen(false)}
+        task={selectedTask}
+        initiativeId={id!}
+        isAdding={false}
+      />
+
+      {/* Edit Initiative Modal */}
+      {initiative && (
+        <InitiativeModal
+          keyResultId={(initiative as any).keyResult?.id || ""}
+          initiative={initiative}
+          open={isEditInitiativeModalOpen}
+          onClose={() => setIsEditInitiativeModalOpen(false)}
+          onSuccess={() => {
+            setIsEditInitiativeModalOpen(false);
+            // Refresh initiative data
+            queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
           }}
-          task={selectedTask}
-          initiativeId={id}
-          isAdding={isAddingTask}
         />
       )}
 
-      {/* Delete Confirmation Modal */}
-      {deletingTask && (
-        <DeleteConfirmationModal
-          open={true}
-          onOpenChange={() => setDeletingTask(null)}
-          onConfirm={() => deleteTaskMutation.mutate(deletingTask.id)}
-          title="Hapus Task"
-          description={`Apakah Anda yakin ingin menghapus task "${deletingTask.title}"? Tindakan ini tidak dapat dibatalkan.`}
-        />
-      )}
+      {/* Metric Update Modal */}
+      <MetricUpdateModal
+        isOpen={isMetricUpdateModalOpen}
+        onClose={() => {
+          setIsMetricUpdateModalOpen(false);
+          setSelectedMetric(null);
+        }}
+        onSubmit={handleMetricSubmit}
+        metric={selectedMetric}
+        isLoading={updateMetricMutation.isPending}
+      />
+
+      {/* Success Metrics CRUD Modal */}
+      <SuccessMetricsModal
+        open={isSuccessMetricsModalOpen}
+        onOpenChange={(open) => {
+          setIsSuccessMetricsModalOpen(open);
+          if (!open) {
+            setEditingMetric(null);
+          }
+        }}
+        initiativeId={id!}
+        metric={editingMetric}
+      />
     </div>
   );
 }
