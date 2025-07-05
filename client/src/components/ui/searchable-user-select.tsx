@@ -51,14 +51,17 @@ export function SearchableUserSelect({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const scrollState = useScrollProgress(scrollContainerRef);
 
-  const selectedUser = users.find((user) => user.id === value);
-  const displayValue = selectedUser 
-    ? `${selectedUser.firstName || ''} ${selectedUser.lastName || ''}`.trim() || selectedUser.email
-    : value === "unassigned" 
-    ? "Belum Ditugaskan"
-    : value === "all"
-    ? "Semua User"
-    : "";
+  const selectedUser = users.find(user => user.id === value);
+
+  const getDisplayText = () => {
+    if (value === "all") return "Semua User";
+    if (value === "unassigned") return "Belum Ditugaskan";
+    if (selectedUser) {
+      const name = `${selectedUser.firstName || ''} ${selectedUser.lastName || ''}`.trim();
+      return name || selectedUser.email;
+    }
+    return placeholder;
+  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -67,14 +70,20 @@ export function SearchableUserSelect({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn("w-full justify-between", className)}
           disabled={disabled}
+          className={cn("w-full justify-between", className)}
         >
-          <div className="flex items-center gap-2">
-            <User className="h-4 w-4 text-gray-500" />
-            <span className="truncate">
-              {displayValue || placeholder}
-            </span>
+          <div className="flex items-center">
+            {value === "all" ? (
+              <Users className="mr-2 h-4 w-4 text-green-600" />
+            ) : value === "unassigned" ? (
+              <User className="mr-2 h-4 w-4 text-gray-600" />
+            ) : selectedUser ? (
+              <User className="mr-2 h-4 w-4 text-blue-600" />
+            ) : (
+              <User className="mr-2 h-4 w-4 text-gray-400" />
+            )}
+            {getDisplayText()}
           </div>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -84,14 +93,11 @@ export function SearchableUserSelect({
           <CommandInput placeholder="Cari user..." />
           <div className="relative">
             {/* Scroll hint - top */}
-            <div 
-              className={cn(
-                "absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-white to-transparent pointer-events-none z-10 transition-opacity duration-200",
-                scrollState.isAtTop ? "opacity-0" : "opacity-100"
-              )}
-            >
-              <ChevronUp className="w-4 h-4 text-gray-400 mx-auto animate-bounce" />
-            </div>
+            {scrollState.canScroll && !scrollState.isAtTop && (
+              <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-white to-transparent pointer-events-none z-10 flex items-center justify-center">
+                <ChevronUp className="w-3 h-3 text-gray-400 animate-pulse" />
+              </div>
+            )}
 
             {/* Scrollable container */}
             <div 
@@ -99,100 +105,118 @@ export function SearchableUserSelect({
               className="max-h-[250px] overflow-y-auto overscroll-contain relative"
               style={{ 
                 WebkitOverflowScrolling: 'touch',
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none'
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'rgba(156, 163, 175, 0.3) transparent'
               }}
             >
-              <CommandList>
+              <CommandList className="py-1">
                 <CommandEmpty>{emptyMessage}</CommandEmpty>
                 <CommandGroup>
-                {allowAll && (
-                  <CommandItem
-                    value="all"
-                    onSelect={() => {
-                      onValueChange("all");
-                      setOpen(false);
-                    }}
-                    className={cn(
-                      "flex items-center py-2 pr-6", // Added pr-6 for scroll indicator space
-                      value === "all" 
-                        ? "bg-green-50 border-l-2 border-green-500" 
-                        : "hover:bg-gray-50"
-                    )}
-                  >
-                    <Users className={cn(
-                      "mr-3 h-4 w-4 flex-shrink-0",
-                      value === "all" ? "text-green-600" : "text-gray-400"
-                    )} />
-                    <span className={cn(
-                      "font-medium",
-                      value === "all" ? "text-green-900" : "text-gray-900"
-                    )}>
-                      Semua User
-                    </span>
-                  </CommandItem>
-                )}
-                {allowUnassigned && (
-                  <CommandItem
-                    value="unassigned"
-                    onSelect={() => {
-                      onValueChange("unassigned");
-                      setOpen(false);
-                    }}
-                    className={cn(
-                      "flex items-center py-2 pr-6", // Added pr-6 for scroll indicator space
-                      value === "unassigned" 
-                        ? "bg-gray-50 border-l-2 border-gray-500" 
-                        : "hover:bg-gray-50"
-                    )}
-                  >
-                    <User className={cn(
-                      "mr-3 h-4 w-4 flex-shrink-0",
-                      value === "unassigned" ? "text-gray-600" : "text-gray-400"
-                    )} />
-                    <span className={cn(
-                      "font-medium",
-                      value === "unassigned" ? "text-gray-900" : "text-gray-900"
-                    )}>
-                      Belum Ditugaskan
-                    </span>
-                  </CommandItem>
-                )}
-                {users.map((user) => (
-                  <CommandItem
-                    key={user.id}
-                    value={`${user.firstName || ''} ${user.lastName || ''} ${user.email}`}
-                    onSelect={() => {
-                      onValueChange(user.id);
-                      setOpen(false);
-                    }}
-                    className={cn(
-                      "flex items-center py-2 pr-6", // Added pr-6 for scroll indicator space
-                      value === user.id 
-                        ? "bg-blue-50 border-l-2 border-blue-500" 
-                        : "hover:bg-gray-50"
-                    )}
-                  >
-                    <User className={cn(
-                      "mr-3 h-4 w-4 flex-shrink-0",
-                      value === user.id ? "text-blue-600" : "text-gray-400"
-                    )} />
-                    <div className="flex flex-col min-w-0 flex-1">
+                  {allowAll && (
+                    <CommandItem
+                      value="all"
+                      onSelect={() => {
+                        onValueChange("all");
+                        setOpen(false);
+                      }}
+                      className={cn(
+                        "flex items-center py-2 pr-6 cursor-pointer",
+                        value === "all" 
+                          ? "bg-green-50 border-l-2 border-green-500" 
+                          : "hover:bg-gray-50"
+                      )}
+                    >
+                      <Users className={cn(
+                        "mr-3 h-4 w-4 flex-shrink-0",
+                        value === "all" ? "text-green-600" : "text-gray-400"
+                      )} />
                       <span className={cn(
-                        "font-medium truncate",
-                        value === user.id ? "text-blue-900" : "text-gray-900"
+                        "font-medium",
+                        value === "all" ? "text-green-900" : "text-gray-900"
                       )}>
-                        {`${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email}
+                        Semua User
                       </span>
+                      <Check
+                        className={cn(
+                          "ml-auto h-4 w-4",
+                          value === "all" ? "opacity-100 text-green-600" : "opacity-0"
+                        )}
+                      />
+                    </CommandItem>
+                  )}
+                  {allowUnassigned && (
+                    <CommandItem
+                      value="unassigned"
+                      onSelect={() => {
+                        onValueChange("unassigned");
+                        setOpen(false);
+                      }}
+                      className={cn(
+                        "flex items-center py-2 pr-6 cursor-pointer",
+                        value === "unassigned" 
+                          ? "bg-gray-50 border-l-2 border-gray-500" 
+                          : "hover:bg-gray-50"
+                      )}
+                    >
+                      <User className={cn(
+                        "mr-3 h-4 w-4 flex-shrink-0",
+                        value === "unassigned" ? "text-gray-600" : "text-gray-400"
+                      )} />
                       <span className={cn(
-                        "text-sm truncate",
-                        value === user.id ? "text-blue-600" : "text-gray-500"
+                        "font-medium",
+                        value === "unassigned" ? "text-gray-900" : "text-gray-900"
                       )}>
-                        {user.email}
+                        Belum Ditugaskan
                       </span>
-                    </div>
-                  </CommandItem>
-                ))}
+                      <Check
+                        className={cn(
+                          "ml-auto h-4 w-4",
+                          value === "unassigned" ? "opacity-100 text-gray-600" : "opacity-0"
+                        )}
+                      />
+                    </CommandItem>
+                  )}
+                  {users.map((user) => (
+                    <CommandItem
+                      key={user.id}
+                      value={`${user.firstName || ''} ${user.lastName || ''} ${user.email}`}
+                      onSelect={() => {
+                        onValueChange(user.id);
+                        setOpen(false);
+                      }}
+                      className={cn(
+                        "flex items-center py-2 pr-6 cursor-pointer",
+                        value === user.id 
+                          ? "bg-blue-50 border-l-2 border-blue-500" 
+                          : "hover:bg-gray-50"
+                      )}
+                    >
+                      <User className={cn(
+                        "mr-3 h-4 w-4 flex-shrink-0",
+                        value === user.id ? "text-blue-600" : "text-gray-400"
+                      )} />
+                      <div className="flex flex-col min-w-0 flex-1">
+                        <span className={cn(
+                          "font-medium truncate",
+                          value === user.id ? "text-blue-900" : "text-gray-900"
+                        )}>
+                          {`${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email}
+                        </span>
+                        <span className={cn(
+                          "text-sm truncate",
+                          value === user.id ? "text-blue-600" : "text-gray-500"
+                        )}>
+                          {user.email}
+                        </span>
+                      </div>
+                      <Check
+                        className={cn(
+                          "ml-3 h-4 w-4 flex-shrink-0",
+                          value === user.id ? "opacity-100 text-blue-600" : "opacity-0"
+                        )}
+                      />
+                    </CommandItem>
+                  ))}
                 </CommandGroup>
               </CommandList>
             </div>
@@ -204,14 +228,11 @@ export function SearchableUserSelect({
             />
 
             {/* Scroll hint - bottom */}
-            <div 
-              className={cn(
-                "absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-white to-transparent pointer-events-none z-10 transition-opacity duration-200",
-                scrollState.isAtBottom ? "opacity-0" : "opacity-100"
-              )}
-            >
-              <ChevronDown className="w-4 h-4 text-gray-400 mx-auto animate-bounce" />
-            </div>
+            {scrollState.canScroll && !scrollState.isAtBottom && (
+              <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-white to-transparent pointer-events-none z-10 flex items-center justify-center">
+                <ChevronDown className="w-3 h-3 text-gray-400 animate-pulse" />
+              </div>
+            )}
           </div>
         </Command>
       </PopoverContent>

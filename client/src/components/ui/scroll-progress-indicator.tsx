@@ -19,7 +19,8 @@ export function ScrollProgressIndicator({ containerRef, className }: ScrollProgr
       const { scrollTop, scrollHeight, clientHeight } = container;
       const maxScroll = scrollHeight - clientHeight;
       
-      if (maxScroll <= 0) {
+      // Only show indicator when content is scrollable
+      if (maxScroll <= 5) { // Small threshold to account for rounding
         setIsVisible(false);
         return;
       }
@@ -29,18 +30,29 @@ export function ScrollProgressIndicator({ containerRef, className }: ScrollProgr
       setScrollProgress(progress);
     };
 
-    // Initial check
-    updateProgress();
+    // Initial check with delay to ensure content is rendered
+    const timeoutId = setTimeout(updateProgress, 100);
 
     container.addEventListener("scroll", updateProgress, { passive: true });
     
     // Use ResizeObserver to detect content changes
-    const resizeObserver = new ResizeObserver(updateProgress);
+    const resizeObserver = new ResizeObserver(() => {
+      // Delay update to ensure layout is stable
+      setTimeout(updateProgress, 50);
+    });
     resizeObserver.observe(container);
 
+    // Also observe child elements for content changes
+    const childObserver = new MutationObserver(() => {
+      setTimeout(updateProgress, 50);
+    });
+    childObserver.observe(container, { childList: true, subtree: true });
+
     return () => {
+      clearTimeout(timeoutId);
       container.removeEventListener("scroll", updateProgress);
       resizeObserver.disconnect();
+      childObserver.disconnect();
     };
   }, [containerRef]);
 
