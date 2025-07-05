@@ -355,6 +355,7 @@ export default function CompanyOKRD3Tree({
       .style("cursor", "pointer")
       .on("click", (event, d) => {
         event.stopPropagation();
+        console.log('Toggling expand for node:', d.data.id, 'currently expanded:', expandedNodes.has(d.data.id));
         onToggleExpand(d.data.id);
       });
 

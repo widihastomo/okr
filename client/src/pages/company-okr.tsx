@@ -103,12 +103,18 @@ export default function CompanyOKRPage() {
   const treeData = buildTree(filteredOKRs);
 
   const toggleExpand = (nodeId: string) => {
+    console.log('toggleExpand called with nodeId:', nodeId);
+    console.log('current expandedNodes:', Array.from(expandedNodes));
+    
     const newExpanded = new Set(expandedNodes);
     if (newExpanded.has(nodeId)) {
+      console.log('Collapsing node:', nodeId);
       newExpanded.delete(nodeId);
     } else {
+      console.log('Expanding node:', nodeId);
       newExpanded.add(nodeId);
     }
+    console.log('new expandedNodes:', Array.from(newExpanded));
     setExpandedNodes(newExpanded);
   };
 
