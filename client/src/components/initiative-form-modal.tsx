@@ -35,7 +35,6 @@ const initiativeFormSchema = z.object({
   picId: z.string().optional(),
   startDate: z.date().optional(),
   dueDate: z.date().optional(),
-  status: z.enum(["not_started", "in_progress", "completed", "on_hold", "cancelled"]).default("not_started"),
   priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
   budget: z.string().optional(),
 });
@@ -76,7 +75,6 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
       picId: initiative?.picId || "",
       startDate: initiative?.startDate ? new Date(initiative.startDate) : undefined,
       dueDate: initiative?.dueDate ? new Date(initiative.dueDate) : undefined,
-      status: (initiative?.status as any) || "not_started",
       priority: (initiative?.priority as any) || "medium",
       budget: initiative?.budget?.toString() || "",
     },
@@ -89,21 +87,14 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
         budget: data.budget ? getNumberValueForSubmission(data.budget) : null,
         startDate: data.startDate ? data.startDate.toISOString() : null,
         dueDate: data.dueDate ? data.dueDate.toISOString() : null,
+        status: "not_started", // Auto-set status to not_started for new initiatives
         createdBy: "550e8400-e29b-41d4-a716-446655440001", // Current user ID
       };
 
       if (isEditMode) {
-        return await apiRequest(`/api/initiatives/${initiative.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
+        return await apiRequest("PUT", `/api/initiatives/${initiative.id}`, payload);
       } else {
-        return await apiRequest("/api/initiatives", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
+        return await apiRequest("POST", "/api/initiatives", payload);
       }
     },
     onSuccess: () => {
@@ -314,8 +305,8 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                   )}
                 />
 
-                {/* Grid for dates, status, priority */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Grid for dates */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Start Date */}
                   <FormField
                     control={form.control}
@@ -397,32 +388,6 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                             />
                           </PopoverContent>
                         </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Status */}
-                  <FormField
-                    control={form.control}
-                    name="status"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Status</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pilih status" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="not_started">Belum Dimulai</SelectItem>
-                            <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
-                            <SelectItem value="completed">Selesai</SelectItem>
-                            <SelectItem value="on_hold">Tertunda</SelectItem>
-                            <SelectItem value="cancelled">Dibatalkan</SelectItem>
-                          </SelectContent>
-                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
