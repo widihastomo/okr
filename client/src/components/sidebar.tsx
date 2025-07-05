@@ -12,7 +12,8 @@ import {
   Settings,
   X,
   Trophy,
-  Network
+  Network,
+  Calendar
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -37,6 +38,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       icon: LayoutDashboard,
       path: "/",
       active: location === "/" || location === "/"
+    },
+    {
+      label: "Daily Focus",
+      icon: Calendar,
+      path: "/daily-focus",
+      active: location === "/daily-focus"
     },
     {
       label: "Goals Perusahaan",
