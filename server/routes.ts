@@ -1872,17 +1872,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/initiatives", async (req, res) => {
+  app.post("/api/initiatives", requireAuth, async (req, res) => {
     try {
-      const result = insertInitiativeSchema.safeParse(req.body);
+      const currentUser = req.user as User;
+      console.log("Initiative creation request:", JSON.stringify(req.body, null, 2));
+      console.log("Current user:", currentUser);
+      
+      // Process the initiative data with authentication
+      const initiativeData = {
+        ...req.body,
+        createdBy: currentUser.id,
+        picId: req.body.picId === "none" || !req.body.picId ? null : req.body.picId,
+        budget: req.body.budget ? req.body.budget.toString() : null,
+        startDate: req.body.startDate ? new Date(req.body.startDate) : null,
+        dueDate: req.body.dueDate ? new Date(req.body.dueDate) : null,
+      };
+      
+      const result = insertInitiativeSchema.safeParse(initiativeData);
       if (!result.success) {
+        console.error("Validation errors:", JSON.stringify(result.error.errors, null, 2));
         return res.status(400).json({ message: "Invalid initiative data", errors: result.error.errors });
       }
 
       const initiative = await storage.createInitiative(result.data);
+      
+      // Award points for creating an initiative
+      try {
+        await gamificationService.awardPoints(
+          currentUser.id,
+          "initiative_created",
+          "initiative",
+          initiative.id,
+          25, // 25 points for creating initiative
+          { title: initiative.title, keyResultId: initiative.keyResultId }
+        );
+      } catch (gamificationError) {
+        console.error("Error awarding points for initiative creation:", gamificationError);
+      }
+      
       res.status(201).json(initiative);
     } catch (error) {
       console.error("Error creating initiative:", error);
+      if (error instanceof z.ZodError) {
+        console.error("Validation errors:", JSON.stringify(error.errors, null, 2));
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
       res.status(500).json({ message: "Failed to create initiative" });
     }
   });
