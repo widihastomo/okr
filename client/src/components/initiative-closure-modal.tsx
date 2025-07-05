@@ -216,33 +216,51 @@ export default function InitiativeClosureModal({
             {successMetrics.length > 0 && (
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Capaian Akhir Metrik Keberhasilan</h3>
-                {successMetrics.map((metric: any, index: number) => (
-                  <Card key={metric.id} className="p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div>
-                        <h4 className="font-medium">{metric.name}</h4>
-                        <p className="text-sm text-gray-600">Target: {metric.target}</p>
-                        <p className="text-sm text-gray-600">Capaian sebelumnya: {metric.achievement}</p>
-                      </div>
-                    </div>
-                    <FormField
-                      control={form.control}
-                      name={`finalMetrics.${index}.finalAchievement`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Capaian Akhir</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Masukkan capaian akhir"
-                              {...field}
+                <div className="border rounded-lg overflow-hidden">
+                  <table className="w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Metrik</th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Target</th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Capaian Sebelumnya</th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Capaian Akhir</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {successMetrics.map((metric: any, index: number) => (
+                        <tr key={metric.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-3">
+                            <div className="font-medium text-gray-900">{metric.name}</div>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-600">
+                            {metric.target}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-600">
+                            {metric.achievement || "-"}
+                          </td>
+                          <td className="px-4 py-3">
+                            <FormField
+                              control={form.control}
+                              name={`finalMetrics.${index}.finalAchievement`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input
+                                      placeholder="Masukkan capaian akhir"
+                                      className="w-full"
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
                             />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </Card>
-                ))}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
 
