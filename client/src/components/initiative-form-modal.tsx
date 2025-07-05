@@ -260,12 +260,12 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Target className="w-5 h-5" />
-            {isEditMode ? "Edit Rencana" : "Buat Rencana Baru"}
+            {isEditMode ? "Edit Inisiatif" : "Buat Inisiatif Baru"}
           </DialogTitle>
           <DialogDescription>
             {isEditMode 
-              ? "Update informasi rencana inisiatif ini." 
-              : "Buat rencana inisiatif baru untuk mendukung pencapaian angka target Anda."
+              ? "Update informasi inisiatif ini." 
+              : "Buat inisiatif baru untuk mendukung pencapaian angka target Anda."
             }
           </DialogDescription>
         </DialogHeader>
@@ -281,7 +281,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-2">
-                        Judul Rencana*
+                        Judul Inisiatif*
                         <Popover>
                           <PopoverTrigger asChild>
                             <button 
@@ -293,7 +293,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                           </PopoverTrigger>
                           <PopoverContent side="right" className="max-w-xs">
                             <p className="text-sm">
-                              Nama rencana yang akan dijalankan untuk mencapai angka target.
+                              Nama inisiatif yang akan dijalankan untuk mencapai angka target.
                               <br /><br />
                               <strong>Contoh:</strong> "Kampanye Digital Marketing", "Pelatihan Tim Sales", "Optimisasi Website"
                             </p>
@@ -315,7 +315,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-2">
-                        Deskripsi Rencana
+                        Deskripsi Inisiatif
                         <Popover>
                           <PopoverTrigger asChild>
                             <button 
@@ -327,14 +327,14 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                           </PopoverTrigger>
                           <PopoverContent side="right" className="max-w-xs">
                             <p className="text-sm">
-                              Penjelasan detail tentang rencana yang akan dilakukan, termasuk langkah-langkah dan strategi.
+                              Penjelasan detail tentang inisiatif yang akan dilakukan, termasuk langkah-langkah dan strategi.
                             </p>
                           </PopoverContent>
                         </Popover>
                       </FormLabel>
                       <FormControl>
                         <Textarea 
-                          placeholder="Jelaskan rencana yang akan dilakukan..." 
+                          placeholder="Jelaskan inisiatif yang akan dilakukan..." 
                           {...field} 
                         />
                       </FormControl>
@@ -362,7 +362,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                           </PopoverTrigger>
                           <PopoverContent side="right" className="max-w-xs">
                             <p className="text-sm">
-                              Pilih angka target yang akan didukung oleh rencana ini.
+                              Pilih angka target yang akan didukung oleh inisiatif ini.
                             </p>
                           </PopoverContent>
                         </Popover>
@@ -680,7 +680,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                             </PopoverTrigger>
                             <PopoverContent side="right" className="max-w-xs">
                               <p className="text-sm">
-                                Seberapa yakin Anda bahwa rencana ini akan berhasil mencapai tujuannya.
+                                Seberapa yakin Anda bahwa inisiatif ini akan berhasil mencapai tujuannya.
                                 <br /><br />
                                 <strong>1:</strong> Keyakinan sangat rendah
                                 <br />
@@ -743,8 +743,8 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                 {createInitiativeMutation.isPending 
                   ? "Menyimpan..." 
                   : isEditMode 
-                    ? "Update Rencana" 
-                    : "Buat Rencana"
+                    ? "Update Inisiatif" 
+                    : "Buat Inisiatif"
                 }
               </Button>
             </div>
