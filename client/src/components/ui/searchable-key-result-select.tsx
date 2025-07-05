@@ -38,39 +38,62 @@ export function SearchableKeyResultSelect({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0">
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={4}>
         <Command>
-          <CommandInput placeholder="Cari angka target..." className="h-9" />
-          <CommandList>
-            <CommandEmpty>Tidak ada angka target ditemukan</CommandEmpty>
-            <CommandGroup>
-              {keyResults.map((keyResult) => (
-                <CommandItem
-                  key={keyResult.id}
-                  value={keyResult.title}
-                  onSelect={() => {
-                    onValueChange(keyResult.id);
-                    setOpen(false);
-                  }}
-                >
-                  <div className="flex flex-col">
-                    <span className="font-medium">{keyResult.title}</span>
-                    {keyResult.description && (
-                      <span className="text-sm text-gray-500 truncate">
-                        {keyResult.description}
-                      </span>
-                    )}
-                  </div>
-                  <Check
+          <CommandInput placeholder="Cari angka target..." />
+          <div 
+            className="max-h-[250px] overflow-y-auto overscroll-contain"
+            style={{ 
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'thin',
+              scrollbarColor: '#CBD5E0 #F7FAFC'
+            }}
+          >
+            <CommandList>
+              <CommandEmpty>Tidak ada angka target ditemukan</CommandEmpty>
+              <CommandGroup>
+                {keyResults.map((keyResult) => (
+                  <CommandItem
+                    key={keyResult.id}
+                    value={keyResult.title}
+                    onSelect={() => {
+                      onValueChange(keyResult.id);
+                      setOpen(false);
+                    }}
                     className={cn(
-                      "ml-auto h-4 w-4",
-                      value === keyResult.id ? "opacity-100" : "opacity-0"
+                      "flex items-center py-2",
+                      value === keyResult.id 
+                        ? "bg-blue-50 border-l-2 border-blue-500" 
+                        : "hover:bg-gray-50"
                     )}
-                  />
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
+                  >
+                    <div className="flex flex-col min-w-0 flex-1">
+                      <span className={cn(
+                        "font-medium truncate",
+                        value === keyResult.id ? "text-blue-900" : "text-gray-900"
+                      )}>
+                        {keyResult.title}
+                      </span>
+                      {keyResult.description && (
+                        <span className={cn(
+                          "text-sm truncate",
+                          value === keyResult.id ? "text-blue-600" : "text-gray-500"
+                        )}>
+                          {keyResult.description}
+                        </span>
+                      )}
+                    </div>
+                    <Check
+                      className={cn(
+                        "ml-3 h-4 w-4 flex-shrink-0",
+                        value === keyResult.id ? "opacity-100 text-blue-600" : "opacity-0"
+                      )}
+                    />
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </div>
         </Command>
       </PopoverContent>
     </Popover>
