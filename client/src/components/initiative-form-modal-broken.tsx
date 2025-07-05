@@ -27,8 +27,8 @@ import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 import { formatNumberWithSeparator, handleNumberInputChange, getNumberValueForSubmission } from "@/lib/number-utils";
 import type { KeyResult, User, Initiative } from "@shared/schema";
 
-// Form schema matching the actual Initiative database schema
-const initiativeFormSchema = z.object({
+// Form schema for initiative (matching database schema)
+const initiativeSchema = z.object({
   title: z.string().min(1, "Judul rencana wajib diisi"),
   description: z.string().optional(),
   keyResultId: z.string().min(1, "Angka target wajib dipilih"),
@@ -40,7 +40,7 @@ const initiativeFormSchema = z.object({
   budget: z.string().optional(),
 });
 
-type InitiativeFormData = z.infer<typeof initiativeFormSchema>;
+type InitiativeFormData = z.infer<typeof initiativeSchema>;
 
 interface InitiativeFormModalProps {
   isOpen: boolean;
@@ -68,7 +68,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
   });
 
   const form = useForm<InitiativeFormData>({
-    resolver: zodResolver(initiativeFormSchema),
+    resolver: zodResolver(initiativeSchema),
     defaultValues: {
       title: initiative?.title || "",
       description: initiative?.description || "",
@@ -86,22 +86,20 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
     mutationFn: async (data: InitiativeFormData) => {
       const payload = {
         ...data,
-        budget: data.budget ? getNumberValueForSubmission(data.budget) : null,
-        startDate: data.startDate ? data.startDate.toISOString() : null,
-        dueDate: data.dueDate ? data.dueDate.toISOString() : null,
-        createdBy: "550e8400-e29b-41d4-a716-446655440001", // Current user ID
+        targetContribution: getNumberValueForSubmission(data.targetContribution),
+        budget: data.budget ? getNumberValueForSubmission(data.budget) : undefined,
+        startDate: data.startDate ? data.startDate.toISOString() : undefined,
+        dueDate: data.dueDate ? data.dueDate.toISOString() : undefined,
       };
 
       if (isEditMode) {
-        return await apiRequest(`/api/initiatives/${initiative.id}`, {
+        return apiRequest(`/api/initiatives/${initiative.id}`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
       } else {
-        return await apiRequest("/api/initiatives", {
+        return apiRequest("/api/initiatives", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
       }
@@ -277,6 +275,45 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                   )}
                 />
 
+                {/* Target Contribution */}
+                <FormField
+                  control={form.control}
+                  name="targetContribution"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        Target Kontribusi*
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button 
+                              type="button" 
+                              className="inline-flex items-center justify-center"
+                            >
+                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent side="right" className="max-w-xs">
+                            <p className="text-sm">
+                              Berapa besar kontribusi yang diharapkan dari rencana ini terhadap pencapaian angka target.
+                            </p>
+                          </PopoverContent>
+                        </Popover>
+                      </FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number"
+                          step="0.1"
+                          placeholder="Contoh: 25" 
+                          {...field} 
+                          value={formatNumberWithSeparator(field.value)}
+                          onChange={(e) => handleNumberInputChange(e, field.onChange)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 {/* PIC Selection */}
                 <FormField
                   control={form.control}
@@ -284,7 +321,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-2">
-                        Penanggung Jawab
+                        Penanggung Jawab*
                         <Popover>
                           <PopoverTrigger asChild>
                             <button 
@@ -304,8 +341,8 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                       <FormControl>
                         <SearchableUserSelect
                           users={users}
-                          value={field.value || ""}
-                          onValueChange={field.onChange}
+                          value={field.value}
+                          onChange={field.onChange}
                           placeholder="Pilih penanggung jawab"
                         />
                       </FormControl>
@@ -419,8 +456,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                             <SelectItem value="not_started">Belum Dimulai</SelectItem>
                             <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
                             <SelectItem value="completed">Selesai</SelectItem>
-                            <SelectItem value="on_hold">Tertunda</SelectItem>
-                            <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                            <SelectItem value="paused">Tertunda</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -447,7 +483,6 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                             <SelectItem value="low">Rendah</SelectItem>
                             <SelectItem value="medium">Sedang</SelectItem>
                             <SelectItem value="high">Tinggi</SelectItem>
-                            <SelectItem value="critical">Kritis</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -463,10 +498,12 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                         <FormLabel>Anggaran</FormLabel>
                         <FormControl>
                           <Input 
-                            type="text"
-                            placeholder="Contoh: 5.000.000" 
+                            type="number"
+                            step="0.01"
+                            placeholder="Contoh: 5000000" 
+                            {...field} 
                             value={formatNumberWithSeparator(field.value || "")}
-                            onChange={(e) => handleNumberInputChange(e.target.value, field.onChange)}
+                            onChange={(e) => handleNumberInputChange(e, field.onChange)}
                           />
                         </FormControl>
                         <FormMessage />

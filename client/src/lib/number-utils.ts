@@ -8,9 +8,17 @@
  */
 export function formatNumberWithSeparator(value: string | number): string {
   if (!value && value !== 0) return "";
+  if (value === null || value === undefined) return "";
   
-  // Convert to string
-  let numStr = value.toString();
+  // Convert to string safely
+  let numStr = "";
+  if (typeof value === "string") {
+    numStr = value;
+  } else if (typeof value === "number") {
+    numStr = value.toString();
+  } else {
+    return "";
+  }
   
   // Handle decimal numbers (split by comma first)
   const parts = numStr.split(",");
