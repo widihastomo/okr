@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -165,19 +165,53 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
   const form = useForm<InitiativeFormData>({
     resolver: zodResolver(initiativeFormSchema),
     defaultValues: {
-      title: initiative?.title || "",
-      description: initiative?.description || "",
-      keyResultId: keyResultId || initiative?.keyResultId || "",
-      picId: initiative?.picId || "",
-      startDate: initiative?.startDate ? new Date(initiative.startDate) : undefined,
-      dueDate: initiative?.dueDate ? new Date(initiative.dueDate) : undefined,
-      priority: (initiative?.priority as any) || "medium",
-      budget: initiative?.budget?.toString() || "",
-      impactScore: (initiative as any)?.impactScore || 5,
-      effortScore: (initiative as any)?.effortScore || 5,
-      confidenceScore: (initiative as any)?.confidenceScore || 5,
+      title: "",
+      description: "",
+      keyResultId: keyResultId || "",
+      picId: "",
+      startDate: undefined,
+      dueDate: undefined,
+      priority: "medium",
+      budget: "",
+      impactScore: 5,
+      effortScore: 5,
+      confidenceScore: 5,
     },
   });
+
+  // Reset form with initiative data when editing
+  useEffect(() => {
+    if (isEditMode && initiative) {
+      form.reset({
+        title: initiative.title || "",
+        description: initiative.description || "",
+        keyResultId: initiative.keyResultId || keyResultId || "",
+        picId: initiative.picId || "",
+        startDate: initiative.startDate ? new Date(initiative.startDate) : undefined,
+        dueDate: initiative.dueDate ? new Date(initiative.dueDate) : undefined,
+        priority: (initiative.priority as any) || "medium",
+        budget: initiative.budget?.toString() || "",
+        impactScore: (initiative as any)?.impactScore || 5,
+        effortScore: (initiative as any)?.effortScore || 5,
+        confidenceScore: (initiative as any)?.confidenceScore || 5,
+      });
+    } else if (!isEditMode) {
+      // Reset form for new initiative
+      form.reset({
+        title: "",
+        description: "",
+        keyResultId: keyResultId || "",
+        picId: "",
+        startDate: undefined,
+        dueDate: undefined,
+        priority: "medium",
+        budget: "",
+        impactScore: 5,
+        effortScore: 5,
+        confidenceScore: 5,
+      });
+    }
+  }, [isEditMode, initiative, keyResultId, form]);
 
   const createInitiativeMutation = useMutation({
     mutationFn: async (data: InitiativeFormData) => {

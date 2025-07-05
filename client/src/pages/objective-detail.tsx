@@ -2265,7 +2265,7 @@ export default function GoalDetail() {
         }}
         keyResultId={goal?.keyResults?.[0]?.id || ""}
         objectiveId={id}
-        initiative={editingInitiative}
+        initiative={editingInitiative ?? undefined}
       />
 
       {/* AI Help Bubble */}
