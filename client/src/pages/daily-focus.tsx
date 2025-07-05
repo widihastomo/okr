@@ -28,6 +28,7 @@ import SuccessMetricsModalSimple from "@/components/success-metrics-modal-simple
 import HabitAlignmentWizard from "@/components/habit-alignment-wizard";
 import { UserStatsCard } from "@/components/gamification/user-stats-card";
 import { DailyAchievements } from "@/components/daily-achievements";
+import { DailyInstantUpdate } from "@/components/daily-instant-update";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function DailyFocusPage() {
@@ -268,6 +269,7 @@ export default function DailyFocusPage() {
           <p className="text-gray-600">Kelola aktivitas harian Anda hari ini</p>
         </div>
         <div className="flex items-center gap-4">
+          <DailyInstantUpdate />
           <HabitAlignmentWizard />
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <Calendar className="h-4 w-4" />

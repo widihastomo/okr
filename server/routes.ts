@@ -5,8 +5,8 @@ import {
   insertCycleSchema, insertTemplateSchema, insertObjectiveSchema, insertKeyResultSchema, 
   insertCheckInSchema, insertInitiativeSchema, insertInitiativeMemberSchema, insertInitiativeDocumentSchema, 
   insertTaskSchema, insertInitiativeNoteSchema, updateKeyResultProgressSchema, createOKRFromTemplateSchema,
-  insertSuccessMetricSchema, insertSuccessMetricUpdateSchema,
-  subscriptionPlans, organizations, organizationSubscriptions, users,
+  insertSuccessMetricSchema, insertSuccessMetricUpdateSchema, insertDailyReflectionSchema,
+  subscriptionPlans, organizations, organizationSubscriptions, users, dailyReflections,
   type User, type SubscriptionPlan, type Organization, type OrganizationSubscription
 } from "@shared/schema";
 import { z } from "zod";
@@ -24,6 +24,8 @@ import {
   generateFallbackHabitSuggestions,
   type HabitAlignmentRequest 
 } from "./habit-alignment";
+import { db } from "./db";
+import { eq, and, desc, inArray } from "drizzle-orm";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
@@ -3102,6 +3104,100 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Register AI routes
   registerAIRoutes(app);
+
+  // Daily Reflections API routes
+  app.post("/api/daily-reflections", requireAuth, async (req, res) => {
+    try {
+      const { date, whatWorkedWell, challenges, tomorrowPriorities } = req.body;
+      const userId = (req.user as any)?.id;
+      const organizationId = (req.user as any)?.organizationId;
+
+      if (!userId || !organizationId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      // Check if reflection already exists for this date
+      const existingReflection = await db
+        .select()
+        .from(dailyReflections)
+        .where(
+          and(
+            eq(dailyReflections.userId, userId),
+            eq(dailyReflections.date, date)
+          )
+        );
+
+      if (existingReflection.length > 0) {
+        // Update existing reflection
+        const updatedReflection = await db
+          .update(dailyReflections)
+          .set({
+            whatWorkedWell,
+            challenges,
+            tomorrowPriorities,
+            updatedAt: new Date()
+          })
+          .where(eq(dailyReflections.id, existingReflection[0].id))
+          .returning();
+
+        res.json(updatedReflection[0]);
+      } else {
+        // Create new reflection
+        const newReflection = await db
+          .insert(dailyReflections)
+          .values({
+            userId,
+            organizationId,
+            date,
+            whatWorkedWell,
+            challenges,
+            tomorrowPriorities
+          })
+          .returning();
+
+        res.json(newReflection[0]);
+      }
+    } catch (error) {
+      console.error("Error saving daily reflection:", error);
+      res.status(500).json({ error: "Failed to save daily reflection" });
+    }
+  });
+
+  app.get("/api/daily-reflections", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any)?.id;
+      const { date, limit = 10 } = req.query;
+
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      if (date) {
+        const reflections = await db
+          .select()
+          .from(dailyReflections)
+          .where(
+            and(
+              eq(dailyReflections.userId, userId),
+              eq(dailyReflections.date, date as string)
+            )
+          );
+        return res.json(reflections);
+      }
+
+      const reflections = await db
+        .select()
+        .from(dailyReflections)
+        .where(eq(dailyReflections.userId, userId))
+        .orderBy(desc(dailyReflections.date))
+        .limit(parseInt(limit as string));
+
+      res.json(reflections);
+    } catch (error) {
+      console.error("Error fetching daily reflections:", error);
+      res.status(500).json({ error: "Failed to fetch daily reflections" });
+    }
+  });
 
   // Habit Alignment API routes
   app.post("/api/habits/generate", requireAuth, async (req, res) => {

@@ -448,6 +448,26 @@ export const insertOrganizationSubscriptionSchema = createInsertSchema(organizat
   updatedAt: true,
 });
 
+// Daily Reflections table
+export const dailyReflections = pgTable("daily_reflections", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
+  date: text("date").notNull(), // YYYY-MM-DD format
+  whatWorkedWell: text("what_worked_well"),
+  challenges: text("challenges"),
+  tomorrowPriorities: text("tomorrow_priorities"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Daily Reflections Insert Schema
+export const insertDailyReflectionSchema = createInsertSchema(dailyReflections).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type InsertCycle = z.infer<typeof insertCycleSchema>;
 export type InsertTemplate = z.infer<typeof insertTemplateSchema>;
 export type InsertObjective = z.infer<typeof insertObjectiveSchema>;
