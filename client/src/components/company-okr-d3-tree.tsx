@@ -348,10 +348,10 @@ export default function CompanyOKRD3Tree({
       .attr("fill", "white")
       .text(d => `${Math.round(d.data.data.overallProgress)}%`);
 
-    // Add expand/collapse button if has children - positioned at middle right edge
+    // Add expand/collapse button if has children - positioned outside the card on the right
     const expandButton = node.filter(d => d.data.children.length > 0)
       .append("g")
-      .attr("transform", `translate(${nodeWidth - 16}, ${nodeHeight / 2 - 10})`)
+      .attr("transform", `translate(${nodeWidth + 8}, ${nodeHeight / 2 - 10})`)
       .style("cursor", "pointer")
       .on("click", (event, d) => {
         event.stopPropagation();
@@ -416,7 +416,7 @@ export default function CompanyOKRD3Tree({
       d3.select(this)
         .transition()
         .duration(200)
-        .attr("transform", d => `translate(${nodeWidth - 16}, ${nodeHeight / 2 - 10}) scale(1.1)`);
+        .attr("transform", d => `translate(${nodeWidth + 8}, ${nodeHeight / 2 - 10}) scale(1.1)`);
     }).on("mouseleave", function(event, d) {
       d3.select(this).selectAll("circle:nth-child(2)")
         .transition()
@@ -427,7 +427,7 @@ export default function CompanyOKRD3Tree({
       d3.select(this)
         .transition()
         .duration(200)
-        .attr("transform", d => `translate(${nodeWidth - 16}, ${nodeHeight / 2 - 10}) scale(1)`);
+        .attr("transform", d => `translate(${nodeWidth + 8}, ${nodeHeight / 2 - 10}) scale(1)`);
     });
 
     // Add subtle pulse animation for collapsed nodes
@@ -437,7 +437,7 @@ export default function CompanyOKRD3Tree({
 
     // Add tooltip-like label for floating button
     expandButton.append("rect")
-      .attr("x", -58)
+      .attr("x", -66)
       .attr("y", 4)
       .attr("width", 76)
       .attr("height", 16)
@@ -447,7 +447,7 @@ export default function CompanyOKRD3Tree({
       .style("pointer-events", "none");
 
     expandButton.append("text")
-      .attr("x", -20)
+      .attr("x", -28)
       .attr("y", 14)
       .attr("text-anchor", "middle")
       .attr("font-size", "10px")
