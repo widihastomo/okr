@@ -29,6 +29,7 @@ export default function OrganizationSettings() {
   const { organization, subscription, isOwner, isLoading } = useOrganization();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
   const [isSaving, setIsSaving] = useState(false);
   
   // User management states
@@ -39,9 +40,38 @@ export default function OrganizationSettings() {
   const [editingPassword, setEditingPassword] = useState<User | null>(null);
   const [showNewPassword, setShowNewPassword] = useState(false);
 
+  // Team management states
+  const [editingTeam, setEditingTeam] = useState<Team | null>(null);
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+  const [teamSearchTerm, setTeamSearchTerm] = useState("");
+
   // Fetch users for organization
   const { data: users = [], isLoading: usersLoading } = useQuery<User[]>({
     queryKey: ["/api/users"],
+  });
+
+  // Fetch teams for organization
+  const { data: teams = [], isLoading: teamsLoading } = useQuery<Team[]>({
+    queryKey: ["/api/teams"],
+  });
+
+  // Fetch team members for selected team (for modal)
+  const { data: teamMembers = [], isLoading: teamMembersLoading } = useQuery<Array<TeamMember & { user: User }>>({
+    queryKey: ["/api/teams", selectedTeam?.id, "members"],
+    enabled: !!selectedTeam,
+  });
+
+  // Fetch all team members for all teams (for card display)
+  const { data: allTeamMembers = [] } = useQuery<Array<TeamMember & { user: User }>>({
+    queryKey: ["/api/team-members"],
+    queryFn: async () => {
+      const memberPromises = teams.map(team => 
+        fetch(`/api/teams/${team.id}/members`).then(res => res.json())
+      );
+      const results = await Promise.all(memberPromises);
+      return results.flat();
+    },
+    enabled: teams.length > 0,
   });
 
   // Filtered users based on search and role filter
@@ -186,6 +216,97 @@ export default function OrganizationSettings() {
     }
   };
 
+  // Team mutations
+  const createTeamMutation = useMutation({
+    mutationFn: async (data: { name: string; description: string; ownerId: string; memberIds: string[] }) => {
+      const response = await fetch("/api/teams", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error('Failed to create team');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/teams"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/team-members"] });
+      toast({
+        title: "Berhasil",
+        description: "Tim berhasil dibuat",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateTeamMutation = useMutation({
+    mutationFn: async (data: { id: string; name: string; description: string; ownerId: string; memberIds: string[] }) => {
+      const response = await fetch(`/api/teams/${data.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error('Failed to update team');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/teams"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/team-members"] });
+      setEditingTeam(null);
+      toast({
+        title: "Berhasil",
+        description: "Tim berhasil diperbarui",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteTeamMutation = useMutation({
+    mutationFn: async (teamId: string) => {
+      const response = await fetch(`/api/teams/${teamId}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) throw new Error('Failed to delete team');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/teams"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/team-members"] });
+      toast({
+        title: "Berhasil",
+        description: "Tim berhasil dihapus",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Filtered teams
+  const filteredTeams = teams.filter(team => {
+    return teamSearchTerm === "" || 
+      team.name.toLowerCase().includes(teamSearchTerm.toLowerCase()) ||
+      team.description?.toLowerCase().includes(teamSearchTerm.toLowerCase());
+  });
+
   // Loading state
   if (isLoading) {
     return (
@@ -198,8 +319,6 @@ export default function OrganizationSettings() {
     );
   }
 
-  const [, setLocation] = useLocation();
-  
   // Access control - only owner can access this page
   if (!isOwner) {
     setLocation("/dashboard");
@@ -215,7 +334,7 @@ export default function OrganizationSettings() {
       </div>
 
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 max-w-2xl">
+        <TabsList className="grid w-full grid-cols-5 max-w-3xl">
           <TabsTrigger value="general">
             <Building2 className="h-4 w-4 mr-2" />
             Umum
@@ -227,6 +346,10 @@ export default function OrganizationSettings() {
           <TabsTrigger value="members">
             <Users className="h-4 w-4 mr-2" />
             Anggota
+          </TabsTrigger>
+          <TabsTrigger value="teams">
+            <Users className="h-4 w-4 mr-2" />
+            Tim
           </TabsTrigger>
           <TabsTrigger value="settings">
             <Settings className="h-4 w-4 mr-2" />
@@ -712,6 +835,334 @@ export default function OrganizationSettings() {
                         >
                           {changePasswordMutation.isPending ? "Mengubah..." : "Ubah Password"}
                         </Button>
+                      </div>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Teams Tab */}
+        <TabsContent value="teams">
+          <Card>
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle>Manajemen Tim</CardTitle>
+                  <CardDescription>
+                    Kelola tim dalam organisasi Anda
+                  </CardDescription>
+                </div>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Tambah Tim
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Buat Tim Baru</DialogTitle>
+                      <DialogDescription>
+                        Buat tim baru dan tentukan anggotanya
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={(e) => {
+                      e.preventDefault();
+                      const formData = new FormData(e.currentTarget);
+                      const memberIds = Array.from(formData.getAll('members')) as string[];
+                      createTeamMutation.mutate({
+                        name: formData.get('name') as string,
+                        description: formData.get('description') as string,
+                        ownerId: formData.get('ownerId') as string,
+                        memberIds,
+                      });
+                    }}>
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="name">Nama Tim</Label>
+                          <Input name="name" placeholder="Nama tim" required />
+                        </div>
+                        <div>
+                          <Label htmlFor="description">Deskripsi</Label>
+                          <Input name="description" placeholder="Deskripsi tim" />
+                        </div>
+                        <div>
+                          <Label htmlFor="ownerId">Pimpinan Tim</Label>
+                          <Select name="ownerId" required>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih pimpinan tim" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {users.map((user) => (
+                                <SelectItem key={user.id} value={user.id}>
+                                  {user.firstName} {user.lastName}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label>Anggota Tim</Label>
+                          <div className="space-y-2 max-h-40 overflow-y-auto">
+                            {users.map((user) => (
+                              <div key={user.id} className="flex items-center space-x-2">
+                                <input
+                                  type="checkbox"
+                                  id={`member-${user.id}`}
+                                  name="members"
+                                  value={user.id}
+                                  className="rounded border-gray-300"
+                                />
+                                <label htmlFor={`member-${user.id}`} className="text-sm">
+                                  {user.firstName} {user.lastName}
+                                </label>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="flex justify-end space-x-2">
+                          <DialogTrigger asChild>
+                            <Button type="button" variant="outline">Batal</Button>
+                          </DialogTrigger>
+                          <Button type="submit" disabled={createTeamMutation.isPending}>
+                            {createTeamMutation.isPending ? "Membuat..." : "Buat Tim"}
+                          </Button>
+                        </div>
+                      </div>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Search */}
+              <div className="flex items-center space-x-2">
+                <Input
+                  placeholder="Cari tim..."
+                  value={teamSearchTerm}
+                  onChange={(e) => setTeamSearchTerm(e.target.value)}
+                  className="max-w-sm"
+                />
+              </div>
+
+              {/* Teams Grid */}
+              {teamsLoading ? (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="animate-pulse">
+                      <div className="h-32 bg-gray-200 rounded-lg"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : filteredTeams.length === 0 ? (
+                <div className="text-center py-8">
+                  <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Belum ada tim</h3>
+                  <p className="text-gray-500">Buat tim pertama untuk memulai kolaborasi</p>
+                </div>
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {filteredTeams.map((team) => {
+                    const teamMembersForTeam = allTeamMembers.filter(tm => tm.teamId === team.id);
+                    const owner = users.find(u => u.id === team.ownerId);
+                    
+                    return (
+                      <Card key={team.id}>
+                        <CardHeader className="pb-3">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <CardTitle className="text-lg">{team.name}</CardTitle>
+                              <CardDescription>{team.description}</CardDescription>
+                            </div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  onClick={() => setEditingTeam(team)}
+                                >
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Edit Tim
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <DropdownMenuItem 
+                                      className="text-red-600 focus:text-red-600"
+                                      onSelect={(e) => e.preventDefault()}
+                                    >
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                      Hapus Tim
+                                    </DropdownMenuItem>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Hapus Tim</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Apakah Anda yakin ingin menghapus tim "{team.name}"? 
+                                        Tindakan ini tidak dapat dibatalkan.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Batal</AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() => deleteTeamMutation.mutate(team.id)}
+                                        className="bg-red-600 hover:bg-red-700"
+                                      >
+                                        Hapus
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-3">
+                            {/* Owner */}
+                            <div className="flex items-center space-x-2">
+                              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                                Pimpinan
+                              </Badge>
+                              <div className="flex items-center space-x-2">
+                                <Avatar className="h-6 w-6">
+                                  <AvatarFallback className="text-xs">
+                                    {owner ? `${owner.firstName?.[0]}${owner.lastName?.[0]}` : '?'}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <span className="text-sm font-medium">
+                                  {owner ? `${owner.firstName} ${owner.lastName}` : 'Unknown'}
+                                </span>
+                              </div>
+                            </div>
+                            
+                            {/* Members */}
+                            <div>
+                              <p className="text-sm text-gray-600 mb-2">
+                                Anggota ({teamMembersForTeam.length})
+                              </p>
+                              <div className="flex flex-wrap gap-1">
+                                {teamMembersForTeam.slice(0, 3).map((member) => (
+                                  <Avatar key={member.id} className="h-6 w-6">
+                                    <AvatarFallback className="text-xs">
+                                      {`${member.user.firstName?.[0]}${member.user.lastName?.[0]}`}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                ))}
+                                {teamMembersForTeam.length > 3 && (
+                                  <div className="h-6 w-6 rounded-full bg-gray-200 flex items-center justify-center">
+                                    <span className="text-xs text-gray-600">
+                                      +{teamMembersForTeam.length - 3}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Edit Team Dialog */}
+              {editingTeam && (
+                <Dialog open={!!editingTeam} onOpenChange={() => setEditingTeam(null)}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Edit Tim</DialogTitle>
+                      <DialogDescription>
+                        Perbarui informasi tim {editingTeam.name}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={(e) => {
+                      e.preventDefault();
+                      const formData = new FormData(e.currentTarget);
+                      const memberIds = Array.from(formData.getAll('members')) as string[];
+                      updateTeamMutation.mutate({
+                        id: editingTeam.id,
+                        name: formData.get('name') as string,
+                        description: formData.get('description') as string,
+                        ownerId: formData.get('ownerId') as string,
+                        memberIds,
+                      });
+                    }}>
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="name">Nama Tim</Label>
+                          <Input 
+                            name="name" 
+                            defaultValue={editingTeam.name} 
+                            placeholder="Nama tim" 
+                            required 
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="description">Deskripsi</Label>
+                          <Input 
+                            name="description" 
+                            defaultValue={editingTeam.description || ''} 
+                            placeholder="Deskripsi tim" 
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="ownerId">Pimpinan Tim</Label>
+                          <Select name="ownerId" defaultValue={editingTeam.ownerId} required>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih pimpinan tim" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {users.map((user) => (
+                                <SelectItem key={user.id} value={user.id}>
+                                  {user.firstName} {user.lastName}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label>Anggota Tim</Label>
+                          <div className="space-y-2 max-h-40 overflow-y-auto">
+                            {users.map((user) => {
+                              const isCurrentMember = teamMembers.some(tm => tm.userId === user.id);
+                              return (
+                                <div key={user.id} className="flex items-center space-x-2">
+                                  <input
+                                    type="checkbox"
+                                    id={`edit-member-${user.id}`}
+                                    name="members"
+                                    value={user.id}
+                                    defaultChecked={isCurrentMember}
+                                    className="rounded border-gray-300"
+                                  />
+                                  <label htmlFor={`edit-member-${user.id}`} className="text-sm">
+                                    {user.firstName} {user.lastName}
+                                  </label>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                        <div className="flex justify-end space-x-2">
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            onClick={() => setEditingTeam(null)}
+                          >
+                            Batal
+                          </Button>
+                          <Button type="submit" disabled={updateTeamMutation.isPending}>
+                            {updateTeamMutation.isPending ? "Memperbarui..." : "Perbarui Tim"}
+                          </Button>
+                        </div>
                       </div>
                     </form>
                   </DialogContent>
