@@ -43,6 +43,9 @@ import {
 import TaskModal from "@/components/task-modal";
 import InitiativeModal from "@/components/initiative-modal";
 import { InitiativeNotes } from "@/components/initiative-notes";
+import { InitiativeMetricsDashboard } from "@/components/initiative-metrics-dashboard";
+import { MetricUpdateModal } from "@/components/metric-update-modal";
+import type { SuccessMetricWithUpdates } from "@shared/schema";
 
 export default function InitiativeDetailPage() {
   const { id } = useParams();
@@ -56,6 +59,10 @@ export default function InitiativeDetailPage() {
   
   // State for initiative editing
   const [isEditInitiativeModalOpen, setIsEditInitiativeModalOpen] = useState(false);
+  
+  // State for metrics management
+  const [isMetricUpdateModalOpen, setIsMetricUpdateModalOpen] = useState(false);
+  const [selectedMetric, setSelectedMetric] = useState<SuccessMetricWithUpdates | null>(null);
 
   // Fetch initiative details with all related data (PIC, members, key result)
   const { data: initiative, isLoading: initiativeLoading } = useQuery({
@@ -80,6 +87,49 @@ export default function InitiativeDetailPage() {
         init.keyResultId === keyResult?.id && init.id !== id
       ) || [];
     },
+  });
+
+  // Helper function to calculate metric progress
+  const calculateMetricProgress = (metric: any): number => {
+    const current = Number(metric.currentValue) || 0;
+    const target = Number(metric.targetValue) || 0;
+    const base = Number(metric.baseValue) || 0;
+
+    if (metric.type === "achieve_or_not") {
+      return current >= target ? 100 : 0;
+    }
+
+    if (metric.type === "increase_to" && target > base) {
+      return Math.min(Math.max(((current - base) / (target - base)) * 100, 0), 100);
+    }
+
+    if (metric.type === "decrease_to" && base > target) {
+      return Math.min(Math.max(((base - current) / (base - target)) * 100, 0), 100);
+    }
+
+    if (metric.type === "should_stay_above") {
+      return current >= target ? 100 : 0;
+    }
+
+    if (metric.type === "should_stay_below") {
+      return current <= target ? 100 : 0;
+    }
+
+    return 0;
+  };
+
+  // Fetch success metrics for this initiative
+  const { data: successMetrics = [], isLoading: metricsLoading } = useQuery<SuccessMetricWithUpdates[]>({
+    queryKey: [`/api/initiatives/${id}/success-metrics`],
+    enabled: !!id,
+    select: (data: any[]) => {
+      // Transform the data to include updates and calculate progress
+      return data.map((metric: any) => ({
+        ...metric,
+        updates: [],
+        progressPercentage: calculateMetricProgress(metric)
+      }));
+    }
   });
 
   // Task mutation
@@ -133,6 +183,53 @@ export default function InitiativeDetailPage() {
       });
     },
   });
+
+  // Metric update mutation
+  const updateMetricMutation = useMutation({
+    mutationFn: async (data: { metricId: string; value: string; notes?: string; confidence: number }) => {
+      const response = await fetch(`/api/success-metrics/${data.metricId}/updates`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          value: data.value,
+          notes: data.notes,
+          confidence: data.confidence
+        })
+      });
+      if (!response.ok) throw new Error('Failed to update metric');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/success-metrics`] });
+      setIsMetricUpdateModalOpen(false);
+      setSelectedMetric(null);
+      toast({
+        title: "Metrik berhasil diupdate",
+        description: "Progress metrik kesuksesan telah diperbarui",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal update metrik",
+        description: error.message || "Terjadi kesalahan saat mengupdate metrik",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Handlers for metrics management
+  const handleUpdateMetric = (metricId: string) => {
+    const metric = successMetrics.find(m => m.id === metricId);
+    if (metric) {
+      setSelectedMetric(metric);
+      setIsMetricUpdateModalOpen(true);
+    }
+  };
+
+  const handleMetricSubmit = (data: { metricId: string; value: string; notes?: string; confidence: number }) => {
+    updateMetricMutation.mutate(data);
+  };
 
   // Extract data from the comprehensive initiative object with proper typing
   const initiativeData = initiative as any;
@@ -530,6 +627,13 @@ export default function InitiativeDetailPage() {
             </CardContent>
           </Card>
 
+          {/* Success Metrics Dashboard */}
+          <InitiativeMetricsDashboard
+            metrics={successMetrics}
+            onUpdateMetric={handleUpdateMetric}
+            className="mt-6"
+          />
+
           {/* Task Management Section */}
           <Card>
             <CardHeader>
@@ -843,6 +947,18 @@ export default function InitiativeDetailPage() {
           }}
         />
       )}
+
+      {/* Metric Update Modal */}
+      <MetricUpdateModal
+        isOpen={isMetricUpdateModalOpen}
+        onClose={() => {
+          setIsMetricUpdateModalOpen(false);
+          setSelectedMetric(null);
+        }}
+        onSubmit={handleMetricSubmit}
+        metric={selectedMetric}
+        isLoading={updateMetricMutation.isPending}
+      />
     </div>
   );
 }

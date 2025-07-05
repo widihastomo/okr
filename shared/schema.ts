@@ -201,6 +201,7 @@ export const initiativeNotes = pgTable("initiative_notes", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+
 // Tasks linked to initiatives
 export const tasks = pgTable("tasks", {
   id: uuid("id").primaryKey().defaultRandom(),
