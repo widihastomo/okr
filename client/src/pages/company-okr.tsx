@@ -6,7 +6,8 @@ import { Plus, Target, Users, TrendingUp, ChevronDown, ChevronRight, Building2, 
 import { OKRWithKeyResults } from "@shared/schema";
 import { ObjectiveStatusBadge } from "@/components/objective-status-badge";
 import OKRFormModal from "@/components/okr-form-modal";
-import { ConnectorLine } from "@/components/connector-line";
+import CompanyOKRD3Tree from "@/components/company-okr-d3-tree";
+import { useLocation } from "wouter";
 
 interface TreeNode {
   okr: OKRWithKeyResults;
@@ -16,6 +17,7 @@ interface TreeNode {
 }
 
 export default function CompanyOKRPage() {
+  const [, navigate] = useLocation();
   const [isOKRModalOpen, setIsOKRModalOpen] = useState(false);
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const [selectedCycle, setSelectedCycle] = useState<string>('all');
@@ -123,152 +125,7 @@ export default function CompanyOKRPage() {
     return colors[status as keyof typeof colors] || 'text-gray-500';
   };
 
-  const calculateKeyResultProgress = (kr: any): number => {
-    const currentNum = parseFloat(kr.currentValue) || 0;
-    const targetNum = parseFloat(kr.targetValue) || 0;
-    const baseNum = parseFloat(kr.baseValue || "0") || 0;
 
-    switch (kr.keyResultType) {
-      case "increase_to":
-        if (targetNum <= baseNum) return 0;
-        return Math.min(100, Math.max(0, ((currentNum - baseNum) / (targetNum - baseNum)) * 100));
-      
-      case "decrease_to":
-        if (baseNum <= targetNum) return 0;
-        return Math.min(100, Math.max(0, ((baseNum - currentNum) / (baseNum - targetNum)) * 100));
-      
-      case "achieve_or_not":
-        return currentNum >= targetNum ? 100 : 0;
-      
-      default:
-        return Math.min(100, Math.max(0, (currentNum / targetNum) * 100));
-    }
-  };
-
-  const renderMindmapCard = (node: TreeNode, isRoot = false) => {
-    const { okr, level, children, isExpanded } = node;
-    const progressColor = getProgressColor(okr.overallProgress);
-    const hasChildren = children.length > 0;
-    
-    return (
-      <div className="flex items-center">
-        {/* OKR Card */}
-        <div 
-          id={`okr-card-${okr.id}`}
-          className={`bg-white rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md transition-all duration-200 ${
-            isRoot ? 'w-96' : 'w-80'
-          }`}
-        >
-          {/* Objective Section */}
-          <div className="flex items-start gap-3 mb-4">
-            <div className={`w-8 h-8 rounded-full ${level === 0 ? 'bg-blue-100' : 'bg-purple-100'} flex items-center justify-center shrink-0`}>
-              {level === 0 ? (
-                <Building2 className="w-4 h-4 text-blue-600" />
-              ) : (
-                <Target className="w-4 h-4 text-purple-600" />
-              )}
-            </div>
-            
-            <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-gray-900 text-sm mb-1 leading-tight">{okr.title}</h3>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-500">Q2 2024</span>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                <span className="text-xs font-medium text-gray-600">
-                  {okr.owner ? okr.owner.charAt(0).toUpperCase() : 'U'}
-                </span>
-              </div>
-              <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-white text-xs font-medium ${progressColor}`}>
-                {okr.overallProgress.toFixed(0)}%
-              </div>
-              {/* Expand/Collapse for children */}
-              {hasChildren && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => toggleExpand(okr.id)}
-                  className="flex items-center gap-1 p-1 h-6 min-w-fit px-2"
-                >
-                  {isExpanded ? (
-                    <ChevronDown className="w-4 h-4 text-gray-500" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4 text-gray-500" />
-                  )}
-                  <span className="text-xs text-gray-500 font-medium">
-                    {children.length}
-                  </span>
-                </Button>
-              )}
-            </div>
-          </div>
-          
-          {/* Key Results Section */}
-          {okr.keyResults.length > 0 && (
-            <div className="space-y-2 border-t border-gray-100 pt-3">
-              {okr.keyResults.map((kr, index) => (
-                <div key={kr.id} className="flex items-center gap-3 py-2">
-                  <div className="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
-                    <Target className="w-3 h-3 text-purple-600" />
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <span className="text-sm text-gray-900">{kr.title}</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 shrink-0">
-                    <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
-                      <span className="text-xs font-medium text-gray-600">
-                        {okr.owner ? okr.owner.charAt(0).toUpperCase() : 'U'}
-                      </span>
-                    </div>
-                    <span className="text-sm font-medium text-gray-900">
-                      {calculateKeyResultProgress(kr).toFixed(0)}%
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-        
-        {/* Children Layout */}
-        {hasChildren && isExpanded && (
-          <div className="relative ml-12 mt-6">
-            {children.map((child, index) => (
-              <div key={child.okr.id} className={`${index > 0 ? 'mt-8' : ''}`}>
-                {/* Dynamic Connector Line */}
-                <ConnectorLine 
-                  fromId={`okr-card-${okr.id}`}
-                  toId={`okr-card-${child.okr.id}`}
-                  color="#D1D5DB"
-                  strokeWidth={1}
-                />
-                
-                {/* Child card */}
-                {renderMindmapCard(child)}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  const renderTree = (nodes: TreeNode[]) => {
-    return (
-      <div className="flex flex-col gap-8">
-        {nodes.map((node) => (
-          <div key={node.okr.id} className="flex justify-start">
-            {renderMindmapCard(node, true)}
-          </div>
-        ))}
-      </div>
-    );
-  };
 
   if (isLoading) {
     return (
@@ -355,8 +212,13 @@ export default function CompanyOKRPage() {
             </Button>
           </div>
         ) : (
-          <div className="min-w-max py-8">
-            {renderTree(treeData)}
+          <div className="h-[calc(100vh-16rem)]">
+            <CompanyOKRD3Tree 
+              okrs={filteredOKRs}
+              expandedNodes={expandedNodes}
+              onToggleExpand={toggleExpand}
+              onNodeClick={(okr) => navigate(`/objectives/${okr.id}`)}
+            />
           </div>
         )}
       </div>
