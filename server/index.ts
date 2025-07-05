@@ -1,5 +1,8 @@
 import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import mongoSanitize from "express-mongo-sanitize";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { scheduleCycleStatusUpdates } from "./cycle-status-updater";
@@ -10,6 +13,44 @@ import { testDatabaseConnection } from "./db";
 import { validateEnvironment, getConfig } from "./config";
 
 const app = express();
+
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false
+}));
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again later."
+});
+
+// Apply rate limiting to API routes
+app.use('/api', limiter);
+
+// Stricter rate limit for auth endpoints
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // limit each IP to 5 requests per windowMs
+  skipSuccessfulRequests: true
+});
+
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/register', authLimiter);
+
+// Data sanitization
+app.use(mongoSanitize());
+
+// CORS configuration for production
+if (process.env.NODE_ENV === 'production') {
+  const cors = require('cors');
+  app.use(cors({
+    origin: process.env.ALLOWED_ORIGINS?.split(',') || ['https://*.replit.app'],
+    credentials: true
+  }));
+}
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
