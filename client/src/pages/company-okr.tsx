@@ -54,20 +54,28 @@ export default function CompanyOKRPage() {
     ? okrs 
     : (okrs as any[]).filter((okr: any) => okr.cycleId === selectedCycle);
 
-  // Auto-expand root nodes that have children on first load
+  // Auto-expand root nodes that have children on first load only
+  const [hasAutoExpanded, setHasAutoExpanded] = useState(false);
+  
   useEffect(() => {
-    if ((filteredOKRs as any[]).length > 0 && expandedNodes.size === 0) {
+    if ((filteredOKRs as any[]).length > 0 && !hasAutoExpanded) {
       const rootNodesWithChildren = (filteredOKRs as any[])
         .filter((okr: any) => !okr.parentId) // root nodes
         .filter((okr: any) => (filteredOKRs as any[]).some((child: any) => child.parentId === okr.id)) // that have children
         .map((okr: any) => okr.id);
       
       if (rootNodesWithChildren.length > 0) {
-
         setExpandedNodes(new Set(rootNodesWithChildren));
+        setHasAutoExpanded(true);
       }
     }
-  }, [(filteredOKRs as any[]).length, expandedNodes.size]);
+  }, [(filteredOKRs as any[]).length]);
+
+  // Reset auto-expand flag when cycle changes
+  useEffect(() => {
+    setHasAutoExpanded(false);
+    setExpandedNodes(new Set());
+  }, [selectedCycle]);
 
   // Build tree structure
   const buildTree = (okrs: OKRWithKeyResults[]): TreeNode[] => {
@@ -103,18 +111,12 @@ export default function CompanyOKRPage() {
   const treeData = buildTree(filteredOKRs);
 
   const toggleExpand = (nodeId: string) => {
-    console.log('toggleExpand called with nodeId:', nodeId);
-    console.log('current expandedNodes:', Array.from(expandedNodes));
-    
     const newExpanded = new Set(expandedNodes);
     if (newExpanded.has(nodeId)) {
-      console.log('Collapsing node:', nodeId);
       newExpanded.delete(nodeId);
     } else {
-      console.log('Expanding node:', nodeId);
       newExpanded.add(nodeId);
     }
-    console.log('new expandedNodes:', Array.from(newExpanded));
     setExpandedNodes(newExpanded);
   };
 
