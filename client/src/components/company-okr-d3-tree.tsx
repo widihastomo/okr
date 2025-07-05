@@ -358,65 +358,55 @@ export default function CompanyOKRD3Tree({
         onToggleExpand(d.data.id);
       });
 
-    // Rounded rectangular button background with shadow
+    // Simple rectangular button background
     expandButton.append("rect")
-      .attr("x", -20)
-      .attr("y", 2)
-      .attr("width", 40)
-      .attr("height", 16)
-      .attr("rx", 8)
-      .attr("fill", "#ffffff")
+      .attr("x", -15)
+      .attr("y", 5)
+      .attr("width", 30)
+      .attr("height", 20)
+      .attr("rx", 4)
+      .attr("fill", "#f8f9fa")
       .attr("stroke", "#e5e7eb")
-      .attr("stroke-width", 2)
-      .attr("filter", "url(#shadow)");
-
-    // Inner rounded rectangle with color based on state
-    expandButton.append("rect")
-      .attr("x", -18)
-      .attr("y", 4)
-      .attr("width", 36)
-      .attr("height", 12)
-      .attr("rx", 6)
-      .attr("fill", d => expandedNodes.has(d.data.id) ? "#3b82f6" : "#f3f4f6")
-      .attr("stroke", "#3b82f6")
       .attr("stroke-width", 1);
 
     // Chevron icon (> or v)
     expandButton.append("text")
-      .attr("x", -10)
-      .attr("y", 13)
+      .attr("x", -8)
+      .attr("y", 18)
       .attr("text-anchor", "middle")
-      .attr("font-size", "10px")
-      .attr("font-weight", "bold")
-      .attr("fill", d => expandedNodes.has(d.data.id) ? "white" : "#3b82f6")
+      .attr("font-size", "12px")
+      .attr("font-weight", "normal")
+      .attr("fill", "#6b7280")
       .text(d => expandedNodes.has(d.data.id) ? "⌄" : ">");
 
     // Children count
     expandButton.append("text")
-      .attr("x", 6)
-      .attr("y", 13)
+      .attr("x", 5)
+      .attr("y", 18)
       .attr("text-anchor", "middle")
-      .attr("font-size", "10px")
-      .attr("font-weight", "600")
-      .attr("fill", d => expandedNodes.has(d.data.id) ? "white" : "#3b82f6")
+      .attr("font-size", "12px")
+      .attr("font-weight", "normal")
+      .attr("fill", "#6b7280")
       .text(d => d.data.children.length);
 
-    // Add hover effect with smooth transitions for rectangular button
+    // Add hover effect for simple rectangular button
     expandButton.on("mouseenter", function(event, d) {
-      d3.select(this).selectAll("rect:nth-child(2)")
+      d3.select(this).selectAll("rect")
         .transition()
         .duration(200)
-        .attr("fill", expandedNodes.has(d.data.id) ? "#2563eb" : "#ddd6fe");
+        .attr("fill", "#ffffff")
+        .attr("stroke", "#d1d5db");
       
       d3.select(this)
         .transition()
         .duration(200)
         .attr("transform", d => `translate(${nodeWidth + 8}, ${nodeHeight / 2 - 10}) scale(1.05)`);
     }).on("mouseleave", function(event, d) {
-      d3.select(this).selectAll("rect:nth-child(2)")
+      d3.select(this).selectAll("rect")
         .transition()
         .duration(200)
-        .attr("fill", expandedNodes.has(d.data.id) ? "#3b82f6" : "#f3f4f6");
+        .attr("fill", "#f8f9fa")
+        .attr("stroke", "#e5e7eb");
       
       d3.select(this)
         .transition()
@@ -424,25 +414,20 @@ export default function CompanyOKRD3Tree({
         .attr("transform", d => `translate(${nodeWidth + 8}, ${nodeHeight / 2 - 10}) scale(1)`);
     });
 
-    // Add subtle pulse animation for collapsed nodes
-    expandButton.filter(d => !expandedNodes.has(d.data.id))
-      .selectAll("rect:nth-child(2)")
-      .style("animation", "pulse 3s ease-in-out infinite");
-
-    // Add tooltip-like label for rectangular button
+    // Add tooltip-like label for simple button
     expandButton.append("rect")
-      .attr("x", -76)
-      .attr("y", -2)
-      .attr("width", 76)
+      .attr("x", -65)
+      .attr("y", -5)
+      .attr("width", 70)
       .attr("height", 16)
-      .attr("rx", 8)
+      .attr("rx", 4)
       .attr("fill", "#1f2937")
       .attr("opacity", 0)
       .style("pointer-events", "none");
 
     expandButton.append("text")
-      .attr("x", -38)
-      .attr("y", 8)
+      .attr("x", -30)
+      .attr("y", 5)
       .attr("text-anchor", "middle")
       .attr("font-size", "10px")
       .attr("fill", "white")
