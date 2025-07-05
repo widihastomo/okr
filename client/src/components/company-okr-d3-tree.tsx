@@ -335,7 +335,7 @@ export default function CompanyOKRD3Tree({
     // Add expand/collapse button if has children
     const expandButton = node.filter(d => d.data.children.length > 0)
       .append("g")
-      .attr("transform", `translate(${nodeWidth - 50}, 8)`)
+      .attr("transform", `translate(${nodeWidth - 45}, ${nodeHeight - 32})`)
       .style("cursor", "pointer")
       .on("click", (event, d) => {
         event.stopPropagation();
@@ -344,29 +344,29 @@ export default function CompanyOKRD3Tree({
 
     // Button background with blue theme
     expandButton.append("rect")
-      .attr("width", 36)
-      .attr("height", 24)
-      .attr("rx", 12)
+      .attr("width", 32)
+      .attr("height", 20)
+      .attr("rx", 10)
       .attr("fill", d => expandedNodes.has(d.data.id) ? "#3b82f6" : "#e5e7eb")
       .attr("stroke", "#3b82f6")
       .attr("stroke-width", 1);
 
     // Plus/minus icon
     expandButton.append("text")
-      .attr("x", 10)
-      .attr("y", 16)
+      .attr("x", 8)
+      .attr("y", 14)
       .attr("text-anchor", "middle")
-      .attr("font-size", "14px")
+      .attr("font-size", "12px")
       .attr("font-weight", "bold")
       .attr("fill", d => expandedNodes.has(d.data.id) ? "white" : "#3b82f6")
       .text(d => expandedNodes.has(d.data.id) ? "−" : "+");
 
     // Children count
     expandButton.append("text")
-      .attr("x", 26)
-      .attr("y", 16)
+      .attr("x", 24)
+      .attr("y", 14)
       .attr("text-anchor", "middle")
-      .attr("font-size", "10px")
+      .attr("font-size", "9px")
       .attr("font-weight", "600")
       .attr("fill", d => expandedNodes.has(d.data.id) ? "white" : "#3b82f6")
       .text(d => d.data.children.length);
@@ -393,7 +393,7 @@ export default function CompanyOKRD3Tree({
 
     // Add tooltip-like label
     expandButton.append("rect")
-      .attr("x", -20)
+      .attr("x", -38)
       .attr("y", -22)
       .attr("width", 76)
       .attr("height", 16)
@@ -403,7 +403,7 @@ export default function CompanyOKRD3Tree({
       .style("pointer-events", "none");
 
     expandButton.append("text")
-      .attr("x", 18)
+      .attr("x", 0)
       .attr("y", -10)
       .attr("text-anchor", "middle")
       .attr("font-size", "10px")

@@ -63,7 +63,7 @@ export default function CompanyOKRPage() {
         .map((okr: any) => okr.id);
       
       if (rootNodesWithChildren.length > 0) {
-        console.log('Auto-expanding root nodes:', rootNodesWithChildren);
+
         setExpandedNodes(new Set(rootNodesWithChildren));
       }
     }
