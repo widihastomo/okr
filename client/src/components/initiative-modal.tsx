@@ -46,6 +46,17 @@ const initiativeSchema = z.object({
   startDate: z.string().optional(),
   dueDate: z.string().optional(),
   members: z.array(z.string()).optional(),
+}).refine((data) => {
+  // Validate that start date is not greater than end date
+  if (data.startDate && data.dueDate) {
+    const startDate = new Date(data.startDate);
+    const endDate = new Date(data.dueDate);
+    return startDate <= endDate;
+  }
+  return true;
+}, {
+  message: "Tanggal mulai tidak boleh lebih besar dari tanggal selesai",
+  path: ["startDate"], // Show error on startDate field
 });
 
 type InitiativeFormData = z.infer<typeof initiativeSchema>;

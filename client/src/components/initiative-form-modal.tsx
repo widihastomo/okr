@@ -39,9 +39,18 @@ const initiativeFormSchema = z.object({
   priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
   budget: z.string().optional(),
   // Priority calculation inputs
-  impactScore: z.number().min(1).max(10).default(5),
-  effortScore: z.number().min(1).max(10).default(5),
-  confidenceScore: z.number().min(1).max(10).default(5),
+  impactScore: z.number().min(1).max(5).default(3),
+  effortScore: z.number().min(1).max(5).default(3),
+  confidenceScore: z.number().min(1).max(5).default(3),
+}).refine((data) => {
+  // Validate that start date is not greater than end date
+  if (data.startDate && data.dueDate) {
+    return data.startDate <= data.dueDate;
+  }
+  return true;
+}, {
+  message: "Tanggal mulai tidak boleh lebih besar dari tanggal selesai",
+  path: ["startDate"], // Show error on startDate field
 });
 
 type InitiativeFormData = z.infer<typeof initiativeFormSchema>;
