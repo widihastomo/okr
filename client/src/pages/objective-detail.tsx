@@ -1738,6 +1738,11 @@ export default function GoalDetail() {
                                           {initiative.description}
                                         </div>
                                       )}
+                                      {initiative.keyResultId && (
+                                        <div className="text-xs text-blue-600 mt-1">
+                                          Angka Target: {goal?.keyResults?.find((kr: any) => kr.id === initiative.keyResultId)?.title || 'Unknown'}
+                                        </div>
+                                      )}
                                       {initiative.budget && (
                                         <div className="text-sm text-gray-500 mt-1">
                                           Budget: Rp{" "}
@@ -1964,6 +1969,11 @@ export default function GoalDetail() {
                                 <p className="text-xs text-gray-500 mt-1 line-clamp-2">
                                   {initiative.description}
                                 </p>
+                              )}
+                              {initiative.keyResultId && (
+                                <div className="text-xs text-blue-600 mt-1 font-medium">
+                                  Angka Target: {goal?.keyResults?.find((kr: any) => kr.id === initiative.keyResultId)?.title || 'Unknown'}
+                                </div>
                               )}
                             </div>
                             <DropdownMenu>
