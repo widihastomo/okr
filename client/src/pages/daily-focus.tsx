@@ -23,7 +23,6 @@ import {
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { toast } from "@/hooks/use-toast";
 import { CheckInModal } from "@/components/check-in-modal";
-import TaskModal from "@/components/task-modal";
 import SuccessMetricsModalSimple from "@/components/success-metrics-modal-simple";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -46,12 +45,14 @@ export default function DailyFocusPage() {
 
   const [selectedKeyResult, setSelectedKeyResult] = useState<any>(null);
   const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
-  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<any>(null);
   const [isSuccessMetricsModalOpen, setIsSuccessMetricsModalOpen] = useState(false);
   const [selectedInitiative, setSelectedInitiative] = useState<any>(null);
 
   // Fetch data
+  const { data: objectives = [] } = useQuery({
+    queryKey: ["/api/objectives"],
+  });
+
   const { data: keyResults = [] } = useQuery({
     queryKey: ["/api/key-results"],
   });
@@ -181,6 +182,30 @@ export default function DailyFocusPage() {
     init.status === 'sedang_berjalan' || init.status === 'draft'
   );
 
+  // Get related objectives for today's activities
+  const getRelatedObjectives = () => {
+    const relatedObjIds = new Set();
+    
+    // From key results
+    activeKeyResults.forEach((kr: any) => {
+      if (kr.objectiveId) relatedObjIds.add(kr.objectiveId);
+    });
+    
+    // From initiatives
+    activeInitiatives.forEach((init: any) => {
+      if (init.keyResultId) {
+        const kr = (keyResults as any[]).find((k: any) => k.id === init.keyResultId);
+        if (kr?.objectiveId) relatedObjIds.add(kr.objectiveId);
+      }
+    });
+
+    return (objectives as any[]).filter((obj: any) => 
+      relatedObjIds.has(obj.id) || obj.status === 'on_track' || obj.status === 'at_risk'
+    );
+  };
+
+  const relatedObjectives = getRelatedObjectives();
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -254,6 +279,81 @@ export default function DailyFocusPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Objective Awareness Section */}
+      {relatedObjectives.length > 0 && (
+        <Card className="border-blue-200 bg-blue-50">
+          <CardHeader>
+            <CardTitle className="text-blue-900 flex items-center gap-2">
+              <Target className="h-5 w-5" />
+              Objective Terkait Aktivitas Hari Ini
+            </CardTitle>
+            <CardDescription className="text-blue-700">
+              Tetap ingat tujuan utama yang mendorong aktivitas harian Anda
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {relatedObjectives.slice(0, 4).map((obj: any) => {
+                const objKeyResults = (keyResults as any[]).filter(kr => kr.objectiveId === obj.id);
+                const objProgress = objKeyResults.length > 0 
+                  ? objKeyResults.reduce((sum, kr) => sum + calculateKeyResultProgress(kr), 0) / objKeyResults.length 
+                  : 0;
+                
+                return (
+                  <div key={obj.id} className="p-4 bg-white border border-blue-200 rounded-lg">
+                    <div className="space-y-3">
+                      <div>
+                        <h3 className="font-medium text-blue-900 line-clamp-2">{obj.title}</h3>
+                        {obj.description && (
+                          <p className="text-sm text-blue-700 mt-1 line-clamp-2">{obj.description}</p>
+                        )}
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-blue-700">Progress</span>
+                          <span className="font-medium text-blue-900">{objProgress.toFixed(0)}%</span>
+                        </div>
+                        <Progress value={objProgress} className="h-2" />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <Badge 
+                          variant="outline" 
+                          className={
+                            obj.status === 'on_track' ? 'border-green-300 text-green-700 bg-green-50' :
+                            obj.status === 'at_risk' ? 'border-yellow-300 text-yellow-700 bg-yellow-50' :
+                            obj.status === 'behind' ? 'border-red-300 text-red-700 bg-red-50' :
+                            'border-blue-300 text-blue-700 bg-blue-50'
+                          }
+                        >
+                          {obj.status === 'on_track' ? 'On Track' :
+                           obj.status === 'at_risk' ? 'At Risk' :
+                           obj.status === 'behind' ? 'Behind' :
+                           obj.status}
+                        </Badge>
+                        
+                        <div className="text-xs text-blue-600">
+                          {objKeyResults.length} Angka Target
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            
+            {relatedObjectives.length > 4 && (
+              <div className="mt-4 text-center">
+                <p className="text-sm text-blue-600">
+                  +{relatedObjectives.length - 4} objective lainnya terkait aktivitas Anda
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="tasks" className="w-full">
@@ -432,15 +532,6 @@ export default function DailyFocusPage() {
           targetValue={selectedKeyResult.targetValue}
           unit={selectedKeyResult.unit}
           keyResultType={selectedKeyResult.keyResultType}
-        />
-      )}
-
-      {selectedTask && (
-        <TaskModal
-          open={isTaskModalOpen}
-          onOpenChange={setIsTaskModalOpen}
-          task={selectedTask}
-          initiativeId={selectedTask.initiativeId}
         />
       )}
 
