@@ -113,6 +113,16 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 05, 2025. Successfully unified user and member system to eliminate duplication and simplify role management:
+  * Standardized team member roles to: lead (formerly admin), member, contributor
+  * Standardized initiative member roles to: lead, contributor (formerly member), reviewer
+  * Updated database with consistent role values across team_members and initiative_members tables
+  * Enhanced frontend components with color-coded role badges: lead (blue), member (green), contributor (purple), reviewer (orange)
+  * Updated API routes to use "contributor" role for new initiative members
+  * Eliminated user/member concept duplication for cleaner data model
+  * Integrated with existing PostgreSQL RLS for secure multi-tenant role-based access
+  * Created comprehensive documentation (USER_MEMBER_UNIFICATION.md) for role system changes
+  * Benefits: simplified role management, consistent access control, better user experience, reduced data redundancy
 - January 10, 2025. Implemented role-based access control system with organization owner and system owner separation:
   * Added ownerId field to organizations table to designate organization owners
   * Created isSystemOwner field in users table for super admin functionality

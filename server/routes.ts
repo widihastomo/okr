@@ -1293,7 +1293,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await storage.createInitiativeMember({
             initiativeId: id,
             userId: userId,
-            role: "member"
+            role: "contributor"
           });
         }
       }

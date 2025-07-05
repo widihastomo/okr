@@ -115,18 +115,18 @@ export const teams = pgTable("teams", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   description: text("description"),
-  ownerId: uuid("owner_id").notNull(),
+  ownerId: uuid("owner_id").notNull().references(() => users.id),
   organizationId: uuid("organization_id").references(() => organizations.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Team members junction table
+// Simplified team membership - users can be members of multiple teams
 export const teamMembers = pgTable("team_members", {
   id: uuid("id").primaryKey().defaultRandom(),
-  teamId: uuid("team_id").notNull(),
-  userId: uuid("user_id").notNull(),
-  role: text("role").notNull().default("member"), // "admin", "member"
+  teamId: uuid("team_id").notNull().references(() => teams.id),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  role: text("role").notNull().default("member"), // "lead", "member", "contributor"
   joinedAt: timestamp("joined_at").defaultNow(),
 });
 
@@ -195,12 +195,12 @@ export const initiatives = pgTable("initiatives", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Project team members
+// Simplified initiative collaboration - users can contribute to initiatives
 export const initiativeMembers = pgTable("initiative_members", {
   id: uuid("id").primaryKey().defaultRandom(),
   initiativeId: uuid("initiative_id").references(() => initiatives.id).notNull(),
   userId: uuid("user_id").references(() => users.id).notNull(),
-  role: text("role").notNull().default("member"), // "member", "lead", "reviewer"
+  role: text("role").notNull().default("contributor"), // "lead", "contributor", "reviewer"
   joinedAt: timestamp("joined_at").defaultNow(),
 });
 

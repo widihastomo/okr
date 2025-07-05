@@ -403,18 +403,20 @@ export default function UsersPage() {
 
   const getRoleBadge = (role: string) => {
     const roleStyles = {
-      admin: "bg-red-100 text-red-800",
-      manager: "bg-blue-100 text-blue-800", 
+      lead: "bg-blue-100 text-blue-800",
       member: "bg-green-100 text-green-800",
+      contributor: "bg-purple-100 text-purple-800",
+      reviewer: "bg-orange-100 text-orange-800",
     };
     return roleStyles[role as keyof typeof roleStyles] || "bg-gray-100 text-gray-800";
   };
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case "admin": return Shield;
-      case "manager": return UserPlus;
+      case "lead": return UserPlus;
       case "member": return UserIcon;
+      case "contributor": return Users;
+      case "reviewer": return Shield;
       default: return UserIcon;
     }
   };
