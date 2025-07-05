@@ -1781,8 +1781,18 @@ export default function GoalDetail() {
                               </td>
                               <td className="px-4 py-4">
                                 {(() => {
-                                  // Calculate priority level from score
-                                  const score = parseFloat(initiative.priorityScore || "0");
+                                  // Calculate priority level from score - add debug logging
+                                  const rawScore = initiative.priorityScore;
+                                  const score = parseFloat(rawScore || "0");
+                                  
+                                  console.log(`Debug Priority for initiative ${initiative.id}:`, {
+                                    rawScore,
+                                    parsedScore: score,
+                                    impactScore: initiative.impactScore,
+                                    effortScore: initiative.effortScore,
+                                    confidenceScore: initiative.confidenceScore
+                                  });
+                                  
                                   let level: string;
                                   let color: string;
                                   let label: string;
