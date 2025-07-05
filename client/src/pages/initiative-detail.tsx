@@ -1,6 +1,6 @@
 import { useParams } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ArrowLeft,
   Calendar,
@@ -210,16 +210,21 @@ export default function InitiativeDetailPage() {
     <div className="min-h-screen bg-gray-50 p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <Link href="/dashboard?tab=initiatives">
-          <Button 
-            variant="ghost" 
-            size="sm"
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
-        </Link>
+        <Button 
+          variant="ghost" 
+          size="sm"
+          className="flex items-center gap-2"
+          onClick={() => {
+            if (window.history.length > 1) {
+              window.history.back();
+            } else {
+              window.location.href = '/dashboard?tab=initiatives';
+            }
+          }}
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </Button>
         
         <div className="flex items-center gap-3">
           <Button 
