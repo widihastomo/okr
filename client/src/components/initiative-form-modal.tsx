@@ -273,7 +273,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <Card>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-6 pt-6">
                 {/* Title */}
                 <FormField
                   control={form.control}
