@@ -206,8 +206,8 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
     },
     onSuccess: () => {
       toast({
-        title: isEditMode ? "Rencana berhasil diupdate" : "Rencana berhasil dibuat",
-        description: isEditMode ? "Rencana telah diperbarui." : "Rencana baru telah ditambahkan.",
+        title: isEditMode ? "Inisiatif berhasil diupdate" : "Inisiatif berhasil dibuat",
+        description: isEditMode ? "Inisiatif telah diperbarui." : "Inisiatif baru telah ditambahkan.",
         className: "border-green-200 bg-green-50 text-green-800",
       });
       
@@ -399,7 +399,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                           </PopoverTrigger>
                           <PopoverContent side="right" className="max-w-xs">
                             <p className="text-sm">
-                              Pilih orang yang bertanggung jawab untuk memimpin dan mengeksekusi rencana ini.
+                              Pilih orang yang bertanggung jawab untuk memimpin dan mengeksekusi inisiatif ini.
                             </p>
                           </PopoverContent>
                         </Popover>
@@ -525,7 +525,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                           </PopoverTrigger>
                           <PopoverContent side="right" className="max-w-xs">
                             <p className="text-sm">
-                              Estimasi anggaran yang dibutuhkan untuk melaksanakan rencana ini dalam Rupiah.
+                              Estimasi anggaran yang dibutuhkan untuk melaksanakan inisiatif ini dalam Rupiah.
                             </p>
                           </PopoverContent>
                         </Popover>
@@ -573,7 +573,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                             </PopoverTrigger>
                             <PopoverContent side="right" className="max-w-xs">
                               <p className="text-sm">
-                                Seberapa besar dampak rencana ini terhadap pencapaian angka target dan tujuan bisnis.
+                                Seberapa besar dampak inisiatif ini terhadap pencapaian angka target dan tujuan bisnis.
                                 <br /><br />
                                 <strong>1:</strong> Dampak sangat rendah
                                 <br />
@@ -626,7 +626,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                             </PopoverTrigger>
                             <PopoverContent side="right" className="max-w-xs">
                               <p className="text-sm">
-                                Seberapa sulit implementasi rencana ini dari segi waktu, sumber daya, dan kompleksitas.
+                                Seberapa sulit implementasi inisiatif ini dari segi waktu, sumber daya, dan kompleksitas.
                                 <br /><br />
                                 <strong>1:</strong> Sangat mudah
                                 <br />
