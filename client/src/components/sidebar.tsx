@@ -66,12 +66,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       path: "/templates",
       active: location === "/templates"
     },
-    {
-      label: "Pengguna",
-      icon: Users,
-      path: "/users",
-      active: location === "/users"
-    },
+
     {
       label: "Pencapaian",
       icon: Trophy,

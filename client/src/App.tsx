@@ -11,7 +11,7 @@ import Sidebar from "@/components/sidebar";
 import Dashboard from "@/pages/dashboard";
 import CyclesPage from "@/components/cycles-page";
 import TemplatesPage from "@/components/templates-page";
-import UsersPage from "@/components/users-page";
+
 import CompanyOKRPage from "@/pages/company-okr";
 import KeyResultDetail from "@/pages/key-result-detail";
 import InitiativeDetail from "@/pages/initiative-detail";
@@ -97,7 +97,7 @@ function Router() {
             <Route path="/tasks/:id" component={TaskDetail} />
             <Route path="/cycles" component={CyclesPage} />
             <Route path="/templates" component={TemplatesPage} />
-            <Route path="/users" component={UsersPage} />
+
             <Route path="/achievements" component={AchievementsPage} />
             <Route path="/analytics" component={AnalyticsPage} />
             <Route path="/network" component={NetworkVisualization} />
