@@ -160,12 +160,12 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
 
       const payload = {
         ...data,
-        budget: data.budget ? getNumberValueForSubmission(data.budget) : null,
-        startDate: data.startDate ? data.startDate.toISOString() : null,
-        dueDate: data.dueDate ? data.dueDate.toISOString() : null,
+        budget: data.budget ? getNumberValueForSubmission(data.budget).toString() : null,
+        startDate: data.startDate ? new Date(data.startDate) : null,
+        dueDate: data.dueDate ? new Date(data.dueDate) : null,
         status: "not_started", // Auto-set status to not_started for new initiatives
         priority: calculatedPriority, // Use calculated priority instead of manual selection
-        priorityScore: priorityScore, // Store the calculated score
+        priorityScore: priorityScore.toString(), // Store the calculated score as string
         createdBy: "550e8400-e29b-41d4-a716-446655440001", // Current user ID
       };
 
