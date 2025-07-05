@@ -17,6 +17,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { id } from "date-fns/locale";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -443,7 +444,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                                 )}
                               >
                                 {field.value ? (
-                                  format(field.value, "PPP")
+                                  format(field.value, "dd/MM/yyyy", { locale: id })
                                 ) : (
                                   <span>Pilih tanggal</span>
                                 )}
@@ -486,7 +487,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                                 )}
                               >
                                 {field.value ? (
-                                  format(field.value, "PPP")
+                                  format(field.value, "dd/MM/yyyy", { locale: id })
                                 ) : (
                                   <span>Pilih tanggal</span>
                                 )}

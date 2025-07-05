@@ -96,6 +96,14 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 05, 2025. Added comprehensive date validation and Indonesian date format to initiative forms:
+  * Added cross-field validation to ensure start date is not greater than end date in initiative forms
+  * Updated initiative-form-modal.tsx with Zod refine validation and clear error messaging
+  * Updated initiative-modal.tsx with same date validation to prevent invalid date ranges
+  * Changed date display format to Indonesian DD/MM/YYYY format using date-fns Indonesian locale
+  * Error message displays "Tanggal mulai tidak boleh lebih besar dari tanggal selesai" on start date field
+  * Updated 5-point scale validation for priority calculation (1-5 instead of 1-10) for consistency
+  * Enhanced user experience with proper date validation preventing logical errors in initiative creation
 - July 05, 2025. Successfully simplified automatic priority calculation system to use 5-point scale instead of 10-point:
   * Updated initiative form modal to display 1-5 scale with clearer labels (Sangat Rendah, Rendah, Sedang, Tinggi, Sangat Tinggi)
   * Modified priority calculation formula to use (6 - effortScore) instead of (11 - effortScore) for 5-point scale
