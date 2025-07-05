@@ -329,67 +329,20 @@ export default function InitiativeDetailPage() {
                   <p className="text-xs mt-1">Tambahkan metrik untuk mengukur pencapaian inisiatif</p>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {successMetrics.map((metric: any) => (
-                    <div key={metric.id} className="border border-gray-200 rounded-lg p-4">
-                      <div className="flex items-start justify-between">
+                    <div key={metric.id} className="border border-gray-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
+                          <div className="flex items-center gap-3">
                             <h4 className="font-medium text-gray-900">{metric.title}</h4>
-                            <Badge variant="outline" className="text-xs">
-                              {metric.type === 'increase_to' && 'Naik ke Target'}
-                              {metric.type === 'decrease_to' && 'Turun ke Target'}
-                              {metric.type === 'achieve_or_not' && 'Tercapai/Tidak'}
-                              {metric.type === 'should_stay_above' && 'Tetap di Atas'}
-                              {metric.type === 'should_stay_below' && 'Tetap di Bawah'}
-                            </Badge>
+                            <span className="text-sm text-gray-600">
+                              Target: <span className="font-medium">{metric.targetValue}{metric.unit && ` ${metric.unit}`}</span>
+                            </span>
+                            <span className="text-sm text-gray-600">
+                              Capaian: <span className="font-medium">{metric.currentValue || 0}{metric.unit && ` ${metric.unit}`}</span>
+                            </span>
                           </div>
-                          {metric.description && (
-                            <p className="text-sm text-gray-600 mb-3">{metric.description}</p>
-                          )}
-                          
-                          {/* Progress Display */}
-                          <div className="flex items-center gap-4 text-sm">
-                            {metric.type !== 'achieve_or_not' && (
-                              <>
-                                {(metric.type === 'increase_to' || metric.type === 'decrease_to') && metric.baseValue && (
-                                  <span className="text-gray-600">
-                                    Awal: <span className="font-medium">{metric.baseValue}</span>
-                                  </span>
-                                )}
-                                <span className="text-gray-600">
-                                  Current: <span className="font-medium">{metric.currentValue || 0}</span>
-                                </span>
-                                <span className="text-gray-600">
-                                  Target: <span className="font-medium">{metric.targetValue}</span>
-                                </span>
-                                <span className="text-gray-600">
-                                  Unit: <span className="font-medium">{metric.unit}</span>
-                                </span>
-                              </>
-                            )}
-                            {metric.type === 'achieve_or_not' && (
-                              <span className="text-gray-600">
-                                Status: <span className={`font-medium ${metric.currentValue >= metric.targetValue ? 'text-green-600' : 'text-red-600'}`}>
-                                  {metric.currentValue >= metric.targetValue ? 'Tercapai' : 'Belum Tercapai'}
-                                </span>
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Progress Bar for non-binary metrics */}
-                          {metric.type !== 'achieve_or_not' && (
-                            <div className="mt-3">
-                              <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
-                                <span>Progress</span>
-                                <span>{calculateMetricProgress(metric).toFixed(1)}%</span>
-                              </div>
-                              <Progress 
-                                value={Math.min(100, Math.max(0, calculateMetricProgress(metric)))} 
-                                className="h-2"
-                              />
-                            </div>
-                          )}
                         </div>
 
                         {/* Action Buttons */}
