@@ -96,6 +96,17 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 05, 2025. Enhanced Collaborative Goal Visualization with D3.js interactive mindmap:
+  * Upgraded to D3.js-powered hierarchical tree layout for intuitive goal visualization
+  * Created interactive mindmap with root system branching into objectives, key results, and initiatives
+  * Added dynamic node sizing and color coding based on status and progress
+  * Implemented progress rings around nodes showing completion percentage
+  * Added zoom, pan, and fit-to-screen controls for navigation
+  * Enhanced with smooth animations and hover effects for better user interaction
+  * Integrated detailed node information panel with status, progress, and owner details
+  * Added comprehensive legend explaining node types, progress indicators, and controls
+  * Created hierarchical layout showing clear relationships from objectives down to initiatives
+  * Mindmap provides intuitive visual understanding of organizational goal structure
 - July 05, 2025. Implemented Collaborative Goal Visualization Network feature for relationship mapping:
   * Created interactive network visualization showing connections between objectives, key results, and initiatives
   * Built hierarchical layout with three levels: Objectives (blue), Angka Target (green), Inisiatif (purple)

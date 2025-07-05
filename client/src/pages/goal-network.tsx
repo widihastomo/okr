@@ -1,9 +1,9 @@
-import GoalNetworkSimple from "@/components/goal-network-simple";
+import GoalMindmap from "@/components/goal-mindmap";
 
 export default function GoalNetworkPage() {
   return (
     <div className="p-6">
-      <GoalNetworkSimple />
+      <GoalMindmap />
     </div>
   );
 }
