@@ -37,6 +37,10 @@ const initiativeFormSchema = z.object({
   dueDate: z.date().optional(),
   priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
   budget: z.string().optional(),
+  // Priority calculation inputs
+  impactScore: z.number().min(1).max(10).default(5),
+  effortScore: z.number().min(1).max(10).default(5),
+  confidenceScore: z.number().min(1).max(10).default(5),
 });
 
 type InitiativeFormData = z.infer<typeof initiativeFormSchema>;
@@ -53,6 +57,68 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
   const queryClient = useQueryClient();
   
   const isEditMode = !!initiative;
+
+  // Helper function to get score labels
+  const getScoreLabel = (score: number, type: 'impact' | 'effort' | 'confidence'): string => {
+    const level = score >= 8 ? 'Sangat Tinggi' : score >= 6 ? 'Tinggi' : score >= 4 ? 'Sedang' : 'Rendah';
+    
+    switch (type) {
+      case 'impact':
+        return level;
+      case 'effort':
+        const effortLevel = score >= 8 ? 'Sangat Sulit' : score >= 6 ? 'Sulit' : score >= 4 ? 'Sedang' : 'Mudah';
+        return effortLevel;
+      case 'confidence':
+        return level;
+    }
+  };
+
+  // Component to display calculated priority
+  const CalculatedPriorityDisplay = ({ impactScore, effortScore, confidenceScore }: {
+    impactScore: number;
+    effortScore: number;
+    confidenceScore: number;
+  }) => {
+    // Calculate priority score using the same formula as backend
+    const priorityScore = (impactScore * 0.4) + ((11 - effortScore) * 0.3) + (confidenceScore * 0.3);
+    
+    // Determine priority level
+    const priorityLevel = priorityScore >= 8.0 ? 'critical' : 
+                         priorityScore >= 6.5 ? 'high' : 
+                         priorityScore >= 4.0 ? 'medium' : 'low';
+    
+    const priorityColors = {
+      critical: 'bg-red-100 text-red-800 border-red-200',
+      high: 'bg-orange-100 text-orange-800 border-orange-200',
+      medium: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      low: 'bg-green-100 text-green-800 border-green-200'
+    };
+    
+    const priorityLabels = {
+      critical: 'Kritis',
+      high: 'Tinggi', 
+      medium: 'Sedang',
+      low: 'Rendah'
+    };
+
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <span className={`px-2 py-1 rounded-md border text-xs font-medium ${priorityColors[priorityLevel]}`}>
+            {priorityLabels[priorityLevel]}
+          </span>
+          <span className="text-sm text-gray-600">
+            Skor: {priorityScore.toFixed(2)}/10
+          </span>
+        </div>
+        <p className="text-xs text-gray-600">
+          Formula: (Dampak×0.4) + (Kemudahan×0.3) + (Keyakinan×0.3)
+          <br />
+          = ({impactScore}×0.4) + ({11-effortScore}×0.3) + ({confidenceScore}×0.3) = {priorityScore.toFixed(2)}
+        </p>
+      </div>
+    );
+  };
 
   // Fetch users for PIC selection
   const { data: users = [] } = useQuery<User[]>({
@@ -77,17 +143,28 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
       dueDate: initiative?.dueDate ? new Date(initiative.dueDate) : undefined,
       priority: (initiative?.priority as any) || "medium",
       budget: initiative?.budget?.toString() || "",
+      impactScore: (initiative as any)?.impactScore || 5,
+      effortScore: (initiative as any)?.effortScore || 5,
+      confidenceScore: (initiative as any)?.confidenceScore || 5,
     },
   });
 
   const createInitiativeMutation = useMutation({
     mutationFn: async (data: InitiativeFormData) => {
+      // Calculate priority automatically based on scores
+      const priorityScore = (data.impactScore * 0.4) + ((11 - data.effortScore) * 0.3) + (data.confidenceScore * 0.3);
+      const calculatedPriority = priorityScore >= 8.0 ? 'critical' : 
+                                 priorityScore >= 6.5 ? 'high' : 
+                                 priorityScore >= 4.0 ? 'medium' : 'low';
+
       const payload = {
         ...data,
         budget: data.budget ? getNumberValueForSubmission(data.budget) : null,
         startDate: data.startDate ? data.startDate.toISOString() : null,
         dueDate: data.dueDate ? data.dueDate.toISOString() : null,
         status: "not_started", // Auto-set status to not_started for new initiatives
+        priority: calculatedPriority, // Use calculated priority instead of manual selection
+        priorityScore: priorityScore, // Store the calculated score
         createdBy: "550e8400-e29b-41d4-a716-446655440001", // Current user ID
       };
 
@@ -394,25 +471,100 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                   />
                 </div>
 
-                {/* Priority and Budget */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Budget */}
+                <FormField
+                  control={form.control}
+                  name="budget"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        Anggaran
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button 
+                              type="button" 
+                              className="inline-flex items-center justify-center"
+                            >
+                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent side="right" className="max-w-xs">
+                            <p className="text-sm">
+                              Estimasi anggaran yang dibutuhkan untuk melaksanakan rencana ini dalam Rupiah.
+                            </p>
+                          </PopoverContent>
+                        </Popover>
+                      </FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="text"
+                          placeholder="Contoh: 5.000.000" 
+                          value={formatNumberWithSeparator(field.value || "")}
+                          onChange={(e) => handleNumberInputChange(e.target.value, field.onChange)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Priority Calculation Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="w-5 h-5" />
+                  Perhitungan Prioritas Otomatis
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Prioritas akan dihitung otomatis berdasarkan dampak, tingkat kesulitan, dan keyakinan (skala 1-10)
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Impact Score */}
                   <FormField
                     control={form.control}
-                    name="priority"
+                    name="impactScore"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Prioritas</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <FormLabel className="flex items-center gap-2">
+                          Dampak Bisnis
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button 
+                                type="button" 
+                                className="inline-flex items-center justify-center"
+                              >
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent side="right" className="max-w-xs">
+                              <p className="text-sm">
+                                Seberapa besar dampak rencana ini terhadap pencapaian angka target dan tujuan bisnis.
+                                <br /><br />
+                                <strong>1-3:</strong> Dampak rendah
+                                <br />
+                                <strong>4-6:</strong> Dampak sedang
+                                <br />
+                                <strong>7-10:</strong> Dampak tinggi
+                              </p>
+                            </PopoverContent>
+                          </Popover>
+                        </FormLabel>
+                        <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Pilih prioritas" />
+                              <SelectValue placeholder="Pilih dampak" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="low">Rendah</SelectItem>
-                            <SelectItem value="medium">Sedang</SelectItem>
-                            <SelectItem value="high">Tinggi</SelectItem>
-                            <SelectItem value="critical">Kritis</SelectItem>
+                            {[1,2,3,4,5,6,7,8,9,10].map(num => (
+                              <SelectItem key={num} value={num.toString()}>
+                                {num} - {getScoreLabel(num, 'impact')}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -420,23 +572,115 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                     )}
                   />
 
+                  {/* Effort Score */}
                   <FormField
                     control={form.control}
-                    name="budget"
+                    name="effortScore"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Anggaran</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="text"
-                            placeholder="Contoh: 5.000.000" 
-                            value={formatNumberWithSeparator(field.value || "")}
-                            onChange={(e) => handleNumberInputChange(e.target.value, field.onChange)}
-                          />
-                        </FormControl>
+                        <FormLabel className="flex items-center gap-2">
+                          Tingkat Kesulitan
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button 
+                                type="button" 
+                                className="inline-flex items-center justify-center"
+                              >
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent side="right" className="max-w-xs">
+                              <p className="text-sm">
+                                Seberapa sulit implementasi rencana ini dari segi waktu, sumber daya, dan kompleksitas.
+                                <br /><br />
+                                <strong>1-3:</strong> Sangat mudah
+                                <br />
+                                <strong>4-6:</strong> Sedang
+                                <br />
+                                <strong>7-10:</strong> Sangat sulit
+                              </p>
+                            </PopoverContent>
+                          </Popover>
+                        </FormLabel>
+                        <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih kesulitan" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {[1,2,3,4,5,6,7,8,9,10].map(num => (
+                              <SelectItem key={num} value={num.toString()}>
+                                {num} - {getScoreLabel(num, 'effort')}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
+                  />
+
+                  {/* Confidence Score */}
+                  <FormField
+                    control={form.control}
+                    name="confidenceScore"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          Tingkat Keyakinan
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button 
+                                type="button" 
+                                className="inline-flex items-center justify-center"
+                              >
+                                <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent side="right" className="max-w-xs">
+                              <p className="text-sm">
+                                Seberapa yakin Anda bahwa rencana ini akan berhasil mencapai tujuannya.
+                                <br /><br />
+                                <strong>1-3:</strong> Keyakinan rendah
+                                <br />
+                                <strong>4-6:</strong> Keyakinan sedang
+                                <br />
+                                <strong>7-10:</strong> Keyakinan tinggi
+                              </p>
+                            </PopoverContent>
+                          </Popover>
+                        </FormLabel>
+                        <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih keyakinan" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {[1,2,3,4,5,6,7,8,9,10].map(num => (
+                              <SelectItem key={num} value={num.toString()}>
+                                {num} - {getScoreLabel(num, 'confidence')}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Calculated Priority Display */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Target className="w-4 h-4 text-blue-600" />
+                    <span className="font-medium text-blue-900">Prioritas Otomatis</span>
+                  </div>
+                  <CalculatedPriorityDisplay 
+                    impactScore={form.watch("impactScore")} 
+                    effortScore={form.watch("effortScore")} 
+                    confidenceScore={form.watch("confidenceScore")}
                   />
                 </div>
               </CardContent>

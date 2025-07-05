@@ -124,6 +124,11 @@ export const initiatives = pgTable("initiatives", {
   completedAt: timestamp("completed_at"),
   budget: decimal("budget", { precision: 15, scale: 2 }), // Project budget
   progressPercentage: integer("progress_percentage").default(0), // 0-100%
+  // Priority calculation fields (1-10 scale)
+  impactScore: integer("impact_score").default(5), // Business impact: 1=very low, 10=very high
+  effortScore: integer("effort_score").default(5), // Implementation effort: 1=very easy, 10=very hard
+  confidenceScore: integer("confidence_score").default(5), // Confidence in success: 1=very low, 10=very high
+  priorityScore: decimal("priority_score", { precision: 5, scale: 2 }), // Calculated priority score
   createdAt: timestamp("created_at").defaultNow(),
   createdBy: uuid("created_by").notNull(), // user ID
   updatedAt: timestamp("updated_at").defaultNow(),

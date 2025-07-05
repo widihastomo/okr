@@ -1964,6 +1964,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/initiatives/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const result = insertInitiativeSchema.safeParse(req.body);
+      
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid initiative data", errors: result.error.errors });
+      }
+
+      const updatedInitiative = await storage.updateInitiative(id, result.data);
+      
+      if (!updatedInitiative) {
+        return res.status(404).json({ message: "Initiative not found" });
+      }
+      
+      res.json(updatedInitiative);
+    } catch (error) {
+      console.error("Error updating initiative:", error);
+      res.status(500).json({ message: "Failed to update initiative" });
+    }
+  });
+
   // Initiative member routes
   app.get("/api/initiative-members", async (req, res) => {
     try {
