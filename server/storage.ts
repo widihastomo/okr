@@ -1,13 +1,16 @@
 import { 
   cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives, tasks,
   initiativeMembers, initiativeDocuments, initiativeNotes, initiativeSuccessMetrics, successMetricUpdates,
+  budgetEntries, initiativeLessons, initiativeHealthChecks, initiativeExperiments,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
   type CheckIn, type Initiative, type Task, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
   type InitiativeNote, type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
   type InsertUser, type UpsertUser, type InsertTeam, type InsertTeamMember,
   type InsertCheckIn, type InsertInitiative, type InsertInitiativeMember, type InsertInitiativeDocument, type InsertTask,
   type InsertInitiativeNote, type OKRWithKeyResults, type CycleWithOKRs, type UpdateKeyResultProgress, type CreateOKRFromTemplate,
-  type SuccessMetric, type InsertSuccessMetric, type SuccessMetricUpdate, type InsertSuccessMetricUpdate
+  type SuccessMetric, type InsertSuccessMetric, type SuccessMetricUpdate, type InsertSuccessMetricUpdate,
+  type BudgetEntry, type InsertBudgetEntry, type InitiativeLesson, type InsertInitiativeLesson,
+  type InitiativeHealthCheck, type InsertInitiativeHealthCheck, type InitiativeExperiment, type InsertInitiativeExperiment
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, inArray } from "drizzle-orm";
@@ -111,6 +114,29 @@ export interface IStorage {
   deleteSuccessMetric(id: string): Promise<boolean>;
   getSuccessMetricUpdates(metricId: string): Promise<SuccessMetricUpdate[]>;
   createSuccessMetricUpdate(update: InsertSuccessMetricUpdate): Promise<SuccessMetricUpdate>;
+  
+  // Initiative Learning & Documentation
+  getBudgetEntries(initiativeId: string): Promise<BudgetEntry[]>;
+  createBudgetEntry(entry: InsertBudgetEntry): Promise<BudgetEntry>;
+  updateBudgetEntry(id: string, entry: Partial<InsertBudgetEntry>): Promise<BudgetEntry | undefined>;
+  deleteBudgetEntry(id: string): Promise<boolean>;
+  
+  getInitiativeLessons(initiativeId: string): Promise<InitiativeLesson[]>;
+  createInitiativeLesson(lesson: InsertInitiativeLesson): Promise<InitiativeLesson>;
+  updateInitiativeLesson(id: string, lesson: Partial<InsertInitiativeLesson>): Promise<InitiativeLesson | undefined>;
+  deleteInitiativeLesson(id: string): Promise<boolean>;
+  
+  getInitiativeHealthChecks(initiativeId: string): Promise<InitiativeHealthCheck[]>;
+  createInitiativeHealthCheck(healthCheck: InsertInitiativeHealthCheck): Promise<InitiativeHealthCheck>;
+  updateInitiativeHealthCheck(id: string, healthCheck: Partial<InsertInitiativeHealthCheck>): Promise<InitiativeHealthCheck | undefined>;
+  deleteInitiativeHealthCheck(id: string): Promise<boolean>;
+  
+  getInitiativeExperiments(initiativeId: string): Promise<InitiativeExperiment[]>;
+  createInitiativeExperiment(experiment: InsertInitiativeExperiment): Promise<InitiativeExperiment>;
+  updateInitiativeExperiment(id: string, experiment: Partial<InsertInitiativeExperiment>): Promise<InitiativeExperiment | undefined>;
+  deleteInitiativeExperiment(id: string): Promise<boolean>;
+  
+  getInitiativeAnalysis(initiativeId: string): Promise<any>;
   
   // Tasks
   getTasks(): Promise<Task[]>;
@@ -1257,6 +1283,316 @@ export class DatabaseStorage implements IStorage {
   async createSuccessMetricUpdate(update: InsertSuccessMetricUpdate): Promise<SuccessMetricUpdate> {
     const [newUpdate] = await db.insert(successMetricUpdates).values(update).returning();
     return newUpdate;
+  }
+
+  // =============== INITIATIVE LEARNING & DOCUMENTATION METHODS ===============
+
+  // Budget Entries
+  async getBudgetEntries(initiativeId: string): Promise<BudgetEntry[]> {
+    return await db
+      .select()
+      .from(budgetEntries)
+      .where(eq(budgetEntries.initiativeId, initiativeId))
+      .orderBy(desc(budgetEntries.createdAt));
+  }
+
+  async createBudgetEntry(entry: InsertBudgetEntry): Promise<BudgetEntry> {
+    const [newEntry] = await db.insert(budgetEntries).values(entry).returning();
+    return newEntry;
+  }
+
+  async updateBudgetEntry(id: string, entry: Partial<InsertBudgetEntry>): Promise<BudgetEntry | undefined> {
+    const [updatedEntry] = await db
+      .update(budgetEntries)
+      .set(entry)
+      .where(eq(budgetEntries.id, id))
+      .returning();
+    return updatedEntry || undefined;
+  }
+
+  async deleteBudgetEntry(id: string): Promise<boolean> {
+    const result = await db.delete(budgetEntries).where(eq(budgetEntries.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Initiative Lessons
+  async getInitiativeLessons(initiativeId: string): Promise<InitiativeLesson[]> {
+    return await db
+      .select()
+      .from(initiativeLessons)
+      .where(eq(initiativeLessons.initiativeId, initiativeId))
+      .orderBy(desc(initiativeLessons.createdAt));
+  }
+
+  async createInitiativeLesson(lesson: InsertInitiativeLesson): Promise<InitiativeLesson> {
+    const [newLesson] = await db.insert(initiativeLessons).values(lesson).returning();
+    return newLesson;
+  }
+
+  async updateInitiativeLesson(id: string, lesson: Partial<InsertInitiativeLesson>): Promise<InitiativeLesson | undefined> {
+    const [updatedLesson] = await db
+      .update(initiativeLessons)
+      .set(lesson)
+      .where(eq(initiativeLessons.id, id))
+      .returning();
+    return updatedLesson || undefined;
+  }
+
+  async deleteInitiativeLesson(id: string): Promise<boolean> {
+    const result = await db.delete(initiativeLessons).where(eq(initiativeLessons.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Initiative Health Checks
+  async getInitiativeHealthChecks(initiativeId: string): Promise<InitiativeHealthCheck[]> {
+    return await db
+      .select()
+      .from(initiativeHealthChecks)
+      .where(eq(initiativeHealthChecks.initiativeId, initiativeId))
+      .orderBy(desc(initiativeHealthChecks.checkDate));
+  }
+
+  async createInitiativeHealthCheck(healthCheck: InsertInitiativeHealthCheck): Promise<InitiativeHealthCheck> {
+    const [newHealthCheck] = await db.insert(initiativeHealthChecks).values(healthCheck).returning();
+    return newHealthCheck;
+  }
+
+  async updateInitiativeHealthCheck(id: string, healthCheck: Partial<InsertInitiativeHealthCheck>): Promise<InitiativeHealthCheck | undefined> {
+    const [updatedHealthCheck] = await db
+      .update(initiativeHealthChecks)
+      .set(healthCheck)
+      .where(eq(initiativeHealthChecks.id, id))
+      .returning();
+    return updatedHealthCheck || undefined;
+  }
+
+  async deleteInitiativeHealthCheck(id: string): Promise<boolean> {
+    const result = await db.delete(initiativeHealthChecks).where(eq(initiativeHealthChecks.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Initiative Experiments
+  async getInitiativeExperiments(initiativeId: string): Promise<InitiativeExperiment[]> {
+    return await db
+      .select()
+      .from(initiativeExperiments)
+      .where(eq(initiativeExperiments.initiativeId, initiativeId))
+      .orderBy(desc(initiativeExperiments.createdAt));
+  }
+
+  async createInitiativeExperiment(experiment: InsertInitiativeExperiment): Promise<InitiativeExperiment> {
+    const [newExperiment] = await db.insert(initiativeExperiments).values(experiment).returning();
+    return newExperiment;
+  }
+
+  async updateInitiativeExperiment(id: string, experiment: Partial<InsertInitiativeExperiment>): Promise<InitiativeExperiment | undefined> {
+    const [updatedExperiment] = await db
+      .update(initiativeExperiments)
+      .set({ ...experiment, updatedAt: new Date() })
+      .where(eq(initiativeExperiments.id, id))
+      .returning();
+    return updatedExperiment || undefined;
+  }
+
+  async deleteInitiativeExperiment(id: string): Promise<boolean> {
+    const result = await db.delete(initiativeExperiments).where(eq(initiativeExperiments.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Initiative Analysis & Summary
+  async getInitiativeAnalysis(initiativeId: string): Promise<any> {
+    // Get comprehensive initiative data for analysis
+    const initiative = await this.getInitiative(initiativeId);
+    if (!initiative) return null;
+
+    const [
+      budgetEntries,
+      lessons,
+      healthChecks,
+      experiments,
+      tasks,
+      successMetrics
+    ] = await Promise.all([
+      this.getBudgetEntries(initiativeId),
+      this.getInitiativeLessons(initiativeId),
+      this.getInitiativeHealthChecks(initiativeId),
+      this.getInitiativeExperiments(initiativeId),
+      this.getTasksByInitiativeId(initiativeId),
+      this.getSuccessMetricsByInitiativeId(initiativeId)
+    ]);
+
+    // Calculate budget analysis
+    const totalPlanned = budgetEntries.reduce((sum, entry) => 
+      sum + (entry.plannedAmount ? parseFloat(entry.plannedAmount) : 0), 0);
+    const totalSpent = budgetEntries.reduce((sum, entry) => 
+      sum + (entry.actualAmount ? parseFloat(entry.actualAmount) : 0), 0);
+    const budgetUtilization = totalPlanned > 0 ? (totalSpent / totalPlanned) * 100 : 0;
+
+    // Group budget by categories
+    const budgetByCategory = budgetEntries.reduce((acc, entry) => {
+      const category = entry.category || 'other';
+      if (!acc[category]) {
+        acc[category] = { planned: 0, spent: 0 };
+      }
+      acc[category].planned += entry.plannedAmount ? parseFloat(entry.plannedAmount) : 0;
+      acc[category].spent += entry.actualAmount ? parseFloat(entry.actualAmount) : 0;
+      return acc;
+    }, {} as { [key: string]: { planned: number; spent: number } });
+
+    // Execution health analysis
+    const lastHealthCheck = healthChecks[0] || null;
+    const currentHealth = lastHealthCheck ? lastHealthCheck.overallHealth : 'unknown';
+    
+    // Task completion analysis
+    const totalTasks = tasks.length;
+    const completedTasks = tasks.filter(task => task.status === 'completed').length;
+    const taskCompletionRate = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+
+    // Experiments analysis
+    const completedExperiments = experiments.filter(exp => exp.status === 'completed');
+    const successfulExperiments = completedExperiments.filter(exp => exp.outcome === 'success');
+    const experimentSuccessRate = completedExperiments.length > 0 ? 
+      (successfulExperiments.length / completedExperiments.length) * 100 : 0;
+
+    return {
+      initiative,
+      budgetAnalysis: {
+        totalPlanned,
+        totalSpent,
+        budgetUtilization,
+        categories: budgetByCategory,
+        variance: totalPlanned - totalSpent,
+        variancePercentage: totalPlanned > 0 ? ((totalPlanned - totalSpent) / totalPlanned) * 100 : 0
+      },
+      executionHealth: {
+        currentHealth,
+        lastCheck: lastHealthCheck,
+        totalHealthChecks: healthChecks.length,
+        trendsAnalysis: this.analyzeHealthTrends(healthChecks)
+      },
+      performanceMetrics: {
+        taskCompletionRate,
+        totalTasks,
+        completedTasks,
+        pendingTasks: totalTasks - completedTasks
+      },
+      experimentResults: {
+        totalExperiments: experiments.length,
+        completedExperiments: completedExperiments.length,
+        successfulExperiments: successfulExperiments.length,
+        experimentSuccessRate,
+        keyFindings: this.extractKeyFindings(experiments)
+      },
+      lessonsLearned: {
+        totalLessons: lessons.length,
+        lessonsByType: this.groupLessonsByType(lessons),
+        actionableLessons: lessons.filter(lesson => lesson.actionable),
+        highImpactLessons: lessons.filter(lesson => lesson.impact === 'high')
+      },
+      recommendations: this.generateRecommendations({
+        budgetUtilization,
+        currentHealth,
+        taskCompletionRate,
+        experimentSuccessRate,
+        lessons
+      })
+    };
+  }
+
+  private analyzeHealthTrends(healthChecks: InitiativeHealthCheck[]): string[] {
+    const trends: string[] = [];
+    
+    if (healthChecks.length < 2) {
+      trends.push("Insufficient data for trend analysis");
+      return trends;
+    }
+
+    // Analyze last 3 health checks for trends
+    const recentChecks = healthChecks.slice(0, 3);
+    const healthValues = { excellent: 4, good: 3, warning: 2, critical: 1 };
+    
+    const healthScores = recentChecks.map(check => 
+      healthValues[check.overallHealth as keyof typeof healthValues] || 0
+    );
+
+    // Check if health is improving or declining
+    if (healthScores[0] > healthScores[1]) {
+      trends.push("Health status is improving");
+    } else if (healthScores[0] < healthScores[1]) {
+      trends.push("Health status is declining");
+    } else {
+      trends.push("Health status is stable");
+    }
+
+    return trends;
+  }
+
+  private extractKeyFindings(experiments: InitiativeExperiment[]): string[] {
+    const findings: string[] = [];
+    
+    experiments.forEach(exp => {
+      if (exp.keyFindings) {
+        try {
+          const parsed = JSON.parse(exp.keyFindings);
+          if (Array.isArray(parsed)) {
+            findings.push(...parsed);
+          }
+        } catch (e) {
+          // If not JSON, treat as string
+          findings.push(exp.keyFindings);
+        }
+      }
+    });
+
+    return findings;
+  }
+
+  private groupLessonsByType(lessons: InitiativeLesson[]): { [key: string]: number } {
+    return lessons.reduce((acc, lesson) => {
+      const type = lesson.type || 'other';
+      acc[type] = (acc[type] || 0) + 1;
+      return acc;
+    }, {} as { [key: string]: number });
+  }
+
+  private generateRecommendations(data: {
+    budgetUtilization: number;
+    currentHealth: string;
+    taskCompletionRate: number;
+    experimentSuccessRate: number;
+    lessons: InitiativeLesson[];
+  }): string[] {
+    const recommendations: string[] = [];
+
+    // Budget recommendations
+    if (data.budgetUtilization > 120) {
+      recommendations.push("Consider reviewing budget allocation - spending is significantly over planned amount");
+    } else if (data.budgetUtilization < 50) {
+      recommendations.push("Budget utilization is low - consider accelerating execution or reallocating resources");
+    }
+
+    // Health recommendations
+    if (data.currentHealth === 'critical' || data.currentHealth === 'warning') {
+      recommendations.push("Immediate attention required - address critical health issues identified in latest health check");
+    }
+
+    // Task completion recommendations
+    if (data.taskCompletionRate < 70) {
+      recommendations.push("Task completion rate is below optimal - consider reviewing task allocation and deadlines");
+    }
+
+    // Experiment recommendations
+    if (data.experimentSuccessRate < 50 && data.experimentSuccessRate > 0) {
+      recommendations.push("Experiment success rate is low - review methodology and hypothesis validation process");
+    }
+
+    // Lessons learned recommendations
+    const actionableLessons = data.lessons.filter(lesson => lesson.actionable);
+    if (actionableLessons.length > 0) {
+      recommendations.push(`Apply ${actionableLessons.length} actionable lessons to future initiatives`);
+    }
+
+    return recommendations;
   }
 }
 

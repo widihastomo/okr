@@ -44,6 +44,10 @@ import TaskModal from "@/components/task-modal";
 import InitiativeModal from "@/components/initiative-modal";
 import { InitiativeNotes } from "@/components/initiative-notes";
 import SuccessMetricsModal from "@/components/success-metrics-modal-simple";
+import { BudgetEntryModal } from "@/components/budget-entry-modal";
+import { InitiativeLessonsModal } from "@/components/initiative-lessons-modal";
+import { InitiativeExperimentModal } from "@/components/initiative-experiment-modal";
+import { InitiativeHealthCheckModal } from "@/components/initiative-health-check-modal";
 import type { SuccessMetricWithUpdates } from "@shared/schema";
 
 export default function InitiativeDetailPage() {
@@ -441,6 +445,85 @@ export default function InitiativeDetailPage() {
               )}
             </CardContent>
           </Card>
+
+          {/* Learning & Documentation Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Budget Management */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <DollarSign className="h-5 w-5" />
+                    Manajemen Anggaran
+                  </CardTitle>
+                  <BudgetEntryModal initiativeId={id!} />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8 text-gray-500">
+                  <DollarSign className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                  <p className="text-sm">Fitur anggaran dalam pengembangan</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Health Monitoring */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Check className="h-5 w-5" />
+                    Pemantauan Kesehatan
+                  </CardTitle>
+                  <InitiativeHealthCheckModal initiativeId={id!} />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8 text-gray-500">
+                  <Check className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                  <p className="text-sm">Belum ada health check</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Lessons Learned */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Pembelajaran
+                  </CardTitle>
+                  <InitiativeLessonsModal initiativeId={id!} />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8 text-gray-500">
+                  <FileText className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                  <p className="text-sm">Belum ada pembelajaran terdokumentasi</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Experiments */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Target className="h-5 w-5" />
+                    Eksperimen
+                  </CardTitle>
+                  <InitiativeExperimentModal initiativeId={id!} />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8 text-gray-500">
+                  <Target className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                  <p className="text-sm">Belum ada eksperimen didokumentasi</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* Sidebar */}
