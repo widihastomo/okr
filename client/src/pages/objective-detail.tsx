@@ -355,6 +355,7 @@ export default function GoalDetail() {
     new Set(),
   );
   const [showInitiativeFormModal, setShowInitiativeFormModal] = useState(false);
+  const [editingInitiative, setEditingInitiative] = useState<Initiative | null>(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [tourStep, setTourStep] = useState<number>(0);
   const [showTour, setShowTour] = useState(false);
@@ -1849,7 +1850,12 @@ export default function GoalDetail() {
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end">
-                                    <DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() => {
+                                        setEditingInitiative(initiative);
+                                        setShowInitiativeFormModal(true);
+                                      }}
+                                    >
                                       <Edit className="mr-2 h-4 w-4" />
                                       Ubah
                                     </DropdownMenuItem>
@@ -2253,9 +2259,13 @@ export default function GoalDetail() {
       {/* Initiative Form Modal */}
       <InitiativeFormModal
         isOpen={showInitiativeFormModal}
-        onClose={() => setShowInitiativeFormModal(false)}
+        onClose={() => {
+          setShowInitiativeFormModal(false);
+          setEditingInitiative(null);
+        }}
         keyResultId={goal?.keyResults?.[0]?.id || ""}
         objectiveId={id}
+        initiative={editingInitiative}
       />
 
       {/* AI Help Bubble */}
