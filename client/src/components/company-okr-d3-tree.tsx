@@ -113,6 +113,22 @@ export default function CompanyOKRD3Tree({
       .attr("width", width)
       .attr("height", height);
 
+    // Add shadow filter definition
+    const defs = svg.append("defs");
+    const filter = defs.append("filter")
+      .attr("id", "shadow")
+      .attr("x", "-50%")
+      .attr("y", "-50%")
+      .attr("width", "200%")
+      .attr("height", "200%");
+    
+    filter.append("feDropShadow")
+      .attr("dx", 0)
+      .attr("dy", 2)
+      .attr("stdDeviation", 3)
+      .attr("flood-color", "#000000")
+      .attr("flood-opacity", 0.2);
+
     // Add zoom behavior
     const g = svg.append("g");
     
@@ -332,69 +348,97 @@ export default function CompanyOKRD3Tree({
       .attr("fill", "white")
       .text(d => `${Math.round(d.data.data.overallProgress)}%`);
 
-    // Add expand/collapse button if has children
+    // Add expand/collapse button if has children - positioned at middle right edge
     const expandButton = node.filter(d => d.data.children.length > 0)
       .append("g")
-      .attr("transform", `translate(${nodeWidth - 45}, ${nodeHeight - 32})`)
+      .attr("transform", `translate(${nodeWidth - 16}, ${nodeHeight / 2 - 10})`)
       .style("cursor", "pointer")
       .on("click", (event, d) => {
         event.stopPropagation();
         onToggleExpand(d.data.id);
       });
 
-    // Button background with blue theme
-    expandButton.append("rect")
-      .attr("width", 32)
-      .attr("height", 20)
-      .attr("rx", 10)
-      .attr("fill", d => expandedNodes.has(d.data.id) ? "#3b82f6" : "#e5e7eb")
+    // Floating button background with shadow effect
+    expandButton.append("circle")
+      .attr("cx", 0)
+      .attr("cy", 10)
+      .attr("r", 16)
+      .attr("fill", "#ffffff")
+      .attr("stroke", "#e5e7eb")
+      .attr("stroke-width", 2)
+      .attr("filter", "url(#shadow)");
+
+    // Inner circle with color based on state
+    expandButton.append("circle")
+      .attr("cx", 0)
+      .attr("cy", 10)
+      .attr("r", 12)
+      .attr("fill", d => expandedNodes.has(d.data.id) ? "#3b82f6" : "#f3f4f6")
       .attr("stroke", "#3b82f6")
       .attr("stroke-width", 1);
 
     // Plus/minus icon
     expandButton.append("text")
-      .attr("x", 8)
-      .attr("y", 14)
+      .attr("x", -6)
+      .attr("y", 15)
       .attr("text-anchor", "middle")
-      .attr("font-size", "12px")
+      .attr("font-size", "14px")
       .attr("font-weight", "bold")
       .attr("fill", d => expandedNodes.has(d.data.id) ? "white" : "#3b82f6")
       .text(d => expandedNodes.has(d.data.id) ? "−" : "+");
 
-    // Children count
+    // Children count in small badge
+    expandButton.append("circle")
+      .attr("cx", 8)
+      .attr("cy", 2)
+      .attr("r", 6)
+      .attr("fill", "#ef4444")
+      .attr("stroke", "white")
+      .attr("stroke-width", 1);
+
     expandButton.append("text")
-      .attr("x", 24)
-      .attr("y", 14)
+      .attr("x", 8)
+      .attr("y", 6)
       .attr("text-anchor", "middle")
-      .attr("font-size", "9px")
-      .attr("font-weight", "600")
-      .attr("fill", d => expandedNodes.has(d.data.id) ? "white" : "#3b82f6")
+      .attr("font-size", "8px")
+      .attr("font-weight", "bold")
+      .attr("fill", "white")
       .text(d => d.data.children.length);
 
-    // Add hover effect with smooth transitions
+    // Add hover effect with smooth transitions for floating button
     expandButton.on("mouseenter", function(event, d) {
-      d3.select(this).select("rect")
+      d3.select(this).selectAll("circle:nth-child(2)")
         .transition()
         .duration(200)
-        .attr("fill", expandedNodes.has(d.data.id) ? "#2563eb" : "#f3f4f6")
-        .attr("transform", "scale(1.05)");
+        .attr("fill", expandedNodes.has(d.data.id) ? "#2563eb" : "#ddd6fe")
+        .attr("r", 13);
+      
+      d3.select(this)
+        .transition()
+        .duration(200)
+        .attr("transform", d => `translate(${nodeWidth - 16}, ${nodeHeight / 2 - 10}) scale(1.1)`);
     }).on("mouseleave", function(event, d) {
-      d3.select(this).select("rect")
+      d3.select(this).selectAll("circle:nth-child(2)")
         .transition()
         .duration(200)
-        .attr("fill", expandedNodes.has(d.data.id) ? "#3b82f6" : "#e5e7eb")
-        .attr("transform", "scale(1)");
+        .attr("fill", expandedNodes.has(d.data.id) ? "#3b82f6" : "#f3f4f6")
+        .attr("r", 12);
+      
+      d3.select(this)
+        .transition()
+        .duration(200)
+        .attr("transform", d => `translate(${nodeWidth - 16}, ${nodeHeight / 2 - 10}) scale(1)`);
     });
 
-    // Add pulse animation for nodes with children when collapsed
+    // Add subtle pulse animation for collapsed nodes
     expandButton.filter(d => !expandedNodes.has(d.data.id))
-      .select("rect")
-      .style("animation", "pulse 2s ease-in-out infinite");
+      .selectAll("circle:nth-child(2)")
+      .style("animation", "pulse 3s ease-in-out infinite");
 
-    // Add tooltip-like label
+    // Add tooltip-like label for floating button
     expandButton.append("rect")
-      .attr("x", -38)
-      .attr("y", -22)
+      .attr("x", -58)
+      .attr("y", 4)
       .attr("width", 76)
       .attr("height", 16)
       .attr("rx", 8)
@@ -403,8 +447,8 @@ export default function CompanyOKRD3Tree({
       .style("pointer-events", "none");
 
     expandButton.append("text")
-      .attr("x", 0)
-      .attr("y", -10)
+      .attr("x", -20)
+      .attr("y", 14)
       .attr("text-anchor", "middle")
       .attr("font-size", "10px")
       .attr("fill", "white")
