@@ -200,10 +200,27 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
         className: "border-green-200 bg-green-50 text-green-800",
       });
       
+      // Invalidate all initiative-related queries
       queryClient.invalidateQueries({ queryKey: ["/api/initiatives"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/initiative-members"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/initiatives/objective"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
+      
+      // Also invalidate specific objective queries if keyResultId is provided
       if (keyResultId) {
-        queryClient.invalidateQueries({ queryKey: ["/api/initiatives/objective"] });
+        // Get the objective ID from keyResult to invalidate specific objective queries
+        const keyResults = queryClient.getQueryData(["/api/key-results"]) as any[];
+        const keyResult = keyResults?.find(kr => kr.id === keyResultId);
+        if (keyResult?.objectiveId) {
+          queryClient.invalidateQueries({ queryKey: [`/api/initiatives/objective/${keyResult.objectiveId}`] });
+          queryClient.invalidateQueries({ queryKey: [`/api/okrs/${keyResult.objectiveId}`] });
+        }
       }
+      
+      // Force a small delay to ensure queries are fully invalidated
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ["/api/initiatives"] });
+      }, 100);
       
       onClose();
       form.reset();
