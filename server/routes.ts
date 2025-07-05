@@ -2828,6 +2828,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update initiative status endpoint
+  app.post("/api/initiatives/:id/update-status", requireAuth, async (req, res) => {
+    try {
+      const { updateInitiativeStatus } = await import("./initiative-status-manager");
+      const initiativeId = req.params.id;
+      
+      const result = await updateInitiativeStatus(initiativeId);
+      
+      if (result) {
+        res.json({
+          message: "Status updated successfully",
+          update: result
+        });
+      } else {
+        res.json({
+          message: "No status change required"
+        });
+      }
+    } catch (error) {
+      console.error("Error updating initiative status:", error);
+      res.status(500).json({ message: "Failed to update initiative status" });
+    }
+  });
+
   // Register AI routes
   registerAIRoutes(app);
 

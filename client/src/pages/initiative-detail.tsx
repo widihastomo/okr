@@ -267,6 +267,10 @@ export default function InitiativeDetailPage() {
                 {initiativeData.title}
               </h1>
               {getStatusBadge(initiativeData.status)}
+              {/* Debug info - remove later */}
+              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                Status: {initiativeData.status}
+              </span>
             </div>
           </div>
           
@@ -281,6 +285,28 @@ export default function InitiativeDetailPage() {
                 Edit
               </Button>
             )}
+            
+            {/* Force update status button for testing */}
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={async () => {
+                try {
+                  await apiRequest("POST", `/api/initiatives/${id}/update-status`);
+                  queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
+                  toast({
+                    title: "Status updated",
+                    description: "Initiative status has been recalculated",
+                    className: "border-green-200 bg-green-50 text-green-800",
+                  });
+                } catch (error) {
+                  console.error("Status update failed:", error);
+                }
+              }}
+              className="text-xs"
+            >
+              Update Status
+            </Button>
             
             {canClose(initiativeData.status) && (
               <Button 
