@@ -241,128 +241,148 @@ export default function InitiativeDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <Button 
-          variant="ghost" 
-          size="sm"
-          className="flex items-center gap-2"
-          onClick={() => {
-            if (window.history.length > 1) {
-              window.history.back();
-            } else {
-              window.location.href = '/dashboard?tab=initiatives';
-            }
-          }}
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </Button>
-        
-        <div className="flex items-center gap-3">
-          {canEdit(initiativeData.status) && (
+      <div className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
             <Button 
-              variant="outline" 
-              onClick={() => setIsEditInitiativeModalOpen(true)}
+              variant="ghost" 
+              size="sm"
               className="flex items-center gap-2"
-            >
-              <Edit className="h-4 w-4" />
-              Edit Initiative
-            </Button>
-          )}
-          
-          {canClose(initiativeData.status) && (
-            <Button 
-              onClick={() => setIsClosureModalOpen(true)}
-              className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
-            >
-              <CheckCircle className="h-4 w-4" />
-              Tutup Inisiatif
-            </Button>
-          )}
-          
-          {canCancel(initiativeData.status) && (
-            <Button 
-              variant="outline" 
               onClick={() => {
-                // TODO: Add cancel functionality
-                console.log('Cancel initiative');
+                if (window.history.length > 1) {
+                  window.history.back();
+                } else {
+                  window.location.href = '/dashboard?tab=initiatives';
+                }
               }}
-              className="flex items-center gap-2 border-red-300 text-red-600 hover:bg-red-50"
             >
-              <XCircle className="h-4 w-4" />
-              Batalkan
+              <ArrowLeft className="h-4 w-4" />
+              Kembali
             </Button>
-          )}
+            
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl font-semibold text-gray-900">
+                {initiativeData.title}
+              </h1>
+              {getStatusBadge(initiativeData.status)}
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            {canEdit(initiativeData.status) && (
+              <Button 
+                variant="outline" 
+                onClick={() => setIsEditInitiativeModalOpen(true)}
+                className="flex items-center gap-2"
+              >
+                <Edit className="h-4 w-4" />
+                Edit
+              </Button>
+            )}
+            
+            {canClose(initiativeData.status) && (
+              <Button 
+                onClick={() => setIsClosureModalOpen(true)}
+                className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+              >
+                <CheckCircle className="h-4 w-4" />
+                Tutup Inisiatif
+              </Button>
+            )}
+            
+            {canCancel(initiativeData.status) && (
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  // TODO: Add cancel functionality
+                  console.log('Cancel initiative');
+                }}
+                className="flex items-center gap-2 border-red-300 text-red-600 hover:bg-red-50"
+              >
+                <XCircle className="h-4 w-4" />
+                Batalkan
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Overview Card */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <CardTitle className="text-xl font-bold text-gray-900">
-                      {initiativeData.title}
-                    </CardTitle>
-                    {getStatusBadge(initiativeData.status)}
+      <div className="p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Overview Card */}
+            <Card>
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                      {initiativeData.description}
+                    </p>
                   </div>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    {initiativeData.description}
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <Flag className="h-4 w-4 text-orange-500" />
-                  <span className="text-gray-600">Priority:</span>
-                  <span className="font-medium">{initiativeData.priority}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4 text-green-500" />
-                  <span className="text-gray-600">Budget:</span>
-                  <span className="font-medium">
-                    {initiativeData.budget ? `Rp ${Number(initiativeData.budget).toLocaleString('id-ID')}` : 'N/A'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-blue-500" />
-                  <span className="text-gray-600">Start:</span>
-                  <span className="font-medium">
-                    {new Date(initiativeData.startDate).toLocaleDateString('id-ID')}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-red-500" />
-                  <span className="text-gray-600">End:</span>
-                  <span className="font-medium">
-                    {new Date(initiativeData.endDate).toLocaleDateString('id-ID')}
-                  </span>
-                </div>
-              </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Flag className="h-4 w-4 text-orange-500" />
+                        <span className="text-gray-600">Priority:</span>
+                        <span className="font-medium">{initiativeData.priority}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <DollarSign className="h-4 w-4 text-green-500" />
+                        <span className="text-gray-600">Budget:</span>
+                        <span className="font-medium">
+                          {initiativeData.budget ? `Rp ${Number(initiativeData.budget).toLocaleString('id-ID')}` : 'Tidak ada'}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="h-4 w-4 text-blue-500" />
+                        <span className="text-gray-600">Mulai:</span>
+                        <span className="font-medium">
+                          {new Date(initiativeData.startDate).toLocaleDateString('id-ID')}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Clock className="h-4 w-4 text-red-500" />
+                        <span className="text-gray-600">Berakhir:</span>
+                        <span className="font-medium">
+                          {new Date(initiativeData.endDate).toLocaleDateString('id-ID')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
 
-              {/* Key Result Information */}
-              {keyResult && (
-                <div className="border border-blue-200 bg-blue-50 p-3 rounded-lg mt-4">
-                  <div className="flex items-center justify-between">
-                    <Link href={`/key-results/${keyResult.id}`}>
-                      <span className="text-sm font-semibold text-blue-900 hover:text-blue-700">
-                        Key Result: {keyResult.title}
-                      </span>
-                    </Link>
-                    <span className="text-xs font-bold text-blue-900">{(keyResult.progress || 0).toFixed(1)}%</span>
-                  </div>
+                  {/* Key Result Information */}
+                  {keyResult && (
+                    <div className="border border-blue-200 bg-blue-50 p-4 rounded-lg mt-4">
+                      <div className="flex items-center justify-between">
+                        <Link href={`/key-results/${keyResult.id}`}>
+                          <div className="hover:text-blue-700 transition-colors">
+                            <span className="text-sm font-semibold text-blue-900">
+                              Target Terkait: {keyResult.title}
+                            </span>
+                            <div className="text-xs text-blue-700 mt-1">
+                              {keyResult.description}
+                            </div>
+                          </div>
+                        </Link>
+                        <div className="text-right">
+                          <div className="text-lg font-bold text-blue-900">
+                            {(keyResult.progress || 0).toFixed(1)}%
+                          </div>
+                          <div className="text-xs text-blue-700">Progress</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
           {/* Success Metrics Management Section */}
           <Card>
@@ -568,8 +588,9 @@ export default function InitiativeDetailPage() {
             </CardContent>
           </Card>
 
-          {/* Initiative Notes */}
-          <InitiativeNotes initiativeId={id!} />
+            {/* Initiative Notes */}
+            <InitiativeNotes initiativeId={id!} />
+          </div>
         </div>
       </div>
 
