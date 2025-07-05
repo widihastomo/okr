@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,25 +18,45 @@ interface InitiativeHealthCheckModalProps {
   trigger?: React.ReactNode;
 }
 
-const healthStatuses = [
+const overallHealthStatuses = [
   { value: "excellent", label: "Sangat Baik", color: "text-green-600" },
   { value: "good", label: "Baik", color: "text-blue-600" },
   { value: "warning", label: "Perhatian", color: "text-yellow-600" },
   { value: "critical", label: "Kritis", color: "text-red-600" }
 ];
 
-const riskLevels = [
-  { value: "low", label: "Rendah" },
-  { value: "medium", label: "Sedang" },
-  { value: "high", label: "Tinggi" },
-  { value: "critical", label: "Kritis" }
+const scheduleHealthStatuses = [
+  { value: "on_track", label: "Sesuai Jadwal" },
+  { value: "slight_delay", label: "Sedikit Terlambat" },
+  { value: "significant_delay", label: "Terlambat Signifikan" },
+  { value: "critical_delay", label: "Terlambat Kritis" }
+];
+
+const budgetHealthStatuses = [
+  { value: "under_budget", label: "Di Bawah Anggaran" },
+  { value: "on_budget", label: "Sesuai Anggaran" },
+  { value: "over_budget", label: "Melebihi Anggaran" },
+  { value: "critical_overspend", label: "Overspend Kritis" }
+];
+
+const teamHealthStatuses = [
+  { value: "high_morale", label: "Moral Tinggi" },
+  { value: "good", label: "Baik" },
+  { value: "concerns", label: "Ada Kekhawatiran" },
+  { value: "critical_issues", label: "Masalah Kritis" }
+];
+
+const qualityHealthStatuses = [
+  { value: "exceeds_expectations", label: "Melebihi Ekspektasi" },
+  { value: "meets_standards", label: "Memenuhi Standar" },
+  { value: "below_standards", label: "Di Bawah Standar" },
+  { value: "critical_issues", label: "Masalah Kritis" }
 ];
 
 const healthCheckFormSchema = insertInitiativeHealthCheckSchema.omit({
   id: true,
   initiativeId: true,
-  checkedBy: true,
-  createdAt: true
+  checkedBy: true
 });
 
 export function InitiativeHealthCheckModal({ initiativeId, trigger }: InitiativeHealthCheckModalProps) {
@@ -44,27 +64,29 @@ export function InitiativeHealthCheckModal({ initiativeId, trigger }: Initiative
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const form = useForm<Omit<InsertInitiativeHealthCheck, 'id' | 'initiativeId' | 'checkedBy' | 'createdAt'>>({
+  const form = useForm<Omit<InsertInitiativeHealthCheck, 'id' | 'initiativeId' | 'checkedBy'>>({
     resolver: zodResolver(healthCheckFormSchema),
     defaultValues: {
-      checkDate: new Date().toISOString().split('T')[0],
       overallHealth: "good",
-      progressHealth: "good",
-      budgetHealth: "good",
+      scheduleHealth: "on_track",
+      budgetHealth: "on_budget", 
       teamHealth: "good",
-      riskLevel: "low",
-      blockers: "",
-      achievements: "",
+      qualityHealth: "meets_standards",
+      scheduleNotes: "",
+      budgetNotes: "",
+      teamNotes: "",
+      qualityNotes: "",
+      immediateActions: "",
+      risks: "",
       recommendations: "",
-      notes: ""
     }
   });
 
   const createHealthCheckMutation = useMutation({
-    mutationFn: (data: Omit<InsertInitiativeHealthCheck, 'id' | 'checkedBy' | 'createdAt'>) =>
+    mutationFn: (data: Omit<InsertInitiativeHealthCheck, 'id' | 'checkedBy'>) =>
       apiRequest(`/api/initiatives/${initiativeId}/health-checks`, {
         method: "POST",
-        body: data
+        body: JSON.stringify(data)
       }),
     onSuccess: () => {
       toast({
@@ -114,6 +136,9 @@ export function InitiativeHealthCheckModal({ initiativeId, trigger }: Initiative
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Pemeriksaan Kesehatan Inisiatif</DialogTitle>
+          <DialogDescription>
+            Lakukan evaluasi kesehatan inisiatif secara berkala untuk memantau progress dan mengidentifikasi risiko
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -149,7 +174,7 @@ export function InitiativeHealthCheckModal({ initiativeId, trigger }: Initiative
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {healthStatuses.map((status) => (
+                        {overallHealthStatuses.map((status) => (
                           <SelectItem key={status.value} value={status.value}>
                             <span className={status.color}>
                               {status.label}
@@ -192,10 +217,10 @@ export function InitiativeHealthCheckModal({ initiativeId, trigger }: Initiative
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
-                name="progressHealth"
+                name="scheduleHealth"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Kesehatan Progress</FormLabel>
+                    <FormLabel>Kesehatan Jadwal</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -203,7 +228,7 @@ export function InitiativeHealthCheckModal({ initiativeId, trigger }: Initiative
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {healthStatuses.map((status) => (
+                        {scheduleHealthStatuses.map((status) => (
                           <SelectItem key={status.value} value={status.value}>
                             {status.label}
                           </SelectItem>
@@ -228,7 +253,7 @@ export function InitiativeHealthCheckModal({ initiativeId, trigger }: Initiative
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {healthStatuses.map((status) => (
+                        {budgetHealthStatuses.map((status) => (
                           <SelectItem key={status.value} value={status.value}>
                             {status.label}
                           </SelectItem>
@@ -253,7 +278,7 @@ export function InitiativeHealthCheckModal({ initiativeId, trigger }: Initiative
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {healthStatuses.map((status) => (
+                        {teamHealthStatuses.map((status) => (
                           <SelectItem key={status.value} value={status.value}>
                             {status.label}
                           </SelectItem>
@@ -268,13 +293,14 @@ export function InitiativeHealthCheckModal({ initiativeId, trigger }: Initiative
 
             <FormField
               control={form.control}
-              name="blockers"
+              name="immediateActions"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Hambatan dan Blocker - Opsional</FormLabel>
                   <FormControl>
                     <Textarea
                       {...field}
+                      value={field.value || ""}
                       placeholder="Apa saja yang menghalangi progress inisiatif saat ini?"
                       rows={3}
                     />
@@ -286,14 +312,15 @@ export function InitiativeHealthCheckModal({ initiativeId, trigger }: Initiative
 
             <FormField
               control={form.control}
-              name="achievements"
+              name="risks"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Pencapaian Periode Ini - Opsional</FormLabel>
                   <FormControl>
                     <Textarea
                       {...field}
-                      placeholder="Apa saja yang telah berhasil dicapai sejak health check terakhir?"
+                      value={field.value || ""}
+                      placeholder="Risiko apa saja yang dapat mempengaruhi kesuksesan inisiatif?"
                       rows={3}
                     />
                   </FormControl>
@@ -311,6 +338,7 @@ export function InitiativeHealthCheckModal({ initiativeId, trigger }: Initiative
                   <FormControl>
                     <Textarea
                       {...field}
+                      value={field.value || ""}
                       placeholder="Apa yang perlu dilakukan untuk meningkatkan kesehatan inisiatif?"
                       rows={3}
                     />
@@ -322,7 +350,7 @@ export function InitiativeHealthCheckModal({ initiativeId, trigger }: Initiative
 
             <FormField
               control={form.control}
-              name="notes"
+              name="scheduleNotes"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Catatan Tambahan - Opsional</FormLabel>
