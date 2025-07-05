@@ -123,6 +123,7 @@ import AIHelpBubble from "@/components/ai-help-bubble";
 import ObjectiveOverviewCard from "@/components/objective-overview-card";
 import ObjectiveTimeline from "@/components/objective-timeline";
 import ActivityLogCard from "@/components/activity-log-card";
+import SimpleTaskModal from "@/components/simple-task-modal";
 import type {
   OKRWithKeyResults,
   KeyResult,
@@ -363,6 +364,7 @@ export default function GoalDetail() {
   const [tourStep, setTourStep] = useState<number>(0);
   const [showTour, setShowTour] = useState(false);
   const [tourForceUpdate, setTourForceUpdate] = useState(0);
+  const [activeTab, setActiveTab] = useState("key-results");
 
 
   // Check for highlight parameter in URL
@@ -472,6 +474,10 @@ export default function GoalDetail() {
       });
       queryClient.invalidateQueries({ queryKey: [`/api/okrs/${id}`] });
       setAddKeyResultModal({ open: false });
+      
+      // Switch to key-results tab after successful creation
+      setActiveTab("key-results");
+      
       // Reset form handled by KeyResultModal
     },
     onError: (error: Error) => {
@@ -977,7 +983,7 @@ export default function GoalDetail() {
         />
       )}
       {/* Tabs Section */}
-      <Tabs defaultValue="key-results" className="space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="flex w-full h-auto p-0 bg-transparent gap-0 rounded-none mb-4 sm:mb-6 relative tour-tabs">
           {/* Tab 1 */}
           <TabsTrigger
@@ -2308,6 +2314,10 @@ export default function GoalDetail() {
           setShowInitiativeFormModal(false);
           setEditingInitiative(null);
         }}
+        onSuccess={() => {
+          // Switch to initiatives tab after successful creation/update
+          setActiveTab("initiatives");
+        }}
         keyResultId={goal?.keyResults?.[0]?.id || ""}
         objectiveId={id}
         initiative={editingInitiative ?? undefined}
@@ -2321,6 +2331,16 @@ export default function GoalDetail() {
           onOpenChange={setEditObjectiveModal}
         />
       )}
+
+      {/* Task Modal */}
+      <SimpleTaskModal
+        open={showTaskModal}
+        onClose={() => setShowTaskModal(false)}
+        onSuccess={() => {
+          // Switch to tasks tab after successful creation
+          setActiveTab("tasks");
+        }}
+      />
 
       {/* AI Help Bubble */}
       <AIHelpBubble

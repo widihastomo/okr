@@ -59,12 +59,13 @@ type InitiativeFormData = z.infer<typeof initiativeFormSchema>;
 interface InitiativeFormModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
   keyResultId?: string;
   initiative?: Initiative;
   objectiveId?: string; // Filter key results by objective
 }
 
-export default function InitiativeFormModal({ isOpen, onClose, keyResultId, initiative, objectiveId }: InitiativeFormModalProps) {
+export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyResultId, initiative, objectiveId }: InitiativeFormModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -266,6 +267,11 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
       setTimeout(() => {
         queryClient.refetchQueries({ queryKey: ["/api/initiatives"] });
       }, 100);
+      
+      // Call onSuccess callback if provided
+      if (onSuccess) {
+        onSuccess();
+      }
       
       onClose();
       form.reset();
