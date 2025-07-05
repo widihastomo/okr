@@ -24,6 +24,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
+import { SearchableKeyResultSelect } from "@/components/ui/searchable-key-result-select";
 import { formatNumberWithSeparator, handleNumberInputChange, getNumberValueForSubmission } from "@/lib/number-utils";
 import type { KeyResult, User, Initiative } from "@shared/schema";
 
@@ -326,20 +327,14 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                           </PopoverContent>
                         </Popover>
                       </FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih angka target" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {keyResults.map((kr) => (
-                            <SelectItem key={kr.id} value={kr.id}>
-                              {kr.title}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <SearchableKeyResultSelect
+                          keyResults={keyResults}
+                          value={field.value || ""}
+                          onValueChange={field.onChange}
+                          placeholder="Pilih angka target"
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
