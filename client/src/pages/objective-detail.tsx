@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import {
@@ -71,6 +73,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -84,16 +96,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import {
   Popover,
   PopoverContent,
@@ -116,8 +118,7 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+
 import AIHelpBubble from "@/components/ai-help-bubble";
 import ObjectiveOverviewCard from "@/components/objective-overview-card";
 import ObjectiveTimeline from "@/components/objective-timeline";
@@ -356,7 +357,9 @@ export default function GoalDetail() {
   );
   const [showInitiativeFormModal, setShowInitiativeFormModal] = useState(false);
   const [editingInitiative, setEditingInitiative] = useState<Initiative | null>(null);
+  const [deletingInitiative, setDeletingInitiative] = useState<Initiative | null>(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
+  const queryClient = useQueryClient();
   const [tourStep, setTourStep] = useState<number>(0);
   const [showTour, setShowTour] = useState(false);
   const [tourForceUpdate, setTourForceUpdate] = useState(0);
@@ -521,6 +524,39 @@ export default function GoalDetail() {
     },
   });
 
+  // Delete initiative mutation
+  const deleteInitiativeMutation = useMutation({
+    mutationFn: async (initiativeId: string) => {
+      return await apiRequest("DELETE", `/api/initiatives/${initiativeId}`);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Inisiatif berhasil dihapus",
+        description: "Inisiatif telah dihapus secara permanen.",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+      
+      // Invalidate all initiative-related queries
+      queryClient.invalidateQueries({ queryKey: ["/api/initiatives"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/initiative-members"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/initiatives/objective"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
+      if (id) {
+        queryClient.invalidateQueries({ queryKey: [`/api/initiatives/objective/${id}`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/okrs/${id}`] });
+      }
+      
+      setDeletingInitiative(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal menghapus inisiatif",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleDeleteKeyResult = (keyResult: KeyResult) => {
     setDeleteKeyResultModal({ open: true, keyResult });
   };
@@ -529,6 +565,12 @@ export default function GoalDetail() {
     if (deleteKeyResultModal.keyResult) {
       deleteKeyResultMutation.mutate(deleteKeyResultModal.keyResult.id);
       setDeleteKeyResultModal({ open: false });
+    }
+  };
+
+  const confirmDeleteInitiative = () => {
+    if (deletingInitiative) {
+      deleteInitiativeMutation.mutate(deletingInitiative.id);
     }
   };
 
@@ -1859,7 +1901,10 @@ export default function GoalDetail() {
                                       <Edit className="mr-2 h-4 w-4" />
                                       Ubah
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem className="text-red-600">
+                                    <DropdownMenuItem 
+                                      className="text-red-600"
+                                      onClick={() => setDeletingInitiative(initiative)}
+                                    >
                                       <Trash2 className="mr-2 h-4 w-4" />
                                       Hapus
                                     </DropdownMenuItem>
@@ -2304,6 +2349,27 @@ export default function GoalDetail() {
             <AlertDialogCancel>Batal</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteKeyResult}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Initiative Confirmation Dialog */}
+      <AlertDialog open={!!deletingInitiative} onOpenChange={() => setDeletingInitiative(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Inisiatif</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus inisiatif "{deletingInitiative?.title}"? Tindakan ini tidak dapat dibatalkan dan akan menghapus semua data terkait secara permanen.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteInitiative}
               className="bg-red-600 hover:bg-red-700"
             >
               Hapus
