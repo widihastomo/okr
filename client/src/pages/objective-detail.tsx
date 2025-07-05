@@ -2313,6 +2313,15 @@ export default function GoalDetail() {
         initiative={editingInitiative ?? undefined}
       />
 
+      {/* Edit Objective Modal */}
+      {goal && (
+        <EditObjectiveModal
+          objective={goal}
+          open={editObjectiveModal}
+          onOpenChange={setEditObjectiveModal}
+        />
+      )}
+
       {/* AI Help Bubble */}
       <AIHelpBubble
         context="objective_detail"
