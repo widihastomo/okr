@@ -52,7 +52,22 @@ export default function CompanyOKRPage() {
   // Filter OKRs by selected cycle
   const filteredOKRs = selectedCycle === 'all' 
     ? okrs 
-    : okrs.filter((okr: any) => okr.cycleId === selectedCycle);
+    : (okrs as any[]).filter((okr: any) => okr.cycleId === selectedCycle);
+
+  // Auto-expand root nodes that have children on first load
+  useEffect(() => {
+    if ((filteredOKRs as any[]).length > 0 && expandedNodes.size === 0) {
+      const rootNodesWithChildren = (filteredOKRs as any[])
+        .filter((okr: any) => !okr.parentId) // root nodes
+        .filter((okr: any) => (filteredOKRs as any[]).some((child: any) => child.parentId === okr.id)) // that have children
+        .map((okr: any) => okr.id);
+      
+      if (rootNodesWithChildren.length > 0) {
+        console.log('Auto-expanding root nodes:', rootNodesWithChildren);
+        setExpandedNodes(new Set(rootNodesWithChildren));
+      }
+    }
+  }, [(filteredOKRs as any[]).length, expandedNodes.size]);
 
   // Build tree structure
   const buildTree = (okrs: OKRWithKeyResults[]): TreeNode[] => {

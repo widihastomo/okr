@@ -47,6 +47,8 @@ export default function CompanyOKRD3Tree({
     const nodeMap = new Map<string, TreeNode>();
     const rootNodes: TreeNode[] = [];
 
+    console.log('Building tree from OKRs:', okrs.map(okr => ({ id: okr.id, title: okr.title, parentId: okr.parentId })));
+
     // Create nodes for all OKRs
     okrs.forEach(okr => {
       nodeMap.set(okr.id, {
@@ -64,10 +66,15 @@ export default function CompanyOKRD3Tree({
         const parent = nodeMap.get(okr.parentId)!;
         parent.children.push(node);
         node.parent = parent;
+        console.log(`Added child ${okr.title} to parent ${parent.data.title}`);
       } else {
         rootNodes.push(node);
+        console.log(`Added root node: ${okr.title}`);
       }
     });
+
+    console.log('Root nodes count:', rootNodes.length);
+    console.log('Nodes with children:', Array.from(nodeMap.values()).filter(node => node.children.length > 0).map(node => ({ title: node.data.title, children: node.children.length })));
 
     return rootNodes;
   };
@@ -126,15 +133,34 @@ export default function CompanyOKRD3Tree({
     const treeData = buildTree(okrs);
     if (treeData.length === 0) return;
 
-    // Create hierarchy and tree layout
-    const root = d3.hierarchy(treeData[0], d => 
-      expandedNodes.has(d.id) ? d.children : []
-    );
+    // Create hierarchy and tree layout - handle multiple roots or single root
+    let root;
+    if (treeData.length === 1) {
+      // Single root node
+      console.log('Creating hierarchy for single root, expandedNodes:', Array.from(expandedNodes));
+      root = d3.hierarchy(treeData[0], d => {
+        const isExpanded = expandedNodes.has(d.id);
+        console.log(`Node ${d.data.title} (${d.id}) expanded: ${isExpanded}, children: ${d.children.length}`);
+        return isExpanded ? d.children : [];
+      });
+    } else {
+      // Multiple root nodes - create artificial root
+      const artificialRoot: TreeNode = {
+        id: 'artificial-root',
+        data: { id: 'root', title: 'Company OKRs', keyResults: [] } as any,
+        children: treeData
+      };
+      root = d3.hierarchy(artificialRoot, d => 
+        d.id === 'artificial-root' ? d.children : (expandedNodes.has(d.id) ? d.children : [])
+      );
+    }
 
     const treeLayout = d3.tree<TreeNode>()
       .nodeSize([verticalSpacing, horizontalSpacing]);
 
     treeLayout(root);
+    
+    console.log('After tree layout:', root.descendants().map(d => ({ title: d.data.data.title, x: d.x, y: d.y, depth: d.depth })));
 
     // Center the tree
     const bounds = {
@@ -196,8 +222,11 @@ export default function CompanyOKRD3Tree({
       });
 
     // Create node groups
+    const descendants = root.descendants();
+    console.log('Total descendants to render:', descendants.length, descendants.map(d => ({ title: d.data.data.title, x: d.x, y: d.y })));
+    
     const node = g.selectAll(".node")
-      .data(root.descendants())
+      .data(descendants)
       .enter()
       .append("g")
       .attr("class", "node")
