@@ -83,10 +83,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       active: location === "/analytics"
     },
     {
-      label: "Jaringan",
+      label: "Jaringan Goal",
       icon: Network,
-      path: "/network",
-      active: location === "/network"
+      path: "/goal-network",
+      active: location === "/goal-network"
     }
   ];
 
