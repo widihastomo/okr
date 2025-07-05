@@ -1688,244 +1688,399 @@ export default function GoalDetail() {
                   </p>
                 </div>
               ) : (
-                <Card>
-                  <CardContent className="p-0">
-                    <div className="overflow-x-auto">
-                      <table className="w-full">
-                        <thead className="bg-gray-50 border-b">
-                          <tr>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Inisiatif
-                            </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Status
-                            </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Prioritas
-                            </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Progress
-                            </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Tenggat
-                            </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              PIC
-                            </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Aksi
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                          {inisiatif.map((initiative) => (
-                            <tr
-                              key={initiative.id}
-                              className="hover:bg-gray-50"
-                            >
-                              <td className="px-4 py-4">
-                                <div>
-                                  <Link href={`/initiatives/${initiative.id}`}>
-                                    <div className="font-medium text-gray-900 hover:text-blue-600 cursor-pointer">
-                                      {initiative.title}
-                                    </div>
-                                  </Link>
-                                  {initiative.description && (
-                                    <div className="text-sm text-gray-500 line-clamp-1">
-                                      {initiative.description}
-                                    </div>
-                                  )}
-                                  {initiative.budget && (
-                                    <div className="text-sm text-gray-500 mt-1">
-                                      Budget: Rp{" "}
-                                      {parseFloat(
-                                        initiative.budget,
-                                      ).toLocaleString("id-ID")}
-                                    </div>
-                                  )}
-                                </div>
-                              </td>
-                              <td className="px-4 py-4">
-                                <Select
-                                  value={initiative.status || "not_started"}
-                                  onValueChange={(newStatus) => {
-                                    // Handle status update here
-                                    console.log(
-                                      "Update initiative status:",
-                                      initiative.id,
-                                      newStatus,
-                                    );
-                                  }}
+                <div className="space-y-4">
+                  {/* Desktop Table View */}
+                  <div className="hidden md:block">
+                    <Card>
+                      <CardContent className="p-0">
+                        <div className="overflow-x-auto">
+                          <table className="w-full">
+                            <thead className="bg-gray-50 border-b">
+                              <tr>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  Inisiatif
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  Status
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  Prioritas
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  Progress
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  Tenggat
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  PIC
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  Aksi
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                              {inisiatif.map((initiative) => (
+                                <tr
+                                  key={initiative.id}
+                                  className="hover:bg-gray-50"
                                 >
-                                  <SelectTrigger className="w-32">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="not_started">
-                                      Belum Dimulai
-                                    </SelectItem>
-                                    <SelectItem value="in_progress">
-                                      Sedang Berjalan
-                                    </SelectItem>
-                                    <SelectItem value="completed">
-                                      Selesai
-                                    </SelectItem>
-                                    <SelectItem value="on_hold">
-                                      Ditahan
-                                    </SelectItem>
-                                    <SelectItem value="cancelled">
-                                      Dibatalkan
-                                    </SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </td>
-                              <td className="px-4 py-4">
-                                {(() => {
-                                  // Calculate priority level from score
-                                  const rawScore = initiative.priorityScore;
-                                  const score = parseFloat(rawScore || "0");
-                                  
-                                  let level: string;
-                                  let color: string;
-                                  let label: string;
-                                  
-                                  if (score >= 4.5) {
-                                    level = "critical";
-                                    color = "bg-red-100 text-red-800";
-                                    label = "Kritis";
-                                  } else if (score >= 3.5) {
-                                    level = "high";
-                                    color = "bg-orange-100 text-orange-800";
-                                    label = "Tinggi";
-                                  } else if (score >= 2.5) {
-                                    level = "medium";
-                                    color = "bg-yellow-100 text-yellow-800";
-                                    label = "Sedang";
-                                  } else {
-                                    level = "low";
-                                    color = "bg-green-100 text-green-800";
-                                    label = "Rendah";
-                                  }
-                                  
-                                  return (
-                                    <div className="flex flex-col items-start gap-1">
-                                      <Badge className={color}>
-                                        {label}
-                                      </Badge>
-                                      <span className="text-xs text-gray-500">
-                                        {score.toFixed(1)}/5.0
+                                  <td className="px-4 py-4">
+                                    <div>
+                                      <Link href={`/initiatives/${initiative.id}`}>
+                                        <div className="font-medium text-gray-900 hover:text-blue-600 cursor-pointer">
+                                          {initiative.title}
+                                        </div>
+                                      </Link>
+                                      {initiative.description && (
+                                        <div className="text-sm text-gray-500 line-clamp-1">
+                                          {initiative.description}
+                                        </div>
+                                      )}
+                                      {initiative.budget && (
+                                        <div className="text-sm text-gray-500 mt-1">
+                                          Budget: Rp{" "}
+                                          {parseFloat(
+                                            initiative.budget,
+                                          ).toLocaleString("id-ID")}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td className="px-4 py-4">
+                                    <Select
+                                      value={initiative.status || "not_started"}
+                                      onValueChange={(newStatus) => {
+                                        console.log(
+                                          "Update initiative status:",
+                                          initiative.id,
+                                          newStatus,
+                                        );
+                                      }}
+                                    >
+                                      <SelectTrigger className="w-32">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="not_started">
+                                          Belum Dimulai
+                                        </SelectItem>
+                                        <SelectItem value="in_progress">
+                                          Sedang Berjalan
+                                        </SelectItem>
+                                        <SelectItem value="completed">
+                                          Selesai
+                                        </SelectItem>
+                                        <SelectItem value="on_hold">
+                                          Ditahan
+                                        </SelectItem>
+                                        <SelectItem value="cancelled">
+                                          Dibatalkan
+                                        </SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </td>
+                                  <td className="px-4 py-4">
+                                    {(() => {
+                                      const rawScore = initiative.priorityScore;
+                                      const score = parseFloat(rawScore || "0");
+                                      
+                                      let level: string;
+                                      let color: string;
+                                      let label: string;
+                                      
+                                      if (score >= 4.5) {
+                                        level = "critical";
+                                        color = "bg-red-100 text-red-800";
+                                        label = "Kritis";
+                                      } else if (score >= 3.5) {
+                                        level = "high";
+                                        color = "bg-orange-100 text-orange-800";
+                                        label = "Tinggi";
+                                      } else if (score >= 2.5) {
+                                        level = "medium";
+                                        color = "bg-yellow-100 text-yellow-800";
+                                        label = "Sedang";
+                                      } else {
+                                        level = "low";
+                                        color = "bg-green-100 text-green-800";
+                                        label = "Rendah";
+                                      }
+                                      
+                                      return (
+                                        <div className="flex flex-col items-start gap-1">
+                                          <Badge className={color}>
+                                            {label}
+                                          </Badge>
+                                          <span className="text-xs text-gray-500">
+                                            {score.toFixed(1)}/5.0
+                                          </span>
+                                        </div>
+                                      );
+                                    })()}
+                                  </td>
+                                  <td className="px-4 py-4">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-16 bg-gray-200 rounded-full h-2">
+                                        <div
+                                          className={`h-2 rounded-full ${(() => {
+                                            const progress =
+                                              initiative.progressPercentage || 0;
+                                            if (progress >= 100)
+                                              return "bg-green-600";
+                                            if (progress >= 80)
+                                              return "bg-green-500";
+                                            if (progress >= 60)
+                                              return "bg-orange-500";
+                                            return "bg-red-500";
+                                          })()}`}
+                                          style={{
+                                            width: `${initiative.progressPercentage || 0}%`,
+                                          }}
+                                        ></div>
+                                      </div>
+                                      <span className="text-sm font-medium text-gray-900">
+                                        {initiative.progressPercentage || 0}%
                                       </span>
                                     </div>
-                                  );
-                                })()}
-                              </td>
-                              <td className="px-4 py-4">
-                                <div className="flex items-center gap-2">
-                                  <div className="w-16 bg-gray-200 rounded-full h-2">
-                                    <div
-                                      className={`h-2 rounded-full ${(() => {
-                                        const progress =
-                                          initiative.progressPercentage || 0;
-                                        // For initiatives, use simpler status logic since they may not be tied to specific cycles
-                                        if (progress >= 100)
-                                          return "bg-green-600";
-                                        if (progress >= 80)
-                                          return "bg-green-500";
-                                        if (progress >= 60)
-                                          return "bg-orange-500";
-                                        return "bg-red-500";
-                                      })()}`}
-                                      style={{
-                                        width: `${initiative.progressPercentage || 0}%`,
-                                      }}
-                                    ></div>
-                                  </div>
-                                  <span className="text-sm font-medium text-gray-900">
-                                    {initiative.progressPercentage || 0}%
-                                  </span>
-                                </div>
-                              </td>
-                              <td className="px-4 py-4">
-                                {initiative.dueDate ? (
-                                  <span
-                                    className={`text-sm ${
-                                      new Date(initiative.dueDate) < new Date()
-                                        ? "text-red-600 font-medium"
-                                        : "text-gray-900"
-                                    }`}
-                                  >
-                                    {new Date(
-                                      initiative.dueDate,
-                                    ).toLocaleDateString("id-ID", {
-                                      day: "numeric",
-                                      month: "short",
-                                      year: "numeric",
-                                    })}
-                                  </span>
-                                ) : (
-                                  <span className="text-gray-400 text-sm">
-                                    -
-                                  </span>
-                                )}
-                              </td>
-                              <td className="px-4 py-4">
+                                  </td>
+                                  <td className="px-4 py-4">
+                                    {initiative.dueDate ? (
+                                      <span
+                                        className={`text-sm ${
+                                          new Date(initiative.dueDate) < new Date()
+                                            ? "text-red-600 font-medium"
+                                            : "text-gray-900"
+                                        }`}
+                                      >
+                                        {new Date(
+                                          initiative.dueDate,
+                                        ).toLocaleDateString("id-ID", {
+                                          day: "numeric",
+                                          month: "short",
+                                          year: "numeric",
+                                        })}
+                                      </span>
+                                    ) : (
+                                      <span className="text-gray-400 text-sm">
+                                        -
+                                      </span>
+                                    )}
+                                  </td>
+                                  <td className="px-4 py-4">
+                                    {initiative.picId ? (
+                                      <div className="flex items-center gap-2">
+                                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                                          {getUserName(initiative.picId)
+                                            ?.split(" ")
+                                            .map((n) => n[0])
+                                            .join("")
+                                            .toUpperCase() || "?"}
+                                        </div>
+                                        <span className="text-sm text-gray-900 truncate">
+                                          {getUserName(initiative.picId)}
+                                        </span>
+                                      </div>
+                                    ) : (
+                                      <span className="text-gray-400 text-sm">
+                                        Tidak ditugaskan
+                                      </span>
+                                    )}
+                                  </td>
+                                  <td className="px-4 py-4">
+                                    <DropdownMenu>
+                                      <DropdownMenuTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          className="h-8 w-8 p-0"
+                                        >
+                                          <MoreHorizontal className="h-4 w-4" />
+                                        </Button>
+                                      </DropdownMenuTrigger>
+                                      <DropdownMenuContent align="end">
+                                        <DropdownMenuItem
+                                          onClick={() => {
+                                            setEditingInitiative(initiative);
+                                            setShowInitiativeFormModal(true);
+                                          }}
+                                        >
+                                          <Edit className="mr-2 h-4 w-4" />
+                                          Ubah
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem 
+                                          className="text-red-600"
+                                          onClick={() => setDeletingInitiative(initiative)}
+                                        >
+                                          <Trash2 className="mr-2 h-4 w-4" />
+                                          Hapus
+                                        </DropdownMenuItem>
+                                      </DropdownMenuContent>
+                                    </DropdownMenu>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Mobile Card View */}
+                  <div className="space-y-3 md:hidden">
+                    {inisiatif.map((initiative) => {
+                      const rawScore = initiative.priorityScore;
+                      const score = parseFloat(rawScore || "0");
+                      
+                      let color: string;
+                      let label: string;
+                      
+                      if (score >= 4.5) {
+                        color = "bg-red-100 text-red-800";
+                        label = "Kritis";
+                      } else if (score >= 3.5) {
+                        color = "bg-orange-100 text-orange-800";
+                        label = "Tinggi";
+                      } else if (score >= 2.5) {
+                        color = "bg-yellow-100 text-yellow-800";
+                        label = "Sedang";
+                      } else {
+                        color = "bg-green-100 text-green-800";
+                        label = "Rendah";
+                      }
+
+                      return (
+                        <Card key={initiative.id} className="p-4">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex-1 min-w-0">
+                              <Link href={`/initiatives/${initiative.id}`}>
+                                <h3 className="font-medium text-gray-900 hover:text-blue-600 cursor-pointer line-clamp-2 text-sm">
+                                  {initiative.title}
+                                </h3>
+                              </Link>
+                              {initiative.description && (
+                                <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                                  {initiative.description}
+                                </p>
+                              )}
+                            </div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6 p-0 ml-2 flex-shrink-0"
+                                >
+                                  <MoreHorizontal className="h-3 w-3" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setEditingInitiative(initiative);
+                                    setShowInitiativeFormModal(true);
+                                  }}
+                                >
+                                  <Edit className="mr-2 h-4 w-4" />
+                                  Ubah
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  className="text-red-600"
+                                  onClick={() => setDeletingInitiative(initiative)}
+                                >
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  Hapus
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Badge className={`${color} text-xs px-2 py-0.5`}>
+                                  {label}
+                                </Badge>
+                                <span className="text-xs text-gray-400">
+                                  {score.toFixed(1)}/5.0
+                                </span>
+                              </div>
+                              <span className="text-xs font-medium text-gray-900">
+                                {initiative.progressPercentage || 0}%
+                              </span>
+                            </div>
+
+                            <div className="w-full bg-gray-200 rounded-full h-1.5">
+                              <div
+                                className={`h-1.5 rounded-full ${(() => {
+                                  const progress = initiative.progressPercentage || 0;
+                                  if (progress >= 100) return "bg-green-600";
+                                  if (progress >= 80) return "bg-green-500";
+                                  if (progress >= 60) return "bg-orange-500";
+                                  return "bg-red-500";
+                                })()}`}
+                                style={{
+                                  width: `${initiative.progressPercentage || 0}%`,
+                                }}
+                              ></div>
+                            </div>
+
+                            <div className="flex items-center justify-between text-xs">
+                              <div className="flex items-center gap-1">
                                 {initiative.picId ? (
-                                  <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                                  <>
+                                    <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
                                       {getUserName(initiative.picId)
                                         ?.split(" ")
                                         .map((n) => n[0])
                                         .join("")
                                         .toUpperCase() || "?"}
                                     </div>
-                                    <span className="text-sm text-gray-900 truncate">
+                                    <span className="text-gray-600 truncate">
                                       {getUserName(initiative.picId)}
                                     </span>
-                                  </div>
+                                  </>
                                 ) : (
-                                  <span className="text-gray-400 text-sm">
+                                  <span className="text-gray-400">
                                     Tidak ditugaskan
                                   </span>
                                 )}
-                              </td>
-                              <td className="px-4 py-4">
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8 p-0"
-                                    >
-                                      <MoreHorizontal className="h-4 w-4" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    <DropdownMenuItem
-                                      onClick={() => {
-                                        setEditingInitiative(initiative);
-                                        setShowInitiativeFormModal(true);
-                                      }}
-                                    >
-                                      <Edit className="mr-2 h-4 w-4" />
-                                      Ubah
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem 
-                                      className="text-red-600"
-                                      onClick={() => setDeletingInitiative(initiative)}
-                                    >
-                                      <Trash2 className="mr-2 h-4 w-4" />
-                                      Hapus
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </CardContent>
-                </Card>
+                              </div>
+                              <div>
+                                {initiative.dueDate ? (
+                                  <span
+                                    className={
+                                      new Date(initiative.dueDate) < new Date()
+                                        ? "text-red-600 font-medium"
+                                        : "text-gray-600"
+                                    }
+                                  >
+                                    {new Date(initiative.dueDate).toLocaleDateString("id-ID", {
+                                      day: "numeric",
+                                      month: "short",
+                                    })}
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </div>
+                            </div>
+
+                            {initiative.budget && (
+                              <div className="pt-2 border-t border-gray-100">
+                                <span className="text-xs text-gray-500">
+                                  Budget: Rp {parseFloat(initiative.budget).toLocaleString("id-ID")}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </div>
               )}
             </div>
           </div>
