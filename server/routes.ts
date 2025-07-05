@@ -2910,6 +2910,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get current user's organization with role information
+  app.get("/api/my-organization-with-role", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      
+      // Get user with organization
+      const user = await storage.getUser(userId);
+      if (!user || !user.organizationId) {
+        return res.status(404).json({ message: "No organization found for user" });
+      }
+
+      // Get organization
+      const [organization] = await db.select().from(organizations).where(eq(organizations.id, user.organizationId));
+      if (!organization) {
+        return res.status(404).json({ message: "Organization not found" });
+      }
+
+      // Get subscription
+      const [subscription] = await db.select()
+        .from(organizationSubscriptions)
+        .leftJoin(subscriptionPlans, eq(organizationSubscriptions.planId, subscriptionPlans.id))
+        .where(eq(organizationSubscriptions.organizationId, organization.id));
+
+      res.json({
+        organization,
+        subscription: subscription ? {
+          ...subscription.organization_subscriptions,
+          plan: subscription.subscription_plans
+        } : null
+      });
+    } catch (error) {
+      console.error("Error fetching organization:", error);
+      res.status(500).json({ message: "Failed to fetch organization data" });
+    }
+  });
+
   // Check organization limits (for enforcing plan restrictions)
   app.get("/api/organization/check-limits", requireAuth, async (req, res) => {
     try {

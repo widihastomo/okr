@@ -70,6 +70,7 @@ export const organizations = pgTable("organizations", {
   website: text("website"),
   industry: text("industry"),
   size: text("size"), // "1-10", "11-50", "51-200", "201-500", "500+"
+  ownerId: uuid("owner_id"), // Organization owner - will be added via migration
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

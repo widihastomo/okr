@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useOrganization } from "@/hooks/useOrganization";
 import {
   Tooltip,
   TooltipContent,
@@ -31,6 +32,7 @@ interface SidebarProps {
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [location] = useLocation();
+  const { isOwner } = useOrganization();
 
   const menuItems = [
     {
@@ -90,6 +92,16 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     },
 
   ];
+
+  // Add organization settings for owners only
+  if (isOwner) {
+    menuItems.push({
+      label: "Pengaturan Organisasi",
+      icon: Settings,
+      path: "/organization-settings",
+      active: location === "/organization-settings"
+    });
+  }
 
   return (
     <TooltipProvider>

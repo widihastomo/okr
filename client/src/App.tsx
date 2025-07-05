@@ -28,6 +28,7 @@ import AchievementsPage from "@/pages/achievements";
 import NetworkVisualization from "@/pages/network-visualization";
 import DailyFocusPage from "@/pages/daily-focus";
 import PricingPage from "@/pages/pricing";
+import OrganizationSettings from "@/pages/organization-settings";
 
 
 
@@ -101,6 +102,7 @@ function Router() {
             <Route path="/network" component={NetworkVisualization} />
             <Route path="/pricing" component={PricingPage} />
             <Route path="/daily-focus" component={DailyFocusPage} />
+            <Route path="/organization-settings" component={OrganizationSettings} />
             <Route component={NotFound} />
           </Switch>
         </div>
