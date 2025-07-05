@@ -385,7 +385,7 @@ export default function KeyResultDetailPage() {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Gagal membuat rencana",
+        description: error.message || "Gagal membuat inisiatif",
         variant: "destructive",
       });
     },
@@ -2132,7 +2132,7 @@ export default function KeyResultDetailPage() {
           <AlertDialogTitle>Hapus Angka Target</AlertDialogTitle>
           <AlertDialogDescription>
             Apakah Anda yakin ingin menghapus angka target "{keyResult?.title}"? 
-            Semua data terkait termasuk rencana dan tugas akan ikut terhapus secara permanen. 
+            Semua data terkait termasuk inisiatif dan tugas akan ikut terhapus secara permanen. 
             Tindakan ini tidak dapat dibatalkan.
           </AlertDialogDescription>
         </AlertDialogHeader>

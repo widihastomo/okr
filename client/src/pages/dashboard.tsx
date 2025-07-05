@@ -325,7 +325,7 @@ export default function Dashboard() {
     onSuccess: () => {
       toast({
         title: "Goal berhasil dihapus",
-        description: "Goal beserta semua ukuran keberhasilan, rencana, dan tugas terkait telah dihapus secara permanen.",
+        description: "Goal beserta semua ukuran keberhasilan, inisiatif, dan tugas terkait telah dihapus secara permanen.",
         variant: "default",
         className: "border-green-200 bg-green-50 text-green-800",
       });

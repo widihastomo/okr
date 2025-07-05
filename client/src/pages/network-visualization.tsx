@@ -159,8 +159,8 @@ export default function NetworkVisualization() {
     },
     {
       target: '.tour-initiatives',
-      title: 'Initiatives (Rencana)',
-      description: 'Initiatives adalah rencana konkret untuk mencapai key results, menampilkan progress dan status pelaksanaan.'
+      title: 'Initiatives (Inisiatif)',
+      description: 'Initiatives adalah inisiatif konkret untuk mencapai key results, menampilkan progress dan status pelaksanaan.'
     },
     {
       target: '.tour-connecting-lines',
