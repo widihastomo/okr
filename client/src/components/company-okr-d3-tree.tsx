@@ -47,7 +47,7 @@ export default function CompanyOKRD3Tree({
     const nodeMap = new Map<string, TreeNode>();
     const rootNodes: TreeNode[] = [];
 
-    console.log('Building tree from OKRs:', okrs.map(okr => ({ id: okr.id, title: okr.title, parentId: okr.parentId })));
+
 
     // Create nodes for all OKRs
     okrs.forEach(okr => {
@@ -66,15 +66,10 @@ export default function CompanyOKRD3Tree({
         const parent = nodeMap.get(okr.parentId)!;
         parent.children.push(node);
         node.parent = parent;
-        console.log(`Added child ${okr.title} to parent ${parent.data.title}`);
       } else {
         rootNodes.push(node);
-        console.log(`Added root node: ${okr.title}`);
       }
     });
-
-    console.log('Root nodes count:', rootNodes.length);
-    console.log('Nodes with children:', Array.from(nodeMap.values()).filter(node => node.children.length > 0).map(node => ({ title: node.data.title, children: node.children.length })));
 
     return rootNodes;
   };
@@ -137,10 +132,8 @@ export default function CompanyOKRD3Tree({
     let root;
     if (treeData.length === 1) {
       // Single root node
-      console.log('Creating hierarchy for single root, expandedNodes:', Array.from(expandedNodes));
       root = d3.hierarchy(treeData[0], d => {
         const isExpanded = expandedNodes.has(d.id);
-        console.log(`Node ${d.data.title} (${d.id}) expanded: ${isExpanded}, children: ${d.children.length}`);
         return isExpanded ? d.children : [];
       });
     } else {
@@ -160,7 +153,7 @@ export default function CompanyOKRD3Tree({
 
     treeLayout(root);
     
-    console.log('After tree layout:', root.descendants().map(d => ({ title: d.data.data.title, x: d.x, y: d.y, depth: d.depth })));
+
 
     // Center the tree
     const bounds = {
@@ -223,7 +216,7 @@ export default function CompanyOKRD3Tree({
 
     // Create node groups
     const descendants = root.descendants();
-    console.log('Total descendants to render:', descendants.length, descendants.map(d => ({ title: d.data.data.title, x: d.x, y: d.y })));
+
     
     const node = g.selectAll(".node")
       .data(descendants)
@@ -342,27 +335,95 @@ export default function CompanyOKRD3Tree({
     // Add expand/collapse button if has children
     const expandButton = node.filter(d => d.data.children.length > 0)
       .append("g")
-      .attr("transform", `translate(${nodeWidth - 30}, 50)`)
+      .attr("transform", `translate(${nodeWidth - 50}, 8)`)
       .style("cursor", "pointer")
       .on("click", (event, d) => {
         event.stopPropagation();
         onToggleExpand(d.data.id);
       });
 
+    // Button background with blue theme
     expandButton.append("rect")
-      .attr("width", 24)
+      .attr("width", 36)
       .attr("height", 24)
-      .attr("rx", 4)
-      .attr("fill", "#f3f4f6")
-      .attr("stroke", "#e5e7eb");
+      .attr("rx", 12)
+      .attr("fill", d => expandedNodes.has(d.data.id) ? "#3b82f6" : "#e5e7eb")
+      .attr("stroke", "#3b82f6")
+      .attr("stroke-width", 1);
 
+    // Plus/minus icon
     expandButton.append("text")
-      .attr("x", 12)
+      .attr("x", 10)
       .attr("y", 16)
       .attr("text-anchor", "middle")
-      .attr("font-size", "18px")
-      .attr("fill", "#6b7280")
+      .attr("font-size", "14px")
+      .attr("font-weight", "bold")
+      .attr("fill", d => expandedNodes.has(d.data.id) ? "white" : "#3b82f6")
       .text(d => expandedNodes.has(d.data.id) ? "−" : "+");
+
+    // Children count
+    expandButton.append("text")
+      .attr("x", 26)
+      .attr("y", 16)
+      .attr("text-anchor", "middle")
+      .attr("font-size", "10px")
+      .attr("font-weight", "600")
+      .attr("fill", d => expandedNodes.has(d.data.id) ? "white" : "#3b82f6")
+      .text(d => d.data.children.length);
+
+    // Add hover effect with smooth transitions
+    expandButton.on("mouseenter", function(event, d) {
+      d3.select(this).select("rect")
+        .transition()
+        .duration(200)
+        .attr("fill", expandedNodes.has(d.data.id) ? "#2563eb" : "#f3f4f6")
+        .attr("transform", "scale(1.05)");
+    }).on("mouseleave", function(event, d) {
+      d3.select(this).select("rect")
+        .transition()
+        .duration(200)
+        .attr("fill", expandedNodes.has(d.data.id) ? "#3b82f6" : "#e5e7eb")
+        .attr("transform", "scale(1)");
+    });
+
+    // Add pulse animation for nodes with children when collapsed
+    expandButton.filter(d => !expandedNodes.has(d.data.id))
+      .select("rect")
+      .style("animation", "pulse 2s ease-in-out infinite");
+
+    // Add tooltip-like label
+    expandButton.append("rect")
+      .attr("x", -20)
+      .attr("y", -22)
+      .attr("width", 76)
+      .attr("height", 16)
+      .attr("rx", 8)
+      .attr("fill", "#1f2937")
+      .attr("opacity", 0)
+      .style("pointer-events", "none");
+
+    expandButton.append("text")
+      .attr("x", 18)
+      .attr("y", -10)
+      .attr("text-anchor", "middle")
+      .attr("font-size", "10px")
+      .attr("fill", "white")
+      .attr("opacity", 0)
+      .style("pointer-events", "none")
+      .text(d => expandedNodes.has(d.data.id) ? "Tutup child" : "Buka child");
+
+    // Show/hide tooltip on hover
+    expandButton.on("mouseenter.tooltip", function() {
+      d3.select(this).selectAll("rect:last-child, text:last-child")
+        .transition()
+        .duration(200)
+        .attr("opacity", 1);
+    }).on("mouseleave.tooltip", function() {
+      d3.select(this).selectAll("rect:last-child, text:last-child")
+        .transition()
+        .duration(200)
+        .attr("opacity", 0);
+    });
 
     // Add Key Results
     const krGroup = node.append("g")

@@ -188,15 +188,19 @@ export default function CompanyOKRPage() {
                 variant="outline"
                 size="sm"
                 onClick={expandAll}
+                className="flex items-center gap-1"
               >
-                Expand All
+                <ChevronDown className="w-3 h-3" />
+                Buka Semua
               </Button>
               <Button 
                 variant="outline"
                 size="sm"
                 onClick={collapseAll}
+                className="flex items-center gap-1"
               >
-                Collapse All
+                <ChevronRight className="w-3 h-3" />
+                Tutup Semua
               </Button>
             </div>
             
