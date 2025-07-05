@@ -1878,6 +1878,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Initiative creation request:", JSON.stringify(req.body, null, 2));
       console.log("Current user:", currentUser);
       
+      // Calculate priority score automatically using the priority calculator
+      const { impactScore, effortScore, confidenceScore } = req.body;
+      
+      let calculatedPriorityScore = null;
+      let calculatedPriorityLevel = "medium";
+      
+      if (impactScore && effortScore && confidenceScore) {
+        try {
+          const { calculatePriority } = await import("./priority-calculator");
+          const priorityResult = calculatePriority({
+            impactScore,
+            effortScore,
+            confidenceScore
+          });
+          calculatedPriorityScore = priorityResult.priorityScore;
+          calculatedPriorityLevel = priorityResult.priorityLevel;
+          
+          console.log("Priority calculation result:", {
+            inputs: { impactScore, effortScore, confidenceScore },
+            result: priorityResult
+          });
+        } catch (calcError) {
+          console.error("Priority calculation error:", calcError);
+        }
+      }
+      
       // Process the initiative data with authentication
       const initiativeData = {
         ...req.body,
@@ -1886,6 +1912,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         budget: req.body.budget ? req.body.budget.toString() : null,
         startDate: req.body.startDate ? new Date(req.body.startDate) : null,
         dueDate: req.body.dueDate ? new Date(req.body.dueDate) : null,
+        priorityScore: calculatedPriorityScore,
+        priority: calculatedPriorityLevel,
       };
       
       const result = insertInitiativeSchema.safeParse(initiativeData);
@@ -1985,7 +2013,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/initiatives/:id", async (req, res) => {
     try {
       const id = req.params.id;
-      const updatedInitiative = await storage.updateInitiative(id, req.body);
+      
+      // If impact, effort, or confidence scores are being updated, recalculate priority
+      const { impactScore, effortScore, confidenceScore } = req.body;
+      let updateData = { ...req.body };
+      
+      if (impactScore || effortScore || confidenceScore) {
+        // Get current initiative data to merge with new scores
+        const currentInitiative = await storage.getInitiativeWithDetails(id);
+        if (currentInitiative) {
+          const scores = {
+            impactScore: impactScore || currentInitiative.impactScore,
+            effortScore: effortScore || currentInitiative.effortScore,
+            confidenceScore: confidenceScore || currentInitiative.confidenceScore
+          };
+          
+          try {
+            const { calculatePriority } = await import("./priority-calculator");
+            const priorityResult = calculatePriority(scores);
+            
+            updateData.priorityScore = priorityResult.priorityScore;
+            updateData.priority = priorityResult.priorityLevel;
+            
+            console.log("Priority recalculation for update:", {
+              initiativeId: id,
+              inputs: scores,
+              result: priorityResult
+            });
+          } catch (calcError) {
+            console.error("Priority calculation error during update:", calcError);
+          }
+        }
+      }
+      
+      const updatedInitiative = await storage.updateInitiative(id, updateData);
       
       if (!updatedInitiative) {
         return res.status(404).json({ message: "Initiative not found" });
