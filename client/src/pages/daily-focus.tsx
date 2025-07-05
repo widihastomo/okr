@@ -18,7 +18,8 @@ import {
   CheckCircle, 
   PlayCircle,
   Target,
-  BarChart3
+  BarChart3,
+  Trophy
 } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { toast } from "@/hooks/use-toast";
@@ -71,6 +72,11 @@ export default function DailyFocusPage() {
 
   const { data: allTasks = [] } = useQuery({
     queryKey: ["/api/tasks"],
+  });
+
+  const { data: stats } = useQuery({
+    queryKey: [`/api/gamification/stats/${userId}`],
+    enabled: !!userId,
   });
 
   // Update task status mutation
@@ -239,7 +245,14 @@ export default function DailyFocusPage() {
             <CheckCircle className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{todayTasks.length}</div>
+            <div className="flex items-center gap-2">
+              <div className="text-2xl font-bold">{todayTasks.length}</div>
+              {todayTasks.filter(t => t.status === 'completed').length > 0 && (
+                <div className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                  +{todayTasks.filter(t => t.status === 'completed').length * 10} poin
+                </div>
+              )}
+            </div>
             <p className="text-xs text-muted-foreground">
               {todayTasks.filter(t => t.status === 'completed').length} selesai
             </p>
@@ -274,82 +287,26 @@ export default function DailyFocusPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Inisiatif Aktif</CardTitle>
-            <PlayCircle className="h-4 w-4 text-purple-500" />
+            <CardTitle className="text-sm font-medium">Level & Progress</CardTitle>
+            <Trophy className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{activeInitiatives.length}</div>
-            <p className="text-xs text-muted-foreground">
-              Sedang berjalan
-            </p>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <div className="text-2xl font-bold">Level {(stats as any)?.level || 1}</div>
+                <div className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full">
+                  {(stats as any)?.totalPoints || 0} poin
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Streak: {(stats as any)?.currentStreak || 0} hari
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Gamification Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <UserStatsCard userId={userId} />
-        </div>
-        
-        <div className="space-y-6">
-          {/* Daily Achievements */}
-          <DailyAchievements userId={userId} />
-          
-          {/* Daily Motivation */}
-          <Card className="border-yellow-200 bg-gradient-to-br from-yellow-50 to-orange-50">
-            <CardHeader>
-              <CardTitle className="text-yellow-900 flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Motivasi Hari Ini
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {/* Daily Progress Encouragement */}
-              <div className="space-y-2">
-                <div className="p-2 bg-white border border-yellow-200 rounded-lg">
-                  <div className="flex items-center gap-2 text-sm">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span className="text-gray-700">
-                      {todayTasks.filter(t => t.status === 'completed').length}/{todayTasks.length} task selesai
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="p-2 bg-white border border-yellow-200 rounded-lg">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Target className="h-4 w-4 text-blue-500" />
-                    <span className="text-gray-700">
-                      {activeKeyResults.length} Angka Target aktif
-                    </span>
-                  </div>
-                </div>
-                
-                {overdueTasks.length > 0 && (
-                  <div className="p-2 bg-white border border-red-200 rounded-lg">
-                    <div className="flex items-center gap-2 text-sm">
-                      <AlertTriangle className="h-4 w-4 text-red-500" />
-                      <span className="text-gray-700">
-                        {overdueTasks.length} task terlambat
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-              
-              {/* Motivation Message */}
-              <div className="text-center p-3 bg-gradient-to-r from-blue-100 to-purple-100 rounded-lg border">
-                <div className="text-sm font-medium text-gray-800 mb-1">
-                  "Konsistensi kecil menghasilkan pencapaian besar"
-                </div>
-                <div className="text-xs text-gray-600">
-                  Tetap fokus pada prioritas utama
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+
 
       {/* Objective Awareness Section */}
       {relatedObjectives.length > 0 && (
