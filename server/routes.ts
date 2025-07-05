@@ -3103,6 +3103,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register AI routes
   registerAIRoutes(app);
 
+  // Habit Alignment API routes
+  app.post("/api/habits/generate", requireAuth, async (req, res) => {
+    try {
+      const { generateHabitSuggestions, generateFallbackHabitSuggestions } = await import("./habit-alignment");
+      
+      const { objectiveIds, objectives, preferences, userId } = req.body;
+      
+      if (!objectiveIds || !Array.isArray(objectiveIds) || objectiveIds.length === 0) {
+        return res.status(400).json({ error: "objectiveIds is required and must be a non-empty array" });
+      }
+      
+      if (!preferences || typeof preferences !== 'object') {
+        return res.status(400).json({ error: "preferences is required" });
+      }
+
+      const request = {
+        objectiveIds,
+        objectives: objectives || [],
+        preferences,
+        userId: userId || (req.user as any)?.id
+      };
+
+      try {
+        // Try AI-powered suggestions first
+        const result = await generateHabitSuggestions(request);
+        res.json(result);
+      } catch (aiError) {
+        console.warn('AI suggestions failed, falling back to rule-based suggestions:', aiError);
+        // Fallback to rule-based suggestions
+        const fallbackResult = generateFallbackHabitSuggestions(request);
+        res.json(fallbackResult);
+      }
+    } catch (error) {
+      console.error("Error generating habit suggestions:", error);
+      res.status(500).json({ error: "Failed to generate habit suggestions" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

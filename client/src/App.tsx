@@ -85,7 +85,8 @@ function Router() {
           sidebarOpen ? "lg:ml-64" : "lg:ml-16"
         )}>
           <Switch>
-            <Route path="/" component={Dashboard} />
+            <Route path="/" component={DailyFocusPage} />
+            <Route path="/daily-focus" component={DailyFocusPage} />
             <Route path="/dashboard" component={Dashboard} />
             <Route path="/home" component={Home} />
             <Route path="/profile" component={Profile} />
@@ -102,7 +103,6 @@ function Router() {
             <Route path="/analytics" component={AnalyticsPage} />
             <Route path="/network" component={NetworkVisualization} />
             <Route path="/pricing" component={PricingPage} />
-            <Route path="/daily-focus" component={DailyFocusPage} />
             <Route path="/organization-settings" component={OrganizationSettings} />
             <Route path="/system-admin" component={SystemAdmin} />
             <Route component={NotFound} />

@@ -90,9 +90,9 @@ export default function HabitAlignmentWizard({ trigger }: HabitAlignmentWizardPr
         objectiveIds: data.objectiveIds,
         objectives: selectedOKRs,
         preferences: data.preferences,
-        userId: user?.id,
+        userId: (user as any)?.id,
       });
-      return response;
+      return response.json();
     },
     onSuccess: (data) => {
       setSuggestions(data.suggestions || []);

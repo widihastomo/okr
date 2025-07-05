@@ -24,6 +24,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { toast } from "@/hooks/use-toast";
 import { CheckInModal } from "@/components/check-in-modal";
 import SuccessMetricsModalSimple from "@/components/success-metrics-modal-simple";
+import HabitAlignmentWizard from "@/components/habit-alignment-wizard";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function DailyFocusPage() {
@@ -214,14 +215,17 @@ export default function DailyFocusPage() {
           <h1 className="text-2xl font-bold text-gray-900">Daily Focus</h1>
           <p className="text-gray-600">Kelola aktivitas harian Anda hari ini</p>
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-500">
-          <Calendar className="h-4 w-4" />
-          {today.toLocaleDateString('id-ID', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-          })}
+        <div className="flex items-center gap-4">
+          <HabitAlignmentWizard />
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <Calendar className="h-4 w-4" />
+            {today.toLocaleDateString('id-ID', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}
+          </div>
         </div>
       </div>
 

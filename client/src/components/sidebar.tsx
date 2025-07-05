@@ -13,7 +13,11 @@ import {
   X,
   Trophy,
   Calendar,
-  CreditCard
+  CreditCard,
+  Clock,
+  Focus,
+  CheckSquare,
+  Sun
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -36,16 +40,16 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const menuItems = [
     {
-      label: "Beranda",
-      icon: LayoutDashboard,
+      label: "Daily Focus",
+      icon: Sun,
       path: "/",
-      active: location === "/" || location === "/"
+      active: location === "/" || location === "/daily-focus"
     },
     {
-      label: "Daily Focus",
-      icon: Calendar,
-      path: "/daily-focus",
-      active: location === "/daily-focus"
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      path: "/dashboard",
+      active: location === "/dashboard"
     },
     {
       label: "Goals Perusahaan",
