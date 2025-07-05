@@ -61,16 +61,34 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
 
   // Helper function to get score labels
   const getScoreLabel = (score: number, type: 'impact' | 'effort' | 'confidence'): string => {
-    const level = score >= 8 ? 'Sangat Tinggi' : score >= 6 ? 'Tinggi' : score >= 4 ? 'Sedang' : 'Rendah';
-    
     switch (type) {
       case 'impact':
-        return level;
+        switch (score) {
+          case 1: return 'Sangat Rendah';
+          case 2: return 'Rendah';
+          case 3: return 'Sedang';
+          case 4: return 'Tinggi';
+          case 5: return 'Sangat Tinggi';
+          default: return 'Sedang';
+        }
       case 'effort':
-        const effortLevel = score >= 8 ? 'Sangat Sulit' : score >= 6 ? 'Sulit' : score >= 4 ? 'Sedang' : 'Mudah';
-        return effortLevel;
+        switch (score) {
+          case 1: return 'Sangat Mudah';
+          case 2: return 'Mudah';
+          case 3: return 'Sedang';
+          case 4: return 'Sulit';
+          case 5: return 'Sangat Sulit';
+          default: return 'Sedang';
+        }
       case 'confidence':
-        return level;
+        switch (score) {
+          case 1: return 'Sangat Rendah';
+          case 2: return 'Rendah';
+          case 3: return 'Sedang';
+          case 4: return 'Tinggi';
+          case 5: return 'Sangat Tinggi';
+          default: return 'Sedang';
+        }
     }
   };
 
@@ -80,13 +98,13 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
     effortScore: number;
     confidenceScore: number;
   }) => {
-    // Calculate priority score using the same formula as backend
-    const priorityScore = (impactScore * 0.4) + ((11 - effortScore) * 0.3) + (confidenceScore * 0.3);
+    // Calculate priority score using the same formula as backend but adjusted for 5-point scale
+    const priorityScore = (impactScore * 0.4) + ((6 - effortScore) * 0.3) + (confidenceScore * 0.3);
     
-    // Determine priority level
-    const priorityLevel = priorityScore >= 8.0 ? 'critical' : 
-                         priorityScore >= 6.5 ? 'high' : 
-                         priorityScore >= 4.0 ? 'medium' : 'low';
+    // Determine priority level adjusted for 5-point scale (max score is now 5)
+    const priorityLevel = priorityScore >= 4.5 ? 'critical' : 
+                         priorityScore >= 3.5 ? 'high' : 
+                         priorityScore >= 2.5 ? 'medium' : 'low';
     
     const priorityColors = {
       critical: 'bg-red-100 text-red-800 border-red-200',
@@ -109,13 +127,13 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
             {priorityLabels[priorityLevel]}
           </span>
           <span className="text-sm text-gray-600">
-            Skor: {priorityScore.toFixed(2)}/10
+            Skor: {priorityScore.toFixed(2)}/5
           </span>
         </div>
         <p className="text-xs text-gray-600">
           Formula: (Dampak×0.4) + (Kemudahan×0.3) + (Keyakinan×0.3)
           <br />
-          = ({impactScore}×0.4) + ({11-effortScore}×0.3) + ({confidenceScore}×0.3) = {priorityScore.toFixed(2)}
+          = ({impactScore}×0.4) + ({6-effortScore}×0.3) + ({confidenceScore}×0.3) = {priorityScore.toFixed(2)}
         </p>
       </div>
     );
@@ -513,7 +531,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                   Perhitungan Prioritas Otomatis
                 </CardTitle>
                 <p className="text-sm text-muted-foreground">
-                  Prioritas akan dihitung otomatis berdasarkan dampak, tingkat kesulitan, dan keyakinan (skala 1-10)
+                  Prioritas akan dihitung otomatis berdasarkan dampak, tingkat kesulitan, dan keyakinan (skala 1-5)
                 </p>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -539,11 +557,15 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                               <p className="text-sm">
                                 Seberapa besar dampak rencana ini terhadap pencapaian angka target dan tujuan bisnis.
                                 <br /><br />
-                                <strong>1-3:</strong> Dampak rendah
+                                <strong>1:</strong> Dampak sangat rendah
                                 <br />
-                                <strong>4-6:</strong> Dampak sedang
+                                <strong>2:</strong> Dampak rendah
                                 <br />
-                                <strong>7-10:</strong> Dampak tinggi
+                                <strong>3:</strong> Dampak sedang
+                                <br />
+                                <strong>4:</strong> Dampak tinggi
+                                <br />
+                                <strong>5:</strong> Dampak sangat tinggi
                               </p>
                             </PopoverContent>
                           </Popover>
@@ -555,7 +577,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {[1,2,3,4,5,6,7,8,9,10].map(num => (
+                            {[1,2,3,4,5].map(num => (
                               <SelectItem key={num} value={num.toString()}>
                                 {num} - {getScoreLabel(num, 'impact')}
                               </SelectItem>
@@ -588,11 +610,15 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                               <p className="text-sm">
                                 Seberapa sulit implementasi rencana ini dari segi waktu, sumber daya, dan kompleksitas.
                                 <br /><br />
-                                <strong>1-3:</strong> Sangat mudah
+                                <strong>1:</strong> Sangat mudah
                                 <br />
-                                <strong>4-6:</strong> Sedang
+                                <strong>2:</strong> Mudah
                                 <br />
-                                <strong>7-10:</strong> Sangat sulit
+                                <strong>3:</strong> Sedang
+                                <br />
+                                <strong>4:</strong> Sulit
+                                <br />
+                                <strong>5:</strong> Sangat sulit
                               </p>
                             </PopoverContent>
                           </Popover>
@@ -604,7 +630,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {[1,2,3,4,5,6,7,8,9,10].map(num => (
+                            {[1,2,3,4,5].map(num => (
                               <SelectItem key={num} value={num.toString()}>
                                 {num} - {getScoreLabel(num, 'effort')}
                               </SelectItem>
@@ -637,11 +663,15 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                               <p className="text-sm">
                                 Seberapa yakin Anda bahwa rencana ini akan berhasil mencapai tujuannya.
                                 <br /><br />
-                                <strong>1-3:</strong> Keyakinan rendah
+                                <strong>1:</strong> Keyakinan sangat rendah
                                 <br />
-                                <strong>4-6:</strong> Keyakinan sedang
+                                <strong>2:</strong> Keyakinan rendah
                                 <br />
-                                <strong>7-10:</strong> Keyakinan tinggi
+                                <strong>3:</strong> Keyakinan sedang
+                                <br />
+                                <strong>4:</strong> Keyakinan tinggi
+                                <br />
+                                <strong>5:</strong> Keyakinan sangat tinggi
                               </p>
                             </PopoverContent>
                           </Popover>
@@ -653,7 +683,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {[1,2,3,4,5,6,7,8,9,10].map(num => (
+                            {[1,2,3,4,5].map(num => (
                               <SelectItem key={num} value={num.toString()}>
                                 {num} - {getScoreLabel(num, 'confidence')}
                               </SelectItem>

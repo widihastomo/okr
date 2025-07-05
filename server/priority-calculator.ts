@@ -6,9 +6,9 @@
  */
 
 export interface PriorityInputs {
-  impactScore: number;      // 1-10: Business impact (higher = more impact)
-  effortScore: number;      // 1-10: Implementation effort (higher = more effort)
-  confidenceScore: number;  // 1-10: Confidence in success (higher = more confident)
+  impactScore: number;      // 1-5: Business impact (higher = more impact)
+  effortScore: number;      // 1-5: Implementation effort (higher = more effort)
+  confidenceScore: number;  // 1-5: Confidence in success (higher = more confident)
 }
 
 export interface PriorityResult {
@@ -19,7 +19,7 @@ export interface PriorityResult {
 
 /**
  * Calculate priority score using weighted formula:
- * Priority Score = (Impact × 0.4) + ((11 - Effort) × 0.3) + (Confidence × 0.3)
+ * Priority Score = (Impact × 0.4) + ((6 - Effort) × 0.3) + (Confidence × 0.3)
  * 
  * Logic:
  * - Impact: Higher impact = higher priority (40% weight)
@@ -29,16 +29,16 @@ export interface PriorityResult {
 export function calculatePriority(inputs: PriorityInputs): PriorityResult {
   const { impactScore, effortScore, confidenceScore } = inputs;
 
-  // Validate inputs (1-10 scale)
+  // Validate inputs (1-5 scale)
   if (!isValidScore(impactScore) || !isValidScore(effortScore) || !isValidScore(confidenceScore)) {
-    throw new Error("All scores must be between 1 and 10");
+    throw new Error("All scores must be between 1 and 5");
   }
 
   // Calculate weighted priority score
-  // Effort is inverted (11 - effort) so lower effort = higher priority
+  // Effort is inverted (6 - effort) so lower effort = higher priority
   const priorityScore = 
     (impactScore * 0.4) +           // Impact weight: 40%
-    ((11 - effortScore) * 0.3) +    // Effort weight: 30% (inverted)
+    ((6 - effortScore) * 0.3) +     // Effort weight: 30% (inverted)
     (confidenceScore * 0.3);        // Confidence weight: 30%
 
   // Determine priority level based on score ranges
@@ -55,24 +55,24 @@ export function calculatePriority(inputs: PriorityInputs): PriorityResult {
 }
 
 /**
- * Validate that score is within 1-10 range
+ * Validate that score is within 1-5 range
  */
 function isValidScore(score: number): boolean {
-  return typeof score === 'number' && score >= 1 && score <= 10;
+  return typeof score === 'number' && score >= 1 && score <= 5;
 }
 
 /**
  * Convert priority score to priority level
- * Score ranges:
- * - 8.0-10.0: Critical
- * - 6.5-7.9: High  
- * - 4.0-6.4: Medium
- * - 1.0-3.9: Low
+ * Score ranges (adjusted for 5-point scale):
+ * - 4.5-5.0: Critical
+ * - 3.5-4.4: High  
+ * - 2.5-3.4: Medium
+ * - 1.0-2.4: Low
  */
 function getPriorityLevel(score: number): 'low' | 'medium' | 'high' | 'critical' {
-  if (score >= 8.0) return 'critical';
-  if (score >= 6.5) return 'high';
-  if (score >= 4.0) return 'medium';
+  if (score >= 4.5) return 'critical';
+  if (score >= 3.5) return 'high';
+  if (score >= 2.5) return 'medium';
   return 'low';
 }
 
@@ -97,22 +97,23 @@ function getScoreDescription(score: number, type: 'impact' | 'effort' | 'confide
   
   switch (type) {
     case 'impact':
-      return `dampak bisnis ${level} (${score}/10)`;
+      return `dampak bisnis ${level} (${score}/5)`;
     case 'effort':
-      return `tingkat kesulitan ${level} (${score}/10)`;
+      return `tingkat kesulitan ${level} (${score}/5)`;
     case 'confidence':
-      return `tingkat keyakinan ${level} (${score}/10)`;
+      return `tingkat keyakinan ${level} (${score}/5)`;
   }
 }
 
 /**
- * Convert numerical score to descriptive level
+ * Convert numerical score to descriptive level (5-point scale)
  */
 function getScoreLevel(score: number): string {
-  if (score >= 8) return 'sangat tinggi';
-  if (score >= 6) return 'tinggi';
-  if (score >= 4) return 'sedang';
-  return 'rendah';
+  if (score >= 5) return 'sangat tinggi';
+  if (score >= 4) return 'tinggi';
+  if (score >= 3) return 'sedang';
+  if (score >= 2) return 'rendah';
+  return 'sangat rendah';
 }
 
 /**

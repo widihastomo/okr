@@ -96,6 +96,22 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 05, 2025. Successfully simplified automatic priority calculation system to use 5-point scale instead of 10-point:
+  * Updated initiative form modal to display 1-5 scale with clearer labels (Sangat Rendah, Rendah, Sedang, Tinggi, Sangat Tinggi)
+  * Modified priority calculation formula to use (6 - effortScore) instead of (11 - effortScore) for 5-point scale
+  * Updated getScoreLabel function with comprehensive 5-point descriptions for impact, effort, and confidence
+  * Adjusted server-side priority-calculator.ts with 5-point validation, thresholds, and score descriptions
+  * Modified priority level thresholds: Critical (4.5-5.0), High (3.5-4.4), Medium (2.5-3.4), Low (1.0-2.4)
+  * Enhanced tooltip descriptions to clearly explain each point on the 5-point scale
+  * Updated CalculatedPriorityDisplay component to show maximum score as /5 instead of /10
+  * Simplified user experience while maintaining accurate priority calculation functionality
+- July 05, 2025. Successfully created database tables for initiative success metrics system:
+  * Created initiative_success_metrics table with comprehensive schema for tracking measurable outcomes
+  * Created success_metric_updates table for recording progress updates with confidence scoring
+  * Added sample success metrics data for testing including conversion rates, customer acquisition costs, and user targets
+  * Database tables now support all 5 metric types: increase_to, decrease_to, achieve_or_not, should_stay_above, should_stay_below
+  * Tables include proper foreign key relationships and default values for seamless integration
+  * Success metrics system now ready for comprehensive initiative progress measurement and tracking
 - July 05, 2025. Implemented comprehensive animated scroll progress indicator system for searchable dropdowns:
   * Created ScrollProgressIndicator component with smooth animations and real-time scroll position tracking
   * Added useScrollProgress hook with scroll state management (isAtTop, isAtBottom, scrollProgress, canScroll)
