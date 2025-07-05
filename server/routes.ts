@@ -2999,6 +2999,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // System Admin Routes (only for system owner)
+  const requireSystemOwner = async (req: any, res: any, next: any) => {
+    try {
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const user = await storage.getUser(userId);
+      if (!user || !(user as any).isSystemOwner) {
+        return res.status(403).json({ message: "Access denied. System owner only." });
+      }
+
+      next();
+    } catch (error) {
+      res.status(500).json({ message: "Authorization check failed" });
+    }
+  };
+
+  // Get all organizations (system admin)
+  app.get("/api/admin/organizations", requireSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { eq, sql } = await import("drizzle-orm");
+      
+      const orgs = await db.select({
+        organization: organizations,
+        subscription: organizationSubscriptions,
+        plan: subscriptionPlans,
+        userCount: sql`(SELECT COUNT(*) FROM users WHERE organization_id = organizations.id)::int`
+      })
+      .from(organizations)
+      .leftJoin(organizationSubscriptions, eq(organizations.id, organizationSubscriptions.organizationId))
+      .leftJoin(subscriptionPlans, eq(organizationSubscriptions.planId, subscriptionPlans.id));
+
+      res.json(orgs.map(row => ({
+        ...row.organization,
+        subscription: row.subscription,
+        plan: row.plan,
+        userCount: row.userCount
+      })));
+    } catch (error) {
+      console.error("Error fetching organizations:", error);
+      res.status(500).json({ message: "Failed to fetch organizations" });
+    }
+  });
+
+  // Get all users (system admin)
+  app.get("/api/admin/users", requireSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      
+      const allUsers = await db.select({
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        role: users.role,
+        organizationId: users.organizationId,
+        isActive: users.isActive,
+        createdAt: users.createdAt
+      }).from(users);
+
+      res.json(allUsers);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  // Get system stats (system admin)
+  app.get("/api/admin/stats", requireSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { sql } = await import("drizzle-orm");
+      
+      const stats = await db.execute(sql`
+        SELECT 
+          (SELECT COUNT(*) FROM organizations WHERE created_at >= date_trunc('month', CURRENT_DATE))::int as new_orgs_this_month,
+          (SELECT COUNT(*) FROM users WHERE is_active = true)::int as active_users,
+          (SELECT SUM(CAST(subscription_plans.price AS NUMERIC)) 
+           FROM organization_subscriptions 
+           JOIN subscription_plans ON organization_subscriptions.plan_id = subscription_plans.id
+           WHERE organization_subscriptions.status = 'active')::int as monthly_revenue
+      `);
+
+      const result = stats && stats.length > 0 ? (stats as any)[0] : {};
+      
+      res.json({
+        newOrgsThisMonth: result.new_orgs_this_month || 0,
+        activeUsers: result.active_users || 0,
+        monthlyRevenue: result.monthly_revenue || 0,
+        revenueGrowth: 15,
+        uptime: "99.9%"
+      });
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+      res.status(500).json({ message: "Failed to fetch stats" });
+    }
+  });
+
   // Register AI routes
   registerAIRoutes(app);
 

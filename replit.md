@@ -96,6 +96,17 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- January 10, 2025. Implemented role-based access control system with organization owner and system owner separation:
+  * Added ownerId field to organizations table to designate organization owners
+  * Created isSystemOwner field in users table for super admin functionality
+  * Built useOrganization hook to check if user is organization owner
+  * Created Organization Settings page (/organization-settings) accessible only by organization owners
+  * Built System Admin Dashboard (/system-admin) for system owner with full platform control
+  * Added system owner user credentials: email: owner@system.com, password: owner123
+  * System owner can view all organizations, users, subscriptions, and system statistics
+  * Organization owners see "Pengaturan Organisasi" menu in sidebar, system owner accesses via /system-admin
+  * PT Teknologi Maju designated with admin user (Widi Hastomo) as organization owner
+  * Clear separation: Organization owners manage their org, System owner manages entire platform
 - July 05, 2025. Implemented SaaS subscription system with pricing page and multi-tenant architecture:
   * Created comprehensive database schema with organizations, subscription_plans, and organization_subscriptions tables
   * Implemented 4-tier pricing model: Starter (Rp 99,000), Tim 10/Growth (Rp 299,000), Tim 25/Scale (Rp 749,000), Enterprise (custom)

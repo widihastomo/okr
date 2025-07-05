@@ -103,6 +103,7 @@ export const users = pgTable("users", {
   lastName: varchar("last_name", { length: 100 }),
   profileImageUrl: varchar("profile_image_url", { length: 500 }),
   role: text("role").notNull().default("member"), // "admin", "manager", "member"
+  isSystemOwner: boolean("is_system_owner").default(false).notNull(), // Super admin for entire system
   organizationId: uuid("organization_id").references(() => organizations.id),
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
