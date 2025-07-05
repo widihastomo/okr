@@ -273,8 +273,6 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <Card>
-              <CardHeader>
-              </CardHeader>
               <CardContent className="space-y-6">
                 {/* Title */}
                 <FormField
