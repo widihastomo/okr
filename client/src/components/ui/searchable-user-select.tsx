@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Check, ChevronsUpDown, User, Users } from "lucide-react";
+import React, { useState, useRef } from "react";
+import { Check, ChevronsUpDown, User, Users, ChevronUp, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { ScrollProgressIndicator, useScrollProgress } from "@/components/ui/scroll-progress-indicator";
 
 interface User {
   id: string;
@@ -47,6 +48,8 @@ export function SearchableUserSelect({
   className,
 }: SearchableUserSelectProps) {
   const [open, setOpen] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const scrollState = useScrollProgress(scrollContainerRef);
 
   const selectedUser = users.find((user) => user.id === value);
   const displayValue = selectedUser 
@@ -79,17 +82,30 @@ export function SearchableUserSelect({
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={4}>
         <Command>
           <CommandInput placeholder="Cari user..." />
-          <div 
-            className="max-h-[250px] overflow-y-auto overscroll-contain"
-            style={{ 
-              WebkitOverflowScrolling: 'touch',
-              scrollbarWidth: 'thin',
-              scrollbarColor: '#CBD5E0 #F7FAFC'
-            }}
-          >
-            <CommandList>
-              <CommandEmpty>{emptyMessage}</CommandEmpty>
-              <CommandGroup>
+          <div className="relative">
+            {/* Scroll hint - top */}
+            <div 
+              className={cn(
+                "absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-white to-transparent pointer-events-none z-10 transition-opacity duration-200",
+                scrollState.isAtTop ? "opacity-0" : "opacity-100"
+              )}
+            >
+              <ChevronUp className="w-4 h-4 text-gray-400 mx-auto animate-bounce" />
+            </div>
+
+            {/* Scrollable container */}
+            <div 
+              ref={scrollContainerRef}
+              className="max-h-[250px] overflow-y-auto overscroll-contain relative"
+              style={{ 
+                WebkitOverflowScrolling: 'touch',
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none'
+              }}
+            >
+              <CommandList>
+                <CommandEmpty>{emptyMessage}</CommandEmpty>
+                <CommandGroup>
                 {allowAll && (
                   <CommandItem
                     value="all"
@@ -98,7 +114,7 @@ export function SearchableUserSelect({
                       setOpen(false);
                     }}
                     className={cn(
-                      "flex items-center py-2",
+                      "flex items-center py-2 pr-6", // Added pr-6 for scroll indicator space
                       value === "all" 
                         ? "bg-green-50 border-l-2 border-green-500" 
                         : "hover:bg-gray-50"
@@ -124,7 +140,7 @@ export function SearchableUserSelect({
                       setOpen(false);
                     }}
                     className={cn(
-                      "flex items-center py-2",
+                      "flex items-center py-2 pr-6", // Added pr-6 for scroll indicator space
                       value === "unassigned" 
                         ? "bg-gray-50 border-l-2 border-gray-500" 
                         : "hover:bg-gray-50"
@@ -151,7 +167,7 @@ export function SearchableUserSelect({
                       setOpen(false);
                     }}
                     className={cn(
-                      "flex items-center py-2",
+                      "flex items-center py-2 pr-6", // Added pr-6 for scroll indicator space
                       value === user.id 
                         ? "bg-blue-50 border-l-2 border-blue-500" 
                         : "hover:bg-gray-50"
@@ -177,8 +193,25 @@ export function SearchableUserSelect({
                     </div>
                   </CommandItem>
                 ))}
-              </CommandGroup>
-            </CommandList>
+                </CommandGroup>
+              </CommandList>
+            </div>
+
+            {/* Scroll Progress Indicator */}
+            <ScrollProgressIndicator 
+              containerRef={scrollContainerRef}
+              className="z-20"
+            />
+
+            {/* Scroll hint - bottom */}
+            <div 
+              className={cn(
+                "absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-white to-transparent pointer-events-none z-10 transition-opacity duration-200",
+                scrollState.isAtBottom ? "opacity-0" : "opacity-100"
+              )}
+            >
+              <ChevronDown className="w-4 h-4 text-gray-400 mx-auto animate-bounce" />
+            </div>
           </div>
         </Command>
       </PopoverContent>

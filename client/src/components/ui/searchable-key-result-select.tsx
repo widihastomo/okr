@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { ScrollProgressIndicator, useScrollProgress } from "@/components/ui/scroll-progress-indicator";
+import { Check, ChevronsUpDown, ChevronUp, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { KeyResult } from "@shared/schema";
 
@@ -22,6 +23,8 @@ export function SearchableKeyResultSelect({
   className
 }: SearchableKeyResultSelectProps) {
   const [open, setOpen] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const scrollState = useScrollProgress(scrollContainerRef);
 
   const selectedKeyResult = keyResults.find(kr => kr.id === value);
 
@@ -41,58 +44,88 @@ export function SearchableKeyResultSelect({
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={4}>
         <Command>
           <CommandInput placeholder="Cari angka target..." />
-          <div 
-            className="max-h-[250px] overflow-y-auto overscroll-contain"
-            style={{ 
-              WebkitOverflowScrolling: 'touch',
-              scrollbarWidth: 'thin',
-              scrollbarColor: '#CBD5E0 #F7FAFC'
-            }}
-          >
-            <CommandList>
-              <CommandEmpty>Tidak ada angka target ditemukan</CommandEmpty>
-              <CommandGroup>
-                {keyResults.map((keyResult) => (
-                  <CommandItem
-                    key={keyResult.id}
-                    value={keyResult.title}
-                    onSelect={() => {
-                      onValueChange(keyResult.id);
-                      setOpen(false);
-                    }}
-                    className={cn(
-                      "flex items-center py-2",
-                      value === keyResult.id 
-                        ? "bg-blue-50 border-l-2 border-blue-500" 
-                        : "hover:bg-gray-50"
-                    )}
-                  >
-                    <div className="flex flex-col min-w-0 flex-1">
-                      <span className={cn(
-                        "font-medium truncate",
-                        value === keyResult.id ? "text-blue-900" : "text-gray-900"
-                      )}>
-                        {keyResult.title}
-                      </span>
-                      {keyResult.description && (
-                        <span className={cn(
-                          "text-sm truncate",
-                          value === keyResult.id ? "text-blue-600" : "text-gray-500"
-                        )}>
-                          {keyResult.description}
-                        </span>
-                      )}
-                    </div>
-                    <Check
+          <div className="relative">
+            {/* Scroll hint - top */}
+            <div 
+              className={cn(
+                "absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-white to-transparent pointer-events-none z-10 transition-opacity duration-200",
+                scrollState.isAtTop ? "opacity-0" : "opacity-100"
+              )}
+            >
+              <ChevronUp className="w-4 h-4 text-gray-400 mx-auto animate-bounce" />
+            </div>
+
+            {/* Scrollable container */}
+            <div 
+              ref={scrollContainerRef}
+              className="max-h-[250px] overflow-y-auto overscroll-contain relative"
+              style={{ 
+                WebkitOverflowScrolling: 'touch',
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none'
+              }}
+            >
+              <CommandList>
+                <CommandEmpty>Tidak ada angka target ditemukan</CommandEmpty>
+                <CommandGroup>
+                  {keyResults.map((keyResult) => (
+                    <CommandItem
+                      key={keyResult.id}
+                      value={keyResult.title}
+                      onSelect={() => {
+                        onValueChange(keyResult.id);
+                        setOpen(false);
+                      }}
                       className={cn(
-                        "ml-3 h-4 w-4 flex-shrink-0",
-                        value === keyResult.id ? "opacity-100 text-blue-600" : "opacity-0"
+                        "flex items-center py-2 pr-6", // Added pr-6 for scroll indicator space
+                        value === keyResult.id 
+                          ? "bg-blue-50 border-l-2 border-blue-500" 
+                          : "hover:bg-gray-50"
                       )}
-                    />
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
+                    >
+                      <div className="flex flex-col min-w-0 flex-1">
+                        <span className={cn(
+                          "font-medium truncate",
+                          value === keyResult.id ? "text-blue-900" : "text-gray-900"
+                        )}>
+                          {keyResult.title}
+                        </span>
+                        {keyResult.description && (
+                          <span className={cn(
+                            "text-sm truncate",
+                            value === keyResult.id ? "text-blue-600" : "text-gray-500"
+                          )}>
+                            {keyResult.description}
+                          </span>
+                        )}
+                      </div>
+                      <Check
+                        className={cn(
+                          "ml-3 h-4 w-4 flex-shrink-0",
+                          value === keyResult.id ? "opacity-100 text-blue-600" : "opacity-0"
+                        )}
+                      />
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </div>
+
+            {/* Scroll Progress Indicator */}
+            <ScrollProgressIndicator 
+              containerRef={scrollContainerRef}
+              className="z-20"
+            />
+
+            {/* Scroll hint - bottom */}
+            <div 
+              className={cn(
+                "absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-white to-transparent pointer-events-none z-10 transition-opacity duration-200",
+                scrollState.isAtBottom ? "opacity-0" : "opacity-100"
+              )}
+            >
+              <ChevronDown className="w-4 h-4 text-gray-400 mx-auto animate-bounce" />
+            </div>
           </div>
         </Command>
       </PopoverContent>
