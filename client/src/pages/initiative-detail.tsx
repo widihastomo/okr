@@ -43,7 +43,7 @@ import {
 import TaskModal from "@/components/task-modal";
 import InitiativeModal from "@/components/initiative-modal";
 import { InitiativeNotes } from "@/components/initiative-notes";
-import SuccessMetricsModal from "@/components/success-metrics-modal";
+import SuccessMetricsModal from "@/components/success-metrics-modal-simple";
 import type { SuccessMetricWithUpdates } from "@shared/schema";
 
 export default function InitiativeDetailPage() {
@@ -335,12 +335,12 @@ export default function InitiativeDetailPage() {
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-3">
-                            <h4 className="font-medium text-gray-900">{metric.title}</h4>
+                            <h4 className="font-medium text-gray-900">{metric.name}</h4>
                             <span className="text-sm text-gray-600">
-                              Target: <span className="font-medium">{metric.targetValue}{metric.unit && ` ${metric.unit}`}</span>
+                              Target: <span className="font-medium">{metric.target}</span>
                             </span>
                             <span className="text-sm text-gray-600">
-                              Capaian: <span className="font-medium">{metric.currentValue || 0}{metric.unit && ` ${metric.unit}`}</span>
+                              Capaian: <span className="font-medium">{metric.achievement}</span>
                             </span>
                           </div>
                         </div>

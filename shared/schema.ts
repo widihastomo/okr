@@ -158,30 +158,23 @@ export const initiativeDocuments = pgTable("initiative_documents", {
   uploadedAt: timestamp("uploaded_at").defaultNow(),
 });
 
-// Success metrics for initiatives to track impact and outcomes
+// Success metrics for initiatives - simplified structure
 export const initiativeSuccessMetrics = pgTable("initiative_success_metrics", {
   id: uuid("id").primaryKey().defaultRandom(),
   initiativeId: uuid("initiative_id").references(() => initiatives.id).notNull(),
-  title: text("title").notNull(),
-  description: text("description"),
-  type: text("type").notNull().default("increase_to"), // "increase_to", "decrease_to", "achieve_or_not", "should_stay_above", "should_stay_below"
-  baseValue: decimal("base_value", { precision: 15, scale: 2 }),
-  targetValue: decimal("target_value", { precision: 15, scale: 2 }).notNull(),
-  currentValue: decimal("current_value", { precision: 15, scale: 2 }).default("0"),
-  unit: text("unit").notNull().default("number"), // "number", "percentage", "currency", "days", etc.
-  status: text("status").notNull().default("not_started"), // "not_started", "on_track", "at_risk", "behind", "completed", "ahead"
-  dueDate: timestamp("due_date"),
+  name: text("name").notNull(), // Nama metrik
+  target: text("target").notNull(), // Target yang ingin dicapai
+  achievement: text("achievement").notNull().default("0"), // Capaian saat ini
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Updates/check-ins for success metrics
+// Updates/check-ins for success metrics - simplified
 export const successMetricUpdates = pgTable("success_metric_updates", {
   id: uuid("id").primaryKey().defaultRandom(),
   metricId: uuid("metric_id").references(() => initiativeSuccessMetrics.id).notNull(),
-  value: decimal("value", { precision: 15, scale: 2 }).notNull(),
+  achievement: text("achievement").notNull(), // Capaian yang diupdate
   notes: text("notes"),
-  confidence: integer("confidence").notNull().default(5), // 1-10 scale
   createdAt: timestamp("created_at").defaultNow(),
   createdBy: uuid("created_by").notNull(), // user ID
 });
