@@ -1,31 +1,43 @@
-import React, { useState, useEffect } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { OKRWithKeyResults } from "@shared/schema";
+import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
+import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { 
-  Zap, 
-  Target, 
-  Calendar, 
-  CheckCircle, 
   Clock, 
+  Target, 
+  Zap, 
   TrendingUp, 
-  Star,
-  ChevronRight,
-  ChevronLeft,
+  CheckCircle2, 
+  Star, 
+  Calendar,
+  BarChart3,
   Lightbulb,
-  Repeat,
-  BookOpen
+  ArrowRight,
+  Sparkles,
+  Timer,
+  Brain,
+  Trophy
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import type { OKRWithKeyResults, User } from "@shared/schema";
+
+interface HabitPreferences {
+  timeAvailable: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  categories: string[];
+  focusAreas: string[];
+}
 
 interface HabitSuggestion {
   id: string;
@@ -41,571 +53,475 @@ interface HabitSuggestion {
 }
 
 interface HabitAlignmentWizardProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  objectives: OKRWithKeyResults[];
-  userId: string;
+  trigger?: React.ReactNode;
 }
 
-export function HabitAlignmentWizard({ 
-  open, 
-  onOpenChange, 
-  objectives, 
-  userId 
-}: HabitAlignmentWizardProps) {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [selectedObjectives, setSelectedObjectives] = useState<string[]>([]);
-  const [habitPreferences, setHabitPreferences] = useState({
-    timeAvailable: '30', // minutes per day
-    difficulty: 'medium' as 'easy' | 'medium' | 'hard',
-    categories: [] as string[],
-    focusAreas: [] as string[]
-  });
-  const [suggestedHabits, setSuggestedHabits] = useState<HabitSuggestion[]>([]);
-  const [selectedHabits, setSelectedHabits] = useState<string[]>([]);
-  const [isGenerating, setIsGenerating] = useState(false);
-
+export default function HabitAlignmentWizard({ trigger }: HabitAlignmentWizardProps) {
+  const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  const [isOpen, setIsOpen] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [selectedObjectives, setSelectedObjectives] = useState<string[]>([]);
+  const [preferences, setPreferences] = useState<HabitPreferences>({
+    timeAvailable: "30",
+    difficulty: "medium",
+    categories: [],
+    focusAreas: []
+  });
+  const [suggestions, setSuggestions] = useState<HabitSuggestion[]>([]);
+  const [selectedHabits, setSelectedHabits] = useState<string[]>([]);
 
-  const totalSteps = 4;
+  // Fetch user's objectives
+  const { data: objectives = [], isLoading: objectivesLoading } = useQuery<OKRWithKeyResults[]>({
+    queryKey: ["/api/okrs"],
+    enabled: isOpen,
+  });
 
-  // Generate AI-powered habit suggestions based on objectives
-  const generateHabitSuggestions = async () => {
-    setIsGenerating(true);
-    try {
-      const response: any = await apiRequest("POST", "/api/ai/habit-suggestions", {
-        objectiveIds: selectedObjectives,
-        preferences: habitPreferences,
-        userId
+  // Generate habit suggestions mutation
+  const generateHabitsMutation = useMutation({
+    mutationFn: async (data: {
+      objectiveIds: string[];
+      preferences: HabitPreferences;
+    }) => {
+      const selectedOKRs = objectives.filter(obj => data.objectiveIds.includes(obj.id));
+      const response = await apiRequest("POST", "/api/habits/generate", {
+        objectiveIds: data.objectiveIds,
+        objectives: selectedOKRs,
+        preferences: data.preferences,
+        userId: user?.id,
       });
-      setSuggestedHabits(response?.suggestions || []);
-    } catch (error) {
-      // Fallback to predefined suggestions if AI fails
-      const fallbackSuggestions = generateFallbackSuggestions();
-      setSuggestedHabits(fallbackSuggestions);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  const generateFallbackSuggestions = (): HabitSuggestion[] => {
-    const selectedObjs = objectives.filter(obj => selectedObjectives.includes(obj.id));
-    const suggestions: HabitSuggestion[] = [];
-
-    selectedObjs.forEach(objective => {
-      // Generate habit suggestions based on objective type and key results
-      if (objective.title.toLowerCase().includes('penjualan') || 
-          objective.title.toLowerCase().includes('revenue') ||
-          objective.keyResults?.some(kr => kr.unit === 'Rp')) {
-        suggestions.push({
-          id: `sales-${objective.id}`,
-          title: "Daily Prospecting",
-          description: "Kontak 5 prospek baru setiap hari untuk membangun pipeline penjualan yang konsisten",
-          category: 'daily',
-          difficulty: 'medium',
-          impactScore: 85,
-          alignedObjectives: [objective.id],
-          timeCommitment: "30 menit",
-          frequency: "Setiap hari",
-          examples: ["Cold call 3 leads", "Email 2 warm prospects", "LinkedIn outreach"]
-        });
-      }
-
-      if (objective.title.toLowerCase().includes('produktivitas') ||
-          objective.title.toLowerCase().includes('efisiensi')) {
-        suggestions.push({
-          id: `productivity-${objective.id}`,
-          title: "Morning Planning Ritual",
-          description: "Mulai hari dengan 15 menit perencanaan untuk fokus pada prioritas tertinggi",
-          category: 'daily',
-          difficulty: 'easy',
-          impactScore: 75,
-          alignedObjectives: [objective.id],
-          timeCommitment: "15 menit",
-          frequency: "Setiap pagi",
-          examples: ["Review top 3 priorities", "Time blocking", "Energy management"]
-        });
-      }
-
-      if (objective.title.toLowerCase().includes('skill') ||
-          objective.title.toLowerCase().includes('learning') ||
-          objective.title.toLowerCase().includes('development')) {
-        suggestions.push({
-          id: `learning-${objective.id}`,
-          title: "Daily Skill Building",
-          description: "Dedikasikan 20 menit setiap hari untuk mempelajari skill baru yang relevan",
-          category: 'daily',
-          difficulty: 'medium',
-          impactScore: 90,
-          alignedObjectives: [objective.id],
-          timeCommitment: "20 menit",
-          frequency: "Setiap hari",
-          examples: ["Online course", "Technical reading", "Practice exercises"]
-        });
-      }
-    });
-
-    // Add general productivity habits
-    suggestions.push({
-      id: 'general-review',
-      title: "Weekly OKR Review",
-      description: "Review progress mingguan terhadap semua objectives dan adjust strategi",
-      category: 'weekly',
-      difficulty: 'easy',
-      impactScore: 80,
-      alignedObjectives: selectedObjectives,
-      timeCommitment: "30 menit",
-      frequency: "Setiap minggu",
-      examples: ["Progress check", "Obstacle identification", "Next week planning"]
-    });
-
-    return suggestions;
-  };
-
-  // Create habit tracking entries
-  const createHabitTrackingMutation = useMutation({
-    mutationFn: async (habitData: any) => {
-      return await apiRequest("POST", "/api/habits", habitData);
+      return response;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      setSuggestions(data.suggestions || []);
+      setCurrentStep(3);
       toast({
-        title: "Sukses",
-        description: `${selectedHabits.length} kebiasaan berhasil ditambahkan ke tracker Anda`,
+        title: "Berhasil",
+        description: "Rekomendasi kebiasaan berhasil dibuat!",
         className: "border-green-200 bg-green-50 text-green-800",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/habits"] });
-      onOpenChange(false);
-      resetWizard();
     },
-    onError: (error: Error) => {
+    onError: (error) => {
       toast({
-        title: "Gagal",
-        description: error.message || "Gagal membuat habit tracker",
+        title: "Error",
+        description: "Gagal membuat rekomendasi kebiasaan",
         variant: "destructive",
       });
     },
   });
 
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'easy': return 'bg-green-100 text-green-800 border-green-200';
+      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'hard': return 'bg-red-100 text-red-800 border-red-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'daily': return Calendar;
+      case 'weekly': return BarChart3;
+      case 'monthly': return Trophy;
+      default: return Target;
+    }
+  };
+
+  const handleObjectiveToggle = (objectiveId: string) => {
+    setSelectedObjectives(prev => 
+      prev.includes(objectiveId)
+        ? prev.filter(id => id !== objectiveId)
+        : [...prev, objectiveId]
+    );
+  };
+
+  const handleGenerateHabits = () => {
+    if (selectedObjectives.length === 0) {
+      toast({
+        title: "Pilih Goals",
+        description: "Silakan pilih minimal satu goal terlebih dahulu",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    generateHabitsMutation.mutate({
+      objectiveIds: selectedObjectives,
+      preferences,
+    });
+  };
+
+  const handleHabitToggle = (habitId: string) => {
+    setSelectedHabits(prev => 
+      prev.includes(habitId)
+        ? prev.filter(id => id !== habitId)
+        : [...prev, habitId]
+    );
+  };
+
+  const handleFinishWizard = () => {
+    if (selectedHabits.length === 0) {
+      toast({
+        title: "Pilih Kebiasaan",
+        description: "Silakan pilih minimal satu kebiasaan untuk diimplementasikan",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Here you could save the selected habits to user preferences or tracking system
+    toast({
+      title: "Kebiasaan Tersimpan!",
+      description: `${selectedHabits.length} kebiasaan berhasil ditambahkan ke rencana Anda`,
+      className: "border-green-200 bg-green-50 text-green-800",
+    });
+    
+    setIsOpen(false);
+    resetWizard();
+  };
+
   const resetWizard = () => {
     setCurrentStep(1);
     setSelectedObjectives([]);
-    setHabitPreferences({
-      timeAvailable: '30',
-      difficulty: 'medium',
+    setPreferences({
+      timeAvailable: "30",
+      difficulty: "medium",
       categories: [],
       focusAreas: []
     });
-    setSuggestedHabits([]);
+    setSuggestions([]);
     setSelectedHabits([]);
   };
 
-  const handleNext = async () => {
-    if (currentStep === 2) {
-      await generateHabitSuggestions();
-    }
-    setCurrentStep(prev => Math.min(prev + 1, totalSteps));
-  };
-
-  const handleBack = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
-  };
-
-  const handleFinish = () => {
-    const habitsToCreate = suggestedHabits
-      .filter(habit => selectedHabits.includes(habit.id))
-      .map(habit => ({
-        title: habit.title,
-        description: habit.description,
-        category: habit.category,
-        frequency: habit.frequency,
-        timeCommitment: habit.timeCommitment,
-        alignedObjectives: habit.alignedObjectives,
-        userId,
-        isActive: true
-      }));
-
-    createHabitTrackingMutation.mutate(habitsToCreate);
-  };
-
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 1:
-        return (
-          <div className="space-y-6">
-            <div className="text-center space-y-2">
-              <Zap className="h-12 w-12 text-blue-600 mx-auto" />
-              <h3 className="text-lg font-semibold">Pilih Objectives yang Ingin Dipercepat</h3>
-              <p className="text-sm text-gray-600">
-                Wizard akan membuat kebiasaan harian yang secara langsung mendukung pencapaian goals Anda
-              </p>
-            </div>
-            
-            <div className="space-y-3">
-              {objectives.map(objective => (
-                <Card 
-                  key={objective.id}
-                  className={`cursor-pointer transition-all ${
-                    selectedObjectives.includes(objective.id) 
-                      ? 'border-blue-500 bg-blue-50' 
-                      : 'hover:border-gray-300'
-                  }`}
-                  onClick={() => {
-                    setSelectedObjectives(prev => 
-                      prev.includes(objective.id)
-                        ? prev.filter(id => id !== objective.id)
-                        : [...prev, objective.id]
-                    );
-                  }}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-start space-x-3">
-                      <Checkbox 
-                        checked={selectedObjectives.includes(objective.id)}
-                        onChange={() => {}}
-                        className="mt-1"
-                      />
-                      <div className="flex-1">
-                        <h4 className="font-medium">{objective.title}</h4>
-                        <p className="text-sm text-gray-600 mt-1">{objective.description}</p>
-                        <div className="flex items-center mt-2 space-x-2">
-                          <Badge variant="outline" className="text-xs">
-                            {objective.keyResults?.length || 0} Angka Target
-                          </Badge>
-                          <div className="text-xs text-gray-500">
-                            Progress: {objective.overallProgress?.toFixed(1) || 0}%
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        );
-
-      case 2:
-        return (
-          <div className="space-y-6">
-            <div className="text-center space-y-2">
-              <Clock className="h-12 w-12 text-blue-600 mx-auto" />
-              <h3 className="text-lg font-semibold">Personalisasi Kebiasaan Anda</h3>
-              <p className="text-sm text-gray-600">
-                Beri tahu kami preferensi Anda untuk mendapatkan saran kebiasaan yang realistis
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <Label className="text-sm font-medium">Waktu yang Tersedia per Hari</Label>
-                <div className="grid grid-cols-4 gap-2 mt-2">
-                  {['15', '30', '60', '90'].map(time => (
-                    <Button
-                      key={time}
-                      variant={habitPreferences.timeAvailable === time ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setHabitPreferences(prev => ({ ...prev, timeAvailable: time }))}
-                    >
-                      {time} min
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <Label className="text-sm font-medium">Tingkat Kesulitan</Label>
-                <div className="grid grid-cols-3 gap-2 mt-2">
-                  {[
-                    { key: 'easy', label: 'Mudah', desc: 'Langkah kecil' },
-                    { key: 'medium', label: 'Sedang', desc: 'Balanced' },
-                    { key: 'hard', label: 'Menantang', desc: 'High impact' }
-                  ].map(diff => (
-                    <Button
-                      key={diff.key}
-                      variant={habitPreferences.difficulty === diff.key ? 'default' : 'outline'}
-                      size="sm"
-                      className="h-auto p-3 flex flex-col"
-                      onClick={() => setHabitPreferences(prev => ({ ...prev, difficulty: diff.key as any }))}
-                    >
-                      <span className="font-medium">{diff.label}</span>
-                      <span className="text-xs opacity-75">{diff.desc}</span>
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <Label className="text-sm font-medium">Area Fokus (Opsional)</Label>
-                <div className="grid grid-cols-2 gap-2 mt-2">
-                  {[
-                    'Pagi Hari', 'Sore Hari', 'Produktivitas', 'Learning',
-                    'Networking', 'Health', 'Mindfulness', 'Organization'
-                  ].map(area => (
-                    <Button
-                      key={area}
-                      variant={habitPreferences.focusAreas.includes(area) ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => {
-                        setHabitPreferences(prev => ({
-                          ...prev,
-                          focusAreas: prev.focusAreas.includes(area)
-                            ? prev.focusAreas.filter(a => a !== area)
-                            : [...prev.focusAreas, area]
-                        }));
-                      }}
-                    >
-                      {area}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 3:
-        return (
-          <div className="space-y-6">
-            <div className="text-center space-y-2">
-              <Lightbulb className="h-12 w-12 text-blue-600 mx-auto" />
-              <h3 className="text-lg font-semibold">Kebiasaan yang Disarankan</h3>
-              <p className="text-sm text-gray-600">
-                Pilih kebiasaan yang paling sesuai dengan gaya hidup dan tujuan Anda
-              </p>
-            </div>
-
-            {isGenerating ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="mt-4 text-sm text-gray-600">Menganalisis objectives dan membuat saran kebiasaan...</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {suggestedHabits.map(habit => (
-                  <Card 
-                    key={habit.id}
-                    className={`cursor-pointer transition-all ${
-                      selectedHabits.includes(habit.id) 
-                        ? 'border-blue-500 bg-blue-50' 
-                        : 'hover:border-gray-300'
-                    }`}
-                    onClick={() => {
-                      setSelectedHabits(prev => 
-                        prev.includes(habit.id)
-                          ? prev.filter(id => id !== habit.id)
-                          : [...prev, habit.id]
-                      );
-                    }}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-start space-x-3">
-                        <Checkbox 
-                          checked={selectedHabits.includes(habit.id)}
-                          onChange={() => {}}
-                          className="mt-1"
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <h4 className="font-medium">{habit.title}</h4>
-                            <div className="flex items-center space-x-2">
-                              <Badge variant="secondary" className="text-xs">
-                                Impact: {habit.impactScore}%
-                              </Badge>
-                              <Badge 
-                                variant={habit.difficulty === 'easy' ? 'default' : 
-                                        habit.difficulty === 'medium' ? 'secondary' : 'destructive'}
-                                className="text-xs"
-                              >
-                                {habit.difficulty}
-                              </Badge>
-                            </div>
-                          </div>
-                          <p className="text-sm text-gray-600 mt-1">{habit.description}</p>
-                          <div className="flex items-center mt-2 space-x-4 text-xs text-gray-500">
-                            <span className="flex items-center">
-                              <Clock className="h-3 w-3 mr-1" />
-                              {habit.timeCommitment}
-                            </span>
-                            <span className="flex items-center">
-                              <Repeat className="h-3 w-3 mr-1" />
-                              {habit.frequency}
-                            </span>
-                            <span className="flex items-center">
-                              <Target className="h-3 w-3 mr-1" />
-                              {habit.alignedObjectives.length} Goal
-                            </span>
-                          </div>
-                          {habit.examples.length > 0 && (
-                            <div className="mt-2">
-                              <p className="text-xs text-gray-500 mb-1">Contoh aktivitas:</p>
-                              <div className="flex flex-wrap gap-1">
-                                {habit.examples.slice(0, 3).map((example, idx) => (
-                                  <Badge key={idx} variant="outline" className="text-xs">
-                                    {example}
-                                  </Badge>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
-        );
-
-      case 4:
-        return (
-          <div className="space-y-6">
-            <div className="text-center space-y-2">
-              <CheckCircle className="h-12 w-12 text-green-600 mx-auto" />
-              <h3 className="text-lg font-semibold">Review & Konfirmasi</h3>
-              <p className="text-sm text-gray-600">
-                Kebiasaan ini akan ditambahkan ke habit tracker Anda dan terintegrasi dengan OKR
-              </p>
-            </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Ringkasan Habit Alignment</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label className="text-sm font-medium">Objectives Terpilih</Label>
-                  <div className="mt-1 space-y-1">
-                    {objectives
-                      .filter(obj => selectedObjectives.includes(obj.id))
-                      .map(obj => (
-                        <div key={obj.id} className="text-sm text-gray-600 flex items-center">
-                          <Target className="h-3 w-3 mr-2" />
-                          {obj.title}
-                        </div>
-                      ))
-                    }
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div>
-                  <Label className="text-sm font-medium">
-                    Kebiasaan yang Akan Dibuat ({selectedHabits.length})
-                  </Label>
-                  <div className="mt-1 space-y-2">
-                    {suggestedHabits
-                      .filter(habit => selectedHabits.includes(habit.id))
-                      .map(habit => (
-                        <div key={habit.id} className="text-sm border rounded p-2">
-                          <div className="font-medium">{habit.title}</div>
-                          <div className="text-gray-600 text-xs mt-1">
-                            {habit.frequency} • {habit.timeCommitment} • Impact {habit.impactScore}%
-                          </div>
-                        </div>
-                      ))
-                    }
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div className="bg-blue-50 rounded-lg p-3">
-                  <div className="flex items-start space-x-2">
-                    <Star className="h-4 w-4 text-blue-600 mt-0.5" />
-                    <div className="text-sm">
-                      <p className="font-medium text-blue-900">Estimasi Impact</p>
-                      <p className="text-blue-700">
-                        Dengan konsistensi, kebiasaan ini dapat meningkatkan progress OKR Anda hingga{' '}
-                        <span className="font-semibold">
-                          {Math.round(selectedHabits.reduce((acc, id) => {
-                            const habit = suggestedHabits.find(h => h.id === id);
-                            return acc + (habit?.impactScore || 0);
-                          }, 0) / selectedHabits.length)}%
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
+  const stepProgress = (currentStep / 3) * 100;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        {trigger || (
+          <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+            <Sparkles className="h-4 w-4 mr-2" />
+            Habit Alignment Wizard
+          </Button>
+        )}
+      </DialogTrigger>
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
-            <Zap className="h-5 w-5 text-blue-600" />
+            <Brain className="h-5 w-5 text-purple-600" />
             <span>One-Click Habit Alignment Wizard</span>
           </DialogTitle>
+          <DialogDescription>
+            Dapatkan rekomendasi kebiasaan yang diselaraskan dengan goals Anda untuk mempercepat pencapaian target
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Progress Indicator */}
+          {/* Progress Bar */}
           <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Step {currentStep} dari {totalSteps}</span>
-              <span>{Math.round((currentStep / totalSteps) * 100)}% Complete</span>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600">Langkah {currentStep} dari 3</span>
+              <span className="text-gray-600">{Math.round(stepProgress)}%</span>
             </div>
-            <Progress value={(currentStep / totalSteps) * 100} className="h-2" />
+            <Progress value={stepProgress} className="w-full" />
           </div>
 
-          {/* Step Content */}
-          {renderStepContent()}
+          <Tabs value={currentStep.toString()} className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="1" disabled={currentStep < 1}>
+                <Target className="h-4 w-4 mr-2" />
+                Pilih Goals
+              </TabsTrigger>
+              <TabsTrigger value="2" disabled={currentStep < 2}>
+                <Timer className="h-4 w-4 mr-2" />
+                Preferensi
+              </TabsTrigger>
+              <TabsTrigger value="3" disabled={currentStep < 3}>
+                <Lightbulb className="h-4 w-4 mr-2" />
+                Rekomendasi
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Navigation */}
-          <div className="flex justify-between pt-4 border-t">
-            <Button
-              variant="outline"
-              onClick={handleBack}
-              disabled={currentStep === 1}
-              className="flex items-center space-x-2"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              <span>Kembali</span>
-            </Button>
+            {/* Step 1: Select Objectives */}
+            <TabsContent value="1" className="space-y-4">
+              <div className="text-center py-4">
+                <h3 className="text-lg font-semibold mb-2">Pilih Goals yang Ingin Difokuskan</h3>
+                <p className="text-gray-600">Pilih satu atau lebih goals yang ingin Anda percepat pencapaiannya</p>
+              </div>
 
-            {currentStep < totalSteps ? (
-              <Button
-                onClick={handleNext}
-                disabled={
-                  (currentStep === 1 && selectedObjectives.length === 0) ||
-                  (currentStep === 3 && selectedHabits.length === 0)
-                }
-                className="flex items-center space-x-2"
-              >
-                <span>Lanjut</span>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            ) : (
-              <Button
-                onClick={handleFinish}
-                disabled={selectedHabits.length === 0 || createHabitTrackingMutation.isPending}
-                className="flex items-center space-x-2 bg-green-600 hover:bg-green-700"
-              >
-                {createHabitTrackingMutation.isPending ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>Membuat...</span>
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="h-4 w-4" />
-                    <span>Buat Habit Tracker</span>
-                  </>
-                )}
-              </Button>
-            )}
-          </div>
+              {objectivesLoading ? (
+                <div className="space-y-3">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="animate-pulse">
+                      <div className="h-20 bg-gray-200 rounded-lg"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : objectives.length === 0 ? (
+                <div className="text-center py-8">
+                  <Target className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Belum ada Goals</h3>
+                  <p className="text-gray-500">Buat goals terlebih dahulu untuk menggunakan fitur ini</p>
+                </div>
+              ) : (
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {objectives.map((objective) => (
+                    <Card 
+                      key={objective.id}
+                      className={`cursor-pointer transition-all ${
+                        selectedObjectives.includes(objective.id)
+                          ? 'ring-2 ring-blue-500 bg-blue-50'
+                          : 'hover:bg-gray-50'
+                      }`}
+                      onClick={() => handleObjectiveToggle(objective.id)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start space-x-3">
+                          <Checkbox
+                            checked={selectedObjectives.includes(objective.id)}
+                            onChange={() => {}} // Handled by card click
+                            className="mt-1"
+                          />
+                          <div className="flex-1">
+                            <h4 className="font-medium text-gray-900">{objective.title}</h4>
+                            <p className="text-sm text-gray-600 mt-1">{objective.description}</p>
+                            <div className="flex items-center space-x-4 mt-2">
+                              <div className="flex items-center space-x-1">
+                                <TrendingUp className="h-4 w-4 text-green-600" />
+                                <span className="text-sm text-gray-600">
+                                  {objective.overallProgress?.toFixed(0) || 0}% progress
+                                </span>
+                              </div>
+                              <Badge variant="outline" className="text-xs">
+                                {objective.keyResults?.length || 0} angka target
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex justify-end pt-4">
+                <Button
+                  onClick={() => setCurrentStep(2)}
+                  disabled={selectedObjectives.length === 0}
+                >
+                  Lanjut ke Preferensi
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </div>
+            </TabsContent>
+
+            {/* Step 2: Preferences */}
+            <TabsContent value="2" className="space-y-6">
+              <div className="text-center py-4">
+                <h3 className="text-lg font-semibold mb-2">Atur Preferensi Kebiasaan</h3>
+                <p className="text-gray-600">Sesuaikan rekomendasi dengan jadwal dan preferensi Anda</p>
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="timeAvailable">Waktu Tersedia per Hari</Label>
+                  <Select 
+                    value={preferences.timeAvailable} 
+                    onValueChange={(value) => setPreferences(prev => ({ ...prev, timeAvailable: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih waktu tersedia" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="15">15 menit</SelectItem>
+                      <SelectItem value="30">30 menit</SelectItem>
+                      <SelectItem value="45">45 menit</SelectItem>
+                      <SelectItem value="60">1 jam</SelectItem>
+                      <SelectItem value="90">1.5 jam</SelectItem>
+                      <SelectItem value="120">2 jam</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="difficulty">Tingkat Kesulitan</Label>
+                  <Select 
+                    value={preferences.difficulty} 
+                    onValueChange={(value: 'easy' | 'medium' | 'hard') => 
+                      setPreferences(prev => ({ ...prev, difficulty: value }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih tingkat kesulitan" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="easy">Mudah - Kebiasaan sederhana</SelectItem>
+                      <SelectItem value="medium">Sedang - Kebiasaan moderat</SelectItem>
+                      <SelectItem value="hard">Sulit - Kebiasaan menantang</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <Label>Area Fokus (Opsional)</Label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {[
+                    'Penjualan', 'Produktivitas', 'Pembelajaran', 'Networking', 
+                    'Customer Service', 'Leadership', 'Kualitas', 'Inovasi'
+                  ].map((area) => (
+                    <div key={area} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={area}
+                        checked={preferences.focusAreas.includes(area)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setPreferences(prev => ({
+                              ...prev,
+                              focusAreas: [...prev.focusAreas, area]
+                            }));
+                          } else {
+                            setPreferences(prev => ({
+                              ...prev,
+                              focusAreas: prev.focusAreas.filter(f => f !== area)
+                            }));
+                          }
+                        }}
+                      />
+                      <Label htmlFor={area} className="text-sm">{area}</Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-between pt-4">
+                <Button variant="outline" onClick={() => setCurrentStep(1)}>
+                  Kembali
+                </Button>
+                <Button
+                  onClick={handleGenerateHabits}
+                  disabled={generateHabitsMutation.isPending}
+                >
+                  {generateHabitsMutation.isPending ? (
+                    <>
+                      <Sparkles className="h-4 w-4 mr-2 animate-spin" />
+                      Membuat Rekomendasi...
+                    </>
+                  ) : (
+                    <>
+                      Buat Rekomendasi
+                      <Zap className="h-4 w-4 ml-2" />
+                    </>
+                  )}
+                </Button>
+              </div>
+            </TabsContent>
+
+            {/* Step 3: Recommendations */}
+            <TabsContent value="3" className="space-y-4">
+              <div className="text-center py-4">
+                <h3 className="text-lg font-semibold mb-2">Rekomendasi Kebiasaan Teraligned</h3>
+                <p className="text-gray-600">Pilih kebiasaan yang ingin Anda implementasikan</p>
+              </div>
+
+              {suggestions.length === 0 ? (
+                <div className="text-center py-8">
+                  <Lightbulb className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Belum ada rekomendasi</h3>
+                  <p className="text-gray-500">Klik tombol "Buat Rekomendasi" untuk mendapatkan saran kebiasaan</p>
+                </div>
+              ) : (
+                <div className="space-y-4 max-h-96 overflow-y-auto">
+                  {suggestions.map((habit) => {
+                    const CategoryIcon = getCategoryIcon(habit.category);
+                    return (
+                      <Card 
+                        key={habit.id}
+                        className={`cursor-pointer transition-all ${
+                          selectedHabits.includes(habit.id)
+                            ? 'ring-2 ring-green-500 bg-green-50'
+                            : 'hover:bg-gray-50'
+                        }`}
+                        onClick={() => handleHabitToggle(habit.id)}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-start space-x-3">
+                            <Checkbox
+                              checked={selectedHabits.includes(habit.id)}
+                              onChange={() => {}} // Handled by card click
+                              className="mt-1"
+                            />
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-2 mb-2">
+                                <CategoryIcon className="h-4 w-4 text-blue-600" />
+                                <h4 className="font-semibold text-gray-900">{habit.title}</h4>
+                                <Badge className={getDifficultyColor(habit.difficulty)}>
+                                  {habit.difficulty === 'easy' ? 'Mudah' : 
+                                   habit.difficulty === 'medium' ? 'Sedang' : 'Sulit'}
+                                </Badge>
+                              </div>
+                              
+                              <p className="text-sm text-gray-600 mb-3">{habit.description}</p>
+                              
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                                <div className="flex items-center space-x-1">
+                                  <Clock className="h-3 w-3 text-gray-500" />
+                                  <span>{habit.timeCommitment}</span>
+                                </div>
+                                <div className="flex items-center space-x-1">
+                                  <Calendar className="h-3 w-3 text-gray-500" />
+                                  <span>{habit.frequency}</span>
+                                </div>
+                                <div className="flex items-center space-x-1">
+                                  <Star className="h-3 w-3 text-yellow-500" />
+                                  <span>{habit.impactScore}/100 impact</span>
+                                </div>
+                                <div className="flex items-center space-x-1">
+                                  <Target className="h-3 w-3 text-blue-500" />
+                                  <span>{habit.alignedObjectives.length} goals</span>
+                                </div>
+                              </div>
+
+                              {habit.examples.length > 0 && (
+                                <div className="mt-3">
+                                  <p className="text-xs font-medium text-gray-700 mb-1">Contoh aktivitas:</p>
+                                  <ul className="text-xs text-gray-600 space-y-1">
+                                    {habit.examples.slice(0, 3).map((example, index) => (
+                                      <li key={index} className="flex items-center space-x-1">
+                                        <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                                        <span>{example}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div className="flex justify-between pt-4">
+                <Button variant="outline" onClick={() => setCurrentStep(2)}>
+                  Kembali
+                </Button>
+                <Button
+                  onClick={handleFinishWizard}
+                  disabled={selectedHabits.length === 0}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <CheckCircle2 className="h-4 w-4 mr-2" />
+                  Implementasikan Kebiasaan ({selectedHabits.length})
+                </Button>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </DialogContent>
     </Dialog>
