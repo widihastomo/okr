@@ -96,6 +96,16 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 05, 2025. Finalized comprehensive initiative status system with complete UI workflow:
+  * Fixed critical JSX syntax errors in initiative detail page that were preventing application from running
+  * Implemented automatic status calculation - initiatives become "sedang_berjalan" when tasks are in progress or success metrics updated
+  * Added manual status update API endpoint for debugging and system maintenance
+  * Completed "Cancel Initiative" functionality with AlertDialog modal for user confirmation and reason collection
+  * Added comprehensive status badge system with proper color coding for all 4 statuses
+  * Integrated conditional action buttons: Edit (draft/running), Close (running only), Cancel (draft/running)
+  * Fixed layout issues and improved header design for better user experience
+  * System now properly tracks initiative lifecycle from draft → running → closed/cancelled
+  * All initiative management features fully functional with proper validation and error handling
 - July 05, 2025. Completed comprehensive initiative status redesign with 4-stage lifecycle management:
   * Redesigned initiative status system: Draft → Sedang Berjalan → Selesai → Dibatalkan
   * Draft: Initiative and tasks created but no tasks running or metrics updated

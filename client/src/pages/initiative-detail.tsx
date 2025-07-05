@@ -42,6 +42,18 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import TaskModal from "@/components/task-modal";
 import InitiativeModal from "@/components/initiative-modal";
 import { InitiativeNotes } from "@/components/initiative-notes";
@@ -62,6 +74,8 @@ export default function InitiativeDetailPage() {
   const [isSuccessMetricsModalOpen, setIsSuccessMetricsModalOpen] = useState(false);
   const [editingMetric, setEditingMetric] = useState<any>(null);
   const [isClosureModalOpen, setIsClosureModalOpen] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
 
   // All queries declared at the top level
   const { data: initiative, isLoading: initiativeLoading } = useQuery({
@@ -133,6 +147,35 @@ export default function InitiativeDetailPage() {
       });
     },
   });
+
+  const cancelInitiativeMutation = useMutation({
+    mutationFn: async ({ reason }: { reason: string }) => {
+      return await apiRequest("POST", `/api/initiatives/${id}/cancel`, { reason });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
+      setIsCancelModalOpen(false);
+      setCancelReason("");
+      toast({
+        title: "Inisiatif dibatalkan",
+        description: "Inisiatif telah dibatalkan secara permanen",
+        className: "border-yellow-200 bg-yellow-50 text-yellow-800",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal membatalkan inisiatif",
+        description: error.message || "Terjadi kesalahan saat membatalkan inisiatif",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleCancelInitiative = () => {
+    if (cancelReason.trim()) {
+      cancelInitiativeMutation.mutate({ reason: cancelReason });
+    }
+  };
 
   // Helper function for status badge
   const getStatusBadge = (status: string) => {
@@ -267,10 +310,6 @@ export default function InitiativeDetailPage() {
                 {initiativeData.title}
               </h1>
               {getStatusBadge(initiativeData.status)}
-              {/* Debug info - remove later */}
-              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                Status: {initiativeData.status}
-              </span>
             </div>
           </div>
           
@@ -286,28 +325,6 @@ export default function InitiativeDetailPage() {
               </Button>
             )}
             
-            {/* Force update status button for testing */}
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={async () => {
-                try {
-                  await apiRequest("POST", `/api/initiatives/${id}/update-status`);
-                  queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
-                  toast({
-                    title: "Status updated",
-                    description: "Initiative status has been recalculated",
-                    className: "border-green-200 bg-green-50 text-green-800",
-                  });
-                } catch (error) {
-                  console.error("Status update failed:", error);
-                }
-              }}
-              className="text-xs"
-            >
-              Update Status
-            </Button>
-            
             {canClose(initiativeData.status) && (
               <Button 
                 onClick={() => setIsClosureModalOpen(true)}
@@ -321,10 +338,7 @@ export default function InitiativeDetailPage() {
             {canCancel(initiativeData.status) && (
               <Button 
                 variant="outline" 
-                onClick={() => {
-                  // TODO: Add cancel functionality
-                  console.log('Cancel initiative');
-                }}
+                onClick={() => setIsCancelModalOpen(true)}
                 className="flex items-center gap-2 border-red-300 text-red-600 hover:bg-red-50"
               >
                 <XCircle className="h-4 w-4" />
@@ -669,6 +683,39 @@ export default function InitiativeDetailPage() {
           initiativeTitle={initiativeData.title}
         />
       )}
+
+      {/* Cancel Initiative Modal */}
+      <AlertDialog open={isCancelModalOpen} onOpenChange={setIsCancelModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Batalkan Inisiatif</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin membatalkan inisiatif ini? Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="cancel-reason">Alasan pembatalan:</Label>
+            <Input
+              id="cancel-reason"
+              placeholder="Masukkan alasan pembatalan..."
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setCancelReason("")}>
+              Batal
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleCancelInitiative}
+              disabled={!cancelReason.trim() || cancelInitiativeMutation.isPending}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {cancelInitiativeMutation.isPending ? "Membatalkan..." : "Batalkan Inisiatif"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
