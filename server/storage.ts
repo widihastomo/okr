@@ -562,6 +562,18 @@ export class DatabaseStorage implements IStorage {
           // Delete initiative notes
           await db.delete(initiativeNotes).where(eq(initiativeNotes.initiativeId, initiative.id));
           
+          // Delete success metrics and their updates
+          const successMetrics = await db.select({ id: initiativeSuccessMetrics.id })
+            .from(initiativeSuccessMetrics)
+            .where(eq(initiativeSuccessMetrics.initiativeId, initiative.id));
+          
+          if (successMetrics.length > 0) {
+            const metricIds = successMetrics.map(m => m.id);
+            await db.delete(successMetricUpdates).where(inArray(successMetricUpdates.metricId, metricIds));
+          }
+          
+          await db.delete(initiativeSuccessMetrics).where(eq(initiativeSuccessMetrics.initiativeId, initiative.id));
+          
           // Delete the initiative itself
           await db.delete(initiatives).where(eq(initiatives.id, initiative.id));
         }
