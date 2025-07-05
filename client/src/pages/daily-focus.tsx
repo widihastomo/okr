@@ -1,25 +1,25 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { 
-  Calendar, 
-  TrendingUp, 
-  AlertTriangle, 
-  CheckCircle, 
+import {
+  Calendar,
+  TrendingUp,
+  AlertTriangle,
+  CheckCircle,
   PlayCircle,
   Target,
   BarChart3,
-  Trophy
+  Trophy,
 } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { toast } from "@/hooks/use-toast";
@@ -32,8 +32,9 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function DailyFocusPage() {
   const { user } = useAuth();
-  const userId = user && typeof user === 'object' && 'id' in user ? (user as any).id : null;
-  
+  const userId =
+    user && typeof user === "object" && "id" in user ? (user as any).id : null;
+
   if (!userId) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -49,7 +50,8 @@ export default function DailyFocusPage() {
 
   const [selectedKeyResult, setSelectedKeyResult] = useState<any>(null);
   const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
-  const [isSuccessMetricsModalOpen, setIsSuccessMetricsModalOpen] = useState(false);
+  const [isSuccessMetricsModalOpen, setIsSuccessMetricsModalOpen] =
+    useState(false);
   const [selectedInitiative, setSelectedInitiative] = useState<any>(null);
 
   // Fetch data
@@ -81,12 +83,20 @@ export default function DailyFocusPage() {
 
   // Update task status mutation
   const updateTaskMutation = useMutation({
-    mutationFn: async ({ taskId, updates }: { taskId: string; updates: any }) => {
+    mutationFn: async ({
+      taskId,
+      updates,
+    }: {
+      taskId: string;
+      updates: any;
+    }) => {
       return await apiRequest("PUT", `/api/tasks/${taskId}`, updates);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
-      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
+      queryClient.invalidateQueries({
+        queryKey: [`/api/users/${userId}/tasks`],
+      });
       toast({
         title: "Task berhasil diperbarui",
         className: "border-green-200 bg-green-50 text-green-800",
@@ -103,7 +113,7 @@ export default function DailyFocusPage() {
 
   // Get today's date info
   const today = new Date();
-  const todayStr = today.toISOString().split('T')[0];
+  const todayStr = today.toISOString().split("T")[0];
 
   // Helper functions
   const calculateKeyResultProgress = (keyResult: any): number => {
@@ -117,12 +127,18 @@ export default function DailyFocusPage() {
 
     if (keyResult.keyResultType === "increase_to") {
       if (base === target) return 0;
-      return Math.min(100, Math.max(0, ((current - base) / (target - base)) * 100));
+      return Math.min(
+        100,
+        Math.max(0, ((current - base) / (target - base)) * 100),
+      );
     }
 
     if (keyResult.keyResultType === "decrease_to") {
       if (base === target) return 0;
-      return Math.min(100, Math.max(0, ((base - current) / (base - target)) * 100));
+      return Math.min(
+        100,
+        Math.max(0, ((base - current) / (base - target)) * 100),
+      );
     }
 
     if (keyResult.keyResultType === "should_stay_above") {
@@ -138,19 +154,27 @@ export default function DailyFocusPage() {
 
   const getTaskStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'bg-green-100 text-green-800 border-green-200';
-      case 'in_progress': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'cancelled': return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case "completed":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "in_progress":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "cancelled":
+        return "bg-red-100 text-red-800 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
   const getTaskStatusLabel = (status: string) => {
     switch (status) {
-      case 'completed': return 'Selesai';
-      case 'in_progress': return 'Sedang Berjalan';
-      case 'cancelled': return 'Dibatalkan';
-      default: return 'Belum Dimulai';
+      case "completed":
+        return "Selesai";
+      case "in_progress":
+        return "Sedang Berjalan";
+      case "cancelled":
+        return "Dibatalkan";
+      default:
+        return "Belum Dimulai";
     }
   };
 
@@ -173,46 +197,63 @@ export default function DailyFocusPage() {
 
   // Filter data for today's focus
   const todayTasks = (allTasks as any[]).filter((task: any) => {
-    const dueDate = task.dueDate ? task.dueDate.split('T')[0] : null;
+    const dueDate = task.dueDate ? task.dueDate.split("T")[0] : null;
     // Include tasks due today, in progress tasks, or overdue incomplete tasks
-    return dueDate === todayStr || 
-           task.status === 'in_progress' || 
-           (dueDate && dueDate < todayStr && task.status !== 'completed' && task.status !== 'cancelled');
+    return (
+      dueDate === todayStr ||
+      task.status === "in_progress" ||
+      (dueDate &&
+        dueDate < todayStr &&
+        task.status !== "completed" &&
+        task.status !== "cancelled")
+    );
   });
 
   const overdueTasks = (allTasks as any[]).filter((task: any) => {
-    const dueDate = task.dueDate ? task.dueDate.split('T')[0] : null;
-    return dueDate && dueDate < todayStr && task.status !== 'completed' && task.status !== 'cancelled';
+    const dueDate = task.dueDate ? task.dueDate.split("T")[0] : null;
+    return (
+      dueDate &&
+      dueDate < todayStr &&
+      task.status !== "completed" &&
+      task.status !== "cancelled"
+    );
   });
 
   const activeKeyResults = (keyResults as any[]).filter((kr: any) => {
     const progress = calculateKeyResultProgress(kr);
-    return progress < 100 && kr.status !== 'completed' && kr.status !== 'cancelled';
+    return (
+      progress < 100 && kr.status !== "completed" && kr.status !== "cancelled"
+    );
   });
 
-  const activeInitiatives = (initiatives as any[]).filter((init: any) => 
-    init.status === 'sedang_berjalan' || init.status === 'draft'
+  const activeInitiatives = (initiatives as any[]).filter(
+    (init: any) => init.status === "sedang_berjalan" || init.status === "draft",
   );
 
   // Get related objectives for today's activities
   const getRelatedObjectives = () => {
     const relatedObjIds = new Set();
-    
+
     // From key results
     activeKeyResults.forEach((kr: any) => {
       if (kr.objectiveId) relatedObjIds.add(kr.objectiveId);
     });
-    
+
     // From initiatives
     activeInitiatives.forEach((init: any) => {
       if (init.keyResultId) {
-        const kr = (keyResults as any[]).find((k: any) => k.id === init.keyResultId);
+        const kr = (keyResults as any[]).find(
+          (k: any) => k.id === init.keyResultId,
+        );
         if (kr?.objectiveId) relatedObjIds.add(kr.objectiveId);
       }
     });
 
-    return (objectives as any[]).filter((obj: any) => 
-      relatedObjIds.has(obj.id) || obj.status === 'on_track' || obj.status === 'at_risk'
+    return (objectives as any[]).filter(
+      (obj: any) =>
+        relatedObjIds.has(obj.id) ||
+        obj.status === "on_track" ||
+        obj.status === "at_risk",
     );
   };
 
@@ -230,16 +271,15 @@ export default function DailyFocusPage() {
           <HabitAlignmentWizard />
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <Calendar className="h-4 w-4" />
-            {today.toLocaleDateString('id-ID', { 
-              weekday: 'long', 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
+            {today.toLocaleDateString("id-ID", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
             })}
           </div>
         </div>
       </div>
-
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
@@ -250,25 +290,34 @@ export default function DailyFocusPage() {
           <CardContent>
             <div className="flex items-center gap-2">
               <div className="text-2xl font-bold">{todayTasks.length}</div>
-              {todayTasks.filter(t => t.status === 'completed').length > 0 && (
+              {todayTasks.filter((t) => t.status === "completed").length >
+                0 && (
                 <div className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                  +{todayTasks.filter(t => t.status === 'completed').length * 10} poin
+                  +
+                  {todayTasks.filter((t) => t.status === "completed").length *
+                    10}{" "}
+                  poin
                 </div>
               )}
             </div>
             <p className="text-xs text-muted-foreground">
-              {todayTasks.filter(t => t.status === 'completed').length} selesai
+              {todayTasks.filter((t) => t.status === "completed").length}{" "}
+              selesai
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Task Terlambat</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Task Terlambat
+            </CardTitle>
             <AlertTriangle className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{overdueTasks.length}</div>
+            <div className="text-2xl font-bold text-red-600">
+              {overdueTasks.length}
+            </div>
             <p className="text-xs text-muted-foreground">
               Perlu perhatian segera
             </p>
@@ -277,7 +326,9 @@ export default function DailyFocusPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Angka Target Aktif</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Angka Target Aktif
+            </CardTitle>
             <Target className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
@@ -290,13 +341,17 @@ export default function DailyFocusPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Level & Progress</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Level & Progress
+            </CardTitle>
             <Trophy className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <div className="text-2xl font-bold">Level {(stats as any)?.level || 1}</div>
+                <div className="text-2xl font-bold">
+                  Level {(stats as any)?.level || 1}
+                </div>
                 <div className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full">
                   {(stats as any)?.totalPoints || 0} poin
                 </div>
@@ -309,6 +364,44 @@ export default function DailyFocusPage() {
         </Card>
       </div>
 
+      {/* Compact Progress & Motivation */}
+      <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-blue-600" />
+                <span className="font-medium text-blue-900">Progress Hari Ini</span>
+              </div>
+              
+              <div className="flex items-center gap-4 text-sm">
+                <div className="flex items-center gap-1">
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                  <span className="text-green-700">{todayTasks.filter(t => t.status === 'completed').length} task selesai</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Target className="h-4 w-4 text-blue-500" />
+                  <span className="text-blue-700">{activeKeyResults.length} target aktif</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              {(stats as any)?.currentStreak && (stats as any).currentStreak > 0 && (
+                <div className="flex items-center gap-1 text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
+                  <span>🔥</span>
+                  <span>{(stats as any).currentStreak} hari berturut</span>
+                </div>
+              )}
+              {todayTasks.filter(t => t.status === 'completed').length > 0 && (
+                <div className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                  +{todayTasks.filter(t => t.status === 'completed').length * 10} poin hari ini
+                </div>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Daily Suggestions */}
       <Card className="border-green-200 bg-gradient-to-r from-green-50 to-blue-50">
@@ -318,16 +411,17 @@ export default function DailyFocusPage() {
               <TrendingUp className="h-4 w-4 text-green-600" />
             </div>
             <div className="flex-1">
-              <h3 className="font-medium text-green-900 mb-1">💡 Suggestion Hari Ini</h3>
+              <h3 className="font-medium text-green-900 mb-1">
+                💡 Suggestion Hari Ini
+              </h3>
               <div className="text-sm text-green-700">
-                {todayTasks.length > 0 
-                  ? `Selesaikan ${todayTasks.filter(t => t.status !== 'completed').length} task prioritas untuk mempertahankan momentum`
-                  : overdueTasks.length > 0 
+                {todayTasks.length > 0
+                  ? `Selesaikan ${todayTasks.filter((t) => t.status !== "completed").length} task prioritas untuk mempertahankan momentum`
+                  : overdueTasks.length > 0
                     ? `Fokus pada ${overdueTasks.length} task terlambat untuk mengejar ketinggalan`
                     : activeKeyResults.length > 0
                       ? `Update progress pada ${activeKeyResults.length} angka target yang belum tercapai`
-                      : "Hari yang produktif! Pertimbangkan untuk merencanakan aktivitas minggu depan"
-                }
+                      : "Hari yang produktif! Pertimbangkan untuk merencanakan aktivitas minggu depan"}
               </div>
             </div>
           </div>
@@ -349,45 +443,66 @@ export default function DailyFocusPage() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {relatedObjectives.slice(0, 4).map((obj: any) => {
-                const objKeyResults = (keyResults as any[]).filter(kr => kr.objectiveId === obj.id);
-                const objProgress = objKeyResults.length > 0 
-                  ? objKeyResults.reduce((sum, kr) => sum + calculateKeyResultProgress(kr), 0) / objKeyResults.length 
-                  : 0;
-                
+                const objKeyResults = (keyResults as any[]).filter(
+                  (kr) => kr.objectiveId === obj.id,
+                );
+                const objProgress =
+                  objKeyResults.length > 0
+                    ? objKeyResults.reduce(
+                        (sum, kr) => sum + calculateKeyResultProgress(kr),
+                        0,
+                      ) / objKeyResults.length
+                    : 0;
+
                 return (
-                  <div key={obj.id} className="p-4 bg-white border border-blue-200 rounded-lg">
+                  <div
+                    key={obj.id}
+                    className="p-4 bg-white border border-blue-200 rounded-lg"
+                  >
                     <div className="space-y-3">
                       <div>
-                        <h3 className="font-medium text-blue-900 line-clamp-2">{obj.title}</h3>
+                        <h3 className="font-medium text-blue-900 line-clamp-2">
+                          {obj.title}
+                        </h3>
                         {obj.description && (
-                          <p className="text-sm text-blue-700 mt-1 line-clamp-2">{obj.description}</p>
+                          <p className="text-sm text-blue-700 mt-1 line-clamp-2">
+                            {obj.description}
+                          </p>
                         )}
                       </div>
-                      
+
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span className="text-blue-700">Progress</span>
-                          <span className="font-medium text-blue-900">{objProgress.toFixed(0)}%</span>
+                          <span className="font-medium text-blue-900">
+                            {objProgress.toFixed(0)}%
+                          </span>
                         </div>
                         <Progress value={objProgress} className="h-2" />
                       </div>
 
                       <div className="flex items-center justify-between">
-                        <Badge 
-                          variant="outline" 
+                        <Badge
+                          variant="outline"
                           className={
-                            obj.status === 'on_track' ? 'border-green-300 text-green-700 bg-green-50' :
-                            obj.status === 'at_risk' ? 'border-yellow-300 text-yellow-700 bg-yellow-50' :
-                            obj.status === 'behind' ? 'border-red-300 text-red-700 bg-red-50' :
-                            'border-blue-300 text-blue-700 bg-blue-50'
+                            obj.status === "on_track"
+                              ? "border-green-300 text-green-700 bg-green-50"
+                              : obj.status === "at_risk"
+                                ? "border-yellow-300 text-yellow-700 bg-yellow-50"
+                                : obj.status === "behind"
+                                  ? "border-red-300 text-red-700 bg-red-50"
+                                  : "border-blue-300 text-blue-700 bg-blue-50"
                           }
                         >
-                          {obj.status === 'on_track' ? 'On Track' :
-                           obj.status === 'at_risk' ? 'At Risk' :
-                           obj.status === 'behind' ? 'Behind' :
-                           obj.status}
+                          {obj.status === "on_track"
+                            ? "On Track"
+                            : obj.status === "at_risk"
+                              ? "At Risk"
+                              : obj.status === "behind"
+                                ? "Behind"
+                                : obj.status}
                         </Badge>
-                        
+
                         <div className="text-xs text-blue-600">
                           {objKeyResults.length} Angka Target
                         </div>
@@ -397,11 +512,12 @@ export default function DailyFocusPage() {
                 );
               })}
             </div>
-            
+
             {relatedObjectives.length > 4 && (
               <div className="mt-4 text-center">
                 <p className="text-sm text-blue-600">
-                  +{relatedObjectives.length - 4} objective lainnya terkait aktivitas Anda
+                  +{relatedObjectives.length - 4} objective lainnya terkait
+                  aktivitas Anda
                 </p>
               </div>
             )}
@@ -434,11 +550,17 @@ export default function DailyFocusPage() {
                     Task Terlambat
                   </h3>
                   {overdueTasks.map((task: any) => (
-                    <div key={task.id} className="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <div
+                      key={task.id}
+                      className="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded-lg"
+                    >
                       <div>
                         <p className="font-medium text-red-900">{task.title}</p>
                         <p className="text-sm text-red-600">
-                          Tenggat: {task.dueDate ? new Date(task.dueDate).toLocaleDateString('id-ID') : 'Tidak ada'}
+                          Tenggat:{" "}
+                          {task.dueDate
+                            ? new Date(task.dueDate).toLocaleDateString("id-ID")
+                            : "Tidak ada"}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
@@ -453,7 +575,9 @@ export default function DailyFocusPage() {
 
               {/* Today's Tasks */}
               <div className="space-y-3">
-                <h3 className="text-sm font-medium text-gray-700">Task Hari Ini</h3>
+                <h3 className="text-sm font-medium text-gray-700">
+                  Task Hari Ini
+                </h3>
                 {todayTasks.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     <CheckCircle className="h-12 w-12 mx-auto mb-3 text-gray-300" />
@@ -461,11 +585,16 @@ export default function DailyFocusPage() {
                   </div>
                 ) : (
                   todayTasks.map((task: any) => (
-                    <div key={task.id} className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                    <div
+                      key={task.id}
+                      className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg"
+                    >
                       <div>
                         <p className="font-medium">{task.title}</p>
                         <p className="text-sm text-gray-600">
-                          {task.dueDate ? new Date(task.dueDate).toLocaleDateString('id-ID') : 'Tidak ada tenggat'}
+                          {task.dueDate
+                            ? new Date(task.dueDate).toLocaleDateString("id-ID")
+                            : "Tidak ada tenggat"}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
@@ -499,11 +628,16 @@ export default function DailyFocusPage() {
                 activeKeyResults.map((kr: any) => {
                   const progress = calculateKeyResultProgress(kr);
                   return (
-                    <div key={kr.id} className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div
+                      key={kr.id}
+                      className="p-4 bg-blue-50 border border-blue-200 rounded-lg"
+                    >
                       <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-medium text-blue-900">{kr.title}</h3>
-                        <Button 
-                          size="sm" 
+                        <h3 className="font-medium text-blue-900">
+                          {kr.title}
+                        </h3>
+                        <Button
+                          size="sm"
                           onClick={() => handleCheckInKeyResult(kr)}
                           className="bg-blue-600 hover:bg-blue-700"
                         >
@@ -545,11 +679,16 @@ export default function DailyFocusPage() {
                 </div>
               ) : (
                 activeInitiatives.map((init: any) => (
-                  <div key={init.id} className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                  <div
+                    key={init.id}
+                    className="p-4 bg-purple-50 border border-purple-200 rounded-lg"
+                  >
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-medium text-purple-900">{init.title}</h3>
-                      <Button 
-                        size="sm" 
+                      <h3 className="font-medium text-purple-900">
+                        {init.title}
+                      </h3>
+                      <Button
+                        size="sm"
                         onClick={() => handleUpdateMetrics(init)}
                         className="bg-purple-600 hover:bg-purple-700"
                       >
