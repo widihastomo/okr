@@ -358,71 +358,65 @@ export default function CompanyOKRD3Tree({
         onToggleExpand(d.data.id);
       });
 
-    // Floating button background with shadow effect
-    expandButton.append("circle")
-      .attr("cx", 0)
-      .attr("cy", 10)
-      .attr("r", 16)
+    // Rounded rectangular button background with shadow
+    expandButton.append("rect")
+      .attr("x", -20)
+      .attr("y", 2)
+      .attr("width", 40)
+      .attr("height", 16)
+      .attr("rx", 8)
       .attr("fill", "#ffffff")
       .attr("stroke", "#e5e7eb")
       .attr("stroke-width", 2)
       .attr("filter", "url(#shadow)");
 
-    // Inner circle with color based on state
-    expandButton.append("circle")
-      .attr("cx", 0)
-      .attr("cy", 10)
-      .attr("r", 12)
+    // Inner rounded rectangle with color based on state
+    expandButton.append("rect")
+      .attr("x", -18)
+      .attr("y", 4)
+      .attr("width", 36)
+      .attr("height", 12)
+      .attr("rx", 6)
       .attr("fill", d => expandedNodes.has(d.data.id) ? "#3b82f6" : "#f3f4f6")
       .attr("stroke", "#3b82f6")
       .attr("stroke-width", 1);
 
-    // Plus/minus icon
+    // Chevron icon (> or v)
     expandButton.append("text")
-      .attr("x", -6)
-      .attr("y", 15)
+      .attr("x", -10)
+      .attr("y", 13)
       .attr("text-anchor", "middle")
-      .attr("font-size", "14px")
+      .attr("font-size", "10px")
       .attr("font-weight", "bold")
       .attr("fill", d => expandedNodes.has(d.data.id) ? "white" : "#3b82f6")
-      .text(d => expandedNodes.has(d.data.id) ? "−" : "+");
+      .text(d => expandedNodes.has(d.data.id) ? "⌄" : ">");
 
-    // Children count in small badge
-    expandButton.append("circle")
-      .attr("cx", 8)
-      .attr("cy", 2)
-      .attr("r", 6)
-      .attr("fill", "#ef4444")
-      .attr("stroke", "white")
-      .attr("stroke-width", 1);
-
+    // Children count
     expandButton.append("text")
-      .attr("x", 8)
-      .attr("y", 6)
+      .attr("x", 6)
+      .attr("y", 13)
       .attr("text-anchor", "middle")
-      .attr("font-size", "8px")
-      .attr("font-weight", "bold")
-      .attr("fill", "white")
+      .attr("font-size", "10px")
+      .attr("font-weight", "600")
+      .attr("fill", d => expandedNodes.has(d.data.id) ? "white" : "#3b82f6")
       .text(d => d.data.children.length);
 
-    // Add hover effect with smooth transitions for floating button
+    // Add hover effect with smooth transitions for rectangular button
     expandButton.on("mouseenter", function(event, d) {
-      d3.select(this).selectAll("circle:nth-child(2)")
+      d3.select(this).selectAll("rect:nth-child(2)")
         .transition()
         .duration(200)
-        .attr("fill", expandedNodes.has(d.data.id) ? "#2563eb" : "#ddd6fe")
-        .attr("r", 13);
+        .attr("fill", expandedNodes.has(d.data.id) ? "#2563eb" : "#ddd6fe");
       
       d3.select(this)
         .transition()
         .duration(200)
-        .attr("transform", d => `translate(${nodeWidth + 8}, ${nodeHeight / 2 - 10}) scale(1.1)`);
+        .attr("transform", d => `translate(${nodeWidth + 8}, ${nodeHeight / 2 - 10}) scale(1.05)`);
     }).on("mouseleave", function(event, d) {
-      d3.select(this).selectAll("circle:nth-child(2)")
+      d3.select(this).selectAll("rect:nth-child(2)")
         .transition()
         .duration(200)
-        .attr("fill", expandedNodes.has(d.data.id) ? "#3b82f6" : "#f3f4f6")
-        .attr("r", 12);
+        .attr("fill", expandedNodes.has(d.data.id) ? "#3b82f6" : "#f3f4f6");
       
       d3.select(this)
         .transition()
@@ -432,13 +426,13 @@ export default function CompanyOKRD3Tree({
 
     // Add subtle pulse animation for collapsed nodes
     expandButton.filter(d => !expandedNodes.has(d.data.id))
-      .selectAll("circle:nth-child(2)")
+      .selectAll("rect:nth-child(2)")
       .style("animation", "pulse 3s ease-in-out infinite");
 
-    // Add tooltip-like label for floating button
+    // Add tooltip-like label for rectangular button
     expandButton.append("rect")
-      .attr("x", -66)
-      .attr("y", 4)
+      .attr("x", -76)
+      .attr("y", -2)
       .attr("width", 76)
       .attr("height", 16)
       .attr("rx", 8)
@@ -447,8 +441,8 @@ export default function CompanyOKRD3Tree({
       .style("pointer-events", "none");
 
     expandButton.append("text")
-      .attr("x", -28)
-      .attr("y", 14)
+      .attr("x", -38)
+      .attr("y", 8)
       .attr("text-anchor", "middle")
       .attr("font-size", "10px")
       .attr("fill", "white")
