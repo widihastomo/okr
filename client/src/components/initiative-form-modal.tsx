@@ -555,10 +555,6 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
             {/* Priority Calculation Card */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="w-5 h-5" />
-                  Perhitungan Prioritas Otomatis
-                </CardTitle>
                 <p className="text-sm text-muted-foreground">
                   Prioritas akan dihitung otomatis berdasarkan dampak, tingkat kesulitan, dan keyakinan (skala 1-5)
                 </p>
