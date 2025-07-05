@@ -25,6 +25,8 @@ import { toast } from "@/hooks/use-toast";
 import { CheckInModal } from "@/components/check-in-modal";
 import SuccessMetricsModalSimple from "@/components/success-metrics-modal-simple";
 import HabitAlignmentWizard from "@/components/habit-alignment-wizard";
+import { UserStatsCard } from "@/components/gamification/user-stats-card";
+import { DailyAchievements } from "@/components/daily-achievements";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function DailyFocusPage() {
@@ -282,6 +284,71 @@ export default function DailyFocusPage() {
             </p>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Gamification Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <UserStatsCard userId={userId} />
+        </div>
+        
+        <div className="space-y-6">
+          {/* Daily Achievements */}
+          <DailyAchievements userId={userId} />
+          
+          {/* Daily Motivation */}
+          <Card className="border-yellow-200 bg-gradient-to-br from-yellow-50 to-orange-50">
+            <CardHeader>
+              <CardTitle className="text-yellow-900 flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                Motivasi Hari Ini
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {/* Daily Progress Encouragement */}
+              <div className="space-y-2">
+                <div className="p-2 bg-white border border-yellow-200 rounded-lg">
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <span className="text-gray-700">
+                      {todayTasks.filter(t => t.status === 'completed').length}/{todayTasks.length} task selesai
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="p-2 bg-white border border-yellow-200 rounded-lg">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Target className="h-4 w-4 text-blue-500" />
+                    <span className="text-gray-700">
+                      {activeKeyResults.length} Angka Target aktif
+                    </span>
+                  </div>
+                </div>
+                
+                {overdueTasks.length > 0 && (
+                  <div className="p-2 bg-white border border-red-200 rounded-lg">
+                    <div className="flex items-center gap-2 text-sm">
+                      <AlertTriangle className="h-4 w-4 text-red-500" />
+                      <span className="text-gray-700">
+                        {overdueTasks.length} task terlambat
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {/* Motivation Message */}
+              <div className="text-center p-3 bg-gradient-to-r from-blue-100 to-purple-100 rounded-lg border">
+                <div className="text-sm font-medium text-gray-800 mb-1">
+                  "Konsistensi kecil menghasilkan pencapaian besar"
+                </div>
+                <div className="text-xs text-gray-600">
+                  Tetap fokus pada prioritas utama
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* Objective Awareness Section */}
