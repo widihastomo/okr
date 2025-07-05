@@ -1892,7 +1892,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             effortScore,
             confidenceScore
           });
-          calculatedPriorityScore = priorityResult.priorityScore;
+          calculatedPriorityScore = priorityResult.priorityScore.toString();
           calculatedPriorityLevel = priorityResult.priorityLevel;
           
           console.log("Priority calculation result:", {
@@ -2032,7 +2032,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const { calculatePriority } = await import("./priority-calculator");
             const priorityResult = calculatePriority(scores);
             
-            updateData.priorityScore = priorityResult.priorityScore;
+            updateData.priorityScore = priorityResult.priorityScore.toString();
             updateData.priority = priorityResult.priorityLevel;
             
             console.log("Priority recalculation for update:", {
