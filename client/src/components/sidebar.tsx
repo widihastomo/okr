@@ -12,7 +12,6 @@ import {
   Settings,
   X,
   Trophy,
-  Network,
   Calendar
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -82,12 +81,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       path: "/analytics",
       active: location === "/analytics"
     },
-    {
-      label: "Jaringan Goal",
-      icon: Network,
-      path: "/goal-network",
-      active: location === "/goal-network"
-    }
+
   ];
 
   return (
