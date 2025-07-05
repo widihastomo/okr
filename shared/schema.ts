@@ -179,97 +179,6 @@ export const successMetricUpdates = pgTable("success_metric_updates", {
   createdBy: uuid("created_by").notNull(), // user ID
 });
 
-// Initiative Budget Tracking
-export const budgetEntries = pgTable("budget_entries", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  initiativeId: uuid("initiative_id").references(() => initiatives.id).notNull(),
-  category: text("category").notNull(), // "planning", "execution", "tools", "marketing", "personnel", "other"
-  description: text("description").notNull(),
-  plannedAmount: decimal("planned_amount", { precision: 15, scale: 2 }),
-  actualAmount: decimal("actual_amount", { precision: 15, scale: 2 }),
-  spentDate: timestamp("spent_date"),
-  receipt: text("receipt"), // URL or file path for receipt
-  notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow(),
-  createdBy: uuid("created_by").references(() => users.id).notNull(),
-});
-
-// Initiative Lessons Learned & Documentation
-export const initiativeLessons = pgTable("initiative_lessons", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  initiativeId: uuid("initiative_id").references(() => initiatives.id).notNull(),
-  type: text("type").notNull(), // "success_factor", "challenge", "improvement", "experiment_result", "unexpected_outcome"
-  title: text("title").notNull(),
-  description: text("description").notNull(),
-  impact: text("impact"), // "high", "medium", "low"
-  actionable: boolean("actionable").default(false), // Can this be applied to future initiatives?
-  category: text("category"), // "process", "team", "resources", "external", "technical"
-  documentedBy: uuid("documented_by").references(() => users.id).notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-// Initiative Execution Status & Health Checks
-export const initiativeHealthChecks = pgTable("initiative_health_checks", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  initiativeId: uuid("initiative_id").references(() => initiatives.id).notNull(),
-  checkDate: timestamp("check_date").defaultNow(),
-  overallHealth: text("overall_health").notNull(), // "excellent", "good", "warning", "critical"
-  
-  // Health Indicators
-  scheduleHealth: text("schedule_health"), // "on_track", "slight_delay", "significant_delay", "critical_delay"
-  budgetHealth: text("budget_health"), // "under_budget", "on_budget", "over_budget", "critical_overspend"
-  teamHealth: text("team_health"), // "high_morale", "good", "concerns", "critical_issues"
-  qualityHealth: text("quality_health"), // "exceeds_expectations", "meets_standards", "below_standards", "critical_issues"
-  
-  // Detailed Notes
-  scheduleNotes: text("schedule_notes"),
-  budgetNotes: text("budget_notes"),
-  teamNotes: text("team_notes"),
-  qualityNotes: text("quality_notes"),
-  
-  // Actions & Recommendations
-  immediateActions: text("immediate_actions"), // JSON array of action items
-  risks: text("risks"), // JSON array of identified risks
-  recommendations: text("recommendations"), // JSON array of recommendations
-  
-  checkedBy: uuid("checked_by").references(() => users.id).notNull(),
-});
-
-// Initiative Experiments & A/B Tests
-export const initiativeExperiments = pgTable("initiative_experiments", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  initiativeId: uuid("initiative_id").references(() => initiatives.id).notNull(),
-  name: text("name").notNull(),
-  hypothesis: text("hypothesis").notNull(),
-  experimentType: text("experiment_type").notNull(), // "ab_test", "user_research", "prototype", "pilot_program", "survey"
-  
-  // Experiment Setup
-  startDate: timestamp("start_date"),
-  endDate: timestamp("end_date"),
-  participants: text("participants"), // Number or description of participants
-  methodology: text("methodology"),
-  successCriteria: text("success_criteria"),
-  
-  // Results
-  status: text("status").default("planning"), // "planning", "running", "completed", "cancelled"
-  results: text("results"),
-  outcome: text("outcome"), // "success", "failure", "inconclusive", "partial_success"
-  confidenceLevel: text("confidence_level"), // "high", "medium", "low"
-  
-  // Data & Evidence
-  keyFindings: text("key_findings"), // JSON array of findings
-  quantitativeData: text("quantitative_data"), // JSON object with metrics
-  qualitativeData: text("qualitative_data"), // JSON array of insights
-  
-  // Follow-up
-  actionsTaken: text("actions_taken"), // JSON array of actions based on results
-  futureExperiments: text("future_experiments"), // Suggested follow-up experiments
-  
-  createdBy: uuid("created_by").references(() => users.id).notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
 // Initiative notes for updates, budget allocations, and other information
 export const initiativeNotes = pgTable("initiative_notes", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -626,51 +535,6 @@ export const activityLogsRelations = relations(activityLogs, ({ one }) => ({
   }),
 }));
 
-// Initiative Learning & Documentation Relations
-export const budgetEntriesRelations = relations(budgetEntries, ({ one }) => ({
-  initiative: one(initiatives, {
-    fields: [budgetEntries.initiativeId],
-    references: [initiatives.id],
-  }),
-  createdBy: one(users, {
-    fields: [budgetEntries.createdBy],
-    references: [users.id],
-  }),
-}));
-
-export const initiativeLessonsRelations = relations(initiativeLessons, ({ one }) => ({
-  initiative: one(initiatives, {
-    fields: [initiativeLessons.initiativeId],
-    references: [initiatives.id],
-  }),
-  documentedBy: one(users, {
-    fields: [initiativeLessons.documentedBy],
-    references: [users.id],
-  }),
-}));
-
-export const initiativeHealthChecksRelations = relations(initiativeHealthChecks, ({ one }) => ({
-  initiative: one(initiatives, {
-    fields: [initiativeHealthChecks.initiativeId],
-    references: [initiatives.id],
-  }),
-  checkedBy: one(users, {
-    fields: [initiativeHealthChecks.checkedBy],
-    references: [users.id],
-  }),
-}));
-
-export const initiativeExperimentsRelations = relations(initiativeExperiments, ({ one }) => ({
-  initiative: one(initiatives, {
-    fields: [initiativeExperiments.initiativeId],
-    references: [initiatives.id],
-  }),
-  createdBy: one(users, {
-    fields: [initiativeExperiments.createdBy],
-    references: [users.id],
-  }),
-}));
-
 // Authentication schemas
 export const loginSchema = z.object({
   email: z.string().email("Email tidak valid"),
@@ -700,27 +564,6 @@ export const insertTeamSchema = createInsertSchema(teams).omit({
 export const insertTeamMemberSchema = createInsertSchema(teamMembers).omit({
   id: true,
   joinedAt: true,
-});
-
-// Insert schemas for new learning & documentation tables
-export const insertBudgetEntrySchema = createInsertSchema(budgetEntries).omit({
-  id: true,
-  createdAt: true,
-});
-
-export const insertInitiativeLessonSchema = createInsertSchema(initiativeLessons).omit({
-  id: true,
-  createdAt: true,
-});
-
-export const insertInitiativeHealthCheckSchema = createInsertSchema(initiativeHealthChecks).omit({
-  id: true,
-});
-
-export const insertInitiativeExperimentSchema = createInsertSchema(initiativeExperiments).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
 });
 
 // Additional types for compatibility
@@ -769,36 +612,4 @@ export type InitiativeWithSuccessMetrics = Initiative & {
   successMetrics: SuccessMetricWithUpdates[];
   members: (InitiativeMember & { user: User })[];
   tasks: Task[];
-};
-
-// Types for new learning & documentation features
-export type BudgetEntry = typeof budgetEntries.$inferSelect;
-export type InsertBudgetEntry = z.infer<typeof insertBudgetEntrySchema>;
-
-export type InitiativeLesson = typeof initiativeLessons.$inferSelect;
-export type InsertInitiativeLesson = z.infer<typeof insertInitiativeLessonSchema>;
-
-export type InitiativeHealthCheck = typeof initiativeHealthChecks.$inferSelect;
-export type InsertInitiativeHealthCheck = z.infer<typeof insertInitiativeHealthCheckSchema>;
-
-export type InitiativeExperiment = typeof initiativeExperiments.$inferSelect;
-export type InsertInitiativeExperiment = z.infer<typeof insertInitiativeExperimentSchema>;
-
-// Extended Initiative type with learning features
-export type InitiativeWithLearning = InitiativeWithSuccessMetrics & {
-  budgetEntries: BudgetEntry[];
-  lessons: InitiativeLesson[];
-  healthChecks: InitiativeHealthCheck[];
-  experiments: InitiativeExperiment[];
-  budgetAnalysis: {
-    totalPlanned: number;
-    totalSpent: number;
-    budgetUtilization: number;
-    categories: { [key: string]: { planned: number; spent: number } };
-  };
-  executionHealth: {
-    currentHealth: string;
-    lastCheck: InitiativeHealthCheck | null;
-    trendsAnalysis: string[];
-  };
 };
