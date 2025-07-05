@@ -96,6 +96,20 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 05, 2025. Completed comprehensive terminology standardization from "rencana" to "Inisiatif" throughout entire application:
+  * Updated all variable names: rencana → inisiatif, getRencanaBy → getInisiatifBy, RencanaProps → InisiatifProps
+  * Updated all component names: Rencana component → Inisiatif component with proper imports and exports
+  * Updated all UI text: "Rencana" tabs → "Inisiatif" tabs, form labels, headers, empty states
+  * Updated form validation messages: "Judul rencana wajib diisi" → "Judul inisiatif wajib diisi"
+  * Updated error messages: "Gagal menyimpan rencana" → "Gagal menyimpan inisiatif"
+  * Fixed dashboard navigation tabs and component references for consistent terminology
+  * Updated comments and documentation throughout codebase for consistency
+  * Successfully implemented comprehensive delete initiative functionality with proper cascading deletion:
+    - Added foreign key constraint handling by deleting success metrics before initiative deletion
+    - Fixed database constraint violations by properly ordering deletion operations
+    - Added confirmation dialogs with clear warning messages about permanent data deletion
+    - Integrated with proper cache invalidation and toast notifications for user feedback
+    - Delete operation now works correctly without database foreign key constraint errors
 - July 05, 2025. Added comprehensive date validation and Indonesian date format to initiative forms:
   * Added cross-field validation to ensure start date is not greater than end date in initiative forms
   * Updated initiative-form-modal.tsx with Zod refine validation and clear error messaging

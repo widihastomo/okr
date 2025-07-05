@@ -27,7 +27,7 @@ import {
 import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 import { Plus, Target, CheckSquare, Building2, Trophy, Zap } from "lucide-react";
 import MyTugas from "@/components/my-tasks";
-import Rencana from "@/components/initiatives";
+import Inisiatif from "@/components/initiatives";
 import { useAuth } from "@/hooks/useAuth";
 import { DashboardHelpBubble } from "@/components/help-bubble";
 import AIHelpBubble from "@/components/ai-help-bubble";
@@ -592,8 +592,8 @@ export default function Dashboard() {
           </TabsTrigger>
           <TabsTrigger value="initiatives" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
             <Building2 className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span className="hidden sm:inline">Rencana</span>
-            <span className="sm:hidden">Rencana</span>
+            <span className="hidden sm:inline">Inisiatif</span>
+            <span className="sm:hidden">Inisiatif</span>
           </TabsTrigger>
           <TabsTrigger value="my-tasks" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
             <CheckSquare className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -651,7 +651,7 @@ export default function Dashboard() {
         </TabsContent>
         
         <TabsContent value="initiatives" className="mt-6">
-          <Rencana 
+          <Inisiatif 
             userFilter={userFilter} 
             filteredKeyResultIds={okrs.flatMap(okr => okr.keyResults.map(kr => kr.id))}
           />

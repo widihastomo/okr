@@ -10,7 +10,7 @@ import {
   type SuccessMetric, type InsertSuccessMetric, type SuccessMetricUpdate, type InsertSuccessMetricUpdate
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, inArray } from "drizzle-orm";
 import { calculateProgressStatus } from "./progress-tracker";
 import { calculateObjectiveStatus } from "./objective-status-tracker";
 
@@ -790,6 +790,16 @@ export class DatabaseStorage implements IStorage {
     await db.delete(tasks).where(eq(tasks.initiativeId, id));
     await db.delete(initiativeMembers).where(eq(initiativeMembers.initiativeId, id));
     await db.delete(initiativeDocuments).where(eq(initiativeDocuments.initiativeId, id));
+    
+    // Delete success metrics and their updates
+    await db.delete(successMetricUpdates).where(
+      inArray(successMetricUpdates.metricId, 
+        db.select({ id: initiativeSuccessMetrics.id })
+          .from(initiativeSuccessMetrics)
+          .where(eq(initiativeSuccessMetrics.initiativeId, id))
+      )
+    );
+    await db.delete(initiativeSuccessMetrics).where(eq(initiativeSuccessMetrics.initiativeId, id));
     
     // Then delete the initiative
     const result = await db.delete(initiatives).where(eq(initiatives.id, id));

@@ -409,13 +409,13 @@ export default function GoalDetail() {
       : undefined;
   const teamOwner = goal?.ownerType === "team" ? (owner as Team) : undefined;
 
-  // Fetch rencana for this goal
-  const { data: rencana = [] } = useQuery<Initiative[]>({
+  // Fetch inisiatif for this goal
+  const { data: inisiatif = [] } = useQuery<Initiative[]>({
     queryKey: [`/api/initiatives/objective/${id}`],
     enabled: !!id,
   });
 
-  // Fetch tugas for rencana
+  // Fetch tugas for inisiatif
   const { data: tugas = [] } = useQuery<TaskWithInitiative[]>({
     queryKey: [`/api/tasks/objective/${id}`],
     enabled: !!id,
@@ -607,7 +607,7 @@ export default function GoalDetail() {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Gagal membuat rencana",
+        description: error.message || "Gagal membuat inisiatif",
         variant: "destructive",
       });
     },
@@ -757,8 +757,8 @@ export default function GoalDetail() {
     }
   };
 
-  const getTugasByRencana = (rencanaId: string) => {
-    return tugas.filter((task) => task.initiativeId === rencanaId);
+  const getTugasByInisiatif = (inisiatifId: string) => {
+    return tugas.filter((task) => task.initiativeId === inisiatifId);
   };
 
   // Tour functionality
@@ -925,7 +925,7 @@ export default function GoalDetail() {
         <div className="lg:col-span-2 h-full tour-objective-info">
           <ObjectiveOverviewCard
             objective={goal}
-            initiatives={rencana}
+            initiatives={inisiatif}
             tasks={tugas}
             daysRemaining={daysRemaining}
             cycle={cycle}
@@ -939,7 +939,7 @@ export default function GoalDetail() {
         </div>
       </div>
       {/* Mission Card - Show when not all missions completed */}
-      {goal && !(goal.keyResults.length > 0 && rencana.length > 0 && tugas.length > 0) && (
+      {goal && !(goal.keyResults.length > 0 && inisiatif.length > 0 && tugas.length > 0) && (
         <MissionCard
           missions={[
             {
@@ -955,10 +955,10 @@ export default function GoalDetail() {
             {
               id: 'add-initiative',
               title: 'Buat Rencana Aksi',
-              description: 'Tambahkan rencana atau inisiatif untuk mencapai goal ini. Rencana yang konkret akan memudahkan eksekusi.',
+              description: 'Tambahkan inisiatif atau inisiatif untuk mencapai goal ini. Rencana yang konkret akan memudahkan eksekusi.',
               icon: <Flag className="h-5 w-5" />,
               action: () => setShowInitiativeFormModal(true),
-              isCompleted: rencana.length > 0,
+              isCompleted: inisiatif.length > 0,
               points: 30,
               difficulty: 'medium'
             },
@@ -1014,8 +1014,8 @@ export default function GoalDetail() {
             <span className="bg-white text-green-600 rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-xs sm:text-sm font-bold shrink-0">
               2
             </span>
-            <span className="hidden sm:inline">Inisiatif ({rencana.length})</span>
-            <span className="sm:hidden">Inisiatif ({rencana.length})</span>
+            <span className="hidden sm:inline">Inisiatif ({inisiatif.length})</span>
+            <span className="sm:hidden">Inisiatif ({inisiatif.length})</span>
           </TabsTrigger>
 
           {/* Tab 3 */}
@@ -1201,7 +1201,7 @@ export default function GoalDetail() {
                   const typeConfig = getKeyResultTypeIcon(kr.keyResultType);
                   const IconComponent = typeConfig.icon;
                   const isExpanded = expandedKeyResults.has(kr.id);
-                  const krInitiatives = rencana.filter(
+                  const krInitiatives = inisiatif.filter(
                     (r) => r.keyResultId === kr.id,
                   );
 
@@ -1465,7 +1465,7 @@ export default function GoalDetail() {
                           <Target className="w-3 h-3" />
                           <span>
                             {
-                              rencana.filter((r) => r.keyResultId === kr.id)
+                              inisiatif.filter((r) => r.keyResultId === kr.id)
                                 .length
                             }
                           </span>
@@ -1616,7 +1616,7 @@ export default function GoalDetail() {
                   </span>
                 </div>
                 <div className="text-2xl font-bold text-green-600">
-                  {rencana.filter((r) => r.status === "completed").length}
+                  {inisiatif.filter((r) => r.status === "completed").length}
                 </div>
               </div>
 
@@ -1628,7 +1628,7 @@ export default function GoalDetail() {
                   </span>
                 </div>
                 <div className="text-2xl font-bold text-blue-600">
-                  {rencana.filter((r) => r.status === "in_progress").length}
+                  {inisiatif.filter((r) => r.status === "in_progress").length}
                 </div>
               </div>
 
@@ -1641,7 +1641,7 @@ export default function GoalDetail() {
                 </div>
                 <div className="text-lg font-bold text-purple-600">
                   Rp{" "}
-                  {rencana
+                  {inisiatif
                     .reduce((sum, r) => sum + parseFloat(r.budget || "0"), 0)
                     .toLocaleString("id-ID")}
                 </div>
@@ -1655,12 +1655,12 @@ export default function GoalDetail() {
                   </span>
                 </div>
                 <div className="text-2xl font-bold text-orange-600">
-                  {rencana.length > 0
+                  {inisiatif.length > 0
                     ? Math.round(
-                        rencana.reduce(
+                        inisiatif.reduce(
                           (sum, r) => sum + (r.progressPercentage || 0),
                           0,
-                        ) / rencana.length,
+                        ) / inisiatif.length,
                       )
                     : 0}
                   %
@@ -1668,9 +1668,9 @@ export default function GoalDetail() {
               </div>
             </div>
 
-            {/* Rencana List */}
+            {/* Inisiatif List */}
             <div className="mt-6 space-y-4">
-              {rencana.length === 0 ? (
+              {inisiatif.length === 0 ? (
                 <div className="border-2 border-dashed border-green-200 bg-green-50/50 rounded-lg p-8 text-center">
                   <FileText className="w-12 h-12 text-green-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-green-900 mb-2">
@@ -1712,7 +1712,7 @@ export default function GoalDetail() {
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                          {rencana.map((initiative) => (
+                          {inisiatif.map((initiative) => (
                             <tr
                               key={initiative.id}
                               className="hover:bg-gray-50"
@@ -1935,7 +1935,7 @@ export default function GoalDetail() {
                 </h3>
                 <p className="text-purple-700 text-sm leading-relaxed">
                   Tugas adalah aktivitas operasional yang mendukung pelaksanaan
-                  rencana. Setiap tugas memiliki PIC, deadline, dan tingkat
+                  inisiatif. Setiap tugas memiliki PIC, deadline, dan tingkat
                   prioritas untuk memastikan eksekusi yang efektif.
                 </p>
               </div>
@@ -2020,7 +2020,7 @@ export default function GoalDetail() {
                     Belum ada tugas
                   </h3>
                   <p className="text-purple-700 mb-4">
-                    Tugas akan muncul ketika rencana dibuat dan dijabarkan ke
+                    Tugas akan muncul ketika inisiatif dibuat dan dijabarkan ke
                     aktivitas operasional.
                   </p>
                 </div>
@@ -2105,7 +2105,7 @@ export default function GoalDetail() {
 
                             const getHealthTooltip = (score: number) => {
                               if (score >= 80)
-                                return "Kesehatan Baik - Tugas berjalan sesuai rencana";
+                                return "Kesehatan Baik - Tugas berjalan sesuai inisiatif";
                               if (score >= 60)
                                 return "Kesehatan Cukup - Perlu perhatian";
                               if (score >= 40)

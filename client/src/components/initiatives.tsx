@@ -50,12 +50,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-interface RencanaProps {
+interface InisiatifProps {
   userFilter?: string;
   filteredKeyResultIds?: string[];
 }
 
-export default function Rencana({ userFilter, filteredKeyResultIds }: RencanaProps) {
+export default function Inisiatif({ userFilter, filteredKeyResultIds }: InisiatifProps) {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -68,8 +68,8 @@ export default function Rencana({ userFilter, filteredKeyResultIds }: RencanaPro
   } | null>(null);
   const { toast } = useToast();
 
-  // Fetch all rencana
-  const { data: rencana = [], isLoading } = useQuery<Initiative[]>({
+  // Fetch all inisiatif
+  const { data: inisiatif = [], isLoading } = useQuery<Initiative[]>({
     queryKey: ["/api/initiatives"],
   });
 
@@ -114,8 +114,8 @@ export default function Rencana({ userFilter, filteredKeyResultIds }: RencanaPro
     },
   });
 
-  // Filter rencana based on status, priority, and user
-  const filteredRencana = rencana.filter((initiative) => {
+  // Filter inisiatif based on status, priority, and user
+  const filteredRencana = inisiatif.filter((initiative) => {
     const statusMatch =
       statusFilter === "all" || initiative.status === statusFilter;
     const priorityMatch =
@@ -303,11 +303,11 @@ export default function Rencana({ userFilter, filteredKeyResultIds }: RencanaPro
           <CardContent className="text-center py-12">
             <Building2 className="w-12 h-12 mx-auto mb-4 text-gray-400" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Tidak ada rencana ditemukan
+              Tidak ada inisiatif ditemukan
             </h3>
             <p className="text-gray-500 mb-4">
               {statusFilter !== "all" || priorityFilter !== "all"
-                ? "Tidak ada rencana yang sesuai dengan filter Anda."
+                ? "Tidak ada inisiatif yang sesuai dengan filter Anda."
                 : "Get started by creating your first initiative."}
             </p>
             <Button

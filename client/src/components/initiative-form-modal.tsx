@@ -31,7 +31,7 @@ import type { KeyResult, User, Initiative } from "@shared/schema";
 
 // Form schema matching the actual Initiative database schema
 const initiativeFormSchema = z.object({
-  title: z.string().min(1, "Judul rencana wajib diisi"),
+  title: z.string().min(1, "Judul inisiatif wajib diisi"),
   description: z.string().optional(),
   keyResultId: z.string().min(1, "Angka target wajib dipilih"),
   picId: z.string().optional(),
@@ -273,7 +273,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
     onError: (error: any) => {
       toast({
         title: "Terjadi kesalahan",
-        description: error.message || "Gagal menyimpan rencana",
+        description: error.message || "Gagal menyimpan inisiatif",
         variant: "destructive",
       });
     },
