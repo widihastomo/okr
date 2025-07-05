@@ -971,8 +971,8 @@ export default function GoalDetail() {
             <span className="bg-white text-green-600 rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-xs sm:text-sm font-bold shrink-0">
               2
             </span>
-            <span className="hidden sm:inline">Rencana ({rencana.length})</span>
-            <span className="sm:hidden">Rencana ({rencana.length})</span>
+            <span className="hidden sm:inline">Inisiatif ({rencana.length})</span>
+            <span className="sm:hidden">Inisiatif ({rencana.length})</span>
           </TabsTrigger>
 
           {/* Tab 3 */}
@@ -1426,7 +1426,7 @@ export default function GoalDetail() {
                                 .length
                             }
                           </span>
-                          <span>rencana</span>
+                          <span>inisiatif</span>
                         </div>
                       </div>
 
@@ -1435,7 +1435,7 @@ export default function GoalDetail() {
                         <div className="mt-4 pt-4 border-t border-gray-100">
                           <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
                             <FileText className="w-4 h-4" />
-                            Rencana Terkait ({krInitiatives.length})
+                            Inisiatif Terkait ({krInitiatives.length})
                           </h4>
                           <div className="space-y-2">
                             {krInitiatives.map((initiative) => (
@@ -1545,11 +1545,11 @@ export default function GoalDetail() {
               <div className="flex-1">
                 <h3 className="text-lg sm:text-xl font-semibold text-green-900 mb-2 flex items-center gap-2">
                   <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 shrink-0" />
-                  Rencana & Inisiatif
+                  Inisiatif
                 </h3>
                 <p className="text-green-700 text-sm leading-relaxed">
-                  Rencana adalah langkah-langkah strategis untuk mencapai ukuran
-                  keberhasilan. Setiap rencana memiliki timeline, budget, dan
+                  Inisiatif adalah langkah-langkah strategis untuk mencapai ukuran
+                  keberhasilan. Setiap inisiatif memiliki timeline, budget, dan
                   PIC yang bertanggung jawab untuk eksekusi.
                 </p>
               </div>
@@ -1559,7 +1559,7 @@ export default function GoalDetail() {
               >
                 <Plus className="w-4 h-4 mr-2" />
                 <span className="sm:hidden">Tambah</span>
-                <span className="hidden sm:inline">Tambah Rencana</span>
+                <span className="hidden sm:inline">Tambah Inisiatif</span>
               </Button>
             </div>
 
@@ -1631,10 +1631,10 @@ export default function GoalDetail() {
                 <div className="border-2 border-dashed border-green-200 bg-green-50/50 rounded-lg p-8 text-center">
                   <FileText className="w-12 h-12 text-green-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-green-900 mb-2">
-                    Belum ada rencana
+                    Belum ada inisiatif
                   </h3>
                   <p className="text-green-700 mb-4">
-                    Mulai buat rencana untuk mencapai ukuran keberhasilan yang
+                    Mulai buat inisiatif untuk mencapai ukuran keberhasilan yang
                     telah ditetapkan
                   </p>
                 </div>
@@ -1646,7 +1646,7 @@ export default function GoalDetail() {
                         <thead className="bg-gray-50 border-b">
                           <tr>
                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Rencana
+                              Inisiatif
                             </th>
                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Status
