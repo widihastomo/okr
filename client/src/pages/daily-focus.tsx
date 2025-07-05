@@ -403,30 +403,7 @@ export default function DailyFocusPage() {
         </CardContent>
       </Card>
 
-      {/* Daily Suggestions */}
-      <Card className="border-green-200 bg-gradient-to-r from-green-50 to-blue-50">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <TrendingUp className="h-4 w-4 text-green-600" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-medium text-green-900 mb-1">
-                💡 Suggestion Hari Ini
-              </h3>
-              <div className="text-sm text-green-700">
-                {todayTasks.length > 0
-                  ? `Selesaikan ${todayTasks.filter((t) => t.status !== "completed").length} task prioritas untuk mempertahankan momentum`
-                  : overdueTasks.length > 0
-                    ? `Fokus pada ${overdueTasks.length} task terlambat untuk mengejar ketinggalan`
-                    : activeKeyResults.length > 0
-                      ? `Update progress pada ${activeKeyResults.length} angka target yang belum tercapai`
-                      : "Hari yang produktif! Pertimbangkan untuk merencanakan aktivitas minggu depan"}
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      
 
       {/* Objective Awareness Section */}
       {relatedObjectives.length > 0 && (
