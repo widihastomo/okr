@@ -258,8 +258,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Target className="w-5 h-5" />
+          <DialogTitle>
             {isEditMode ? "Edit Inisiatif" : "Buat Inisiatif Baru"}
           </DialogTitle>
           <DialogDescription>
