@@ -96,6 +96,17 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 05, 2025. Implemented SaaS subscription system with pricing page and multi-tenant architecture:
+  * Created comprehensive database schema with organizations, subscription_plans, and organization_subscriptions tables
+  * Implemented 4-tier pricing model: Starter (Rp 99,000), Tim 10/Growth (Rp 299,000), Tim 25/Scale (Rp 749,000), Enterprise (custom)
+  * Built professional pricing page matching user reference design with feature comparison and current plan highlighting
+  * Added SaaS API endpoints for subscription management and organization limit checking
+  * Populated development data with sample organizations (PT Teknologi Maju, CV Kreatif Indonesia, PT Solusi Digital)
+  * Updated admin user (550e8400-e29b-41d4-a716-446655440001) to belong to PT Teknologi Maju with Growth plan
+  * Added pricing page link to sidebar navigation with CreditCard icon
+  * Ready for Stripe integration for subscription payment processing
+  * SaaS architecture supports user limits per plan (3, 10, 25, unlimited users)
+  * Multi-tenant system isolates data by organization for secure SaaS operation
 - July 05, 2025. Enhanced Collaborative Goal Visualization with D3.js interactive mindmap:
   * Upgraded to D3.js-powered hierarchical tree layout for intuitive goal visualization
   * Created interactive mindmap with root system branching into objectives, key results, and initiatives

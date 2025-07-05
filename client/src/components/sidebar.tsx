@@ -12,7 +12,8 @@ import {
   Settings,
   X,
   Trophy,
-  Calendar
+  Calendar,
+  CreditCard
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -80,6 +81,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       icon: BarChart3,
       path: "/analytics",
       active: location === "/analytics"
+    },
+    {
+      label: "Harga",
+      icon: CreditCard,
+      path: "/pricing",
+      active: location === "/pricing"
     },
 
   ];

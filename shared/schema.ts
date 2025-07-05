@@ -46,6 +46,53 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
+// Subscription Plans table
+export const subscriptionPlans = pgTable("subscription_plans", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(), // "Starter", "Tim 10 (Growth)", "Tim 25 (Scale)", "Enterprise"
+  slug: text("slug").notNull().unique(), // "starter", "growth", "scale", "enterprise"
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(), // Monthly price in IDR
+  maxUsers: integer("max_users"), // null for enterprise (unlimited)
+  features: jsonb("features").notNull(), // Array of feature strings
+  stripeProductId: text("stripe_product_id"),
+  stripePriceId: text("stripe_price_id"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Organizations table (companies that subscribe)
+export const organizations = pgTable("organizations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  logo: text("logo"),
+  website: text("website"),
+  industry: text("industry"),
+  size: text("size"), // "1-10", "11-50", "51-200", "201-500", "500+"
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Organization Subscriptions
+export const organizationSubscriptions = pgTable("organization_subscriptions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
+  planId: uuid("plan_id").notNull().references(() => subscriptionPlans.id),
+  status: text("status").notNull().default("active"), // "active", "cancelled", "past_due", "trialing"
+  currentPeriodStart: timestamp("current_period_start").notNull(),
+  currentPeriodEnd: timestamp("current_period_end").notNull(),
+  cancelAt: timestamp("cancel_at"),
+  cancelledAt: timestamp("cancelled_at"),
+  trialStart: timestamp("trial_start"),
+  trialEnd: timestamp("trial_end"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  stripeCustomerId: text("stripe_customer_id"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Users table with email/password authentication
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -55,6 +102,7 @@ export const users = pgTable("users", {
   lastName: varchar("last_name", { length: 100 }),
   profileImageUrl: varchar("profile_image_url", { length: 500 }),
   role: text("role").notNull().default("member"), // "admin", "manager", "member"
+  organizationId: uuid("organization_id").references(() => organizations.id),
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -66,6 +114,7 @@ export const teams = pgTable("teams", {
   name: text("name").notNull(),
   description: text("description"),
   ownerId: uuid("owner_id").notNull(),
+  organizationId: uuid("organization_id").references(() => organizations.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -378,6 +427,25 @@ export const insertActivityLogSchema = createInsertSchema(activityLogs).omit({
   createdAt: true,
 });
 
+// SaaS Insert Schemas
+export const insertSubscriptionPlanSchema = createInsertSchema(subscriptionPlans).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertOrganizationSchema = createInsertSchema(organizations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertOrganizationSubscriptionSchema = createInsertSchema(organizationSubscriptions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type InsertCycle = z.infer<typeof insertCycleSchema>;
 export type InsertTemplate = z.infer<typeof insertTemplateSchema>;
 export type InsertObjective = z.infer<typeof insertObjectiveSchema>;
@@ -623,3 +691,11 @@ export type InitiativeWithSuccessMetrics = Initiative & {
   members: (InitiativeMember & { user: User })[];
   tasks: Task[];
 };
+
+// SaaS Types
+export type SubscriptionPlan = typeof subscriptionPlans.$inferSelect;
+export type InsertSubscriptionPlan = z.infer<typeof insertSubscriptionPlanSchema>;
+export type Organization = typeof organizations.$inferSelect;
+export type InsertOrganization = z.infer<typeof insertOrganizationSchema>;
+export type OrganizationSubscription = typeof organizationSubscriptions.$inferSelect;
+export type InsertOrganizationSubscription = z.infer<typeof insertOrganizationSubscriptionSchema>;

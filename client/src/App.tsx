@@ -27,6 +27,7 @@ import AnalyticsPage from "@/pages/analytics";
 import AchievementsPage from "@/pages/achievements";
 import NetworkVisualization from "@/pages/network-visualization";
 import DailyFocusPage from "@/pages/daily-focus";
+import PricingPage from "@/pages/pricing";
 
 
 
@@ -98,7 +99,7 @@ function Router() {
             <Route path="/achievements" component={AchievementsPage} />
             <Route path="/analytics" component={AnalyticsPage} />
             <Route path="/network" component={NetworkVisualization} />
-
+            <Route path="/pricing" component={PricingPage} />
             <Route path="/daily-focus" component={DailyFocusPage} />
             <Route component={NotFound} />
           </Switch>

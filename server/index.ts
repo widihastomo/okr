@@ -5,6 +5,7 @@ import { setupVite, serveStatic, log } from "./vite";
 import { scheduleCycleStatusUpdates } from "./cycle-status-updater";
 import { populateDatabase } from "./populate-postgres";
 import { populateGamificationData } from "./gamification-data";
+import { populateSaaSData } from "./populate-saas-data";
 import { testDatabaseConnection } from "./db";
 import { validateEnvironment, getConfig } from "./config";
 
@@ -227,6 +228,8 @@ const config = getConfig();
       if (dbConnected) {
         console.log("Populating PostgreSQL database with sample data...");
         await populateDatabase();
+        console.log("Populating SaaS subscription data...");
+        await populateSaaSData();
         console.log("Database initialized successfully");
       } else {
         console.error("Database connection failed - server will continue without database");

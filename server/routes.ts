@@ -6,7 +6,8 @@ import {
   insertCheckInSchema, insertInitiativeSchema, insertInitiativeMemberSchema, insertInitiativeDocumentSchema, 
   insertTaskSchema, insertInitiativeNoteSchema, updateKeyResultProgressSchema, createOKRFromTemplateSchema,
   insertSuccessMetricSchema, insertSuccessMetricUpdateSchema,
-  type User
+  subscriptionPlans, organizations, organizationSubscriptions, users,
+  type User, type SubscriptionPlan, type Organization, type OrganizationSubscription
 } from "@shared/schema";
 import { z } from "zod";
 import { setupEmailAuth } from "./authRoutes";
@@ -2849,6 +2850,110 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating initiative status:", error);
       res.status(500).json({ message: "Failed to update initiative status" });
+    }
+  });
+
+  // SaaS Subscription Routes
+  
+  // Get all subscription plans
+  app.get("/api/subscription-plans", async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      const plans = await db.select().from(subscriptionPlans).where(eq(subscriptionPlans.isActive, true));
+      res.json(plans);
+    } catch (error) {
+      console.error("Error fetching subscription plans:", error);
+      res.status(500).json({ message: "Failed to fetch subscription plans" });
+    }
+  });
+
+  // Get current user's organization and subscription
+  app.get("/api/my-organization", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      
+      // Get user with organization
+      const user = await storage.getUser(userId);
+      if (!user || !user.organizationId) {
+        return res.status(404).json({ message: "No organization found for user" });
+      }
+
+      // Get organization
+      const [organization] = await db.select().from(organizations).where(eq(organizations.id, user.organizationId));
+      if (!organization) {
+        return res.status(404).json({ message: "Organization not found" });
+      }
+
+      // Get subscription
+      const [subscription] = await db.select()
+        .from(organizationSubscriptions)
+        .leftJoin(subscriptionPlans, eq(organizationSubscriptions.planId, subscriptionPlans.id))
+        .where(eq(organizationSubscriptions.organizationId, organization.id));
+
+      res.json({
+        organization,
+        subscription: subscription ? {
+          ...subscription.organization_subscriptions,
+          plan: subscription.subscription_plans
+        } : null
+      });
+    } catch (error) {
+      console.error("Error fetching organization:", error);
+      res.status(500).json({ message: "Failed to fetch organization data" });
+    }
+  });
+
+  // Check organization limits (for enforcing plan restrictions)
+  app.get("/api/organization/check-limits", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const { db } = await import("./db");
+      const { eq, count } = await import("drizzle-orm");
+      
+      const user = await storage.getUser(userId);
+      if (!user || !user.organizationId) {
+        return res.status(404).json({ message: "No organization found for user" });
+      }
+
+      // Get organization subscription
+      const [subscription] = await db.select()
+        .from(organizationSubscriptions)
+        .leftJoin(subscriptionPlans, eq(organizationSubscriptions.planId, subscriptionPlans.id))
+        .where(eq(organizationSubscriptions.organizationId, user.organizationId));
+
+      if (!subscription || !subscription.subscription_plans) {
+        return res.status(404).json({ message: "No active subscription found" });
+      }
+
+      // Count users in organization
+      const [{ value: userCount }] = await db.select({ value: count() })
+        .from(users)
+        .where(eq(users.organizationId, user.organizationId));
+
+      const plan = subscription.subscription_plans;
+      const limits = {
+        maxUsers: plan.maxUsers,
+        currentUsers: userCount,
+        canAddUsers: plan.maxUsers ? userCount < plan.maxUsers : true,
+        planName: plan.name,
+        planSlug: plan.slug
+      };
+
+      res.json(limits);
+    } catch (error) {
+      console.error("Error checking organization limits:", error);
+      res.status(500).json({ message: "Failed to check organization limits" });
     }
   });
 
