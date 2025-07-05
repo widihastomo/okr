@@ -11,6 +11,8 @@ import { populateGamificationData } from "./gamification-data";
 import { populateSaaSData } from "./populate-saas-data";
 import { testDatabaseConnection } from "./db";
 import { validateEnvironment, getConfig } from "./config";
+import { setupRLS } from "./setup-rls";
+import { rlsMiddleware, rlsCleanupMiddleware } from "./rls-middleware";
 
 const app = express();
 
@@ -53,6 +55,10 @@ if (process.env.NODE_ENV === 'production') {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// RLS middleware - set context before requests, cleanup after
+app.use(rlsCleanupMiddleware);
+app.use(rlsMiddleware);
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -267,6 +273,8 @@ const config = getConfig();
       const dbConnected = await testDatabaseConnection();
       
       if (dbConnected) {
+        console.log("Setting up Row Level Security (RLS)...");
+        await setupRLS();
         console.log("Populating PostgreSQL database with sample data...");
         await populateDatabase();
         console.log("Populating SaaS subscription data...");
