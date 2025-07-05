@@ -1,9 +1,9 @@
-import GoalMindmap from "@/components/goal-mindmap";
+import CompanyOKRMindmap from "@/components/company-okr-mindmap";
 
 export default function GoalNetworkPage() {
   return (
     <div className="p-6">
-      <GoalMindmap />
+      <CompanyOKRMindmap />
     </div>
   );
 }
