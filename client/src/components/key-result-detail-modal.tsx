@@ -395,9 +395,42 @@ export function KeyResultDetailModal({ keyResultId, isOpen, onClose }: KeyResult
                               )}
                               <div className="flex items-center gap-4 text-xs text-gray-500">
                                 <span className="flex items-center gap-1">
-                                  Priority: <Badge variant="outline" className="text-xs px-1 py-0">
-                                    {initiative.priority}
-                                  </Badge>
+                                  Priority: {(() => {
+                                    // Calculate priority level from score
+                                    const score = parseFloat(initiative.priorityScore || "0");
+                                    let level: string;
+                                    let color: string;
+                                    let label: string;
+                                    
+                                    if (score >= 4.5) {
+                                      level = "critical";
+                                      color = "bg-red-100 text-red-800";
+                                      label = "Kritis";
+                                    } else if (score >= 3.5) {
+                                      level = "high";
+                                      color = "bg-orange-100 text-orange-800";
+                                      label = "Tinggi";
+                                    } else if (score >= 2.5) {
+                                      level = "medium";
+                                      color = "bg-yellow-100 text-yellow-800";
+                                      label = "Sedang";
+                                    } else {
+                                      level = "low";
+                                      color = "bg-green-100 text-green-800";
+                                      label = "Rendah";
+                                    }
+                                    
+                                    return (
+                                      <div className="flex items-center gap-2">
+                                        <Badge className={`${color} text-xs px-1 py-0`}>
+                                          {label}
+                                        </Badge>
+                                        <span className="text-xs text-gray-500">
+                                          {score.toFixed(1)}/5.0
+                                        </span>
+                                      </div>
+                                    );
+                                  })()}
                                 </span>
                                 {initiative.dueDate && (
                                   <span className="flex items-center gap-1">

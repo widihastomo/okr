@@ -1731,25 +1731,42 @@ export default function GoalDetail() {
                                 </Select>
                               </td>
                               <td className="px-4 py-4">
-                                <Badge
-                                  className={
-                                    initiative.priority === "critical"
-                                      ? "bg-red-100 text-red-800"
-                                      : initiative.priority === "high"
-                                        ? "bg-orange-100 text-orange-800"
-                                        : initiative.priority === "medium"
-                                          ? "bg-yellow-100 text-yellow-800"
-                                          : "bg-green-100 text-green-800"
+                                {(() => {
+                                  // Calculate priority level from score
+                                  const score = parseFloat(initiative.priorityScore || "0");
+                                  let level: string;
+                                  let color: string;
+                                  let label: string;
+                                  
+                                  if (score >= 4.5) {
+                                    level = "critical";
+                                    color = "bg-red-100 text-red-800";
+                                    label = "Kritis";
+                                  } else if (score >= 3.5) {
+                                    level = "high";
+                                    color = "bg-orange-100 text-orange-800";
+                                    label = "Tinggi";
+                                  } else if (score >= 2.5) {
+                                    level = "medium";
+                                    color = "bg-yellow-100 text-yellow-800";
+                                    label = "Sedang";
+                                  } else {
+                                    level = "low";
+                                    color = "bg-green-100 text-green-800";
+                                    label = "Rendah";
                                   }
-                                >
-                                  {initiative.priority === "critical"
-                                    ? "Kritis"
-                                    : initiative.priority === "high"
-                                      ? "Tinggi"
-                                      : initiative.priority === "medium"
-                                        ? "Sedang"
-                                        : "Rendah"}
-                                </Badge>
+                                  
+                                  return (
+                                    <div className="flex flex-col items-start gap-1">
+                                      <Badge className={color}>
+                                        {label}
+                                      </Badge>
+                                      <span className="text-xs text-gray-500">
+                                        {score.toFixed(1)}/5.0
+                                      </span>
+                                    </div>
+                                  );
+                                })()}
                               </td>
                               <td className="px-4 py-4">
                                 <div className="flex items-center gap-2">
