@@ -96,6 +96,21 @@ The application is configured for deployment on Replit with the following setup:
 ## Changelog
 ```
 Changelog:
+- July 05, 2025. Completed comprehensive initiative status redesign with 4-stage lifecycle management:
+  * Redesigned initiative status system: Draft → Sedang Berjalan → Selesai → Dibatalkan
+  * Draft: Initiative and tasks created but no tasks running or metrics updated
+  * Sedang Berjalan: At least 1 task started (in progress) or success metrics updated
+  * Selesai: User closes initiative with completion data including final metrics, budget used, learning insights, closure notes, and attachments
+  * Dibatalkan: User cancels initiative with reason
+  * Added comprehensive database schema with closure fields: finalResult, learningInsights, closureNotes, budgetUsed, attachmentUrls, closedBy, closedAt
+  * Created InitiativeStatusManager service for automatic status calculation based on task and metric activity
+  * Built InitiativeClosureModal component with full completion workflow including final metric updates, budget tracking, insights capture, and file attachments
+  * Added conditional action buttons based on status: Edit (draft/running), Close (running only), Cancel (draft/running)
+  * Implemented proper permission system - closed initiatives cannot be edited
+  * Enhanced status badges with color-coded display system
+  * Added API endpoints for initiative closure and cancellation with proper validation
+  * Migrated existing initiative statuses to new 4-stage system
+  * Created comprehensive closure workflow requiring final results (berhasil/tidak_berhasil/ulangi), learning insights, and metric completion
 - July 05, 2025. Completed comprehensive terminology standardization from "rencana" to "Inisiatif" throughout entire application:
   * Updated all variable names: rencana → inisiatif, getRencanaBy → getInisiatifBy, RencanaProps → InisiatifProps
   * Updated all component names: Rencana component → Inisiatif component with proper imports and exports

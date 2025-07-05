@@ -2738,6 +2738,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Close initiative endpoint
+  app.post("/api/initiatives/:id/close", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const initiativeId = req.params.id;
+      const closureData = req.body;
+
+      // Validate closure data
+      const closureSchema = z.object({
+        finalResult: z.enum(['berhasil', 'tidak_berhasil', 'ulangi']),
+        learningInsights: z.string().min(10),
+        closureNotes: z.string().min(5),
+        budgetUsed: z.number().optional(),
+        attachmentUrls: z.array(z.string()).optional(),
+        finalMetrics: z.array(z.object({
+          metricId: z.string(),
+          finalAchievement: z.string()
+        }))
+      });
+
+      const validatedData = closureSchema.parse(closureData);
+
+      // Update final metrics
+      for (const metric of validatedData.finalMetrics) {
+        await storage.updateSuccessMetric(metric.metricId, {
+          achievement: metric.finalAchievement
+        });
+
+        // Create update record
+        await storage.createSuccessMetricUpdate({
+          metricId: metric.metricId,
+          achievement: metric.finalAchievement,
+          notes: 'Final achievement update during initiative closure',
+          createdBy: userId
+        });
+      }
+
+      // Update initiative with closure data
+      const updatedInitiative = await storage.updateInitiative(initiativeId, {
+        status: 'selesai',
+        finalResult: validatedData.finalResult,
+        learningInsights: validatedData.learningInsights,
+        closureNotes: validatedData.closureNotes,
+        budgetUsed: validatedData.budgetUsed,
+        attachmentUrls: validatedData.attachmentUrls || [],
+        closedBy: userId,
+        closedAt: new Date(),
+        completedAt: new Date()
+      });
+
+      res.json(updatedInitiative);
+    } catch (error) {
+      console.error("Error closing initiative:", error);
+      res.status(500).json({ message: "Failed to close initiative" });
+    }
+  });
+
+  // Cancel initiative endpoint
+  app.post("/api/initiatives/:id/cancel", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const initiativeId = req.params.id;
+      const { cancelReason } = req.body;
+
+      if (!cancelReason) {
+        return res.status(400).json({ message: "Cancel reason is required" });
+      }
+
+      const updatedInitiative = await storage.updateInitiative(initiativeId, {
+        status: 'dibatalkan',
+        closureNotes: cancelReason,
+        closedBy: userId,
+        closedAt: new Date()
+      });
+
+      res.json(updatedInitiative);
+    } catch (error) {
+      console.error("Error cancelling initiative:", error);
+      res.status(500).json({ message: "Failed to cancel initiative" });
+    }
+  });
+
   // Register AI routes
   registerAIRoutes(app);
 

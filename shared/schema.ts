@@ -116,18 +116,28 @@ export const initiatives = pgTable("initiatives", {
   keyResultId: uuid("key_result_id").references(() => keyResults.id).notNull(),
   title: text("title").notNull(),
   description: text("description"),
-  status: text("status").notNull().default("not_started"), // "not_started", "in_progress", "completed", "on_hold", "cancelled"
+  status: text("status").notNull().default("draft"), // "draft", "sedang_berjalan", "selesai", "dibatalkan"
   priority: text("priority").notNull().default("medium"), // "low", "medium", "high", "critical"
   picId: uuid("pic_id").references(() => users.id), // Person in Charge
   startDate: timestamp("start_date"),
   dueDate: timestamp("due_date"),
   completedAt: timestamp("completed_at"),
   budget: decimal("budget", { precision: 15, scale: 2 }), // Project budget
+  budgetUsed: decimal("budget_used", { precision: 15, scale: 2 }), // Actual budget used when closing
   progressPercentage: integer("progress_percentage").default(0), // 0-100%
-  // Priority calculation fields (1-10 scale)
-  impactScore: integer("impact_score").default(5), // Business impact: 1=very low, 10=very high
-  effortScore: integer("effort_score").default(5), // Implementation effort: 1=very easy, 10=very hard
-  confidenceScore: integer("confidence_score").default(5), // Confidence in success: 1=very low, 10=very high
+  
+  // Closure information (filled when status changes to "selesai")
+  finalResult: text("final_result"), // "berhasil", "tidak_berhasil", "ulangi"
+  learningInsights: text("learning_insights"), // Catatan pembelajaran/insight
+  closureNotes: text("closure_notes"), // Catatan penutupan inisiatif
+  attachmentUrls: text("attachment_urls").array(), // Array of file URLs for attachments
+  closedBy: uuid("closed_by").references(() => users.id), // Who closed the initiative
+  closedAt: timestamp("closed_at"), // When it was closed
+  
+  // Priority calculation fields (1-5 scale, simplified)
+  impactScore: integer("impact_score").default(3), // Business impact: 1=very low, 5=very high
+  effortScore: integer("effort_score").default(3), // Implementation effort: 1=very easy, 5=very hard
+  confidenceScore: integer("confidence_score").default(3), // Confidence in success: 1=very low, 5=very high
   priorityScore: decimal("priority_score", { precision: 5, scale: 2 }), // Calculated priority score
   createdAt: timestamp("created_at").defaultNow(),
   createdBy: uuid("created_by").notNull(), // user ID

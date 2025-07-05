@@ -17,6 +17,8 @@ import {
   Trash2,
   Info,
   ChevronDown,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
@@ -44,6 +46,7 @@ import TaskModal from "@/components/task-modal";
 import InitiativeModal from "@/components/initiative-modal";
 import { InitiativeNotes } from "@/components/initiative-notes";
 import SuccessMetricsModal from "@/components/success-metrics-modal-simple";
+import InitiativeClosureModal from "@/components/initiative-closure-modal";
 import type { SuccessMetricWithUpdates } from "@shared/schema";
 
 export default function InitiativeDetailPage() {
@@ -58,6 +61,7 @@ export default function InitiativeDetailPage() {
   const [isEditInitiativeModalOpen, setIsEditInitiativeModalOpen] = useState(false);
   const [isSuccessMetricsModalOpen, setIsSuccessMetricsModalOpen] = useState(false);
   const [editingMetric, setEditingMetric] = useState<any>(null);
+  const [isClosureModalOpen, setIsClosureModalOpen] = useState(false);
 
   // All queries declared at the top level
   const { data: initiative, isLoading: initiativeLoading } = useQuery({
@@ -129,6 +133,36 @@ export default function InitiativeDetailPage() {
       });
     },
   });
+
+  // Helper function for status badge
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      'draft': { 
+        label: 'Draft', 
+        className: 'bg-gray-100 text-gray-800 border-gray-200' 
+      },
+      'sedang_berjalan': { 
+        label: 'Sedang Berjalan', 
+        className: 'bg-blue-100 text-blue-800 border-blue-200' 
+      },
+      'selesai': { 
+        label: 'Selesai', 
+        className: 'bg-green-100 text-green-800 border-green-200' 
+      },
+      'dibatalkan': { 
+        label: 'Dibatalkan', 
+        className: 'bg-red-100 text-red-800 border-red-200' 
+      }
+    };
+    
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig['draft'];
+    return <Badge className={config.className}>{config.label}</Badge>;
+  };
+
+  // Helper function to check permissions based on status
+  const canEdit = (status: string) => status === 'draft' || status === 'sedang_berjalan';
+  const canClose = (status: string) => status === 'sedang_berjalan';
+  const canCancel = (status: string) => status === 'draft' || status === 'sedang_berjalan';
 
   // Helper functions
   const calculateMetricProgress = (metric: any): number => {
@@ -227,14 +261,40 @@ export default function InitiativeDetailPage() {
         </Button>
         
         <div className="flex items-center gap-3">
-          <Button 
-            variant="outline" 
-            onClick={() => setIsEditInitiativeModalOpen(true)}
-            className="flex items-center gap-2"
-          >
-            <Edit className="h-4 w-4" />
-            Edit Initiative
-          </Button>
+          {canEdit(initiativeData.status) && (
+            <Button 
+              variant="outline" 
+              onClick={() => setIsEditInitiativeModalOpen(true)}
+              className="flex items-center gap-2"
+            >
+              <Edit className="h-4 w-4" />
+              Edit Initiative
+            </Button>
+          )}
+          
+          {canClose(initiativeData.status) && (
+            <Button 
+              onClick={() => setIsClosureModalOpen(true)}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+            >
+              <CheckCircle className="h-4 w-4" />
+              Tutup Inisiatif
+            </Button>
+          )}
+          
+          {canCancel(initiativeData.status) && (
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                // TODO: Add cancel functionality
+                console.log('Cancel initiative');
+              }}
+              className="flex items-center gap-2 border-red-300 text-red-600 hover:bg-red-50"
+            >
+              <XCircle className="h-4 w-4" />
+              Batalkan
+            </Button>
+          )}
         </div>
       </div>
 
@@ -250,9 +310,7 @@ export default function InitiativeDetailPage() {
                     <CardTitle className="text-xl font-bold text-gray-900">
                       {initiativeData.title}
                     </CardTitle>
-                    <Badge className="bg-blue-100 text-blue-800 border-blue-200">
-                      {initiativeData.status}
-                    </Badge>
+                    {getStatusBadge(initiativeData.status)}
                   </div>
                   <p className="text-gray-600 text-sm leading-relaxed">
                     {initiativeData.description}
@@ -555,6 +613,15 @@ export default function InitiativeDetailPage() {
         initiativeId={id!}
         metric={editingMetric}
       />
+
+      {initiativeData && (
+        <InitiativeClosureModal
+          open={isClosureModalOpen}
+          onOpenChange={setIsClosureModalOpen}
+          initiativeId={id!}
+          initiativeTitle={initiativeData.title}
+        />
+      )}
     </div>
   );
 }
