@@ -1485,10 +1485,7 @@ export default function DailyFocusPage() {
                         {todayTasks.length > 0 && (
                           <tr>
                             <td colSpan={6} className="px-4 py-3 bg-blue-50 border-b-2 border-blue-200">
-                              <div className="flex items-center gap-2 font-semibold text-blue-800">
-                                <Calendar className="h-4 w-4" />
-                                <span>Task Hari Ini ({todayTasks.length})</span>
-                              </div>
+                              
                             </td>
                           </tr>
                         )}
