@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -99,6 +99,20 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
     mentionQuery,
     showSuggestions: showMentionSuggestions 
   });
+
+  // Close mention dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (editorRef.current && !editorRef.current.contains(event.target as Node)) {
+        setShowMentionSuggestions(false);
+      }
+    };
+
+    if (showMentionSuggestions) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showMentionSuggestions]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -232,29 +246,41 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
             
             {/* Mention suggestions */}
             <AnimatePresence>
-              {showMentionSuggestions && filteredUsers.length > 0 && (
+              {showMentionSuggestions && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute left-4 top-full mt-1 bg-white border rounded-lg shadow-lg z-10 max-h-40 overflow-y-auto"
+                  className="absolute left-4 top-full mt-1 bg-white border rounded-lg shadow-lg z-50 max-h-40 overflow-y-auto min-w-[240px] border-gray-200"
+                  style={{ 
+                    visibility: 'visible',
+                    display: 'block',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e5e7eb'
+                  }}
                 >
-                  {filteredUsers.slice(0, 5).map((user) => (
-                    <button
-                      key={user.id}
-                      type="button"
-                      onClick={() => handleMentionSelect(user)}
-                      className="w-full px-3 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-sm"
-                    >
-                      <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-medium">
-                        {user.username?.charAt(0).toUpperCase()}
-                      </div>
-                      <div>
-                        <div className="font-medium">{user.username}</div>
-                        <div className="text-xs text-gray-500">{user.email}</div>
-                      </div>
-                    </button>
-                  ))}
+                  {filteredUsers.length > 0 ? (
+                    filteredUsers.slice(0, 5).map((user) => (
+                      <button
+                        key={user.id}
+                        type="button"
+                        onClick={() => handleMentionSelect(user)}
+                        className="w-full px-3 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-sm"
+                      >
+                        <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-medium">
+                          {user.username?.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <div className="font-medium">{user.username}</div>
+                          <div className="text-xs text-gray-500">{user.email}</div>
+                        </div>
+                      </button>
+                    ))
+                  ) : (
+                    <div className="px-3 py-2 text-sm text-gray-500">
+                      Tidak ada user yang cocok dengan "{mentionQuery}"
+                    </div>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
