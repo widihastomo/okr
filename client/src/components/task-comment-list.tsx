@@ -170,8 +170,8 @@ export function TaskCommentList({ taskId }: TaskCommentListProps) {
             </Avatar>
 
             <div className="flex-1 min-w-0">
-              <div className="bg-gray-50 rounded-lg px-3 py-2">
-                <div className="flex items-center gap-2 mb-1">
+              <div className="bg-gray-50 rounded-lg px-3 py-2 relative">
+                <div className="flex items-center gap-2 mb-1 pr-8">
                   <span className="font-medium text-sm text-gray-900">
                     {comment.user.firstName || comment.user.email}
                   </span>
@@ -185,6 +185,35 @@ export function TaskCommentList({ taskId }: TaskCommentListProps) {
                     <span className="text-xs text-gray-400">(diedit)</span>
                   )}
                 </div>
+
+                {/* Action menu - positioned inside bubble at top-right */}
+                {currentUser?.id === comment.userId && editingCommentId !== comment.id && (
+                  <div className="absolute top-2 right-2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600">
+                          <MoreVertical className="h-3 w-3" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() => handleEditStart(comment)}
+                          className="text-sm"
+                        >
+                          <Edit2 className="mr-2 h-3 w-3" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => setDeleteCommentId(comment.id)}
+                          className="text-sm text-red-600"
+                        >
+                          <Trash2 className="mr-2 h-3 w-3" />
+                          Hapus
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                )}
 
                 {editingCommentId === comment.id ? (
                   <div className="space-y-2">
@@ -222,35 +251,6 @@ export function TaskCommentList({ taskId }: TaskCommentListProps) {
                   />
                 )}
               </div>
-
-              {/* Action menu - only show for comment owner */}
-              {currentUser?.id === comment.userId && editingCommentId !== comment.id && (
-                <div className="flex justify-end mt-1">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600">
-                        <MoreVertical className="h-3 w-3" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() => handleEditStart(comment)}
-                        className="text-sm"
-                      >
-                        <Edit2 className="mr-2 h-3 w-3" />
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => setDeleteCommentId(comment.id)}
-                        className="text-sm text-red-600"
-                      >
-                        <Trash2 className="mr-2 h-3 w-3" />
-                        Hapus
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              )}
             </div>
           </motion.div>
         ))}
