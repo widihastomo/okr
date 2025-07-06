@@ -47,14 +47,14 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       active: location === "/" || location === "/daily-focus"
     },
     {
-      label: "Dashboard",
-      icon: LayoutDashboard,
+      label: "Goals",
+      icon: Goal,
       path: "/dashboard",
       active: location === "/dashboard"
     },
     {
-      label: "Goals",
-      icon: Goal,
+      label: "Goals Perusahaan",
+      icon: Building2,
       path: "/company-okr",
       active: location === "/company-okr"
     },
