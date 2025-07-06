@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Card,
   CardContent,
@@ -53,8 +53,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { toast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import { CheckInModal } from "@/components/check-in-modal";
 import MetricsUpdateModal from "@/components/metrics-update-modal";
@@ -89,6 +89,47 @@ export default function DailyFocusPage() {
     useState(false);
   const [selectedInitiative, setSelectedInitiative] = useState<any>(null);
   const [selectedUserId, setSelectedUserId] = useState<string>(userId || "all"); // Filter state - default to current user
+
+  // Status update mutation
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  const statusUpdateMutation = useMutation({
+    mutationFn: async ({ taskId, newStatus }: { taskId: string; newStatus: string }) => {
+      const response = await apiRequest("PATCH", `/api/tasks/${taskId}`, {
+        status: newStatus,
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
+      toast({
+        title: "Status berhasil diupdate",
+        description: "Status task telah diperbarui",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Gagal update status",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Handle status update with cycling through status options
+  const handleStatusUpdate = (taskId: string, currentStatus: string) => {
+    const statusCycle = {
+      'not_started': 'in_progress',
+      'in_progress': 'completed',
+      'completed': 'not_started',
+      'cancelled': 'not_started'
+    };
+    
+    const newStatus = statusCycle[currentStatus as keyof typeof statusCycle] || 'in_progress';
+    statusUpdateMutation.mutate({ taskId, newStatus });
+  };
 
   // Fetch data with status calculation
   const { data: objectives = [] } = useQuery({
@@ -779,9 +820,6 @@ export default function DailyFocusPage() {
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             PIC
                           </th>
-                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Aksi
-                          </th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
@@ -798,7 +836,11 @@ export default function DailyFocusPage() {
                               </div>
                             </td>
                             <td className="px-4 py-4">
-                              <Badge className={getTaskStatusColor(task.status)}>
+                              <Badge 
+                                className={`${getTaskStatusColor(task.status)} cursor-pointer hover:opacity-80 transition-opacity`}
+                                onClick={() => handleStatusUpdate(task.id, task.status)}
+                                title="Klik untuk update status"
+                              >
                                 {getTaskStatusLabel(task.status)}
                               </Badge>
                             </td>
@@ -826,17 +868,6 @@ export default function DailyFocusPage() {
                                 </span>
                               </div>
                             </td>
-                            <td className="px-4 py-4 text-center">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleOpenTaskModal(task)}
-                                className="text-xs"
-                              >
-                                <Edit className="w-4 h-4 mr-1" />
-                                Edit
-                              </Button>
-                            </td>
                           </tr>
                         ))}
                         
@@ -853,7 +884,11 @@ export default function DailyFocusPage() {
                               </div>
                             </td>
                             <td className="px-4 py-4">
-                              <Badge className={getTaskStatusColor(task.status)}>
+                              <Badge 
+                                className={`${getTaskStatusColor(task.status)} cursor-pointer hover:opacity-80 transition-opacity`}
+                                onClick={() => handleStatusUpdate(task.id, task.status)}
+                                title="Klik untuk update status"
+                              >
                                 {getTaskStatusLabel(task.status)}
                               </Badge>
                             </td>
@@ -881,17 +916,6 @@ export default function DailyFocusPage() {
                                 </span>
                               </div>
                             </td>
-                            <td className="px-4 py-4 text-center">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleOpenTaskModal(task)}
-                                className="text-xs"
-                              >
-                                <Edit className="w-4 h-4 mr-1" />
-                                Edit
-                              </Button>
-                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -914,7 +938,11 @@ export default function DailyFocusPage() {
                           >
                             <div className="flex items-center justify-between">
                               <div className="font-medium text-red-900">{task.title}</div>
-                              <Badge className={getTaskStatusColor(task.status)}>
+                              <Badge 
+                                className={`${getTaskStatusColor(task.status)} cursor-pointer hover:opacity-80 transition-opacity`}
+                                onClick={() => handleStatusUpdate(task.id, task.status)}
+                                title="Klik untuk update status"
+                              >
                                 {getTaskStatusLabel(task.status)}
                               </Badge>
                             </div>
@@ -967,7 +995,11 @@ export default function DailyFocusPage() {
                           >
                             <div className="flex items-center justify-between">
                               <div className="font-medium text-gray-900">{task.title}</div>
-                              <Badge className={getTaskStatusColor(task.status)}>
+                              <Badge 
+                                className={`${getTaskStatusColor(task.status)} cursor-pointer hover:opacity-80 transition-opacity`}
+                                onClick={() => handleStatusUpdate(task.id, task.status)}
+                                title="Klik untuk update status"
+                              >
                                 {getTaskStatusLabel(task.status)}
                               </Badge>
                             </div>
