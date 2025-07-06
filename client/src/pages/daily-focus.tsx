@@ -926,7 +926,7 @@ export default function DailyFocusPage() {
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="bg-gradient-to-r from-orange-600 to-orange-500 hover:bg-gradient-to-r hover:from-orange-500 hover:to-orange-400 hover:shadow-lg hover:scale-105 transform transition-all duration-200 text-white border-orange-600"
+                      className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white border-orange-600"
                     >
                       <Plus className="w-4 h-4 mr-2" />
                       Tambah Task
