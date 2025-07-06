@@ -146,21 +146,21 @@ function TaskOverviewCard({ task, assignedUser, initiative }: any) {
   };
 
   return (
-    <Card className="h-full">
-      <CardHeader>
+    <Card>
+      <CardHeader className="pb-4">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <CardTitle className="text-xl mb-2">{task?.title}</CardTitle>
-            <div className="flex items-center gap-2 mb-3">
-              <Badge className={`${getTaskStatusColor(task?.status || '')} text-sm`}>
+            <CardTitle className="text-lg mb-2">{task?.title}</CardTitle>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge className={`${getTaskStatusColor(task?.status || '')} text-xs`}>
                 {getTaskStatusLabel(task?.status || '')}
               </Badge>
-              <Badge className={`${getTaskPriorityColor(task?.priority || '')} text-sm`}>
+              <Badge className={`${getTaskPriorityColor(task?.priority || '')} text-xs`}>
                 <Flag className="w-3 h-3 mr-1" />
                 {getTaskPriorityLabel(task?.priority || '')}
               </Badge>
               {isOverdue && (
-                <Badge className="bg-red-100 text-red-800 border-red-200 text-sm">
+                <Badge className="bg-red-100 text-red-800 border-red-200 text-xs">
                   <AlertTriangle className="w-3 h-3 mr-1" />
                   Terlambat
                 </Badge>
@@ -169,88 +169,79 @@ function TaskOverviewCard({ task, assignedUser, initiative }: any) {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="pt-0 space-y-4">
         {/* Description */}
         {task?.description && (
           <div>
-            <h3 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
+            <h3 className="font-medium text-gray-900 mb-2 flex items-center gap-2 text-sm">
               <FileText className="w-4 h-4" />
               Deskripsi
             </h3>
-            <p className="text-gray-700 leading-relaxed">{task.description}</p>
+            <p className="text-sm text-gray-700 leading-relaxed">{task.description}</p>
           </div>
         )}
 
-        {/* Key Information Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Left Column */}
-          <div className="space-y-4">
-            {/* Due Date */}
-            <div className="flex items-center gap-3">
-              <CalendarDays className="w-5 h-5 text-gray-500" />
-              <div>
-                <p className="text-sm font-medium text-gray-900">Tenggat Waktu</p>
-                <p className={`text-sm ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-600'}`}>
-                  {task?.dueDate ? formatDate(task.dueDate) : "Tidak ditentukan"}
-                </p>
-              </div>
+        {/* Key Information - Compact Grid */}
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          {/* Due Date */}
+          <div className="flex items-center gap-2">
+            <CalendarDays className="w-4 h-4 text-gray-500 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-gray-900">Tenggat</p>
+              <p className={`text-xs truncate ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-600'}`}>
+                {task?.dueDate ? formatDate(task.dueDate) : "Tidak ditentukan"}
+              </p>
             </div>
+          </div>
 
-            {/* Created Date */}
-            <div className="flex items-center gap-3">
-              <Clock className="w-5 h-5 text-gray-500" />
-              <div>
-                <p className="text-sm font-medium text-gray-900">Dibuat</p>
-                <p className="text-sm text-gray-600">
-                  {task?.createdAt ? formatDate(task.createdAt) : "Tidak diketahui"}
-                </p>
+          {/* Assigned User */}
+          <div className="flex items-center gap-2">
+            <User className="w-4 h-4 text-gray-500 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-gray-900">PIC</p>
+              <div className="flex items-center gap-1">
+                {assignedUser ? (
+                  <>
+                    <Avatar className="w-4 h-4">
+                      <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
+                        {assignedUser.firstName?.[0]}{assignedUser.lastName?.[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-xs text-gray-700 truncate">
+                      {assignedUser.firstName} {assignedUser.lastName}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-xs text-gray-500">Belum ditentukan</span>
+                )}
               </div>
             </div>
           </div>
 
-          {/* Right Column */}
-          <div className="space-y-4">
-            {/* Assigned User */}
-            <div className="flex items-center gap-3">
-              <User className="w-5 h-5 text-gray-500" />
-              <div>
-                <p className="text-sm font-medium text-gray-900">PIC</p>
-                <div className="flex items-center gap-2">
-                  {assignedUser ? (
-                    <>
-                      <Avatar className="w-6 h-6">
-                        <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${assignedUser.firstName} ${assignedUser.lastName}`} />
-                        <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
-                          {assignedUser.firstName?.[0]}{assignedUser.lastName?.[0]}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="text-sm text-gray-700">
-                        {assignedUser.firstName} {assignedUser.lastName}
-                      </span>
-                    </>
-                  ) : (
-                    <span className="text-sm text-gray-500">Belum ditentukan</span>
-                  )}
-                </div>
+          {/* Created Date */}
+          <div className="flex items-center gap-2">
+            <Clock className="w-4 h-4 text-gray-500 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-gray-900">Dibuat</p>
+              <p className="text-xs text-gray-600 truncate">
+                {task?.createdAt ? formatDate(task.createdAt) : "Tidak diketahui"}
+              </p>
+            </div>
+          </div>
+
+          {/* Initiative */}
+          {initiative && (
+            <div className="flex items-center gap-2">
+              <Target className="w-4 h-4 text-gray-500 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-gray-900">Inisiatif</p>
+                <Link href={`/initiatives/${initiative.id}`} className="text-xs text-blue-600 hover:underline truncate block">
+                  {initiative.title}
+                </Link>
               </div>
             </div>
-
-            {/* Initiative */}
-            {initiative && (
-              <div className="flex items-center gap-3">
-                <Target className="w-5 h-5 text-gray-500" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Inisiatif</p>
-                  <Link href={`/initiatives/${initiative.id}`} className="text-sm text-blue-600 hover:underline">
-                    {initiative.title}
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
+          )}
         </div>
-
-        
       </CardContent>
     </Card>
   );
@@ -324,28 +315,28 @@ function TaskHistoryCard({ taskId }: { taskId: string }) {
   };
 
   return (
-    <Card className="h-full">
-      <CardHeader>
+    <Card className="h-fit">
+      <CardHeader className="pb-4">
         <CardTitle className="text-lg">Riwayat Task</CardTitle>
-        <CardDescription>Timeline aktivitas dan perubahan</CardDescription>
+        <CardDescription className="text-sm">Timeline aktivitas dan perubahan</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
+      <CardContent className="pt-0">
+        <div className="space-y-3">
           {historyItems.map((item, index) => (
-            <div key={item.id} className="flex gap-3">
+            <div key={item.id} className="flex gap-2">
               <div className="flex flex-col items-center">
-                <div className="p-2 rounded-full bg-gray-100">
+                <div className="p-1.5 rounded-full bg-gray-100">
                   {getHistoryIcon(item.type)}
                 </div>
                 {index < historyItems.length - 1 && (
-                  <div className="w-px h-8 bg-gray-200 mt-2"></div>
+                  <div className="w-px h-6 bg-gray-200 mt-1"></div>
                 )}
               </div>
-              <div className="flex-1 pb-4">
-                <p className="text-sm font-medium text-gray-900">
+              <div className="flex-1 pb-2">
+                <p className="text-xs font-medium text-gray-900">
                   {item.action}
                 </p>
-                <div className="flex items-center gap-2 mt-1">
+                <div className="flex items-center gap-1 mt-1">
                   <span className="text-xs text-gray-500">{item.user}</span>
                   <span className="text-xs text-gray-400">•</span>
                   <span className="text-xs text-gray-500">{item.timestamp}</span>
