@@ -516,10 +516,8 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                           <TableCell className="font-medium">
                             <div className="font-semibold">{metric.name}</div>
                           </TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="text-xs">
-                              {metric.initiativeTitle}
-                            </Badge>
+                          <TableCell className="text-sm text-gray-600">
+                            {metric.initiativeTitle}
                           </TableCell>
                           <TableCell>{metric.achievement}</TableCell>
                           <TableCell>{metric.target}</TableCell>
@@ -560,9 +558,7 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                     <div key={metric.id} className="border rounded-lg p-4 space-y-3">
                       <div className="space-y-1">
                         <div className="font-semibold text-sm">{metric.name}</div>
-                        <Badge variant="outline" className="text-xs">
-                          {metric.initiativeTitle}
-                        </Badge>
+                        <div className="text-xs text-gray-600">{metric.initiativeTitle}</div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-3 text-sm">
