@@ -50,6 +50,7 @@ import {
   Flag,
   Sparkles,
   HelpCircle,
+  Crosshair,
 } from "lucide-react";
 import { Link } from "wouter";
 import { CheckInModal } from "@/components/check-in-modal";
@@ -1728,8 +1729,20 @@ export default function GoalDetail() {
                                       </Link>
 
                                       {initiative.keyResultId && (
-                                        <div className="text-xs text-blue-600 mt-1">
-                                          Angka Target: {goal?.keyResults?.find((kr: any) => kr.id === initiative.keyResultId)?.title || 'Unknown'}
+                                        <div className="flex items-center gap-1 mt-1">
+                                          <TooltipProvider>
+                                            <Tooltip>
+                                              <TooltipTrigger>
+                                                <Crosshair className="w-3 h-3 text-blue-600" />
+                                              </TooltipTrigger>
+                                              <TooltipContent>
+                                                <p>Angka Target</p>
+                                              </TooltipContent>
+                                            </Tooltip>
+                                          </TooltipProvider>
+                                          <span className="text-xs text-blue-600 font-medium">
+                                            {goal?.keyResults?.find((kr: any) => kr.id === initiative.keyResultId)?.title || 'Unknown'}
+                                          </span>
                                         </div>
                                       )}
                                       {initiative.budget && (
@@ -1972,8 +1985,20 @@ export default function GoalDetail() {
                                 </p>
                               )}
                               {initiative.keyResultId && (
-                                <div className="text-xs text-blue-600 mt-1 font-medium">
-                                  Angka Target: {goal?.keyResults?.find((kr: any) => kr.id === initiative.keyResultId)?.title || 'Unknown'}
+                                <div className="flex items-center gap-1 mt-1">
+                                  <TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger>
+                                        <Crosshair className="w-3 h-3 text-blue-600" />
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>Angka Target</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
+                                  <span className="text-xs text-blue-600 font-medium">
+                                    {goal?.keyResults?.find((kr: any) => kr.id === initiative.keyResultId)?.title || 'Unknown'}
+                                  </span>
                                 </div>
                               )}
                             </div>
