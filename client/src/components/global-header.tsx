@@ -114,7 +114,7 @@ export default function GlobalHeader({
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
       toast({
         title: "Task berhasil dibuat",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       setShowTaskModal(false);
       form.reset();

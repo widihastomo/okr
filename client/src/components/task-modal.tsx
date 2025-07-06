@@ -112,7 +112,7 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
       // Show success toast for task creation
       toast({
         title: "Task berhasil dibuat",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
 
       // Show additional toast if user was automatically added as member
@@ -157,7 +157,7 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
       // Show success toast for task update
       toast({
         title: "Task berhasil diperbarui",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
 
       // Show additional toast if user was automatically added as member

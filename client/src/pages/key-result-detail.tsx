@@ -153,7 +153,7 @@ export default function KeyResultDetailPage() {
       toast({
         title: "Task berhasil diperbarui",
         description: "Perubahan task telah disimpan",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       setEditTaskOpen(false);
       setEditingTask(null);
@@ -186,7 +186,7 @@ export default function KeyResultDetailPage() {
       toast({
         title: "Task berhasil dihapus",
         description: "Task telah dihapus dari initiative",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error: any) => {
@@ -229,7 +229,7 @@ export default function KeyResultDetailPage() {
       toast({
         title: "Task berhasil dibuat",
         description: "Task baru telah ditambahkan ke initiative",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       setAddTaskOpen(false);
       setAddingTaskToInitiative(null);
@@ -259,7 +259,7 @@ export default function KeyResultDetailPage() {
       toast({
         title: "Angka Target berhasil dihapus",
         description: "Data telah dihapus secara permanen",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       // Navigate back to the objective detail page
       window.history.back();
@@ -342,7 +342,7 @@ export default function KeyResultDetailPage() {
       queryClient.invalidateQueries({ queryKey: [`/api/key-results/${keyResultId}/initiatives`] });
       toast({
         title: "Initiative berhasil dihapus",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error: any) => {
@@ -379,7 +379,7 @@ export default function KeyResultDetailPage() {
       toast({
         title: "Rencana berhasil dibuat",
         description: "Rencana dengan ukuran keberhasilan telah ditambahkan",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error: any) => {
@@ -460,7 +460,7 @@ export default function KeyResultDetailPage() {
       toast({
         title: "Progress berhasil diperbarui",
         description: `${data.updatedInitiativesCount} initiative telah diperbarui`,
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error: any) => {
@@ -502,7 +502,7 @@ export default function KeyResultDetailPage() {
       toast({
         title: "Status berhasil diperbarui",
         description: `Task status berhasil diubah ke ${newStatus}`,
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
 
       // Invalidate queries to refresh data including nested tasks
@@ -2061,7 +2061,7 @@ export default function KeyResultDetailPage() {
                           toast({
                             title: "Comment added",
                             description: "Your comment has been posted successfully.",
-                            className: "border-green-200 bg-green-50 text-green-800",
+                            variant: "success",
                           });
                         }}
                         className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"

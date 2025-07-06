@@ -88,7 +88,7 @@ export default function UsersPage() {
       toast({
         title: "Success",
         description: "User created successfully",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error) => {
@@ -115,7 +115,7 @@ export default function UsersPage() {
       toast({
         title: "Success",
         description: "User updated successfully",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       setEditingUser(null);
     },
@@ -141,7 +141,7 @@ export default function UsersPage() {
       toast({
         title: "Success",
         description: "User deleted successfully",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: () => {
@@ -169,7 +169,7 @@ export default function UsersPage() {
       toast({
         title: "Success",
         description: "Password changed successfully",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error) => {
@@ -224,7 +224,7 @@ export default function UsersPage() {
       toast({
         title: "Success",
         description: "Team created successfully",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       setNewTeamDialog({ open: false });
     },
@@ -278,7 +278,7 @@ export default function UsersPage() {
       toast({
         title: "Success",
         description: "Team updated successfully",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error) => {
@@ -306,7 +306,7 @@ export default function UsersPage() {
       toast({
         title: "Success",
         description: "Team deleted successfully",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error) => {
@@ -335,7 +335,7 @@ export default function UsersPage() {
       toast({
         title: "Success",
         description: "Team member added successfully",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error) => {
@@ -361,7 +361,7 @@ export default function UsersPage() {
       toast({
         title: "Success",
         description: "Team member removed successfully",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error) => {
@@ -389,7 +389,7 @@ export default function UsersPage() {
       toast({
         title: "Success",
         description: "Member role updated successfully",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error) => {

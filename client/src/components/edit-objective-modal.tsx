@@ -105,8 +105,7 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
       toast({
         title: "Success",
         description: "Objective berhasil diperbarui",
-        variant: "default",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });

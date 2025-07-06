@@ -186,8 +186,7 @@ export default function EditKeyResultModal({
       toast({
         title: "Angka Target berhasil diperbarui",
         description: "Perubahan telah disimpan.",
-        variant: "default",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       
       // Invalidate all related queries

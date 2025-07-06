@@ -243,7 +243,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
       toast({
         title: isEditMode ? "Inisiatif berhasil diperbarui" : "Inisiatif berhasil dibuat",
         description: isEditMode ? "Inisiatif telah diperbarui." : "Inisiatif baru telah ditambahkan.",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       
       // Invalidate all initiative-related queries

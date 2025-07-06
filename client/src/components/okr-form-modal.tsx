@@ -294,8 +294,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
       toast({
         title: "Success",
         description: `Goal ${isEditMode ? 'diperbarui' : 'berhasil dibuat'}`,
-        variant: "default",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });

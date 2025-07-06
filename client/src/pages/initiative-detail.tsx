@@ -115,7 +115,7 @@ export default function InitiativeDetailPage() {
       toast({
         title: "Berhasil",
         description: "Task berhasil dihapus",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error: any) => {
@@ -136,7 +136,7 @@ export default function InitiativeDetailPage() {
       toast({
         title: "Berhasil",
         description: "Metrik keberhasilan berhasil dihapus",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error: any) => {

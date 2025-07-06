@@ -107,7 +107,7 @@ export default function QuickActionFAB() {
       toast({
         title: "Task berhasil dibuat",
         description: "Task baru telah ditambahkan ke initiative.",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       setShowTaskModal(false);
       setIsExpanded(false);

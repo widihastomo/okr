@@ -94,7 +94,7 @@ export default function StandaloneTaskModal({ open, onOpenChange, onSuccess }: S
       queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
       toast({
         title: "Task berhasil dibuat",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       form.reset();
       onOpenChange(false);

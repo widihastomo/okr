@@ -92,7 +92,7 @@ export default function ProjectDetailPage() {
       toast({
         title: "Progress Updated",
         description: "Project progress has been updated successfully.",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
   });
@@ -114,7 +114,7 @@ export default function ProjectDetailPage() {
       toast({
         title: "Task Created",
         description: "New task has been created successfully.",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
   });
@@ -134,7 +134,7 @@ export default function ProjectDetailPage() {
       toast({
         title: "Member Added",
         description: "Team member has been added successfully.",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
   });
@@ -155,7 +155,7 @@ export default function ProjectDetailPage() {
       toast({
         title: "Document Added",
         description: "Document has been added successfully.",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
   });

@@ -35,7 +35,7 @@ export default function CyclesPage() {
       toast({
         title: "Siklus dihapus",
         description: "Siklus berhasil dihapus",
-        className: "border-green-200 bg-green-50 text-green-800"
+        variant: "success"
       });
       setDeleteModalOpen(false);
       setSelectedCycle(null);
@@ -56,7 +56,7 @@ export default function CyclesPage() {
       toast({
         title: "Status siklus diperbarui",
         description: data.message,
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error: any) => {

@@ -83,7 +83,7 @@ export default function SuccessMetricsModal({
       toast({
         title: "Berhasil",
         description: "Metrik keberhasilan berhasil ditambahkan",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       onOpenChange(false);
       form.reset();
@@ -106,7 +106,7 @@ export default function SuccessMetricsModal({
       toast({
         title: "Berhasil",
         description: "Metrik keberhasilan berhasil diperbarui",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       onOpenChange(false);
     },

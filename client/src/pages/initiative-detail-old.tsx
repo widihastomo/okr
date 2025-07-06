@@ -152,7 +152,7 @@ export default function InitiativeDetailPage() {
       queryClient.invalidateQueries({ queryKey: ['/api/initiatives'], refetchType: 'active' });
       toast({
         title: "Task berhasil dihapus",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: () => {
@@ -178,7 +178,7 @@ export default function InitiativeDetailPage() {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`], refetchType: 'active' });
       toast({
         description: "Status task berhasil diperbarui",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: () => {
@@ -211,7 +211,7 @@ export default function InitiativeDetailPage() {
       toast({
         title: "Metrik berhasil diperbarui",
         description: "Progress metrik kesuksesan telah diperbarui",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error: any) => {
@@ -470,7 +470,7 @@ export default function InitiativeDetailPage() {
       toast({
         title: "Berhasil",
         description: "Metrik keberhasilan berhasil dihapus",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error: any) => {

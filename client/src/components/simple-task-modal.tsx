@@ -89,7 +89,7 @@ export default function SimpleTaskModal({ open, onClose, task, onSuccess }: Simp
       queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
       toast({
         title: "Task berhasil dibuat",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       onClose();
       onSuccess?.();
@@ -105,7 +105,7 @@ export default function SimpleTaskModal({ open, onClose, task, onSuccess }: Simp
       queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
       toast({
         title: "Task berhasil diperbarui",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       onClose();
       onSuccess?.();

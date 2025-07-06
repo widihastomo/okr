@@ -125,7 +125,7 @@ export default function EditObjectiveFormModal({
       toast({
         title: "Berhasil",
         description: "Objective berhasil diperbarui",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       onOpenChange(false);
       form.reset();

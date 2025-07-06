@@ -59,8 +59,7 @@ export default function Login() {
       toast({
         title: "Berhasil masuk",
         description: "Selamat datang kembali!",
-        variant: "default",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
@@ -90,8 +89,7 @@ export default function Login() {
       toast({
         title: "Berhasil mendaftar",
         description: "Akun Anda telah dibuat dan otomatis masuk",
-        variant: "default",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       window.location.href = "/";

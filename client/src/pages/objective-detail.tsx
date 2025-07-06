@@ -474,8 +474,7 @@ export default function GoalDetail() {
       toast({
         title: "Success",
         description: "Angka Target berhasil dibuat",
-        variant: "default",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       queryClient.invalidateQueries({ queryKey: [`/api/okrs/${id}`] });
       setAddKeyResultModal({ open: false });
@@ -520,8 +519,7 @@ export default function GoalDetail() {
       toast({
         title: "Success",
         description: "Angka Target berhasil dihapus",
-        variant: "default",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       queryClient.invalidateQueries({ queryKey: [`/api/okrs/${id}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
@@ -544,7 +542,7 @@ export default function GoalDetail() {
       toast({
         title: "Inisiatif berhasil dihapus",
         description: "Inisiatif telah dihapus secara permanen.",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       
       // Invalidate all initiative-related queries
@@ -612,7 +610,7 @@ export default function GoalDetail() {
       toast({
         title: "Rencana berhasil dibuat",
         description: "Rencana dengan ukuran keberhasilan telah ditambahkan",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error: any) => {

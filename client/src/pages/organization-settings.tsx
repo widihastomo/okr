@@ -102,7 +102,7 @@ export default function OrganizationSettings() {
       toast({
         title: "Berhasil",
         description: "User berhasil dibuat",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error) => {
@@ -130,7 +130,7 @@ export default function OrganizationSettings() {
       toast({
         title: "Berhasil",
         description: "User berhasil diperbarui",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error) => {
@@ -155,7 +155,7 @@ export default function OrganizationSettings() {
       toast({
         title: "Berhasil",
         description: "User berhasil dihapus",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error) => {
@@ -183,7 +183,7 @@ export default function OrganizationSettings() {
       toast({
         title: "Berhasil",
         description: "Password berhasil diubah",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error) => {
@@ -233,7 +233,7 @@ export default function OrganizationSettings() {
       toast({
         title: "Berhasil",
         description: "Tim berhasil dibuat",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error) => {
@@ -262,7 +262,7 @@ export default function OrganizationSettings() {
       toast({
         title: "Berhasil",
         description: "Tim berhasil diperbarui",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error) => {
@@ -288,7 +288,7 @@ export default function OrganizationSettings() {
       toast({
         title: "Berhasil",
         description: "Tim berhasil dihapus",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error) => {

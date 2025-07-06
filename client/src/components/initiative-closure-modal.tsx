@@ -126,7 +126,7 @@ export default function InitiativeClosureModal({
       toast({
         title: "Berhasil",
         description: "Inisiatif berhasil ditutup",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       onOpenChange(false);
     },

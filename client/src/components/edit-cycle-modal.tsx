@@ -36,7 +36,7 @@ export default function EditCycleModal({ cycle, open, onOpenChange }: EditCycleM
       queryClient.invalidateQueries({ queryKey: ["/api/cycles"] });
       toast({
         title: "Siklus berhasil diperbarui",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       onOpenChange(false);
     },

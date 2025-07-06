@@ -262,8 +262,7 @@ export default function GoalDetail() {
       toast({
         title: "Success",
         description: "Angka Target berhasil dibuat",
-        variant: "default",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       queryClient.invalidateQueries({ queryKey: [`/api/okrs/${id}`] });
       setAddKeyResultModal({ open: false });

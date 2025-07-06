@@ -127,7 +127,7 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/notes`] });
       toast({
         title: "Catatan berhasil ditambahkan",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       setIsCreateOpen(false);
       resetForm();
@@ -150,7 +150,7 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/notes`] });
       toast({
         title: "Catatan berhasil diperbarui",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       setEditingNote(null);
       resetForm();
@@ -173,7 +173,7 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/notes`] });
       toast({
         title: "Catatan berhasil dihapus",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       setDeleteNoteId(null);
     },

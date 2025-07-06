@@ -91,7 +91,7 @@ export default function MyTugas({ filteredKeyResultIds, userFilter }: MyTugasPro
       queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
       toast({
         title: "Task berhasil diperbarui",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       setEditingTask(null);
     },
@@ -123,7 +123,7 @@ export default function MyTugas({ filteredKeyResultIds, userFilter }: MyTugasPro
       queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
       toast({
         title: "Task berhasil dihapus",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       setTaskToDelete(null);
     },

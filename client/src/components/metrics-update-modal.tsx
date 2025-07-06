@@ -88,7 +88,7 @@ export default function MetricsUpdateModal({
       toast({
         title: "Metrik berhasil diperbarui",
         description: "Progress metrik kesuksesan telah diperbarui",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       
       // Clear input state first

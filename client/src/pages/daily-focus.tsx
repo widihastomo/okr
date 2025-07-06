@@ -163,6 +163,7 @@ export default function DailyFocusPage() {
       toast({
         title: "Status berhasil diperbarui",
         description: "Status task telah diperbarui",
+        variant: "success",
       });
     },
     onError: (error: Error) => {
@@ -414,7 +415,7 @@ export default function DailyFocusPage() {
       });
       toast({
         title: "Task berhasil diperbarui",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error: any) => {

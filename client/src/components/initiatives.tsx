@@ -101,7 +101,7 @@ export default function Inisiatif({ userFilter, filteredKeyResultIds }: Inisiati
       toast({
         title: "Initiative deleted",
         description: "The initiative has been deleted successfully.",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       setDeletingInitiative(null);
     },

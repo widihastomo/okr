@@ -60,7 +60,7 @@ export default function TaskDetailPage() {
       toast({
         title: "Status Updated",
         description: "Task status has been updated successfully.",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
   });

@@ -57,7 +57,7 @@ export default function KanbanView({ tasks, onEditTask, onDeleteTask, userId }: 
       queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
       toast({
         title: "Task status berhasil diperbarui",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
     onError: (error) => {

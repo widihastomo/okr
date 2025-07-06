@@ -95,7 +95,7 @@ export function CheckInModal({
       toast({
         title: "Update berhasil",
         description: "Progress telah diperbarui secara otomatis",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       
       // Invalidate general lists first

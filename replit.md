@@ -113,11 +113,13 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
-- July 06, 2025. Standardized success message consistency across entire application:
+- July 06, 2025. Standardized success message consistency and styling across entire application:
   * Updated all "berhasil diupdate" to "berhasil diperbarui" for proper Indonesian terminology
   * Standardized success message pattern: "[Item] berhasil [action]" throughout entire application  
   * Examples: "Task berhasil dibuat", "Objective berhasil diperbarui", "Inisiatif berhasil dihapus"
-  * Enhanced user experience with consistent feedback messages across all forms and actions
+  * Added "success" variant to toast component with green styling (border-green-200 bg-green-50 text-green-800)
+  * Replaced manual className styling with consistent variant: "success" across all success messages
+  * Enhanced user experience with consistent feedback messages and styling across all forms and actions
   * Replaced inconsistent terms like "Initiative" with "Inisiatif" in success messages
   * Applied changes to 50+ components including tasks, objectives, initiatives, and key results
 - July 06, 2025. Added three-dot kebab menu to task lists with view details, edit, and delete functions:

@@ -42,8 +42,7 @@ export default function Profile() {
       toast({
         title: "Profil Berhasil Diperbarui",
         description: "Perubahan profil Anda telah disimpan.",
-        variant: "default",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       setIsEditing(false);
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
@@ -71,8 +70,7 @@ export default function Profile() {
       toast({
         title: "Password Berhasil Diubah",
         description: "Password Anda telah berhasil diperbarui.",
-        variant: "default",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       setPasswordData({
         currentPassword: "",
