@@ -1397,27 +1397,15 @@ export default function DailyFocusPage() {
                             <span className="sm:hidden">Update</span>
                             <span className="hidden sm:inline">Update</span>
                           </Button>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 shrink-0"
-                              >
-                                <MoreVertical className="w-4 h-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  (window.location.href = `/key-results/${kr.id}`)
-                                }
-                              >
-                                <Eye className="w-4 h-4 mr-2" />
-                                Lihat Detail
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => (window.location.href = `/key-results/${kr.id}`)}
+                            className="h-8 w-8 p-0 shrink-0"
+                            title="Lihat Detail"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
                         </div>
                       </div>
 
