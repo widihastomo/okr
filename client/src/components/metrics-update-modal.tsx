@@ -76,10 +76,9 @@ export default function MetricsUpdateModal({
 
       const promises = updates.map(({ metricId, newValue }) =>
         apiRequest("POST", `/api/initiatives/${initiativeId}/success-metrics/${metricId}/updates`, {
-          currentAchievement: newValue,
-          confidence: 3,
+          achievement: newValue,
           notes: `Updated via Daily Focus on ${new Date().toLocaleDateString('id-ID')}`,
-          updatedAt: new Date().toISOString(),
+          createdBy: "550e8400-e29b-41d4-a716-446655440001", // Current user ID - should be dynamic
         })
       );
 
@@ -160,10 +159,10 @@ export default function MetricsUpdateModal({
                         </div>
                       </td>
                       <td className="px-4 py-4 text-sm text-gray-900">
-                        {metric.targetValue} {metric.unit}
+                        {metric.target}
                       </td>
                       <td className="px-4 py-4 text-sm text-gray-900">
-                        {metric.currentAchievement || "0"} {metric.unit}
+                        {metric.achievement || "0"}
                       </td>
                       <td className="px-4 py-4">
                         <Input
@@ -183,19 +182,21 @@ export default function MetricsUpdateModal({
                           <div className="w-full bg-gray-200 rounded-full h-2 max-w-20">
                             <div
                               className={`h-2 rounded-full ${(() => {
-                                const progress = Math.round((parseFloat(metric.currentAchievement || "0") / parseFloat(metric.targetValue || "1")) * 100);
+                                const achievement = parseFloat(metric.achievement || "0");
+                                const target = parseFloat(metric.target || "1");
+                                const progress = Math.round((achievement / target) * 100);
                                 if (progress >= 100) return "bg-green-600";
                                 if (progress >= 80) return "bg-green-500";
                                 if (progress >= 60) return "bg-orange-500";
                                 return "bg-red-500";
                               })()}`}
                               style={{
-                                width: `${Math.min(100, Math.round((parseFloat(metric.currentAchievement || "0") / parseFloat(metric.targetValue || "1")) * 100))}%`,
+                                width: `${Math.min(100, Math.round((parseFloat(metric.achievement || "0") / parseFloat(metric.target || "1")) * 100))}%`,
                               }}
                             ></div>
                           </div>
                           <span className="ml-2 text-sm font-medium text-gray-900">
-                            {Math.round((parseFloat(metric.currentAchievement || "0") / parseFloat(metric.targetValue || "1")) * 100)}%
+                            {Math.round((parseFloat(metric.achievement || "0") / parseFloat(metric.target || "1")) * 100)}%
                           </span>
                         </div>
                       </td>
