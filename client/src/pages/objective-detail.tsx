@@ -364,7 +364,7 @@ export default function GoalDetail() {
   const [tourStep, setTourStep] = useState<number>(0);
   const [showTour, setShowTour] = useState(false);
   const [tourForceUpdate, setTourForceUpdate] = useState(0);
-  const [activeTab, setActiveTab] = useState("key-results");
+  const [activeTab, setActiveTab] = useState("overview");
 
 
   // Check for highlight parameter in URL
