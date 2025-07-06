@@ -1743,26 +1743,17 @@ export default function DailyFocusPage() {
                                   Update
                                 </Button>
                               </td>
-                              <td className="px-4 py-4 text-right">
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8 p-0"
-                                    >
-                                      <MoreHorizontal className="h-4 w-4" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    <DropdownMenuItem asChild>
-                                      <Link href={`/initiatives/${initiative.id}`}>
-                                        <Eye className="mr-2 h-4 w-4" />
-                                        Lihat Detail
-                                      </Link>
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
+                              <td className="px-4 py-4 text-center">
+                                <Link href={`/initiatives/${initiative.id}`}>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0"
+                                    title="Lihat Detail"
+                                  >
+                                    <Eye className="h-4 w-4" />
+                                  </Button>
+                                </Link>
                               </td>
                             </tr>
                           );
@@ -1937,7 +1928,7 @@ export default function DailyFocusPage() {
                                 Update Metrics
                               </Button>
                               <Link href={`/initiatives/${initiative.id}`}>
-                                <Button variant="outline" size="sm">
+                                <Button variant="outline" size="sm" title="Lihat Detail">
                                   <Eye className="h-4 w-4" />
                                 </Button>
                               </Link>
