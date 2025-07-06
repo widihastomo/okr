@@ -530,37 +530,48 @@ export default function DailyFocusPage() {
       {/* Compact Progress & Motivation */}
       <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
         <CardContent className="p-3 md:p-4">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-6">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-blue-600" />
-                <span className="font-medium text-blue-900">Progress Hari Ini</span>
+          <div className="flex items-center gap-2 mb-3">
+            <TrendingUp className="h-5 w-5 text-blue-600" />
+            <span className="font-medium text-blue-900">Progress Hari Ini</span>
+          </div>
+          
+          <div className="grid grid-cols-3 gap-3 md:gap-4">
+            {/* Task Selesai */}
+            <div className="text-center p-3 bg-white/50 rounded-lg border border-green-200">
+              <div className="flex items-center justify-center gap-1 mb-1">
+                <CheckCircle className="h-4 w-4 text-green-500" />
               </div>
-              
-              <div className="flex flex-col gap-2 text-sm md:flex-row md:items-center md:gap-4">
-                <div className="flex items-center gap-1">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  <span className="text-green-700">{todayTasks.filter(t => t.status === 'completed').length} task selesai</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Target className="h-4 w-4 text-blue-500" />
-                  <span className="text-blue-700">{activeKeyResults.length} target aktif</span>
-                </div>
+              <div className="text-lg font-semibold text-green-700">
+                {todayTasks.filter(t => t.status === 'completed').length}
               </div>
+              <div className="text-xs text-green-600">Task Selesai</div>
+              {todayTasks.filter(t => t.status === 'completed').length > 0 && (
+                <div className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full mt-1">
+                  +{todayTasks.filter(t => t.status === 'completed').length * 10} poin
+                </div>
+              )}
             </div>
             
-            <div className="flex flex-wrap items-center gap-2">
-              {(stats as any)?.currentStreak && (stats as any).currentStreak > 0 && (
-                <div className="flex items-center gap-1 text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
-                  <span>🔥</span>
-                  <span>{(stats as any).currentStreak} hari berturut</span>
-                </div>
-              )}
-              {todayTasks.filter(t => t.status === 'completed').length > 0 && (
-                <div className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                  +{todayTasks.filter(t => t.status === 'completed').length * 10} poin hari ini
-                </div>
-              )}
+            {/* Target Aktif */}
+            <div className="text-center p-3 bg-white/50 rounded-lg border border-blue-200">
+              <div className="flex items-center justify-center gap-1 mb-1">
+                <Target className="h-4 w-4 text-blue-500" />
+              </div>
+              <div className="text-lg font-semibold text-blue-700">
+                {activeKeyResults.length}
+              </div>
+              <div className="text-xs text-blue-600">Target Aktif</div>
+            </div>
+            
+            {/* Streak */}
+            <div className="text-center p-3 bg-white/50 rounded-lg border border-orange-200">
+              <div className="flex items-center justify-center gap-1 mb-1">
+                <span className="text-sm">🔥</span>
+              </div>
+              <div className="text-lg font-semibold text-orange-700">
+                {(stats as any)?.currentStreak || 0}
+              </div>
+              <div className="text-xs text-orange-600">Hari Berturut</div>
             </div>
           </div>
         </CardContent>
