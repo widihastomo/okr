@@ -119,7 +119,7 @@ export default function MetricsUpdateModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Update Metrik Keberhasilan</DialogTitle>
           <DialogDescription>
@@ -138,7 +138,8 @@ export default function MetricsUpdateModal({
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="overflow-x-auto">
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
@@ -190,18 +191,67 @@ export default function MetricsUpdateModal({
               </table>
             </div>
 
-            <div className="flex justify-end gap-3 pt-4">
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {successMetrics.map((metric: any) => (
+                <div
+                  key={metric.id}
+                  className="bg-white border border-gray-200 rounded-lg p-4 space-y-3"
+                >
+                  {/* Metric Header */}
+                  <div className="space-y-1">
+                    <h3 className="font-medium text-gray-900">{metric.name}</h3>
+                    {metric.description && (
+                      <p className="text-sm text-gray-500">{metric.description}</p>
+                    )}
+                  </div>
+
+                  {/* Metric Info */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Target:</span>
+                      <span className="font-medium text-gray-900">{metric.target}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Capaian Saat Ini:</span>
+                      <span className="font-medium text-gray-900">{metric.achievement || "0"}</span>
+                    </div>
+                  </div>
+
+                  {/* Input Field */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Capaian Baru:
+                    </label>
+                    <Input
+                      placeholder="Masukkan nilai baru"
+                      className="w-full"
+                      value={metricUpdates[metric.id] || ""}
+                      onChange={(e) => {
+                        setMetricUpdates(prev => ({
+                          ...prev,
+                          [metric.id]: e.target.value
+                        }));
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
+                className="w-full sm:w-auto"
               >
                 Batal
               </Button>
               <Button
                 onClick={handleSaveAll}
                 disabled={updateMetricsMutation.isPending || !Object.values(metricUpdates).some(value => value && value.trim() !== "")}
-                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                className="w-full sm:w-auto bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
               >
                 {updateMetricsMutation.isPending ? "Menyimpan..." : "Simpan Semua"}
               </Button>
