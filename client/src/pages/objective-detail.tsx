@@ -1325,6 +1325,15 @@ export default function GoalDetail() {
                             <span className="sm:hidden">Update</span>
                             <span className="hidden sm:inline">Update</span>
                           </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => (window.location.href = `/key-results/${kr.id}`)}
+                            className="h-8 w-8 p-0 shrink-0"
+                            title="Lihat Detail"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button
@@ -1336,14 +1345,6 @@ export default function GoalDetail() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  (window.location.href = `/key-results/${kr.id}`)
-                                }
-                              >
-                                <Eye className="w-4 h-4 mr-2" />
-                                Lihat Detail
-                              </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => handleEditKeyResult(kr)}
                               >
@@ -1913,41 +1914,46 @@ export default function GoalDetail() {
                                     )}
                                   </td>
                                   <td className="px-4 py-4">
-                                    <DropdownMenu>
-                                      <DropdownMenuTrigger asChild>
-                                        <Button
-                                          variant="ghost"
-                                          size="icon"
-                                          className="h-8 w-8 p-0"
-                                        >
-                                          <MoreHorizontal className="h-4 w-4" />
-                                        </Button>
-                                      </DropdownMenuTrigger>
-                                      <DropdownMenuContent align="end">
-                                        <DropdownMenuItem asChild>
-                                          <Link href={`/initiatives/${initiative.id}`}>
-                                            <Eye className="mr-2 h-4 w-4" />
-                                            Lihat Detail
-                                          </Link>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                          onClick={() => {
-                                            setEditingInitiative(initiative);
-                                            setShowInitiativeFormModal(true);
-                                          }}
-                                        >
-                                          <Edit className="mr-2 h-4 w-4" />
-                                          Ubah
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem 
-                                          className="text-red-600"
-                                          onClick={() => setDeletingInitiative(initiative)}
-                                        >
-                                          <Trash2 className="mr-2 h-4 w-4" />
-                                          Hapus
-                                        </DropdownMenuItem>
-                                      </DropdownMenuContent>
-                                    </DropdownMenu>
+                                    <div className="flex items-center gap-1">
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => (window.location.href = `/initiatives/${initiative.id}`)}
+                                        className="h-8 w-8 p-0"
+                                        title="Lihat Detail"
+                                      >
+                                        <Eye className="h-4 w-4" />
+                                      </Button>
+                                      <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                          <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8 p-0"
+                                          >
+                                            <MoreHorizontal className="h-4 w-4" />
+                                          </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                          <DropdownMenuItem
+                                            onClick={() => {
+                                              setEditingInitiative(initiative);
+                                              setShowInitiativeFormModal(true);
+                                            }}
+                                          >
+                                            <Edit className="mr-2 h-4 w-4" />
+                                            Ubah
+                                          </DropdownMenuItem>
+                                          <DropdownMenuItem 
+                                            className="text-red-600"
+                                            onClick={() => setDeletingInitiative(initiative)}
+                                          >
+                                            <Trash2 className="mr-2 h-4 w-4" />
+                                            Hapus
+                                          </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                      </DropdownMenu>
+                                    </div>
                                   </td>
                                 </tr>
                               ))}
@@ -2019,41 +2025,46 @@ export default function GoalDetail() {
                                 </div>
                               )}
                             </div>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-6 w-6 p-0 ml-2 flex-shrink-0"
-                                >
-                                  <MoreHorizontal className="h-3 w-3" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem asChild>
-                                  <Link href={`/initiatives/${initiative.id}`}>
-                                    <Eye className="mr-2 h-4 w-4" />
-                                    Lihat Detail
-                                  </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => {
-                                    setEditingInitiative(initiative);
-                                    setShowInitiativeFormModal(true);
-                                  }}
-                                >
-                                  <Edit className="mr-2 h-4 w-4" />
-                                  Ubah
-                                </DropdownMenuItem>
-                                <DropdownMenuItem 
-                                  className="text-red-600"
-                                  onClick={() => setDeletingInitiative(initiative)}
-                                >
-                                  <Trash2 className="mr-2 h-4 w-4" />
-                                  Hapus
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                            <div className="flex items-center gap-1 ml-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => (window.location.href = `/initiatives/${initiative.id}`)}
+                                className="h-6 w-6 p-0 flex-shrink-0"
+                                title="Lihat Detail"
+                              >
+                                <Eye className="h-3 w-3" />
+                              </Button>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 p-0 flex-shrink-0"
+                                  >
+                                    <MoreHorizontal className="h-3 w-3" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setEditingInitiative(initiative);
+                                      setShowInitiativeFormModal(true);
+                                    }}
+                                  >
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    Ubah
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem 
+                                    className="text-red-600"
+                                    onClick={() => setDeletingInitiative(initiative)}
+                                  >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Hapus
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
                           </div>
 
                           <div className="space-y-2">
