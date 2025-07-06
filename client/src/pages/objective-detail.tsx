@@ -1812,7 +1812,7 @@ export default function GoalDetail() {
                                       }
                                       
                                       return (
-                                        <div className="flex flex-col items-start gap-1">
+                                        <div className="flex flex-col items-center gap-1">
                                           <Badge className={color}>
                                             {label}
                                           </Badge>
