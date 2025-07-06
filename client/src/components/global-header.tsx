@@ -53,6 +53,7 @@ import { useToast } from "@/hooks/use-toast";
 import OKRFormModal from "./okr-form-modal";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 
 interface GlobalHeaderProps {
   onMenuToggle?: () => void;
@@ -274,6 +275,9 @@ export default function GlobalHeader({
             <Plus className="h-4 w-4" />
           </Button>
         </div>
+
+        {/* Notification Bell */}
+        <NotificationBell />
 
         {/* User Avatar Menu */}
         <DropdownMenu>

@@ -18,6 +18,7 @@ import { updateCycleStatuses } from "./cycle-status-updater";
 import { gamificationService } from "./gamification";
 import { populateGamificationData } from "./gamification-data";
 import { registerAIRoutes } from "./ai-routes";
+import { NotificationService } from "./notification-service";
 import { calculateKeyResultProgress } from "@shared/progress-calculator";
 import { 
   generateHabitSuggestions, 
@@ -2552,6 +2553,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const comment = await storage.createTaskComment(result.data);
+      
+      // Create notifications for comment added and user mentions
+      try {
+        // Get task details to know who is assigned to it
+        const task = await storage.getTask(taskId);
+        
+        if (task) {
+          // Notify assigned user about new comment
+          if (task.assignedTo && task.assignedTo !== currentUser.id) {
+            await NotificationService.notifyCommentAdded(
+              taskId,
+              task.title,
+              task.assignedTo,
+              currentUser.id,
+              currentUser.organizationId || ""
+            );
+          }
+          
+          // Notify mentioned users
+          if (result.data.mentionedUsers && Array.isArray(result.data.mentionedUsers)) {
+            for (const mentionedUserId of result.data.mentionedUsers) {
+              if (mentionedUserId !== currentUser.id) {
+                await NotificationService.notifyUserMentioned(
+                  taskId,
+                  task.title,
+                  mentionedUserId,
+                  currentUser.id,
+                  currentUser.organizationId || ""
+                );
+              }
+            }
+          }
+        }
+      } catch (notificationError) {
+        console.error("Error creating notifications for comment:", notificationError);
+        // Don't fail the comment creation if notifications fail
+      }
+      
       res.status(201).json(comment);
     } catch (error) {
       console.error("Error creating task comment:", error);
@@ -3284,6 +3323,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error generating habit suggestions:", error);
       res.status(500).json({ error: "Failed to generate habit suggestions" });
+    }
+  });
+
+  // Notification routes
+  app.get("/api/notifications", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const limit = parseInt(req.query.limit as string) || 50;
+      const notifications = await storage.getNotifications(currentUser.id, limit);
+      res.json(notifications);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      res.status(500).json({ message: "Failed to fetch notifications" });
+    }
+  });
+
+  app.get("/api/notifications/unread-count", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const count = await storage.getUnreadNotificationsCount(currentUser.id);
+      res.json({ count });
+    } catch (error) {
+      console.error("Error fetching unread notification count:", error);
+      res.status(500).json({ message: "Failed to fetch unread notification count" });
+    }
+  });
+
+  app.patch("/api/notifications/:id/read", requireAuth, async (req, res) => {
+    try {
+      const id = req.params.id;
+      const success = await storage.markNotificationAsRead(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Notification not found" });
+      }
+      
+      res.json({ message: "Notification marked as read" });
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+      res.status(500).json({ message: "Failed to mark notification as read" });
+    }
+  });
+
+  app.patch("/api/notifications/mark-all-read", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const success = await storage.markAllNotificationsAsRead(currentUser.id);
+      res.json({ message: "All notifications marked as read", success });
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
+      res.status(500).json({ message: "Failed to mark all notifications as read" });
+    }
+  });
+
+  app.delete("/api/notifications/:id", requireAuth, async (req, res) => {
+    try {
+      const id = req.params.id;
+      const success = await storage.deleteNotification(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Notification not found" });
+      }
+      
+      res.json({ message: "Notification deleted" });
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+      res.status(500).json({ message: "Failed to delete notification" });
+    }
+  });
+
+  app.get("/api/notification-preferences", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const preferences = await storage.getNotificationPreferences(currentUser.id);
+      res.json(preferences);
+    } catch (error) {
+      console.error("Error fetching notification preferences:", error);
+      res.status(500).json({ message: "Failed to fetch notification preferences" });
+    }
+  });
+
+  app.post("/api/notification-preferences", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const preferences = await storage.createOrUpdateNotificationPreferences({
+        userId: currentUser.id,
+        ...req.body,
+      });
+      res.json(preferences);
+    } catch (error) {
+      console.error("Error updating notification preferences:", error);
+      res.status(500).json({ message: "Failed to update notification preferences" });
     }
   });
 

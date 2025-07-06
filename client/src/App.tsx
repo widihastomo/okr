@@ -8,6 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import GlobalHeader from "@/components/global-header";
 import Sidebar from "@/components/sidebar";
+import { NotificationProvider } from "@/components/notifications/notification-provider";
 import Dashboard from "@/pages/dashboard";
 import CyclesPage from "@/components/cycles-page";
 import TemplatesPage from "@/components/templates-page";
@@ -68,51 +69,53 @@ function Router() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Global Header */}
-      <GlobalHeader onMenuToggle={() => setSidebarOpen(!sidebarOpen)} sidebarOpen={sidebarOpen} />
-      
-      <div className="flex pt-16">
-        {/* Sidebar */}
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+    <NotificationProvider>
+      <div className="min-h-screen bg-gray-50">
+        {/* Global Header */}
+        <GlobalHeader onMenuToggle={() => setSidebarOpen(!sidebarOpen)} sidebarOpen={sidebarOpen} />
         
-        {/* Main Content */}
-        <div className={cn(
-          "flex-1 min-h-[calc(100vh-4rem)] transition-all duration-300 overflow-x-hidden",
-          // Mobile: no margin left (sidebar is overlay)
-          "ml-0",
-          // Desktop: margin based on sidebar state
-          sidebarOpen ? "lg:ml-64" : "lg:ml-16"
-        )}>
-          <Switch>
-            <Route path="/" component={DailyFocusPage} />
-            <Route path="/daily-focus" component={DailyFocusPage} />
-            <Route path="/dashboard" component={Dashboard} />
-            <Route path="/home" component={Home} />
-            <Route path="/profile" component={Profile} />
-            <Route path="/company-okr" component={CompanyOKRPage} />
-            <Route path="/key-results/:id" component={KeyResultDetail} />
-            <Route path="/initiatives/:id" component={InitiativeDetail} />
-            <Route path="/objectives/:id" component={ObjectiveDetail} />
-            <Route path="/projects/:id" component={ProjectDetail} />
-            <Route path="/task/:id" component={TaskDetail} />
-            <Route path="/tasks/:id" component={TaskDetail} />
-            <Route path="/cycles" component={CyclesPage} />
-            <Route path="/templates" component={TemplatesPage} />
+        <div className="flex pt-16">
+          {/* Sidebar */}
+          <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+          
+          {/* Main Content */}
+          <div className={cn(
+            "flex-1 min-h-[calc(100vh-4rem)] transition-all duration-300 overflow-x-hidden",
+            // Mobile: no margin left (sidebar is overlay)
+            "ml-0",
+            // Desktop: margin based on sidebar state
+            sidebarOpen ? "lg:ml-64" : "lg:ml-16"
+          )}>
+            <Switch>
+              <Route path="/" component={DailyFocusPage} />
+              <Route path="/daily-focus" component={DailyFocusPage} />
+              <Route path="/dashboard" component={Dashboard} />
+              <Route path="/home" component={Home} />
+              <Route path="/profile" component={Profile} />
+              <Route path="/company-okr" component={CompanyOKRPage} />
+              <Route path="/key-results/:id" component={KeyResultDetail} />
+              <Route path="/initiatives/:id" component={InitiativeDetail} />
+              <Route path="/objectives/:id" component={ObjectiveDetail} />
+              <Route path="/projects/:id" component={ProjectDetail} />
+              <Route path="/task/:id" component={TaskDetail} />
+              <Route path="/tasks/:id" component={TaskDetail} />
+              <Route path="/cycles" component={CyclesPage} />
+              <Route path="/templates" component={TemplatesPage} />
 
-            <Route path="/achievements" component={AchievementsPage} />
-            <Route path="/analytics" component={AnalyticsPage} />
-            <Route path="/network" component={NetworkVisualization} />
-            <Route path="/pricing" component={PricingPage} />
-            <Route path="/organization-settings" component={OrganizationSettings} />
-            <Route path="/system-admin" component={SystemAdmin} />
-            <Route component={NotFound} />
-          </Switch>
+              <Route path="/achievements" component={AchievementsPage} />
+              <Route path="/analytics" component={AnalyticsPage} />
+              <Route path="/network" component={NetworkVisualization} />
+              <Route path="/pricing" component={PricingPage} />
+              <Route path="/organization-settings" component={OrganizationSettings} />
+              <Route path="/system-admin" component={SystemAdmin} />
+              <Route component={NotFound} />
+            </Switch>
+          </div>
+
+
         </div>
-
-
       </div>
-    </div>
+    </NotificationProvider>
   );
 }
 

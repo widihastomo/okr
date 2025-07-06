@@ -1,16 +1,18 @@
 import { 
   cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives, tasks, taskComments,
   initiativeMembers, initiativeDocuments, initiativeNotes, initiativeSuccessMetrics, successMetricUpdates,
+  notifications, notificationPreferences,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
   type CheckIn, type Initiative, type Task, type TaskComment, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
   type InitiativeNote, type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
   type InsertUser, type UpsertUser, type InsertTeam, type InsertTeamMember,
   type InsertCheckIn, type InsertInitiative, type InsertInitiativeMember, type InsertInitiativeDocument, type InsertTask,
   type InsertTaskComment, type InsertInitiativeNote, type OKRWithKeyResults, type CycleWithOKRs, type UpdateKeyResultProgress, type CreateOKRFromTemplate,
-  type SuccessMetric, type InsertSuccessMetric, type SuccessMetricUpdate, type InsertSuccessMetricUpdate
+  type SuccessMetric, type InsertSuccessMetric, type SuccessMetricUpdate, type InsertSuccessMetricUpdate,
+  type Notification, type InsertNotification, type NotificationPreferences, type InsertNotificationPreferences
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, inArray } from "drizzle-orm";
+import { eq, and, desc, inArray, count } from "drizzle-orm";
 import { calculateProgressStatus } from "./progress-tracker";
 import { calculateObjectiveStatus } from "./objective-status-tracker";
 
@@ -131,6 +133,18 @@ export interface IStorage {
   
   // Key Result with Details
   getKeyResultWithDetails(id: string): Promise<KeyResultWithDetails | undefined>;
+
+  // Notifications
+  getNotifications(userId: string, limit?: number): Promise<(Notification & { actor?: User })[]>;
+  getUnreadNotificationsCount(userId: string): Promise<number>;
+  createNotification(notification: InsertNotification): Promise<Notification>;
+  markNotificationAsRead(id: string): Promise<boolean>;
+  markAllNotificationsAsRead(userId: string): Promise<boolean>;
+  deleteNotification(id: string): Promise<boolean>;
+  
+  // Notification Preferences
+  getNotificationPreferences(userId: string): Promise<NotificationPreferences | undefined>;
+  createOrUpdateNotificationPreferences(preferences: InsertNotificationPreferences): Promise<NotificationPreferences>;
 
   // Combined
   getOKRsWithKeyResults(): Promise<OKRWithKeyResults[]>;
@@ -1303,6 +1317,104 @@ export class DatabaseStorage implements IStorage {
   async deleteTaskComment(id: string): Promise<boolean> {
     const result = await db.delete(taskComments).where(eq(taskComments.id, id));
     return result.rowCount > 0;
+  }
+
+  // Notifications
+  async getNotifications(userId: string, limit: number = 50): Promise<(Notification & { actor?: User })[]> {
+    const notificationList = await db
+      .select({
+        notification: notifications,
+        actor: users,
+      })
+      .from(notifications)
+      .leftJoin(users, eq(notifications.actorId, users.id))
+      .where(eq(notifications.userId, userId))
+      .orderBy(desc(notifications.createdAt))
+      .limit(limit);
+
+    return notificationList.map(row => ({
+      ...row.notification,
+      actor: row.actor || undefined,
+    }));
+  }
+
+  async getUnreadNotificationsCount(userId: string): Promise<number> {
+    const unreadNotifications = await db
+      .select()
+      .from(notifications)
+      .where(and(eq(notifications.userId, userId), eq(notifications.isRead, false)));
+    
+    return unreadNotifications.length;
+  }
+
+  async createNotification(notification: InsertNotification): Promise<Notification> {
+    const [newNotification] = await db.insert(notifications).values(notification).returning();
+    return newNotification;
+  }
+
+  async markNotificationAsRead(id: string): Promise<boolean> {
+    const result = await db
+      .update(notifications)
+      .set({ 
+        isRead: true, 
+        readAt: new Date(),
+        updatedAt: new Date() 
+      })
+      .where(eq(notifications.id, id));
+    
+    return result.rowCount > 0;
+  }
+
+  async markAllNotificationsAsRead(userId: string): Promise<boolean> {
+    const result = await db
+      .update(notifications)
+      .set({ 
+        isRead: true, 
+        readAt: new Date(),
+        updatedAt: new Date() 
+      })
+      .where(and(eq(notifications.userId, userId), eq(notifications.isRead, false)));
+    
+    return result.rowCount > 0;
+  }
+
+  async deleteNotification(id: string): Promise<boolean> {
+    const result = await db.delete(notifications).where(eq(notifications.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Notification Preferences
+  async getNotificationPreferences(userId: string): Promise<NotificationPreferences | undefined> {
+    const [preferences] = await db
+      .select()
+      .from(notificationPreferences)
+      .where(eq(notificationPreferences.userId, userId));
+    
+    return preferences;
+  }
+
+  async createOrUpdateNotificationPreferences(preferences: InsertNotificationPreferences): Promise<NotificationPreferences> {
+    const existing = await this.getNotificationPreferences(preferences.userId);
+    
+    if (existing) {
+      const [updated] = await db
+        .update(notificationPreferences)
+        .set({
+          ...preferences,
+          updatedAt: new Date(),
+        })
+        .where(eq(notificationPreferences.userId, preferences.userId))
+        .returning();
+      
+      return updated;
+    } else {
+      const [created] = await db
+        .insert(notificationPreferences)
+        .values(preferences)
+        .returning();
+      
+      return created;
+    }
   }
 }
 

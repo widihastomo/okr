@@ -743,3 +743,63 @@ export type Organization = typeof organizations.$inferSelect;
 export type InsertOrganization = z.infer<typeof insertOrganizationSchema>;
 export type OrganizationSubscription = typeof organizationSubscriptions.$inferSelect;
 export type InsertOrganizationSubscription = z.infer<typeof insertOrganizationSubscriptionSchema>;
+
+// Notifications System
+export const notifications = pgTable("notifications", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  type: varchar("type", { length: 50 }).notNull(), // 'task_created', 'objective_updated', 'comment_added', etc.
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  entityType: varchar("entity_type", { length: 50 }), // 'task', 'objective', 'key_result', 'initiative', 'comment'
+  entityId: uuid("entity_id"), // ID of the related entity
+  entityTitle: varchar("entity_title", { length: 255 }), // Title of the related entity for quick display
+  actorId: uuid("actor_id").references(() => users.id), // User who performed the action
+  isRead: boolean("is_read").default(false).notNull(),
+  readAt: timestamp("read_at"),
+  metadata: jsonb("metadata"), // Additional data like old/new values, mentions, etc.
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()),
+});
+
+export const insertNotificationSchema = createInsertSchema(notifications).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Notification Preferences
+export const notificationPreferences = pgTable("notification_preferences", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  taskCreated: boolean("task_created").default(true),
+  taskAssigned: boolean("task_assigned").default(true),
+  taskCompleted: boolean("task_completed").default(true),
+  taskOverdue: boolean("task_overdue").default(true),
+  objectiveCreated: boolean("objective_created").default(true),
+  objectiveUpdated: boolean("objective_updated").default(true),
+  keyResultUpdated: boolean("key_result_updated").default(true),
+  initiativeCreated: boolean("initiative_created").default(true),
+  initiativeUpdated: boolean("initiative_updated").default(true),
+  commentAdded: boolean("comment_added").default(true),
+  commentMention: boolean("comment_mention").default(true),
+  teamUpdates: boolean("team_updates").default(true),
+  weeklyDigest: boolean("weekly_digest").default(true),
+  emailNotifications: boolean("email_notifications").default(false),
+  pushNotifications: boolean("push_notifications").default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()),
+});
+
+export const insertNotificationPreferencesSchema = createInsertSchema(notificationPreferences).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+export type NotificationPreferences = typeof notificationPreferences.$inferSelect;
+export type InsertNotificationPreferences = z.infer<typeof insertNotificationPreferencesSchema>;
