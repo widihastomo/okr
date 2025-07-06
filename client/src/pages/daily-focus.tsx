@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import {
   Card,
@@ -45,7 +45,7 @@ import {
 } from "@/components/ui/select";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { toast } from "@/hooks/use-toast";
-import { Link, useLocation } from "wouter";
+import { Link } from "wouter";
 import { CheckInModal } from "@/components/check-in-modal";
 import SuccessMetricsModalSimple from "@/components/success-metrics-modal-simple";
 import OneClickHabitButton from "@/components/one-click-habit-button";
@@ -57,7 +57,6 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function DailyFocusPage() {
   const { user } = useAuth();
-  const [location, setLocation] = useLocation();
   const userId =
     user && typeof user === "object" && "id" in user ? (user as any).id : null;
 
@@ -74,37 +73,12 @@ export default function DailyFocusPage() {
     );
   }
 
-  // Query string management for tabs
-  const getCurrentTabFromUrl = () => {
-    const searchParams = new URLSearchParams(location.split('?')[1] || '');
-    const tabFromUrl = searchParams.get('tab');
-    return tabFromUrl && ['tasks', 'progress', 'initiatives'].includes(tabFromUrl) ? tabFromUrl : 'tasks';
-  };
-
-  const [activeTab, setActiveTab] = useState(() => getCurrentTabFromUrl());
-
   const [selectedKeyResult, setSelectedKeyResult] = useState<any>(null);
   const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
   const [isSuccessMetricsModalOpen, setIsSuccessMetricsModalOpen] =
     useState(false);
   const [selectedInitiative, setSelectedInitiative] = useState<any>(null);
   const [selectedUserId, setSelectedUserId] = useState<string>(userId || "all"); // Filter state - default to current user
-
-  // Sync tab with URL changes (for browser back/forward)
-  useEffect(() => {
-    const urlTab = getCurrentTabFromUrl();
-    if (urlTab !== activeTab) {
-      setActiveTab(urlTab);
-    }
-  }, [location]);
-
-  // Update URL when tab changes
-  const handleTabChange = (newTab: string) => {
-    const currentPath = location.split('?')[0];
-    const searchParams = new URLSearchParams(location.split('?')[1] || '');
-    searchParams.set('tab', newTab);
-    setLocation(`${currentPath}?${searchParams.toString()}`);
-  };
 
   // Fetch data with status calculation
   const { data: objectives = [] } = useQuery({
@@ -745,7 +719,7 @@ export default function DailyFocusPage() {
       )}
 
       {/* Main Content Tabs */}
-      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+      <Tabs defaultValue="tasks" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="tasks">Task Prioritas</TabsTrigger>
           <TabsTrigger value="progress">Update Progress</TabsTrigger>
