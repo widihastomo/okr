@@ -38,14 +38,11 @@ interface DailyUpdateData {
   }>;
   successMetrics: Array<{
     id: string;
-    title: string;
-    description: string;
-    target: number;
-    achievement: number;
-    unit: string;
-    metricType: string;
+    name: string;
+    target: string;
+    achievement: string;
     initiativeTitle: string;
-    newValue?: number;
+    newValue?: string;
     notes?: string;
   }>;
   todayTasks: Array<{
@@ -211,12 +208,9 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
         })) || [],
         successMetrics: allSuccessMetrics?.map((metric: any) => ({
           id: metric.id,
-          title: metric.title,
-          description: metric.description,
+          name: metric.name,
           target: metric.target,
           achievement: metric.achievement,
-          unit: metric.unit,
-          metricType: metric.metricType,
           initiativeTitle: metric.initiativeTitle,
           newValue: metric.achievement,
           notes: ''
@@ -258,7 +252,7 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
 
       // Update success metrics
       for (const metric of data.successMetrics) {
-        if (metric.newValue !== metric.achievement && metric.newValue !== undefined) {
+        if (metric.newValue && metric.newValue !== metric.achievement && metric.newValue.trim() !== '') {
           await apiRequest('POST', `/api/success-metrics/${metric.id}/updates`, {
             achievement: metric.newValue,
             notes: metric.notes || `Update harian instant - ${format(today, 'dd MMM yyyy', { locale: id })}`,
@@ -520,32 +514,26 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                       {updateData.successMetrics.map((metric, index) => (
                         <TableRow key={metric.id}>
                           <TableCell className="font-medium">
-                            <div>
-                              <div className="font-semibold">{metric.title}</div>
-                              <div className="text-sm text-gray-500">{metric.description}</div>
-                            </div>
+                            <div className="font-semibold">{metric.name}</div>
                           </TableCell>
                           <TableCell>
                             <Badge variant="outline" className="text-xs">
                               {metric.initiativeTitle}
                             </Badge>
                           </TableCell>
-                          <TableCell>{formatNumberWithSeparator(metric.achievement.toString())} {metric.unit}</TableCell>
-                          <TableCell>{formatNumberWithSeparator(metric.target.toString())} {metric.unit}</TableCell>
+                          <TableCell>{metric.achievement}</TableCell>
+                          <TableCell>{metric.target}</TableCell>
                           <TableCell>
                             <Input
                               type="text"
-                              value={metric.newValue !== undefined ? formatNumberWithSeparator(metric.newValue.toString()) : ''}
+                              value={metric.newValue || ''}
                               onChange={(e) => {
-                                handleNumberInputChange(e.target.value, (formattedValue) => {
-                                  const newData = { ...updateData };
-                                  const cleanValue = formattedValue.replace(/[.,]/g, '');
-                                  newData.successMetrics[index].newValue = parseFloat(cleanValue) || 0;
-                                  setUpdateData(newData);
-                                });
+                                const newData = { ...updateData };
+                                newData.successMetrics[index].newValue = e.target.value;
+                                setUpdateData(newData);
                               }}
-                              placeholder="0"
-                              className="w-24"
+                              placeholder="Rp 0"
+                              className="w-32"
                             />
                           </TableCell>
                           <TableCell>
@@ -571,8 +559,7 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                   {updateData.successMetrics.map((metric, index) => (
                     <div key={metric.id} className="border rounded-lg p-4 space-y-3">
                       <div className="space-y-1">
-                        <div className="font-semibold text-sm">{metric.title}</div>
-                        <div className="text-xs text-gray-500">{metric.description}</div>
+                        <div className="font-semibold text-sm">{metric.name}</div>
                         <Badge variant="outline" className="text-xs">
                           {metric.initiativeTitle}
                         </Badge>
@@ -581,11 +568,11 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         <div>
                           <span className="text-gray-600">Saat ini:</span>
-                          <div className="font-medium">{formatNumberWithSeparator(metric.achievement.toString())} {metric.unit}</div>
+                          <div className="font-medium">{metric.achievement}</div>
                         </div>
                         <div>
                           <span className="text-gray-600">Target:</span>
-                          <div className="font-medium">{formatNumberWithSeparator(metric.target.toString())} {metric.unit}</div>
+                          <div className="font-medium">{metric.target}</div>
                         </div>
                       </div>
 
@@ -593,16 +580,13 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                         <label className="text-sm font-medium text-gray-700">Pencapaian Baru:</label>
                         <Input
                           type="text"
-                          value={metric.newValue !== undefined ? formatNumberWithSeparator(metric.newValue.toString()) : ''}
+                          value={metric.newValue || ''}
                           onChange={(e) => {
-                            handleNumberInputChange(e.target.value, (formattedValue) => {
-                              const newData = { ...updateData };
-                              const cleanValue = formattedValue.replace(/[.,]/g, '');
-                              newData.successMetrics[index].newValue = parseFloat(cleanValue) || 0;
-                              setUpdateData(newData);
-                            });
+                            const newData = { ...updateData };
+                            newData.successMetrics[index].newValue = e.target.value;
+                            setUpdateData(newData);
                           }}
-                          placeholder="0"
+                          placeholder="Rp 0"
                         />
                       </div>
 
