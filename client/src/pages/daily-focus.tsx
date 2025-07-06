@@ -36,6 +36,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { toast } from "@/hooks/use-toast";
 import { Link } from "wouter";
@@ -71,6 +78,7 @@ export default function DailyFocusPage() {
   const [isSuccessMetricsModalOpen, setIsSuccessMetricsModalOpen] =
     useState(false);
   const [selectedInitiative, setSelectedInitiative] = useState<any>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string>("all"); // Filter state
 
   // Fetch data with status calculation
   const { data: objectives = [] } = useQuery({
@@ -282,8 +290,17 @@ export default function DailyFocusPage() {
     return initiatives.filter((init: any) => init.keyResultId === keyResultId).length;
   };
 
+  // Apply user filter to tasks and key results
+  const filteredTasks = selectedUserId === "all" 
+    ? (allTasks as any[])
+    : (allTasks as any[]).filter((task: any) => task.assignedTo === selectedUserId);
+
+  const filteredKeyResults = selectedUserId === "all"
+    ? (keyResults as any[])
+    : (keyResults as any[]).filter((kr: any) => kr.assignedTo === selectedUserId);
+
   // Filter data for today's focus
-  const todayTasks = (allTasks as any[]).filter((task: any) => {
+  const todayTasks = filteredTasks.filter((task: any) => {
     const dueDate = task.dueDate ? task.dueDate.split("T")[0] : null;
     // Include tasks due today, in progress tasks, or overdue incomplete tasks
     return (
@@ -296,7 +313,7 @@ export default function DailyFocusPage() {
     );
   });
 
-  const overdueTasks = (allTasks as any[]).filter((task: any) => {
+  const overdueTasks = filteredTasks.filter((task: any) => {
     const dueDate = task.dueDate ? task.dueDate.split("T")[0] : null;
     return (
       dueDate &&
@@ -306,7 +323,7 @@ export default function DailyFocusPage() {
     );
   });
 
-  const activeKeyResults = (keyResults as any[]).filter((kr: any) => {
+  const activeKeyResults = filteredKeyResults.filter((kr: any) => {
     const progress = calculateKeyResultProgress(kr);
     return (
       progress < 100 && kr.status !== "completed" && kr.status !== "cancelled"
@@ -355,6 +372,25 @@ export default function DailyFocusPage() {
           <p className="text-gray-600">Kelola aktivitas harian Anda hari ini</p>
         </div>
         <div className="flex items-center gap-4">
+          {/* User Filter */}
+          <div className="flex items-center gap-2">
+            <User className="h-4 w-4 text-gray-500" />
+            <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Pilih anggota tim" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Anggota Tim</SelectItem>
+                {users?.map((user: any) => (
+                  <SelectItem key={user.id} value={user.id}>
+                    {user.firstName && user.lastName 
+                      ? `${user.firstName} ${user.lastName}`
+                      : user.email || user.username || "Unknown"}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <DailyInstantUpdate />
           <OneClickHabitButton />
           <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -368,6 +404,25 @@ export default function DailyFocusPage() {
           </div>
         </div>
       </div>
+
+      {/* Filter Indicator */}
+      {selectedUserId !== "all" && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+          <div className="flex items-center gap-2 text-sm text-blue-800">
+            <User className="h-4 w-4" />
+            <span>
+              Menampilkan prioritas harian untuk: {" "}
+              <span className="font-medium">
+                {users?.find((u: any) => u.id === selectedUserId)?.firstName && 
+                 users?.find((u: any) => u.id === selectedUserId)?.lastName
+                  ? `${users.find((u: any) => u.id === selectedUserId)?.firstName} ${users.find((u: any) => u.id === selectedUserId)?.lastName}`
+                  : users?.find((u: any) => u.id === selectedUserId)?.email || "Unknown"}
+              </span>
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>

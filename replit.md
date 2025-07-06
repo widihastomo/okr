@@ -113,6 +113,13 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 06, 2025. Added user filter to Daily Focus dashboard for viewing team member priorities:
+  * Added Select dropdown with all team members for filtering daily priorities
+  * Implemented filtering for both tasks and key results based on selected user
+  * Added visual filter indicator showing currently selected team member
+  * Enhanced team management by allowing leaders to monitor individual member workloads
+  * Filter includes "Semua Anggota Tim" option to view all team activities
+  * Improved team coordination and oversight capabilities
 - July 06, 2025. Added hyperlink navigation to key result detail pages from Daily Focus dashboard:
   * Made key result titles clickable using Link component from wouter
   * Added direct navigation to /key-results/{id} detail page for easy access
