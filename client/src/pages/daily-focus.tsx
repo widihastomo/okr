@@ -1154,15 +1154,16 @@ export default function DailyFocusPage() {
                                   {task.assignedTo ? getUserName(task.assignedTo) : "Belum ditentukan"}
                                 </span>
                               </div>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleOpenTaskModal(task)}
-                                className="text-xs"
-                              >
-                                <Edit className="w-3 h-3 mr-1" />
-                                Edit
-                              </Button>
+                              <Link href={`/tasks/${task.id}`}>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="text-xs"
+                                >
+                                  <Eye className="w-3 h-3 mr-1" />
+                                  Detail
+                                </Button>
+                              </Link>
                             </div>
                           </div>
                         ))}
@@ -1261,15 +1262,16 @@ export default function DailyFocusPage() {
                                   {task.assignedTo ? getUserName(task.assignedTo) : "Belum ditentukan"}
                                 </span>
                               </div>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleOpenTaskModal(task)}
-                                className="text-xs"
-                              >
-                                <Edit className="w-3 h-3 mr-1" />
-                                Edit
-                              </Button>
+                              <Link href={`/tasks/${task.id}`}>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="text-xs"
+                                >
+                                  <Eye className="w-3 h-3 mr-1" />
+                                  Detail
+                                </Button>
+                              </Link>
                             </div>
                           </div>
                         ))}
