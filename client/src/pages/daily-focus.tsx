@@ -84,6 +84,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -124,6 +134,8 @@ export default function DailyFocusPage() {
   const [selectedUserId, setSelectedUserId] = useState<string>(userId || "all"); // Filter state - default to current user
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<any>(null);
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [taskFormData, setTaskFormData] = useState({
     title: "",
@@ -305,9 +317,16 @@ export default function DailyFocusPage() {
     setIsEditTaskModalOpen(true);
   };
 
-  const handleDeleteTask = (taskId: string) => {
-    if (confirm("Apakah Anda yakin ingin menghapus task ini?")) {
-      deleteTaskMutation.mutate(taskId);
+  const handleDeleteTask = (task: any) => {
+    setTaskToDelete(task);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (taskToDelete) {
+      deleteTaskMutation.mutate(taskToDelete.id);
+      setIsDeleteDialogOpen(false);
+      setTaskToDelete(null);
     }
   };
 
@@ -1426,7 +1445,7 @@ export default function DailyFocusPage() {
                                     Edit
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => handleDeleteTask(task.id)}
+                                    onClick={() => handleDeleteTask(task)}
                                     className="cursor-pointer text-red-600"
                                   >
                                     <Trash2 className="w-4 h-4 mr-2" />
@@ -1554,7 +1573,7 @@ export default function DailyFocusPage() {
                                     Edit
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => handleDeleteTask(task.id)}
+                                    onClick={() => handleDeleteTask(task)}
                                     className="cursor-pointer text-red-600"
                                   >
                                     <Trash2 className="w-4 h-4 mr-2" />
@@ -1690,7 +1709,7 @@ export default function DailyFocusPage() {
                                     Edit
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => handleDeleteTask(task.id)}
+                                    onClick={() => handleDeleteTask(task)}
                                     className="cursor-pointer text-red-600"
                                   >
                                     <Trash2 className="w-3 h-3 mr-2" />
@@ -1822,7 +1841,7 @@ export default function DailyFocusPage() {
                                     Edit
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => handleDeleteTask(task.id)}
+                                    onClick={() => handleDeleteTask(task)}
                                     className="cursor-pointer text-red-600"
                                   >
                                     <Trash2 className="w-3 h-3 mr-2" />
@@ -2664,6 +2683,31 @@ export default function DailyFocusPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Task</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus task "{taskToDelete?.title}"? 
+              Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>
+              Batal
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-red-600 hover:bg-red-700 text-white"
+              disabled={deleteTaskMutation.isPending}
+            >
+              {deleteTaskMutation.isPending ? "Menghapus..." : "Hapus"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -117,10 +117,11 @@ Changelog:
   * Replaced "Detail" button with MoreVertical icon dropdown menu for all task lists
   * Added view details function that shows task information in toast notification
   * Implemented edit task functionality with comprehensive form modal including all task fields
-  * Added delete task function with confirmation dialog for safe task removal
+  * Added delete task function with proper AlertDialog confirmation instead of browser alert
   * Applied to both desktop table view and mobile card view for consistent UX
   * Enhanced task management workflow with direct access to CRUD operations from task lists
   * Edit task modal includes timezone-adjusted DatePicker and full field validation
+  * Delete confirmation dialog shows task title and proper loading states during deletion
 - July 06, 2025. Fixed DatePicker timezone conversion issue for GMT+7:
   * Fixed critical bug where selecting "today" from DatePicker was saving as yesterday's date
   * Added timezone adjustment (+7 hours) to prevent UTC conversion from shifting dates
