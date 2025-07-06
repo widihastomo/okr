@@ -113,6 +113,11 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 06, 2025. Fixed DatePicker timezone conversion issue for GMT+7:
+  * Fixed critical bug where selecting "today" from DatePicker was saving as yesterday's date
+  * Added timezone adjustment (+7 hours) to prevent UTC conversion from shifting dates
+  * Tasks selected for "today" now correctly appear in "Today's Tasks" section instead of "Overdue"
+  * DatePicker selections now properly respect GMT+7 timezone for accurate task scheduling
 - July 06, 2025. Implemented GMT+7 timezone consistency across entire application:
   * Standardized all date operations to use GMT+7 (WIB - Waktu Indonesia Barat) timezone
   * Updated Daily Focus page, Dashboard, DatePicker, and notification system to use GMT+7

@@ -262,14 +262,6 @@ export default function DailyFocusPage() {
       createdBy: userId, // Add the required createdBy field
     };
 
-    // Debug logging to check date handling
-    console.log('Task creation debug:', {
-      selectedDate: taskFormData.dueDate,
-      selectedDateISO: taskFormData.dueDate?.toISOString(),
-      todayGMT7: todayStr,
-      taskData: taskData
-    });
-
     createTaskMutation.mutate(taskData);
   };
 
@@ -1129,7 +1121,16 @@ export default function DailyFocusPage() {
                               <DateCalendar
                                 mode="single"
                                 selected={taskFormData.dueDate}
-                                onSelect={(date) => setTaskFormData({ ...taskFormData, dueDate: date })}
+                                onSelect={(date) => {
+                                  if (date) {
+                                    // Adjust for GMT+7 timezone to prevent date shifting
+                                    const adjustedDate = new Date(date);
+                                    adjustedDate.setHours(adjustedDate.getHours() + 7);
+                                    setTaskFormData({ ...taskFormData, dueDate: adjustedDate });
+                                  } else {
+                                    setTaskFormData({ ...taskFormData, dueDate: date });
+                                  }
+                                }}
                                 disabled={(date) => {
                                   // Use GMT+7 timezone for date comparison
                                   const now = new Date();
