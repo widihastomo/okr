@@ -120,6 +120,7 @@ Changelog:
   * Replaced previous blue-purple gradient with modern orange theme for better visual appeal and brand consistency
   * Maintained accessibility and hover states while creating cohesive orange design language
   * All buttons (create, update, edit, submit) now use consistent orange gradient for unified user experience
+  * Updated sidebar navigation active states to match orange gradient theme
   * Application now features distinctive orange gradient branding throughout all user interfaces
 - July 06, 2025. Completed comprehensive application-wide gradient button styling update for unified professional design:
   * Updated all primary buttons throughout the entire application to use gradient styling

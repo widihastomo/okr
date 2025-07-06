@@ -145,7 +145,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                     className={cn(
                       "flex items-center rounded-lg text-sm font-medium transition-colors space-x-3 px-3 py-2",
                       isActive
-                        ? "bg-blue-600 text-white"
+                        ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
                         : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                     )}
                     onClick={onClose}
@@ -165,7 +165,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                       className={cn(
                         "hidden lg:flex lg:items-center lg:justify-center lg:rounded-lg lg:text-sm lg:font-medium lg:transition-colors lg:px-2 lg:py-3",
                         isActive
-                          ? "bg-blue-600 text-white"
+                          ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
                           : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                       )}
                       onClick={onClose}
