@@ -830,15 +830,33 @@ export default function DailyFocusPage() {
                         </div>
                       </div>
 
-                      {/* User and Initiative Info */}
-                      <div className="flex items-center justify-between text-xs text-gray-500 mt-3 pt-3 border-t border-gray-100">
-                        <div className="flex items-center gap-2">
-                          <User className="w-3 h-3" />
-                          <span>PIC: {getUserName(kr.assignedTo)}</span>
+                      {/* User and Initiative Info - matching objective detail page format */}
+                      <div className="flex items-center justify-between text-xs mt-3 pt-3 border-t border-gray-100">
+                        {/* Assignee info - Left */}
+                        <div className="relative group">
+                          <div className="flex items-center gap-1 text-gray-500">
+                            <User className="w-3 h-3" />
+                            <span className="truncate max-w-24 sm:max-w-32">
+                              {kr.assignedTo
+                                ? getUserName(kr.assignedTo)
+                                : "Belum ditentukan"}
+                            </span>
+                          </div>
+                          
+                          {/* Tooltip for assignee info */}
+                          <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap">
+                            {kr.assignedTo
+                              ? `Penanggung jawab: ${getUserName(kr.assignedTo)} - Bertanggung jawab untuk memantau dan melaporkan progress angka target ini`
+                              : "Belum ada penanggung jawab - Assign seseorang untuk memantau progress angka target ini"}
+                            <div className="absolute top-full left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <BarChart3 className="w-3 h-3" />
-                          <span>{getInitiativeCount(kr.id)} inisiatif</span>
+
+                        {/* Initiative count - Right */}
+                        <div className="text-xs text-gray-500 flex items-center gap-1">
+                          <Target className="w-3 h-3" />
+                          <span>{getInitiativeCount(kr.id)}</span>
+                          <span>inisiatif</span>
                         </div>
                       </div>
                     </div>
