@@ -1042,36 +1042,38 @@ export default function DailyFocusPage() {
                   <p>Tidak ada inisiatif aktif</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Inisiatif
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Prioritas
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Progress
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Tenggat
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          PIC
-                        </th>
-                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Update
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Aksi
-                        </th>
-                      </tr>
-                    </thead>
+                <>
+                  {/* Desktop Table View */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Inisiatif
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                          </th>
+                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Prioritas
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Progress
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Tenggat
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            PIC
+                          </th>
+                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Update
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Aksi
+                          </th>
+                        </tr>
+                      </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {activeInitiatives
                         .sort((a, b) => {
@@ -1293,9 +1295,186 @@ export default function DailyFocusPage() {
                             </tr>
                           );
                         })}
-                    </tbody>
-                  </table>
-                </div>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Mobile Card View */}
+                  <div className="md:hidden space-y-4">
+                    {activeInitiatives
+                      .sort((a, b) => {
+                        const scoreA = parseFloat(a.priorityScore || "0");
+                        const scoreB = parseFloat(b.priorityScore || "0");
+                        return scoreB - scoreA; // Sort by priority score descending
+                      })
+                      .map((initiative: any) => {
+                        const rawScore = initiative.priorityScore;
+                        const score = parseFloat(rawScore || "0");
+                        
+                        let priorityColor: string;
+                        let priorityLabel: string;
+                        
+                        if (score >= 4.0) {
+                          priorityColor = "bg-red-100 text-red-800";
+                          priorityLabel = "Kritis";
+                        } else if (score >= 3.0) {
+                          priorityColor = "bg-orange-100 text-orange-800";
+                          priorityLabel = "Tinggi";
+                        } else if (score >= 2.0) {
+                          priorityColor = "bg-yellow-100 text-yellow-800";
+                          priorityLabel = "Sedang";
+                        } else {
+                          priorityColor = "bg-green-100 text-green-800";
+                          priorityLabel = "Rendah";
+                        }
+
+                        const status = initiative.status || "draft";
+                        const getStatusInfo = (status: string) => {
+                          const statusMap = {
+                            'draft': {
+                              label: 'Draft',
+                              bgColor: 'bg-gray-100',
+                              textColor: 'text-gray-800',
+                            },
+                            'sedang_berjalan': {
+                              label: 'Sedang Berjalan',
+                              bgColor: 'bg-blue-100',
+                              textColor: 'text-blue-800',
+                            },
+                            'selesai': {
+                              label: 'Selesai',
+                              bgColor: 'bg-green-100',
+                              textColor: 'text-green-800',
+                            },
+                            'dibatalkan': {
+                              label: 'Dibatalkan',
+                              bgColor: 'bg-red-100',
+                              textColor: 'text-red-800',
+                            },
+                          };
+                          return statusMap[status as keyof typeof statusMap] || statusMap.draft;
+                        };
+
+                        const statusInfo = getStatusInfo(status);
+
+                        return (
+                          <div
+                            key={initiative.id}
+                            className="bg-white border border-gray-200 rounded-lg p-4 space-y-3"
+                          >
+                            {/* Header */}
+                            <div className="space-y-2">
+                              <Link href={`/initiatives/${initiative.id}`}>
+                                <h3 className="font-medium text-gray-900 hover:text-blue-600 cursor-pointer">
+                                  {initiative.title}
+                                </h3>
+                              </Link>
+                              
+                              {initiative.keyResultId && (
+                                <div className="flex items-center gap-1">
+                                  <Target className="w-3 h-3 text-blue-600" />
+                                  <span className="text-xs text-blue-600 font-medium">
+                                    {keyResults.find((kr: any) => kr.id === initiative.keyResultId)?.title || 'Unknown'}
+                                  </span>
+                                </div>
+                              )}
+                              
+                              {initiative.budget && (
+                                <div className="text-sm text-gray-500">
+                                  Budget: Rp{" "}
+                                  {parseFloat(initiative.budget).toLocaleString("id-ID")}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Status and Priority */}
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <Badge
+                                className={`${statusInfo.bgColor} ${statusInfo.textColor} text-xs px-2 py-1`}
+                              >
+                                {statusInfo.label}
+                              </Badge>
+                              <Badge className={`${priorityColor} text-xs px-2 py-1`}>
+                                {priorityLabel} ({score.toFixed(1)}/5.0)
+                              </Badge>
+                            </div>
+
+                            {/* Progress */}
+                            <div className="space-y-1">
+                              <div className="flex justify-between text-sm">
+                                <span className="text-gray-600">Progress</span>
+                                <span className="font-medium text-gray-900">
+                                  {initiative.progressPercentage || 0}%
+                                </span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div
+                                  className={`h-2 rounded-full ${(() => {
+                                    const progress = initiative.progressPercentage || 0;
+                                    if (progress >= 100) return "bg-green-600";
+                                    if (progress >= 80) return "bg-green-500";
+                                    if (progress >= 60) return "bg-orange-500";
+                                    return "bg-red-500";
+                                  })()}`}
+                                  style={{
+                                    width: `${initiative.progressPercentage || 0}%`,
+                                  }}
+                                ></div>
+                              </div>
+                            </div>
+
+                            {/* Dates and PIC */}
+                            <div className="space-y-2 text-sm">
+                              <div className="flex justify-between">
+                                <span className="text-gray-600">Tenggat:</span>
+                                <span className={initiative.dueDate && new Date(initiative.dueDate) < new Date() ? "text-red-600 font-medium" : "text-gray-900"}>
+                                  {initiative.dueDate ? new Date(initiative.dueDate).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : "-"}
+                                </span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-gray-600">PIC:</span>
+                                <div className="flex items-center gap-2">
+                                  {initiative.picId ? (
+                                    <>
+                                      <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                                        {getUserName(initiative.picId)
+                                          ?.split(" ")
+                                          .map((n) => n[0])
+                                          .join("")
+                                          .toUpperCase() || "?"}
+                                      </div>
+                                      <span className="text-gray-900 text-sm">
+                                        {getUserName(initiative.picId)}
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <span className="text-gray-400">
+                                      Tidak ditugaskan
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                              <Button
+                                onClick={() => handleUpdateMetrics(initiative)}
+                                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium flex-1 mr-2"
+                              >
+                                Update Metrics
+                              </Button>
+                              <Link href={`/initiatives/${initiative.id}`}>
+                                <Button variant="outline" size="sm">
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </Link>
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
