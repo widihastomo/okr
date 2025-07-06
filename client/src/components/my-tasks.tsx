@@ -191,7 +191,7 @@ export default function MyTugas({ filteredKeyResultIds, userFilter }: MyTugasPro
         <Button
           onClick={handleAddQuickTask}
           size="sm"
-          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+          className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
         >
           <Plus className="h-4 w-4 mr-1" />
           Tambah Task

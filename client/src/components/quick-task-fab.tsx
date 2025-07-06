@@ -157,7 +157,7 @@ export default function QuickTaskFAB() {
       <div className="fixed bottom-6 right-6 z-50">
         <Button
           onClick={() => setIsOpen(true)}
-          className="h-14 w-14 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
+          className="h-14 w-14 rounded-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
           size="icon"
         >
           <Plus className="h-6 w-6 text-white" />
@@ -331,7 +331,7 @@ export default function QuickTaskFAB() {
                 <Button
                   type="submit"
                   disabled={createTaskMutation.isPending}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
                 >
                   {createTaskMutation.isPending ? "Creating..." : "Buat Task"}
                 </Button>

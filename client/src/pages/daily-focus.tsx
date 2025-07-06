@@ -915,7 +915,7 @@ export default function DailyFocusPage() {
                             variant="default"
                             size="sm"
                             onClick={() => handleCheckInKeyResult(kr)}
-                            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                            className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
                           >
                             <TrendingUp className="w-4 h-4 mr-1" />
                             <span className="sm:hidden">Update</span>

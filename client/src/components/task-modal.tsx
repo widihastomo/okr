@@ -356,7 +356,7 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
             <Button 
               type="submit" 
               disabled={createMutation.isPending || updateMutation.isPending}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
             >
               {createMutation.isPending || updateMutation.isPending
                 ? "Menyimpan..."
