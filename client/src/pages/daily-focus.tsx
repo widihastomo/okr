@@ -123,6 +123,8 @@ export default function DailyFocusPage() {
   const [selectedInitiative, setSelectedInitiative] = useState<any>(null);
   const [selectedUserId, setSelectedUserId] = useState<string>(userId || "all"); // Filter state - default to current user
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<any>(null);
   const [taskFormData, setTaskFormData] = useState({
     title: "",
     description: "",
@@ -223,6 +225,116 @@ export default function DailyFocusPage() {
       });
     },
   });
+
+  // Task deletion mutation
+  const deleteTaskMutation = useMutation({
+    mutationFn: async (taskId: string) => {
+      const response = await apiRequest("DELETE", `/api/tasks/${taskId}`, {});
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
+      toast({
+        title: "Task berhasil dihapus",
+        description: "Task telah dihapus dari sistem",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Gagal menghapus task",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Task edit mutation
+  const editTaskMutation = useMutation({
+    mutationFn: async (data: { taskId: string; updates: any }) => {
+      const response = await apiRequest("PUT", `/api/tasks/${data.taskId}`, data.updates);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
+      toast({
+        title: "Task berhasil diperbarui",
+        description: "Task telah diperbarui",
+      });
+      setIsEditTaskModalOpen(false);
+      setSelectedTask(null);
+      setTaskFormData({
+        title: "",
+        description: "",
+        priority: "medium",
+        assignedTo: userId || "unassigned",
+        dueDate: null,
+        initiativeId: "none",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Gagal memperbarui task",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Task action handlers
+  const handleViewTaskDetails = (task: any) => {
+    setSelectedTask(task);
+    // You can implement a view details modal here if needed
+    toast({
+      title: "Task Details",
+      description: `${task.title}: ${task.description || "No description"}`,
+    });
+  };
+
+  const handleEditTask = (task: any) => {
+    setSelectedTask(task);
+    setTaskFormData({
+      title: task.title,
+      description: task.description || "",
+      priority: task.priority || "medium",
+      assignedTo: task.assignedTo || userId || "unassigned",
+      dueDate: task.dueDate ? new Date(task.dueDate) : null,
+      initiativeId: task.initiativeId || "none",
+    });
+    setIsEditTaskModalOpen(true);
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    if (confirm("Apakah Anda yakin ingin menghapus task ini?")) {
+      deleteTaskMutation.mutate(taskId);
+    }
+  };
+
+  const handleEditTaskSubmit = () => {
+    if (!taskFormData.title.trim()) {
+      toast({
+        title: "Error",
+        description: "Title task harus diisi",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!selectedTask) return;
+
+    const updateData = {
+      ...taskFormData,
+      assignedTo: taskFormData.assignedTo === "unassigned" ? null : taskFormData.assignedTo || null,
+      dueDate: taskFormData.dueDate || null,
+      initiativeId: taskFormData.initiativeId === "none" || !taskFormData.initiativeId ? null : taskFormData.initiativeId,
+    };
+
+    editTaskMutation.mutate({
+      taskId: selectedTask.id,
+      updates: updateData,
+    });
+  };
 
   const { data: stats } = useQuery({
     queryKey: [`/api/gamification/stats/${userId}`],
@@ -1292,11 +1404,36 @@ export default function DailyFocusPage() {
                               </div>
                             </td>
                             <td className="px-4 py-4 text-center">
-                              <Link href={`/tasks/${task.id}`}>
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                              </Link>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem
+                                    onClick={() => handleViewTaskDetails(task)}
+                                    className="cursor-pointer"
+                                  >
+                                    <Eye className="w-4 h-4 mr-2" />
+                                    Lihat Detail
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleEditTask(task)}
+                                    className="cursor-pointer"
+                                  >
+                                    <Edit className="w-4 h-4 mr-2" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleDeleteTask(task.id)}
+                                    className="cursor-pointer text-red-600"
+                                  >
+                                    <Trash2 className="w-4 h-4 mr-2" />
+                                    Hapus
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </td>
                           </tr>
                         ))}
@@ -1395,11 +1532,36 @@ export default function DailyFocusPage() {
                               </div>
                             </td>
                             <td className="px-4 py-4 text-center">
-                              <Link href={`/tasks/${task.id}`}>
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                              </Link>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem
+                                    onClick={() => handleViewTaskDetails(task)}
+                                    className="cursor-pointer"
+                                  >
+                                    <Eye className="w-4 h-4 mr-2" />
+                                    Lihat Detail
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleEditTask(task)}
+                                    className="cursor-pointer"
+                                  >
+                                    <Edit className="w-4 h-4 mr-2" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleDeleteTask(task.id)}
+                                    className="cursor-pointer text-red-600"
+                                  >
+                                    <Trash2 className="w-4 h-4 mr-2" />
+                                    Hapus
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </td>
                           </tr>
                         ))}
@@ -1502,16 +1664,40 @@ export default function DailyFocusPage() {
                                   {task.assignedTo ? getUserName(task.assignedTo) : "Belum ditentukan"}
                                 </span>
                               </div>
-                              <Link href={`/tasks/${task.id}`}>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="text-xs"
-                                >
-                                  <Eye className="w-3 h-3 mr-1" />
-                                  Detail
-                                </Button>
-                              </Link>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-xs h-8 w-8 p-0"
+                                  >
+                                    <MoreVertical className="w-3 h-3" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem
+                                    onClick={() => handleViewTaskDetails(task)}
+                                    className="cursor-pointer"
+                                  >
+                                    <Eye className="w-3 h-3 mr-2" />
+                                    Lihat Detail
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleEditTask(task)}
+                                    className="cursor-pointer"
+                                  >
+                                    <Edit className="w-3 h-3 mr-2" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleDeleteTask(task.id)}
+                                    className="cursor-pointer text-red-600"
+                                  >
+                                    <Trash2 className="w-3 h-3 mr-2" />
+                                    Hapus
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </div>
                           </div>
                         ))}
@@ -1610,16 +1796,40 @@ export default function DailyFocusPage() {
                                   {task.assignedTo ? getUserName(task.assignedTo) : "Belum ditentukan"}
                                 </span>
                               </div>
-                              <Link href={`/tasks/${task.id}`}>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="text-xs"
-                                >
-                                  <Eye className="w-3 h-3 mr-1" />
-                                  Detail
-                                </Button>
-                              </Link>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-xs h-8 w-8 p-0"
+                                  >
+                                    <MoreVertical className="w-3 h-3" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem
+                                    onClick={() => handleViewTaskDetails(task)}
+                                    className="cursor-pointer"
+                                  >
+                                    <Eye className="w-3 h-3 mr-2" />
+                                    Lihat Detail
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleEditTask(task)}
+                                    className="cursor-pointer"
+                                  >
+                                    <Edit className="w-3 h-3 mr-2" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleDeleteTask(task.id)}
+                                    className="cursor-pointer text-red-600"
+                                  >
+                                    <Trash2 className="w-3 h-3 mr-2" />
+                                    Hapus
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </div>
                           </div>
                         ))}
@@ -2313,6 +2523,147 @@ export default function DailyFocusPage() {
           initiativeId={selectedInitiative.id}
         />
       )}
+
+      {/* Edit Task Modal */}
+      <Dialog open={isEditTaskModalOpen} onOpenChange={setIsEditTaskModalOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Edit Task</DialogTitle>
+            <DialogDescription>
+              Update task information
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700">
+                Judul Task *
+              </label>
+              <Input
+                value={taskFormData.title}
+                onChange={(e) =>
+                  setTaskFormData({ ...taskFormData, title: e.target.value })
+                }
+                placeholder="Masukkan judul task"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">
+                Deskripsi
+              </label>
+              <Textarea
+                value={taskFormData.description}
+                onChange={(e) =>
+                  setTaskFormData({
+                    ...taskFormData,
+                    description: e.target.value,
+                  })
+                }
+                placeholder="Masukkan deskripsi task"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">
+                Prioritas
+              </label>
+              <Select
+                value={taskFormData.priority}
+                onValueChange={(value) =>
+                  setTaskFormData({ ...taskFormData, priority: value })
+                }
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Rendah</SelectItem>
+                  <SelectItem value="medium">Sedang</SelectItem>
+                  <SelectItem value="high">Tinggi</SelectItem>
+                  <SelectItem value="critical">Kritis</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">PIC</label>
+              <Select
+                value={taskFormData.assignedTo || "unassigned"}
+                onValueChange={(value) =>
+                  setTaskFormData({ ...taskFormData, assignedTo: value })
+                }
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="unassigned">Belum ditentukan</SelectItem>
+                  {users.map((user: any) => (
+                    <SelectItem key={user.id} value={user.id}>
+                      {user.username || user.email}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">
+                Tenggat Waktu
+              </label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal mt-1"
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {taskFormData.dueDate
+                      ? taskFormData.dueDate.toLocaleDateString("id-ID")
+                      : "Pilih tanggal"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <DateCalendar
+                    mode="single"
+                    selected={taskFormData.dueDate}
+                    onSelect={(date) => {
+                      if (date) {
+                        // Adjust for GMT+7 timezone to prevent date shifting
+                        const adjustedDate = new Date(date);
+                        adjustedDate.setHours(adjustedDate.getHours() + 7);
+                        setTaskFormData({ ...taskFormData, dueDate: adjustedDate });
+                      } else {
+                        setTaskFormData({ ...taskFormData, dueDate: date });
+                      }
+                    }}
+                    disabled={(date) => {
+                      // Use GMT+7 timezone for date comparison
+                      const now = new Date();
+                      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+                      const gmt7Date = new Date(utc + (7 * 3600000));
+                      const today = new Date(gmt7Date.getFullYear(), gmt7Date.getMonth(), gmt7Date.getDate());
+                      
+                      return date < today;
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditTaskModalOpen(false)}>
+              Batal
+            </Button>
+            <Button 
+              onClick={handleEditTaskSubmit}
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+              disabled={editTaskMutation.isPending}
+            >
+              {editTaskMutation.isPending ? "Menyimpan..." : "Simpan"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
