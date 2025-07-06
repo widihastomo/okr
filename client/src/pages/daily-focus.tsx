@@ -70,6 +70,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Calendar as DateCalendar } from "@/components/ui/calendar";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -123,7 +128,7 @@ export default function DailyFocusPage() {
     description: "",
     priority: "medium",
     assignedTo: "unassigned",
-    dueDate: "",
+    dueDate: null as Date | null,
     initiativeId: "none",
   });
 
@@ -206,7 +211,7 @@ export default function DailyFocusPage() {
         description: "",
         priority: "medium",
         assignedTo: "unassigned",
-        dueDate: "",
+        dueDate: null,
         initiativeId: "none",
       });
     },
@@ -239,7 +244,7 @@ export default function DailyFocusPage() {
     const taskData = {
       ...taskFormData,
       assignedTo: taskFormData.assignedTo === "unassigned" ? null : taskFormData.assignedTo || null,
-      dueDate: taskFormData.dueDate || null,
+      dueDate: taskFormData.dueDate ? taskFormData.dueDate.toISOString().split('T')[0] : null,
       initiativeId: taskFormData.initiativeId === "none" || !taskFormData.initiativeId ? null : taskFormData.initiativeId,
     };
 
@@ -1079,12 +1084,35 @@ export default function DailyFocusPage() {
 
                         <div>
                           <Label htmlFor="dueDate">Tenggat Waktu</Label>
-                          <Input
-                            id="dueDate"
-                            type="date"
-                            value={taskFormData.dueDate}
-                            onChange={(e) => setTaskFormData({ ...taskFormData, dueDate: e.target.value })}
-                          />
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className={cn(
+                                  "w-full pl-3 text-left font-normal",
+                                  !taskFormData.dueDate && "text-muted-foreground"
+                                )}
+                              >
+                                {taskFormData.dueDate ? (
+                                  format(taskFormData.dueDate, "dd/MM/yyyy", { locale: id })
+                                ) : (
+                                  <span>Pilih tanggal tenggat</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <DateCalendar
+                                mode="single"
+                                selected={taskFormData.dueDate}
+                                onSelect={(date) => setTaskFormData({ ...taskFormData, dueDate: date })}
+                                disabled={(date) =>
+                                  date < new Date() || date < new Date("1900-01-01")
+                                }
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
                         </div>
                       </div>
 
