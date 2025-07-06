@@ -135,6 +135,8 @@ export default function DailyFocusPage() {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState({ title: "", description: "" });
   const [taskToDelete, setTaskToDelete] = useState<any>(null);
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [taskFormData, setTaskFormData] = useState({
@@ -215,10 +217,6 @@ export default function DailyFocusPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
       queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
-      toast({
-        title: "Task berhasil dibuat",
-        description: "Task baru telah ditambahkan",
-      });
       setIsTaskModalOpen(false);
       setTaskFormData({
         title: "",
@@ -228,6 +226,10 @@ export default function DailyFocusPage() {
         dueDate: null,
         initiativeId: "none",
       });
+      showSuccessDialog(
+        "Task Berhasil Dibuat",
+        "Task baru telah ditambahkan ke sistem"
+      );
     },
     onError: (error: Error) => {
       toast({
@@ -247,10 +249,10 @@ export default function DailyFocusPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
       queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
-      toast({
-        title: "Task berhasil dihapus",
-        description: "Task telah dihapus dari sistem",
-      });
+      showSuccessDialog(
+        "Task Berhasil Dihapus",
+        "Task telah dihapus dari sistem"
+      );
     },
     onError: (error: Error) => {
       toast({
@@ -270,10 +272,6 @@ export default function DailyFocusPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
       queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
-      toast({
-        title: "Task berhasil diperbarui",
-        description: "Task telah diperbarui",
-      });
       setIsEditTaskModalOpen(false);
       setSelectedTask(null);
       setTaskFormData({
@@ -284,6 +282,10 @@ export default function DailyFocusPage() {
         dueDate: null,
         initiativeId: "none",
       });
+      showSuccessDialog(
+        "Task Berhasil Diperbarui",
+        "Perubahan task telah disimpan"
+      );
     },
     onError: (error: Error) => {
       toast({
@@ -294,14 +296,19 @@ export default function DailyFocusPage() {
     },
   });
 
+  // Helper function to show success dialog
+  const showSuccessDialog = (title: string, description: string) => {
+    setSuccessMessage({ title, description });
+    setIsSuccessDialogOpen(true);
+  };
+
   // Task action handlers
   const handleViewTaskDetails = (task: any) => {
     setSelectedTask(task);
-    // You can implement a view details modal here if needed
-    toast({
-      title: "Task Details",
-      description: `${task.title}: ${task.description || "No description"}`,
-    });
+    showSuccessDialog(
+      "Detail Task",
+      `${task.title}: ${task.description || "Tidak ada deskripsi"}`
+    );
   };
 
   const handleEditTask = (task: any) => {
@@ -412,10 +419,10 @@ export default function DailyFocusPage() {
       queryClient.invalidateQueries({
         queryKey: [`/api/users/${userId}/tasks`],
       });
-      toast({
-        title: "Task berhasil diperbarui",
-        className: "border-green-200 bg-green-50 text-green-800",
-      });
+      showSuccessDialog(
+        "Status Task Diperbarui",
+        "Status task berhasil diubah"
+      );
     },
     onError: (error: any) => {
       toast({
@@ -2704,6 +2711,28 @@ export default function DailyFocusPage() {
               disabled={deleteTaskMutation.isPending}
             >
               {deleteTaskMutation.isPending ? "Menghapus..." : "Hapus"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Success Notification Dialog */}
+      <AlertDialog open={isSuccessDialogOpen} onOpenChange={setIsSuccessDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-green-600">
+              {successMessage.title}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {successMessage.description}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              onClick={() => setIsSuccessDialogOpen(false)}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              OK
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

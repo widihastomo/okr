@@ -122,6 +122,8 @@ Changelog:
   * Enhanced task management workflow with direct access to CRUD operations from task lists
   * Edit task modal includes timezone-adjusted DatePicker and full field validation
   * Delete confirmation dialog shows task title and proper loading states during deletion
+  * Replaced all toast notifications with proper AlertDialog for success messages
+  * Success alerts now use green-themed AlertDialog with proper styling instead of toast notifications
 - July 06, 2025. Fixed DatePicker timezone conversion issue for GMT+7:
   * Fixed critical bug where selecting "today" from DatePicker was saving as yesterday's date
   * Added timezone adjustment (+7 hours) to prevent UTC conversion from shifting dates
