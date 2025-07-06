@@ -75,7 +75,7 @@ export default function MetricsUpdateModal({
       }
 
       const promises = updates.map(({ metricId, newValue }) =>
-        apiRequest("POST", `/api/initiatives/${initiativeId}/success-metrics/${metricId}/updates`, {
+        apiRequest("POST", `/api/success-metrics/${metricId}/updates`, {
           achievement: newValue,
           notes: `Updated via Daily Focus on ${new Date().toLocaleDateString('id-ID')}`,
           createdBy: "550e8400-e29b-41d4-a716-446655440001", // Current user ID - should be dynamic
@@ -84,14 +84,23 @@ export default function MetricsUpdateModal({
 
       return Promise.all(promises);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast({
         title: "Berhasil",
         description: "Metrik berhasil diperbarui",
       });
-      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/success-metrics`] });
-      queryClient.invalidateQueries({ queryKey: ["/api/initiatives"] });
+      
+      // Clear input state first
       setMetricUpdates({});
+      
+      // Invalidate and refetch to ensure fresh data
+      await queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/success-metrics`] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/initiatives"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
+      
+      // Force refetch the success metrics to update current achievement values
+      await queryClient.refetchQueries({ queryKey: [`/api/initiatives/${initiativeId}/success-metrics`] });
+      
       onOpenChange(false);
     },
     onError: (error: Error) => {

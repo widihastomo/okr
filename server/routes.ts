@@ -1561,9 +1561,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const update = await storage.createSuccessMetricUpdate(result.data);
       
-      // Update the metric's current value
+      // Update the metric's current achievement value
       await storage.updateSuccessMetric(metricId, {
-        currentValue: result.data.value
+        achievement: result.data.achievement
       });
       
       res.status(201).json(update);
