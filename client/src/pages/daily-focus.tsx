@@ -14,6 +14,7 @@ import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Calendar,
+  Clock,
   TrendingUp,
   TrendingDown,
   AlertTriangle,
@@ -752,71 +753,262 @@ export default function DailyFocusPage() {
                 Fokus pada task yang perlu diselesaikan hari ini
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Overdue Tasks */}
-              {overdueTasks.length > 0 && (
-                <div className="space-y-3">
-                  <h3 className="text-sm font-medium text-red-700 flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4" />
-                    Task Terlambat
-                  </h3>
-                  {overdueTasks.map((task: any) => (
-                    <div
-                      key={task.id}
-                      className="flex flex-col gap-2 p-3 bg-red-50 border border-red-200 rounded-lg md:flex-row md:items-center md:justify-between md:gap-0"
-                    >
-                      <div className="flex-1">
-                        <p className="font-medium text-red-900">{task.title}</p>
-                        <p className="text-sm text-red-600">
-                          Tenggat:{" "}
-                          {task.dueDate
-                            ? new Date(task.dueDate).toLocaleDateString("id-ID")
-                            : "Tidak ada"}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge className={getTaskStatusColor(task.status)}>
-                          {getTaskStatusLabel(task.status)}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
+            <CardContent>
+              {/* Check if we have any tasks to show */}
+              {overdueTasks.length === 0 && todayTasks.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <CheckCircle className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                  <p>Tidak ada task untuk hari ini</p>
                 </div>
-              )}
-
-              {/* Today's Tasks */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-gray-700">
-                  Task Hari Ini
-                </h3>
-                {todayTasks.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <CheckCircle className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                    <p>Tidak ada task untuk hari ini</p>
+              ) : (
+                <>
+                  {/* Desktop Table View */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Task
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Tenggat
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            PIC
+                          </th>
+                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Aksi
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {/* Overdue Tasks */}
+                        {overdueTasks.map((task: any) => (
+                          <tr key={task.id} className="hover:bg-gray-50 bg-red-50">
+                            <td className="px-4 py-4">
+                              <div className="flex items-center gap-2">
+                                <AlertTriangle className="h-4 w-4 text-red-600" />
+                                <div>
+                                  <div className="font-medium text-red-900">{task.title}</div>
+                                  <div className="text-sm text-red-600">Task Terlambat</div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-4 py-4">
+                              <Badge className={getTaskStatusColor(task.status)}>
+                                {getTaskStatusLabel(task.status)}
+                              </Badge>
+                            </td>
+                            <td className="px-4 py-4">
+                              <div className="text-sm text-red-600 font-medium">
+                                {task.dueDate
+                                  ? new Date(task.dueDate).toLocaleDateString("id-ID")
+                                  : "Tidak ada"}
+                              </div>
+                            </td>
+                            <td className="px-4 py-4">
+                              <div className="flex items-center gap-2">
+                                {task.assignedTo ? (
+                                  <Avatar className="w-6 h-6">
+                                    <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`} />
+                                    <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
+                                      {getUserInitials(task.assignedTo)}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                ) : (
+                                  <User className="w-4 h-4" />
+                                )}
+                                <span className="text-sm text-gray-600">
+                                  {task.assignedTo ? getUserName(task.assignedTo) : "Belum ditentukan"}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-4 py-4 text-center">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleOpenTaskModal(task)}
+                                className="text-xs"
+                              >
+                                <Edit className="w-4 h-4 mr-1" />
+                                Edit
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                        
+                        {/* Today's Tasks */}
+                        {todayTasks.map((task: any) => (
+                          <tr key={task.id} className="hover:bg-gray-50">
+                            <td className="px-4 py-4">
+                              <div className="flex items-center gap-2">
+                                <Clock className="h-4 w-4 text-blue-600" />
+                                <div>
+                                  <div className="font-medium text-gray-900">{task.title}</div>
+                                  <div className="text-sm text-gray-600">Task Hari Ini</div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-4 py-4">
+                              <Badge className={getTaskStatusColor(task.status)}>
+                                {getTaskStatusLabel(task.status)}
+                              </Badge>
+                            </td>
+                            <td className="px-4 py-4">
+                              <div className="text-sm text-gray-600">
+                                {task.dueDate
+                                  ? new Date(task.dueDate).toLocaleDateString("id-ID")
+                                  : "Tidak ada tenggat"}
+                              </div>
+                            </td>
+                            <td className="px-4 py-4">
+                              <div className="flex items-center gap-2">
+                                {task.assignedTo ? (
+                                  <Avatar className="w-6 h-6">
+                                    <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`} />
+                                    <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
+                                      {getUserInitials(task.assignedTo)}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                ) : (
+                                  <User className="w-4 h-4" />
+                                )}
+                                <span className="text-sm text-gray-600">
+                                  {task.assignedTo ? getUserName(task.assignedTo) : "Belum ditentukan"}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-4 py-4 text-center">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleOpenTaskModal(task)}
+                                className="text-xs"
+                              >
+                                <Edit className="w-4 h-4 mr-1" />
+                                Edit
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
-                ) : (
-                  todayTasks.map((task: any) => (
-                    <div
-                      key={task.id}
-                      className="flex flex-col gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg md:flex-row md:items-center md:justify-between md:gap-0"
-                    >
-                      <div className="flex-1">
-                        <p className="font-medium">{task.title}</p>
-                        <p className="text-sm text-gray-600">
-                          {task.dueDate
-                            ? new Date(task.dueDate).toLocaleDateString("id-ID")
-                            : "Tidak ada tenggat"}
-                        </p>
+
+                  {/* Mobile Card View */}
+                  <div className="md:hidden space-y-4">
+                    {/* Overdue Tasks */}
+                    {overdueTasks.length > 0 && (
+                      <div className="space-y-3">
+                        <h3 className="text-sm font-medium text-red-700 flex items-center gap-2">
+                          <AlertTriangle className="h-4 w-4" />
+                          Task Terlambat
+                        </h3>
+                        {overdueTasks.map((task: any) => (
+                          <div
+                            key={task.id}
+                            className="p-3 bg-red-50 border border-red-200 rounded-lg space-y-2"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="font-medium text-red-900">{task.title}</div>
+                              <Badge className={getTaskStatusColor(task.status)}>
+                                {getTaskStatusLabel(task.status)}
+                              </Badge>
+                            </div>
+                            <div className="text-sm text-red-600">
+                              Tenggat: {task.dueDate
+                                ? new Date(task.dueDate).toLocaleDateString("id-ID")
+                                : "Tidak ada"}
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                {task.assignedTo ? (
+                                  <Avatar className="w-5 h-5">
+                                    <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`} />
+                                    <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
+                                      {getUserInitials(task.assignedTo)}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                ) : (
+                                  <User className="w-4 h-4" />
+                                )}
+                                <span className="text-xs text-gray-600">
+                                  {task.assignedTo ? getUserName(task.assignedTo) : "Belum ditentukan"}
+                                </span>
+                              </div>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleOpenTaskModal(task)}
+                                className="text-xs"
+                              >
+                                <Edit className="w-3 h-3 mr-1" />
+                                Edit
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Badge className={getTaskStatusColor(task.status)}>
-                          {getTaskStatusLabel(task.status)}
-                        </Badge>
+                    )}
+
+                    {/* Today's Tasks */}
+                    {todayTasks.length > 0 && (
+                      <div className="space-y-3">
+                        <h3 className="text-sm font-medium text-gray-700">
+                          Task Hari Ini
+                        </h3>
+                        {todayTasks.map((task: any) => (
+                          <div
+                            key={task.id}
+                            className="p-3 bg-gray-50 border border-gray-200 rounded-lg space-y-2"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="font-medium text-gray-900">{task.title}</div>
+                              <Badge className={getTaskStatusColor(task.status)}>
+                                {getTaskStatusLabel(task.status)}
+                              </Badge>
+                            </div>
+                            <div className="text-sm text-gray-600">
+                              {task.dueDate
+                                ? new Date(task.dueDate).toLocaleDateString("id-ID")
+                                : "Tidak ada tenggat"}
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                {task.assignedTo ? (
+                                  <Avatar className="w-5 h-5">
+                                    <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`} />
+                                    <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
+                                      {getUserInitials(task.assignedTo)}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                ) : (
+                                  <User className="w-4 h-4" />
+                                )}
+                                <span className="text-xs text-gray-600">
+                                  {task.assignedTo ? getUserName(task.assignedTo) : "Belum ditentukan"}
+                                </span>
+                              </div>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleOpenTaskModal(task)}
+                                className="text-xs"
+                              >
+                                <Edit className="w-3 h-3 mr-1" />
+                                Edit
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    </div>
-                  ))
-                )}
-              </div>
+                    )}
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
