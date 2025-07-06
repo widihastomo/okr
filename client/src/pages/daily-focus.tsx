@@ -35,6 +35,7 @@ import {
   Trash2,
   Check,
   ExternalLink,
+  Plus,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -55,6 +56,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
@@ -90,6 +103,14 @@ export default function DailyFocusPage() {
     useState(false);
   const [selectedInitiative, setSelectedInitiative] = useState<any>(null);
   const [selectedUserId, setSelectedUserId] = useState<string>(userId || "all"); // Filter state - default to current user
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [taskFormData, setTaskFormData] = useState({
+    title: "",
+    description: "",
+    priority: "medium",
+    assignedTo: "",
+    dueDate: "",
+  });
 
   // Status update mutation
   const { toast } = useToast();
@@ -147,14 +168,66 @@ export default function DailyFocusPage() {
     queryKey: ["/api/tasks"],
   });
 
+  const { data: users = [] } = useQuery({
+    queryKey: ["/api/users"],
+  });
+
+  // Task creation mutation
+  const createTaskMutation = useMutation({
+    mutationFn: async (taskData: any) => {
+      const response = await apiRequest("POST", "/api/tasks", taskData);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
+      toast({
+        title: "Task berhasil dibuat",
+        description: "Task baru telah ditambahkan",
+      });
+      setIsTaskModalOpen(false);
+      setTaskFormData({
+        title: "",
+        description: "",
+        priority: "medium",
+        assignedTo: "",
+        dueDate: "",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Gagal membuat task",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const { data: stats } = useQuery({
     queryKey: [`/api/gamification/stats/${userId}`],
     enabled: !!userId,
   });
 
-  const { data: users = [] } = useQuery({
-    queryKey: ["/api/users"],
-  });
+  // Handle task form submission
+  const handleTaskSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!taskFormData.title.trim()) {
+      toast({
+        title: "Title diperlukan",
+        description: "Mohon masukkan title untuk task",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const taskData = {
+      ...taskFormData,
+      assignedTo: taskFormData.assignedTo || null,
+      dueDate: taskFormData.dueDate || null,
+    };
+
+    createTaskMutation.mutate(taskData);
+  };
 
   // Update task status mutation
   const updateTaskMutation = useMutation({
@@ -841,10 +914,122 @@ export default function DailyFocusPage() {
         <TabsContent value="tasks" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Task Prioritas Hari Ini</CardTitle>
-              <CardDescription>
-                Fokus pada task yang perlu diselesaikan hari ini
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Task Prioritas Hari Ini</CardTitle>
+                  <CardDescription>
+                    Fokus pada task yang perlu diselesaikan hari ini
+                  </CardDescription>
+                </div>
+                <Dialog open={isTaskModalOpen} onOpenChange={setIsTaskModalOpen}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white border-orange-600"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Tambah Task
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[500px]">
+                    <DialogHeader>
+                      <DialogTitle>Buat Task Baru</DialogTitle>
+                      <DialogDescription>
+                        Tambahkan task baru untuk aktivitas harian
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleTaskSubmit} className="space-y-4">
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="title">Title *</Label>
+                          <Input
+                            id="title"
+                            value={taskFormData.title}
+                            onChange={(e) => setTaskFormData({ ...taskFormData, title: e.target.value })}
+                            placeholder="Masukkan title task"
+                            required
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="description">Deskripsi</Label>
+                          <Textarea
+                            id="description"
+                            value={taskFormData.description}
+                            onChange={(e) => setTaskFormData({ ...taskFormData, description: e.target.value })}
+                            placeholder="Masukkan deskripsi task (opsional)"
+                            rows={3}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="priority">Prioritas</Label>
+                            <Select 
+                              value={taskFormData.priority} 
+                              onValueChange={(value) => setTaskFormData({ ...taskFormData, priority: value })}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih prioritas" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="low">Rendah</SelectItem>
+                                <SelectItem value="medium">Sedang</SelectItem>
+                                <SelectItem value="high">Tinggi</SelectItem>
+                                <SelectItem value="urgent">Urgent</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div>
+                            <Label htmlFor="assignedTo">PIC</Label>
+                            <Select 
+                              value={taskFormData.assignedTo} 
+                              onValueChange={(value) => setTaskFormData({ ...taskFormData, assignedTo: value })}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih PIC" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="">Belum ditentukan</SelectItem>
+                                {users?.map((user: any) => (
+                                  <SelectItem key={user.id} value={user.id}>
+                                    {user.firstName} {user.lastName}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="dueDate">Tenggat Waktu</Label>
+                          <Input
+                            id="dueDate"
+                            type="date"
+                            value={taskFormData.dueDate}
+                            onChange={(e) => setTaskFormData({ ...taskFormData, dueDate: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      <DialogFooter>
+                        <Button type="button" variant="outline" onClick={() => setIsTaskModalOpen(false)}>
+                          Batal
+                        </Button>
+                        <Button 
+                          type="submit" 
+                          disabled={createTaskMutation.isPending}
+                          className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                        >
+                          {createTaskMutation.isPending ? "Membuat..." : "Buat Task"}
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </CardHeader>
             <CardContent>
               {/* Check if we have any tasks to show */}

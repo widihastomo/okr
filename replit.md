@@ -113,6 +113,14 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 06, 2025. Added task creation button to Daily Focus page:
+  * Added "Tambah Task" button in Task Prioritas Hari Ini card header with orange gradient styling
+  * Created task creation modal with comprehensive form including title, description, priority, PIC assignment, and due date
+  * Integrated with users query for PIC selection with dropdown showing all team members
+  * Added task creation mutation with proper success/error handling and cache invalidation
+  * Enhanced Daily Focus workflow by allowing users to create tasks directly from the main dashboard
+  * Modal includes validation for required title field and proper form state management
+  * Consistent styling with application's orange gradient theme for primary actions
 - July 06, 2025. Localized OKR card status labels to Indonesian language:
   * Updated status labels: "On track" → "Sesuai Target", "At risk" → "Berisiko", "Behind" → "Tertinggal"
   * Updated status labels: "Completed" → "Selesai", "In progress" → "Sedang Berjalan", "Not started" → "Belum Mulai"
