@@ -149,23 +149,23 @@ function TaskOverviewCard({ task, assignedUser, initiative }: any) {
     <Card>
       <CardHeader className="pb-4">
         <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <CardTitle className="text-lg mb-2">{task?.title}</CardTitle>
-            <div className="flex items-center gap-2 flex-wrap">
-              <Badge className={`${getTaskStatusColor(task?.status || '')} text-xs`}>
-                {getTaskStatusLabel(task?.status || '')}
+          <div className="flex-1 min-w-0">
+            <CardTitle className="text-lg mb-2 pr-4">{task?.title}</CardTitle>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap flex-shrink-0">
+            <Badge className={`${getTaskStatusColor(task?.status || '')} text-xs`}>
+              {getTaskStatusLabel(task?.status || '')}
+            </Badge>
+            <Badge className={`${getTaskPriorityColor(task?.priority || '')} text-xs`}>
+              <Flag className="w-3 h-3 mr-1" />
+              {getTaskPriorityLabel(task?.priority || '')}
+            </Badge>
+            {isOverdue && (
+              <Badge className="bg-red-100 text-red-800 border-red-200 text-xs">
+                <AlertTriangle className="w-3 h-3 mr-1" />
+                Terlambat
               </Badge>
-              <Badge className={`${getTaskPriorityColor(task?.priority || '')} text-xs`}>
-                <Flag className="w-3 h-3 mr-1" />
-                {getTaskPriorityLabel(task?.priority || '')}
-              </Badge>
-              {isOverdue && (
-                <Badge className="bg-red-100 text-red-800 border-red-200 text-xs">
-                  <AlertTriangle className="w-3 h-3 mr-1" />
-                  Terlambat
-                </Badge>
-              )}
-            </div>
+            )}
           </div>
         </div>
       </CardHeader>
