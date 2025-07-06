@@ -166,7 +166,7 @@ export default function EditCycleModal({ cycle, open, onOpenChange }: EditCycleM
             <Button
               type="submit"
               disabled={updateMutation.isPending}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
             >
               {updateMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
             </Button>

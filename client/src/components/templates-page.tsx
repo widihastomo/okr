@@ -85,7 +85,7 @@ export default function TemplatesPage() {
               <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">OKR Templates</h1>
               <p className="text-gray-600 mt-2 text-sm lg:text-base">Create and manage reusable OKR templates</p>
             </div>
-            <Button onClick={() => setCreateModalOpen(true)} className="bg-primary hover:bg-blue-700 w-full sm:w-auto">
+            <Button onClick={() => setCreateModalOpen(true)} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 w-full sm:w-auto">
               <Plus className="w-4 h-4 mr-2" />
               New Template
             </Button>
@@ -181,7 +181,7 @@ export default function TemplatesPage() {
           <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No templates yet</h3>
           <p className="text-gray-500 mb-4">Create your first OKR template to reuse across cycles</p>
-          <Button onClick={() => setCreateModalOpen(true)} className="bg-primary hover:bg-blue-700">
+          <Button onClick={() => setCreateModalOpen(true)} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
             <Plus className="w-4 h-4 mr-2" />
             Create Template
           </Button>

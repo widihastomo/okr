@@ -915,19 +915,7 @@ export default function DailyFocusPage() {
                             variant="default"
                             size="sm"
                             onClick={() => handleCheckInKeyResult(kr)}
-                            className="text-white"
-                            style={{
-                              backgroundColor: "#2095F4",
-                              borderColor: "#2095F4",
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = "#1976D2";
-                              e.currentTarget.style.borderColor = "#1976D2";
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor = "#2095F4";
-                              e.currentTarget.style.borderColor = "#2095F4";
-                            }}
+                            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                           >
                             <TrendingUp className="w-4 h-4 mr-1" />
                             <span className="sm:hidden">Update</span>

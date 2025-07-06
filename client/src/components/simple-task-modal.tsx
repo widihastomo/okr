@@ -275,7 +275,7 @@ export default function SimpleTaskModal({ open, onClose, task, onSuccess }: Simp
           <Button
             onClick={handleSubmit}
             disabled={!formData.title || isLoading}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
           >
             {isLoading ? "Menyimpan..." : (task ? "Update Task" : "Tambah Task")}
           </Button>

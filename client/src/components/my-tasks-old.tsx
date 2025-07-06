@@ -397,7 +397,7 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
         
         <Button
           onClick={() => setShowQuickTaskForm(!showQuickTaskForm)}
-          className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
           Tambah Task

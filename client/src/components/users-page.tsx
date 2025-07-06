@@ -452,7 +452,7 @@ export default function UsersPage() {
             <h2 className="text-xl font-semibold">Users ({filteredUsers.length})</h2>
             <Dialog>
               <DialogTrigger asChild>
-                <Button className="bg-blue-600 hover:bg-blue-700">
+                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
                   <UserPlus className="h-4 w-4 mr-2" />
                   Add User
                 </Button>
@@ -821,7 +821,7 @@ export default function UsersPage() {
                 <h2 className="text-xl font-semibold">Teams ({teams.length})</h2>
                 <Dialog open={newTeamDialog.open} onOpenChange={(open) => setNewTeamDialog({ open })}>
                   <DialogTrigger asChild>
-                    <Button className="bg-blue-600 hover:bg-blue-700">
+                    <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
                       <Plus className="h-4 w-4 mr-2" />
                       Create Team
                     </Button>

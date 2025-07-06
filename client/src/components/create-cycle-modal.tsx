@@ -212,7 +212,7 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
               <Button 
                 type="submit" 
                 disabled={mutation.isPending}
-                className="bg-primary hover:bg-blue-700"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
                 {mutation.isPending ? "Creating..." : "Create Cycle"}
               </Button>
