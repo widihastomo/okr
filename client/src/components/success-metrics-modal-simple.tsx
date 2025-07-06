@@ -105,7 +105,7 @@ export default function SuccessMetricsModal({
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/success-metrics`] });
       toast({
         title: "Berhasil",
-        description: "Metrik keberhasilan berhasil diupdate",
+        description: "Metrik keberhasilan berhasil diperbarui",
         className: "border-green-200 bg-green-50 text-green-800",
       });
       onOpenChange(false);

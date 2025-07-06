@@ -106,7 +106,7 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
     },
     onSuccess: () => {
       toast({
-        title: isEditMode ? "Rencana berhasil diupdate" : "Rencana berhasil dibuat",
+        title: isEditMode ? "Inisiatif berhasil diperbarui" : "Inisiatif berhasil dibuat",
         description: isEditMode ? "Rencana telah diperbarui." : "Rencana baru telah ditambahkan.",
         className: "border-green-200 bg-green-50 text-green-800",
       });

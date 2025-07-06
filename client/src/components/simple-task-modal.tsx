@@ -104,7 +104,7 @@ export default function SimpleTaskModal({ open, onClose, task, onSuccess }: Simp
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
       toast({
-        title: "Task berhasil diupdate",
+        title: "Task berhasil diperbarui",
         className: "border-green-200 bg-green-50 text-green-800",
       });
       onClose();

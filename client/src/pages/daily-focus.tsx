@@ -161,7 +161,7 @@ export default function DailyFocusPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
       queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
       toast({
-        title: "Status berhasil diupdate",
+        title: "Status berhasil diperbarui",
         description: "Status task telah diperbarui",
       });
     },

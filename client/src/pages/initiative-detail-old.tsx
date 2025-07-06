@@ -177,7 +177,7 @@ export default function InitiativeDetailPage() {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/tasks`], refetchType: 'active' });
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`], refetchType: 'active' });
       toast({
-        description: "Status task berhasil diupdate",
+        description: "Status task berhasil diperbarui",
         className: "border-green-200 bg-green-50 text-green-800",
       });
     },
@@ -209,7 +209,7 @@ export default function InitiativeDetailPage() {
       setIsMetricUpdateModalOpen(false);
       setSelectedMetric(null);
       toast({
-        title: "Metrik berhasil diupdate",
+        title: "Metrik berhasil diperbarui",
         description: "Progress metrik kesuksesan telah diperbarui",
         className: "border-green-200 bg-green-50 text-green-800",
       });

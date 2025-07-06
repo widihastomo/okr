@@ -151,7 +151,7 @@ export default function KeyResultDetailPage() {
         refetchType: 'active'
       });
       toast({
-        title: "Task berhasil diupdate",
+        title: "Task berhasil diperbarui",
         description: "Perubahan task telah disimpan",
         className: "border-green-200 bg-green-50 text-green-800",
       });

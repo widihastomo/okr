@@ -104,7 +104,7 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
     onSuccess: () => {
       toast({
         title: "Success",
-        description: "Goal berhasil diperbarui",
+        description: "Objective berhasil diperbarui",
         variant: "default",
         className: "border-green-200 bg-green-50 text-green-800",
       });

@@ -175,7 +175,7 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
     },
     onSuccess: () => {
       toast({
-        title: "Initiative berhasil dibuat",
+        title: "Inisiatif berhasil dibuat",
         description: "Initiative baru telah ditambahkan ke key result",
         className: "border-green-200 bg-green-50 text-green-800",
       });
@@ -217,7 +217,7 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
     },
     onSuccess: () => {
       toast({
-        title: "Initiative berhasil diupdate",
+        title: "Initiative berhasil diperbarui",
         description: "Perubahan initiative telah disimpan",
         className: "border-green-200 bg-green-50 text-green-800",
       });
