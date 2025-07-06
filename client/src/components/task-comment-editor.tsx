@@ -220,14 +220,6 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
             </AnimatePresence>
             
             <div className="flex-1" />
-            
-            <button
-              type="button"
-              className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1"
-            >
-              <AtSign size={14} />
-              @ untuk mention
-            </button>
           </div>
 
           {/* Content editor */}
