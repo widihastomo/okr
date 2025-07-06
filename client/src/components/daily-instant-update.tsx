@@ -289,7 +289,7 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto sm:max-w-6xl max-w-[95vw]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-blue-600" />
@@ -314,50 +314,100 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Angka Target</TableHead>
-                      <TableHead>Nilai Saat Ini</TableHead>
-                      <TableHead>Target</TableHead>
-                      <TableHead>Nilai Baru</TableHead>
-                      <TableHead>Catatan</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {updateData.keyResults.map((kr, index) => (
-                      <TableRow key={kr.id}>
-                        <TableCell className="font-medium">{kr.title}</TableCell>
-                        <TableCell>{kr.currentValue} {kr.unit}</TableCell>
-                        <TableCell>{kr.targetValue} {kr.unit}</TableCell>
-                        <TableCell>
-                          <Input
-                            type="number"
-                            value={kr.newValue || ''}
-                            onChange={(e) => {
-                              const newData = { ...updateData };
-                              newData.keyResults[index].newValue = parseFloat(e.target.value) || 0;
-                              setUpdateData(newData);
-                            }}
-                            className="w-24"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Input
-                            placeholder="Catatan singkat..."
-                            value={kr.notes || ''}
-                            onChange={(e) => {
-                              const newData = { ...updateData };
-                              newData.keyResults[index].notes = e.target.value;
-                              setUpdateData(newData);
-                            }}
-                            className="w-40"
-                          />
-                        </TableCell>
+                {/* Desktop Table */}
+                <div className="hidden md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Angka Target</TableHead>
+                        <TableHead>Nilai Saat Ini</TableHead>
+                        <TableHead>Target</TableHead>
+                        <TableHead>Nilai Baru</TableHead>
+                        <TableHead>Catatan</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {updateData.keyResults.map((kr, index) => (
+                        <TableRow key={kr.id}>
+                          <TableCell className="font-medium">{kr.title}</TableCell>
+                          <TableCell>{kr.currentValue} {kr.unit}</TableCell>
+                          <TableCell>{kr.targetValue} {kr.unit}</TableCell>
+                          <TableCell>
+                            <Input
+                              type="number"
+                              value={kr.newValue || ''}
+                              onChange={(e) => {
+                                const newData = { ...updateData };
+                                newData.keyResults[index].newValue = parseFloat(e.target.value) || 0;
+                                setUpdateData(newData);
+                              }}
+                              className="w-24"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Input
+                              placeholder="Catatan singkat..."
+                              value={kr.notes || ''}
+                              onChange={(e) => {
+                                const newData = { ...updateData };
+                                newData.keyResults[index].notes = e.target.value;
+                                setUpdateData(newData);
+                              }}
+                              className="w-40"
+                            />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Mobile Cards */}
+                <div className="md:hidden space-y-4">
+                  {updateData.keyResults.map((kr, index) => (
+                    <div key={kr.id} className="p-4 border border-gray-200 rounded-lg space-y-3">
+                      <h4 className="font-medium text-gray-900">{kr.title}</h4>
+                      
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                          <span className="text-gray-600">Saat ini:</span>
+                          <p className="font-medium">{kr.currentValue} {kr.unit}</p>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Target:</span>
+                          <p className="font-medium">{kr.targetValue} {kr.unit}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">Nilai Baru:</label>
+                        <Input
+                          type="number"
+                          value={kr.newValue || ''}
+                          onChange={(e) => {
+                            const newData = { ...updateData };
+                            newData.keyResults[index].newValue = parseFloat(e.target.value) || 0;
+                            setUpdateData(newData);
+                          }}
+                          placeholder="Masukkan nilai baru"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">Catatan:</label>
+                        <Input
+                          placeholder="Catatan singkat..."
+                          value={kr.notes || ''}
+                          onChange={(e) => {
+                            const newData = { ...updateData };
+                            newData.keyResults[index].notes = e.target.value;
+                            setUpdateData(newData);
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           )}
@@ -375,60 +425,115 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Task</TableHead>
-                      <TableHead>Status Saat Ini</TableHead>
-                      <TableHead>Status Baru</TableHead>
-                      <TableHead>Selesai</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {updateData.todayTasks.map((task, index) => (
-                      <TableRow key={task.id}>
-                        <TableCell className="font-medium">{task.title}</TableCell>
-                        <TableCell>
-                          <Badge className={getTaskStatusColor(task.status)}>
-                            {getTaskStatusLabel(task.status)}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Select
-                            value={task.newStatus}
-                            onValueChange={(value) => {
-                              const newData = { ...updateData };
-                              newData.todayTasks[index].newStatus = value;
-                              newData.todayTasks[index].completed = value === 'completed';
-                              setUpdateData(newData);
-                            }}
-                          >
-                            <SelectTrigger className="w-40">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="not_started">Belum Dimulai</SelectItem>
-                              <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
-                              <SelectItem value="completed">Selesai</SelectItem>
-                              <SelectItem value="cancelled">Dibatalkan</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </TableCell>
-                        <TableCell>
-                          <Checkbox
-                            checked={task.completed}
-                            onCheckedChange={(checked) => {
-                              const newData = { ...updateData };
-                              newData.todayTasks[index].completed = !!checked;
-                              newData.todayTasks[index].newStatus = checked ? 'completed' : 'in_progress';
-                              setUpdateData(newData);
-                            }}
-                          />
-                        </TableCell>
+                {/* Desktop Table */}
+                <div className="hidden md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Task</TableHead>
+                        <TableHead>Status Saat Ini</TableHead>
+                        <TableHead>Status Baru</TableHead>
+                        <TableHead>Selesai</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {updateData.todayTasks.map((task, index) => (
+                        <TableRow key={task.id}>
+                          <TableCell className="font-medium">{task.title}</TableCell>
+                          <TableCell>
+                            <Badge className={getTaskStatusColor(task.status)}>
+                              {getTaskStatusLabel(task.status)}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Select
+                              value={task.newStatus}
+                              onValueChange={(value) => {
+                                const newData = { ...updateData };
+                                newData.todayTasks[index].newStatus = value;
+                                newData.todayTasks[index].completed = value === 'completed';
+                                setUpdateData(newData);
+                              }}
+                            >
+                              <SelectTrigger className="w-40">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="not_started">Belum Dimulai</SelectItem>
+                                <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
+                                <SelectItem value="completed">Selesai</SelectItem>
+                                <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </TableCell>
+                          <TableCell>
+                            <Checkbox
+                              checked={task.completed}
+                              onCheckedChange={(checked) => {
+                                const newData = { ...updateData };
+                                newData.todayTasks[index].completed = !!checked;
+                                newData.todayTasks[index].newStatus = checked ? 'completed' : 'in_progress';
+                                setUpdateData(newData);
+                              }}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Mobile Cards */}
+                <div className="md:hidden space-y-4">
+                  {updateData.todayTasks.map((task, index) => (
+                    <div key={task.id} className="p-4 border border-gray-200 rounded-lg space-y-3">
+                      <h4 className="font-medium text-gray-900">{task.title}</h4>
+                      
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600">Status saat ini:</span>
+                        <Badge className={getTaskStatusColor(task.status)}>
+                          {getTaskStatusLabel(task.status)}
+                        </Badge>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">Status Baru:</label>
+                        <Select
+                          value={task.newStatus}
+                          onValueChange={(value) => {
+                            const newData = { ...updateData };
+                            newData.todayTasks[index].newStatus = value;
+                            newData.todayTasks[index].completed = value === 'completed';
+                            setUpdateData(newData);
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="not_started">Belum Dimulai</SelectItem>
+                            <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
+                            <SelectItem value="completed">Selesai</SelectItem>
+                            <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          checked={task.completed}
+                          onCheckedChange={(checked) => {
+                            const newData = { ...updateData };
+                            newData.todayTasks[index].completed = !!checked;
+                            newData.todayTasks[index].newStatus = checked ? 'completed' : 'in_progress';
+                            setUpdateData(newData);
+                          }}
+                        />
+                        <label className="text-sm font-medium text-gray-700">Tandai sebagai selesai</label>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           )}
@@ -527,14 +632,14 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
           )}
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-3 pt-4 border-t">
-            <Button variant="outline" onClick={() => setOpen(false)}>
+          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t">
+            <Button variant="outline" onClick={() => setOpen(false)} className="w-full sm:w-auto">
               Batal
             </Button>
             <Button
               onClick={() => submitUpdateMutation.mutate(updateData)}
               disabled={submitUpdateMutation.isPending}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
             >
               {submitUpdateMutation.isPending ? (
                 <>

@@ -127,6 +127,14 @@ Changelog:
   * Added direct navigation to /key-results/{id} detail page for easy access
   * Improved user experience by providing quick access to detailed key result information
   * Enhanced workflow efficiency by eliminating need to use dropdown menu for navigation
+- July 06, 2025. Enhanced Daily Instant Update form with mobile-responsive design for better user experience:
+  * Replaced table layouts with responsive card-based design for mobile devices
+  * Added responsive dialog width (95vw on mobile, max-w-6xl on desktop) for better screen utilization
+  * Implemented desktop table view (hidden on mobile) and mobile card view (hidden on desktop) for optimal UX
+  * Enhanced mobile key results section with labeled fields and proper spacing
+  * Improved mobile task status section with clear labels and checkbox description
+  * Added responsive action buttons (full width on mobile, auto width on desktop)
+  * Maintained all functionality while improving mobile accessibility and usability
 - July 06, 2025. Standardized avatar sizing and styling across entire application for consistent user experience:
   * Updated Daily Focus page avatars to use standard w-6 h-6 (24px) size matching other pages
   * Added consistent avatar styling with bg-blue-100 text-blue-700 color scheme for fallback initials
