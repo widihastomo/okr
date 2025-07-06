@@ -134,6 +134,8 @@ Changelog:
   * Updated objective filtering logic to include "in_progress" status objectives
   * Previously only "on_track" and "at_risk" objectives were shown in related objectives section
   * Fixed issue where new objectives with "in_progress" status weren't appearing in Daily Focus
+  * Enhanced user filtering to include objectives owned by the selected user, even without key results
+  * Fixed filtering logic that was hiding user-owned objectives without assigned key results
   * All active objectives now properly display regardless of status when relevant to user activities
 - July 06, 2025. Removed One-Click Habits feature from Daily Focus page:
   * Removed OneClickHabitButton component from Daily Focus action buttons

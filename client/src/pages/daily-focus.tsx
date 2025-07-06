@@ -437,13 +437,18 @@ export default function DailyFocusPage() {
         obj.status === "in_progress",
     );
 
-    // Apply user filter - only show objectives that have key results assigned to the selected user
+    // Apply user filter - show objectives that are owned by user or have key results assigned to the selected user
     if (selectedUserId !== "all") {
       filteredObjectives = filteredObjectives.filter((obj: any) => {
+        // Include objective if user is the owner
+        if (obj.ownerId === selectedUserId) {
+          return true;
+        }
+        
+        // Include objective if any of its key results are assigned to the selected user
         const objectiveKeyResults = (keyResults as any[]).filter(
           (kr: any) => kr.objectiveId === obj.id
         );
-        // Include objective if any of its key results are assigned to the selected user
         return objectiveKeyResults.some((kr: any) => kr.assignedTo === selectedUserId);
       });
     }
