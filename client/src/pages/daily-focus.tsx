@@ -1064,6 +1064,9 @@ export default function DailyFocusPage() {
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           PIC
                         </th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Update
+                        </th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Aksi
                         </th>
@@ -1258,6 +1261,14 @@ export default function DailyFocusPage() {
                                   )}
                                 </div>
                               </td>
+                              <td className="px-4 py-4 text-center">
+                                <Button
+                                  onClick={() => handleUpdateMetrics(initiative)}
+                                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-3 py-1 rounded-md text-sm font-medium"
+                                >
+                                  Update
+                                </Button>
+                              </td>
                               <td className="px-4 py-4 text-right">
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
@@ -1275,12 +1286,6 @@ export default function DailyFocusPage() {
                                         <Eye className="mr-2 h-4 w-4" />
                                         Lihat Detail
                                       </Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                      onClick={() => handleUpdateMetrics(initiative)}
-                                    >
-                                      <Edit className="mr-2 h-4 w-4" />
-                                      Update Metrics
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
