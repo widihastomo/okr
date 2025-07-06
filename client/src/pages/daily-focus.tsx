@@ -486,19 +486,16 @@ export default function DailyFocusPage() {
   // Filter data for today's focus
   const todayTasks = filteredTasks.filter((task: any) => {
     const dueDate = task.dueDate ? task.dueDate.split("T")[0] : null;
-    // Include tasks due today, in progress tasks, or overdue incomplete tasks
+    // Include tasks due today or in progress tasks
     return (
       dueDate === todayStr ||
-      task.status === "in_progress" ||
-      (dueDate &&
-        dueDate < todayStr &&
-        task.status !== "completed" &&
-        task.status !== "cancelled")
+      task.status === "in_progress"
     );
   });
 
   const overdueTasks = filteredTasks.filter((task: any) => {
     const dueDate = task.dueDate ? task.dueDate.split("T")[0] : null;
+    // Only consider tasks overdue if they were due BEFORE today (not including today)
     return (
       dueDate &&
       dueDate < todayStr &&

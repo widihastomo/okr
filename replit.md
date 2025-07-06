@@ -113,6 +113,11 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 06, 2025. Fixed task overdue logic to properly handle same-day due dates:
+  * Updated overdue task filtering to only consider tasks overdue after the full day has passed
+  * Tasks due today are no longer incorrectly marked as "overdue" - they appear in "Today's Tasks" section
+  * Fixed Daily Focus page task categorization to properly separate overdue vs today's tasks
+  * Overdue tasks now only include tasks with due dates before today, not including today
 - July 06, 2025. Fixed DatePicker to allow selecting today's date:
   * Updated date validation logic to use start of today (setHours(0, 0, 0, 0)) instead of current timestamp
   * Fixed issue where "hari ini" (today) was disabled in task due date selection

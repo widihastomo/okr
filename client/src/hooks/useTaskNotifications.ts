@@ -35,6 +35,7 @@ export function useTaskNotifications() {
     dueDate.setHours(0, 0, 0, 0);
     
     // Include overdue tasks (due before today) and tasks due today
+    // Tasks due today are still considered urgent but not overdue
     const isUrgent = dueDate <= today;
     
     return isUrgent;
