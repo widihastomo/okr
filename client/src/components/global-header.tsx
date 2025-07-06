@@ -192,7 +192,7 @@ export default function GlobalHeader({
           <img 
             src="/refokus-logo.png" 
             alt="Refokus" 
-            className="h-8 w-auto"
+            className="h-10 w-auto"
           />
         </div>
       </div>
