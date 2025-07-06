@@ -1397,15 +1397,16 @@ export default function DailyFocusPage() {
                             <span className="sm:hidden">Update</span>
                             <span className="hidden sm:inline">Update</span>
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => (window.location.href = `/key-results/${kr.id}`)}
-                            className="h-8 w-8 p-0 shrink-0"
-                            title="Lihat Detail"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Button>
+                          <Link href={`/key-results/${kr.id}`}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 shrink-0"
+                              title="Lihat Detail"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                          </Link>
                         </div>
                       </div>
 

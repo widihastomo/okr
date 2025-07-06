@@ -1325,15 +1325,16 @@ export default function GoalDetail() {
                             <span className="sm:hidden">Update</span>
                             <span className="hidden sm:inline">Update</span>
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => (window.location.href = `/key-results/${kr.id}`)}
-                            className="h-8 w-8 p-0 shrink-0"
-                            title="Lihat Detail"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Button>
+                          <Link href={`/key-results/${kr.id}`}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 shrink-0"
+                              title="Lihat Detail"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                          </Link>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button
@@ -1915,15 +1916,16 @@ export default function GoalDetail() {
                                   </td>
                                   <td className="px-4 py-4">
                                     <div className="flex items-center gap-1">
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => (window.location.href = `/initiatives/${initiative.id}`)}
-                                        className="h-8 w-8 p-0"
-                                        title="Lihat Detail"
-                                      >
-                                        <Eye className="h-4 w-4" />
-                                      </Button>
+                                      <Link href={`/initiatives/${initiative.id}`}>
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          className="h-8 w-8 p-0"
+                                          title="Lihat Detail"
+                                        >
+                                          <Eye className="h-4 w-4" />
+                                        </Button>
+                                      </Link>
                                       <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                           <Button
