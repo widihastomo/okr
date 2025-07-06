@@ -117,6 +117,8 @@ Changelog:
   * Updated OKR form modal to create objectives with "not_started" status instead of "in_progress"
   * Updated objective duplication function to use "not_started" status for better lifecycle management
   * Updated key result duplication to also use "not_started" status for consistency
+  * Fixed Daily Focus filtering to include "not_started" status objectives in related objectives section
+  * Enhanced status badge display with gray styling for "not_started" and proper Indonesian labels
   * Objectives now properly start in "not_started" state until there are actual updates to key results, initiatives, or tasks
   * Improved objective lifecycle management with clear progression from creation to active work
 - July 06, 2025. Enhanced Daily Focus objectives layout with horizontal scrolling design:

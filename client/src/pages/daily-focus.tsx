@@ -434,7 +434,8 @@ export default function DailyFocusPage() {
         relatedObjIds.has(obj.id) ||
         obj.status === "on_track" ||
         obj.status === "at_risk" ||
-        obj.status === "in_progress",
+        obj.status === "in_progress" ||
+        obj.status === "not_started",
     );
 
     // Apply user filter - show objectives that are owned by user or have key results assigned to the selected user
@@ -789,7 +790,9 @@ export default function DailyFocusPage() {
                                 ? "border-yellow-300 text-yellow-700 bg-yellow-50"
                                 : obj.status === "behind"
                                   ? "border-red-300 text-red-700 bg-red-50"
-                                  : "border-blue-300 text-blue-700 bg-blue-50"
+                                  : obj.status === "not_started"
+                                    ? "border-gray-300 text-gray-700 bg-gray-50"
+                                    : "border-blue-300 text-blue-700 bg-blue-50"
                           }
                         >
                           {obj.status === "on_track"
@@ -798,7 +801,11 @@ export default function DailyFocusPage() {
                               ? "At Risk"
                               : obj.status === "behind"
                                 ? "Behind"
-                                : obj.status}
+                                : obj.status === "not_started"
+                                  ? "Belum Mulai"
+                                  : obj.status === "in_progress"
+                                    ? "Sedang Berjalan"
+                                    : obj.status}
                         </Badge>
 
                         <div className="text-xs text-blue-600">
