@@ -2,6 +2,9 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { User } from "@shared/schema";
@@ -19,6 +22,10 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
   const [showMentionSuggestions, setShowMentionSuggestions] = useState(false);
   const [mentionQuery, setMentionQuery] = useState("");
   const [cursorPosition, setCursorPosition] = useState(0);
+  const [showLinkModal, setShowLinkModal] = useState(false);
+  const [linkText, setLinkText] = useState("");
+  const [linkUrl, setLinkUrl] = useState("");
+  const [pendingLinkRange, setPendingLinkRange] = useState<Range | null>(null);
 
   const editorRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
@@ -180,14 +187,11 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
         htmlElement.textContent = selectedText;
         break;
       case 'link':
-        const url = prompt('Masukkan URL:');
-        if (!url) return;
-        htmlElement = document.createElement('a');
-        htmlElement.textContent = selectedText;
-        (htmlElement as HTMLAnchorElement).href = url;
-        (htmlElement as HTMLAnchorElement).target = '_blank';
-        (htmlElement as HTMLAnchorElement).className = 'text-blue-600 underline';
-        break;
+        setLinkText(selectedText);
+        setLinkUrl("");
+        setPendingLinkRange(range.cloneRange());
+        setShowLinkModal(true);
+        return;
       default:
         return;
     }
@@ -210,6 +214,47 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
     if (editorRef.current) {
       setContent(editorRef.current.innerHTML || "");
     }
+  };
+
+  const handleLinkSubmit = () => {
+    if (!pendingLinkRange || !linkUrl.trim()) return;
+
+    const htmlElement = document.createElement('a');
+    htmlElement.textContent = linkText || linkUrl;
+    (htmlElement as HTMLAnchorElement).href = linkUrl;
+    (htmlElement as HTMLAnchorElement).target = '_blank';
+    (htmlElement as HTMLAnchorElement).className = 'text-blue-600 underline';
+
+    pendingLinkRange.deleteContents();
+    pendingLinkRange.insertNode(htmlElement);
+    
+    // Add a space after the link element to prevent continued formatting
+    const spaceNode = document.createTextNode(" ");
+    pendingLinkRange.setStartAfter(htmlElement);
+    pendingLinkRange.insertNode(spaceNode);
+    
+    // Position cursor after the space
+    pendingLinkRange.setStartAfter(spaceNode);
+    pendingLinkRange.collapse(true);
+    const selection = window.getSelection();
+    if (selection) {
+      selection.removeAllRanges();
+      selection.addRange(pendingLinkRange);
+    }
+    
+    // Update content state with HTML content
+    if (editorRef.current) {
+      setContent(editorRef.current.innerHTML || "");
+    }
+
+    // Reset modal state
+    setShowLinkModal(false);
+    setLinkText("");
+    setLinkUrl("");
+    setPendingLinkRange(null);
+    
+    // Focus back to editor
+    editorRef.current?.focus();
   };
 
   return (
@@ -401,6 +446,56 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
           font-style: italic;
         }
       `}</style>
+
+      {/* Link Modal */}
+      <Dialog open={showLinkModal} onOpenChange={setShowLinkModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Tambah Link</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="linkText">Teks Link</Label>
+              <Input
+                id="linkText"
+                value={linkText}
+                onChange={(e) => setLinkText(e.target.value)}
+                placeholder="Masukkan teks yang akan ditampilkan"
+              />
+            </div>
+            <div>
+              <Label htmlFor="linkUrl">URL</Label>
+              <Input
+                id="linkUrl"
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+                placeholder="https://example.com"
+                type="url"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowLinkModal(false);
+                setLinkText("");
+                setLinkUrl("");
+                setPendingLinkRange(null);
+              }}
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={handleLinkSubmit}
+              disabled={!linkUrl.trim()}
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+            >
+              Tambah Link
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
