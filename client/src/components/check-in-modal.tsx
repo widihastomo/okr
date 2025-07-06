@@ -261,7 +261,7 @@ export function CheckInModal({
           <Button 
             variant="default" 
             size="sm" 
-            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
+            className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white"
           >
             <TrendingUp className="w-4 h-4 mr-1" />
             <span className="sm:hidden">Update</span>

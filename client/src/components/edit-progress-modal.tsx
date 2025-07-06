@@ -223,7 +223,7 @@ export default function EditProgressModal({
                 <Button
                   type="submit"
                   disabled={updateProgressMutation.isPending}
-                  className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                  className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700"
                 >
                   {updateProgressMutation.isPending ? "Updating..." : "Update Progress"}
                 </Button>
