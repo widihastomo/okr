@@ -75,17 +75,22 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
   }, [users]);
 
   const handleMentionSelect = useCallback((user: User) => {
+    console.log("User selected:", user);
     const beforeMention = content.substring(0, cursorPosition);
     const afterMention = content.substring(cursorPosition + mentionQuery.length + 1);
     const newContent = `${beforeMention}@${user.firstName || user.email}${afterMention} `;
     
+    console.log("New content:", newContent);
     setContent(newContent);
     setMentionedUsers(prev => [...prev, user.id]);
     setShowMentionSuggestions(false);
     setMentionQuery("");
     
-    // Focus back to editor
-    editorRef.current?.focus();
+    // Update editor content directly
+    if (editorRef.current) {
+      editorRef.current.textContent = newContent;
+      editorRef.current.focus();
+    }
   }, [content, cursorPosition, mentionQuery]);
 
   const filteredUsers = users.filter(user => {
