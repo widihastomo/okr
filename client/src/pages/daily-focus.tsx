@@ -33,6 +33,7 @@ import {
   User,
   Edit,
   Trash2,
+  Check,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -828,32 +829,54 @@ export default function DailyFocusPage() {
                               </div>
                             </td>
                             <td className="px-4 py-4">
-                              <Select 
-                                value={task.status} 
-                                onValueChange={(value) => handleStatusUpdate(task.id, value)}
-                              >
-                                <SelectTrigger className="w-32">
-                                  <SelectValue>
-                                    <Badge className={getTaskStatusColor(task.status)}>
-                                      {getTaskStatusLabel(task.status)}
-                                    </Badge>
-                                  </SelectValue>
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="not_started">
-                                    <Badge className="bg-gray-100 text-gray-800">Belum Mulai</Badge>
-                                  </SelectItem>
-                                  <SelectItem value="in_progress">
-                                    <Badge className="bg-blue-100 text-blue-800">Sedang Berjalan</Badge>
-                                  </SelectItem>
-                                  <SelectItem value="completed">
-                                    <Badge className="bg-green-100 text-green-800">Selesai</Badge>
-                                  </SelectItem>
-                                  <SelectItem value="cancelled">
-                                    <Badge className="bg-red-100 text-red-800">Dibatalkan</Badge>
-                                  </SelectItem>
-                                </SelectContent>
-                              </Select>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <button 
+                                    className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
+                                  >
+                                    {getTaskStatusLabel(task.status)}
+                                    <ChevronDown className="h-3 w-3" />
+                                  </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem
+                                    onClick={() => handleStatusUpdate(task.id, 'not_started')}
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      {task.status === 'not_started' && <Check className="h-3 w-3" />}
+                                      <span>Belum Mulai</span>
+                                    </div>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleStatusUpdate(task.id, 'in_progress')}
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      {task.status === 'in_progress' && <Check className="h-3 w-3" />}
+                                      <span>Sedang Berjalan</span>
+                                    </div>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleStatusUpdate(task.id, 'completed')}
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      {task.status === 'completed' && <Check className="h-3 w-3" />}
+                                      <span>Selesai</span>
+                                    </div>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleStatusUpdate(task.id, 'cancelled')}
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      {task.status === 'cancelled' && <Check className="h-3 w-3" />}
+                                      <span>Dibatalkan</span>
+                                    </div>
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </td>
                             <td className="px-4 py-4">
                               <div className="text-sm text-red-600 font-medium">
@@ -895,32 +918,54 @@ export default function DailyFocusPage() {
                               </div>
                             </td>
                             <td className="px-4 py-4">
-                              <Select 
-                                value={task.status} 
-                                onValueChange={(value) => handleStatusUpdate(task.id, value)}
-                              >
-                                <SelectTrigger className="w-32">
-                                  <SelectValue>
-                                    <Badge className={getTaskStatusColor(task.status)}>
-                                      {getTaskStatusLabel(task.status)}
-                                    </Badge>
-                                  </SelectValue>
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="not_started">
-                                    <Badge className="bg-gray-100 text-gray-800">Belum Mulai</Badge>
-                                  </SelectItem>
-                                  <SelectItem value="in_progress">
-                                    <Badge className="bg-blue-100 text-blue-800">Sedang Berjalan</Badge>
-                                  </SelectItem>
-                                  <SelectItem value="completed">
-                                    <Badge className="bg-green-100 text-green-800">Selesai</Badge>
-                                  </SelectItem>
-                                  <SelectItem value="cancelled">
-                                    <Badge className="bg-red-100 text-red-800">Dibatalkan</Badge>
-                                  </SelectItem>
-                                </SelectContent>
-                              </Select>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <button 
+                                    className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
+                                  >
+                                    {getTaskStatusLabel(task.status)}
+                                    <ChevronDown className="h-3 w-3" />
+                                  </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem
+                                    onClick={() => handleStatusUpdate(task.id, 'not_started')}
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      {task.status === 'not_started' && <Check className="h-3 w-3" />}
+                                      <span>Belum Mulai</span>
+                                    </div>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleStatusUpdate(task.id, 'in_progress')}
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      {task.status === 'in_progress' && <Check className="h-3 w-3" />}
+                                      <span>Sedang Berjalan</span>
+                                    </div>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleStatusUpdate(task.id, 'completed')}
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      {task.status === 'completed' && <Check className="h-3 w-3" />}
+                                      <span>Selesai</span>
+                                    </div>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleStatusUpdate(task.id, 'cancelled')}
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      {task.status === 'cancelled' && <Check className="h-3 w-3" />}
+                                      <span>Dibatalkan</span>
+                                    </div>
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </td>
                             <td className="px-4 py-4">
                               <div className="text-sm text-gray-600">
@@ -968,32 +1013,54 @@ export default function DailyFocusPage() {
                           >
                             <div className="flex items-center justify-between">
                               <div className="font-medium text-red-900">{task.title}</div>
-                              <Select 
-                                value={task.status} 
-                                onValueChange={(value) => handleStatusUpdate(task.id, value)}
-                              >
-                                <SelectTrigger className="w-32">
-                                  <SelectValue>
-                                    <Badge className={getTaskStatusColor(task.status)}>
-                                      {getTaskStatusLabel(task.status)}
-                                    </Badge>
-                                  </SelectValue>
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="not_started">
-                                    <Badge className="bg-gray-100 text-gray-800">Belum Mulai</Badge>
-                                  </SelectItem>
-                                  <SelectItem value="in_progress">
-                                    <Badge className="bg-blue-100 text-blue-800">Sedang Berjalan</Badge>
-                                  </SelectItem>
-                                  <SelectItem value="completed">
-                                    <Badge className="bg-green-100 text-green-800">Selesai</Badge>
-                                  </SelectItem>
-                                  <SelectItem value="cancelled">
-                                    <Badge className="bg-red-100 text-red-800">Dibatalkan</Badge>
-                                  </SelectItem>
-                                </SelectContent>
-                              </Select>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <button 
+                                    className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
+                                  >
+                                    {getTaskStatusLabel(task.status)}
+                                    <ChevronDown className="h-3 w-3" />
+                                  </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem
+                                    onClick={() => handleStatusUpdate(task.id, 'not_started')}
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      {task.status === 'not_started' && <Check className="h-3 w-3" />}
+                                      <span>Belum Mulai</span>
+                                    </div>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleStatusUpdate(task.id, 'in_progress')}
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      {task.status === 'in_progress' && <Check className="h-3 w-3" />}
+                                      <span>Sedang Berjalan</span>
+                                    </div>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleStatusUpdate(task.id, 'completed')}
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      {task.status === 'completed' && <Check className="h-3 w-3" />}
+                                      <span>Selesai</span>
+                                    </div>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleStatusUpdate(task.id, 'cancelled')}
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      {task.status === 'cancelled' && <Check className="h-3 w-3" />}
+                                      <span>Dibatalkan</span>
+                                    </div>
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </div>
                             <div className="text-sm text-red-600">
                               Tenggat: {task.dueDate
@@ -1044,32 +1111,54 @@ export default function DailyFocusPage() {
                           >
                             <div className="flex items-center justify-between">
                               <div className="font-medium text-gray-900">{task.title}</div>
-                              <Select 
-                                value={task.status} 
-                                onValueChange={(value) => handleStatusUpdate(task.id, value)}
-                              >
-                                <SelectTrigger className="w-32">
-                                  <SelectValue>
-                                    <Badge className={getTaskStatusColor(task.status)}>
-                                      {getTaskStatusLabel(task.status)}
-                                    </Badge>
-                                  </SelectValue>
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="not_started">
-                                    <Badge className="bg-gray-100 text-gray-800">Belum Mulai</Badge>
-                                  </SelectItem>
-                                  <SelectItem value="in_progress">
-                                    <Badge className="bg-blue-100 text-blue-800">Sedang Berjalan</Badge>
-                                  </SelectItem>
-                                  <SelectItem value="completed">
-                                    <Badge className="bg-green-100 text-green-800">Selesai</Badge>
-                                  </SelectItem>
-                                  <SelectItem value="cancelled">
-                                    <Badge className="bg-red-100 text-red-800">Dibatalkan</Badge>
-                                  </SelectItem>
-                                </SelectContent>
-                              </Select>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <button 
+                                    className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
+                                  >
+                                    {getTaskStatusLabel(task.status)}
+                                    <ChevronDown className="h-3 w-3" />
+                                  </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem
+                                    onClick={() => handleStatusUpdate(task.id, 'not_started')}
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      {task.status === 'not_started' && <Check className="h-3 w-3" />}
+                                      <span>Belum Mulai</span>
+                                    </div>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleStatusUpdate(task.id, 'in_progress')}
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      {task.status === 'in_progress' && <Check className="h-3 w-3" />}
+                                      <span>Sedang Berjalan</span>
+                                    </div>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleStatusUpdate(task.id, 'completed')}
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      {task.status === 'completed' && <Check className="h-3 w-3" />}
+                                      <span>Selesai</span>
+                                    </div>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleStatusUpdate(task.id, 'cancelled')}
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      {task.status === 'cancelled' && <Check className="h-3 w-3" />}
+                                      <span>Dibatalkan</span>
+                                    </div>
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </div>
                             <div className="text-sm text-gray-600">
                               {task.dueDate
