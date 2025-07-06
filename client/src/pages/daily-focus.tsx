@@ -31,6 +31,7 @@ import { toast } from "@/hooks/use-toast";
 import { CheckInModal } from "@/components/check-in-modal";
 import SuccessMetricsModalSimple from "@/components/success-metrics-modal-simple";
 import OneClickHabitButton from "@/components/one-click-habit-button";
+import { SimpleProgressStatus } from "@/components/progress-status";
 import { UserStatsCard } from "@/components/gamification/user-stats-card";
 import { DailyAchievements } from "@/components/daily-achievements";
 import { DailyInstantUpdate } from "@/components/daily-instant-update";
@@ -759,13 +760,14 @@ export default function DailyFocusPage() {
                       {/* Progress section with SimpleProgressStatus component */}
                       <div className="space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
                         <div className="w-full sm:flex-1 sm:mr-4">
-                          <div className="space-y-2">
-                            <div className="flex justify-between text-sm">
-                              <span>Progress</span>
-                              <span>{progress.toFixed(1)}%</span>
-                            </div>
-                            <Progress value={progress} className="h-2" />
-                          </div>
+                          <SimpleProgressStatus 
+                            status={kr.status}
+                            progressPercentage={progress}
+                            timeProgressPercentage={kr.timeProgressPercentage || 0}
+                            dueDate={null}
+                            startDate="2025-07-01"
+                            compact={false}
+                          />
                         </div>
                       </div>
                     </div>
