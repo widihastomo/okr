@@ -75,9 +75,7 @@ export default function DailyFocusPage() {
   }
 
   // Query string management for tabs
-  const searchParams = new URLSearchParams(location.split('?')[1] || '');
-  const tabFromUrl = searchParams.get('tab') || 'tasks';
-  const [activeTab, setActiveTab] = useState(tabFromUrl);
+  const [activeTab, setActiveTab] = useState('tasks');
 
   const [selectedKeyResult, setSelectedKeyResult] = useState<any>(null);
   const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
@@ -86,21 +84,38 @@ export default function DailyFocusPage() {
   const [selectedInitiative, setSelectedInitiative] = useState<any>(null);
   const [selectedUserId, setSelectedUserId] = useState<string>(userId || "all"); // Filter state - default to current user
 
+  // Initialize tab from URL on mount
+  React.useEffect(() => {
+    const searchParams = new URLSearchParams(location.split('?')[1] || '');
+    const tabFromUrl = searchParams.get('tab');
+    
+    // Set initial tab from URL if valid, otherwise default to 'tasks'
+    if (tabFromUrl && ['tasks', 'progress', 'initiatives'].includes(tabFromUrl)) {
+      setActiveTab(tabFromUrl);
+    } else {
+      setActiveTab('tasks');
+    }
+  }, []); // Only run on mount
+
+  // Sync tab state with URL changes (for browser back/forward navigation)
+  React.useEffect(() => {
+    const searchParams = new URLSearchParams(location.split('?')[1] || '');
+    const tabFromUrl = searchParams.get('tab') || 'tasks';
+    
+    // Only update if different to prevent unnecessary re-renders
+    if (tabFromUrl !== activeTab && ['tasks', 'progress', 'initiatives'].includes(tabFromUrl)) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [location, activeTab]);
+
   // Update URL when tab changes
   const handleTabChange = (newTab: string) => {
     setActiveTab(newTab);
-    const newSearchParams = new URLSearchParams(location.split('?')[1] || '');
-    newSearchParams.set('tab', newTab);
-    setLocation(`${location.split('?')[0]}?${newSearchParams.toString()}`);
+    const currentPath = location.split('?')[0];
+    const searchParams = new URLSearchParams(location.split('?')[1] || '');
+    searchParams.set('tab', newTab);
+    setLocation(`${currentPath}?${searchParams.toString()}`);
   };
-
-  // Sync tab state with URL changes
-  React.useEffect(() => {
-    const urlTab = searchParams.get('tab') || 'tasks';
-    if (urlTab !== activeTab) {
-      setActiveTab(urlTab);
-    }
-  }, [location]);
 
   // Fetch data with status calculation
   const { data: objectives = [] } = useQuery({
