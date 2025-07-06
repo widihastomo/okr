@@ -1138,13 +1138,7 @@ export default function DailyFocusPage() {
                                       {initiative.title}
                                     </div>
                                   </Link>
-                                  {initiative.description && (
-                                    <div className="text-sm text-gray-500 mt-1">
-                                      {initiative.description.length > 50
-                                        ? `${initiative.description.substring(0, 50)}...`
-                                        : initiative.description}
-                                    </div>
-                                  )}
+                                  
                                   {initiative.keyResultId && (
                                     <div className="flex items-center gap-1 mt-1">
                                       <TooltipProvider>
