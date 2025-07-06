@@ -89,8 +89,8 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
   }, [content, cursorPosition, mentionQuery]);
 
   const filteredUsers = users.filter(user => 
-    user.username.toLowerCase().includes(mentionQuery.toLowerCase()) ||
-    user.email.toLowerCase().includes(mentionQuery.toLowerCase())
+    user.username?.toLowerCase().includes(mentionQuery.toLowerCase()) ||
+    user.email?.toLowerCase().includes(mentionQuery.toLowerCase())
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -240,7 +240,7 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
                       className="w-full px-3 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-sm"
                     >
                       <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-medium">
-                        {user.username.charAt(0).toUpperCase()}
+                        {user.username?.charAt(0).toUpperCase()}
                       </div>
                       <div>
                         <div className="font-medium">{user.username}</div>
@@ -289,7 +289,7 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
         </div>
       </form>
 
-      <style jsx>{`
+      <style>{`
         [contenteditable]:empty:before {
           content: attr(data-placeholder);
           color: #9ca3af;

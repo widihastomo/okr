@@ -113,6 +113,17 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 06, 2025. Successfully implemented comprehensive comment system for tasks with full WYSIWYG editor and user mention functionality:
+  * Added taskComments database table with user mentions, edit tracking, and content storage
+  * Created complete API routes for CRUD operations (create, read, update, delete comments)
+  * Implemented TaskCommentEditor with WYSIWYG toolbar (bold, italic, underline, link formatting)
+  * Added real-time user mention functionality with @ symbol and autocomplete suggestions
+  * Built TaskCommentList with edit/delete permissions and responsive design
+  * Replaced activity log with comment system in task detail page sidebar
+  * Integrated with React Query for real-time updates and cache management
+  * Added proper error handling, loading states, and Indonesian localization
+  * Comments support rich text formatting and user collaboration features
+  * Enhanced task collaboration workflow with threaded discussion capability
 - July 06, 2025. Completely redesigned task detail page interface to match objective detail page structure:
   * Restructured layout with professional header containing back button and action buttons
   * Implemented 2/3 + 1/3 grid layout with main task overview card and activity log sidebar

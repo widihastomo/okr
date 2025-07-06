@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { 
   insertCycleSchema, insertTemplateSchema, insertObjectiveSchema, insertKeyResultSchema, 
   insertCheckInSchema, insertInitiativeSchema, insertInitiativeMemberSchema, insertInitiativeDocumentSchema, 
-  insertTaskSchema, insertInitiativeNoteSchema, updateKeyResultProgressSchema, createOKRFromTemplateSchema,
+  insertTaskSchema, insertTaskCommentSchema, insertInitiativeNoteSchema, updateKeyResultProgressSchema, createOKRFromTemplateSchema,
   insertSuccessMetricSchema, insertSuccessMetricUpdateSchema, insertDailyReflectionSchema,
   subscriptionPlans, organizations, organizationSubscriptions, users, dailyReflections,
   type User, type SubscriptionPlan, type Organization, type OrganizationSubscription
