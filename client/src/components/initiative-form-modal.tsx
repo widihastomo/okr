@@ -113,10 +113,10 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
     // Calculate priority score using the same formula as backend but adjusted for 5-point scale
     const priorityScore = (impactScore * 0.4) + ((6 - effortScore) * 0.3) + (confidenceScore * 0.3);
     
-    // Determine priority level adjusted for 5-point scale (max score is now 5)
-    const priorityLevel = priorityScore >= 4.5 ? 'critical' : 
-                         priorityScore >= 3.5 ? 'high' : 
-                         priorityScore >= 2.5 ? 'medium' : 'low';
+    // Determine priority level adjusted for 1.0-5.0 score range
+    const priorityLevel = priorityScore >= 4.0 ? 'critical' : 
+                         priorityScore >= 3.0 ? 'high' : 
+                         priorityScore >= 2.0 ? 'medium' : 'low';
     
     const priorityColors = {
       critical: 'bg-red-100 text-red-800 border-red-200',
@@ -216,11 +216,11 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
 
   const createInitiativeMutation = useMutation({
     mutationFn: async (data: InitiativeFormData) => {
-      // Calculate priority automatically based on scores
-      const priorityScore = (data.impactScore * 0.4) + ((11 - data.effortScore) * 0.3) + (data.confidenceScore * 0.3);
-      const calculatedPriority = priorityScore >= 8.0 ? 'critical' : 
-                                 priorityScore >= 6.5 ? 'high' : 
-                                 priorityScore >= 4.0 ? 'medium' : 'low';
+      // Calculate priority automatically based on scores (5-point scale)
+      const priorityScore = (data.impactScore * 0.4) + ((6 - data.effortScore) * 0.3) + (data.confidenceScore * 0.3);
+      const calculatedPriority = priorityScore >= 4.0 ? 'critical' : 
+                                 priorityScore >= 3.0 ? 'high' : 
+                                 priorityScore >= 2.0 ? 'medium' : 'low';
 
       const payload = {
         ...data,

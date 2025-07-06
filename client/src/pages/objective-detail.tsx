@@ -1801,15 +1801,15 @@ export default function GoalDetail() {
                                       let color: string;
                                       let label: string;
                                       
-                                      if (score >= 4.5) {
+                                      if (score >= 4.0) {
                                         level = "critical";
                                         color = "bg-red-100 text-red-800";
                                         label = "Kritis";
-                                      } else if (score >= 3.5) {
+                                      } else if (score >= 3.0) {
                                         level = "high";
                                         color = "bg-orange-100 text-orange-800";
                                         label = "Tinggi";
-                                      } else if (score >= 2.5) {
+                                      } else if (score >= 2.0) {
                                         level = "medium";
                                         color = "bg-yellow-100 text-yellow-800";
                                         label = "Sedang";
@@ -1955,13 +1955,13 @@ export default function GoalDetail() {
                       let color: string;
                       let label: string;
                       
-                      if (score >= 4.5) {
+                      if (score >= 4.0) {
                         color = "bg-red-100 text-red-800";
                         label = "Kritis";
-                      } else if (score >= 3.5) {
+                      } else if (score >= 3.0) {
                         color = "bg-orange-100 text-orange-800";
                         label = "Tinggi";
-                      } else if (score >= 2.5) {
+                      } else if (score >= 2.0) {
                         color = "bg-yellow-100 text-yellow-800";
                         label = "Sedang";
                       } else {

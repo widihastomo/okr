@@ -63,16 +63,16 @@ function isValidScore(score: number): boolean {
 
 /**
  * Convert priority score to priority level
- * Score ranges (adjusted for 5-point scale):
- * - 4.5-5.0: Critical
- * - 3.5-4.4: High  
- * - 2.5-3.4: Medium
- * - 1.0-2.4: Low
+ * Score ranges (adjusted for 1.0-5.0 range):
+ * - 4.0-5.0: Critical
+ * - 3.0-3.9: High  
+ * - 2.0-2.9: Medium
+ * - 1.0-1.9: Low
  */
 function getPriorityLevel(score: number): 'low' | 'medium' | 'high' | 'critical' {
-  if (score >= 4.5) return 'critical';
-  if (score >= 3.5) return 'high';
-  if (score >= 2.5) return 'medium';
+  if (score >= 4.0) return 'critical';
+  if (score >= 3.0) return 'high';
+  if (score >= 2.0) return 'medium';
   return 'low';
 }
 

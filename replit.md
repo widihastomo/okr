@@ -113,6 +113,20 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 06, 2025. Fixed priority calculation thresholds to properly work with 5-point scale:
+  * Updated priority level thresholds from old 10-point scale to realistic 1.0-5.0 range
+  * Changed thresholds: Critical (4.0-5.0), High (3.0-3.9), Medium (2.0-2.9), Low (1.0-1.9)
+  * Fixed server-side priority-calculator.ts with correct threshold values
+  * Updated frontend display logic in objective-detail.tsx for both desktop and mobile views
+  * Fixed initiative form modal calculation and initiative detail page display logic
+  * High-impact initiatives now correctly show as "High" priority instead of "Medium"
+  * Priority distribution now more balanced across all four priority levels
+- July 06, 2025. Fixed budget formatting issue in edit forms caused by decimal interpretation:
+  * Corrected formatNumberWithSeparator function to properly handle database values like "9000.00"
+  * Fixed issue where "9000.00" was incorrectly formatted as "900.000" instead of "9.000"
+  * Updated logic to recognize when decimal ".00" should be treated as whole number
+  * Edit forms now display correct budget values with proper Indonesian formatting
+  * All budget display and entry issues resolved across create and edit workflows
 - July 06, 2025. Transformed entire application to use orange gradient design theme for all primary buttons:
   * Converted all primary buttons from blue-purple gradient to warm orange gradient styling
   * Applied unified `bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600` across entire application
