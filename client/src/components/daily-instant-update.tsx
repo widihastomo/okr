@@ -827,10 +827,15 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
           {updateData.tomorrowTasks.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <ArrowRight className="h-5 w-5 text-orange-600" />
-                  Prioritas Besok ({format(tomorrow, 'dd MMM yyyy', { locale: id })})
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <ArrowRight className="h-5 w-5 text-orange-600" />
+                    Prioritas Besok
+                  </CardTitle>
+                  <span className="text-sm text-gray-500 font-medium">
+                    {format(tomorrow, 'dd MMM yyyy', { locale: id })}
+                  </span>
+                </div>
                 <CardDescription>
                   Task yang harus diselesaikan besok, diurutkan berdasarkan prioritas
                 </CardDescription>
