@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { User } from "@shared/schema";
 import { AtSign, Send, Bold, Italic, Underline, List, Link } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+
 
 interface TaskCommentEditorProps {
   taskId: string;
@@ -19,7 +19,7 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
   const [showMentionSuggestions, setShowMentionSuggestions] = useState(false);
   const [mentionQuery, setMentionQuery] = useState("");
   const [cursorPosition, setCursorPosition] = useState(0);
-  const [isFormattingMenuOpen, setIsFormattingMenuOpen] = useState(false);
+
   const editorRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -166,60 +166,47 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
         <div className="border rounded-lg overflow-hidden">
           {/* Formatting toolbar */}
           <div className="bg-gray-50 border-b px-3 py-2 flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setIsFormattingMenuOpen(!isFormattingMenuOpen)}
-              className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1"
-            >
-              <Bold size={14} />
-              Format
-            </button>
-            
-            <AnimatePresence>
-              {isFormattingMenuOpen && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="flex items-center gap-1 ml-2"
-                >
-                  <button
-                    type="button"
-                    onClick={() => applyFormatting('bold')}
-                    className="p-1 rounded hover:bg-gray-200"
-                    title="Bold"
-                  >
-                    <Bold size={14} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => applyFormatting('italic')}
-                    className="p-1 rounded hover:bg-gray-200"
-                    title="Italic"
-                  >
-                    <Italic size={14} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => applyFormatting('underline')}
-                    className="p-1 rounded hover:bg-gray-200"
-                    title="Underline"
-                  >
-                    <Underline size={14} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => applyFormatting('link')}
-                    className="p-1 rounded hover:bg-gray-200"
-                    title="Link"
-                  >
-                    <Link size={14} />
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => applyFormatting('bold')}
+                className="p-1 rounded hover:bg-gray-200"
+                title="Bold"
+              >
+                <Bold size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => applyFormatting('italic')}
+                className="p-1 rounded hover:bg-gray-200"
+                title="Italic"
+              >
+                <Italic size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => applyFormatting('underline')}
+                className="p-1 rounded hover:bg-gray-200"
+                title="Underline"
+              >
+                <Underline size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => applyFormatting('link')}
+                className="p-1 rounded hover:bg-gray-200"
+                title="Link"
+              >
+                <Link size={14} />
+              </button>
+            </div>
             
             <div className="flex-1" />
+            
+            <span className="text-sm text-gray-500 flex items-center gap-1">
+              <AtSign size={14} />
+              @ untuk mention
+            </span>
           </div>
 
           {/* Content editor */}
