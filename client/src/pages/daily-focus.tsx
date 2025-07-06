@@ -652,9 +652,11 @@ export default function DailyFocusPage() {
                   >
                     <div className="space-y-3">
                       <div>
-                        <h3 className="font-medium text-blue-900 line-clamp-2">
-                          {obj.title}
-                        </h3>
+                        <Link href={`/objectives/${obj.id}`} className="font-medium text-blue-900 hover:text-blue-600 hover:underline cursor-pointer">
+                          <h3 className="line-clamp-2">
+                            {obj.title}
+                          </h3>
+                        </Link>
                         {obj.description && (
                           <p className="text-sm text-blue-700 mt-1 line-clamp-2">
                             {obj.description}
