@@ -113,7 +113,11 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
-- July 06, 2025. Added three-dot kebab menu to task lists with view details, edit, and delete functions:
+- July 06, 2025. Added task list dividers and enhanced CRUD functionality with proper alert dialogs:
+  * Added dividers to separate task categories: overdue (red), today (blue), and tomorrow (green)
+  * Created tomorrow's tasks filtering logic with dedicated color scheme and visual indicators
+  * Enhanced desktop table view with colored section headers showing task counts for each category
+  * Enhanced mobile card view with consistent section headers and color-coded dividers
   * Replaced "Detail" button with MoreVertical icon dropdown menu for all task lists
   * Added view details function that shows task information in toast notification
   * Implemented edit task functionality with comprehensive form modal including all task fields
