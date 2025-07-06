@@ -86,8 +86,9 @@ export default function MetricsUpdateModal({
     },
     onSuccess: async () => {
       toast({
-        title: "Berhasil",
-        description: "Metrik berhasil diperbarui",
+        title: "Metrik berhasil diperbarui",
+        description: "Progress metrik kesuksesan telah diperbarui",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       
       // Clear input state first
