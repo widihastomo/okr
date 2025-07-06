@@ -118,16 +118,8 @@ export default function DailyFocusPage() {
     },
   });
 
-  // Handle status update with cycling through status options
-  const handleStatusUpdate = (taskId: string, currentStatus: string) => {
-    const statusCycle = {
-      'not_started': 'in_progress',
-      'in_progress': 'completed',
-      'completed': 'not_started',
-      'cancelled': 'not_started'
-    };
-    
-    const newStatus = statusCycle[currentStatus as keyof typeof statusCycle] || 'in_progress';
+  // Handle status update from dropdown
+  const handleStatusUpdate = (taskId: string, newStatus: string) => {
     statusUpdateMutation.mutate({ taskId, newStatus });
   };
 
@@ -836,13 +828,32 @@ export default function DailyFocusPage() {
                               </div>
                             </td>
                             <td className="px-4 py-4">
-                              <Badge 
-                                className={`${getTaskStatusColor(task.status)} cursor-pointer hover:opacity-80 transition-opacity`}
-                                onClick={() => handleStatusUpdate(task.id, task.status)}
-                                title="Klik untuk update status"
+                              <Select 
+                                value={task.status} 
+                                onValueChange={(value) => handleStatusUpdate(task.id, value)}
                               >
-                                {getTaskStatusLabel(task.status)}
-                              </Badge>
+                                <SelectTrigger className="w-32">
+                                  <SelectValue>
+                                    <Badge className={getTaskStatusColor(task.status)}>
+                                      {getTaskStatusLabel(task.status)}
+                                    </Badge>
+                                  </SelectValue>
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="not_started">
+                                    <Badge className="bg-gray-100 text-gray-800">Belum Mulai</Badge>
+                                  </SelectItem>
+                                  <SelectItem value="in_progress">
+                                    <Badge className="bg-blue-100 text-blue-800">Sedang Berjalan</Badge>
+                                  </SelectItem>
+                                  <SelectItem value="completed">
+                                    <Badge className="bg-green-100 text-green-800">Selesai</Badge>
+                                  </SelectItem>
+                                  <SelectItem value="cancelled">
+                                    <Badge className="bg-red-100 text-red-800">Dibatalkan</Badge>
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
                             </td>
                             <td className="px-4 py-4">
                               <div className="text-sm text-red-600 font-medium">
@@ -884,13 +895,32 @@ export default function DailyFocusPage() {
                               </div>
                             </td>
                             <td className="px-4 py-4">
-                              <Badge 
-                                className={`${getTaskStatusColor(task.status)} cursor-pointer hover:opacity-80 transition-opacity`}
-                                onClick={() => handleStatusUpdate(task.id, task.status)}
-                                title="Klik untuk update status"
+                              <Select 
+                                value={task.status} 
+                                onValueChange={(value) => handleStatusUpdate(task.id, value)}
                               >
-                                {getTaskStatusLabel(task.status)}
-                              </Badge>
+                                <SelectTrigger className="w-32">
+                                  <SelectValue>
+                                    <Badge className={getTaskStatusColor(task.status)}>
+                                      {getTaskStatusLabel(task.status)}
+                                    </Badge>
+                                  </SelectValue>
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="not_started">
+                                    <Badge className="bg-gray-100 text-gray-800">Belum Mulai</Badge>
+                                  </SelectItem>
+                                  <SelectItem value="in_progress">
+                                    <Badge className="bg-blue-100 text-blue-800">Sedang Berjalan</Badge>
+                                  </SelectItem>
+                                  <SelectItem value="completed">
+                                    <Badge className="bg-green-100 text-green-800">Selesai</Badge>
+                                  </SelectItem>
+                                  <SelectItem value="cancelled">
+                                    <Badge className="bg-red-100 text-red-800">Dibatalkan</Badge>
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
                             </td>
                             <td className="px-4 py-4">
                               <div className="text-sm text-gray-600">
@@ -938,13 +968,32 @@ export default function DailyFocusPage() {
                           >
                             <div className="flex items-center justify-between">
                               <div className="font-medium text-red-900">{task.title}</div>
-                              <Badge 
-                                className={`${getTaskStatusColor(task.status)} cursor-pointer hover:opacity-80 transition-opacity`}
-                                onClick={() => handleStatusUpdate(task.id, task.status)}
-                                title="Klik untuk update status"
+                              <Select 
+                                value={task.status} 
+                                onValueChange={(value) => handleStatusUpdate(task.id, value)}
                               >
-                                {getTaskStatusLabel(task.status)}
-                              </Badge>
+                                <SelectTrigger className="w-32">
+                                  <SelectValue>
+                                    <Badge className={getTaskStatusColor(task.status)}>
+                                      {getTaskStatusLabel(task.status)}
+                                    </Badge>
+                                  </SelectValue>
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="not_started">
+                                    <Badge className="bg-gray-100 text-gray-800">Belum Mulai</Badge>
+                                  </SelectItem>
+                                  <SelectItem value="in_progress">
+                                    <Badge className="bg-blue-100 text-blue-800">Sedang Berjalan</Badge>
+                                  </SelectItem>
+                                  <SelectItem value="completed">
+                                    <Badge className="bg-green-100 text-green-800">Selesai</Badge>
+                                  </SelectItem>
+                                  <SelectItem value="cancelled">
+                                    <Badge className="bg-red-100 text-red-800">Dibatalkan</Badge>
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
                             </div>
                             <div className="text-sm text-red-600">
                               Tenggat: {task.dueDate
@@ -995,13 +1044,32 @@ export default function DailyFocusPage() {
                           >
                             <div className="flex items-center justify-between">
                               <div className="font-medium text-gray-900">{task.title}</div>
-                              <Badge 
-                                className={`${getTaskStatusColor(task.status)} cursor-pointer hover:opacity-80 transition-opacity`}
-                                onClick={() => handleStatusUpdate(task.id, task.status)}
-                                title="Klik untuk update status"
+                              <Select 
+                                value={task.status} 
+                                onValueChange={(value) => handleStatusUpdate(task.id, value)}
                               >
-                                {getTaskStatusLabel(task.status)}
-                              </Badge>
+                                <SelectTrigger className="w-32">
+                                  <SelectValue>
+                                    <Badge className={getTaskStatusColor(task.status)}>
+                                      {getTaskStatusLabel(task.status)}
+                                    </Badge>
+                                  </SelectValue>
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="not_started">
+                                    <Badge className="bg-gray-100 text-gray-800">Belum Mulai</Badge>
+                                  </SelectItem>
+                                  <SelectItem value="in_progress">
+                                    <Badge className="bg-blue-100 text-blue-800">Sedang Berjalan</Badge>
+                                  </SelectItem>
+                                  <SelectItem value="completed">
+                                    <Badge className="bg-green-100 text-green-800">Selesai</Badge>
+                                  </SelectItem>
+                                  <SelectItem value="cancelled">
+                                    <Badge className="bg-red-100 text-red-800">Dibatalkan</Badge>
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
                             </div>
                             <div className="text-sm text-gray-600">
                               {task.dueDate
