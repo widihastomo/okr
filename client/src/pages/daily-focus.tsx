@@ -484,7 +484,7 @@ export default function DailyFocusPage() {
         </div>
 
         {/* Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           {/* User Filter */}
           <div className="flex items-center gap-2">
             <User className="h-4 w-4 text-gray-500" />
