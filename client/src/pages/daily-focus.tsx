@@ -78,7 +78,7 @@ export default function DailyFocusPage() {
   const [isSuccessMetricsModalOpen, setIsSuccessMetricsModalOpen] =
     useState(false);
   const [selectedInitiative, setSelectedInitiative] = useState<any>(null);
-  const [selectedUserId, setSelectedUserId] = useState<string>("all"); // Filter state
+  const [selectedUserId, setSelectedUserId] = useState<string>(userId || "all"); // Filter state - default to current user
 
   // Fetch data with status calculation
   const { data: objectives = [] } = useQuery({

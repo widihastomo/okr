@@ -115,6 +115,7 @@ The system implements multiple layers of security for data protection:
 Changelog:
 - July 06, 2025. Added user filter to Daily Focus dashboard for viewing team member priorities:
   * Added Select dropdown with all team members for filtering daily priorities
+  * Set default filter to currently logged-in user for immediate personal view
   * Implemented filtering for both tasks and key results based on selected user
   * Added smart filter indicator that only shows when viewing another user's data
   * Enhanced team management by allowing leaders to monitor individual member workloads
