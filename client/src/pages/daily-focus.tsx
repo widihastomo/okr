@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import {
   Card,
@@ -85,7 +85,7 @@ export default function DailyFocusPage() {
   const [selectedUserId, setSelectedUserId] = useState<string>(userId || "all"); // Filter state - default to current user
 
   // Initialize tab from URL on mount
-  React.useEffect(() => {
+  useEffect(() => {
     const searchParams = new URLSearchParams(location.split('?')[1] || '');
     const tabFromUrl = searchParams.get('tab');
     
@@ -98,7 +98,7 @@ export default function DailyFocusPage() {
   }, []); // Only run on mount
 
   // Sync tab state with URL changes (for browser back/forward navigation)
-  React.useEffect(() => {
+  useEffect(() => {
     const searchParams = new URLSearchParams(location.split('?')[1] || '');
     const tabFromUrl = searchParams.get('tab') || 'tasks';
     
