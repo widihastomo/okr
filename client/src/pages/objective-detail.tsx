@@ -1924,6 +1924,12 @@ export default function GoalDetail() {
                                         </Button>
                                       </DropdownMenuTrigger>
                                       <DropdownMenuContent align="end">
+                                        <DropdownMenuItem asChild>
+                                          <Link href={`/initiatives/${initiative.id}`}>
+                                            <Eye className="mr-2 h-4 w-4" />
+                                            Lihat Detail
+                                          </Link>
+                                        </DropdownMenuItem>
                                         <DropdownMenuItem
                                           onClick={() => {
                                             setEditingInitiative(initiative);
@@ -2024,6 +2030,12 @@ export default function GoalDetail() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
+                                <DropdownMenuItem asChild>
+                                  <Link href={`/initiatives/${initiative.id}`}>
+                                    <Eye className="mr-2 h-4 w-4" />
+                                    Lihat Detail
+                                  </Link>
+                                </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onClick={() => {
                                     setEditingInitiative(initiative);
