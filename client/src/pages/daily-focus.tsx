@@ -433,7 +433,8 @@ export default function DailyFocusPage() {
       (obj: any) =>
         relatedObjIds.has(obj.id) ||
         obj.status === "on_track" ||
-        obj.status === "at_risk",
+        obj.status === "at_risk" ||
+        obj.status === "in_progress",
     );
 
     // Apply user filter - only show objectives that have key results assigned to the selected user

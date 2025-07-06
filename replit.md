@@ -130,6 +130,11 @@ Changelog:
   * Hidden "Tambah Angka Target" button when objective has no key results to reduce UI clutter
   * Hidden Quick Stats section when objective has no key results for cleaner empty state
   * Improved UX by showing relevant actions only when appropriate
+- July 06, 2025. Fixed goal visibility issue in Daily Focus page:
+  * Updated objective filtering logic to include "in_progress" status objectives
+  * Previously only "on_track" and "at_risk" objectives were shown in related objectives section
+  * Fixed issue where new objectives with "in_progress" status weren't appearing in Daily Focus
+  * All active objectives now properly display regardless of status when relevant to user activities
 - July 06, 2025. Removed One-Click Habits feature from Daily Focus page:
   * Removed OneClickHabitButton component from Daily Focus action buttons
   * Deleted one-click-habit-button.tsx component file
