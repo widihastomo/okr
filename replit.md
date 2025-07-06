@@ -113,6 +113,12 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 06, 2025. Removed One-Click Habits feature from Daily Focus page:
+  * Removed OneClickHabitButton component from Daily Focus action buttons
+  * Deleted one-click-habit-button.tsx component file
+  * Cleaned up imports and references to habit alignment feature
+  * Simplified Daily Focus interface to focus on core task and progress management
+  * Removed habit alignment wizard integration for cleaner user experience
 - July 06, 2025. Fixed priority calculation thresholds to properly work with 5-point scale:
   * Updated priority level thresholds from old 10-point scale to realistic 1.0-5.0 range
   * Changed thresholds: Critical (4.0-5.0), High (3.0-3.9), Medium (2.0-2.9), Low (1.0-1.9)

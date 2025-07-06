@@ -60,7 +60,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import { CheckInModal } from "@/components/check-in-modal";
 import MetricsUpdateModal from "@/components/metrics-update-modal";
-import OneClickHabitButton from "@/components/one-click-habit-button";
 import { SimpleProgressStatus } from "@/components/progress-status";
 import { UserStatsCard } from "@/components/gamification/user-stats-card";
 import { DailyAchievements } from "@/components/daily-achievements";
@@ -499,7 +498,6 @@ export default function DailyFocusPage() {
           {/* Action buttons */}
           <div className="flex items-center gap-2 sm:gap-3">
             <DailyInstantUpdate />
-            <OneClickHabitButton />
           </div>
           
           {/* Date display - show on desktop */}
