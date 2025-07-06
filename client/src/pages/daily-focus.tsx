@@ -25,7 +25,15 @@ import {
   MoveDown,
   ChevronRight,
   ChevronDown,
+  MoreVertical,
+  Eye,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { toast } from "@/hooks/use-toast";
 import { CheckInModal } from "@/components/check-in-modal";
@@ -754,20 +762,54 @@ export default function DailyFocusPage() {
                             <span className="sm:hidden">Update</span>
                             <span className="hidden sm:inline">Update</span>
                           </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 shrink-0"
+                              >
+                                <MoreVertical className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  (window.location.href = `/key-results/${kr.id}`)
+                                }
+                              >
+                                <Eye className="w-4 h-4 mr-2" />
+                                Lihat Detail
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </div>
 
                       {/* Progress section with SimpleProgressStatus component */}
                       <div className="space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
                         <div className="w-full sm:flex-1 sm:mr-4">
-                          <SimpleProgressStatus 
-                            status={kr.status}
-                            progressPercentage={progress}
-                            timeProgressPercentage={kr.timeProgressPercentage || 0}
-                            dueDate={null}
-                            startDate="2025-07-01"
-                            compact={false}
-                          />
+                          {/* Mobile: Use compact mode, Desktop: Use full progress bar */}
+                          <div className="block sm:hidden">
+                            <SimpleProgressStatus
+                              status={kr.status}
+                              progressPercentage={progress}
+                              timeProgressPercentage={kr.timeProgressPercentage || 0}
+                              dueDate={null}
+                              startDate="2025-07-01"
+                              compact={true}
+                            />
+                          </div>
+                          <div className="hidden sm:block">
+                            <SimpleProgressStatus
+                              status={kr.status}
+                              progressPercentage={progress}
+                              timeProgressPercentage={kr.timeProgressPercentage || 0}
+                              dueDate={null}
+                              startDate="2025-07-01"
+                              compact={false}
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
