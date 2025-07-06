@@ -192,6 +192,7 @@ function TaskOverviewCard({ task, assignedUser, initiative }: any) {
 
           {/* Assigned User */}
           <div className="flex items-center gap-2">
+            <User className="w-4 h-4 text-gray-500 flex-shrink-0" />
             {assignedUser ? (
               <>
                 <Avatar className="w-5 h-5">
@@ -204,10 +205,7 @@ function TaskOverviewCard({ task, assignedUser, initiative }: any) {
                 </span>
               </>
             ) : (
-              <>
-                <User className="w-4 h-4 text-gray-500 flex-shrink-0" />
-                <span className="text-xs text-gray-500">Belum ditentukan</span>
-              </>
+              <span className="text-xs text-gray-500">Belum ditentukan</span>
             )}
           </div>
 
