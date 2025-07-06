@@ -27,6 +27,7 @@ import {
   ChevronDown,
   MoreVertical,
   Eye,
+  User,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -95,6 +96,10 @@ export default function DailyFocusPage() {
   const { data: stats } = useQuery({
     queryKey: [`/api/gamification/stats/${userId}`],
     enabled: !!userId,
+  });
+
+  const { data: users = [] } = useQuery({
+    queryKey: ["/api/users"],
   });
 
   // Update task status mutation
@@ -245,6 +250,17 @@ export default function DailyFocusPage() {
   const handleUpdateMetrics = (initiative: any) => {
     setSelectedInitiative(initiative);
     setIsSuccessMetricsModalOpen(true);
+  };
+
+  // Helper function to get user name by ID
+  const getUserName = (userId: string): string => {
+    const user = users.find((u: any) => u.id === userId);
+    return user ? user.name || user.username || "Unknown User" : "Tidak ditentukan";
+  };
+
+  // Helper function to get initiative count for a key result
+  const getInitiativeCount = (keyResultId: string): number => {
+    return initiatives.filter((init: any) => init.keyResultId === keyResultId).length;
   };
 
   // Filter data for today's focus
@@ -811,6 +827,18 @@ export default function DailyFocusPage() {
                               compact={false}
                             />
                           </div>
+                        </div>
+                      </div>
+
+                      {/* User and Initiative Info */}
+                      <div className="flex items-center justify-between text-xs text-gray-500 mt-3 pt-3 border-t border-gray-100">
+                        <div className="flex items-center gap-2">
+                          <User className="w-3 h-3" />
+                          <span>PIC: {getUserName(kr.assignedTo)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <BarChart3 className="w-3 h-3" />
+                          <span>{getInitiativeCount(kr.id)} inisiatif</span>
                         </div>
                       </div>
                     </div>
