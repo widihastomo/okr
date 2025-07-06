@@ -95,7 +95,7 @@ export function CheckInModal({
       toast({
         title: "Update berhasil",
         description: "Progress telah diperbarui secara otomatis",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       
       // Invalidate general lists first
@@ -261,7 +261,7 @@ export function CheckInModal({
           <Button 
             variant="default" 
             size="sm" 
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+            className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
           >
             <TrendingUp className="w-4 h-4 mr-1" />
             <span className="sm:hidden">Update</span>
@@ -400,7 +400,7 @@ export function CheckInModal({
             <Button 
               type="submit" 
               disabled={checkInMutation.isPending}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
             >
               {checkInMutation.isPending ? "Menyimpan..." : "Simpan Update"}
             </Button>

@@ -127,7 +127,7 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/notes`] });
       toast({
         title: "Catatan berhasil ditambahkan",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       setIsCreateOpen(false);
       resetForm();
@@ -150,7 +150,7 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/notes`] });
       toast({
         title: "Catatan berhasil diperbarui",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       setEditingNote(null);
       resetForm();
@@ -173,7 +173,7 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/notes`] });
       toast({
         title: "Catatan berhasil dihapus",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       setDeleteNoteId(null);
     },
@@ -497,7 +497,7 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
             <Button 
               onClick={handleSubmit}
               disabled={createNoteMutation.isPending || updateNoteMutation.isPending}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
             >
               {editingNote ? "Simpan Perubahan" : "Tambah Catatan"}
             </Button>

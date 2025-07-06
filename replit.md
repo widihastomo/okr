@@ -113,21 +113,6 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
-- July 06, 2025. Reverted button styling to blue-purple gradient theme across entire application:
-  * Changed all primary buttons from orange gradient back to blue-purple gradient styling
-  * Applied consistent `bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700` styling
-  * Updated 100+ components and pages including all forms, modals, and action buttons
-  * Maintained professional gradient design while changing color scheme back to blue-purple
-  * All primary buttons now use unified blue-purple gradient for consistent visual identity
-- July 06, 2025. Standardized success message consistency and styling across entire application:
-  * Updated all "berhasil diupdate" to "berhasil diperbarui" for proper Indonesian terminology
-  * Standardized success message pattern: "[Item] berhasil [action]" throughout entire application  
-  * Examples: "Task berhasil dibuat", "Objective berhasil diperbarui", "Inisiatif berhasil dihapus"
-  * Added "success" variant to toast component with green styling (border-green-200 bg-green-50 text-green-800)
-  * Replaced manual className styling with consistent variant: "success" across all success messages
-  * Enhanced user experience with consistent feedback messages and styling across all forms and actions
-  * Replaced inconsistent terms like "Initiative" with "Inisiatif" in success messages
-  * Applied changes to 50+ components including tasks, objectives, initiatives, and key results
 - July 06, 2025. Added three-dot kebab menu to task lists with view details, edit, and delete functions:
   * Replaced "Detail" button with MoreVertical icon dropdown menu for all task lists
   * Added view details function that shows task information in toast notification

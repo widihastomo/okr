@@ -51,8 +51,8 @@ export default function ListView({ tasks, onEditTask, onDeleteTask, userId }: Li
       queryClient.invalidateQueries({ queryKey: ['/api/initiatives'] });
       queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
       toast({
-        title: "Task status berhasil diperbarui",
-        variant: "success",
+        title: "Task status berhasil diupdate",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
     },
     onError: (error) => {

@@ -22,6 +22,7 @@ const progressVariants = cva(
       },
     },
     defaultVariants: {
+      variant: "default",
     },
   }
 )

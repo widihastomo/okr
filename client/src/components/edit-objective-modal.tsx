@@ -104,8 +104,9 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
     onSuccess: () => {
       toast({
         title: "Success",
-        description: "Objective berhasil diperbarui",
-        variant: "success",
+        description: "Goal berhasil diperbarui",
+        variant: "default",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
@@ -434,7 +435,7 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
             </Button>
             <Button 
               type="submit" 
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
               disabled={updateObjectiveMutation.isPending}
             >
               {updateObjectiveMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}

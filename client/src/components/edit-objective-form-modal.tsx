@@ -125,7 +125,7 @@ export default function EditObjectiveFormModal({
       toast({
         title: "Berhasil",
         description: "Objective berhasil diperbarui",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       onOpenChange(false);
       form.reset();
@@ -379,7 +379,7 @@ export default function EditObjectiveFormModal({
               <Button 
                 type="submit" 
                 disabled={updateMutation.isPending}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-colors"
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white rounded-lg transition-colors"
               >
                 {updateMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
               </Button>

@@ -186,7 +186,8 @@ export default function EditKeyResultModal({
       toast({
         title: "Angka Target berhasil diperbarui",
         description: "Perubahan telah disimpan.",
-        variant: "success",
+        variant: "default",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       
       // Invalidate all related queries
@@ -725,7 +726,7 @@ export default function EditKeyResultModal({
               <Button
                 type="submit"
                 disabled={updateKeyResultMutation.isPending}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
               >
                 {updateKeyResultMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
               </Button>

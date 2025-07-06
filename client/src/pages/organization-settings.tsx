@@ -102,7 +102,7 @@ export default function OrganizationSettings() {
       toast({
         title: "Berhasil",
         description: "User berhasil dibuat",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
     },
     onError: (error) => {
@@ -130,7 +130,7 @@ export default function OrganizationSettings() {
       toast({
         title: "Berhasil",
         description: "User berhasil diperbarui",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
     },
     onError: (error) => {
@@ -155,7 +155,7 @@ export default function OrganizationSettings() {
       toast({
         title: "Berhasil",
         description: "User berhasil dihapus",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
     },
     onError: (error) => {
@@ -183,7 +183,7 @@ export default function OrganizationSettings() {
       toast({
         title: "Berhasil",
         description: "Password berhasil diubah",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
     },
     onError: (error) => {
@@ -233,7 +233,7 @@ export default function OrganizationSettings() {
       toast({
         title: "Berhasil",
         description: "Tim berhasil dibuat",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
     },
     onError: (error) => {
@@ -262,7 +262,7 @@ export default function OrganizationSettings() {
       toast({
         title: "Berhasil",
         description: "Tim berhasil diperbarui",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
     },
     onError: (error) => {
@@ -288,7 +288,7 @@ export default function OrganizationSettings() {
       toast({
         title: "Berhasil",
         description: "Tim berhasil dihapus",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
     },
     onError: (error) => {
@@ -480,7 +480,7 @@ export default function OrganizationSettings() {
               <div className="flex justify-between items-center mb-6">
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                    <Button className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
                       <UserPlus className="h-4 w-4 mr-2" />
                       Tambah Anggota
                     </Button>
@@ -558,7 +558,7 @@ export default function OrganizationSettings() {
                         </div>
                         <Button 
                           type="submit" 
-                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                          className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
                           disabled={createUserMutation.isPending}
                         >
                           {createUserMutation.isPending ? "Membuat..." : "Buat Anggota"}
@@ -770,7 +770,7 @@ export default function OrganizationSettings() {
                         </div>
                         <Button 
                           type="submit" 
-                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                          className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
                           disabled={updateUserMutation.isPending}
                         >
                           {updateUserMutation.isPending ? "Memperbarui..." : "Perbarui Anggota"}
@@ -830,7 +830,7 @@ export default function OrganizationSettings() {
                         </div>
                         <Button 
                           type="submit" 
-                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                          className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
                           disabled={changePasswordMutation.isPending}
                         >
                           {changePasswordMutation.isPending ? "Mengubah..." : "Ubah Password"}

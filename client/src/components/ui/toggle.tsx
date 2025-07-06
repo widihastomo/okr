@@ -20,6 +20,7 @@ const toggleVariants = cva(
       },
     },
     defaultVariants: {
+      variant: "default",
       size: "default",
     },
   }

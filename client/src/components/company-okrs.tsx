@@ -31,7 +31,8 @@ export default function CompanyOKRs({ onRefresh }: CompanyOKRsProps) {
       toast({
         title: "Status Updated",
         description: `Updated status for ${data.updatedCount} key results based on progress tracking`,
-        variant: "success",
+        variant: "default",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
       onRefresh();

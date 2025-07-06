@@ -328,7 +328,8 @@ export default function Dashboard() {
       toast({
         title: "Goal berhasil dihapus",
         description: "Goal beserta semua ukuran keberhasilan, inisiatif, dan tugas terkait telah dihapus secara permanen.",
-        variant: "success",
+        variant: "default",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
@@ -357,7 +358,7 @@ export default function Dashboard() {
       toast({
         title: "Angka Target berhasil dihapus",
         description: "Data telah dihapus secara permanen",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
@@ -431,7 +432,8 @@ export default function Dashboard() {
       toast({
         title: "OKR berhasil diduplikasi",
         description: "OKR baru telah dibuat dengan progress direset ke 0.",
-        variant: "success",
+        variant: "default",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats"] });

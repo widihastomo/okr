@@ -107,7 +107,7 @@ export default function QuickActionFAB() {
       toast({
         title: "Task berhasil dibuat",
         description: "Task baru telah ditambahkan ke initiative.",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       setShowTaskModal(false);
       setIsExpanded(false);
@@ -186,7 +186,7 @@ export default function QuickActionFAB() {
           {/* Buat Goal Button */}
           <Button
             onClick={handleOKRClick}
-            className="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-4 py-3 rounded-full"
+            className="flex items-center space-x-2 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-4 py-3 rounded-full"
           >
             <Target className="h-5 w-5" />
             <span className="font-medium">Buat Goal</span>

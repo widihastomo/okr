@@ -155,7 +155,7 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
       toast({
         title: "Status Updated",
         description: "Task status has been updated successfully.",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
     },
     onError: () => {
@@ -177,7 +177,7 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
       toast({
         title: "Task Deleted",
         description: "Task has been deleted successfully.",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       setTaskToDelete(null);
     },
@@ -202,7 +202,7 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
       queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
       toast({
         title: "Task berhasil dibuat",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       setShowQuickTaskForm(false);
       setQuickTaskData({
@@ -232,8 +232,8 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
       queryClient.invalidateQueries({ queryKey: ['/api/initiatives'] });
       queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
       toast({
-        title: "Task berhasil diperbarui",
-        variant: "success",
+        title: "Task berhasil diupdate",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       setShowQuickTaskForm(false);
       setEditingTask(null);

@@ -151,9 +151,9 @@ export default function KeyResultDetailPage() {
         refetchType: 'active'
       });
       toast({
-        title: "Task berhasil diperbarui",
+        title: "Task berhasil diupdate",
         description: "Perubahan task telah disimpan",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       setEditTaskOpen(false);
       setEditingTask(null);
@@ -186,7 +186,7 @@ export default function KeyResultDetailPage() {
       toast({
         title: "Task berhasil dihapus",
         description: "Task telah dihapus dari initiative",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
     },
     onError: (error: any) => {
@@ -229,7 +229,7 @@ export default function KeyResultDetailPage() {
       toast({
         title: "Task berhasil dibuat",
         description: "Task baru telah ditambahkan ke initiative",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       setAddTaskOpen(false);
       setAddingTaskToInitiative(null);
@@ -259,7 +259,7 @@ export default function KeyResultDetailPage() {
       toast({
         title: "Angka Target berhasil dihapus",
         description: "Data telah dihapus secara permanen",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       // Navigate back to the objective detail page
       window.history.back();
@@ -342,7 +342,7 @@ export default function KeyResultDetailPage() {
       queryClient.invalidateQueries({ queryKey: [`/api/key-results/${keyResultId}/initiatives`] });
       toast({
         title: "Initiative berhasil dihapus",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
     },
     onError: (error: any) => {
@@ -379,7 +379,7 @@ export default function KeyResultDetailPage() {
       toast({
         title: "Rencana berhasil dibuat",
         description: "Rencana dengan ukuran keberhasilan telah ditambahkan",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
     },
     onError: (error: any) => {
@@ -460,7 +460,7 @@ export default function KeyResultDetailPage() {
       toast({
         title: "Progress berhasil diperbarui",
         description: `${data.updatedInitiativesCount} initiative telah diperbarui`,
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
     },
     onError: (error: any) => {
@@ -502,7 +502,7 @@ export default function KeyResultDetailPage() {
       toast({
         title: "Status berhasil diperbarui",
         description: `Task status berhasil diubah ke ${newStatus}`,
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
 
       // Invalidate queries to refresh data including nested tasks
@@ -1221,7 +1221,7 @@ export default function KeyResultDetailPage() {
                 <div className="flex gap-2">
                   <Button 
                     onClick={() => setShowInitiativeFormModal(true)}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                    className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Tambah Rencana
@@ -1403,7 +1403,7 @@ export default function KeyResultDetailPage() {
                                     <Button
                                       size="sm"
                                       onClick={() => handleAddTask(initiative.id)}
-                                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-xs h-7 px-3"
+                                      className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-xs h-7 px-3"
                                     >
                                       <Plus className="h-3 w-3 mr-1" />
                                       Tambah Task
@@ -1694,7 +1694,7 @@ export default function KeyResultDetailPage() {
               <Button type="button" variant="outline" onClick={() => setEditTaskOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+              <Button type="submit" className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
                 Update Task
               </Button>
             </DialogFooter>
@@ -1838,7 +1838,7 @@ export default function KeyResultDetailPage() {
               </Button>
               <Button 
                 type="submit" 
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
                 disabled={createTaskMutation.isPending}
               >
                 {createTaskMutation.isPending ? "Creating..." : "Buat Task"}
@@ -2061,10 +2061,10 @@ export default function KeyResultDetailPage() {
                           toast({
                             title: "Comment added",
                             description: "Your comment has been posted successfully.",
-                            variant: "success",
+                            className: "border-green-200 bg-green-50 text-green-800",
                           });
                         }}
-                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                        className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
                       >
                         <Send className="h-4 w-4 mr-1" />
                         Send

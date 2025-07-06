@@ -112,7 +112,7 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
       // Show success toast for task creation
       toast({
         title: "Task berhasil dibuat",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
 
       // Show additional toast if user was automatically added as member
@@ -156,8 +156,8 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
 
       // Show success toast for task update
       toast({
-        title: "Task berhasil diperbarui",
-        variant: "success",
+        title: "Task berhasil diupdate",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
 
       // Show additional toast if user was automatically added as member
@@ -356,7 +356,7 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
             <Button 
               type="submit" 
               disabled={createMutation.isPending || updateMutation.isPending}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
             >
               {createMutation.isPending || updateMutation.isPending
                 ? "Menyimpan..."

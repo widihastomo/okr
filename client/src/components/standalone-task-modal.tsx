@@ -94,7 +94,7 @@ export default function StandaloneTaskModal({ open, onOpenChange, onSuccess }: S
       queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
       toast({
         title: "Task berhasil dibuat",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       form.reset();
       onOpenChange(false);
@@ -254,7 +254,7 @@ export default function StandaloneTaskModal({ open, onOpenChange, onSuccess }: S
               <Button
                 type="submit"
                 disabled={createTaskMutation.isPending}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
               >
                 {createTaskMutation.isPending ? "Membuat..." : "Buat Task"}
               </Button>

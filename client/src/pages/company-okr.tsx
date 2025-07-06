@@ -214,7 +214,7 @@ export default function CompanyOKRPage() {
             
             <Button 
               onClick={() => setIsOKRModalOpen(true)}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
             >
               <Plus className="h-4 w-4 mr-2" />
               Buat OKR
@@ -232,7 +232,7 @@ export default function CompanyOKRPage() {
             <p className="text-gray-600 mb-4">Mulai dengan membuat objective pertama untuk perusahaan</p>
             <Button 
               onClick={() => setIsOKRModalOpen(true)}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
             >
               <Plus className="h-4 w-4 mr-2" />
               Buat OKR Pertama

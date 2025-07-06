@@ -115,7 +115,7 @@ export default function InitiativeDetailPage() {
       toast({
         title: "Berhasil",
         description: "Task berhasil dihapus",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
     },
     onError: (error: any) => {
@@ -136,7 +136,7 @@ export default function InitiativeDetailPage() {
       toast({
         title: "Berhasil",
         description: "Metrik keberhasilan berhasil dihapus",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
     },
     onError: (error: any) => {
@@ -438,7 +438,7 @@ export default function InitiativeDetailPage() {
                     setIsSuccessMetricsModalOpen(true);
                   }}
                   size="sm"
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
                 >
                   Tambah Metrik
                 </Button>
@@ -508,7 +508,7 @@ export default function InitiativeDetailPage() {
                 <Button 
                   onClick={() => setIsAddTaskModalOpen(true)}
                   size="sm"
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
                 >
                   Tambah Task
                 </Button>

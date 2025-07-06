@@ -535,6 +535,7 @@ const sidebarMenuButtonVariants = cva(
       },
     },
     defaultVariants: {
+      variant: "default",
       size: "default",
     },
   }

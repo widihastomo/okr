@@ -175,9 +175,9 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
     },
     onSuccess: () => {
       toast({
-        title: "Inisiatif berhasil dibuat",
+        title: "Initiative berhasil dibuat",
         description: "Initiative baru telah ditambahkan ke key result",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       queryClient.invalidateQueries({ queryKey: [`/api/key-results/${keyResultId}/initiatives`] });
       setOpen(false);
@@ -217,9 +217,9 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
     },
     onSuccess: () => {
       toast({
-        title: "Initiative berhasil diperbarui",
+        title: "Initiative berhasil diupdate",
         description: "Perubahan initiative telah disimpan",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       queryClient.invalidateQueries({ queryKey: [`/api/key-results/${keyResultId}/initiatives`] });
       setOpen(false);

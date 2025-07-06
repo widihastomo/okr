@@ -101,7 +101,7 @@ export default function HabitAlignmentWizard({ trigger }: HabitAlignmentWizardPr
       toast({
         title: "Berhasil",
         description: "Rekomendasi kebiasaan berhasil dibuat!",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
     },
     onError: (error) => {
@@ -161,7 +161,7 @@ export default function HabitAlignmentWizard({ trigger }: HabitAlignmentWizardPr
       toast({
         title: "One-Click Setup Berhasil!",
         description: `${data.suggestions?.length || 0} kebiasaan optimal telah dipilih untuk Anda`,
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
     },
     onError: (error: any) => {
@@ -265,7 +265,7 @@ export default function HabitAlignmentWizard({ trigger }: HabitAlignmentWizardPr
     toast({
       title: isOneClickMode ? "One-Click Setup Berhasil!" : "Kebiasaan Tersimpan!",
       description: successMessage,
-      variant: "success",
+      className: "border-green-200 bg-green-50 text-green-800",
     });
     
     setIsOpen(false);

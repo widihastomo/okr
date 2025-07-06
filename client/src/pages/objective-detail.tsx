@@ -474,7 +474,8 @@ export default function GoalDetail() {
       toast({
         title: "Success",
         description: "Angka Target berhasil dibuat",
-        variant: "success",
+        variant: "default",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       queryClient.invalidateQueries({ queryKey: [`/api/okrs/${id}`] });
       setAddKeyResultModal({ open: false });
@@ -519,7 +520,8 @@ export default function GoalDetail() {
       toast({
         title: "Success",
         description: "Angka Target berhasil dihapus",
-        variant: "success",
+        variant: "default",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       queryClient.invalidateQueries({ queryKey: [`/api/okrs/${id}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
@@ -542,7 +544,7 @@ export default function GoalDetail() {
       toast({
         title: "Inisiatif berhasil dihapus",
         description: "Inisiatif telah dihapus secara permanen.",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       
       // Invalidate all initiative-related queries
@@ -610,7 +612,7 @@ export default function GoalDetail() {
       toast({
         title: "Rencana berhasil dibuat",
         description: "Rencana dengan ukuran keberhasilan telah ditambahkan",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
     },
     onError: (error: any) => {
@@ -1067,7 +1069,7 @@ export default function GoalDetail() {
               {goal.keyResults.length > 0 && (
                 <Button
                   onClick={() => setAddKeyResultModal({ open: true })}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white w-full sm:w-auto sm:ml-4 shrink-0"
+                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white w-full sm:w-auto sm:ml-4 shrink-0"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   <span className="sm:hidden">Tambah</span>
@@ -1156,7 +1158,7 @@ export default function GoalDetail() {
                   </p>
                   <Button
                     onClick={() => setAddKeyResultModal({ open: true })}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                    className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Tambah Angka Target Pertama
@@ -1321,7 +1323,7 @@ export default function GoalDetail() {
                             variant="default"
                             size="sm"
                             onClick={() => handleCheckIn(kr)}
-                            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white tour-check-in"
+                            className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white tour-check-in"
                           >
                             <TrendingUp className="w-4 h-4 mr-1" />
                             <span className="sm:hidden">Update</span>

@@ -89,7 +89,7 @@ export default function SimpleTaskModal({ open, onClose, task, onSuccess }: Simp
       queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
       toast({
         title: "Task berhasil dibuat",
-        variant: "success",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       onClose();
       onSuccess?.();
@@ -104,8 +104,8 @@ export default function SimpleTaskModal({ open, onClose, task, onSuccess }: Simp
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
       toast({
-        title: "Task berhasil diperbarui",
-        variant: "success",
+        title: "Task berhasil diupdate",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       onClose();
       onSuccess?.();
@@ -275,7 +275,7 @@ export default function SimpleTaskModal({ open, onClose, task, onSuccess }: Simp
           <Button
             onClick={handleSubmit}
             disabled={!formData.title || isLoading}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
           >
             {isLoading ? "Menyimpan..." : (task ? "Update Task" : "Tambah Task")}
           </Button>
