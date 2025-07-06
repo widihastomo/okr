@@ -459,7 +459,7 @@ export default function DailyFocusPage() {
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center justify-between sm:block">
-              <h1 className="text-xl md:text-2xl font-bold text-gray-900">Daily Focus</h1>
+              <h1 className="text-xl md:text-2xl font-bold text-gray-900">Goals</h1>
               {/* Date display - top-right on mobile, positioned at title level */}
               <div className="flex items-center gap-2 text-sm text-gray-500 sm:hidden">
                 <Calendar className="h-4 w-4" />
@@ -472,7 +472,7 @@ export default function DailyFocusPage() {
                 </span>
               </div>
             </div>
-            <p className="text-sm md:text-base text-gray-600">Kelola aktivitas harian Anda hari ini</p>
+            <p className="text-sm md:text-base text-gray-600">Kelola objective, angka target, dan inisiatif harian Anda</p>
           </div>
           
           {/* Date display - desktop only */}

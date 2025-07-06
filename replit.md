@@ -114,8 +114,9 @@ The system implements multiple layers of security for data protection:
 ```
 Changelog:
 - July 06, 2025. Improved Daily Focus page layout with better element positioning and mobile responsiveness:
+  * Changed page title from "Daily Focus" to "Goals" with updated description emphasizing objective, angka target, and inisiatif management
   * Made Daily Instant Update button full width on mobile view for better touch interaction
-  * Positioned date display at top-right corner aligned with "Daily Focus" title in mobile view
+  * Positioned date display at top-right corner aligned with page title in mobile view
   * Moved action buttons to the right side of controls section using justify-between layout
   * Relocated date display from controls section to header section aligned with page title
   * Enhanced mobile layout with date at title level for improved visual hierarchy
