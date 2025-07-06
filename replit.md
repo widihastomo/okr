@@ -113,7 +113,9 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
-- July 06, 2025. Added initiative information display and cleaned up task descriptive text in Daily Focus:
+- July 06, 2025. Fixed tomorrow's tasks timezone filtering and cleaned up task interface:
+  * Fixed tomorrow's tasks filtering logic to use GMT+7 timezone consistency with rest of application
+  * Corrected issue where tomorrow's tasks filter was using UTC instead of GMT+7, causing incorrect task categorization
   * Enhanced both desktop table view and mobile card view to show related initiative information when available
   * Added color-coded initiative badges below task titles matching section theme colors (red for overdue, blue for today, green for tomorrow)
   * Initiative badges display "Inisiatif: [Initiative Title]" with proper background styling

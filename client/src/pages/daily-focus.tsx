@@ -639,12 +639,17 @@ export default function DailyFocusPage() {
     );
   });
 
-  // Tomorrow's tasks - tasks due tomorrow
+  // Tomorrow's tasks - tasks due tomorrow (using GMT+7 timezone)
   const tomorrowTasks = filteredTasks.filter((task: any) => {
     const dueDate = task.dueDate ? task.dueDate.split("T")[0] : null;
+    // Calculate tomorrow's date using GMT+7 timezone
     const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+    const utcTomorrow = tomorrow.getTime() + (tomorrow.getTimezoneOffset() * 60000);
+    const gmt7Tomorrow = new Date(utcTomorrow + (7 * 3600000)); // GMT+7
+    gmt7Tomorrow.setDate(gmt7Tomorrow.getDate() + 1);
+    const tomorrowStr = gmt7Tomorrow.getFullYear() + '-' + 
+      String(gmt7Tomorrow.getMonth() + 1).padStart(2, '0') + '-' + 
+      String(gmt7Tomorrow.getDate()).padStart(2, '0');
     return (
       dueDate === tomorrowStr &&
       task.status !== "completed" &&
