@@ -510,8 +510,8 @@ export default function Dashboard() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
             <div className="flex items-center">
               <div>
-                <h1 className="text-lg sm:text-2xl font-semibold text-gray-900">OKR Dashboard</h1>
-                <p className="text-gray-600 mt-0.5 sm:mt-1 text-xs sm:text-base">Track your objectives and key results</p>
+                <h1 className="text-lg sm:text-2xl font-semibold text-gray-900">Goals</h1>
+                <p className="text-gray-600 mt-0.5 sm:mt-1 text-xs sm:text-base">Kelola objective, angka target, dan inisiatif Anda</p>
               </div>
               {currentUser && (currentUser as any).id ? (
                 <DashboardHelpBubble userId={(currentUser as any).id as string} />

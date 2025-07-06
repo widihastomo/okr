@@ -114,14 +114,17 @@ The system implements multiple layers of security for data protection:
 ```
 Changelog:
 - July 06, 2025. Improved Daily Focus page layout with better element positioning and mobile responsiveness:
-  * Changed page title from "Daily Focus" to "Goals" with updated description emphasizing objective, angka target, and inisiatif management
   * Made Daily Instant Update button full width on mobile view for better touch interaction
-  * Positioned date display at top-right corner aligned with page title in mobile view
+  * Positioned date display at top-right corner aligned with "Daily Focus" title in mobile view
   * Moved action buttons to the right side of controls section using justify-between layout
   * Relocated date display from controls section to header section aligned with page title
   * Enhanced mobile layout with date at title level for improved visual hierarchy
   * Maintained responsive design with full date format on desktop and shortened format on mobile
   * Enhanced visual balance with user filter on left and action buttons on right in controls row
+- July 06, 2025. Updated Dashboard page title and description:
+  * Changed main dashboard page title from "OKR Dashboard" to "Goals"
+  * Updated description to "Kelola objective, angka target, dan inisiatif Anda" for better Indonesian localization
+  * Kept Daily Focus page with original "Daily Focus" title and daily activity description
 - July 06, 2025. Removed One-Click Habits feature from Daily Focus page:
   * Removed OneClickHabitButton component from Daily Focus action buttons
   * Deleted one-click-habit-button.tsx component file
