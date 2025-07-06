@@ -49,7 +49,7 @@ export default function MetricsUpdateModal({
 }: MetricsUpdateModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedMetricId, setSelectedMetricId] = useState<string | null>(null);
+  const [metricUpdates, setMetricUpdates] = useState<Record<string, string>>({});
 
   // Fetch existing success metrics for this initiative
   const { data: successMetrics = [], isLoading } = useQuery({
@@ -57,53 +57,33 @@ export default function MetricsUpdateModal({
     enabled: open && !!initiativeId,
   });
 
-  const form = useForm<MetricUpdateFormData>({
-    resolver: zodResolver(metricUpdateSchema),
-    defaultValues: {
-      currentAchievement: "",
-      confidence: 3,
-      notes: "",
-    },
-  });
-
-  // Reset form when modal opens or metric changes
+  // Reset updates when modal opens
   useEffect(() => {
     if (open) {
-      form.reset({
-        currentAchievement: "",
-        confidence: 3,
-        notes: "",
-      });
-      setSelectedMetricId(null);
+      setMetricUpdates({});
     }
-  }, [open, form]);
+  }, [open]);
 
-  // Update form when metric is selected
-  useEffect(() => {
-    if (selectedMetricId && successMetrics.length > 0) {
-      const metric = successMetrics.find((m: any) => m.id === selectedMetricId);
-      if (metric) {
-        form.setValue("currentAchievement", metric.currentAchievement || "");
-        form.setValue("confidence", metric.confidence || 3);
-        form.setValue("notes", "");
-      }
-    }
-  }, [selectedMetricId, successMetrics, form]);
+  const updateMetricsMutation = useMutation({
+    mutationFn: async () => {
+      const updates = Object.entries(metricUpdates)
+        .filter(([_, value]) => value && value.trim() !== "")
+        .map(([metricId, newValue]) => ({ metricId, newValue }));
 
-  const updateMetricMutation = useMutation({
-    mutationFn: async (data: MetricUpdateFormData) => {
-      if (!selectedMetricId) {
-        throw new Error("Pilih metrik terlebih dahulu");
+      if (updates.length === 0) {
+        throw new Error("Tidak ada perubahan untuk disimpan");
       }
 
-      const response = await apiRequest("POST", `/api/initiatives/${initiativeId}/success-metrics/${selectedMetricId}/updates`, {
-        currentAchievement: data.currentAchievement,
-        confidence: data.confidence,
-        notes: data.notes,
-        updatedAt: new Date().toISOString(),
-      });
+      const promises = updates.map(({ metricId, newValue }) =>
+        apiRequest("POST", `/api/initiatives/${initiativeId}/success-metrics/${metricId}/updates`, {
+          currentAchievement: newValue,
+          confidence: 3,
+          notes: `Updated via Daily Focus on ${new Date().toLocaleDateString('id-ID')}`,
+          updatedAt: new Date().toISOString(),
+        })
+      );
 
-      return response.json();
+      return Promise.all(promises);
     },
     onSuccess: () => {
       toast({
@@ -112,6 +92,7 @@ export default function MetricsUpdateModal({
       });
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/success-metrics`] });
       queryClient.invalidateQueries({ queryKey: ["/api/initiatives"] });
+      setMetricUpdates({});
       onOpenChange(false);
     },
     onError: (error: Error) => {
@@ -123,11 +104,9 @@ export default function MetricsUpdateModal({
     },
   });
 
-  const handleSubmit = (data: MetricUpdateFormData) => {
-    updateMetricMutation.mutate(data);
+  const handleSaveAll = () => {
+    updateMetricsMutation.mutate();
   };
-
-  const selectedMetric = successMetrics.find((m: any) => m.id === selectedMetricId);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -149,143 +128,99 @@ export default function MetricsUpdateModal({
             <p className="text-sm mt-2">Silakan buat metrik keberhasilan terlebih dahulu di halaman detail inisiatif.</p>
           </div>
         ) : (
-          <div className="space-y-6">
-            {/* Metric Selection */}
-            <div>
-              <label className="text-sm font-medium mb-3 block">Pilih Metrik untuk Diperbarui:</label>
-              <div className="space-y-2">
-                {successMetrics.map((metric: any) => (
-                  <Card 
-                    key={metric.id} 
-                    className={`cursor-pointer transition-all ${
-                      selectedMetricId === metric.id 
-                        ? 'ring-2 ring-orange-500 bg-orange-50' 
-                        : 'hover:bg-gray-50'
-                    }`}
-                    onClick={() => setSelectedMetricId(metric.id)}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex justify-between items-start">
+          <div className="space-y-4">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Metrik
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Target
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Capaian Saat Ini
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Capaian Baru
+                    </th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Progress
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {successMetrics.map((metric: any) => (
+                    <tr key={metric.id}>
+                      <td className="px-4 py-4">
                         <div>
-                          <h4 className="font-medium">{metric.name}</h4>
-                          <p className="text-sm text-gray-600 mt-1">{metric.description}</p>
-                          <div className="flex items-center gap-4 mt-2">
-                            <span className="text-sm">
-                              <span className="font-medium">Target:</span> {metric.targetValue} {metric.unit}
-                            </span>
-                            <span className="text-sm">
-                              <span className="font-medium">Saat ini:</span> {metric.currentAchievement || "0"} {metric.unit}
-                            </span>
-                          </div>
+                          <div className="font-medium text-gray-900">{metric.name}</div>
+                          <div className="text-sm text-gray-500">{metric.description}</div>
                         </div>
-                        <div className="text-right">
-                          <Badge variant="outline" className="mb-2">
-                            {metric.metricType}
-                          </Badge>
-                          <div className="text-sm text-gray-500">
-                            Progress: {Math.round((parseFloat(metric.currentAchievement || "0") / parseFloat(metric.targetValue || "1")) * 100)}%
+                      </td>
+                      <td className="px-4 py-4 text-sm text-gray-900">
+                        {metric.targetValue} {metric.unit}
+                      </td>
+                      <td className="px-4 py-4 text-sm text-gray-900">
+                        {metric.currentAchievement || "0"} {metric.unit}
+                      </td>
+                      <td className="px-4 py-4">
+                        <Input
+                          placeholder="Masukkan nilai"
+                          className="w-32"
+                          value={metricUpdates[metric.id] || ""}
+                          onChange={(e) => {
+                            setMetricUpdates(prev => ({
+                              ...prev,
+                              [metric.id]: e.target.value
+                            }));
+                          }}
+                        />
+                      </td>
+                      <td className="px-4 py-4 text-center">
+                        <div className="flex items-center justify-center">
+                          <div className="w-full bg-gray-200 rounded-full h-2 max-w-20">
+                            <div
+                              className={`h-2 rounded-full ${(() => {
+                                const progress = Math.round((parseFloat(metric.currentAchievement || "0") / parseFloat(metric.targetValue || "1")) * 100);
+                                if (progress >= 100) return "bg-green-600";
+                                if (progress >= 80) return "bg-green-500";
+                                if (progress >= 60) return "bg-orange-500";
+                                return "bg-red-500";
+                              })()}`}
+                              style={{
+                                width: `${Math.min(100, Math.round((parseFloat(metric.currentAchievement || "0") / parseFloat(metric.targetValue || "1")) * 100))}%`,
+                              }}
+                            ></div>
                           </div>
+                          <span className="ml-2 text-sm font-medium text-gray-900">
+                            {Math.round((parseFloat(metric.currentAchievement || "0") / parseFloat(metric.targetValue || "1")) * 100)}%
+                          </span>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
-            {/* Update Form */}
-            {selectedMetricId && (
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <h4 className="font-medium text-blue-900 mb-2">
-                      Update: {selectedMetric?.name}
-                    </h4>
-                    <p className="text-sm text-blue-700">
-                      Target: {selectedMetric?.targetValue} {selectedMetric?.unit}
-                    </p>
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name="currentAchievement"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Capaian Saat Ini ({selectedMetric?.unit})</FormLabel>
-                        <FormControl>
-                          <Input 
-                            {...field} 
-                            placeholder={`Masukkan capaian dalam ${selectedMetric?.unit}`}
-                            type="text"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="confidence"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Tingkat Keyakinan (1-5)</FormLabel>
-                        <Select onValueChange={(value) => field.onChange(parseInt(value))}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pilih tingkat keyakinan" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="1">1 - Sangat Rendah</SelectItem>
-                            <SelectItem value="2">2 - Rendah</SelectItem>
-                            <SelectItem value="3">3 - Sedang</SelectItem>
-                            <SelectItem value="4">4 - Tinggi</SelectItem>
-                            <SelectItem value="5">5 - Sangat Tinggi</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="notes"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Catatan (Opsional)</FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            {...field} 
-                            placeholder="Tambahkan catatan atau konteks terkait update ini..."
-                            rows={3}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="flex justify-end gap-3 pt-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => onOpenChange(false)}
-                    >
-                      Batal
-                    </Button>
-                    <Button
-                      type="submit"
-                      disabled={updateMetricMutation.isPending}
-                      className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
-                    >
-                      {updateMetricMutation.isPending ? "Menyimpan..." : "Update Metrik"}
-                    </Button>
-                  </div>
-                </form>
-              </Form>
-            )}
+            <div className="flex justify-end gap-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
+                Batal
+              </Button>
+              <Button
+                onClick={handleSaveAll}
+                disabled={updateMetricsMutation.isPending || !Object.values(metricUpdates).some(value => value && value.trim() !== "")}
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+              >
+                {updateMetricsMutation.isPending ? "Menyimpan..." : "Simpan Semua"}
+              </Button>
+            </div>
           </div>
         )}
       </DialogContent>
