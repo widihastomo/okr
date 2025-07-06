@@ -334,7 +334,7 @@ export function MetricUpdateModal({
                 <Button variant="outline" onClick={handleClose} disabled={isLoading}>
                   Batal
                 </Button>
-                <Button type="submit" disabled={isLoading}>
+                <Button type="submit" disabled={isLoading} className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
                   {isLoading ? "Menyimpan..." : "Simpan Update"}
                 </Button>
               </div>
