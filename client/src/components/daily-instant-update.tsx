@@ -336,7 +336,7 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                           <TableCell>
                             <Input
                               type="text"
-                              value={formatNumberWithSeparator(kr.newValue?.toString() || '')}
+                              value={formatNumberWithSeparator(kr.newValue?.toString() || '0')}
                               onChange={(e) => {
                                 handleNumberInputChange(e.target.value, (formattedValue) => {
                                   const newData = { ...updateData };
@@ -388,7 +388,7 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                         <label className="text-sm font-medium text-gray-700">Nilai Baru:</label>
                         <Input
                           type="text"
-                          value={formatNumberWithSeparator(kr.newValue?.toString() || '')}
+                          value={formatNumberWithSeparator(kr.newValue?.toString() || '0')}
                           onChange={(e) => {
                             handleNumberInputChange(e.target.value, (formattedValue) => {
                               const newData = { ...updateData };

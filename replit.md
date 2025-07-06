@@ -137,6 +137,7 @@ Changelog:
   * Integrated consistent Indonesian number formatting (dots for thousands, commas for decimals)
   * Updated number inputs to use formatNumberWithSeparator and handleNumberInputChange for consistency
   * Display values now formatted consistently with rest of application (1000 shows as "1.000")
+  * Fixed input fields to default to "0" when empty instead of being blank for better user experience
   * Maintained all functionality while improving mobile accessibility and number handling consistency
 - July 06, 2025. Standardized avatar sizing and styling across entire application for consistent user experience:
   * Updated Daily Focus page avatars to use standard w-6 h-6 (24px) size matching other pages
