@@ -14,10 +14,27 @@ import { AtSign, Send, Bold, Italic, Underline, List, Link } from "lucide-react"
 interface TaskCommentEditorProps {
   taskId: string;
   onCommentAdded?: () => void;
+  onCommentSubmit?: (content: string) => void;
+  initialContent?: string;
+  placeholder?: string;
+  submitButtonText?: string;
+  isSubmitting?: boolean;
+  showCancelButton?: boolean;
+  onCancel?: () => void;
 }
 
-export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorProps) {
-  const [content, setContent] = useState("");
+export function TaskCommentEditor({ 
+  taskId, 
+  onCommentAdded, 
+  onCommentSubmit,
+  initialContent = "",
+  placeholder = "Tulis komentar...",
+  submitButtonText = "Kirim",
+  isSubmitting = false,
+  showCancelButton = false,
+  onCancel
+}: TaskCommentEditorProps) {
+  const [content, setContent] = useState(initialContent);
   const [mentionedUsers, setMentionedUsers] = useState<string[]>([]);
   const [showMentionSuggestions, setShowMentionSuggestions] = useState(false);
   const [mentionQuery, setMentionQuery] = useState("");
@@ -30,6 +47,14 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
   const editorRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  // Set initial content when initialContent prop changes
+  useEffect(() => {
+    if (initialContent && editorRef.current) {
+      editorRef.current.innerHTML = initialContent;
+      setContent(initialContent);
+    }
+  }, [initialContent]);
 
   // Fetch users for mention suggestions
   const { data: users = [] } = useQuery<User[]>({
@@ -157,10 +182,16 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
     e.preventDefault();
     if (!content.trim()) return;
 
-    createCommentMutation.mutate({
-      content: content.trim(),
-      mentionedUsers,
-    });
+    if (onCommentSubmit) {
+      // Edit mode
+      onCommentSubmit(content.trim());
+    } else {
+      // Create mode
+      createCommentMutation.mutate({
+        content: content.trim(),
+        mentionedUsers,
+      });
+    }
   };
 
   const applyFormatting = (format: string) => {
@@ -317,7 +348,7 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
                 whiteSpace: "pre-wrap",
                 wordBreak: "break-word",
               }}
-              data-placeholder="Tulis komentar... Gunakan @ untuk mention user"
+              data-placeholder={placeholder}
             />
           </div>
         </div>
@@ -339,18 +370,18 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
           </Button>
           <Button
             type="submit"
-            disabled={!content.trim() || createCommentMutation.isPending}
+            disabled={!content.trim() || isSubmitting || createCommentMutation.isPending}
             className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
           >
-            {createCommentMutation.isPending ? (
+            {(isSubmitting || createCommentMutation.isPending) ? (
               <div className="flex items-center gap-2">
                 <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                Mengirim...
+                {submitButtonText.includes("...") ? submitButtonText : "Mengirim..."}
               </div>
             ) : (
               <div className="flex items-center gap-2">
                 <Send size={16} />
-                Kirim Komentar
+                {submitButtonText}
               </div>
             )}
           </Button>

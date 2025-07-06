@@ -25,6 +25,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { motion, AnimatePresence } from "framer-motion";
+import { TaskCommentEditor } from "./task-comment-editor";
 
 interface TaskCommentListProps {
   taskId: string;
@@ -104,9 +105,10 @@ export function TaskCommentList({ taskId }: TaskCommentListProps) {
     setEditContent("");
   };
 
-  const handleEditSave = (commentId: string) => {
-    if (!editContent.trim()) return;
-    updateCommentMutation.mutate({ commentId, content: editContent.trim() });
+  const handleEditSave = (commentId: string, content?: string) => {
+    const contentToSave = content || editContent;
+    if (!contentToSave.trim()) return;
+    updateCommentMutation.mutate({ commentId, content: contentToSave.trim() });
   };
 
   const handleDeleteConfirm = () => {
@@ -216,31 +218,19 @@ export function TaskCommentList({ taskId }: TaskCommentListProps) {
                 )}
 
                 {editingCommentId === comment.id ? (
-                  <div className="space-y-2">
-                    <textarea
-                      value={editContent}
-                      onChange={(e) => setEditContent(e.target.value)}
-                      className="w-full p-2 text-sm border rounded resize-none focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      rows={3}
+                  <div className="space-y-2 mt-2">
+                    <TaskCommentEditor
+                      taskId={taskId}
+                      onCommentSubmit={(content) => {
+                        handleEditSave(comment.id, content);
+                      }}
+                      initialContent={editContent}
                       placeholder="Edit komentar..."
+                      submitButtonText={updateCommentMutation.isPending ? "Menyimpan..." : "Simpan"}
+                      isSubmitting={updateCommentMutation.isPending}
+                      showCancelButton={true}
+                      onCancel={handleEditCancel}
                     />
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        onClick={() => handleEditSave(comment.id)}
-                        disabled={!editContent.trim() || updateCommentMutation.isPending}
-                        className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
-                      >
-                        {updateCommentMutation.isPending ? "Menyimpan..." : "Simpan"}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={handleEditCancel}
-                      >
-                        Batal
-                      </Button>
-                    </div>
                   </div>
                 ) : (
                   <div
