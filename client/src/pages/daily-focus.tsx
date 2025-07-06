@@ -25,7 +25,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { toast } from "@/hooks/use-toast";
 import { CheckInModal } from "@/components/check-in-modal";
 import SuccessMetricsModalSimple from "@/components/success-metrics-modal-simple";
-import HabitAlignmentWizard from "@/components/habit-alignment-wizard";
+import OneClickHabitButton from "@/components/one-click-habit-button";
 import { UserStatsCard } from "@/components/gamification/user-stats-card";
 import { DailyAchievements } from "@/components/daily-achievements";
 import { DailyInstantUpdate } from "@/components/daily-instant-update";
@@ -270,7 +270,7 @@ export default function DailyFocusPage() {
         </div>
         <div className="flex items-center gap-4">
           <DailyInstantUpdate />
-          <HabitAlignmentWizard />
+          <OneClickHabitButton />
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <Calendar className="h-4 w-4" />
             {today.toLocaleDateString("id-ID", {

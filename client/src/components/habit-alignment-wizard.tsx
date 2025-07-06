@@ -72,6 +72,7 @@ export default function HabitAlignmentWizard({ trigger }: HabitAlignmentWizardPr
   });
   const [suggestions, setSuggestions] = useState<HabitSuggestion[]>([]);
   const [selectedHabits, setSelectedHabits] = useState<string[]>([]);
+  const [isOneClickMode, setIsOneClickMode] = useState(false);
 
   // Fetch user's objectives
   const { data: objectives = [], isLoading: objectivesLoading } = useQuery<OKRWithKeyResults[]>({
@@ -111,6 +112,90 @@ export default function HabitAlignmentWizard({ trigger }: HabitAlignmentWizardPr
       });
     },
   });
+
+  // One-click habit generation mutation
+  const oneClickGenerateMutation = useMutation({
+    mutationFn: async () => {
+      // Auto-select active objectives with < 80% progress
+      const autoSelectedObjectives = objectives
+        .filter(obj => 
+          obj.status === 'on_track' || 
+          obj.status === 'at_risk' || 
+          obj.status === 'behind' ||
+          (obj.overallProgress && obj.overallProgress < 80)
+        )
+        .slice(0, 3) // Limit to top 3 objectives
+        .map(obj => obj.id);
+
+      if (autoSelectedObjectives.length === 0) {
+        throw new Error("Tidak ada goals aktif yang memerlukan percepatan");
+      }
+
+      // Smart preferences based on user profile
+      const smartPreferences: HabitPreferences = {
+        timeAvailable: "30", // Default 30 minutes
+        difficulty: "medium", // Balanced approach
+        categories: [],
+        focusAreas: determineAutoFocusAreas(objectives.filter(obj => autoSelectedObjectives.includes(obj.id)))
+      };
+
+      const selectedOKRs = objectives.filter(obj => autoSelectedObjectives.includes(obj.id));
+      const response = await apiRequest("POST", "/api/habits/generate", {
+        objectiveIds: autoSelectedObjectives,
+        objectives: selectedOKRs,
+        preferences: smartPreferences,
+        userId: (user as any)?.id,
+      });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setSuggestions(data.suggestions || []);
+      // Auto-select top 3 suggestions based on impact score
+      const topSuggestions = (data.suggestions || [])
+        .sort((a: HabitSuggestion, b: HabitSuggestion) => b.impactScore - a.impactScore)
+        .slice(0, 3)
+        .map((s: HabitSuggestion) => s.id);
+      setSelectedHabits(topSuggestions);
+      setCurrentStep(3);
+      setIsOneClickMode(true);
+      toast({
+        title: "One-Click Setup Berhasil!",
+        description: `${data.suggestions?.length || 0} kebiasaan optimal telah dipilih untuk Anda`,
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "One-Click Setup Gagal",
+        description: error.message || "Gagal membuat rekomendasi otomatis",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Determine focus areas based on objectives
+  const determineAutoFocusAreas = (objectives: any[]): string[] => {
+    const focusAreas: string[] = [];
+    const objText = objectives.map(obj => `${obj.title} ${obj.description}`.toLowerCase()).join(' ');
+    
+    if (objText.includes('penjualan') || objText.includes('sales') || objText.includes('revenue')) {
+      focusAreas.push('Penjualan');
+    }
+    if (objText.includes('produktivitas') || objText.includes('efficiency')) {
+      focusAreas.push('Produktivitas');
+    }
+    if (objText.includes('customer') || objText.includes('pelanggan')) {
+      focusAreas.push('Customer Service');
+    }
+    if (objText.includes('learning') || objText.includes('skill') || objText.includes('training')) {
+      focusAreas.push('Pembelajaran');
+    }
+    if (objText.includes('leadership') || objText.includes('manage')) {
+      focusAreas.push('Leadership');
+    }
+    
+    return focusAreas.slice(0, 3); // Limit to 3 focus areas
+  };
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -173,9 +258,13 @@ export default function HabitAlignmentWizard({ trigger }: HabitAlignmentWizardPr
     }
 
     // Here you could save the selected habits to user preferences or tracking system
+    const successMessage = isOneClickMode 
+      ? `One-Click Setup selesai! ${selectedHabits.length} kebiasaan optimal siap dijalankan`
+      : `${selectedHabits.length} kebiasaan berhasil ditambahkan ke rencana Anda`;
+      
     toast({
-      title: "Kebiasaan Tersimpan!",
-      description: `${selectedHabits.length} kebiasaan berhasil ditambahkan ke rencana Anda`,
+      title: isOneClickMode ? "One-Click Setup Berhasil!" : "Kebiasaan Tersimpan!",
+      description: successMessage,
       className: "border-green-200 bg-green-50 text-green-800",
     });
     
@@ -194,6 +283,7 @@ export default function HabitAlignmentWizard({ trigger }: HabitAlignmentWizardPr
     });
     setSuggestions([]);
     setSelectedHabits([]);
+    setIsOneClickMode(false);
   };
 
   const stepProgress = (currentStep / 3) * 100;
@@ -212,7 +302,7 @@ export default function HabitAlignmentWizard({ trigger }: HabitAlignmentWizardPr
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <Brain className="h-5 w-5 text-purple-600" />
-            <span>One-Click Habit Alignment Wizard</span>
+            <span>Habit Alignment Wizard</span>
           </DialogTitle>
           <DialogDescription>
             Dapatkan rekomendasi kebiasaan yang diselaraskan dengan goals Anda untuk mempercepat pencapaian target
@@ -229,7 +319,84 @@ export default function HabitAlignmentWizard({ trigger }: HabitAlignmentWizardPr
             <Progress value={stepProgress} className="w-full" />
           </div>
 
-          <Tabs value={currentStep.toString()} className="w-full">
+          {/* One-Click vs Manual Choice */}
+          {currentStep === 1 && !isOneClickMode && (
+            <div className="text-center space-y-6">
+              <div className="space-y-2">
+                <h2 className="text-2xl font-bold text-gray-900">Pilih Mode Setup</h2>
+                <p className="text-gray-600">Bagaimana Anda ingin membuat habit alignment?</p>
+              </div>
+              
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* One-Click Option */}
+                <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-blue-50">
+                  <div className="text-center space-y-4">
+                    <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center mx-auto">
+                      <Zap className="h-8 w-8 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">One-Click Setup</h3>
+                      <p className="text-sm text-gray-600 mt-2">
+                        AI otomatis memilih goals yang perlu dipercepat dan membuat kebiasaan optimal untuk Anda
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() => oneClickGenerateMutation.mutate()}
+                      disabled={oneClickGenerateMutation.isPending || objectives.length === 0}
+                      className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                    >
+                      {oneClickGenerateMutation.isPending ? (
+                        <>
+                          <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />
+                          Membuat Setup...
+                        </>
+                      ) : (
+                        <>
+                          <Zap className="h-4 w-4 mr-2" />
+                          Mulai One-Click Setup
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </Card>
+
+                {/* Manual Option */}
+                <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer border-2 border-gray-200">
+                  <div className="text-center space-y-4">
+                    <div className="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center mx-auto">
+                      <Target className="h-8 w-8 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">Manual Setup</h3>
+                      <p className="text-sm text-gray-600 mt-2">
+                        Pilih goals secara manual dan atur preferensi detail sesuai kebutuhan Anda
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() => setCurrentStep(2)}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      <Target className="h-4 w-4 mr-2" />
+                      Pilih Manual Setup
+                    </Button>
+                  </div>
+                </Card>
+              </div>
+
+              {objectives.length === 0 && (
+                <div className="text-center py-4">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <p className="text-yellow-800 text-sm">
+                      <strong>Perhatian:</strong> Anda belum memiliki goals aktif. Buat goals terlebih dahulu untuk menggunakan Habit Alignment Wizard.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          <Tabs value={currentStep.toString()} className={`w-full ${currentStep === 1 && !isOneClickMode ? 'hidden' : ''}`}>
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="1" disabled={currentStep < 1}>
                 <Target className="h-4 w-4 mr-2" />
@@ -245,7 +412,7 @@ export default function HabitAlignmentWizard({ trigger }: HabitAlignmentWizardPr
               </TabsTrigger>
             </TabsList>
 
-            {/* Step 1: Select Objectives */}
+            {/* Step 1: Select Objectives (Manual Mode) */}
             <TabsContent value="1" className="space-y-4">
               <div className="text-center py-4">
                 <h3 className="text-lg font-semibold mb-2">Pilih Goals yang Ingin Difokuskan</h3>
@@ -307,7 +474,13 @@ export default function HabitAlignmentWizard({ trigger }: HabitAlignmentWizardPr
                 </div>
               )}
 
-              <div className="flex justify-end pt-4">
+              <div className="flex justify-between pt-4">
+                <Button variant="outline" onClick={() => {
+                  setCurrentStep(1);
+                  setIsOneClickMode(false);
+                }}>
+                  Kembali ke Mode
+                </Button>
                 <Button
                   onClick={() => setCurrentStep(2)}
                   disabled={selectedObjectives.length === 0}
@@ -423,8 +596,23 @@ export default function HabitAlignmentWizard({ trigger }: HabitAlignmentWizardPr
             {/* Step 3: Recommendations */}
             <TabsContent value="3" className="space-y-4">
               <div className="text-center py-4">
-                <h3 className="text-lg font-semibold mb-2">Rekomendasi Kebiasaan Teraligned</h3>
-                <p className="text-gray-600">Pilih kebiasaan yang ingin Anda implementasikan</p>
+                <h3 className="text-lg font-semibold mb-2 flex items-center justify-center gap-2">
+                  {isOneClickMode && <Zap className="h-5 w-5 text-purple-600" />}
+                  {isOneClickMode ? "One-Click Setup Berhasil!" : "Rekomendasi Kebiasaan Teraligned"}
+                </h3>
+                <p className="text-gray-600">
+                  {isOneClickMode 
+                    ? "AI telah memilih kebiasaan terbaik untuk goals Anda. Review dan konfirmasi pilihan Anda."
+                    : "Pilih kebiasaan yang ingin Anda implementasikan"
+                  }
+                </p>
+                {isOneClickMode && (
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 mt-3">
+                    <p className="text-sm text-purple-800">
+                      <strong>Smart Selection:</strong> Sistem telah otomatis memilih {selectedHabits.length} kebiasaan berimpact tinggi untuk goals Anda
+                    </p>
+                  </div>
+                )}
               </div>
 
               {suggestions.length === 0 ? (
@@ -508,17 +696,50 @@ export default function HabitAlignmentWizard({ trigger }: HabitAlignmentWizardPr
               )}
 
               <div className="flex justify-between pt-4">
-                <Button variant="outline" onClick={() => setCurrentStep(2)}>
-                  Kembali
-                </Button>
-                <Button
-                  onClick={handleFinishWizard}
-                  disabled={selectedHabits.length === 0}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  <CheckCircle2 className="h-4 w-4 mr-2" />
-                  Implementasikan Kebiasaan ({selectedHabits.length})
-                </Button>
+                {isOneClickMode ? (
+                  <Button variant="outline" onClick={() => {
+                    setIsOpen(false);
+                    resetWizard();
+                  }}>
+                    Tutup
+                  </Button>
+                ) : (
+                  <Button variant="outline" onClick={() => setCurrentStep(2)}>
+                    Kembali
+                  </Button>
+                )}
+                
+                {isOneClickMode ? (
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setSelectedHabits([]);
+                        setIsOneClickMode(false);
+                        setCurrentStep(1);
+                      }}
+                    >
+                      Customize Manual
+                    </Button>
+                    <Button
+                      onClick={handleFinishWizard}
+                      disabled={selectedHabits.length === 0}
+                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                    >
+                      <Zap className="h-4 w-4 mr-2" />
+                      Aktivasi Instant ({selectedHabits.length})
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={handleFinishWizard}
+                    disabled={selectedHabits.length === 0}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    <CheckCircle2 className="h-4 w-4 mr-2" />
+                    Implementasikan Kebiasaan ({selectedHabits.length})
+                  </Button>
+                )}
               </div>
             </TabsContent>
           </Tabs>
