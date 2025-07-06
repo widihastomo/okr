@@ -364,19 +364,33 @@ export default function DailyFocusPage() {
   const relatedObjectives = getRelatedObjectives();
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-3 md:p-6 space-y-4 md:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Daily Focus</h1>
-          <p className="text-gray-600">Kelola aktivitas harian Anda hari ini</p>
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900">Daily Focus</h1>
+            <p className="text-sm md:text-base text-gray-600">Kelola aktivitas harian Anda hari ini</p>
+          </div>
+          
+          {/* Date display - show on mobile */}
+          <div className="flex items-center gap-2 text-sm text-gray-500 sm:hidden">
+            <Calendar className="h-4 w-4" />
+            {today.toLocaleDateString("id-ID", {
+              weekday: "short",
+              month: "short",
+              day: "numeric",
+            })}
+          </div>
         </div>
-        <div className="flex items-center gap-4">
+
+        {/* Controls */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
           {/* User Filter */}
           <div className="flex items-center gap-2">
             <User className="h-4 w-4 text-gray-500" />
             <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-              <SelectTrigger className="w-48">
+              <SelectTrigger className="w-full sm:w-48">
                 <SelectValue placeholder="Pilih anggota tim" />
               </SelectTrigger>
               <SelectContent>
@@ -391,9 +405,15 @@ export default function DailyFocusPage() {
               </SelectContent>
             </Select>
           </div>
-          <DailyInstantUpdate />
-          <OneClickHabitButton />
-          <div className="flex items-center gap-2 text-sm text-gray-500">
+          
+          {/* Action buttons */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <DailyInstantUpdate />
+            <OneClickHabitButton />
+          </div>
+          
+          {/* Date display - show on desktop */}
+          <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500 sm:ml-auto">
             <Calendar className="h-4 w-4" />
             {today.toLocaleDateString("id-ID", {
               weekday: "long",
@@ -424,7 +444,7 @@ export default function DailyFocusPage() {
       )}
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Task Hari Ini</CardTitle>
@@ -509,15 +529,15 @@ export default function DailyFocusPage() {
 
       {/* Compact Progress & Motivation */}
       <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
+        <CardContent className="p-3 md:p-4">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-6">
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-blue-600" />
                 <span className="font-medium text-blue-900">Progress Hari Ini</span>
               </div>
               
-              <div className="flex items-center gap-4 text-sm">
+              <div className="flex flex-col gap-2 text-sm md:flex-row md:items-center md:gap-4">
                 <div className="flex items-center gap-1">
                   <CheckCircle className="h-4 w-4 text-green-500" />
                   <span className="text-green-700">{todayTasks.filter(t => t.status === 'completed').length} task selesai</span>
@@ -529,7 +549,7 @@ export default function DailyFocusPage() {
               </div>
             </div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {(stats as any)?.currentStreak && (stats as any).currentStreak > 0 && (
                 <div className="flex items-center gap-1 text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
                   <span>🔥</span>
@@ -561,7 +581,7 @@ export default function DailyFocusPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
               {relatedObjectives.slice(0, 4).map((obj: any) => {
                 const objKeyResults = (keyResults as any[]).filter(
                   (kr) => kr.objectiveId === obj.id,
@@ -672,9 +692,9 @@ export default function DailyFocusPage() {
                   {overdueTasks.map((task: any) => (
                     <div
                       key={task.id}
-                      className="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded-lg"
+                      className="flex flex-col gap-2 p-3 bg-red-50 border border-red-200 rounded-lg md:flex-row md:items-center md:justify-between md:gap-0"
                     >
-                      <div>
+                      <div className="flex-1">
                         <p className="font-medium text-red-900">{task.title}</p>
                         <p className="text-sm text-red-600">
                           Tenggat:{" "}
@@ -707,9 +727,9 @@ export default function DailyFocusPage() {
                   todayTasks.map((task: any) => (
                     <div
                       key={task.id}
-                      className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg"
+                      className="flex flex-col gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg md:flex-row md:items-center md:justify-between md:gap-0"
                     >
-                      <div>
+                      <div className="flex-1">
                         <p className="font-medium">{task.title}</p>
                         <p className="text-sm text-gray-600">
                           {task.dueDate
@@ -970,16 +990,16 @@ export default function DailyFocusPage() {
                 activeInitiatives.map((init: any) => (
                   <div
                     key={init.id}
-                    className="p-4 bg-purple-50 border border-purple-200 rounded-lg"
+                    className="p-3 md:p-4 bg-purple-50 border border-purple-200 rounded-lg"
                   >
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-medium text-purple-900">
+                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-3">
+                      <h3 className="font-medium text-purple-900 flex-1">
                         {init.title}
                       </h3>
                       <Button
                         size="sm"
                         onClick={() => handleUpdateMetrics(init)}
-                        className="bg-purple-600 hover:bg-purple-700"
+                        className="bg-purple-600 hover:bg-purple-700 w-full md:w-auto"
                       >
                         Update Metrics
                       </Button>
