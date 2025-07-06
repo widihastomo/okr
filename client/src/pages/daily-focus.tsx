@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import {
   Card,
@@ -69,14 +69,15 @@ export default function DailyFocusPage() {
     useState(false);
   const [selectedInitiative, setSelectedInitiative] = useState<any>(null);
 
-  // Fetch data
+  // Fetch data with status calculation
   const { data: objectives = [] } = useQuery({
-    queryKey: ["/api/objectives"],
+    queryKey: ["/api/okrs"],
   });
 
-  const { data: keyResults = [] } = useQuery({
-    queryKey: ["/api/key-results"],
-  });
+  // Extract key results from objectives data (includes calculated status)
+  const keyResults = React.useMemo(() => {
+    return objectives.flatMap((obj: any) => obj.keyResults || []);
+  }, [objectives]);
 
   const { data: initiatives = [] } = useQuery({
     queryKey: ["/api/initiatives"],
