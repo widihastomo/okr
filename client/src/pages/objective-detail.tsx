@@ -1726,11 +1726,7 @@ export default function GoalDetail() {
                                           {initiative.title}
                                         </div>
                                       </Link>
-                                      {initiative.description && (
-                                        <div className="text-sm text-gray-500 line-clamp-1">
-                                          {initiative.description}
-                                        </div>
-                                      )}
+
                                       {initiative.keyResultId && (
                                         <div className="text-xs text-blue-600 mt-1">
                                           Angka Target: {goal?.keyResults?.find((kr: any) => kr.id === initiative.keyResultId)?.title || 'Unknown'}
