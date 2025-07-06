@@ -1088,7 +1088,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                 {!isEditMode && currentStep === 1 ? (
                   <Button 
                     type="submit"
-                    className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white w-full sm:w-auto order-1 sm:order-2"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white w-full sm:w-auto order-1 sm:order-2"
                   >
                     Lanjut
                     <ChevronRight className="w-4 h-4 ml-2" />
@@ -1097,7 +1097,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                   <Button 
                     type="submit"
                     disabled={mutation.isPending}
-                    className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white w-full sm:w-auto order-1 sm:order-2"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white w-full sm:w-auto order-1 sm:order-2"
                   >
                     {mutation.isPending 
                       ? (isEditMode ? "Memperbarui..." : "Membuat...") 
@@ -1836,7 +1836,7 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
               </Button>
               <Button 
                 type="submit"
-                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
               >
                 Simpan Angka Target
               </Button>
@@ -1856,7 +1856,7 @@ export function CreateOKRButton() {
     <>
       <Button 
         onClick={() => setOpen(true)}
-        className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white w-full sm:w-auto"
+        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white w-full sm:w-auto"
       >
         <Plus className="w-4 h-4 mr-2" />
         Buat Goal

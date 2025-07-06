@@ -480,7 +480,7 @@ export default function OrganizationSettings() {
               <div className="flex justify-between items-center mb-6">
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
+                    <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
                       <UserPlus className="h-4 w-4 mr-2" />
                       Tambah Anggota
                     </Button>
@@ -558,7 +558,7 @@ export default function OrganizationSettings() {
                         </div>
                         <Button 
                           type="submit" 
-                          className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                           disabled={createUserMutation.isPending}
                         >
                           {createUserMutation.isPending ? "Membuat..." : "Buat Anggota"}
@@ -770,7 +770,7 @@ export default function OrganizationSettings() {
                         </div>
                         <Button 
                           type="submit" 
-                          className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                           disabled={updateUserMutation.isPending}
                         >
                           {updateUserMutation.isPending ? "Memperbarui..." : "Perbarui Anggota"}
@@ -830,7 +830,7 @@ export default function OrganizationSettings() {
                         </div>
                         <Button 
                           type="submit" 
-                          className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                           disabled={changePasswordMutation.isPending}
                         >
                           {changePasswordMutation.isPending ? "Mengubah..." : "Ubah Password"}

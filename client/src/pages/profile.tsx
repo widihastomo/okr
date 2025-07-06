@@ -192,7 +192,7 @@ export default function Profile() {
                         onClick={handleSubmit}
                         size="sm"
                         disabled={updateProfileMutation.isPending}
-                        className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                       >
                         <Save className="w-4 h-4 mr-2" />
                         {updateProfileMutation.isPending ? "Menyimpan..." : "Simpan"}
@@ -381,7 +381,7 @@ export default function Profile() {
                   <div className="flex justify-end pt-4">
                     <Button 
                       type="submit" 
-                      className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 h-11 px-8"
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 h-11 px-8"
                       disabled={changePasswordMutation.isPending}
                     >
                       {changePasswordMutation.isPending ? "Memperbarui..." : "Perbarui Password"}

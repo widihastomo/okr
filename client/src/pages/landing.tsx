@@ -18,7 +18,7 @@ export default function Landing() {
           <Button 
             onClick={() => window.location.href = '/api/login'}
             size="lg"
-            className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white rounded-lg transition-colors"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-colors"
           >
             Masuk
           </Button>
@@ -38,7 +38,7 @@ export default function Landing() {
         <Button 
           onClick={() => window.location.href = '/api/login'}
           size="lg"
-          className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white rounded-lg transition-colors text-lg px-8 py-3"
+          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-colors text-lg px-8 py-3"
         >
           Mulai Sekarang
         </Button>
@@ -172,7 +172,7 @@ export default function Landing() {
               <Button 
                 onClick={() => window.location.href = '/api/login'}
                 size="lg"
-                className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white rounded-lg transition-colors"
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-colors"
               >
                 Mulai Gratis Sekarang
               </Button>

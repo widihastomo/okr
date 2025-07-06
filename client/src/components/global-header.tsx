@@ -249,7 +249,7 @@ export default function GlobalHeader({
             <div className="flex flex-col space-y-2">
               <Button
                 onClick={handleCreateOKR}
-                className="h-8 px-3 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white text-sm whitespace-nowrap"
+                className="h-8 px-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-sm whitespace-nowrap"
               >
                 <Target className="h-4 w-4 mr-1" />
                 <span className="font-medium">Buat OKR</span>

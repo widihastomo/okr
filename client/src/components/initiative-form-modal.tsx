@@ -777,7 +777,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
               <Button 
                 type="submit" 
                 disabled={createInitiativeMutation.isPending}
-                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
                 {createInitiativeMutation.isPending 
                   ? "Menyimpan..." 

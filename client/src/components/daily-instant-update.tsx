@@ -346,7 +346,7 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger || (
-          <Button className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 w-full sm:w-auto">
+          <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 w-full sm:w-auto">
             <Clock className="h-4 w-4 mr-2" />
             Update Harian Instant
           </Button>
@@ -879,7 +879,7 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
             <Button
               onClick={() => submitUpdateMutation.mutate(updateData)}
               disabled={submitUpdateMutation.isPending}
-              className="w-full sm:w-auto bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
             >
               {submitUpdateMutation.isPending ? (
                 <>

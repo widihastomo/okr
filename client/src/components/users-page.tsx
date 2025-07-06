@@ -452,7 +452,7 @@ export default function UsersPage() {
             <h2 className="text-xl font-semibold">Users ({filteredUsers.length})</h2>
             <Dialog>
               <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
+                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
                   <UserPlus className="h-4 w-4 mr-2" />
                   Add User
                 </Button>
@@ -529,7 +529,7 @@ export default function UsersPage() {
                     </div>
                     <Button 
                       type="submit" 
-                      className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                       disabled={createUserMutation.isPending}
                     >
                       {createUserMutation.isPending ? "Creating..." : "Create User"}
@@ -731,7 +731,7 @@ export default function UsersPage() {
                     </div>
                     <Button 
                       type="submit" 
-                      className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                       disabled={changePasswordMutation.isPending}
                     >
                       {changePasswordMutation.isPending ? "Changing..." : "Change Password"}
@@ -804,7 +804,7 @@ export default function UsersPage() {
                         </div>
                         <Button 
                           type="submit" 
-                          className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                           disabled={updateUserMutation.isPending}
                         >
                           {updateUserMutation.isPending ? "Updating..." : "Update User"}
@@ -821,7 +821,7 @@ export default function UsersPage() {
                 <h2 className="text-xl font-semibold">Teams ({teams.length})</h2>
                 <Dialog open={newTeamDialog.open} onOpenChange={(open) => setNewTeamDialog({ open })}>
                   <DialogTrigger asChild>
-                    <Button className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
+                    <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
                       <Plus className="h-4 w-4 mr-2" />
                       Create Team
                     </Button>
@@ -899,7 +899,7 @@ export default function UsersPage() {
                         </div>
                         <Button 
                           type="submit" 
-                          className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                           disabled={createTeamMutation.isPending}
                         >
                           {createTeamMutation.isPending ? "Creating..." : "Create Team"}
@@ -988,7 +988,7 @@ export default function UsersPage() {
                       </div>
                       <Button 
                         type="submit" 
-                        className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                         disabled={updateTeamMutation.isPending}
                       >
                         {updateTeamMutation.isPending ? "Updating..." : "Update Team"}

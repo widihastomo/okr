@@ -1094,7 +1094,7 @@ export default function DailyFocusPage() {
                   <DialogTrigger asChild>
                     <Button 
                       size="sm" 
-                      className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                       onClick={handleOpenTaskModal}
                     >
                       <Plus className="w-4 h-4 mr-2" />
@@ -1285,7 +1285,7 @@ export default function DailyFocusPage() {
                         <Button 
                           type="submit" 
                           disabled={createTaskMutation.isPending}
-                          className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                         >
                           {createTaskMutation.isPending ? "Membuat..." : "Buat Task"}
                         </Button>
@@ -1969,7 +1969,7 @@ export default function DailyFocusPage() {
                             variant="default"
                             size="sm"
                             onClick={() => handleCheckInKeyResult(kr)}
-                            className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                           >
                             <TrendingUp className="w-4 h-4 mr-1" />
                             <span className="sm:hidden">Update</span>
@@ -2316,7 +2316,7 @@ export default function DailyFocusPage() {
                               <td className="px-4 py-4 text-center">
                                 <Button
                                   onClick={() => handleUpdateMetrics(initiative)}
-                                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-3 py-1 rounded-md text-sm font-medium"
+                                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-3 py-1 rounded-md text-sm font-medium"
                                 >
                                   Update
                                 </Button>
@@ -2501,7 +2501,7 @@ export default function DailyFocusPage() {
                             <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                               <Button
                                 onClick={() => handleUpdateMetrics(initiative)}
-                                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium flex-1 mr-2"
+                                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium flex-1 mr-2"
                               >
                                 Update Metrics
                               </Button>
@@ -2676,7 +2676,7 @@ export default function DailyFocusPage() {
             </Button>
             <Button 
               onClick={handleEditTaskSubmit}
-              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
               disabled={editTaskMutation.isPending}
             >
               {editTaskMutation.isPending ? "Menyimpan..." : "Simpan"}

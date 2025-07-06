@@ -141,7 +141,7 @@ export default function CyclesPage() {
                 <RefreshCw className={`w-4 h-4 mr-2 ${updateStatusMutation.isPending ? 'animate-spin' : ''}`} />
                 Update Status
               </Button>
-              <Button onClick={() => setCreateModalOpen(true)} className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 w-full sm:w-auto">
+              <Button onClick={() => setCreateModalOpen(true)} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 w-full sm:w-auto">
                 <Plus className="w-4 h-4 mr-2" />
                 Tambah Siklus
               </Button>
@@ -168,7 +168,7 @@ export default function CyclesPage() {
                       <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                       <h3 className="text-lg font-medium text-gray-900 mb-2">Belum ada siklus</h3>
                       <p className="text-gray-500 mb-4">Buat siklus OKR pertama Anda untuk memulai</p>
-                      <Button onClick={() => setCreateModalOpen(true)} className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
+                      <Button onClick={() => setCreateModalOpen(true)} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
                         <Plus className="w-4 h-4 mr-2" />
                         Buat Siklus
                       </Button>
