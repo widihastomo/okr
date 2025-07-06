@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { toast } from "@/hooks/use-toast";
+import { Link } from "wouter";
 import { CheckInModal } from "@/components/check-in-modal";
 import SuccessMetricsModalSimple from "@/components/success-metrics-modal-simple";
 import OneClickHabitButton from "@/components/one-click-habit-button";
@@ -702,9 +703,11 @@ export default function DailyFocusPage() {
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer text-left">
-                              {kr.title}
-                            </h3>
+                            <Link href={`/key-results/${kr.id}`} className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer text-left">
+                              <h3>
+                                {kr.title}
+                              </h3>
+                            </Link>
                             <div className="relative group">
                               <IconComponent className="w-4 h-4 text-gray-500 hover:text-gray-700 cursor-help" />
                               <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap">
