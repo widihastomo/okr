@@ -953,10 +953,17 @@ export default function DailyFocusPage() {
               
               <div className="flex flex-wrap items-center gap-2">
                 {(stats as any)?.currentStreak && (stats as any).currentStreak > 0 && (
-                  <div className="flex items-center gap-1 text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
-                    <span>🔥</span>
-                    <span>{(stats as any).currentStreak} hari berturut</span>
-                  </div>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-1 text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full cursor-help">
+                        <span>🔥</span>
+                        <span>{(stats as any).currentStreak} hari berturut</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Jumlah hari berturut-turut Anda menyelesaikan setidaknya satu task</p>
+                    </TooltipContent>
+                  </Tooltip>
                 )}
                 {todayTasks.filter(t => t.status === 'completed').length > 0 && (
                   <div className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
