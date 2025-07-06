@@ -295,9 +295,11 @@ export default function DailyFocusPage() {
     },
   });
 
-  // Get today's date info
+  // Get today's date info using local timezone
   const today = new Date();
-  const todayStr = today.toISOString().split("T")[0];
+  const todayStr = today.getFullYear() + '-' + 
+    String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+    String(today.getDate()).padStart(2, '0');
 
   // Helper function for key result type icons
   const getKeyResultTypeIcon = (type: string) => {
@@ -496,12 +498,17 @@ export default function DailyFocusPage() {
   const overdueTasks = filteredTasks.filter((task: any) => {
     const dueDate = task.dueDate ? task.dueDate.split("T")[0] : null;
     // Only consider tasks overdue if they were due BEFORE today (not including today)
-    return (
-      dueDate &&
+    const isOverdue = dueDate &&
       dueDate < todayStr &&
       task.status !== "completed" &&
-      task.status !== "cancelled"
-    );
+      task.status !== "cancelled";
+    
+    // Debug logging
+    if (dueDate) {
+      console.log(`Task: ${task.title}, Due: ${dueDate}, Today: ${todayStr}, Is Overdue: ${isOverdue}`);
+    }
+    
+    return isOverdue;
   });
 
   const activeKeyResults = filteredKeyResults.filter((kr: any) => {
