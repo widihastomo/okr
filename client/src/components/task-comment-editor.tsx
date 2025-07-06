@@ -103,7 +103,7 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
     
     // Update editor content directly and set cursor position after the mention
     if (editorRef.current) {
-      editorRef.current.textContent = newContent;
+      editorRef.current.innerHTML = newContent;
       editorRef.current.focus();
       
       // Set cursor position after the mention
@@ -165,29 +165,40 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
     
     if (!selectedText) return;
 
-    let formattedText = selectedText;
+    let htmlElement: HTMLElement;
     switch (format) {
       case 'bold':
-        formattedText = `**${selectedText}**`;
+        htmlElement = document.createElement('strong');
+        htmlElement.textContent = selectedText;
         break;
       case 'italic':
-        formattedText = `*${selectedText}*`;
+        htmlElement = document.createElement('em');
+        htmlElement.textContent = selectedText;
         break;
       case 'underline':
-        formattedText = `__${selectedText}__`;
+        htmlElement = document.createElement('u');
+        htmlElement.textContent = selectedText;
         break;
       case 'link':
-        formattedText = `[${selectedText}](url)`;
+        const url = prompt('Masukkan URL:');
+        if (!url) return;
+        htmlElement = document.createElement('a');
+        htmlElement.textContent = selectedText;
+        (htmlElement as HTMLAnchorElement).href = url;
+        (htmlElement as HTMLAnchorElement).target = '_blank';
+        (htmlElement as HTMLAnchorElement).className = 'text-blue-600 underline';
         break;
+      default:
+        return;
     }
 
     range.deleteContents();
-    range.insertNode(document.createTextNode(formattedText));
+    range.insertNode(htmlElement);
     selection.removeAllRanges();
     
-    // Update content state
+    // Update content state with HTML content
     if (editorRef.current) {
-      setContent(editorRef.current.textContent || "");
+      setContent(editorRef.current.innerHTML || "");
     }
   };
 
@@ -245,7 +256,7 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
             <div
               ref={editorRef}
               contentEditable
-              onInput={(e) => handleContentChange(e.currentTarget.textContent || "")}
+              onInput={(e) => handleContentChange(e.currentTarget.innerHTML || "")}
               className="min-h-[120px] p-4 outline-none resize-none text-sm leading-relaxed"
               style={{
                 whiteSpace: "pre-wrap",
@@ -265,7 +276,7 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
               setContent("");
               setMentionedUsers([]);
               if (editorRef.current) {
-                editorRef.current.textContent = "";
+                editorRef.current.innerHTML = "";
               }
             }}
           >
