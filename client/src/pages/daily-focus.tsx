@@ -1152,7 +1152,7 @@ export default function DailyFocusPage() {
                                         </Tooltip>
                                       </TooltipProvider>
                                       <span className="text-xs text-blue-600 font-medium">
-                                        {initiative.keyResultTitle || 'Unknown'}
+                                        {keyResults.find((kr: any) => kr.id === initiative.keyResultId)?.title || 'Unknown'}
                                       </span>
                                     </div>
                                   )}
