@@ -336,7 +336,7 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                           <TableCell>
                             <Input
                               type="text"
-                              value={formatNumberWithSeparator(kr.newValue?.toString() || '0')}
+                              value={kr.newValue !== undefined ? formatNumberWithSeparator(kr.newValue.toString()) : ''}
                               onChange={(e) => {
                                 handleNumberInputChange(e.target.value, (formattedValue) => {
                                   const newData = { ...updateData };
@@ -346,6 +346,7 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                                   setUpdateData(newData);
                                 });
                               }}
+                              placeholder="0"
                               className="w-24"
                             />
                           </TableCell>
@@ -388,7 +389,7 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                         <label className="text-sm font-medium text-gray-700">Nilai Baru:</label>
                         <Input
                           type="text"
-                          value={formatNumberWithSeparator(kr.newValue?.toString() || '0')}
+                          value={kr.newValue !== undefined ? formatNumberWithSeparator(kr.newValue.toString()) : ''}
                           onChange={(e) => {
                             handleNumberInputChange(e.target.value, (formattedValue) => {
                               const newData = { ...updateData };
@@ -398,7 +399,7 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                               setUpdateData(newData);
                             });
                           }}
-                          placeholder="Masukkan nilai baru"
+                          placeholder="0"
                         />
                       </div>
 
