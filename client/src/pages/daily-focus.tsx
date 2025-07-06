@@ -14,12 +14,17 @@ import { Progress } from "@/components/ui/progress";
 import {
   Calendar,
   TrendingUp,
+  TrendingDown,
   AlertTriangle,
   CheckCircle,
   PlayCircle,
   Target,
   BarChart3,
   Trophy,
+  MoveUp,
+  MoveDown,
+  ChevronRight,
+  ChevronDown,
 } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { toast } from "@/hooks/use-toast";
@@ -115,6 +120,42 @@ export default function DailyFocusPage() {
   // Get today's date info
   const today = new Date();
   const todayStr = today.toISOString().split("T")[0];
+
+  // Helper function for key result type icons
+  const getKeyResultTypeIcon = (type: string) => {
+    switch (type) {
+      case "increase_to":
+        return {
+          icon: TrendingUp,
+          tooltip: "Target Peningkatan - Progress dihitung dari nilai awal ke target",
+        };
+      case "decrease_to":
+        return {
+          icon: TrendingDown,
+          tooltip: "Target Penurunan - Progress dihitung mundur dari nilai awal ke target",
+        };
+      case "should_stay_above":
+        return {
+          icon: MoveUp,
+          tooltip: "Tetap Di Atas - Nilai harus tetap berada di atas ambang batas target",
+        };
+      case "should_stay_below":
+        return {
+          icon: MoveDown,
+          tooltip: "Tetap Di Bawah - Nilai harus tetap berada di bawah ambang batas target",
+        };
+      case "achieve_or_not":
+        return {
+          icon: Target,
+          tooltip: "Target Binary - 100% jika tercapai, 0% jika tidak",
+        };
+      default:
+        return {
+          icon: Target,
+          tooltip: "Tipe target tidak diketahui",
+        };
+    }
+  };
 
   // Helper functions
   const calculateKeyResultProgress = (keyResult: any): number => {
@@ -606,33 +647,120 @@ export default function DailyFocusPage() {
               ) : (
                 activeKeyResults.map((kr: any) => {
                   const progress = calculateKeyResultProgress(kr);
+                  const typeConfig = getKeyResultTypeIcon(kr.keyResultType);
+                  const IconComponent = typeConfig.icon;
+                  
                   return (
                     <div
                       key={kr.id}
-                      className="p-4 bg-blue-50 border border-blue-200 rounded-lg"
+                      className="p-3 sm:p-4 bg-white border border-gray-200 rounded-lg space-y-2 sm:space-y-3"
                     >
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-medium text-blue-900">
-                          {kr.title}
-                        </h3>
-                        <Button
-                          size="sm"
-                          onClick={() => handleCheckInKeyResult(kr)}
-                          className="bg-blue-600 hover:bg-blue-700"
-                        >
-                          Check-in
-                        </Button>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-medium text-gray-900 hover:text-blue-600 cursor-pointer text-left">
+                              {kr.title}
+                            </h3>
+                            <div className="relative group">
+                              <IconComponent className="w-4 h-4 text-gray-500 hover:text-gray-700 cursor-help" />
+                              <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap">
+                                {typeConfig.tooltip}
+                                <div className="absolute right-full top-1/2 transform -translate-y-1/2 w-0 h-0 border-t-4 border-b-4 border-r-4 border-transparent border-r-black"></div>
+                              </div>
+                            </div>
+                          </div>
+                          <p className="text-sm text-gray-600 mb-2">
+                            {kr.description}
+                          </p>
+                          <div className="text-xs text-gray-500">
+                            {(() => {
+                              // Handle achieve_or_not type
+                              if (kr.keyResultType === "achieve_or_not") {
+                                return progress >= 100
+                                  ? "Status: Tercapai"
+                                  : "Status: Belum tercapai";
+                              }
+
+                              // Handle should_stay types
+                              if (
+                                kr.keyResultType === "should_stay_above" ||
+                                kr.keyResultType === "should_stay_below"
+                              ) {
+                                const currentVal = parseFloat(kr.currentValue);
+                                const targetVal = parseFloat(kr.targetValue);
+                                const unitDisplay =
+                                  kr.unit === "Rp"
+                                    ? "Rp "
+                                    : kr.unit === "%"
+                                      ? ""
+                                      : "";
+                                const unitSuffix = kr.unit === "%" ? "%" : "";
+
+                                return `Saat ini: ${unitDisplay}${currentVal.toLocaleString("id-ID")}${unitSuffix} | Threshold: ${unitDisplay}${targetVal.toLocaleString("id-ID")}${unitSuffix}`;
+                              }
+
+                              // Handle increase_to and decrease_to types
+                              const currentVal = parseFloat(kr.currentValue);
+                              const targetVal = parseFloat(kr.targetValue);
+                              const baseVal = kr.baseValue
+                                ? parseFloat(kr.baseValue)
+                                : 0;
+
+                              if (kr.keyResultType === "decrease_to") {
+                                if (kr.unit === "Rp") {
+                                  return `Rp ${baseVal.toLocaleString("id-ID")} → Rp ${targetVal.toLocaleString("id-ID")} (capaian: Rp ${currentVal.toLocaleString("id-ID")})`;
+                                } else if (kr.unit === "%") {
+                                  return `${baseVal.toLocaleString("id-ID")}% → ${targetVal.toLocaleString("id-ID")}% (capaian: ${currentVal.toLocaleString("id-ID")}%)`;
+                                } else {
+                                  return `${baseVal.toLocaleString("id-ID")} → ${targetVal.toLocaleString("id-ID")} ${kr.unit || ""} (capaian: ${currentVal.toLocaleString("id-ID")})`;
+                                }
+                              } else {
+                                // increase_to type
+                                if (kr.unit === "Rp") {
+                                  return `Rp ${baseVal.toLocaleString("id-ID")} → Rp ${targetVal.toLocaleString("id-ID")} (capaian: Rp ${currentVal.toLocaleString("id-ID")})`;
+                                } else if (kr.unit === "%") {
+                                  return `${baseVal.toLocaleString("id-ID")}% → ${targetVal.toLocaleString("id-ID")}% (capaian: ${currentVal.toLocaleString("id-ID")}%)`;
+                                } else {
+                                  return `${baseVal.toLocaleString("id-ID")} → ${targetVal.toLocaleString("id-ID")} ${kr.unit || ""} (capaian: ${currentVal.toLocaleString("id-ID")})`;
+                                }
+                              }
+                            })()}
+                          </div>
+                        </div>
+
+                        {/* Action Button */}
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => handleCheckInKeyResult(kr)}
+                            className="text-white"
+                            style={{
+                              backgroundColor: "#2095F4",
+                              borderColor: "#2095F4",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = "#1976D2";
+                              e.currentTarget.style.borderColor = "#1976D2";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = "#2095F4";
+                              e.currentTarget.style.borderColor = "#2095F4";
+                            }}
+                          >
+                            <TrendingUp className="w-4 h-4 mr-1" />
+                            Update
+                          </Button>
+                        </div>
                       </div>
+
+                      {/* Progress section */}
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span>Progress</span>
                           <span>{progress.toFixed(1)}%</span>
                         </div>
                         <Progress value={progress} className="h-2" />
-                        <div className="flex justify-between text-xs text-gray-600">
-                          <span>Saat ini: {kr.currentValue}</span>
-                          <span>Target: {kr.targetValue}</span>
-                        </div>
                       </div>
                     </div>
                   );
