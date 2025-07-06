@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { formatNumberWithSeparator, handleNumberInputChange } from "@/lib/number-utils";
 import { 
   Clock, 
   CheckCircle, 
@@ -330,16 +331,20 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                       {updateData.keyResults.map((kr, index) => (
                         <TableRow key={kr.id}>
                           <TableCell className="font-medium">{kr.title}</TableCell>
-                          <TableCell>{kr.currentValue} {kr.unit}</TableCell>
-                          <TableCell>{kr.targetValue} {kr.unit}</TableCell>
+                          <TableCell>{formatNumberWithSeparator(kr.currentValue.toString())} {kr.unit}</TableCell>
+                          <TableCell>{formatNumberWithSeparator(kr.targetValue.toString())} {kr.unit}</TableCell>
                           <TableCell>
                             <Input
-                              type="number"
-                              value={kr.newValue || ''}
+                              type="text"
+                              value={formatNumberWithSeparator(kr.newValue?.toString() || '')}
                               onChange={(e) => {
-                                const newData = { ...updateData };
-                                newData.keyResults[index].newValue = parseFloat(e.target.value) || 0;
-                                setUpdateData(newData);
+                                handleNumberInputChange(e.target.value, (formattedValue) => {
+                                  const newData = { ...updateData };
+                                  // Remove formatting for storage (convert back to number)
+                                  const cleanValue = formattedValue.replace(/[.,]/g, '');
+                                  newData.keyResults[index].newValue = parseFloat(cleanValue) || 0;
+                                  setUpdateData(newData);
+                                });
                               }}
                               className="w-24"
                             />
@@ -371,23 +376,27 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         <div>
                           <span className="text-gray-600">Saat ini:</span>
-                          <p className="font-medium">{kr.currentValue} {kr.unit}</p>
+                          <p className="font-medium">{formatNumberWithSeparator(kr.currentValue.toString())} {kr.unit}</p>
                         </div>
                         <div>
                           <span className="text-gray-600">Target:</span>
-                          <p className="font-medium">{kr.targetValue} {kr.unit}</p>
+                          <p className="font-medium">{formatNumberWithSeparator(kr.targetValue.toString())} {kr.unit}</p>
                         </div>
                       </div>
 
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-700">Nilai Baru:</label>
                         <Input
-                          type="number"
-                          value={kr.newValue || ''}
+                          type="text"
+                          value={formatNumberWithSeparator(kr.newValue?.toString() || '')}
                           onChange={(e) => {
-                            const newData = { ...updateData };
-                            newData.keyResults[index].newValue = parseFloat(e.target.value) || 0;
-                            setUpdateData(newData);
+                            handleNumberInputChange(e.target.value, (formattedValue) => {
+                              const newData = { ...updateData };
+                              // Remove formatting for storage (convert back to number)
+                              const cleanValue = formattedValue.replace(/[.,]/g, '');
+                              newData.keyResults[index].newValue = parseFloat(cleanValue) || 0;
+                              setUpdateData(newData);
+                            });
                           }}
                           placeholder="Masukkan nilai baru"
                         />
