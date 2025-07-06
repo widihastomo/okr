@@ -165,7 +165,7 @@ export function TaskCommentList({ taskId }: TaskCommentListProps) {
           >
             <Avatar className="w-8 h-8 flex-shrink-0">
               <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
-                {comment.user.username.charAt(0).toUpperCase()}
+                {(comment.user.firstName || comment.user.email)?.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
 
@@ -173,10 +173,10 @@ export function TaskCommentList({ taskId }: TaskCommentListProps) {
               <div className="bg-gray-50 rounded-lg px-3 py-2">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="font-medium text-sm text-gray-900">
-                    {comment.user.username}
+                    {comment.user.firstName || comment.user.email}
                   </span>
                   <span className="text-xs text-gray-500">
-                    {formatDistanceToNow(new Date(comment.createdAt), {
+                    {formatDistanceToNow(comment.createdAt ? new Date(comment.createdAt) : new Date(), {
                       addSuffix: true,
                       locale: id,
                     })}
