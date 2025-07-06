@@ -245,50 +245,83 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
               data-placeholder="Tulis komentar... Gunakan @ untuk mention user"
             />
             
-            {/* Debug dropdown position */}
+            {/* Mention suggestions dropdown */}
             {showMentionSuggestions && (
               <div 
-                className="bg-red-500 text-white p-4 rounded"
                 style={{
-                  position: 'fixed',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  zIndex: 99999,
-                  width: '300px',
-                  maxHeight: '400px',
-                  overflow: 'auto'
+                  position: 'absolute',
+                  left: '0',
+                  bottom: '100%',
+                  marginBottom: '8px',
+                  width: '100%',
+                  backgroundColor: 'white',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '8px',
+                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                  maxHeight: '200px',
+                  overflowY: 'auto',
+                  zIndex: 9999
                 }}
               >
-                <div className="font-bold mb-2">MENTION DROPDOWN ACTIVE</div>
-                <div className="text-sm mb-2">Query: "{mentionQuery}"</div>
-                <div className="text-sm mb-2">Total Users: {users.length}</div>
-                <div className="text-sm mb-4">Filtered: {filteredUsers.length}</div>
-                
-                <div className="bg-white text-black rounded p-2">
-                  {filteredUsers.length > 0 ? (
-                    filteredUsers.slice(0, 5).map((user) => (
+                {filteredUsers.length > 0 ? (
+                  <div>
+                    {filteredUsers.slice(0, 5).map((user) => (
                       <button
                         key={user.id}
                         type="button"
                         onClick={() => handleMentionSelect(user)}
-                        className="w-full px-3 py-2 text-left hover:bg-gray-200 flex items-center gap-2 text-sm border-b last:border-b-0"
+                        style={{
+                          width: '100%',
+                          padding: '12px 16px',
+                          textAlign: 'left',
+                          backgroundColor: 'white',
+                          border: 'none',
+                          borderBottom: '1px solid #f3f4f6',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          transition: 'background-color 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
                       >
-                        <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold">
+                        <div style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          backgroundColor: '#3b82f6',
+                          color: 'white',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '14px',
+                          fontWeight: 'bold',
+                          flexShrink: 0
+                        }}>
                           {user.username?.charAt(0).toUpperCase()}
                         </div>
-                        <div>
-                          <div className="font-semibold">{user.username}</div>
-                          <div className="text-xs text-gray-600">{user.email}</div>
+                        <div style={{ textAlign: 'left' }}>
+                          <div style={{ fontWeight: '600', color: '#111827', fontSize: '14px' }}>
+                            {user.username}
+                          </div>
+                          <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                            {user.email}
+                          </div>
                         </div>
                       </button>
-                    ))
-                  ) : (
-                    <div className="px-3 py-2 text-sm text-gray-500">
-                      Tidak ada user yang cocok
-                    </div>
-                  )}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={{
+                    padding: '16px',
+                    textAlign: 'center',
+                    color: '#6b7280',
+                    fontSize: '14px'
+                  }}>
+                    Tidak ada user yang cocok dengan "{mentionQuery}"
+                  </div>
+                )}
               </div>
             )}
           </div>
