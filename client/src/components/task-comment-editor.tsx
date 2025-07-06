@@ -260,15 +260,15 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
         </div>
       </form>
 
-      {/* Mention suggestions dropdown - moved outside form */}
+      {/* Mention suggestions dropdown - positioned above form */}
       {showMentionSuggestions && (
         <div 
-          className="fixed bg-white border-2 border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto z-50"
+          className="absolute bg-white border-2 border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto z-50"
           style={{
-            width: '300px',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)'
+            width: '100%',
+            bottom: '100%',
+            marginBottom: '8px',
+            left: '0'
           }}
         >
           {filteredUsers.length > 0 ? (
