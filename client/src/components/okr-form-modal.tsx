@@ -225,7 +225,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
             owner: "",
             ownerType: "user",
             ownerId: "",
-            status: "in_progress",
+            status: "not_started",
             cycleId: undefined,
             teamId: undefined,
             parentId: undefined,

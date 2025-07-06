@@ -386,7 +386,7 @@ export default function Dashboard() {
           owner: okr.owner,
           ownerType: okr.ownerType,
           ownerId: okr.ownerId,
-          status: "in_progress",
+          status: "not_started",
           cycleId: okr.cycleId,
           teamId: okr.teamId,
           parentId: okr.parentId,
@@ -414,7 +414,7 @@ export default function Dashboard() {
             baseValue: kr.baseValue,
             unit: kr.unit,
             keyResultType: kr.keyResultType,
-            status: "in_progress",
+            status: "not_started",
             objectiveId: newObjective.id,
           }),
         });

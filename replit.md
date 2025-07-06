@@ -113,6 +113,12 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 06, 2025. Changed default objective status to "not_started" for new objectives:
+  * Updated OKR form modal to create objectives with "not_started" status instead of "in_progress"
+  * Updated objective duplication function to use "not_started" status for better lifecycle management
+  * Updated key result duplication to also use "not_started" status for consistency
+  * Objectives now properly start in "not_started" state until there are actual updates to key results, initiatives, or tasks
+  * Improved objective lifecycle management with clear progression from creation to active work
 - July 06, 2025. Enhanced Daily Focus objectives layout with horizontal scrolling design:
   * Changed from 2-column grid to horizontal scrolling layout for better mobile experience
   * Fixed card width to 320px (w-80) with flex-shrink-0 to maintain consistent sizing
