@@ -50,7 +50,6 @@ import {
   Flag,
   Sparkles,
   HelpCircle,
-  Crosshair,
 } from "lucide-react";
 import { Link } from "wouter";
 import { CheckInModal } from "@/components/check-in-modal";
@@ -1733,7 +1732,7 @@ export default function GoalDetail() {
                                           <TooltipProvider>
                                             <Tooltip>
                                               <TooltipTrigger>
-                                                <Crosshair className="w-3 h-3 text-blue-600" />
+                                                <Target className="w-3 h-3 text-blue-600" />
                                               </TooltipTrigger>
                                               <TooltipContent>
                                                 <p>Angka Target</p>
@@ -1989,7 +1988,7 @@ export default function GoalDetail() {
                                   <TooltipProvider>
                                     <Tooltip>
                                       <TooltipTrigger>
-                                        <Crosshair className="w-3 h-3 text-blue-600" />
+                                        <Target className="w-3 h-3 text-blue-600" />
                                       </TooltipTrigger>
                                       <TooltipContent>
                                         <p>Angka Target</p>
