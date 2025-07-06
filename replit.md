@@ -124,6 +124,10 @@ Changelog:
   * Added proper error handling, loading states, and Indonesian localization
   * Comments support rich text formatting and user collaboration features
   * Enhanced task collaboration workflow with threaded discussion capability
+  * Fixed mention functionality to prevent dropdown appearing after user selection
+  * Implemented modal-based link creation instead of simple prompt for better UX
+  * Added instant preview for text formatting (bold, italic, underline) with proper HTML rendering
+  * Complete comment CRUD functionality with owner-only edit/delete permissions working perfectly
 - July 06, 2025. Completely redesigned task detail page interface to match objective detail page structure:
   * Restructured layout with professional header containing back button and action buttons
   * Implemented 2/3 + 1/3 grid layout with main task overview card and activity log sidebar
