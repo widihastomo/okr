@@ -225,10 +225,10 @@ export function TaskCommentList({ taskId }: TaskCommentListProps) {
 
               {/* Action menu - only show for comment owner */}
               {currentUser?.id === comment.userId && editingCommentId !== comment.id && (
-                <div className="flex justify-end mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex justify-end mt-1">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600">
                         <MoreVertical className="h-3 w-3" />
                       </Button>
                     </DropdownMenuTrigger>
