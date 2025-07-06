@@ -1216,27 +1216,29 @@ export default function DailyFocusPage() {
                                 <div className="text-sm">
                                   {initiative.startDate && (
                                     <div className="text-gray-500">
-                                      {new Date(initiative.startDate).toLocaleDateString("id-ID", {
-                                        day: "2-digit",
-                                        month: "2-digit",
+                                      Mulai: {new Date(initiative.startDate).toLocaleDateString("id-ID", {
+                                        day: "numeric",
+                                        month: "short",
                                       })}
                                     </div>
                                   )}
                                   {initiative.dueDate ? (
                                     <div
-                                      className={
+                                      className={`text-sm ${
                                         new Date(initiative.dueDate) < new Date()
                                           ? "text-red-600 font-medium"
                                           : "text-gray-900"
-                                      }
+                                      }`}
                                     >
-                                      {new Date(initiative.dueDate).toLocaleDateString("id-ID", {
-                                        day: "2-digit",
-                                        month: "2-digit",
+                                      Selesai: {new Date(initiative.dueDate).toLocaleDateString("id-ID", {
+                                        day: "numeric",
+                                        month: "short",
                                       })}
                                     </div>
                                   ) : (
-                                    <div className="text-gray-400">-</div>
+                                    <div className="text-gray-400 text-sm">
+                                      Selesai: -
+                                    </div>
                                   )}
                                 </div>
                               </td>
