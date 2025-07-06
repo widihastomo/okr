@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -230,7 +231,7 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
           </div>
 
           {/* Content editor */}
-          <div className="relative">
+          <div className="relative overflow-visible">
             <div
               ref={editorRef}
               contentEditable
@@ -244,31 +245,50 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
               data-placeholder="Tulis komentar... Gunakan @ untuk mention user"
             />
             
-            {/* Mention suggestions */}
+            {/* Debug dropdown position */}
             {showMentionSuggestions && (
-              <div className="absolute left-0 top-full mt-2 w-full bg-white border border-gray-200 rounded-md shadow-lg z-50 max-h-48 overflow-y-auto">
-                {filteredUsers.length > 0 ? (
-                  filteredUsers.slice(0, 5).map((user) => (
-                    <button
-                      key={user.id}
-                      type="button"
-                      onClick={() => handleMentionSelect(user)}
-                      className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 text-sm border-b border-gray-100 last:border-b-0"
-                    >
-                      <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-medium">
-                        {user.username?.charAt(0).toUpperCase()}
-                      </div>
-                      <div>
-                        <div className="font-medium text-gray-900">{user.username}</div>
-                        <div className="text-xs text-gray-500">{user.email}</div>
-                      </div>
-                    </button>
-                  ))
-                ) : (
-                  <div className="px-4 py-3 text-sm text-gray-500">
-                    Tidak ada user yang cocok dengan "{mentionQuery}"
-                  </div>
-                )}
+              <div 
+                className="bg-red-500 text-white p-4 rounded"
+                style={{
+                  position: 'fixed',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: 99999,
+                  width: '300px',
+                  maxHeight: '400px',
+                  overflow: 'auto'
+                }}
+              >
+                <div className="font-bold mb-2">MENTION DROPDOWN ACTIVE</div>
+                <div className="text-sm mb-2">Query: "{mentionQuery}"</div>
+                <div className="text-sm mb-2">Total Users: {users.length}</div>
+                <div className="text-sm mb-4">Filtered: {filteredUsers.length}</div>
+                
+                <div className="bg-white text-black rounded p-2">
+                  {filteredUsers.length > 0 ? (
+                    filteredUsers.slice(0, 5).map((user) => (
+                      <button
+                        key={user.id}
+                        type="button"
+                        onClick={() => handleMentionSelect(user)}
+                        className="w-full px-3 py-2 text-left hover:bg-gray-200 flex items-center gap-2 text-sm border-b last:border-b-0"
+                      >
+                        <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold">
+                          {user.username?.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <div className="font-semibold">{user.username}</div>
+                          <div className="text-xs text-gray-600">{user.email}</div>
+                        </div>
+                      </button>
+                    ))
+                  ) : (
+                    <div className="px-3 py-2 text-sm text-gray-500">
+                      Tidak ada user yang cocok
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
