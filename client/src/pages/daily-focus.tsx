@@ -262,6 +262,14 @@ export default function DailyFocusPage() {
       createdBy: userId, // Add the required createdBy field
     };
 
+    // Debug logging to check date handling
+    console.log('Task creation debug:', {
+      selectedDate: taskFormData.dueDate,
+      selectedDateISO: taskFormData.dueDate?.toISOString(),
+      todayGMT7: todayStr,
+      taskData: taskData
+    });
+
     createTaskMutation.mutate(taskData);
   };
 
