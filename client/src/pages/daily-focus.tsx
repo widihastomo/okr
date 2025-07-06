@@ -289,6 +289,33 @@ export default function DailyFocusPage() {
     }
   };
 
+  // Helper functions for priority styling
+  const getTaskPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "medium":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "low":
+        return "bg-green-100 text-green-800 border-green-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const getTaskPriorityLabel = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return "Tinggi";
+      case "medium":
+        return "Sedang";
+      case "low":
+        return "Rendah";
+      default:
+        return "Sedang";
+    }
+  };
+
   const handleTaskStatusUpdate = (taskId: string, newStatus: string) => {
     updateTaskMutation.mutate({
       taskId,
@@ -804,6 +831,9 @@ export default function DailyFocusPage() {
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Task
                           </th>
+                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Prioritas
+                          </th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Status
                           </th>
@@ -827,6 +857,11 @@ export default function DailyFocusPage() {
                                   <div className="text-sm text-red-600">Task Terlambat</div>
                                 </div>
                               </div>
+                            </td>
+                            <td className="px-4 py-4 text-center">
+                              <Badge className={getTaskPriorityColor(task.priority || "medium")}>
+                                {getTaskPriorityLabel(task.priority || "medium")}
+                              </Badge>
                             </td>
                             <td className="px-4 py-4">
                               <DropdownMenu>
@@ -916,6 +951,11 @@ export default function DailyFocusPage() {
                                   <div className="text-sm text-gray-600">Task Hari Ini</div>
                                 </div>
                               </div>
+                            </td>
+                            <td className="px-4 py-4 text-center">
+                              <Badge className={getTaskPriorityColor(task.priority || "medium")}>
+                                {getTaskPriorityLabel(task.priority || "medium")}
+                              </Badge>
                             </td>
                             <td className="px-4 py-4">
                               <DropdownMenu>
@@ -1012,7 +1052,14 @@ export default function DailyFocusPage() {
                             className="p-3 bg-red-50 border border-red-200 rounded-lg space-y-2"
                           >
                             <div className="flex items-center justify-between">
-                              <div className="font-medium text-red-900">{task.title}</div>
+                              <div className="flex-1">
+                                <div className="font-medium text-red-900">{task.title}</div>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Badge className={getTaskPriorityColor(task.priority || "medium")}>
+                                    {getTaskPriorityLabel(task.priority || "medium")}
+                                  </Badge>
+                                </div>
+                              </div>
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <button 
@@ -1110,7 +1157,14 @@ export default function DailyFocusPage() {
                             className="p-3 bg-gray-50 border border-gray-200 rounded-lg space-y-2"
                           >
                             <div className="flex items-center justify-between">
-                              <div className="font-medium text-gray-900">{task.title}</div>
+                              <div className="flex-1">
+                                <div className="font-medium text-gray-900">{task.title}</div>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Badge className={getTaskPriorityColor(task.priority || "medium")}>
+                                    {getTaskPriorityLabel(task.priority || "medium")}
+                                  </Badge>
+                                </div>
+                              </div>
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <button 
