@@ -924,9 +924,8 @@ export default function DailyFocusPage() {
                 <Dialog open={isTaskModalOpen} onOpenChange={setIsTaskModalOpen}>
                   <DialogTrigger asChild>
                     <Button 
-                      variant="outline" 
                       size="sm" 
-                      className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white border-orange-600"
+                      className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
                     >
                       <Plus className="w-4 h-4 mr-2" />
                       Tambah Task
