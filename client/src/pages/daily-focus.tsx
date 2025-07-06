@@ -295,14 +295,7 @@ export default function DailyFocusPage() {
   });
 
   // Task action handlers
-  const handleViewTaskDetails = (task: any) => {
-    setSelectedTask(task);
-    // You can implement a view details modal here if needed
-    toast({
-      title: "Task Details",
-      description: `${task.title}: ${task.description || "No description"}`,
-    });
-  };
+
 
   const handleEditTask = (task: any) => {
     setSelectedTask(task);
@@ -1459,12 +1452,11 @@ export default function DailyFocusPage() {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem
-                                    onClick={() => handleViewTaskDetails(task)}
-                                    className="cursor-pointer"
-                                  >
-                                    <Eye className="w-4 h-4 mr-2" />
-                                    Lihat Detail
+                                  <DropdownMenuItem asChild>
+                                    <Link href={`/tasks/${task.id}`} className="cursor-pointer flex items-center">
+                                      <Eye className="w-4 h-4 mr-2" />
+                                      Lihat Detail
+                                    </Link>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     onClick={() => handleEditTask(task)}
@@ -1602,12 +1594,11 @@ export default function DailyFocusPage() {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem
-                                    onClick={() => handleViewTaskDetails(task)}
-                                    className="cursor-pointer"
-                                  >
-                                    <Eye className="w-4 h-4 mr-2" />
-                                    Lihat Detail
+                                  <DropdownMenuItem asChild>
+                                    <Link href={`/tasks/${task.id}`} className="cursor-pointer flex items-center">
+                                      <Eye className="w-4 h-4 mr-2" />
+                                      Lihat Detail
+                                    </Link>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     onClick={() => handleEditTask(task)}
@@ -1745,12 +1736,11 @@ export default function DailyFocusPage() {
                                   </button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem
-                                    onClick={() => handleViewTaskDetails(task)}
-                                    className="cursor-pointer"
-                                  >
-                                    <Eye className="w-4 h-4 mr-2" />
-                                    Lihat Detail
+                                  <DropdownMenuItem asChild>
+                                    <Link href={`/tasks/${task.id}`} className="cursor-pointer flex items-center">
+                                      <Eye className="w-4 h-4 mr-2" />
+                                      Lihat Detail
+                                    </Link>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     onClick={() => handleEditTask(task)}
@@ -1886,12 +1876,11 @@ export default function DailyFocusPage() {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem
-                                    onClick={() => handleViewTaskDetails(task)}
-                                    className="cursor-pointer"
-                                  >
-                                    <Eye className="w-3 h-3 mr-2" />
-                                    Lihat Detail
+                                  <DropdownMenuItem asChild>
+                                    <Link href={`/tasks/${task.id}`} className="cursor-pointer flex items-center">
+                                      <Eye className="w-3 h-3 mr-2" />
+                                      Lihat Detail
+                                    </Link>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     onClick={() => handleEditTask(task)}
@@ -2024,12 +2013,11 @@ export default function DailyFocusPage() {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem
-                                    onClick={() => handleViewTaskDetails(task)}
-                                    className="cursor-pointer"
-                                  >
-                                    <Eye className="w-3 h-3 mr-2" />
-                                    Lihat Detail
+                                  <DropdownMenuItem asChild>
+                                    <Link href={`/tasks/${task.id}`} className="cursor-pointer flex items-center">
+                                      <Eye className="w-3 h-3 mr-2" />
+                                      Lihat Detail
+                                    </Link>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     onClick={() => handleEditTask(task)}
@@ -2160,12 +2148,11 @@ export default function DailyFocusPage() {
                                   </button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem
-                                    onClick={() => handleViewTaskDetails(task)}
-                                    className="cursor-pointer"
-                                  >
-                                    <Eye className="w-3 h-3 mr-2" />
-                                    Lihat Detail
+                                  <DropdownMenuItem asChild>
+                                    <Link href={`/tasks/${task.id}`} className="cursor-pointer flex items-center">
+                                      <Eye className="w-3 h-3 mr-2" />
+                                      Lihat Detail
+                                    </Link>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     onClick={() => handleEditTask(task)}

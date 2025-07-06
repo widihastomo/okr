@@ -113,6 +113,13 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 06, 2025. Completed task navigation enhancements with proper hyperlinks throughout mobile views:
+  * Converted all "Lihat Detail" dropdown menu items to use Link components for proper task detail page navigation
+  * Updated all three mobile task sections (overdue, today, tomorrow) to use href navigation instead of onClick handlers
+  * Replaced onClick handlers with proper Link components for desktop and mobile task views
+  * Cleaned up unused handleViewTaskDetails function since all navigation now uses hyperlinks
+  * Enhanced user experience with proper browser navigation behavior for task detail pages
+  * Maintained all existing task management functionality while improving navigation consistency
 - July 06, 2025. Fixed tomorrow's tasks timezone filtering and cleaned up task interface:
   * Fixed tomorrow's tasks filtering logic to use GMT+7 timezone consistency with rest of application
   * Corrected issue where tomorrow's tasks filter was using UTC instead of GMT+7, causing incorrect task categorization
