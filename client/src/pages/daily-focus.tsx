@@ -308,6 +308,10 @@ export default function DailyFocusPage() {
     ? (keyResults as any[])
     : (keyResults as any[]).filter((kr: any) => kr.assignedTo === selectedUserId);
 
+  const filteredInitiatives = selectedUserId === "all"
+    ? (initiatives as any[])
+    : (initiatives as any[]).filter((init: any) => init.picId === selectedUserId);
+
   // Filter data for today's focus
   const todayTasks = filteredTasks.filter((task: any) => {
     const dueDate = task.dueDate ? task.dueDate.split("T")[0] : null;
@@ -339,8 +343,8 @@ export default function DailyFocusPage() {
     );
   });
 
-  const activeInitiatives = (initiatives as any[]).filter(
-    (init: any) => (init.status === "sedang_berjalan" || init.status === "draft") && init.picId === user?.id,
+  const activeInitiatives = filteredInitiatives.filter(
+    (init: any) => init.status === "sedang_berjalan" || init.status === "draft",
   );
 
   // Get related objectives for today's activities
@@ -1030,17 +1034,32 @@ export default function DailyFocusPage() {
         <TabsContent value="initiatives" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Kelola Inisiatif Aktif</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                Kelola Inisiatif Aktif
+                {selectedUserId !== "all" && (
+                  <span className="text-sm font-normal text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                    {getUserName(selectedUserId)}
+                  </span>
+                )}
+              </CardTitle>
               <CardDescription>
-                Update metrics dan kelola inisiatif aktif yang Anda tanggung jawabi
+                Update metrics dan kelola inisiatif aktif{selectedUserId === "all" ? " semua anggota tim" : " yang ditanggung jawabi"}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {activeInitiatives.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <BarChart3 className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                  <p>Tidak ada inisiatif aktif yang Anda tanggung jawabi</p>
-                  <p className="text-sm mt-2">Hanya inisiatif dengan Anda sebagai PIC yang ditampilkan</p>
+                  <p>
+                    {selectedUserId === "all" 
+                      ? "Tidak ada inisiatif aktif dari tim" 
+                      : `Tidak ada inisiatif aktif untuk ${getUserName(selectedUserId)}`}
+                  </p>
+                  <p className="text-sm mt-2">
+                    {selectedUserId === "all" 
+                      ? "Semua anggota tim tidak memiliki inisiatif aktif"
+                      : "Gunakan filter pengguna untuk melihat inisiatif anggota tim lainnya"}
+                  </p>
                 </div>
               ) : (
                 <>
