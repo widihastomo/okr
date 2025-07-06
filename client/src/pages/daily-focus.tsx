@@ -704,72 +704,74 @@ export default function DailyFocusPage() {
                   };
                   
                   return (
-                    <div key={kr.id} className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
-                      {/* Title and Update Button Row */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-base font-medium text-gray-900">
-                            {kr.title}
-                          </h3>
-                          <IconComponent className="w-4 h-4 text-gray-500" />
+                    <Card key={kr.id} className="mb-4">
+                      <CardContent className="p-4">
+                        {/* Title and Update Button Row */}
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-base font-medium text-gray-900">
+                              {kr.title}
+                            </h3>
+                            <IconComponent className="w-4 h-4 text-gray-500" />
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Button
+                              size="sm"
+                              onClick={() => handleCheckInKeyResult(kr)}
+                              className="bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                              <TrendingUp className="w-4 h-4 mr-1" />
+                              Update
+                            </Button>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <span className="text-gray-400">⋮</span>
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Button
-                            size="sm"
-                            onClick={() => handleCheckInKeyResult(kr)}
-                            className="bg-blue-600 hover:bg-blue-700 text-white"
-                          >
-                            <TrendingUp className="w-4 h-4 mr-1" />
-                            Update
-                          </Button>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <span className="text-gray-400">⋮</span>
-                          </Button>
-                        </div>
-                      </div>
 
-                      {/* Values Row */}
-                      <div className="text-sm text-gray-600">
-                        <span>{getCurrentValueText()}</span>
-                        <span className="mx-2">|</span>
-                        <span>{getTargetText()}</span>
-                      </div>
-
-                      {/* Status Badge and Progress Row */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          {getStatusBadge()}
+                        {/* Values Row */}
+                        <div className="text-sm text-gray-600 mb-3">
+                          <span>{getCurrentValueText()}</span>
+                          <span className="mx-2">|</span>
+                          <span>{getTargetText()}</span>
                         </div>
-                        <span className="text-sm font-medium">{progress.toFixed(1)}%</span>
-                      </div>
 
-                      {/* Progress Bar */}
-                      <div className="relative">
-                        <Progress value={progress} className="h-2 bg-gray-200" />
-                      </div>
+                        {/* Status Badge and Progress Row */}
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            {getStatusBadge()}
+                          </div>
+                          <span className="text-sm font-medium">{progress.toFixed(1)}%</span>
+                        </div>
 
-                      {/* Assignee Row */}
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <div className="flex items-center gap-2">
-                          {kr.assignedTo ? (
-                            <>
-                              <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
-                                <span className="text-xs font-medium text-blue-600">
-                                  W
-                                </span>
-                              </div>
-                              <span>Widi Hastomo</span>
-                            </>
-                          ) : (
-                            <span>Belum ada assignee</span>
-                          )}
+                        {/* Progress Bar */}
+                        <div className="mb-3">
+                          <Progress value={progress} className="h-2" />
                         </div>
-                        <div className="flex items-center gap-1 text-gray-400">
-                          <span>🔗</span>
-                          <span>0 rencana</span>
+
+                        {/* Assignee Row */}
+                        <div className="flex items-center justify-between text-sm text-gray-500">
+                          <div className="flex items-center gap-2">
+                            {kr.assignedTo ? (
+                              <>
+                                <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
+                                  <span className="text-xs font-medium text-blue-600">
+                                    W
+                                  </span>
+                                </div>
+                                <span>Widi Hastomo</span>
+                              </>
+                            ) : (
+                              <span>Belum ada assignee</span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1 text-gray-400">
+                            <span>🔗</span>
+                            <span>0 rencana</span>
+                          </div>
                         </div>
-                      </div>
-                    </div>
+                      </CardContent>
+                    </Card>
                   );
                 })
               )}
