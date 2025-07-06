@@ -56,7 +56,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { toast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import { CheckInModal } from "@/components/check-in-modal";
-import SuccessMetricsModalSimple from "@/components/success-metrics-modal-simple";
+import MetricsUpdateModal from "@/components/metrics-update-modal";
 import OneClickHabitButton from "@/components/one-click-habit-button";
 import { SimpleProgressStatus } from "@/components/progress-status";
 import { UserStatsCard } from "@/components/gamification/user-stats-card";
@@ -1317,7 +1317,7 @@ export default function DailyFocusPage() {
       )}
 
       {selectedInitiative && (
-        <SuccessMetricsModalSimple
+        <MetricsUpdateModal
           open={isSuccessMetricsModalOpen}
           onOpenChange={setIsSuccessMetricsModalOpen}
           initiativeId={selectedInitiative.id}
