@@ -1359,6 +1359,11 @@ export default function DailyFocusPage() {
                                     {task.title}
                                   </Link>
                                   <div className="text-sm text-red-600">Task Terlambat</div>
+                                  {task.initiative && (
+                                    <div className="text-xs text-red-500 bg-red-100 px-2 py-1 rounded mt-1 inline-block">
+                                      Inisiatif: {task.initiative.title}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             </td>
@@ -1497,6 +1502,11 @@ export default function DailyFocusPage() {
                                     {task.title}
                                   </Link>
                                   <div className="text-sm text-gray-600">Task Hari Ini</div>
+                                  {task.initiative && (
+                                    <div className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded mt-1 inline-block">
+                                      Inisiatif: {task.initiative.title}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             </td>
@@ -1635,6 +1645,11 @@ export default function DailyFocusPage() {
                                     {task.title}
                                   </Link>
                                   <div className="text-sm text-green-600">Task Besok</div>
+                                  {task.initiative && (
+                                    <div className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded mt-1 inline-block">
+                                      Inisiatif: {task.initiative.title}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             </td>
@@ -1774,6 +1789,11 @@ export default function DailyFocusPage() {
                                 <Link href={`/tasks/${task.id}`} className="font-medium text-red-900 hover:text-red-600 hover:underline cursor-pointer">
                                   {task.title}
                                 </Link>
+                                {task.initiative && (
+                                  <div className="text-xs text-red-500 bg-red-100 px-2 py-1 rounded mt-1 inline-block">
+                                    Inisiatif: {task.initiative.title}
+                                  </div>
+                                )}
                                 <div className="flex items-center gap-2 mt-1">
                                   <Badge className={getTaskPriorityColor(task.priority || "medium")}>
                                     {getTaskPriorityLabel(task.priority || "medium")}
@@ -1907,6 +1927,11 @@ export default function DailyFocusPage() {
                                 <Link href={`/tasks/${task.id}`} className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer">
                                   {task.title}
                                 </Link>
+                                {task.initiative && (
+                                  <div className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded mt-1 inline-block">
+                                    Inisiatif: {task.initiative.title}
+                                  </div>
+                                )}
                                 <div className="flex items-center gap-2 mt-1">
                                   <Badge className={getTaskPriorityColor(task.priority || "medium")}>
                                     {getTaskPriorityLabel(task.priority || "medium")}
@@ -2040,6 +2065,11 @@ export default function DailyFocusPage() {
                                 <Link href={`/tasks/${task.id}`} className="font-medium text-green-900 hover:text-green-600 hover:underline cursor-pointer">
                                   {task.title}
                                 </Link>
+                                {task.initiative && (
+                                  <div className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded mt-1 inline-block">
+                                    Inisiatif: {task.initiative.title}
+                                  </div>
+                                )}
                                 <div className="flex items-center gap-2 mt-1">
                                   <Badge className={getTaskPriorityColor(task.priority || "medium")}>
                                     {getTaskPriorityLabel(task.priority || "medium")}
