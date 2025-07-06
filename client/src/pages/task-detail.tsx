@@ -18,6 +18,7 @@ import {
   CheckCircle,
   Target,
   Building2,
+  Plus,
   Users,
   Timer,
   CalendarDays,
@@ -268,7 +269,7 @@ function TaskOverviewCard({ task, assignedUser, initiative }: any) {
 // Comments Card Component
 function CommentsCard({ taskId }: { taskId: string }) {
   return (
-    <Card className="h-full">
+    <Card>
       <CardHeader>
         <CardTitle className="text-lg">Diskusi Task</CardTitle>
         <CardDescription>Diskusi dan kolaborasi tim</CardDescription>
@@ -277,6 +278,91 @@ function CommentsCard({ taskId }: { taskId: string }) {
         <TaskCommentList taskId={taskId} />
         <div className="border-t pt-4">
           <TaskCommentEditor taskId={taskId} />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Task History Card Component
+function TaskHistoryCard({ taskId }: { taskId: string }) {
+  // For now, create a placeholder history. In future this could be actual task activity logs
+  const historyItems = [
+    {
+      id: 1,
+      action: "Task dibuat",
+      user: "Widi Hastomo",
+      timestamp: "2025-01-07 10:30",
+      type: "created"
+    },
+    {
+      id: 2,
+      action: "Status diubah menjadi 'Sedang Berjalan'",
+      user: "Widi Hastomo", 
+      timestamp: "2025-01-07 11:15",
+      type: "status_change"
+    },
+    {
+      id: 3,
+      action: "Due date diperbarui",
+      user: "Admin User",
+      timestamp: "2025-01-07 14:20",
+      type: "due_date_change"
+    },
+    {
+      id: 4,
+      action: "PIC diubah",
+      user: "Admin User",
+      timestamp: "2025-01-07 16:45",
+      type: "assignee_change"
+    }
+  ];
+
+  const getHistoryIcon = (type: string) => {
+    switch (type) {
+      case "created":
+        return <Plus className="w-4 h-4 text-green-600" />;
+      case "status_change":
+        return <CheckCircle className="w-4 h-4 text-blue-600" />;
+      case "due_date_change":
+        return <Calendar className="w-4 h-4 text-orange-600" />;
+      case "assignee_change":
+        return <User className="w-4 h-4 text-purple-600" />;
+      default:
+        return <Clock className="w-4 h-4 text-gray-600" />;
+    }
+  };
+
+  return (
+    <Card className="h-full">
+      <CardHeader>
+        <CardTitle className="text-lg">Riwayat Task</CardTitle>
+        <CardDescription>Timeline aktivitas dan perubahan</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {historyItems.map((item, index) => (
+            <div key={item.id} className="flex gap-3">
+              <div className="flex flex-col items-center">
+                <div className="p-2 rounded-full bg-gray-100">
+                  {getHistoryIcon(item.type)}
+                </div>
+                {index < historyItems.length - 1 && (
+                  <div className="w-px h-8 bg-gray-200 mt-2"></div>
+                )}
+              </div>
+              <div className="flex-1 pb-4">
+                <p className="text-sm font-medium text-gray-900">
+                  {item.action}
+                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs text-gray-500">{item.user}</span>
+                  <span className="text-xs text-gray-400">•</span>
+                  <span className="text-xs text-gray-500">{item.timestamp}</span>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </CardContent>
     </Card>
@@ -425,15 +511,16 @@ export default function TaskDetailPage() {
 
       {/* Main Content Grid */}
       <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 h-full">
+        <div className="lg:col-span-2 space-y-6">
           <TaskOverviewCard 
             task={taskData}
             assignedUser={assignedUser}
             initiative={initiative}
           />
+          <CommentsCard taskId={id!} />
         </div>
         <div className="lg:col-span-1 h-full">
-          <CommentsCard taskId={id!} />
+          <TaskHistoryCard taskId={id!} />
         </div>
       </div>
 
