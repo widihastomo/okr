@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -378,24 +378,40 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
               </CardHeader>
               <CardContent>
                 {/* Desktop Table */}
-                <div className="hidden md:block">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Angka Target</TableHead>
-                        <TableHead>Nilai Saat Ini</TableHead>
-                        <TableHead>Target</TableHead>
-                        <TableHead>Nilai Baru</TableHead>
-                        <TableHead>Catatan</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Angka Target
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Nilai Saat Ini
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Target
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Nilai Baru
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Catatan
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
                       {updateData.keyResults.map((kr, index) => (
-                        <TableRow key={kr.id}>
-                          <TableCell className="font-medium">{kr.title}</TableCell>
-                          <TableCell>{formatNumberWithSeparator(kr.currentValue.toString())} {kr.unit}</TableCell>
-                          <TableCell>{formatNumberWithSeparator(kr.targetValue.toString())} {kr.unit}</TableCell>
-                          <TableCell>
+                        <tr key={kr.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <div className="font-medium text-gray-900">{kr.title}</div>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {formatNumberWithSeparator(kr.currentValue.toString())} {kr.unit}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {formatNumberWithSeparator(kr.targetValue.toString())} {kr.unit}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap">
                             <Input
                               type="text"
                               value={kr.newValue !== undefined ? formatNumberWithSeparator(kr.newValue.toString()) : ''}
@@ -411,8 +427,8 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                               placeholder="0"
                               className="w-24"
                             />
-                          </TableCell>
-                          <TableCell>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap">
                             <Input
                               placeholder="Catatan singkat..."
                               value={kr.notes || ''}
@@ -423,11 +439,11 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                               }}
                               className="w-40"
                             />
-                          </TableCell>
-                        </TableRow>
+                          </td>
+                        </tr>
                       ))}
-                    </TableBody>
-                  </Table>
+                    </tbody>
+                  </table>
                 </div>
 
                 {/* Mobile Cards */}
@@ -498,30 +514,46 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
               </CardHeader>
               <CardContent>
                 {/* Desktop Table */}
-                <div className="hidden md:block">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Metrik Sukses</TableHead>
-                        <TableHead>Inisiatif</TableHead>
-                        <TableHead>Pencapaian Saat Ini</TableHead>
-                        <TableHead>Target</TableHead>
-                        <TableHead>Pencapaian Baru</TableHead>
-                        <TableHead>Catatan</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Metrik Sukses
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Inisiatif
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Pencapaian Saat Ini
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Target
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Pencapaian Baru
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Catatan
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
                       {updateData.successMetrics.map((metric, index) => (
-                        <TableRow key={metric.id}>
-                          <TableCell className="font-medium">
-                            <div className="font-semibold">{metric.name}</div>
-                          </TableCell>
-                          <TableCell className="text-sm text-gray-600">
+                        <tr key={metric.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <div className="font-medium text-gray-900">{metric.name}</div>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                             {metric.initiativeTitle}
-                          </TableCell>
-                          <TableCell>{metric.achievement}</TableCell>
-                          <TableCell>{metric.target}</TableCell>
-                          <TableCell>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {metric.achievement}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {metric.target}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap">
                             <Input
                               type="text"
                               value={metric.newValue || ''}
@@ -533,8 +565,8 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                               placeholder="Rp 0"
                               className="w-32"
                             />
-                          </TableCell>
-                          <TableCell>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap">
                             <Input
                               placeholder="Catatan singkat..."
                               value={metric.notes || ''}
@@ -545,11 +577,11 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                               }}
                               className="w-32"
                             />
-                          </TableCell>
-                        </TableRow>
+                          </td>
+                        </tr>
                       ))}
-                    </TableBody>
-                  </Table>
+                    </tbody>
+                  </table>
                 </div>
 
                 {/* Mobile Cards */}
