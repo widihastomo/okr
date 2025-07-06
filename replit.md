@@ -113,11 +113,12 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
-- July 06, 2025. Added initiative information display to Daily Focus task lists:
+- July 06, 2025. Added initiative information display and cleaned up task descriptive text in Daily Focus:
   * Enhanced both desktop table view and mobile card view to show related initiative information when available
   * Added color-coded initiative badges below task titles matching section theme colors (red for overdue, blue for today, green for tomorrow)
   * Initiative badges display "Inisiatif: [Initiative Title]" with proper background styling
   * Applied to all task categories: overdue tasks, today's tasks, and tomorrow's tasks
+  * Removed redundant descriptive text ("Task Terlambat", "Task Hari Ini", "Task Besok") from desktop table view for cleaner appearance
   * Enhanced task context by showing initiative relationship, improving workflow understanding
   * Leveraged existing API structure that already includes initiative data in task responses
 - July 06, 2025. Added task list dividers and enhanced CRUD functionality with proper alert dialogs:
