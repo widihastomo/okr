@@ -307,21 +307,21 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
                   const getProgressConfig = (status: string) => {
                     switch (status) {
                       case 'on_track':
-                        return { bgColor: 'bg-green-100', textColor: 'text-green-800', dotColor: 'bg-green-500', label: 'On track' };
+                        return { bgColor: 'bg-green-100', textColor: 'text-green-800', dotColor: 'bg-green-500', label: 'Sesuai Target' };
                       case 'at_risk':
-                        return { bgColor: 'bg-orange-100', textColor: 'text-orange-800', dotColor: 'bg-orange-500', label: 'At risk' };
+                        return { bgColor: 'bg-orange-100', textColor: 'text-orange-800', dotColor: 'bg-orange-500', label: 'Berisiko' };
                       case 'behind':
-                        return { bgColor: 'bg-red-100', textColor: 'text-red-800', dotColor: 'bg-red-500', label: 'Behind' };
+                        return { bgColor: 'bg-red-100', textColor: 'text-red-800', dotColor: 'bg-red-500', label: 'Tertinggal' };
                       case 'completed':
-                        return { bgColor: 'bg-purple-100', textColor: 'text-purple-800', dotColor: 'bg-purple-500', label: 'Completed' };
+                        return { bgColor: 'bg-purple-100', textColor: 'text-purple-800', dotColor: 'bg-purple-500', label: 'Selesai' };
                       case 'in_progress':
-                        return { bgColor: 'bg-blue-100', textColor: 'text-blue-800', dotColor: 'bg-blue-500', label: 'In progress' };
+                        return { bgColor: 'bg-blue-100', textColor: 'text-blue-800', dotColor: 'bg-blue-500', label: 'Sedang Berjalan' };
                       case 'not_started':
-                        return { bgColor: 'bg-gray-100', textColor: 'text-gray-800', dotColor: 'bg-gray-500', label: 'Not started' };
+                        return { bgColor: 'bg-gray-100', textColor: 'text-gray-800', dotColor: 'bg-gray-500', label: 'Belum Mulai' };
                       case 'paused':
-                        return { bgColor: 'bg-yellow-100', textColor: 'text-yellow-800', dotColor: 'bg-yellow-500', label: 'Paused' };
+                        return { bgColor: 'bg-yellow-100', textColor: 'text-yellow-800', dotColor: 'bg-yellow-500', label: 'Ditunda' };
                       default:
-                        return { bgColor: 'bg-gray-100', textColor: 'text-gray-800', dotColor: 'bg-gray-500', label: 'Unknown' };
+                        return { bgColor: 'bg-gray-100', textColor: 'text-gray-800', dotColor: 'bg-gray-500', label: 'Tidak Diketahui' };
                     }
                   };
                   const config = getProgressConfig(okr.status);
@@ -336,7 +336,7 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
               </div>
               <div 
                 className="w-24 sm:w-32 lg:w-40 bg-gray-200 rounded-full h-2 mb-1 relative group cursor-pointer"
-                title={`Progress: ${overallProgress.toFixed(1)}% | Target ideal: ${idealProgress.toFixed(1)}%`}
+                title={`Progres: ${overallProgress.toFixed(1)}% | Target ideal: ${idealProgress.toFixed(1)}%`}
               >
                 {(() => {
                   const getProgressBarColor = (status: string) => {
@@ -371,7 +371,7 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
                       )}
                       {/* Enhanced tooltip on hover */}
                       <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-                        Progress: {overallProgress.toFixed(1)}% | Target ideal: {idealProgress.toFixed(1)}%
+                        Progres: {overallProgress.toFixed(1)}% | Target ideal: {idealProgress.toFixed(1)}%
                         <div className="absolute right-full top-1/2 transform -translate-y-1/2 w-0 h-0 border-t-4 border-b-4 border-r-4 border-transparent border-r-black"></div>
                       </div>
                     </>
@@ -424,21 +424,21 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
               const getProgressConfig = (status: string) => {
                 switch (status) {
                   case 'on_track':
-                    return { bgColor: 'bg-green-100', textColor: 'text-green-800', dotColor: 'bg-green-500', label: 'On track' };
+                    return { bgColor: 'bg-green-100', textColor: 'text-green-800', dotColor: 'bg-green-500', label: 'Sesuai Target' };
                   case 'at_risk':
-                    return { bgColor: 'bg-orange-100', textColor: 'text-orange-800', dotColor: 'bg-orange-500', label: 'At risk' };
+                    return { bgColor: 'bg-orange-100', textColor: 'text-orange-800', dotColor: 'bg-orange-500', label: 'Berisiko' };
                   case 'behind':
-                    return { bgColor: 'bg-red-100', textColor: 'text-red-800', dotColor: 'bg-red-500', label: 'Behind' };
+                    return { bgColor: 'bg-red-100', textColor: 'text-red-800', dotColor: 'bg-red-500', label: 'Tertinggal' };
                   case 'completed':
-                    return { bgColor: 'bg-purple-100', textColor: 'text-purple-800', dotColor: 'bg-purple-500', label: 'Completed' };
+                    return { bgColor: 'bg-purple-100', textColor: 'text-purple-800', dotColor: 'bg-purple-500', label: 'Selesai' };
                   case 'in_progress':
-                    return { bgColor: 'bg-blue-100', textColor: 'text-blue-800', dotColor: 'bg-blue-500', label: 'In progress' };
+                    return { bgColor: 'bg-blue-100', textColor: 'text-blue-800', dotColor: 'bg-blue-500', label: 'Sedang Berjalan' };
                   case 'not_started':
-                    return { bgColor: 'bg-gray-100', textColor: 'text-gray-800', dotColor: 'bg-gray-500', label: 'Not started' };
+                    return { bgColor: 'bg-gray-100', textColor: 'text-gray-800', dotColor: 'bg-gray-500', label: 'Belum Mulai' };
                   case 'paused':
-                    return { bgColor: 'bg-yellow-100', textColor: 'text-yellow-800', dotColor: 'bg-yellow-500', label: 'Paused' };
+                    return { bgColor: 'bg-yellow-100', textColor: 'text-yellow-800', dotColor: 'bg-yellow-500', label: 'Ditunda' };
                   default:
-                    return { bgColor: 'bg-gray-100', textColor: 'text-gray-800', dotColor: 'bg-gray-500', label: 'Unknown' };
+                    return { bgColor: 'bg-gray-100', textColor: 'text-gray-800', dotColor: 'bg-gray-500', label: 'Tidak Diketahui' };
                 }
               };
               const config = getProgressConfig(okr.status);
@@ -455,7 +455,7 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
           <div className="flex items-center gap-2">
             <div 
               className="w-24 bg-gray-200 rounded-full h-2 relative group cursor-pointer"
-              title={`Progress: ${overallProgress.toFixed(1)}% | Target ideal: ${idealProgress.toFixed(1)}%`}
+              title={`Progres: ${overallProgress.toFixed(1)}% | Target ideal: ${idealProgress.toFixed(1)}%`}
             >
               {(() => {
                 const getProgressBarColor = (status: string) => {

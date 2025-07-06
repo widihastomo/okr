@@ -113,6 +113,13 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 06, 2025. Localized OKR card status labels to Indonesian language:
+  * Updated status labels: "On track" → "Sesuai Target", "At risk" → "Berisiko", "Behind" → "Tertinggal"
+  * Updated status labels: "Completed" → "Selesai", "In progress" → "Sedang Berjalan", "Not started" → "Belum Mulai"
+  * Updated status labels: "Paused" → "Ditunda", "Unknown" → "Tidak Diketahui"
+  * Updated tooltip text: "Progress" → "Progres" for consistent Indonesian localization
+  * Applied changes to both desktop and mobile versions of OKR card component
+  * Enhanced user experience with fully Indonesian interface for status display
 - July 06, 2025. Changed default objective status to "not_started" for new objectives:
   * Updated OKR form modal to create objectives with "not_started" status instead of "in_progress"
   * Updated objective duplication function to use "not_started" status for better lifecycle management
