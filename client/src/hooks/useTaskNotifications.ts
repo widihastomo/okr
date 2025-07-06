@@ -20,7 +20,10 @@ export function useTaskNotifications() {
 
   const tasks = Array.isArray(rawTasks) ? rawTasks as Task[] : [];
 
-  const today = new Date();
+  // Use GMT+7 timezone for date comparison
+  const now = new Date();
+  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+  const today = new Date(utc + (7 * 3600000)); // GMT+7
   today.setHours(0, 0, 0, 0);
 
   const tomorrow = new Date(today);

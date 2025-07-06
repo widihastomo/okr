@@ -113,6 +113,12 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 06, 2025. Implemented GMT+7 timezone consistency across entire application:
+  * Standardized all date operations to use GMT+7 (WIB - Waktu Indonesia Barat) timezone
+  * Updated Daily Focus page, Dashboard, DatePicker, and notification system to use GMT+7
+  * Fixed timezone discrepancies that were causing date comparison issues
+  * Created shared timezone utility functions for consistent date handling
+  * All date operations now accurately reflect Indonesian timezone for proper task scheduling
 - July 06, 2025. Fixed task overdue logic to properly handle same-day due dates:
   * Updated overdue task filtering to only consider tasks overdue after the full day has passed
   * Tasks due today are no longer incorrectly marked as "overdue" - they appear in "Today's Tasks" section

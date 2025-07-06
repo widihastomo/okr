@@ -295,11 +295,13 @@ export default function DailyFocusPage() {
     },
   });
 
-  // Get today's date info using local timezone
+  // Get today's date info using GMT+7 timezone
   const today = new Date();
-  const todayStr = today.getFullYear() + '-' + 
-    String(today.getMonth() + 1).padStart(2, '0') + '-' + 
-    String(today.getDate()).padStart(2, '0');
+  const utc = today.getTime() + (today.getTimezoneOffset() * 60000);
+  const gmt7Date = new Date(utc + (7 * 3600000)); // GMT+7
+  const todayStr = gmt7Date.getFullYear() + '-' + 
+    String(gmt7Date.getMonth() + 1).padStart(2, '0') + '-' + 
+    String(gmt7Date.getDate()).padStart(2, '0');
 
   // Helper function for key result type icons
   const getKeyResultTypeIcon = (type: string) => {
@@ -498,17 +500,12 @@ export default function DailyFocusPage() {
   const overdueTasks = filteredTasks.filter((task: any) => {
     const dueDate = task.dueDate ? task.dueDate.split("T")[0] : null;
     // Only consider tasks overdue if they were due BEFORE today (not including today)
-    const isOverdue = dueDate &&
+    return (
+      dueDate &&
       dueDate < todayStr &&
       task.status !== "completed" &&
-      task.status !== "cancelled";
-    
-    // Debug logging
-    if (dueDate) {
-      console.log(`Task: ${task.title}, Due: ${dueDate}, Today: ${todayStr}, Is Overdue: ${isOverdue}`);
-    }
-    
-    return isOverdue;
+      task.status !== "cancelled"
+    );
   });
 
   const activeKeyResults = filteredKeyResults.filter((kr: any) => {
@@ -1126,9 +1123,12 @@ export default function DailyFocusPage() {
                                 selected={taskFormData.dueDate}
                                 onSelect={(date) => setTaskFormData({ ...taskFormData, dueDate: date })}
                                 disabled={(date) => {
-                                  const today = new Date();
-                                  today.setHours(0, 0, 0, 0); // Start of today
-                                  return date < today || date < new Date("1900-01-01");
+                                  // Use GMT+7 timezone for date comparison
+                                  const now = new Date();
+                                  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+                                  const todayGMT7 = new Date(utc + (7 * 3600000)); // GMT+7
+                                  todayGMT7.setHours(0, 0, 0, 0); // Start of today in GMT+7
+                                  return date < todayGMT7 || date < new Date("1900-01-01");
                                 }}
                                 initialFocus
                               />

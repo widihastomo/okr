@@ -100,8 +100,10 @@ export default function Dashboard() {
     enabled: showAllUsers || !!targetUserId,
   });
 
-  // Calculate filtered task notifications that respect current filters
-  const today = new Date();
+  // Calculate filtered task notifications that respect current filters using GMT+7
+  const now = new Date();
+  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+  const today = new Date(utc + (7 * 3600000)); // GMT+7
   today.setHours(0, 0, 0, 0);
 
   const overdueAndDueTodayCount = filteredTasks.filter((task: any) => {
