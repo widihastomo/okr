@@ -194,16 +194,9 @@ function TaskOverviewCard({ task, assignedUser, initiative }: any) {
           <div className="flex items-center gap-2">
             <User className="w-4 h-4 text-gray-500 flex-shrink-0" />
             {assignedUser ? (
-              <>
-                <Avatar className="w-5 h-5">
-                  <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
-                    {assignedUser.firstName?.[0]}{assignedUser.lastName?.[0]}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="text-xs text-gray-700 truncate">
-                  {assignedUser.firstName} {assignedUser.lastName}
-                </span>
-              </>
+              <span className="text-xs text-gray-700 truncate">
+                {assignedUser.firstName} {assignedUser.lastName}
+              </span>
             ) : (
               <span className="text-xs text-gray-500">Belum ditentukan</span>
             )}
