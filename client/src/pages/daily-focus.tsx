@@ -1246,7 +1246,7 @@ export default function DailyFocusPage() {
                                 <div className="flex items-center gap-2">
                                   {initiative.picId ? (
                                     <>
-                                      <div className="w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-medium">
+                                      <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
                                         {getUserName(initiative.picId)
                                           ?.split(" ")
                                           .map((n) => n[0])
