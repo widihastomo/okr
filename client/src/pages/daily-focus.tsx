@@ -1121,9 +1121,11 @@ export default function DailyFocusPage() {
                                 mode="single"
                                 selected={taskFormData.dueDate}
                                 onSelect={(date) => setTaskFormData({ ...taskFormData, dueDate: date })}
-                                disabled={(date) =>
-                                  date < new Date() || date < new Date("1900-01-01")
-                                }
+                                disabled={(date) => {
+                                  const today = new Date();
+                                  today.setHours(0, 0, 0, 0); // Start of today
+                                  return date < today || date < new Date("1900-01-01");
+                                }}
                                 initialFocus
                               />
                             </PopoverContent>

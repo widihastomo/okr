@@ -113,6 +113,11 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 06, 2025. Fixed DatePicker to allow selecting today's date:
+  * Updated date validation logic to use start of today (setHours(0, 0, 0, 0)) instead of current timestamp
+  * Fixed issue where "hari ini" (today) was disabled in task due date selection
+  * Users can now properly select today as task due date in Daily Focus task creation
+  * DatePicker now correctly allows selection from today onwards while preventing past dates
 - July 06, 2025. Added task creation button to Daily Focus page:
   * Added "Tambah Task" button in Task Prioritas Hari Ini card header with orange gradient styling
   * Created task creation modal with comprehensive form including title, description, priority, PIC assignment, and due date
