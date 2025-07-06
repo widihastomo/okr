@@ -429,12 +429,26 @@ export default function DailyFocusPage() {
       }
     });
 
-    return (objectives as any[]).filter(
+    // Filter objectives by related IDs or status
+    let filteredObjectives = (objectives as any[]).filter(
       (obj: any) =>
         relatedObjIds.has(obj.id) ||
         obj.status === "on_track" ||
         obj.status === "at_risk",
     );
+
+    // Apply user filter - only show objectives that have key results assigned to the selected user
+    if (selectedUserId !== "all") {
+      filteredObjectives = filteredObjectives.filter((obj: any) => {
+        const objectiveKeyResults = (keyResults as any[]).filter(
+          (kr: any) => kr.objectiveId === obj.id
+        );
+        // Include objective if any of its key results are assigned to the selected user
+        return objectiveKeyResults.some((kr: any) => kr.assignedTo === selectedUserId);
+      });
+    }
+
+    return filteredObjectives;
   };
 
   const relatedObjectives = getRelatedObjectives();
@@ -507,7 +521,7 @@ export default function DailyFocusPage() {
           <div className="flex items-center gap-2 text-sm text-blue-800">
             <User className="h-4 w-4" />
             <span>
-              Menampilkan prioritas harian untuk: {" "}
+              Menampilkan objective, task, dan aktivitas untuk: {" "}
               <span className="font-medium">
                 {users?.find((u: any) => u.id === selectedUserId)?.firstName && 
                  users?.find((u: any) => u.id === selectedUserId)?.lastName
