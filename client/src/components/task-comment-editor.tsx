@@ -62,17 +62,16 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
       const spaceIndex = afterAt.indexOf(" ");
       const query = spaceIndex === -1 ? afterAt : afterAt.substring(0, spaceIndex);
       
-      if (query.length > 0) {
-        setMentionQuery(query);
-        setShowMentionSuggestions(true);
-        setCursorPosition(atIndex);
-      } else {
-        setShowMentionSuggestions(false);
-      }
+      // Show suggestions immediately when @ is typed, even with empty query
+      setMentionQuery(query);
+      setShowMentionSuggestions(true);
+      setCursorPosition(atIndex);
+      
+      console.log("Mention detected:", { query, atIndex, afterAt, users: users.length });
     } else {
       setShowMentionSuggestions(false);
     }
-  }, []);
+  }, [users]);
 
   const handleMentionSelect = useCallback((user: User) => {
     const beforeMention = content.substring(0, cursorPosition);
@@ -88,10 +87,18 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
     editorRef.current?.focus();
   }, [content, cursorPosition, mentionQuery]);
 
-  const filteredUsers = users.filter(user => 
-    user.username?.toLowerCase().includes(mentionQuery.toLowerCase()) ||
-    user.email?.toLowerCase().includes(mentionQuery.toLowerCase())
-  );
+  const filteredUsers = users.filter(user => {
+    if (!mentionQuery) return true; // Show all users when no query
+    return user.username?.toLowerCase().includes(mentionQuery.toLowerCase()) ||
+           user.email?.toLowerCase().includes(mentionQuery.toLowerCase());
+  });
+
+  console.log("Filtered users:", { 
+    totalUsers: users.length, 
+    filteredCount: filteredUsers.length, 
+    mentionQuery,
+    showSuggestions: showMentionSuggestions 
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
