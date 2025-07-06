@@ -189,10 +189,11 @@ export default function GlobalHeader({
 
         {/* Logo */}
         <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">GM</span>
-          </div>
-          <span className="font-semibold text-gray-900 text-lg">Sentri</span>
+          <img 
+            src="/refokus-logo.png" 
+            alt="Refokus" 
+            className="h-8 w-auto"
+          />
         </div>
       </div>
 
