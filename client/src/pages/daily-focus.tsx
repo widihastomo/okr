@@ -405,8 +405,8 @@ export default function DailyFocusPage() {
         </div>
       </div>
 
-      {/* Filter Indicator */}
-      {selectedUserId !== "all" && (
+      {/* Filter Indicator - Only show when viewing another user's data */}
+      {selectedUserId !== "all" && selectedUserId !== userId && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
           <div className="flex items-center gap-2 text-sm text-blue-800">
             <User className="h-4 w-4" />
