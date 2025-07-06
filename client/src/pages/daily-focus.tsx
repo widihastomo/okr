@@ -506,7 +506,7 @@ export default function DailyFocusPage() {
           </div>
           
           {/* Action buttons */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <DailyInstantUpdate />
           </div>
         </div>

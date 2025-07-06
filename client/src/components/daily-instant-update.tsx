@@ -346,7 +346,7 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger || (
-          <Button className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
+          <Button className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 w-full sm:w-auto">
             <Clock className="h-4 w-4 mr-2" />
             Update Harian Instant
           </Button>
