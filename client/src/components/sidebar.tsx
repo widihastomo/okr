@@ -17,7 +17,8 @@ import {
   Clock,
   Focus,
   CheckSquare,
-  Sun
+  Sun,
+  Goal
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -52,8 +53,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       active: location === "/dashboard"
     },
     {
-      label: "Goals Perusahaan",
-      icon: Building2,
+      label: "Goals",
+      icon: Goal,
       path: "/company-okr",
       active: location === "/company-okr"
     },
