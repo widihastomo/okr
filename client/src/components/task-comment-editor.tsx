@@ -194,7 +194,17 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
 
     range.deleteContents();
     range.insertNode(htmlElement);
+    
+    // Add a space after the formatted element to prevent continued formatting
+    const spaceNode = document.createTextNode(" ");
+    range.setStartAfter(htmlElement);
+    range.insertNode(spaceNode);
+    
+    // Position cursor after the space
+    range.setStartAfter(spaceNode);
+    range.collapse(true);
     selection.removeAllRanges();
+    selection.addRange(range);
     
     // Update content state with HTML content
     if (editorRef.current) {
