@@ -2159,45 +2159,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Task routes
-  app.post("/api/tasks", async (req, res) => {
-    try {
-      const result = insertTaskSchema.safeParse(req.body);
-      if (!result.success) {
-        return res.status(400).json({ message: "Invalid task data", errors: result.error.errors });
-      }
 
-      const task = await storage.createTask(result.data);
-      
-      // Auto-add assigned user as initiative member if not already a member
-      let addedAsMember = false;
-      if (task.assignedTo && task.initiativeId) {
-        try {
-          // Check if user is already a member
-          const existingMembers = await storage.getInitiativeMembers(task.initiativeId);
-          const isAlreadyMember = existingMembers.some(member => 
-            member.userId === task.assignedTo || member.user?.id === task.assignedTo
-          );
-          
-          if (!isAlreadyMember) {
-            // Add user as initiative member
-            await storage.createInitiativeMember({
-              initiativeId: task.initiativeId,
-              userId: task.assignedTo,
-              role: "member"
-            });
-            addedAsMember = true;
-          }
-        } catch (error) {
-          console.error("Error adding user as initiative member:", error);
-        }
-      }
-      
-      res.status(201).json({ task, addedAsMember });
-    } catch (error) {
-      console.error("Error creating task:", error);
-      res.status(500).json({ message: "Failed to create task" });
-    }
-  });
 
   // Get all tasks
   app.get("/api/tasks", async (req, res) => {
@@ -2238,7 +2200,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Get current user ID - handle both development and production modes
       let currentUserId: string;
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV !== 'production') {
         // Use mock user ID for development
         currentUserId = "550e8400-e29b-41d4-a716-446655440001";
       } else {
@@ -2256,9 +2218,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: req.body.status || "not_started",
         priority: req.body.priority || "medium",
         createdBy: currentUserId,
-        assignedTo: req.body.assignedTo === "unassigned" ? null : req.body.assignedTo,
+        assignedTo: req.body.assignedTo === "unassigned" || !req.body.assignedTo ? null : req.body.assignedTo,
         dueDate: req.body.dueDate ? new Date(req.body.dueDate) : null,
-        initiativeId: req.body.initiativeId === "no-initiative" ? null : req.body.initiativeId,
+        initiativeId: req.body.initiativeId === "no-initiative" || !req.body.initiativeId ? null : req.body.initiativeId,
       };
 
       console.log("Creating standalone task with data:", {

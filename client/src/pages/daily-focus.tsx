@@ -244,8 +244,9 @@ export default function DailyFocusPage() {
     const taskData = {
       ...taskFormData,
       assignedTo: taskFormData.assignedTo === "unassigned" ? null : taskFormData.assignedTo || null,
-      dueDate: taskFormData.dueDate ? taskFormData.dueDate.toISOString().split('T')[0] : null,
+      dueDate: taskFormData.dueDate || null,
       initiativeId: taskFormData.initiativeId === "none" || !taskFormData.initiativeId ? null : taskFormData.initiativeId,
+      createdBy: userId, // Add the required createdBy field
     };
 
     createTaskMutation.mutate(taskData);
