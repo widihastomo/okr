@@ -45,7 +45,7 @@ import {
 } from "@/components/ui/select";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { toast } from "@/hooks/use-toast";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { CheckInModal } from "@/components/check-in-modal";
 import SuccessMetricsModalSimple from "@/components/success-metrics-modal-simple";
 import OneClickHabitButton from "@/components/one-click-habit-button";
@@ -57,6 +57,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function DailyFocusPage() {
   const { user } = useAuth();
+  const [location, setLocation] = useLocation();
   const userId =
     user && typeof user === "object" && "id" in user ? (user as any).id : null;
 
@@ -73,12 +74,33 @@ export default function DailyFocusPage() {
     );
   }
 
+  // Query string management for tabs
+  const searchParams = new URLSearchParams(location.split('?')[1] || '');
+  const tabFromUrl = searchParams.get('tab') || 'tasks';
+  const [activeTab, setActiveTab] = useState(tabFromUrl);
+
   const [selectedKeyResult, setSelectedKeyResult] = useState<any>(null);
   const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
   const [isSuccessMetricsModalOpen, setIsSuccessMetricsModalOpen] =
     useState(false);
   const [selectedInitiative, setSelectedInitiative] = useState<any>(null);
   const [selectedUserId, setSelectedUserId] = useState<string>(userId || "all"); // Filter state - default to current user
+
+  // Update URL when tab changes
+  const handleTabChange = (newTab: string) => {
+    setActiveTab(newTab);
+    const newSearchParams = new URLSearchParams(location.split('?')[1] || '');
+    newSearchParams.set('tab', newTab);
+    setLocation(`${location.split('?')[0]}?${newSearchParams.toString()}`);
+  };
+
+  // Sync tab state with URL changes
+  React.useEffect(() => {
+    const urlTab = searchParams.get('tab') || 'tasks';
+    if (urlTab !== activeTab) {
+      setActiveTab(urlTab);
+    }
+  }, [location]);
 
   // Fetch data with status calculation
   const { data: objectives = [] } = useQuery({
@@ -719,7 +741,7 @@ export default function DailyFocusPage() {
       )}
 
       {/* Main Content Tabs */}
-      <Tabs defaultValue="tasks" className="w-full">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="tasks">Task Prioritas</TabsTrigger>
           <TabsTrigger value="progress">Update Progress</TabsTrigger>
