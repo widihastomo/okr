@@ -56,19 +56,33 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
   const handleContentChange = useCallback((value: string) => {
     setContent(value);
     
-    // Check for @ mentions
+    // Get cursor position from the editor
+    const selection = window.getSelection();
+    let currentCursorPosition = 0;
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      currentCursorPosition = range.startOffset;
+    }
+    
+    // Check for @ mentions - only at current cursor position
     const atIndex = value.lastIndexOf("@");
     if (atIndex !== -1) {
       const afterAt = value.substring(atIndex + 1);
       const spaceIndex = afterAt.indexOf(" ");
       const query = spaceIndex === -1 ? afterAt : afterAt.substring(0, spaceIndex);
       
-      // Show suggestions immediately when @ is typed, even with empty query
-      setMentionQuery(query);
-      setShowMentionSuggestions(true);
-      setCursorPosition(atIndex);
+      // Only show suggestions if @ is recent and we're typing after it
+      const isAtCurrentPosition = currentCursorPosition >= atIndex && currentCursorPosition <= atIndex + query.length + 1;
+      const hasSpaceAfterQuery = spaceIndex !== -1;
       
-      console.log("Mention detected:", { query, atIndex, afterAt, users: users.length });
+      if (isAtCurrentPosition && !hasSpaceAfterQuery) {
+        setMentionQuery(query);
+        setShowMentionSuggestions(true);
+        setCursorPosition(atIndex);
+        console.log("Mention detected:", { query, atIndex, afterAt, users: users.length });
+      } else {
+        setShowMentionSuggestions(false);
+      }
     } else {
       setShowMentionSuggestions(false);
     }
@@ -78,18 +92,30 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
     console.log("User selected:", user);
     const beforeMention = content.substring(0, cursorPosition);
     const afterMention = content.substring(cursorPosition + mentionQuery.length + 1);
-    const newContent = `${beforeMention}@${user.firstName || user.email}${afterMention} `;
+    const newContent = `${beforeMention}@${user.firstName || user.email} ${afterMention}`;
     
     console.log("New content:", newContent);
     setContent(newContent);
     setMentionedUsers(prev => [...prev, user.id]);
     setShowMentionSuggestions(false);
     setMentionQuery("");
+    setCursorPosition(0);
     
-    // Update editor content directly
+    // Update editor content directly and set cursor position after the mention
     if (editorRef.current) {
       editorRef.current.textContent = newContent;
       editorRef.current.focus();
+      
+      // Set cursor position after the mention
+      const selection = window.getSelection();
+      if (selection) {
+        const range = document.createRange();
+        const mentionEndPosition = cursorPosition + (user.firstName || user.email).length + 2; // +2 for @ and space
+        range.setStart(editorRef.current.firstChild || editorRef.current, Math.min(mentionEndPosition, newContent.length));
+        range.setEnd(editorRef.current.firstChild || editorRef.current, Math.min(mentionEndPosition, newContent.length));
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
     }
   }, [content, cursorPosition, mentionQuery]);
 
