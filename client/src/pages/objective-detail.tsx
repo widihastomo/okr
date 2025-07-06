@@ -364,7 +364,7 @@ export default function GoalDetail() {
   const [tourStep, setTourStep] = useState<number>(0);
   const [showTour, setShowTour] = useState(false);
   const [tourForceUpdate, setTourForceUpdate] = useState(0);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("key-results");
 
 
   // Check for highlight parameter in URL
@@ -375,6 +375,11 @@ export default function GoalDetail() {
       // Remove highlight after animation
       setTimeout(() => setShouldHighlight(false), 3000);
     }
+    
+    // Prevent auto-scroll on page load by resetting scroll position
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 100);
   }, [location]);
 
   // Fetch goal data
