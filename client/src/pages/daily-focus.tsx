@@ -127,7 +127,7 @@ export default function DailyFocusPage() {
     title: "",
     description: "",
     priority: "medium",
-    assignedTo: "unassigned",
+    assignedTo: userId || "unassigned", // Default to current user
     dueDate: null as Date | null,
     initiativeId: "none",
   });
@@ -210,7 +210,7 @@ export default function DailyFocusPage() {
         title: "",
         description: "",
         priority: "medium",
-        assignedTo: "unassigned",
+        assignedTo: userId || "unassigned", // Reset to current user
         dueDate: null,
         initiativeId: "none",
       });
@@ -228,6 +228,19 @@ export default function DailyFocusPage() {
     queryKey: [`/api/gamification/stats/${userId}`],
     enabled: !!userId,
   });
+
+  // Reset task form when modal opens
+  const handleOpenTaskModal = () => {
+    setTaskFormData({
+      title: "",
+      description: "",
+      priority: "medium",
+      assignedTo: userId || "unassigned", // Default to current user
+      dueDate: null,
+      initiativeId: "none",
+    });
+    setIsTaskModalOpen(true);
+  };
 
   // Handle task form submission
   const handleTaskSubmit = (e: React.FormEvent) => {
@@ -949,6 +962,7 @@ export default function DailyFocusPage() {
                     <Button 
                       size="sm" 
                       className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                      onClick={handleOpenTaskModal}
                     >
                       <Plus className="w-4 h-4 mr-2" />
                       Tambah Task
