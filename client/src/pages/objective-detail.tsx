@@ -1714,7 +1714,13 @@ export default function GoalDetail() {
                               </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                              {inisiatif.map((initiative) => (
+                              {inisiatif
+                                .sort((a, b) => {
+                                  const scoreA = parseFloat(a.priorityScore || "0");
+                                  const scoreB = parseFloat(b.priorityScore || "0");
+                                  return scoreB - scoreA; // Sort by priority score descending
+                                })
+                                .map((initiative) => (
                                 <tr
                                   key={initiative.id}
                                   className="hover:bg-gray-50"
@@ -1948,7 +1954,13 @@ export default function GoalDetail() {
 
                   {/* Mobile Card View */}
                   <div className="space-y-3 md:hidden">
-                    {inisiatif.map((initiative) => {
+                    {inisiatif
+                      .sort((a, b) => {
+                        const scoreA = parseFloat(a.priorityScore || "0");
+                        const scoreB = parseFloat(b.priorityScore || "0");
+                        return scoreB - scoreA; // Sort by priority score descending
+                      })
+                      .map((initiative) => {
                       const rawScore = initiative.priorityScore;
                       const score = parseFloat(rawScore || "0");
                       
