@@ -75,7 +75,13 @@ export default function DailyFocusPage() {
   }
 
   // Query string management for tabs
-  const [activeTab, setActiveTab] = useState('tasks');
+  const getCurrentTabFromUrl = () => {
+    const searchParams = new URLSearchParams(location.split('?')[1] || '');
+    const tabFromUrl = searchParams.get('tab');
+    return tabFromUrl && ['tasks', 'progress', 'initiatives'].includes(tabFromUrl) ? tabFromUrl : 'tasks';
+  };
+
+  const [activeTab, setActiveTab] = useState(() => getCurrentTabFromUrl());
 
   const [selectedKeyResult, setSelectedKeyResult] = useState<any>(null);
   const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
@@ -84,33 +90,16 @@ export default function DailyFocusPage() {
   const [selectedInitiative, setSelectedInitiative] = useState<any>(null);
   const [selectedUserId, setSelectedUserId] = useState<string>(userId || "all"); // Filter state - default to current user
 
-  // Initialize tab from URL on mount
+  // Sync tab with URL changes (for browser back/forward)
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.split('?')[1] || '');
-    const tabFromUrl = searchParams.get('tab');
-    
-    // Set initial tab from URL if valid, otherwise default to 'tasks'
-    if (tabFromUrl && ['tasks', 'progress', 'initiatives'].includes(tabFromUrl)) {
-      setActiveTab(tabFromUrl);
-    } else {
-      setActiveTab('tasks');
+    const urlTab = getCurrentTabFromUrl();
+    if (urlTab !== activeTab) {
+      setActiveTab(urlTab);
     }
-  }, []); // Only run on mount
-
-  // Sync tab state with URL changes (for browser back/forward navigation)
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.split('?')[1] || '');
-    const tabFromUrl = searchParams.get('tab') || 'tasks';
-    
-    // Only update if different to prevent unnecessary re-renders
-    if (tabFromUrl !== activeTab && ['tasks', 'progress', 'initiatives'].includes(tabFromUrl)) {
-      setActiveTab(tabFromUrl);
-    }
-  }, [location, activeTab]);
+  }, [location]);
 
   // Update URL when tab changes
   const handleTabChange = (newTab: string) => {
-    setActiveTab(newTab);
     const currentPath = location.split('?')[0];
     const searchParams = new URLSearchParams(location.split('?')[1] || '');
     searchParams.set('tab', newTab);
