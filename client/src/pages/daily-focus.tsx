@@ -1012,11 +1012,7 @@ export default function DailyFocusPage() {
                             {obj.title}
                           </h3>
                         </Link>
-                        {obj.description && (
-                          <p className="text-sm text-blue-700 mt-1 line-clamp-2">
-                            {obj.description}
-                          </p>
-                        )}
+                        
                       </div>
 
                       <div className="space-y-2">
