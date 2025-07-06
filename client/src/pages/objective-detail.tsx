@@ -1747,37 +1747,42 @@ export default function GoalDetail() {
                                     </div>
                                   </td>
                                   <td className="px-4 py-4">
-                                    <Select
-                                      value={initiative.status || "not_started"}
-                                      onValueChange={(newStatus) => {
-                                        console.log(
-                                          "Update initiative status:",
-                                          initiative.id,
-                                          newStatus,
-                                        );
-                                      }}
-                                    >
-                                      <SelectTrigger className="w-32">
-                                        <SelectValue />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="not_started">
-                                          Belum Dimulai
-                                        </SelectItem>
-                                        <SelectItem value="in_progress">
-                                          Sedang Berjalan
-                                        </SelectItem>
-                                        <SelectItem value="completed">
-                                          Selesai
-                                        </SelectItem>
-                                        <SelectItem value="on_hold">
-                                          Ditahan
-                                        </SelectItem>
-                                        <SelectItem value="cancelled">
-                                          Dibatalkan
-                                        </SelectItem>
-                                      </SelectContent>
-                                    </Select>
+                                    {(() => {
+                                      const status = initiative.status || "draft";
+                                      const getStatusInfo = (status: string) => {
+                                        const statusMap = {
+                                          'draft': {
+                                            label: 'Draft',
+                                            bgColor: 'bg-gray-100',
+                                            textColor: 'text-gray-800',
+                                          },
+                                          'sedang_berjalan': {
+                                            label: 'Sedang Berjalan',
+                                            bgColor: 'bg-blue-100',
+                                            textColor: 'text-blue-800',
+                                          },
+                                          'selesai': {
+                                            label: 'Selesai',
+                                            bgColor: 'bg-green-100',
+                                            textColor: 'text-green-800',
+                                          },
+                                          'dibatalkan': {
+                                            label: 'Dibatalkan',
+                                            bgColor: 'bg-red-100',
+                                            textColor: 'text-red-800',
+                                          }
+                                        };
+                                        return statusMap[status as keyof typeof statusMap] || statusMap['draft'];
+                                      };
+                                      
+                                      const statusInfo = getStatusInfo(status);
+                                      
+                                      return (
+                                        <Badge className={`${statusInfo.bgColor} ${statusInfo.textColor}`}>
+                                          {statusInfo.label}
+                                        </Badge>
+                                      );
+                                    })()}
                                   </td>
                                   <td className="px-4 py-4">
                                     {(() => {
