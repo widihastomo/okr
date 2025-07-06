@@ -36,6 +36,7 @@ import {
   Check,
   ExternalLink,
   Plus,
+  ChevronsUpDown,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -980,22 +981,60 @@ export default function DailyFocusPage() {
 
                         <div>
                           <Label htmlFor="initiativeId">Inisiatif (Opsional)</Label>
-                          <Select 
-                            value={taskFormData.initiativeId} 
-                            onValueChange={(value) => setTaskFormData({ ...taskFormData, initiativeId: value })}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pilih inisiatif (opsional)" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="none">Tidak terkait inisiatif</SelectItem>
-                              {initiatives?.map((initiative: any) => (
-                                <SelectItem key={initiative.id} value={initiative.id}>
-                                  {initiative.title}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                className="w-full justify-between"
+                              >
+                                {taskFormData.initiativeId && taskFormData.initiativeId !== "none" 
+                                  ? initiatives?.find((initiative: any) => initiative.id === taskFormData.initiativeId)?.title 
+                                  : "Pilih inisiatif (opsional)"
+                                }
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-full p-0">
+                              <Command>
+                                <CommandInput placeholder="Cari inisiatif..." />
+                                <CommandList>
+                                  <CommandEmpty>Tidak ada inisiatif ditemukan</CommandEmpty>
+                                  <CommandGroup>
+                                    <CommandItem
+                                      value="none"
+                                      onSelect={() => {
+                                        setTaskFormData({ ...taskFormData, initiativeId: "none" });
+                                      }}
+                                    >
+                                      <Check
+                                        className={`mr-2 h-4 w-4 ${
+                                          taskFormData.initiativeId === "none" ? "opacity-100" : "opacity-0"
+                                        }`}
+                                      />
+                                      Tidak terkait inisiatif
+                                    </CommandItem>
+                                    {initiatives?.map((initiative: any) => (
+                                      <CommandItem
+                                        key={initiative.id}
+                                        value={initiative.title}
+                                        onSelect={() => {
+                                          setTaskFormData({ ...taskFormData, initiativeId: initiative.id });
+                                        }}
+                                      >
+                                        <Check
+                                          className={`mr-2 h-4 w-4 ${
+                                            taskFormData.initiativeId === initiative.id ? "opacity-100" : "opacity-0"
+                                          }`}
+                                        />
+                                        {initiative.title}
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
