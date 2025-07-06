@@ -20,10 +20,32 @@ export function formatNumberWithSeparator(value: string | number): string {
     return "";
   }
   
-  // Handle decimal numbers (split by comma first)
-  const parts = numStr.split(",");
-  let integerPart = parts[0] || "";
-  const decimalPart = parts[1];
+  // Handle decimal numbers - first check if it's already in Indonesian format (with comma)
+  let integerPart = "";
+  let decimalPart = "";
+  
+  if (numStr.includes(",")) {
+    // Indonesian format: "1.000,50"
+    const parts = numStr.split(",");
+    integerPart = parts[0] || "";
+    decimalPart = parts[1];
+  } else if (numStr.includes(".")) {
+    // Check if it's a decimal number (like 9000.00) or already formatted (like 9.000)
+    const parts = numStr.split(".");
+    if (parts.length === 2 && parts[1].length <= 2 && parseFloat(parts[1]) === 0) {
+      // It's like "9000.00" - treat as whole number
+      integerPart = parts[0];
+      decimalPart = "";
+    } else {
+      // It's already formatted like "9.000" or a real decimal
+      integerPart = numStr.replace(/\./g, "");
+      decimalPart = "";
+    }
+  } else {
+    // Pure integer
+    integerPart = numStr;
+    decimalPart = "";
+  }
   
   // Remove any existing dots from integer part
   integerPart = integerPart.replace(/\./g, "");
@@ -32,7 +54,7 @@ export function formatNumberWithSeparator(value: string | number): string {
   const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   
   // Return with decimal part if exists
-  return decimalPart !== undefined ? `${formattedInteger},${decimalPart}` : formattedInteger;
+  return decimalPart ? `${formattedInteger},${decimalPart}` : formattedInteger;
 }
 
 /**
