@@ -144,9 +144,6 @@ export default function MetricsUpdateModal({
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Capaian Baru
                     </th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Progress
-                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -176,29 +173,6 @@ export default function MetricsUpdateModal({
                             }));
                           }}
                         />
-                      </td>
-                      <td className="px-4 py-4 text-center">
-                        <div className="flex items-center justify-center">
-                          <div className="w-full bg-gray-200 rounded-full h-2 max-w-20">
-                            <div
-                              className={`h-2 rounded-full ${(() => {
-                                const achievement = parseFloat(metric.achievement || "0");
-                                const target = parseFloat(metric.target || "1");
-                                const progress = Math.round((achievement / target) * 100);
-                                if (progress >= 100) return "bg-green-600";
-                                if (progress >= 80) return "bg-green-500";
-                                if (progress >= 60) return "bg-orange-500";
-                                return "bg-red-500";
-                              })()}`}
-                              style={{
-                                width: `${Math.min(100, Math.round((parseFloat(metric.achievement || "0") / parseFloat(metric.target || "1")) * 100))}%`,
-                              }}
-                            ></div>
-                          </div>
-                          <span className="ml-2 text-sm font-medium text-gray-900">
-                            {Math.round((parseFloat(metric.achievement || "0") / parseFloat(metric.target || "1")) * 100)}%
-                          </span>
-                        </div>
                       </td>
                     </tr>
                   ))}
