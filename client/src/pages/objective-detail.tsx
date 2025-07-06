@@ -1845,27 +1845,34 @@ export default function GoalDetail() {
                                     </div>
                                   </td>
                                   <td className="px-4 py-4">
-                                    {initiative.dueDate ? (
-                                      <span
-                                        className={`text-sm ${
-                                          new Date(initiative.dueDate) < new Date()
-                                            ? "text-red-600 font-medium"
-                                            : "text-gray-900"
-                                        }`}
-                                      >
-                                        {new Date(
-                                          initiative.dueDate,
-                                        ).toLocaleDateString("id-ID", {
-                                          day: "numeric",
-                                          month: "short",
-                                          year: "numeric",
-                                        })}
-                                      </span>
-                                    ) : (
-                                      <span className="text-gray-400 text-sm">
-                                        -
-                                      </span>
-                                    )}
+                                    <div className="space-y-1">
+                                      {initiative.startDate && (
+                                        <div className="text-xs text-gray-500">
+                                          Mulai: {new Date(initiative.startDate).toLocaleDateString("id-ID", {
+                                            day: "numeric",
+                                            month: "short",
+                                          })}
+                                        </div>
+                                      )}
+                                      {initiative.dueDate ? (
+                                        <div
+                                          className={`text-sm ${
+                                            new Date(initiative.dueDate) < new Date()
+                                              ? "text-red-600 font-medium"
+                                              : "text-gray-900"
+                                          }`}
+                                        >
+                                          Selesai: {new Date(initiative.dueDate).toLocaleDateString("id-ID", {
+                                            day: "numeric",
+                                            month: "short",
+                                          })}
+                                        </div>
+                                      ) : (
+                                        <div className="text-gray-400 text-sm">
+                                          Selesai: -
+                                        </div>
+                                      )}
+                                    </div>
                                   </td>
                                   <td className="px-4 py-4">
                                     {initiative.picId ? (
@@ -2052,22 +2059,30 @@ export default function GoalDetail() {
                                   </span>
                                 )}
                               </div>
-                              <div>
+                              <div className="text-right">
+                                {initiative.startDate && (
+                                  <div className="text-xs text-gray-500">
+                                    Mulai: {new Date(initiative.startDate).toLocaleDateString("id-ID", {
+                                      day: "numeric",
+                                      month: "short",
+                                    })}
+                                  </div>
+                                )}
                                 {initiative.dueDate ? (
-                                  <span
+                                  <div
                                     className={
                                       new Date(initiative.dueDate) < new Date()
                                         ? "text-red-600 font-medium"
                                         : "text-gray-600"
                                     }
                                   >
-                                    {new Date(initiative.dueDate).toLocaleDateString("id-ID", {
+                                    Selesai: {new Date(initiative.dueDate).toLocaleDateString("id-ID", {
                                       day: "numeric",
                                       month: "short",
                                     })}
-                                  </span>
+                                  </div>
                                 ) : (
-                                  <span className="text-gray-400">-</span>
+                                  <div className="text-gray-400">Selesai: -</div>
                                 )}
                               </div>
                             </div>
@@ -2211,7 +2226,7 @@ export default function GoalDetail() {
                               Prioritas
                             </th>
                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Tenggat
+                              Jadwal
                             </th>
                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Ditugaskan
