@@ -36,6 +36,18 @@ interface DailyUpdateData {
     newValue?: number;
     notes?: string;
   }>;
+  successMetrics: Array<{
+    id: string;
+    title: string;
+    description: string;
+    target: number;
+    achievement: number;
+    unit: string;
+    metricType: string;
+    initiativeTitle: string;
+    newValue?: number;
+    notes?: string;
+  }>;
   todayTasks: Array<{
     id: string;
     title: string;
@@ -64,6 +76,7 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
   const [open, setOpen] = useState(false);
   const [updateData, setUpdateData] = useState<DailyUpdateData>({
     keyResults: [],
+    successMetrics: [],
     todayTasks: [],
     tomorrowTasks: [],
     reflection: {
@@ -89,6 +102,36 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
   const { data: allTasks } = useQuery({
     queryKey: ['/api/tasks'],
     enabled: open,
+  });
+
+  const { data: initiatives } = useQuery({
+    queryKey: ['/api/initiatives'],
+    enabled: open,
+  });
+
+  // Fetch success metrics for active initiatives
+  const { data: allSuccessMetrics } = useQuery({
+    queryKey: ['/api/success-metrics'],
+    queryFn: async () => {
+      if (!initiatives) return [];
+      
+      const metricsPromises = (initiatives as any[])
+        .filter(init => init.status === 'sedang_berjalan' || init.status === 'draft')
+        .map(async (init) => {
+          const response = await fetch(`/api/initiatives/${init.id}/success-metrics`);
+          if (!response.ok) return [];
+          const metrics = await response.json();
+          return metrics.map((metric: any) => ({
+            ...metric,
+            initiativeTitle: init.title,
+            initiativeId: init.id,
+          }));
+        });
+      
+      const results = await Promise.all(metricsPromises);
+      return results.flat();
+    },
+    enabled: open && !!initiatives,
   });
 
   // Filter tasks for today and tomorrow
@@ -154,9 +197,9 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
 
   // Initialize update data when modal opens
   React.useEffect(() => {
-    if (open && activeKeyResults && activeKeyResults.length > 0 && todayTasks.length > 0) {
+    if (open && (activeKeyResults?.length > 0 || allSuccessMetrics?.length > 0 || todayTasks.length > 0)) {
       setUpdateData({
-        keyResults: activeKeyResults.map((kr: any) => ({
+        keyResults: activeKeyResults?.map((kr: any) => ({
           id: kr.id,
           title: kr.title,
           currentValue: kr.currentValue,
@@ -165,7 +208,19 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
           keyResultType: kr.keyResultType,
           newValue: kr.currentValue,
           notes: ''
-        })),
+        })) || [],
+        successMetrics: allSuccessMetrics?.map((metric: any) => ({
+          id: metric.id,
+          title: metric.title,
+          description: metric.description,
+          target: metric.target,
+          achievement: metric.achievement,
+          unit: metric.unit,
+          metricType: metric.metricType,
+          initiativeTitle: metric.initiativeTitle,
+          newValue: metric.achievement,
+          notes: ''
+        })) || [],
         todayTasks: todayTasks.map((task: any) => ({
           id: task.id,
           title: task.title,
@@ -186,7 +241,7 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
         }
       });
     }
-  }, [open, activeKeyResults, todayTasks, tomorrowTasks]);
+  }, [open, activeKeyResults, allSuccessMetrics, todayTasks, tomorrowTasks]);
 
   // Submit instant update
   const submitUpdateMutation = useMutation({
@@ -197,6 +252,17 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
           await apiRequest('POST', `/api/key-results/${kr.id}/check-in`, {
             currentValue: kr.newValue,
             notes: kr.notes || `Update harian instant - ${format(today, 'dd MMM yyyy', { locale: id })}`
+          });
+        }
+      }
+
+      // Update success metrics
+      for (const metric of data.successMetrics) {
+        if (metric.newValue !== metric.achievement && metric.newValue !== undefined) {
+          await apiRequest('POST', `/api/success-metrics/${metric.id}/updates`, {
+            achievement: metric.newValue,
+            notes: metric.notes || `Update harian instant - ${format(today, 'dd MMM yyyy', { locale: id })}`,
+            confidence: 4 // Default confidence for instant updates
           });
         }
       }
@@ -232,6 +298,8 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
       queryClient.invalidateQueries({ queryKey: ['/api/key-results'] });
       queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
       queryClient.invalidateQueries({ queryKey: ['/api/daily-reflections'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/success-metrics'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/initiatives'] });
       
       setOpen(false);
     },
@@ -411,6 +479,141 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                           onChange={(e) => {
                             const newData = { ...updateData };
                             newData.keyResults[index].notes = e.target.value;
+                            setUpdateData(newData);
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Success Metrics Update */}
+          {updateData.successMetrics.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Target className="h-5 w-5 text-purple-600" />
+                  Update Metrik Inisiatif
+                </CardTitle>
+                <CardDescription>
+                  Update pencapaian untuk metrik sukses inisiatif aktif
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {/* Desktop Table */}
+                <div className="hidden md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Metrik Sukses</TableHead>
+                        <TableHead>Inisiatif</TableHead>
+                        <TableHead>Pencapaian Saat Ini</TableHead>
+                        <TableHead>Target</TableHead>
+                        <TableHead>Pencapaian Baru</TableHead>
+                        <TableHead>Catatan</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {updateData.successMetrics.map((metric, index) => (
+                        <TableRow key={metric.id}>
+                          <TableCell className="font-medium">
+                            <div>
+                              <div className="font-semibold">{metric.title}</div>
+                              <div className="text-sm text-gray-500">{metric.description}</div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="text-xs">
+                              {metric.initiativeTitle}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{formatNumberWithSeparator(metric.achievement.toString())} {metric.unit}</TableCell>
+                          <TableCell>{formatNumberWithSeparator(metric.target.toString())} {metric.unit}</TableCell>
+                          <TableCell>
+                            <Input
+                              type="text"
+                              value={metric.newValue !== undefined ? formatNumberWithSeparator(metric.newValue.toString()) : ''}
+                              onChange={(e) => {
+                                handleNumberInputChange(e.target.value, (formattedValue) => {
+                                  const newData = { ...updateData };
+                                  const cleanValue = formattedValue.replace(/[.,]/g, '');
+                                  newData.successMetrics[index].newValue = parseFloat(cleanValue) || 0;
+                                  setUpdateData(newData);
+                                });
+                              }}
+                              placeholder="0"
+                              className="w-24"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Input
+                              placeholder="Catatan singkat..."
+                              value={metric.notes || ''}
+                              onChange={(e) => {
+                                const newData = { ...updateData };
+                                newData.successMetrics[index].notes = e.target.value;
+                                setUpdateData(newData);
+                              }}
+                              className="w-32"
+                            />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Mobile Cards */}
+                <div className="md:hidden space-y-4">
+                  {updateData.successMetrics.map((metric, index) => (
+                    <div key={metric.id} className="border rounded-lg p-4 space-y-3">
+                      <div className="space-y-1">
+                        <div className="font-semibold text-sm">{metric.title}</div>
+                        <div className="text-xs text-gray-500">{metric.description}</div>
+                        <Badge variant="outline" className="text-xs">
+                          {metric.initiativeTitle}
+                        </Badge>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                          <span className="text-gray-600">Saat ini:</span>
+                          <div className="font-medium">{formatNumberWithSeparator(metric.achievement.toString())} {metric.unit}</div>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Target:</span>
+                          <div className="font-medium">{formatNumberWithSeparator(metric.target.toString())} {metric.unit}</div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">Pencapaian Baru:</label>
+                        <Input
+                          type="text"
+                          value={metric.newValue !== undefined ? formatNumberWithSeparator(metric.newValue.toString()) : ''}
+                          onChange={(e) => {
+                            handleNumberInputChange(e.target.value, (formattedValue) => {
+                              const newData = { ...updateData };
+                              const cleanValue = formattedValue.replace(/[.,]/g, '');
+                              newData.successMetrics[index].newValue = parseFloat(cleanValue) || 0;
+                              setUpdateData(newData);
+                            });
+                          }}
+                          placeholder="0"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">Catatan:</label>
+                        <Input
+                          placeholder="Catatan singkat..."
+                          value={metric.notes || ''}
+                          onChange={(e) => {
+                            const newData = { ...updateData };
+                            newData.successMetrics[index].notes = e.target.value;
                             setUpdateData(newData);
                           }}
                         />
