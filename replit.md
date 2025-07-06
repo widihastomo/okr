@@ -113,6 +113,13 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 06, 2025. Enhanced Daily Focus objectives layout with horizontal scrolling design:
+  * Changed from 2-column grid to horizontal scrolling layout for better mobile experience
+  * Fixed card width to 320px (w-80) with flex-shrink-0 to maintain consistent sizing
+  * Replaced "4 objectives limit" with unlimited horizontal scrolling
+  * Added scroll instruction text "Geser ke kanan untuk melihat objective lainnya" for user guidance
+  * Improved responsive design allowing users to view all objectives without pagination
+  * Enhanced UX with smooth horizontal scrolling through objective cards
 - July 06, 2025. Improved Daily Focus page layout with better element positioning and mobile responsiveness:
   * Made Daily Instant Update button full width on mobile view for better touch interaction
   * Positioned date display at top-right corner aligned with "Daily Focus" title in mobile view

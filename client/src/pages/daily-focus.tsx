@@ -731,8 +731,9 @@ export default function DailyFocusPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-              {relatedObjectives.slice(0, 4).map((obj: any) => {
+            <div className="overflow-x-auto">
+              <div className="flex gap-4 pb-2 min-w-max">
+                {relatedObjectives.map((obj: any) => {
                 const objKeyResults = (keyResults as any[]).filter(
                   (kr) => kr.objectiveId === obj.id,
                 );
@@ -747,7 +748,7 @@ export default function DailyFocusPage() {
                 return (
                   <div
                     key={obj.id}
-                    className="p-4 bg-white border border-blue-200 rounded-lg"
+                    className="p-4 bg-white border border-blue-200 rounded-lg flex-shrink-0 w-80"
                   >
                     <div className="space-y-3">
                       <div>
@@ -808,13 +809,13 @@ export default function DailyFocusPage() {
                   </div>
                 );
               })}
+              </div>
             </div>
 
-            {relatedObjectives.length > 4 && (
+            {relatedObjectives.length > 3 && (
               <div className="mt-4 text-center">
                 <p className="text-sm text-blue-600">
-                  +{relatedObjectives.length - 4} objective lainnya terkait
-                  aktivitas Anda
+                  Geser ke kanan untuk melihat objective lainnya
                 </p>
               </div>
             )}
