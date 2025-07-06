@@ -282,7 +282,16 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
                 <button
                   key={user.id}
                   type="button"
-                  onClick={() => handleMentionSelect(user)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log("Button clicked for user:", user.firstName || user.email);
+                    handleMentionSelect(user);
+                  }}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
                   style={{
                     width: '100%',
                     padding: '12px 16px',
