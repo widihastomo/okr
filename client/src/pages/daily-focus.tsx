@@ -457,26 +457,32 @@ export default function DailyFocusPage() {
       {/* Header */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-          <div>
-            <h1 className="text-xl md:text-2xl font-bold text-gray-900">Daily Focus</h1>
+          <div className="flex-1">
+            <div className="flex items-center justify-between sm:block">
+              <h1 className="text-xl md:text-2xl font-bold text-gray-900">Daily Focus</h1>
+              {/* Date display - top-right on mobile, positioned at title level */}
+              <div className="flex items-center gap-2 text-sm text-gray-500 sm:hidden">
+                <Calendar className="h-4 w-4" />
+                <span>
+                  {today.toLocaleDateString("id-ID", {
+                    weekday: "short",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
+              </div>
+            </div>
             <p className="text-sm md:text-base text-gray-600">Kelola aktivitas harian Anda hari ini</p>
           </div>
           
-          {/* Date display - show on all screens, positioned at title level */}
-          <div className="flex items-center gap-2 text-sm text-gray-500">
+          {/* Date display - desktop only */}
+          <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500">
             <Calendar className="h-4 w-4" />
-            <span className="hidden sm:inline">
+            <span>
               {today.toLocaleDateString("id-ID", {
                 weekday: "long",
                 year: "numeric",
                 month: "long",
-                day: "numeric",
-              })}
-            </span>
-            <span className="sm:hidden">
-              {today.toLocaleDateString("id-ID", {
-                weekday: "short",
-                month: "short",
                 day: "numeric",
               })}
             </span>
