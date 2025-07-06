@@ -108,7 +108,7 @@ export default function DailyFocusPage() {
     title: "",
     description: "",
     priority: "medium",
-    assignedTo: "",
+    assignedTo: "unassigned",
     dueDate: "",
   });
 
@@ -190,7 +190,7 @@ export default function DailyFocusPage() {
         title: "",
         description: "",
         priority: "medium",
-        assignedTo: "",
+        assignedTo: "unassigned",
         dueDate: "",
       });
     },
@@ -222,7 +222,7 @@ export default function DailyFocusPage() {
 
     const taskData = {
       ...taskFormData,
-      assignedTo: taskFormData.assignedTo || null,
+      assignedTo: taskFormData.assignedTo === "unassigned" ? null : taskFormData.assignedTo || null,
       dueDate: taskFormData.dueDate || null,
     };
 
@@ -992,7 +992,7 @@ export default function DailyFocusPage() {
                                 <SelectValue placeholder="Pilih PIC" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="">Belum ditentukan</SelectItem>
+                                <SelectItem value="unassigned">Belum ditentukan</SelectItem>
                                 {users?.map((user: any) => (
                                   <SelectItem key={user.id} value={user.id}>
                                     {user.firstName} {user.lastName}
