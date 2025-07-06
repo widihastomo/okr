@@ -34,6 +34,7 @@ import {
   Edit,
   Trash2,
   Check,
+  ExternalLink,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -843,6 +844,9 @@ export default function DailyFocusPage() {
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             PIC
                           </th>
+                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Aksi
+                          </th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
@@ -853,7 +857,9 @@ export default function DailyFocusPage() {
                               <div className="flex items-center gap-2">
                                 <AlertTriangle className="h-4 w-4 text-red-600" />
                                 <div>
-                                  <div className="font-medium text-red-900">{task.title}</div>
+                                  <Link href={`/tasks/${task.id}`} className="font-medium text-red-900 hover:text-red-600 hover:underline cursor-pointer">
+                                    {task.title}
+                                  </Link>
                                   <div className="text-sm text-red-600">Task Terlambat</div>
                                 </div>
                               </div>
@@ -937,6 +943,13 @@ export default function DailyFocusPage() {
                                 </span>
                               </div>
                             </td>
+                            <td className="px-4 py-4 text-center">
+                              <Link href={`/tasks/${task.id}`}>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </Link>
+                            </td>
                           </tr>
                         ))}
                         
@@ -947,7 +960,9 @@ export default function DailyFocusPage() {
                               <div className="flex items-center gap-2">
                                 <Clock className="h-4 w-4 text-blue-600" />
                                 <div>
-                                  <div className="font-medium text-gray-900">{task.title}</div>
+                                  <Link href={`/tasks/${task.id}`} className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer">
+                                    {task.title}
+                                  </Link>
                                   <div className="text-sm text-gray-600">Task Hari Ini</div>
                                 </div>
                               </div>
@@ -1031,6 +1046,13 @@ export default function DailyFocusPage() {
                                 </span>
                               </div>
                             </td>
+                            <td className="px-4 py-4 text-center">
+                              <Link href={`/tasks/${task.id}`}>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </Link>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -1053,7 +1075,9 @@ export default function DailyFocusPage() {
                           >
                             <div className="flex items-center justify-between">
                               <div className="flex-1">
-                                <div className="font-medium text-red-900">{task.title}</div>
+                                <Link href={`/tasks/${task.id}`} className="font-medium text-red-900 hover:text-red-600 hover:underline cursor-pointer">
+                                  {task.title}
+                                </Link>
                                 <div className="flex items-center gap-2 mt-1">
                                   <Badge className={getTaskPriorityColor(task.priority || "medium")}>
                                     {getTaskPriorityLabel(task.priority || "medium")}
@@ -1158,7 +1182,9 @@ export default function DailyFocusPage() {
                           >
                             <div className="flex items-center justify-between">
                               <div className="flex-1">
-                                <div className="font-medium text-gray-900">{task.title}</div>
+                                <Link href={`/tasks/${task.id}`} className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer">
+                                  {task.title}
+                                </Link>
                                 <div className="flex items-center gap-2 mt-1">
                                   <Badge className={getTaskPriorityColor(task.priority || "medium")}>
                                     {getTaskPriorityLabel(task.priority || "medium")}
