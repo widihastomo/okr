@@ -252,10 +252,14 @@ export default function DailyFocusPage() {
     setIsSuccessMetricsModalOpen(true);
   };
 
-  // Helper function to get user name by ID
+  // Helper function to get user name by ID (matching objective detail page format)
   const getUserName = (userId: string): string => {
+    if (!users || !userId) return "Tidak ditentukan";
     const user = users.find((u: any) => u.id === userId);
-    return user ? user.name || user.username || "Unknown User" : "Tidak ditentukan";
+    if (user && user.firstName && user.lastName) {
+      return `${user.firstName} ${user.lastName}`;
+    }
+    return user?.email || user?.username || "Tidak ditentukan";
   };
 
   // Helper function to get initiative count for a key result
@@ -841,6 +845,12 @@ export default function DailyFocusPage() {
                                 ? getUserName(kr.assignedTo)
                                 : "Belum ditentukan"}
                             </span>
+                            {/* Debug info - remove after testing */}
+                            {process.env.NODE_ENV === 'development' && (
+                              <span className="text-red-500 ml-1" title={`assignedTo: ${kr.assignedTo}, users count: ${users.length}`}>
+                                🐛
+                              </span>
+                            )}
                           </div>
                           
                           {/* Tooltip for assignee info */}
