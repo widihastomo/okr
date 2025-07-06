@@ -77,7 +77,7 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
   const handleMentionSelect = useCallback((user: User) => {
     const beforeMention = content.substring(0, cursorPosition);
     const afterMention = content.substring(cursorPosition + mentionQuery.length + 1);
-    const newContent = `${beforeMention}@${user.username}${afterMention} `;
+    const newContent = `${beforeMention}@${user.firstName || user.email}${afterMention} `;
     
     setContent(newContent);
     setMentionedUsers(prev => [...prev, user.id]);
@@ -90,7 +90,7 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
 
   const filteredUsers = users.filter(user => {
     if (!mentionQuery) return true; // Show all users when no query
-    return user.username?.toLowerCase().includes(mentionQuery.toLowerCase()) ||
+    return user.firstName?.toLowerCase().includes(mentionQuery.toLowerCase()) ||
            user.email?.toLowerCase().includes(mentionQuery.toLowerCase());
   });
 
@@ -210,99 +210,18 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
           </div>
 
           {/* Content editor */}
-          <div className="relative overflow-visible">
+          <div className="relative">
             <div
               ref={editorRef}
               contentEditable
               onInput={(e) => handleContentChange(e.currentTarget.textContent || "")}
               className="min-h-[120px] p-4 outline-none resize-none text-sm leading-relaxed"
-              placeholder="Tulis komentar... Gunakan @ untuk mention user"
               style={{
                 whiteSpace: "pre-wrap",
                 wordBreak: "break-word",
               }}
               data-placeholder="Tulis komentar... Gunakan @ untuk mention user"
             />
-            
-            {/* Mention suggestions dropdown */}
-            {showMentionSuggestions && (
-              <div 
-                style={{
-                  position: 'absolute',
-                  left: '0',
-                  bottom: '100%',
-                  marginBottom: '8px',
-                  width: '100%',
-                  backgroundColor: 'white',
-                  border: '2px solid #e5e7eb',
-                  borderRadius: '8px',
-                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-                  maxHeight: '200px',
-                  overflowY: 'auto',
-                  zIndex: 9999
-                }}
-              >
-                {filteredUsers.length > 0 ? (
-                  <div>
-                    {filteredUsers.slice(0, 5).map((user) => (
-                      <button
-                        key={user.id}
-                        type="button"
-                        onClick={() => handleMentionSelect(user)}
-                        style={{
-                          width: '100%',
-                          padding: '12px 16px',
-                          textAlign: 'left',
-                          backgroundColor: 'white',
-                          border: 'none',
-                          borderBottom: '1px solid #f3f4f6',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '12px',
-                          transition: 'background-color 0.2s'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
-                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
-                      >
-                        <div style={{
-                          width: '32px',
-                          height: '32px',
-                          borderRadius: '50%',
-                          backgroundColor: '#3b82f6',
-                          color: 'white',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '14px',
-                          fontWeight: 'bold',
-                          flexShrink: 0
-                        }}>
-                          {user.username?.charAt(0).toUpperCase()}
-                        </div>
-                        <div style={{ textAlign: 'left' }}>
-                          <div style={{ fontWeight: '600', color: '#111827', fontSize: '14px' }}>
-                            {user.username}
-                          </div>
-                          <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                            {user.email}
-                          </div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                ) : (
-                  <div style={{
-                    padding: '16px',
-                    textAlign: 'center',
-                    color: '#6b7280',
-                    fontSize: '14px'
-                  }}>
-                    Tidak ada user yang cocok dengan "{mentionQuery}"
-                  </div>
-                )}
-              </div>
-            )}
           </div>
         </div>
 
@@ -340,6 +259,79 @@ export function TaskCommentEditor({ taskId, onCommentAdded }: TaskCommentEditorP
           </Button>
         </div>
       </form>
+
+      {/* Mention suggestions dropdown - moved outside form */}
+      {showMentionSuggestions && (
+        <div 
+          className="fixed bg-white border-2 border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto z-50"
+          style={{
+            width: '300px',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)'
+          }}
+        >
+          {filteredUsers.length > 0 ? (
+            <div>
+              {filteredUsers.slice(0, 5).map((user) => (
+                <button
+                  key={user.id}
+                  type="button"
+                  onClick={() => handleMentionSelect(user)}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    textAlign: 'left',
+                    backgroundColor: 'white',
+                    border: 'none',
+                    borderBottom: '1px solid #f3f4f6',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                >
+                  <div style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: '#3b82f6',
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '14px',
+                    fontWeight: 'bold',
+                    flexShrink: 0
+                  }}>
+                    {user.firstName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
+                  </div>
+                  <div style={{ textAlign: 'left' }}>
+                    <div style={{ fontWeight: '600', color: '#111827', fontSize: '14px' }}>
+                      {user.firstName || user.email}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                      {user.email}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div style={{
+              padding: '16px',
+              textAlign: 'center',
+              color: '#6b7280',
+              fontSize: '14px'
+            }}>
+              Tidak ada user yang cocok dengan "{mentionQuery}"
+            </div>
+          )}
+        </div>
+      )}
 
       <style>{`
         [contenteditable]:empty:before {
