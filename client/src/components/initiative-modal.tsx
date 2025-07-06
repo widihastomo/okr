@@ -613,7 +613,7 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
                 <Button 
                   type="submit" 
                   disabled={createInitiativeMutation.isPending || updateInitiativeMutation.isPending}
-                  className="bg-blue-600 hover:bg-blue-700"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                 >
                   {(createInitiativeMutation.isPending || updateInitiativeMutation.isPending) 
                     ? "Menyimpan..." 

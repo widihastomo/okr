@@ -379,7 +379,7 @@ export default function EditObjectiveFormModal({
               <Button 
                 type="submit" 
                 disabled={updateMutation.isPending}
-                className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-colors"
               >
                 {updateMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
               </Button>

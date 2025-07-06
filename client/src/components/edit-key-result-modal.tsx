@@ -726,7 +726,7 @@ export default function EditKeyResultModal({
               <Button
                 type="submit"
                 disabled={updateKeyResultMutation.isPending}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
                 {updateKeyResultMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
               </Button>

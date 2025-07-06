@@ -1089,7 +1089,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                 {!isEditMode && currentStep === 1 ? (
                   <Button 
                     type="submit"
-                    className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto order-1 sm:order-2"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white w-full sm:w-auto order-1 sm:order-2"
                   >
                     Lanjut
                     <ChevronRight className="w-4 h-4 ml-2" />
@@ -1098,7 +1098,7 @@ export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormM
                   <Button 
                     type="submit"
                     disabled={mutation.isPending}
-                    className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto order-1 sm:order-2"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white w-full sm:w-auto order-1 sm:order-2"
                   >
                     {mutation.isPending 
                       ? (isEditMode ? "Memperbarui..." : "Membuat...") 
@@ -1837,7 +1837,7 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
               </Button>
               <Button 
                 type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
               >
                 Simpan Angka Target
               </Button>
@@ -1857,7 +1857,7 @@ export function CreateOKRButton() {
     <>
       <Button 
         onClick={() => setOpen(true)}
-        className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
+        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white w-full sm:w-auto"
       >
         <Plus className="w-4 h-4 mr-2" />
         Buat Goal

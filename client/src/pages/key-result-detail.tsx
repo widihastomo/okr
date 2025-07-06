@@ -1221,7 +1221,7 @@ export default function KeyResultDetailPage() {
                 <div className="flex gap-2">
                   <Button 
                     onClick={() => setShowInitiativeFormModal(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Tambah Rencana
@@ -1403,7 +1403,7 @@ export default function KeyResultDetailPage() {
                                     <Button
                                       size="sm"
                                       onClick={() => handleAddTask(initiative.id)}
-                                      className="bg-blue-600 hover:bg-blue-700 text-xs h-7 px-3"
+                                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-xs h-7 px-3"
                                     >
                                       <Plus className="h-3 w-3 mr-1" />
                                       Tambah Task
@@ -1838,7 +1838,7 @@ export default function KeyResultDetailPage() {
               </Button>
               <Button 
                 type="submit" 
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                 disabled={createTaskMutation.isPending}
               >
                 {createTaskMutation.isPending ? "Creating..." : "Buat Task"}
@@ -2064,7 +2064,7 @@ export default function KeyResultDetailPage() {
                             className: "border-green-200 bg-green-50 text-green-800",
                           });
                         }}
-                        className="bg-blue-600 hover:bg-blue-700"
+                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                       >
                         <Send className="h-4 w-4 mr-1" />
                         Send

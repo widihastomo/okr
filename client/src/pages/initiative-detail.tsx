@@ -438,7 +438,7 @@ export default function InitiativeDetailPage() {
                     setIsSuccessMetricsModalOpen(true);
                   }}
                   size="sm"
-                  className="bg-blue-600 hover:bg-blue-700"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                 >
                   Tambah Metrik
                 </Button>
@@ -508,7 +508,7 @@ export default function InitiativeDetailPage() {
                 <Button 
                   onClick={() => setIsAddTaskModalOpen(true)}
                   size="sm"
-                  className="bg-blue-600 hover:bg-blue-700"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                 >
                   Tambah Task
                 </Button>

@@ -211,7 +211,7 @@ export default function SuccessMetricsModal({
               <Button
                 type="submit"
                 disabled={createMutation.isPending || updateMutation.isPending}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
                 {createMutation.isPending || updateMutation.isPending
                   ? "Loading..."

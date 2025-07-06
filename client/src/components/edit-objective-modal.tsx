@@ -435,7 +435,7 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
             </Button>
             <Button 
               type="submit" 
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
               disabled={updateObjectiveMutation.isPending}
             >
               {updateObjectiveMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}

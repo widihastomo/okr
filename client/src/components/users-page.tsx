@@ -529,7 +529,7 @@ export default function UsersPage() {
                     </div>
                     <Button 
                       type="submit" 
-                      className="w-full bg-blue-600 hover:bg-blue-700"
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                       disabled={createUserMutation.isPending}
                     >
                       {createUserMutation.isPending ? "Creating..." : "Create User"}
@@ -731,7 +731,7 @@ export default function UsersPage() {
                     </div>
                     <Button 
                       type="submit" 
-                      className="w-full bg-blue-600 hover:bg-blue-700"
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                       disabled={changePasswordMutation.isPending}
                     >
                       {changePasswordMutation.isPending ? "Changing..." : "Change Password"}
@@ -804,7 +804,7 @@ export default function UsersPage() {
                         </div>
                         <Button 
                           type="submit" 
-                          className="w-full bg-blue-600 hover:bg-blue-700"
+                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                           disabled={updateUserMutation.isPending}
                         >
                           {updateUserMutation.isPending ? "Updating..." : "Update User"}
@@ -899,7 +899,7 @@ export default function UsersPage() {
                         </div>
                         <Button 
                           type="submit" 
-                          className="w-full bg-blue-600 hover:bg-blue-700"
+                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                           disabled={createTeamMutation.isPending}
                         >
                           {createTeamMutation.isPending ? "Creating..." : "Create Team"}
@@ -988,7 +988,7 @@ export default function UsersPage() {
                       </div>
                       <Button 
                         type="submit" 
-                        className="w-full bg-blue-600 hover:bg-blue-700"
+                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                         disabled={updateTeamMutation.isPending}
                       >
                         {updateTeamMutation.isPending ? "Updating..." : "Update Team"}

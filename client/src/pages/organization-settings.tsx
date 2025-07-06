@@ -558,7 +558,7 @@ export default function OrganizationSettings() {
                         </div>
                         <Button 
                           type="submit" 
-                          className="w-full bg-blue-600 hover:bg-blue-700"
+                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                           disabled={createUserMutation.isPending}
                         >
                           {createUserMutation.isPending ? "Membuat..." : "Buat Anggota"}
@@ -770,7 +770,7 @@ export default function OrganizationSettings() {
                         </div>
                         <Button 
                           type="submit" 
-                          className="w-full bg-blue-600 hover:bg-blue-700"
+                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                           disabled={updateUserMutation.isPending}
                         >
                           {updateUserMutation.isPending ? "Memperbarui..." : "Perbarui Anggota"}
@@ -830,7 +830,7 @@ export default function OrganizationSettings() {
                         </div>
                         <Button 
                           type="submit" 
-                          className="w-full bg-blue-600 hover:bg-blue-700"
+                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                           disabled={changePasswordMutation.isPending}
                         >
                           {changePasswordMutation.isPending ? "Mengubah..." : "Ubah Password"}

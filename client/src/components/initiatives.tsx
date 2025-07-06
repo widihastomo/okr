@@ -276,7 +276,7 @@ export default function Inisiatif({ userFilter, filteredKeyResultIds }: Inisiati
 
         <Button
           onClick={() => setShowCreateModal(true)}
-          className="bg-blue-600 hover:bg-blue-700"
+          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
         >
           <Plus className="w-4 h-4 mr-2" />
           New Initiative
@@ -312,7 +312,7 @@ export default function Inisiatif({ userFilter, filteredKeyResultIds }: Inisiati
             </p>
             <Button
               onClick={() => setShowCreateModal(true)}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
             >
               <Plus className="w-4 h-4 mr-2" />
               Create Initiative

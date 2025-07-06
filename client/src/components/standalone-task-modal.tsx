@@ -254,7 +254,7 @@ export default function StandaloneTaskModal({ open, onOpenChange, onSuccess }: S
               <Button
                 type="submit"
                 disabled={createTaskMutation.isPending}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
                 {createTaskMutation.isPending ? "Membuat..." : "Buat Task"}
               </Button>
