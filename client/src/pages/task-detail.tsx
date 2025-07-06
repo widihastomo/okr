@@ -173,10 +173,6 @@ function TaskOverviewCard({ task, assignedUser, initiative }: any) {
         {/* Description */}
         {task?.description && (
           <div>
-            <h3 className="font-medium text-gray-900 mb-2 flex items-center gap-2 text-sm">
-              <FileText className="w-4 h-4" />
-              Deskripsi
-            </h3>
             <p className="text-sm text-gray-700 leading-relaxed">{task.description}</p>
           </div>
         )}
