@@ -222,15 +222,9 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                                  priorityScore >= 6.5 ? 'high' : 
                                  priorityScore >= 4.0 ? 'medium' : 'low';
 
-      const budgetValue = data.budget ? getNumberValueForSubmission(data.budget) : null;
-      console.log('Budget processing:', { 
-        rawBudget: data.budget, 
-        processedBudget: budgetValue 
-      });
-      
       const payload = {
         ...data,
-        budget: budgetValue,
+        budget: data.budget ? getNumberValueForSubmission(data.budget) : null,
         startDate: data.startDate ? new Date(data.startDate) : null,
         dueDate: data.dueDate ? new Date(data.dueDate) : null,
         status: "not_started", // Auto-set status to not_started for new initiatives
