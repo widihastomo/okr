@@ -191,7 +191,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
         startDate: initiative.startDate ? new Date(initiative.startDate) : undefined,
         dueDate: initiative.dueDate ? new Date(initiative.dueDate) : undefined,
         priority: (initiative.priority as any) || "medium",
-        budget: initiative.budget?.toString() || "",
+        budget: initiative.budget ? formatNumberWithSeparator(initiative.budget.toString()) : "",
         impactScore: (initiative as any)?.impactScore || 5,
         effortScore: (initiative as any)?.effortScore || 5,
         confidenceScore: (initiative as any)?.confidenceScore || 5,
