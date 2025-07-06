@@ -456,20 +456,30 @@ export default function DailyFocusPage() {
     <div className="p-3 md:p-6 space-y-4 md:space-y-6">
       {/* Header */}
       <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
             <h1 className="text-xl md:text-2xl font-bold text-gray-900">Daily Focus</h1>
             <p className="text-sm md:text-base text-gray-600">Kelola aktivitas harian Anda hari ini</p>
           </div>
           
-          {/* Date display - show on mobile */}
-          <div className="flex items-center gap-2 text-sm text-gray-500 sm:hidden">
+          {/* Date display - show on all screens, positioned at title level */}
+          <div className="flex items-center gap-2 text-sm text-gray-500">
             <Calendar className="h-4 w-4" />
-            {today.toLocaleDateString("id-ID", {
-              weekday: "short",
-              month: "short",
-              day: "numeric",
-            })}
+            <span className="hidden sm:inline">
+              {today.toLocaleDateString("id-ID", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </span>
+            <span className="sm:hidden">
+              {today.toLocaleDateString("id-ID", {
+                weekday: "short",
+                month: "short",
+                day: "numeric",
+              })}
+            </span>
           </div>
         </div>
 
@@ -498,17 +508,6 @@ export default function DailyFocusPage() {
           {/* Action buttons */}
           <div className="flex items-center gap-2 sm:gap-3">
             <DailyInstantUpdate />
-          </div>
-          
-          {/* Date display - show on desktop */}
-          <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500 sm:ml-auto">
-            <Calendar className="h-4 w-4" />
-            {today.toLocaleDateString("id-ID", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
           </div>
         </div>
       </div>
