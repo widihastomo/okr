@@ -1,12 +1,12 @@
 import { 
-  cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives, tasks,
+  cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives, tasks, taskComments,
   initiativeMembers, initiativeDocuments, initiativeNotes, initiativeSuccessMetrics, successMetricUpdates,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
-  type CheckIn, type Initiative, type Task, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
+  type CheckIn, type Initiative, type Task, type TaskComment, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
   type InitiativeNote, type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
   type InsertUser, type UpsertUser, type InsertTeam, type InsertTeamMember,
   type InsertCheckIn, type InsertInitiative, type InsertInitiativeMember, type InsertInitiativeDocument, type InsertTask,
-  type InsertInitiativeNote, type OKRWithKeyResults, type CycleWithOKRs, type UpdateKeyResultProgress, type CreateOKRFromTemplate,
+  type InsertTaskComment, type InsertInitiativeNote, type OKRWithKeyResults, type CycleWithOKRs, type UpdateKeyResultProgress, type CreateOKRFromTemplate,
   type SuccessMetric, type InsertSuccessMetric, type SuccessMetricUpdate, type InsertSuccessMetricUpdate
 } from "@shared/schema";
 import { db } from "./db";
@@ -122,6 +122,12 @@ export interface IStorage {
   getTasksByUserId(userId: string): Promise<Task[]>;
   updateInitiativeProgress(initiativeId: string): Promise<void>;
   getTaskWithDetails(id: string): Promise<Task | undefined>;
+  
+  // Task Comments
+  getTaskComments(taskId: string): Promise<(TaskComment & { user: User })[]>;
+  createTaskComment(comment: InsertTaskComment): Promise<TaskComment>;
+  updateTaskComment(id: string, comment: Partial<InsertTaskComment>): Promise<TaskComment | undefined>;
+  deleteTaskComment(id: string): Promise<boolean>;
   
   // Key Result with Details
   getKeyResultWithDetails(id: string): Promise<KeyResultWithDetails | undefined>;
@@ -1257,6 +1263,46 @@ export class DatabaseStorage implements IStorage {
   async createSuccessMetricUpdate(update: InsertSuccessMetricUpdate): Promise<SuccessMetricUpdate> {
     const [newUpdate] = await db.insert(successMetricUpdates).values(update).returning();
     return newUpdate;
+  }
+
+  // Task Comments
+  async getTaskComments(taskId: string): Promise<(TaskComment & { user: User })[]> {
+    const comments = await db
+      .select({
+        comment: taskComments,
+        user: users,
+      })
+      .from(taskComments)
+      .innerJoin(users, eq(taskComments.userId, users.id))
+      .where(eq(taskComments.taskId, taskId))
+      .orderBy(desc(taskComments.createdAt));
+
+    return comments.map(row => ({
+      ...row.comment,
+      user: row.user,
+    }));
+  }
+
+  async createTaskComment(comment: InsertTaskComment): Promise<TaskComment> {
+    const [newComment] = await db.insert(taskComments).values(comment).returning();
+    return newComment;
+  }
+
+  async updateTaskComment(id: string, comment: Partial<InsertTaskComment>): Promise<TaskComment | undefined> {
+    const [updatedComment] = await db
+      .update(taskComments)
+      .set({
+        ...comment,
+        updatedAt: new Date(),
+      })
+      .where(eq(taskComments.id, id))
+      .returning();
+    return updatedComment || undefined;
+  }
+
+  async deleteTaskComment(id: string): Promise<boolean> {
+    const result = await db.delete(taskComments).where(eq(taskComments.id, id));
+    return result.rowCount > 0;
   }
 }
 

@@ -27,6 +27,8 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
+import { TaskCommentList } from "@/components/task-comment-list";
+import { TaskCommentEditor } from "@/components/task-comment-editor";
 
 // UI Components
 import { 
@@ -263,27 +265,18 @@ function TaskOverviewCard({ task, assignedUser, initiative }: any) {
   );
 }
 
-// Activity Log Card Component
-function ActivityLogCard({ taskId }: { taskId: string }) {
+// Comments Card Component
+function CommentsCard({ taskId }: { taskId: string }) {
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle className="text-lg">Riwayat Aktivitas</CardTitle>
-        <CardDescription>Timeline perubahan dan update task</CardDescription>
+        <CardTitle className="text-lg">Diskusi Task</CardTitle>
+        <CardDescription>Diskusi dan kolaborasi tim</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="flex items-start gap-3">
-            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-            <div>
-              <p className="text-sm font-medium">Task dibuat</p>
-              <p className="text-xs text-gray-500">Baru saja</p>
-            </div>
-          </div>
-          <div className="text-center py-4 text-gray-500">
-            <Clock className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-            <p className="text-sm">Riwayat aktivitas akan muncul di sini</p>
-          </div>
+      <CardContent className="space-y-6">
+        <TaskCommentList taskId={taskId} />
+        <div className="border-t pt-4">
+          <TaskCommentEditor taskId={taskId} />
         </div>
       </CardContent>
     </Card>
@@ -440,7 +433,7 @@ export default function TaskDetailPage() {
           />
         </div>
         <div className="lg:col-span-1 h-full">
-          <ActivityLogCard taskId={id!} />
+          <CommentsCard taskId={id!} />
         </div>
       </div>
 

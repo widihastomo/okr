@@ -2520,6 +2520,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Task Comments API Routes
+  app.get("/api/tasks/:taskId/comments", async (req, res) => {
+    try {
+      const taskId = req.params.taskId;
+      const comments = await storage.getTaskComments(taskId);
+      res.json(comments);
+    } catch (error) {
+      console.error("Error fetching task comments:", error);
+      res.status(500).json({ message: "Failed to fetch task comments" });
+    }
+  });
+
+  app.post("/api/tasks/:taskId/comments", requireAuth, async (req, res) => {
+    try {
+      const taskId = req.params.taskId;
+      const currentUser = req.user as User;
+      
+      const commentData = {
+        ...req.body,
+        taskId,
+        userId: currentUser.id,
+      };
+      
+      const result = insertTaskCommentSchema.safeParse(commentData);
+      if (!result.success) {
+        return res.status(400).json({ 
+          message: "Invalid comment data", 
+          errors: result.error.errors 
+        });
+      }
+
+      const comment = await storage.createTaskComment(result.data);
+      res.status(201).json(comment);
+    } catch (error) {
+      console.error("Error creating task comment:", error);
+      res.status(500).json({ message: "Failed to create task comment" });
+    }
+  });
+
+  app.put("/api/tasks/:taskId/comments/:commentId", requireAuth, async (req, res) => {
+    try {
+      const { taskId, commentId } = req.params;
+      const currentUser = req.user as User;
+      
+      const commentData = {
+        ...req.body,
+        taskId,
+        userId: currentUser.id,
+        isEdited: true,
+        editedAt: new Date().toISOString(),
+      };
+      
+      const result = insertTaskCommentSchema.safeParse(commentData);
+      if (!result.success) {
+        return res.status(400).json({ 
+          message: "Invalid comment data", 
+          errors: result.error.errors 
+        });
+      }
+
+      const comment = await storage.updateTaskComment(commentId, result.data);
+      if (!comment) {
+        return res.status(404).json({ message: "Comment not found" });
+      }
+      
+      res.json(comment);
+    } catch (error) {
+      console.error("Error updating task comment:", error);
+      res.status(500).json({ message: "Failed to update task comment" });
+    }
+  });
+
+  app.delete("/api/tasks/:taskId/comments/:commentId", requireAuth, async (req, res) => {
+    try {
+      const { commentId } = req.params;
+      const deleted = await storage.deleteTaskComment(commentId);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Comment not found" });
+      }
+      
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting task comment:", error);
+      res.status(500).json({ message: "Failed to delete task comment" });
+    }
+  });
+
   // Get dashboard stats
   app.get("/api/stats", async (req, res) => {
     try {
