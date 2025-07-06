@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Calendar,
   TrendingUp,
@@ -260,6 +261,19 @@ export default function DailyFocusPage() {
       return `${user.firstName} ${user.lastName}`;
     }
     return user?.email || user?.username || "Tidak ditentukan";
+  };
+
+  // Helper function to get user initials for avatar
+  const getUserInitials = (userId: string): string => {
+    if (!users || !userId) return "?";
+    const user = users.find((u: any) => u.id === userId);
+    if (user && user.firstName && user.lastName) {
+      return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
+    }
+    if (user?.email) {
+      return user.email.charAt(0).toUpperCase();
+    }
+    return "?";
   };
 
   // Helper function to get initiative count for a key result
@@ -838,19 +852,22 @@ export default function DailyFocusPage() {
                       <div className="flex items-center justify-between text-xs mt-3 pt-3 border-t border-gray-100">
                         {/* Assignee info - Left */}
                         <div className="relative group">
-                          <div className="flex items-center gap-1 text-gray-500">
-                            <User className="w-3 h-3" />
-                            <span className="truncate max-w-24 sm:max-w-32">
+                          <div className="flex items-center gap-2 text-gray-500">
+                            {kr.assignedTo ? (
+                              <Avatar className="w-4 h-4">
+                                <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(kr.assignedTo)}`} />
+                                <AvatarFallback className="text-xs">
+                                  {getUserInitials(kr.assignedTo)}
+                                </AvatarFallback>
+                              </Avatar>
+                            ) : (
+                              <User className="w-3 h-3" />
+                            )}
+                            <span className="truncate max-w-20 sm:max-w-28 text-xs">
                               {kr.assignedTo
                                 ? getUserName(kr.assignedTo)
                                 : "Belum ditentukan"}
                             </span>
-                            {/* Debug info - remove after testing */}
-                            {process.env.NODE_ENV === 'development' && (
-                              <span className="text-red-500 ml-1" title={`assignedTo: ${kr.assignedTo}, users count: ${users.length}`}>
-                                🐛
-                              </span>
-                            )}
                           </div>
                           
                           {/* Tooltip for assignee info */}
