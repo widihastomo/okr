@@ -854,14 +854,14 @@ export default function DailyFocusPage() {
                         <div className="relative group">
                           <div className="flex items-center gap-2 text-gray-500">
                             {kr.assignedTo ? (
-                              <Avatar className="w-4 h-4">
+                              <Avatar className="w-6 h-6">
                                 <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(kr.assignedTo)}`} />
-                                <AvatarFallback className="text-xs">
+                                <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
                                   {getUserInitials(kr.assignedTo)}
                                 </AvatarFallback>
                               </Avatar>
                             ) : (
-                              <User className="w-3 h-3" />
+                              <User className="w-4 h-4" />
                             )}
                             <span className="truncate max-w-20 sm:max-w-28 text-xs">
                               {kr.assignedTo

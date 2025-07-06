@@ -392,7 +392,7 @@ export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDelete
             ) : (
               <Avatar className="w-6 h-6">
                 <AvatarImage src="" alt={okr.owner} />
-                <AvatarFallback className="text-xs bg-blue-600 text-white">
+                <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
                   {okr.owner.split(' ').map(n => n[0]).join('').toUpperCase()}
                 </AvatarFallback>
               </Avatar>

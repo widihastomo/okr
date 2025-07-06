@@ -361,7 +361,7 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
 
                           <div className="flex items-center gap-2 mt-3 text-xs text-gray-500">
                             <Avatar className="w-6 h-6">
-                              <AvatarFallback className="text-xs bg-blue-100">
+                              <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
                                 {getUserInitials(note.createdByUser)}
                               </AvatarFallback>
                             </Avatar>
