@@ -57,6 +57,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -110,6 +123,7 @@ export default function DailyFocusPage() {
     priority: "medium",
     assignedTo: "unassigned",
     dueDate: "",
+    initiativeId: "none",
   });
 
   // Status update mutation
@@ -192,6 +206,7 @@ export default function DailyFocusPage() {
         priority: "medium",
         assignedTo: "unassigned",
         dueDate: "",
+        initiativeId: "none",
       });
     },
     onError: (error: Error) => {
@@ -224,6 +239,7 @@ export default function DailyFocusPage() {
       ...taskFormData,
       assignedTo: taskFormData.assignedTo === "unassigned" ? null : taskFormData.assignedTo || null,
       dueDate: taskFormData.dueDate || null,
+      initiativeId: taskFormData.initiativeId === "none" || !taskFormData.initiativeId ? null : taskFormData.initiativeId,
     };
 
     createTaskMutation.mutate(taskData);
@@ -960,6 +976,26 @@ export default function DailyFocusPage() {
                             placeholder="Masukkan deskripsi task (opsional)"
                             rows={3}
                           />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="initiativeId">Inisiatif (Opsional)</Label>
+                          <Select 
+                            value={taskFormData.initiativeId} 
+                            onValueChange={(value) => setTaskFormData({ ...taskFormData, initiativeId: value })}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih inisiatif (opsional)" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">Tidak terkait inisiatif</SelectItem>
+                              {initiatives?.map((initiative: any) => (
+                                <SelectItem key={initiative.id} value={initiative.id}>
+                                  {initiative.title}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
