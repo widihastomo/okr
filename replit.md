@@ -125,6 +125,11 @@ Changelog:
   * Changed main dashboard page title from "OKR Dashboard" to "Goals"
   * Updated description to "Kelola objective, angka target, dan inisiatif Anda" for better Indonesian localization
   * Kept Daily Focus page with original "Daily Focus" title and daily activity description
+- July 06, 2025. Enhanced objective detail page button behavior and layout:
+  * Changed "Tambah Ukuran" button text to "Tambah Angka Target" for clearer terminology
+  * Hidden "Tambah Angka Target" button when objective has no key results to reduce UI clutter
+  * Hidden Quick Stats section when objective has no key results for cleaner empty state
+  * Improved UX by showing relevant actions only when appropriate
 - July 06, 2025. Removed One-Click Habits feature from Daily Focus page:
   * Removed OneClickHabitButton component from Daily Focus action buttons
   * Deleted one-click-habit-button.tsx component file
