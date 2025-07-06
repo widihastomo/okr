@@ -340,7 +340,7 @@ export default function DailyFocusPage() {
   });
 
   const activeInitiatives = (initiatives as any[]).filter(
-    (init: any) => init.status === "sedang_berjalan" || init.status === "draft",
+    (init: any) => (init.status === "sedang_berjalan" || init.status === "draft") && init.picId === user?.id,
   );
 
   // Get related objectives for today's activities
@@ -1032,14 +1032,15 @@ export default function DailyFocusPage() {
             <CardHeader>
               <CardTitle>Kelola Inisiatif Aktif</CardTitle>
               <CardDescription>
-                Update metrics dan kelola inisiatif yang sedang berjalan
+                Update metrics dan kelola inisiatif aktif yang Anda tanggung jawabi
               </CardDescription>
             </CardHeader>
             <CardContent>
               {activeInitiatives.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <BarChart3 className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                  <p>Tidak ada inisiatif aktif</p>
+                  <p>Tidak ada inisiatif aktif yang Anda tanggung jawabi</p>
+                  <p className="text-sm mt-2">Hanya inisiatif dengan Anda sebagai PIC yang ditampilkan</p>
                 </div>
               ) : (
                 <>
