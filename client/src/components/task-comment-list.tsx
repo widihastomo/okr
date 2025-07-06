@@ -44,7 +44,7 @@ export function TaskCommentList({ taskId }: TaskCommentListProps) {
   });
 
   const { data: currentUser } = useQuery<User>({
-    queryKey: ['/api/user'],
+    queryKey: ['/api/auth/me'],
   });
 
   const updateCommentMutation = useMutation({
