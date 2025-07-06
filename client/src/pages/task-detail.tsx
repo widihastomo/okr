@@ -250,17 +250,7 @@ function TaskOverviewCard({ task, assignedUser, initiative }: any) {
           </div>
         </div>
 
-        {/* Status Progress (for visual appeal) */}
-        <div className="pt-4 border-t border-gray-200">
-          <div className="flex justify-between text-sm text-gray-600 mb-2">
-            <span>Status Progress</span>
-            <span>{task?.status === 'completed' ? '100%' : task?.status === 'in_progress' ? '50%' : '0%'}</span>
-          </div>
-          <Progress 
-            value={task?.status === 'completed' ? 100 : task?.status === 'in_progress' ? 50 : 0} 
-            className="h-2"
-          />
-        </div>
+        
       </CardContent>
     </Card>
   );
