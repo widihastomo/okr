@@ -176,12 +176,7 @@ export default function Sidebar({
         path: "/client-users",
         active: location === "/client-users",
       },
-      {
-        label: "Kelola Role",
-        icon: Shield,
-        path: "/role-management",
-        active: location === "/role-management",
-      },
+
     );
   }
 

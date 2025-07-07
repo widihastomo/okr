@@ -438,6 +438,8 @@ Changelog:
   * Enhanced tab layout to accommodate 6 tabs (expanded from 5) with proper spacing
   * Role management includes default sample roles: Admin (full access), Manager (team management), Member (basic access), Viewer (read-only)
   * Organization owners can now create custom roles and assign specific permissions for granular access control
+  * Removed redundant standalone role management page since functionality is now integrated into organization settings
+  * Cleaned up routing, imports, and sidebar menu items to remove duplicate role management access points
 - July 07, 2025. Removed Network Visualization feature per user request:
   * Deleted network-visualization.tsx page and all related components
   * Removed "Jaringan Goal" menu item from sidebar navigation
