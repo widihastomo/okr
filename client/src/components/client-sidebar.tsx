@@ -212,21 +212,7 @@ export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse
         >
           
 
-          {/* Desktop collapse toggle button */}
-          <div className="hidden lg:flex justify-end p-2 border-b border-gray-200">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onToggleCollapse}
-              className="h-8 w-8 p-0"
-            >
-              {isCollapsed ? (
-                <ChevronRight className="h-4 w-4" />
-              ) : (
-                <ChevronLeft className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
+          
 
           <nav className="flex-1 px-2 py-4 overflow-y-auto">
             <ul className="space-y-1">
