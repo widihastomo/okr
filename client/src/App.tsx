@@ -99,7 +99,7 @@ function Router() {
             // Mobile: no margin left (sidebar is overlay)
             "ml-0",
             // Desktop: margin based on sidebar state
-            sidebarOpen ? "lg:ml-64" : "lg:ml-16"
+            sidebarOpen ? "lg:ml-64" : "lg:ml-0"
           )}>
             <Switch>
               <Route path="/" component={DailyFocusPage} />

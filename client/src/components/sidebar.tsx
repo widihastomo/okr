@@ -198,8 +198,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       <div
         className={cn(
           "fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out z-30",
-          "lg:translate-x-0",
-          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         {/* Mobile header with close button */}
