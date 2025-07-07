@@ -7,10 +7,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import GlobalHeader from "@/components/global-header";
-import Sidebar from "@/components/sidebar";
 import ClientSidebar from "@/components/client-sidebar";
 import { NotificationProvider } from "@/components/notifications/notification-provider";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import Dashboard from "@/pages/dashboard";
 import CyclesPage from "@/components/cycles-page";
 import TemplatesPage from "@/components/templates-page";
@@ -45,6 +43,7 @@ import ClientRegistration from "@/pages/client-registration";
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [location] = useLocation();
 
   // Clear logout flag on app start if user is authenticated
@@ -53,6 +52,10 @@ function Router() {
       localStorage.removeItem('isLoggedOut');
     }
   }, [isAuthenticated]);
+
+  const handleMenuToggle = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
 
   // Redirect system owner to system admin dashboard by default
   useEffect(() => {
@@ -87,52 +90,33 @@ function Router() {
     );
   }
 
-  // System admin users should use the old Sidebar for system administration
-  const isSystemAdmin = user && (user as any)?.isSystemOwner;
-
-  if (isSystemAdmin && location.startsWith('/system-admin')) {
-    return (
-      <NotificationProvider>
-        <div className="min-h-screen bg-gray-50">
-          {/* Global Header */}
-          <GlobalHeader onMenuToggle={() => setSidebarOpen(!sidebarOpen)} sidebarOpen={sidebarOpen} />
-          
-          <div className="flex pt-16">
-            {/* System Admin Sidebar */}
-            <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-            
-            {/* Main Content */}
-            <div className={cn(
-              "flex-1 min-h-[calc(100vh-4rem)] transition-all duration-300 overflow-x-hidden",
-              "ml-0",
-              sidebarOpen ? "lg:ml-64" : "lg:ml-0"
-            )}>
-              <Switch>
-                <Route path="/system-admin" component={SystemAdmin} />
-                <Route path="/user-management" component={UserManagement} />
-                <Route component={NotFound} />
-              </Switch>
-            </div>
-          </div>
-        </div>
-      </NotificationProvider>
-    );
-  }
-
-  // Regular client users get the new collapsible sidebar
   return (
     <NotificationProvider>
-      <SidebarProvider defaultOpen={true} storageKey="client-sidebar">
-        <div className="min-h-screen bg-gray-50 flex">
-          {/* Client Sidebar with collapsible icons */}
-          <ClientSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div className="flex h-screen bg-gray-50">
+        <ClientSidebar 
+          isOpen={sidebarOpen} 
+          onClose={() => setSidebarOpen(false)}
+          isCollapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        />
+        
+        {/* Main layout with responsive margin to avoid overlap */}
+        <div className={cn(
+          "flex-1 flex flex-col",
+          // Desktop: Dynamic margin based on sidebar collapsed state, Mobile: full width (sidebar is overlay)
+          sidebarCollapsed ? "lg:ml-16" : "lg:ml-64" // 16 = 64px for collapsed, 64 = 256px for expanded
+        )}>
+          {/* Global Header */}
+          <GlobalHeader 
+            onMenuToggle={handleMenuToggle} 
+            sidebarOpen={sidebarOpen}
+            sidebarCollapsed={sidebarCollapsed}
+            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          />
           
           {/* Main Content */}
-          <SidebarInset className="flex-1">
-            {/* Global Header */}
-            <GlobalHeader onMenuToggle={() => setSidebarOpen(!sidebarOpen)} sidebarOpen={sidebarOpen} />
-            
-            <div className="pt-16 min-h-[calc(100vh-4rem)]">
+          <div className="flex-1 min-h-[calc(100vh-4rem)] overflow-x-hidden">
+            <div className="w-full p-4">
               <Switch>
                 <Route path="/" component={DailyFocusPage} />
                 <Route path="/daily-focus" component={DailyFocusPage} />
@@ -153,6 +137,8 @@ function Router() {
                 <Route path="/network" component={NetworkVisualization} />
                 <Route path="/pricing" component={PricingPage} />
                 <Route path="/organization-settings" component={OrganizationSettings} />
+                <Route path="/system-admin" component={SystemAdmin} />
+                <Route path="/user-management" component={UserManagement} />
                 <Route path="/client-users" component={ClientUserManagement} />
                 <Route path="/role-management" component={ClientRoleManagement} />
                 <Route path="/notification-settings" component={NotificationSettings} />
@@ -160,9 +146,9 @@ function Router() {
                 <Route component={NotFound} />
               </Switch>
             </div>
-          </SidebarInset>
+          </div>
         </div>
-      </SidebarProvider>
+      </div>
     </NotificationProvider>
   );
 }
