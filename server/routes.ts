@@ -3619,6 +3619,168 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Organization user management endpoints for client users
+  app.get("/api/organization/users", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      if (!user.organizationId) {
+        return res.status(400).json({ error: "User not associated with an organization" });
+      }
+
+      // Only organization owners can access this endpoint
+      const organization = await db.select().from(organizations).where(eq(organizations.id, user.organizationId)).limit(1);
+      if (organization.length === 0) {
+        return res.status(404).json({ error: "Organization not found" });
+      }
+
+      const isOwner = organization[0].ownerId === user.id || user.role === "admin" || user.isSystemOwner;
+      if (!isOwner) {
+        return res.status(403).json({ error: "Access denied. Only organization owners can manage users." });
+      }
+
+      // Get all users in the organization
+      const orgUsers = await db.select({
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        role: users.role,
+        isActive: users.isActive,
+        organizationId: users.organizationId,
+        createdAt: users.createdAt
+      }).from(users).where(eq(users.organizationId, user.organizationId));
+
+      res.json(orgUsers);
+    } catch (error) {
+      console.error("Error fetching organization users:", error);
+      res.status(500).json({ error: "Failed to fetch organization users" });
+    }
+  });
+
+  app.post("/api/organization/invite", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { email } = req.body;
+
+      if (!user.organizationId) {
+        return res.status(400).json({ error: "User not associated with an organization" });
+      }
+
+      // Only organization owners can invite users
+      const organization = await db.select().from(organizations).where(eq(organizations.id, user.organizationId)).limit(1);
+      if (organization.length === 0) {
+        return res.status(404).json({ error: "Organization not found" });
+      }
+
+      const isOwner = organization[0].ownerId === user.id || user.role === "admin" || user.isSystemOwner;
+      if (!isOwner) {
+        return res.status(403).json({ error: "Access denied. Only organization owners can invite users." });
+      }
+
+      // Check if user already exists
+      const existingUser = await db.select().from(users).where(eq(users.email, email)).limit(1);
+      if (existingUser.length > 0) {
+        // If user exists but not in this organization, add them
+        if (existingUser[0].organizationId !== user.organizationId) {
+          await db.update(users)
+            .set({ organizationId: user.organizationId })
+            .where(eq(users.id, existingUser[0].id));
+          
+          res.json({ message: "User added to organization successfully" });
+        } else {
+          res.status(400).json({ error: "User already exists in this organization" });
+        }
+      } else {
+        // For now, we'll create a placeholder user that needs to complete registration
+        // In a real implementation, you'd send an invitation email
+        const [newUser] = await db.insert(users).values({
+          id: crypto.randomUUID(),
+          email,
+          passwordHash: "", // Empty until they complete registration
+          organizationId: user.organizationId,
+          role: "member",
+          isActive: false, // Inactive until they complete registration
+          createdAt: new Date().toISOString()
+        }).returning();
+
+        res.json({ message: "Invitation sent successfully", user: newUser });
+      }
+    } catch (error) {
+      console.error("Error inviting user:", error);
+      res.status(500).json({ error: "Failed to invite user" });
+    }
+  });
+
+  app.put("/api/organization/users/:userId/status", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { userId } = req.params;
+      const { isActive } = req.body;
+
+      if (!user.organizationId) {
+        return res.status(400).json({ error: "User not associated with an organization" });
+      }
+
+      // Only organization owners can update user status
+      const organization = await db.select().from(organizations).where(eq(organizations.id, user.organizationId)).limit(1);
+      if (organization.length === 0) {
+        return res.status(404).json({ error: "Organization not found" });
+      }
+
+      const isOwner = organization[0].ownerId === user.id || user.role === "admin" || user.isSystemOwner;
+      if (!isOwner) {
+        return res.status(403).json({ error: "Access denied. Only organization owners can update user status." });
+      }
+
+      // Update user status
+      await db.update(users)
+        .set({ isActive })
+        .where(and(eq(users.id, userId), eq(users.organizationId, user.organizationId)));
+
+      res.json({ message: "User status updated successfully" });
+    } catch (error) {
+      console.error("Error updating user status:", error);
+      res.status(500).json({ error: "Failed to update user status" });
+    }
+  });
+
+  app.delete("/api/organization/users/:userId", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { userId } = req.params;
+
+      if (!user.organizationId) {
+        return res.status(400).json({ error: "User not associated with an organization" });
+      }
+
+      // Only organization owners can remove users
+      const organization = await db.select().from(organizations).where(eq(organizations.id, user.organizationId)).limit(1);
+      if (organization.length === 0) {
+        return res.status(404).json({ error: "Organization not found" });
+      }
+
+      const isOwner = organization[0].ownerId === user.id || user.role === "admin" || user.isSystemOwner;
+      if (!isOwner) {
+        return res.status(403).json({ error: "Access denied. Only organization owners can remove users." });
+      }
+
+      // Don't allow removing the organization owner
+      if (userId === organization[0].ownerId) {
+        return res.status(400).json({ error: "Cannot remove organization owner" });
+      }
+
+      // Remove user from organization (set organizationId to null instead of deleting)
+      await db.update(users)
+        .set({ organizationId: null, isActive: false })
+        .where(and(eq(users.id, userId), eq(users.organizationId, user.organizationId)));
+
+      res.json({ message: "User removed from organization successfully" });
+    } catch (error) {
+      console.error("Error removing user:", error);
+      res.status(500).json({ error: "Failed to remove user" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

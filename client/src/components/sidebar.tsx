@@ -103,6 +103,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       active: location === "/organization-settings"
     });
     menuItems.push({
+      label: "Kelola Pengguna",
+      icon: Users,
+      path: "/client-users",
+      active: location === "/client-users"
+    });
+    menuItems.push({
       label: "Kelola Role",
       icon: Shield,
       path: "/role-management",

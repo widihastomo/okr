@@ -113,6 +113,15 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 07, 2025. Successfully implemented complete separation between client users and system/owner users:
+  * Created dedicated ClientUserManagement page for organization owners to manage users within their organization
+  * Updated routing with /client-users route for client user management and maintained /user-management for system routing
+  * Enhanced sidebar navigation with separate "Kelola Pengguna" and "Kelola Role" menus for organization owners
+  * Added comprehensive API endpoints: /api/organization/users (GET), /api/organization/invite (POST), /api/organization/users/:id/status (PUT), /api/organization/users/:id (DELETE)
+  * Fixed authorization logic in ClientRoleManagement to use useOrganization() hook instead of checking "organization_admin" role
+  * Implemented organization-scoped user management: invite users, activate/deactivate, remove from organization
+  * Clear separation: Organization owners manage users in their org, System owners manage entire platform via system admin
+  * Organization owners can now effectively manage their team members through dedicated user management interface
 - July 07, 2025. Fixed system owner login authentication issue by updating password hash compatibility:
   * Identified bcrypt version incompatibility - stored hash used $2a$ format while current library expected $2b$
   * Updated system owner (owner@system.com) password hash to use compatible $2b$ format
