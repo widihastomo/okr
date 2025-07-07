@@ -20,6 +20,7 @@ import { calculateObjectiveStatus } from "./objective-status-tracker";
 export interface IStorage {
   // Cycles
   getCycles(): Promise<Cycle[]>;
+  getCyclesByOrganization(organizationId: string): Promise<Cycle[]>;
   getCycle(id: string): Promise<Cycle | undefined>;
   createCycle(cycle: InsertCycle): Promise<Cycle>;
   updateCycle(id: string, cycle: Partial<InsertCycle>): Promise<Cycle | undefined>;
@@ -36,6 +37,7 @@ export interface IStorage {
   
   // Objectives
   getObjectives(): Promise<Objective[]>;
+  getObjectivesByOrganization(organizationId: string): Promise<Objective[]>;
   getObjective(id: string): Promise<Objective | undefined>;
   createObjective(objective: InsertObjective): Promise<Objective>;
   updateObjective(id: string, objective: Partial<InsertObjective>): Promise<Objective | undefined>;
@@ -66,6 +68,7 @@ export interface IStorage {
   // Teams
   getTeam(id: string): Promise<Team | undefined>;
   getTeams(): Promise<Team[]>;
+  getTeamsByOrganization(organizationId: string): Promise<Team[]>;
   createTeam(team: InsertTeam): Promise<Team>;
   updateTeam(id: string, team: Partial<InsertTeam>): Promise<Team | undefined>;
   deleteTeam(id: string): Promise<boolean>;
@@ -84,6 +87,7 @@ export interface IStorage {
   
   // Initiatives
   getInitiatives(): Promise<Initiative[]>;
+  getInitiativesByOrganization(organizationId: string): Promise<Initiative[]>;
   getInitiativesByKeyResultId(keyResultId: string): Promise<Initiative[]>;
   getInitiativesByObjectiveId(objectiveId: string): Promise<Initiative[]>;
   getInitiativeWithDetails(id: string): Promise<any>;
@@ -118,6 +122,7 @@ export interface IStorage {
   
   // Tasks
   getTasks(): Promise<Task[]>;
+  getTasksByOrganization(organizationId: string): Promise<Task[]>;
   getTask(id: string): Promise<Task | undefined>;
   createTask(task: InsertTask): Promise<Task>;
   updateTask(id: string, task: Partial<InsertTask>): Promise<Task | undefined>;
@@ -273,6 +278,10 @@ export class DatabaseStorage implements IStorage {
   async getTeams(): Promise<Team[]> {
     return await db.select().from(teams);
   }
+  
+  async getTeamsByOrganization(organizationId: string): Promise<Team[]> {
+    return await db.select().from(teams).where(eq(teams.organizationId, organizationId));
+  }
 
   async createTeam(teamData: InsertTeam): Promise<Team> {
     const [team] = await db.insert(teams).values(teamData).returning();
@@ -362,6 +371,18 @@ export class DatabaseStorage implements IStorage {
   // Cycles
   async getCycles(): Promise<Cycle[]> {
     return await db.select().from(cycles);
+  }
+  
+  async getCyclesByOrganization(organizationId: string): Promise<Cycle[]> {
+    // Cycles don't have organizationId, so we need to get cycles that have objectives from this organization
+    const result = await db
+      .selectDistinct({ cycle: cycles })
+      .from(cycles)
+      .leftJoin(objectives, eq(objectives.cycleId, cycles.id))
+      .leftJoin(users, eq(users.id, objectives.ownerId))
+      .where(eq(users.organizationId, organizationId));
+    
+    return result.map(r => r.cycle).filter(Boolean) as Cycle[];
   }
 
   async getCycle(id: string): Promise<Cycle | undefined> {
@@ -545,6 +566,17 @@ export class DatabaseStorage implements IStorage {
 
   async getObjectives(): Promise<Objective[]> {
     return await db.select().from(objectives);
+  }
+  
+  async getObjectivesByOrganization(organizationId: string): Promise<Objective[]> {
+    // Join with users to filter by organization
+    const result = await db
+      .select({ objective: objectives })
+      .from(objectives)
+      .innerJoin(users, eq(users.id, objectives.ownerId))
+      .where(eq(users.organizationId, organizationId));
+    
+    return result.map(r => r.objective);
   }
 
   async getObjective(id: string): Promise<Objective | undefined> {
@@ -780,6 +812,17 @@ export class DatabaseStorage implements IStorage {
   async getInitiatives(): Promise<Initiative[]> {
     return await db.select().from(initiatives);
   }
+  
+  async getInitiativesByOrganization(organizationId: string): Promise<Initiative[]> {
+    // Join with users through createdBy to filter by organization
+    const result = await db
+      .select({ initiative: initiatives })
+      .from(initiatives)
+      .innerJoin(users, eq(users.id, initiatives.createdBy))
+      .where(eq(users.organizationId, organizationId));
+    
+    return result.map(r => r.initiative);
+  }
 
   async getAllInitiativeMembers(): Promise<InitiativeMember[]> {
     return await db.select().from(initiativeMembers);
@@ -887,6 +930,17 @@ export class DatabaseStorage implements IStorage {
   // Tasks for automatic progress calculation
   async getTasks(): Promise<Task[]> {
     return await db.select().from(tasks);
+  }
+  
+  async getTasksByOrganization(organizationId: string): Promise<Task[]> {
+    // Join with users through createdBy to filter by organization
+    const result = await db
+      .select({ task: tasks })
+      .from(tasks)
+      .innerJoin(users, eq(users.id, tasks.createdBy))
+      .where(eq(users.organizationId, organizationId));
+    
+    return result.map(r => r.task);
   }
 
   async getTasksByInitiativeId(initiativeId: string): Promise<Task[]> {

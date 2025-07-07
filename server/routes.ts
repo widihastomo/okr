@@ -44,9 +44,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Note: Auth routes are handled in authRoutes.ts
   // Cycles endpoints
-  app.get("/api/cycles", async (req, res) => {
+  app.get("/api/cycles", requireAuth, async (req, res) => {
     try {
-      const cycles = await storage.getCycles();
+      const currentUser = req.user as User;
+      
+      if (!currentUser.organizationId) {
+        return res.status(400).json({ message: "User not associated with an organization" });
+      }
+      
+      const cycles = await storage.getCyclesByOrganization(currentUser.organizationId);
       res.json(cycles);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch cycles" });
@@ -205,9 +211,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Objectives endpoints
-  app.get("/api/objectives", async (req, res) => {
+  app.get("/api/objectives", requireAuth, async (req, res) => {
     try {
-      const objectives = await storage.getObjectives();
+      const currentUser = req.user as User;
+      
+      if (!currentUser.organizationId) {
+        return res.status(400).json({ message: "User not associated with an organization" });
+      }
+      
+      const objectives = await storage.getObjectivesByOrganization(currentUser.organizationId);
       res.json(objectives);
     } catch (error) {
       console.error("Error fetching objectives:", error);
@@ -398,9 +410,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Team management endpoints
-  app.get('/api/teams', async (req, res) => {
+  app.get('/api/teams', requireAuth, async (req, res) => {
     try {
-      const teams = await storage.getTeams();
+      const currentUser = req.user as User;
+      
+      if (!currentUser.organizationId) {
+        return res.status(400).json({ message: "User not associated with an organization" });
+      }
+      
+      const teams = await storage.getTeamsByOrganization(currentUser.organizationId);
       // Include member data for each team
       const teamsWithMembers = await Promise.all(teams.map(async (team) => {
         const members = await storage.getTeamMembers(team.id);
@@ -1862,9 +1880,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Initiative/Project routes
-  app.get("/api/initiatives", async (req, res) => {
+  app.get("/api/initiatives", requireAuth, async (req, res) => {
     try {
-      const initiatives = await storage.getInitiatives();
+      const currentUser = req.user as User;
+      
+      if (!currentUser.organizationId) {
+        return res.status(400).json({ message: "User not associated with an organization" });
+      }
+      
+      const initiatives = await storage.getInitiativesByOrganization(currentUser.organizationId);
       res.json(initiatives);
     } catch (error) {
       console.error("Error fetching initiatives:", error);
@@ -2171,9 +2195,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
   // Get all tasks
-  app.get("/api/tasks", async (req, res) => {
+  app.get("/api/tasks", requireAuth, async (req, res) => {
     try {
-      const allTasks = await storage.getTasks();
+      const currentUser = req.user as User;
+      
+      if (!currentUser.organizationId) {
+        return res.status(400).json({ message: "User not associated with an organization" });
+      }
+      
+      const allTasks = await storage.getTasksByOrganization(currentUser.organizationId);
       res.json(allTasks);
     } catch (error) {
       console.error("Error fetching tasks:", error);

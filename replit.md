@@ -113,13 +113,20 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
-- January 12, 2025. Fixed critical security vulnerability - Cross-tenant data leakage in /api/users endpoint:
-  * Previously `/api/users` endpoint was not protected by authentication and returned ALL users across all organizations
-  * Added `requireAuth` middleware to protect the endpoint
-  * Now properly filters users by current user's organizationId using new `getUsersByOrganization` method
-  * Updated IStorage interface and DatabaseStorage implementation with organization-based filtering
-  * This ensures complete multi-tenant data isolation at API level, preventing unauthorized access to other organizations' user data
-  * Security fix aligns with existing PostgreSQL RLS (Row Level Security) for defense in depth
+- January 12, 2025. COMPREHENSIVE SECURITY OVERHAUL - Fixed cross-tenant data leakage across ALL major endpoints:
+  * Previously multiple endpoints (`/api/users`, `/api/objectives`, `/api/cycles`, `/api/initiatives`, `/api/tasks`, `/api/teams`) exposed data from all organizations
+  * Added `requireAuth` middleware to ALL data endpoints preventing unauthorized access
+  * Implemented organization-filtered data retrieval methods with proper join-based filtering for tables without direct `organizationId` columns:
+    - `getUsersByOrganization` - direct filter on users.organizationId
+    - `getTeamsByOrganization` - direct filter on teams.organizationId  
+    - `getObjectivesByOrganization` - joins with users table through ownerId
+    - `getCyclesByOrganization` - joins through objectives and users to find organization-specific cycles
+    - `getInitiativesByOrganization` - joins with users table through createdBy
+    - `getTasksByOrganization` - joins with users table through createdBy
+  * Updated IStorage interface and DatabaseStorage implementation with comprehensive organization-based filtering
+  * Enhanced multi-tenant isolation architecture with complete API-level data protection across entire application
+  * Security fixes complement existing PostgreSQL RLS (Row Level Security) for defense in depth
+  * CRITICAL: Some tables (objectives, cycles, initiatives, tasks) don't have direct organizationId columns - implemented join-based filtering through users table
 - July 07, 2025. Successfully implemented unified sidebar system with role-based menu separation and consistent styling:
   * System owners automatically redirected to /system-admin dashboard on login instead of Daily Focus
   * Created conditional sidebar with different menu items for system owners vs regular users
