@@ -443,16 +443,30 @@ export default function ClientRegistration() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Jabatan</FormLabel>
-                            <FormControl>
-                              <div className="relative">
-                                <Briefcase className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                                <Input 
-                                  placeholder="CEO, Manager, dll" 
-                                  {...field}
-                                  className="pl-10"
-                                />
-                              </div>
-                            </FormControl>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Pilih jabatan Anda" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="CEO">CEO</SelectItem>
+                                <SelectItem value="CTO">CTO</SelectItem>
+                                <SelectItem value="CFO">CFO</SelectItem>
+                                <SelectItem value="COO">COO</SelectItem>
+                                <SelectItem value="Direktur">Direktur</SelectItem>
+                                <SelectItem value="General Manager">General Manager</SelectItem>
+                                <SelectItem value="Manager">Manager</SelectItem>
+                                <SelectItem value="Senior Manager">Senior Manager</SelectItem>
+                                <SelectItem value="Assistant Manager">Assistant Manager</SelectItem>
+                                <SelectItem value="Supervisor">Supervisor</SelectItem>
+                                <SelectItem value="Team Lead">Team Lead</SelectItem>
+                                <SelectItem value="Senior Staff">Senior Staff</SelectItem>
+                                <SelectItem value="Staff">Staff</SelectItem>
+                                <SelectItem value="Admin">Admin</SelectItem>
+                                <SelectItem value="Lainnya">Lainnya</SelectItem>
+                              </SelectContent>
+                            </Select>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -464,16 +478,31 @@ export default function ClientRegistration() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Departemen</FormLabel>
-                            <FormControl>
-                              <div className="relative">
-                                <Users className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                                <Input 
-                                  placeholder="IT, HR, Sales, dll" 
-                                  {...field}
-                                  className="pl-10"
-                                />
-                              </div>
-                            </FormControl>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Pilih departemen Anda" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="Teknologi Informasi">Teknologi Informasi</SelectItem>
+                                <SelectItem value="Human Resources">Human Resources</SelectItem>
+                                <SelectItem value="Sales & Marketing">Sales & Marketing</SelectItem>
+                                <SelectItem value="Finance & Accounting">Finance & Accounting</SelectItem>
+                                <SelectItem value="Operations">Operations</SelectItem>
+                                <SelectItem value="Research & Development">Research & Development</SelectItem>
+                                <SelectItem value="Customer Service">Customer Service</SelectItem>
+                                <SelectItem value="Quality Assurance">Quality Assurance</SelectItem>
+                                <SelectItem value="Supply Chain">Supply Chain</SelectItem>
+                                <SelectItem value="Legal">Legal</SelectItem>
+                                <SelectItem value="Procurement">Procurement</SelectItem>
+                                <SelectItem value="Business Development">Business Development</SelectItem>
+                                <SelectItem value="Product Management">Product Management</SelectItem>
+                                <SelectItem value="Project Management">Project Management</SelectItem>
+                                <SelectItem value="General Management">General Management</SelectItem>
+                                <SelectItem value="Lainnya">Lainnya</SelectItem>
+                              </SelectContent>
+                            </Select>
                             <FormMessage />
                           </FormItem>
                         )}
