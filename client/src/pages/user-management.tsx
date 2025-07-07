@@ -34,6 +34,324 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { UserWithPermissions, Permission, RoleTemplate } from "../../../shared/schema";
 
+// Role Edit Form Component
+interface RoleEditFormProps {
+  user: UserWithPermissions;
+  onSave: (data: { role: string; permissions: Permission[] }) => void;
+  onCancel: () => void;
+  isLoading: boolean;
+}
+
+function RoleEditForm({ user, onSave, onCancel, isLoading }: RoleEditFormProps) {
+  const [selectedRole, setSelectedRole] = useState(user.role);
+  const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>(
+    user.permissions?.map(p => p.permission as Permission) || []
+  );
+
+  const allPermissions: Permission[] = [
+    'manage_users',
+    'invite_users', 
+    'view_users',
+    'deactivate_users',
+    'create_objectives',
+    'edit_objectives',
+    'delete_objectives', 
+    'view_objectives',
+    'create_initiatives',
+    'edit_initiatives',
+    'delete_initiatives',
+    'view_initiatives',
+    'view_analytics',
+    'export_data',
+    'manage_organization',
+    'manage_billing',
+  ];
+
+  const handlePermissionToggle = (permission: Permission) => {
+    setSelectedPermissions(prev => 
+      prev.includes(permission)
+        ? prev.filter(p => p !== permission)
+        : [...prev, permission]
+    );
+  };
+
+  const handleSave = () => {
+    onSave({
+      role: selectedRole,
+      permissions: selectedPermissions,
+    });
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <Label htmlFor="role">Role</Label>
+        <Select value={selectedRole} onValueChange={setSelectedRole}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="organization_admin">Administrator</SelectItem>
+            <SelectItem value="manager">Manager</SelectItem>
+            <SelectItem value="member">Member</SelectItem>
+            <SelectItem value="viewer">Viewer</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <Label className="mb-3 block">Permission</Label>
+        <div className="space-y-2 max-h-60 overflow-y-auto border rounded-md p-3">
+          {allPermissions.map((permission) => (
+            <div key={permission} className="flex items-center space-x-2">
+              <Checkbox
+                id={permission}
+                checked={selectedPermissions.includes(permission)}
+                onCheckedChange={() => handlePermissionToggle(permission)}
+              />
+              <label
+                htmlFor={permission}
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                {permission.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <DialogFooter>
+        <Button variant="outline" onClick={onCancel} disabled={isLoading}>
+          Batal
+        </Button>
+        <Button 
+          onClick={handleSave}
+          disabled={isLoading}
+          className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+        >
+          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Simpan
+        </Button>
+      </DialogFooter>
+    </div>
+  );
+}
+
+// Role Template Form Component
+interface RoleTemplateFormProps {
+  onSave: (data: { name: string; description: string; permissions: Permission[] }) => void;
+  onCancel: () => void;
+  isLoading: boolean;
+}
+
+function RoleTemplateForm({ onSave, onCancel, isLoading }: RoleTemplateFormProps) {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>([]);
+
+  const allPermissions: Permission[] = [
+    'manage_users',
+    'invite_users', 
+    'view_users',
+    'deactivate_users',
+    'create_objectives',
+    'edit_objectives',
+    'delete_objectives', 
+    'view_objectives',
+    'create_initiatives',
+    'edit_initiatives',
+    'delete_initiatives',
+    'view_initiatives',
+    'view_analytics',
+    'export_data',
+    'manage_organization',
+    'manage_billing',
+  ];
+
+  const handlePermissionToggle = (permission: Permission) => {
+    setSelectedPermissions(prev => 
+      prev.includes(permission)
+        ? prev.filter(p => p !== permission)
+        : [...prev, permission]
+    );
+  };
+
+  const handleSave = () => {
+    onSave({
+      name,
+      description,
+      permissions: selectedPermissions,
+    });
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <Label htmlFor="template-name">Nama Template</Label>
+        <Input
+          id="template-name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Contoh: Sales Manager"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="template-description">Deskripsi</Label>
+        <Textarea
+          id="template-description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Deskripsi role dan tanggung jawab"
+          rows={3}
+        />
+      </div>
+
+      <div>
+        <Label className="mb-3 block">Permission</Label>
+        <div className="space-y-2 max-h-60 overflow-y-auto border rounded-md p-3">
+          {allPermissions.map((permission) => (
+            <div key={permission} className="flex items-center space-x-2">
+              <Checkbox
+                id={`template-${permission}`}
+                checked={selectedPermissions.includes(permission)}
+                onCheckedChange={() => handlePermissionToggle(permission)}
+              />
+              <label
+                htmlFor={`template-${permission}`}
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                {permission.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <DialogFooter>
+        <Button variant="outline" onClick={onCancel} disabled={isLoading}>
+          Batal
+        </Button>
+        <Button 
+          onClick={handleSave}
+          disabled={isLoading || !name.trim()}
+          className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+        >
+          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Buat Template
+        </Button>
+      </DialogFooter>
+    </div>
+  );
+}
+
+// Bulk Role Assign Form Component
+interface BulkRoleAssignFormProps {
+  userCount: number;
+  onSave: (data: { role: string; permissions: Permission[] }) => void;
+  onCancel: () => void;
+  isLoading: boolean;
+}
+
+function BulkRoleAssignForm({ userCount, onSave, onCancel, isLoading }: BulkRoleAssignFormProps) {
+  const [selectedRole, setSelectedRole] = useState("");
+  const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>([]);
+
+  const allPermissions: Permission[] = [
+    'manage_users',
+    'invite_users', 
+    'view_users',
+    'deactivate_users',
+    'create_objectives',
+    'edit_objectives',
+    'delete_objectives', 
+    'view_objectives',
+    'create_initiatives',
+    'edit_initiatives',
+    'delete_initiatives',
+    'view_initiatives',
+    'view_analytics',
+    'export_data',
+    'manage_organization',
+    'manage_billing',
+  ];
+
+  const handlePermissionToggle = (permission: Permission) => {
+    setSelectedPermissions(prev => 
+      prev.includes(permission)
+        ? prev.filter(p => p !== permission)
+        : [...prev, permission]
+    );
+  };
+
+  const handleSave = () => {
+    onSave({
+      role: selectedRole,
+      permissions: selectedPermissions,
+    });
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="p-3 bg-blue-50 rounded-lg">
+        <p className="text-sm text-blue-700">
+          Role dan permission akan diterapkan ke {userCount} pengguna terpilih
+        </p>
+      </div>
+
+      <div>
+        <Label htmlFor="bulk-role">Role</Label>
+        <Select value={selectedRole} onValueChange={setSelectedRole}>
+          <SelectTrigger>
+            <SelectValue placeholder="Pilih role" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="organization_admin">Administrator</SelectItem>
+            <SelectItem value="manager">Manager</SelectItem>
+            <SelectItem value="member">Member</SelectItem>
+            <SelectItem value="viewer">Viewer</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <Label className="mb-3 block">Permission</Label>
+        <div className="space-y-2 max-h-60 overflow-y-auto border rounded-md p-3">
+          {allPermissions.map((permission) => (
+            <div key={permission} className="flex items-center space-x-2">
+              <Checkbox
+                id={`bulk-${permission}`}
+                checked={selectedPermissions.includes(permission)}
+                onCheckedChange={() => handlePermissionToggle(permission)}
+              />
+              <label
+                htmlFor={`bulk-${permission}`}
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                {permission.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <DialogFooter>
+        <Button variant="outline" onClick={onCancel} disabled={isLoading}>
+          Batal
+        </Button>
+        <Button 
+          onClick={handleSave}
+          disabled={isLoading || !selectedRole}
+          className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+        >
+          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Terapkan ke {userCount} Pengguna
+        </Button>
+      </DialogFooter>
+    </div>
+  );
+}
+
 export default function UserManagement() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -44,6 +362,9 @@ export default function UserManagement() {
   const [selectedUser, setSelectedUser] = useState<UserWithPermissions | null>(null);
   const [showUserModal, setShowUserModal] = useState(false);
   const [showRoleModal, setShowRoleModal] = useState(false);
+  const [showRoleTemplateModal, setShowRoleTemplateModal] = useState(false);
+  const [showBulkAssignModal, setShowBulkAssignModal] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
 
   // Fetch users with permissions
   const { data: users = [], isLoading: loadingUsers } = useQuery<UserWithPermissions[]>({
@@ -119,6 +440,56 @@ export default function UserManagement() {
     },
   });
 
+  // Create role template mutation
+  const createRoleTemplateMutation = useMutation({
+    mutationFn: async (templateData: { name: string; description: string; permissions: Permission[] }) => {
+      const response = await apiRequest("POST", "/api/role-templates", templateData);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/role-templates"] });
+      toast({
+        title: "Berhasil",
+        description: "Template role berhasil dibuat",
+      });
+      setShowRoleTemplateModal(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: "Gagal membuat template role",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Bulk assign role mutation
+  const bulkAssignRoleMutation = useMutation({
+    mutationFn: async ({ userIds, role, permissions }: { userIds: string[]; role: string; permissions: Permission[] }) => {
+      await Promise.all(
+        userIds.map(userId =>
+          apiRequest("PUT", `/api/users/${userId}/role`, { role, permissions })
+        )
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({
+        title: "Berhasil",
+        description: `Role berhasil ditetapkan untuk ${selectedUsers.length} pengguna`,
+      });
+      setShowBulkAssignModal(false);
+      setSelectedUsers([]);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: "Gagal menetapkan role secara massal",
+        variant: "destructive",
+      });
+    },
+  });
+
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case "organization_admin":
@@ -157,6 +528,30 @@ export default function UserManagement() {
     });
   };
 
+  const handleCreateRoleTemplate = (templateData: { name: string; description: string; permissions: Permission[] }) => {
+    createRoleTemplateMutation.mutate(templateData);
+  };
+
+  const handleBulkAssignRole = (roleData: { role: string; permissions: Permission[] }) => {
+    bulkAssignRoleMutation.mutate({
+      userIds: selectedUsers,
+      role: roleData.role,
+      permissions: roleData.permissions,
+    });
+  };
+
+  const handleUserSelection = (userId: string, checked: boolean) => {
+    setSelectedUsers(prev => 
+      checked 
+        ? [...prev, userId]
+        : prev.filter(id => id !== userId)
+    );
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    setSelectedUsers(checked ? filteredUsers.map(u => u.id) : []);
+  };
+
   if (loadingUsers) {
     return (
       <div className="h-screen flex items-center justify-center">
@@ -171,9 +566,29 @@ export default function UserManagement() {
   return (
     <div className="container mx-auto py-8 px-4 max-w-7xl">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Manajemen Pengguna</h1>
-        <p className="text-gray-600">Kelola pengguna, role, dan permission di seluruh sistem</p>
+      <div className="mb-8 flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">Manajemen Pengguna</h1>
+          <p className="text-gray-600">Kelola pengguna, role, dan permission di seluruh sistem</p>
+        </div>
+        <div className="flex gap-3">
+          <Button
+            variant="outline"
+            onClick={() => setShowRoleTemplateModal(true)}
+          >
+            <Settings className="h-4 w-4 mr-2" />
+            Template Role
+          </Button>
+          {selectedUsers.length > 0 && (
+            <Button
+              onClick={() => setShowBulkAssignModal(true)}
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+            >
+              <UserPlus className="h-4 w-4 mr-2" />
+              Atur Role ({selectedUsers.length})
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -288,13 +703,46 @@ export default function UserManagement() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Bulk Actions Header */}
+          {filteredUsers.length > 0 && (
+            <div className="flex items-center justify-between mb-4 p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <Checkbox
+                  checked={selectedUsers.length === filteredUsers.length}
+                  onCheckedChange={handleSelectAll}
+                />
+                <span className="text-sm font-medium">
+                  {selectedUsers.length > 0 
+                    ? `${selectedUsers.length} pengguna dipilih`
+                    : "Pilih semua pengguna"
+                  }
+                </span>
+              </div>
+              {selectedUsers.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedUsers([])}
+                >
+                  Batal Pilih
+                </Button>
+              )}
+            </div>
+          )}
+
           <div className="space-y-4">
             {filteredUsers.map((user) => (
               <div
                 key={user.id}
-                className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
+                className={`flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors ${
+                  selectedUsers.includes(user.id) ? 'bg-blue-50 border-blue-200' : ''
+                }`}
               >
                 <div className="flex items-center space-x-4">
+                  <Checkbox
+                    checked={selectedUsers.includes(user.id)}
+                    onCheckedChange={(checked) => handleUserSelection(user.id, checked as boolean)}
+                  />
                   <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                     <span className="text-blue-700 font-medium">
                       {user.firstName?.[0] || user.email[0].toUpperCase()}
@@ -474,109 +922,44 @@ export default function UserManagement() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Role Template Modal */}
+      <Dialog open={showRoleTemplateModal} onOpenChange={setShowRoleTemplateModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Buat Template Role</DialogTitle>
+            <DialogDescription>
+              Buat template role dengan permission yang dapat digunakan untuk multiple pengguna
+            </DialogDescription>
+          </DialogHeader>
+          
+          <RoleTemplateForm 
+            onSave={handleCreateRoleTemplate}
+            onCancel={() => setShowRoleTemplateModal(false)}
+            isLoading={createRoleTemplateMutation.isPending}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Assign Role Modal */}
+      <Dialog open={showBulkAssignModal} onOpenChange={setShowBulkAssignModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Atur Role Massal</DialogTitle>
+            <DialogDescription>
+              Tetapkan role dan permission untuk {selectedUsers.length} pengguna terpilih
+            </DialogDescription>
+          </DialogHeader>
+          
+          <BulkRoleAssignForm 
+            userCount={selectedUsers.length}
+            onSave={handleBulkAssignRole}
+            onCancel={() => setShowBulkAssignModal(false)}
+            isLoading={bulkAssignRoleMutation.isPending}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
-// Role Edit Form Component
-interface RoleEditFormProps {
-  user: UserWithPermissions;
-  onSave: (data: { role: string; permissions: Permission[] }) => void;
-  onCancel: () => void;
-  isLoading: boolean;
-}
-
-function RoleEditForm({ user, onSave, onCancel, isLoading }: RoleEditFormProps) {
-  const [selectedRole, setSelectedRole] = useState(user.role);
-  const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>(
-    user.permissions?.map(p => p.permission as Permission) || []
-  );
-
-  const allPermissions: Permission[] = [
-    'manage_users',
-    'invite_users', 
-    'view_users',
-    'deactivate_users',
-    'create_objectives',
-    'edit_objectives',
-    'delete_objectives', 
-    'view_objectives',
-    'create_initiatives',
-    'edit_initiatives',
-    'delete_initiatives',
-    'view_initiatives',
-    'view_analytics',
-    'export_data',
-    'manage_organization',
-    'manage_billing',
-  ];
-
-  const handlePermissionToggle = (permission: Permission) => {
-    setSelectedPermissions(prev => 
-      prev.includes(permission)
-        ? prev.filter(p => p !== permission)
-        : [...prev, permission]
-    );
-  };
-
-  const handleSave = () => {
-    onSave({
-      role: selectedRole,
-      permissions: selectedPermissions,
-    });
-  };
-
-  return (
-    <div className="space-y-4">
-      <div>
-        <Label htmlFor="role">Role</Label>
-        <Select value={selectedRole} onValueChange={setSelectedRole}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="organization_admin">Administrator</SelectItem>
-            <SelectItem value="manager">Manager</SelectItem>
-            <SelectItem value="member">Member</SelectItem>
-            <SelectItem value="viewer">Viewer</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div>
-        <Label className="mb-3 block">Permission</Label>
-        <div className="space-y-2 max-h-60 overflow-y-auto border rounded-md p-3">
-          {allPermissions.map((permission) => (
-            <div key={permission} className="flex items-center space-x-2">
-              <Checkbox
-                id={permission}
-                checked={selectedPermissions.includes(permission)}
-                onCheckedChange={() => handlePermissionToggle(permission)}
-              />
-              <label
-                htmlFor={permission}
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                {permission.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-              </label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <DialogFooter>
-        <Button variant="outline" onClick={onCancel} disabled={isLoading}>
-          Batal
-        </Button>
-        <Button 
-          onClick={handleSave}
-          disabled={isLoading}
-          className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
-        >
-          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Simpan
-        </Button>
-      </DialogFooter>
-    </div>
-  );
-}
