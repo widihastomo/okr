@@ -1,7 +1,7 @@
 import { 
   cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives, tasks, taskComments,
   initiativeMembers, initiativeDocuments, initiativeNotes, initiativeSuccessMetrics, successMetricUpdates,
-  notifications, notificationPreferences,
+  notifications, notificationPreferences, userOnboardingProgress,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
   type CheckIn, type Initiative, type Task, type TaskComment, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
   type InitiativeNote, type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
@@ -9,7 +9,8 @@ import {
   type InsertCheckIn, type InsertInitiative, type InsertInitiativeMember, type InsertInitiativeDocument, type InsertTask,
   type InsertTaskComment, type InsertInitiativeNote, type OKRWithKeyResults, type CycleWithOKRs, type UpdateKeyResultProgress, type CreateOKRFromTemplate,
   type SuccessMetric, type InsertSuccessMetric, type SuccessMetricUpdate, type InsertSuccessMetricUpdate,
-  type Notification, type InsertNotification, type NotificationPreferences, type InsertNotificationPreferences
+  type Notification, type InsertNotification, type NotificationPreferences, type InsertNotificationPreferences,
+  type UserOnboardingProgress, type InsertUserOnboardingProgress, type UpdateOnboardingProgress
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, inArray, count } from "drizzle-orm";
@@ -155,6 +156,10 @@ export interface IStorage {
   updateOrganization(id: string, updates: any): Promise<any>;
   getOKRWithKeyResults(id: string): Promise<OKRWithKeyResults | undefined>;
   getOKRsWithFullHierarchy(cycleId?: string): Promise<any[]>;
+  
+  // Onboarding Progress
+  getUserOnboardingProgress(userId: string): Promise<UserOnboardingProgress | null>;
+  updateUserOnboardingProgress(userId: string, progress: UpdateOnboardingProgress): Promise<UserOnboardingProgress>;
 }
 
 // Helper function to calculate and update status automatically

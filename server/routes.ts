@@ -5,9 +5,9 @@ import {
   insertCycleSchema, insertTemplateSchema, insertObjectiveSchema, insertKeyResultSchema, 
   insertCheckInSchema, insertInitiativeSchema, insertInitiativeMemberSchema, insertInitiativeDocumentSchema, 
   insertTaskSchema, insertTaskCommentSchema, insertInitiativeNoteSchema, updateKeyResultProgressSchema, createOKRFromTemplateSchema,
-  insertSuccessMetricSchema, insertSuccessMetricUpdateSchema, insertDailyReflectionSchema,
+  insertSuccessMetricSchema, insertSuccessMetricUpdateSchema, insertDailyReflectionSchema, updateOnboardingProgressSchema,
   subscriptionPlans, organizations, organizationSubscriptions, users, dailyReflections,
-  type User, type SubscriptionPlan, type Organization, type OrganizationSubscription
+  type User, type SubscriptionPlan, type Organization, type OrganizationSubscription, type UserOnboardingProgress, type UpdateOnboardingProgress
 } from "@shared/schema";
 import { z } from "zod";
 import { setupEmailAuth } from "./authRoutes";
@@ -3856,6 +3856,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         message: "Terjadi kesalahan saat mendaftar. Silakan coba lagi." 
       });
+    }
+  });
+
+  // Onboarding Progress API Routes
+  app.get("/api/user/onboarding-progress", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const progress = await storage.getUserOnboardingProgress(currentUser.id);
+      res.json(progress);
+    } catch (error: any) {
+      console.error("Error fetching onboarding progress:", error);
+      res.status(500).json({ message: "Failed to fetch onboarding progress" });
+    }
+  });
+
+  app.put("/api/user/onboarding-progress", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const updateData = updateOnboardingProgressSchema.parse(req.body);
+      
+      const updatedProgress = await storage.updateUserOnboardingProgress(currentUser.id, updateData);
+      res.json(updatedProgress);
+    } catch (error: any) {
+      console.error("Error updating onboarding progress:", error);
+      res.status(500).json({ message: "Failed to update onboarding progress" });
     }
   });
 
