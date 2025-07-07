@@ -224,12 +224,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                     className={cn(
                       "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full text-left",
                       item.active
-                        ? isSystemOwner 
-                          ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-                          : "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
-                        : isSystemOwner
-                          ? "text-gray-300 hover:bg-gray-800 hover:text-white"
-                          : "text-gray-700 hover:bg-gray-100"
+                        ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
+                        : "text-gray-700 hover:bg-gray-100"
                     )}
                     onClick={onClose}
                   >
@@ -249,12 +245,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               className={cn(
                 "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full text-left",
                 location === "/profile"
-                  ? isSystemOwner 
-                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-                    : "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
-                  : isSystemOwner
-                    ? "text-gray-300 hover:bg-gray-800 hover:text-white"
-                    : "text-gray-700 hover:bg-gray-100"
+                  ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
+                  : "text-gray-700 hover:bg-gray-100"
               )}
               onClick={onClose}
             >
