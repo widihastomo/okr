@@ -79,6 +79,7 @@ function Router() {
     return (
       <Switch>
         <Route path="/landing" component={Landing} />
+        <Route path="/client-registration" component={ClientRegistration} />
         <Route component={Login} />
       </Switch>
     );
