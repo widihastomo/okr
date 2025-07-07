@@ -28,6 +28,15 @@ import {
 import { db } from "./db";
 import { eq, and, desc, inArray } from "drizzle-orm";
 
+// System Owner middleware to protect admin endpoints
+const isSystemOwner = (req: any, res: any, next: any) => {
+  const user = req.user as User;
+  if (!user?.isSystemOwner) {
+    return res.status(403).json({ message: "Access denied. System owner access required." });
+  }
+  next();
+};
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
   setupEmailAuth(app);
@@ -2984,7 +2993,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // SaaS Subscription Routes
   
-  // Get all subscription plans
+  // Get all subscription plans (public endpoint - only active plans)
   app.get("/api/subscription-plans", async (req, res) => {
     try {
       const { db } = await import("./db");
@@ -2994,6 +3003,136 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching subscription plans:", error);
       res.status(500).json({ message: "Failed to fetch subscription plans" });
+    }
+  });
+
+  // Admin API - Get all subscription plans (including inactive)
+  app.get("/api/admin/subscription-plans", requireAuth, isSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const plans = await db.select().from(subscriptionPlans).orderBy(subscriptionPlans.createdAt);
+      res.json(plans);
+    } catch (error) {
+      console.error("Error fetching admin subscription plans:", error);
+      res.status(500).json({ message: "Failed to fetch subscription plans" });
+    }
+  });
+
+  // Admin API - Create new subscription plan
+  app.post("/api/admin/subscription-plans", requireAuth, isSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const insertSubscriptionPlanSchema = createInsertSchema(subscriptionPlans);
+      
+      const validatedData = insertSubscriptionPlanSchema.parse(req.body);
+      
+      const [newPlan] = await db.insert(subscriptionPlans)
+        .values({
+          ...validatedData,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .returning();
+      
+      res.status(201).json(newPlan);
+    } catch (error) {
+      console.error("Error creating subscription plan:", error);
+      res.status(500).json({ message: "Failed to create subscription plan" });
+    }
+  });
+
+  // Admin API - Update subscription plan
+  app.put("/api/admin/subscription-plans/:id", requireAuth, isSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      const planId = req.params.id;
+      
+      const updateSubscriptionPlanSchema = createInsertSchema(subscriptionPlans).partial();
+      const validatedData = updateSubscriptionPlanSchema.parse(req.body);
+      
+      const [updatedPlan] = await db.update(subscriptionPlans)
+        .set({
+          ...validatedData,
+          updatedAt: new Date(),
+        })
+        .where(eq(subscriptionPlans.id, planId))
+        .returning();
+      
+      if (!updatedPlan) {
+        return res.status(404).json({ message: "Subscription plan not found" });
+      }
+      
+      res.json(updatedPlan);
+    } catch (error) {
+      console.error("Error updating subscription plan:", error);
+      res.status(500).json({ message: "Failed to update subscription plan" });
+    }
+  });
+
+  // Admin API - Delete subscription plan
+  app.delete("/api/admin/subscription-plans/:id", requireAuth, isSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      const planId = req.params.id;
+      
+      // Check if any organizations are using this plan
+      const { organizationSubscriptions } = await import("@shared/schema");
+      const [activeSubscription] = await db.select()
+        .from(organizationSubscriptions)
+        .where(eq(organizationSubscriptions.planId, planId))
+        .limit(1);
+      
+      if (activeSubscription) {
+        return res.status(400).json({ 
+          message: "Cannot delete subscription plan that is in use by organizations" 
+        });
+      }
+      
+      const [deletedPlan] = await db.delete(subscriptionPlans)
+        .where(eq(subscriptionPlans.id, planId))
+        .returning();
+      
+      if (!deletedPlan) {
+        return res.status(404).json({ message: "Subscription plan not found" });
+      }
+      
+      res.json({ message: "Subscription plan deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting subscription plan:", error);
+      res.status(500).json({ message: "Failed to delete subscription plan" });
+    }
+  });
+
+  // Admin API - Toggle subscription plan status
+  app.patch("/api/admin/subscription-plans/:id/toggle-status", requireAuth, isSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      const planId = req.params.id;
+      
+      // Get current plan
+      const [currentPlan] = await db.select()
+        .from(subscriptionPlans)
+        .where(eq(subscriptionPlans.id, planId));
+      
+      if (!currentPlan) {
+        return res.status(404).json({ message: "Subscription plan not found" });
+      }
+      
+      const [updatedPlan] = await db.update(subscriptionPlans)
+        .set({
+          isActive: !currentPlan.isActive,
+          updatedAt: new Date(),
+        })
+        .where(eq(subscriptionPlans.id, planId))
+        .returning();
+      
+      res.json(updatedPlan);
+    } catch (error) {
+      console.error("Error toggling subscription plan status:", error);
+      res.status(500).json({ message: "Failed to toggle subscription plan status" });
     }
   });
 

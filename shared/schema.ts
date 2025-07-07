@@ -586,6 +586,12 @@ export type User = typeof users.$inferSelect;
 export type Team = typeof teams.$inferSelect;
 export type TeamMember = typeof teamMembers.$inferSelect;
 
+// SaaS Types
+export type SubscriptionPlan = typeof subscriptionPlans.$inferSelect;
+export type InsertSubscriptionPlan = typeof subscriptionPlans.$inferInsert;
+export type Organization = typeof organizations.$inferSelect;
+export type OrganizationSubscription = typeof organizationSubscriptions.$inferSelect;
+
 // Gamification Primary Types
 export type Achievement = typeof achievements.$inferSelect;
 export type UserAchievement = typeof userAchievements.$inferSelect;

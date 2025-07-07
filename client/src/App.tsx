@@ -35,6 +35,7 @@ import SystemAdmin from "@/pages/system-admin";
 import ClientUserManagement from "@/pages/client-user-management";
 import NotificationSettings from "@/pages/notification-settings";
 import ClientRegistration from "@/pages/client-registration";
+import SubscriptionPackageManagement from "@/pages/subscription-package-management";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -147,6 +148,10 @@ function Router() {
                 component={NotificationSettings}
               />
               <Route path="/register" component={ClientRegistration} />
+              <Route 
+                path="/subscription-packages" 
+                component={SubscriptionPackageManagement} 
+              />
               <Route component={NotFound} />
             </Switch>
           </div>

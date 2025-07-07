@@ -10,7 +10,8 @@ import {
   Shield,
   Bell,
   LogOut,
-  Menu
+  Menu,
+  Package
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -40,10 +41,10 @@ export default function SystemAdminSidebar({ isOpen, onClose }: SystemAdminSideb
     },
 
     {
-      label: "Kelola Subscription",
-      icon: CreditCard,
-      path: "/system-admin/subscriptions",
-      active: location === "/system-admin/subscriptions"
+      label: "Kelola Paket",
+      icon: Package,
+      path: "/subscription-packages",
+      active: location === "/subscription-packages"
     },
     {
       label: "Pengaturan Sistem",
