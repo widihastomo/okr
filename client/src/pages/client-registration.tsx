@@ -111,7 +111,10 @@ export default function ClientRegistration() {
     form.setValue("organizationName", value);
   };
 
-  const nextStep = async () => {
+  const nextStep = async (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent form submission
+    e.stopPropagation(); // Stop event bubbling
+    
     let fieldsToValidate: string[] = [];
     
     if (currentStep === 1) {
