@@ -32,6 +32,7 @@ import PricingPage from "@/pages/pricing";
 import OrganizationSettings from "@/pages/organization-settings";
 import SystemAdmin from "@/pages/system-admin";
 import UserManagement from "@/pages/user-management";
+import ClientRoleManagement from "@/pages/client-role-management";
 import NotificationSettings from "@/pages/notification-settings";
 
 
@@ -111,6 +112,7 @@ function Router() {
               <Route path="/organization-settings" component={OrganizationSettings} />
               <Route path="/system-admin" component={SystemAdmin} />
               <Route path="/user-management" component={UserManagement} />
+              <Route path="/role-management" component={ClientRoleManagement} />
               <Route path="/notification-settings" component={NotificationSettings} />
               <Route component={NotFound} />
             </Switch>

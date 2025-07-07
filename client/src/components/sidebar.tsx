@@ -10,6 +10,7 @@ import {
   BarChart3,
   User,
   Settings,
+  Shield,
   X,
   Trophy,
   Calendar,
@@ -100,6 +101,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       icon: Settings,
       path: "/organization-settings",
       active: location === "/organization-settings"
+    });
+    menuItems.push({
+      label: "Kelola Role",
+      icon: Shield,
+      path: "/role-management",
+      active: location === "/role-management"
     });
   }
 
