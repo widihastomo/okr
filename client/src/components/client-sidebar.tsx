@@ -234,7 +234,12 @@ export default function Sidebar({
                           ? "lg:px-3 lg:py-2 lg:justify-center px-3 py-2 space-x-3"
                           : "px-3 py-2 space-x-3",
                       )}
-                      onClick={onClose}
+                      onClick={() => {
+                        // Only close sidebar on mobile, don't affect desktop collapsed state
+                        if (window.innerWidth < 1024) {
+                          onClose?.();
+                        }
+                      }}
                     >
                       <item.icon className="flex-shrink-0 w-5 h-5" />
                       {/* Desktop: show label only when not collapsed, Mobile: always show label */}
@@ -288,7 +293,12 @@ export default function Sidebar({
                             ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
                             : "text-gray-700 hover:bg-gray-100",
                         )}
-                        onClick={onClose}
+                        onClick={() => {
+                          // Only close sidebar on mobile, don't affect desktop collapsed state
+                          if (window.innerWidth < 1024) {
+                            onClose?.();
+                          }
+                        }}
                       >
                         <User className="w-5 h-5" />
                       </button>
@@ -311,7 +321,12 @@ export default function Sidebar({
                       ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
                       : "text-gray-700 hover:bg-gray-100",
                   )}
-                  onClick={onClose}
+                  onClick={() => {
+                    // Only close sidebar on mobile, don't affect desktop collapsed state
+                    if (window.innerWidth < 1024) {
+                      onClose?.();
+                    }
+                  }}
                 >
                   <User className="w-5 h-5" />
                   <span>Profile</span>
