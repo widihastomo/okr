@@ -157,6 +157,20 @@ export const userActivityLog = pgTable("user_activity_log", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// User Onboarding Progress for tracking interactive tour completion
+export const userOnboardingProgress = pgTable("user_onboarding_progress", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  completedTours: text("completed_tours").array().notNull().default([""]), // Array of tour IDs
+  currentTour: text("current_tour"), // Currently active tour
+  currentStepIndex: integer("current_step_index").default(0),
+  isFirstTimeUser: boolean("is_first_time_user").default(true),
+  welcomeWizardCompleted: boolean("welcome_wizard_completed").default(false),
+  lastTourStartedAt: timestamp("last_tour_started_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Teams table
 export const teams = pgTable("teams", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -953,3 +967,19 @@ export const clientRegistrationSchema = z.object({
 });
 
 export type ClientRegistrationData = z.infer<typeof clientRegistrationSchema>;
+
+// Onboarding Progress types
+export type UserOnboardingProgress = typeof userOnboardingProgress.$inferSelect;
+export const insertUserOnboardingProgressSchema = createInsertSchema(userOnboardingProgress);
+export type InsertUserOnboardingProgress = z.infer<typeof insertUserOnboardingProgressSchema>;
+
+// Onboarding progress update schema
+export const updateOnboardingProgressSchema = z.object({
+  completedTours: z.array(z.string()).default([]),
+  currentTour: z.string().optional(),
+  currentStepIndex: z.number().min(0).default(0),
+  isFirstTimeUser: z.boolean().default(true),
+  welcomeWizardCompleted: z.boolean().default(false),
+});
+
+export type UpdateOnboardingProgress = z.infer<typeof updateOnboardingProgressSchema>;
