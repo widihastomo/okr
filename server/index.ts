@@ -13,6 +13,7 @@ import { testDatabaseConnection } from "./db";
 import { validateEnvironment, getConfig } from "./config";
 import { setupRLS } from "./setup-rls";
 import { rlsMiddleware, rlsCleanupMiddleware } from "./rls-middleware";
+import { scheduleInitiativeDeadlineChecks } from "./initiative-deadline-checker";
 
 const app = express();
 
@@ -116,6 +117,9 @@ const config = getConfig();
   
   // Start automatic cycle status updates
   scheduleCycleStatusUpdates();
+  
+  // Start initiative deadline checking
+  scheduleInitiativeDeadlineChecks();
 
   app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

@@ -53,6 +53,22 @@ export default function NotificationSettings() {
       category: 'deadlines'
     },
     {
+      id: 'initiative_deadline',
+      title: 'Deadline Inisiatif Mendekat',
+      description: 'Dapatkan notifikasi 2 hari sebelum deadline inisiatif',
+      icon: <Calendar className="h-4 w-4" />,
+      enabled: true,
+      category: 'deadlines'
+    },
+    {
+      id: 'initiative_overdue',
+      title: 'Inisiatif Melewati Deadline',
+      description: 'Dapatkan notifikasi ketika inisiatif sudah melewati tanggal selesai yang ditentukan',
+      icon: <Calendar className="h-4 w-4" />,
+      enabled: true,
+      category: 'deadlines'
+    },
+    {
       id: 'objective_progress',
       title: 'Update Progress Objective',
       description: 'Dapatkan notifikasi ketika ada update progress pada objective yang Anda terlibat',

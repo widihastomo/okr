@@ -3403,6 +3403,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Temporary endpoint to manually test initiative deadline checking
+  app.post("/api/test/check-initiative-deadlines", requireAuth, async (req, res) => {
+    try {
+      const { checkInitiativeDeadlines } = await import("./initiative-deadline-checker");
+      await checkInitiativeDeadlines();
+      res.json({ message: "Initiative deadline check completed" });
+    } catch (error: any) {
+      console.error("Error checking initiative deadlines:", error);
+      res.status(500).json({ message: "Failed to check initiative deadlines" });
+    }
+  });
+
   app.delete("/api/notifications/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
