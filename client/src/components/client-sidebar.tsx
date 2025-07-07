@@ -1,19 +1,19 @@
 import React from "react";
 import { Link, useLocation } from "wouter";
 import { 
-  Home, 
   Target, 
   Calendar, 
   BarChart3, 
   Trophy, 
   Network,
-  Bell,
   Settings,
   Users,
   Shield,
   CreditCard,
   LogOut,
-  Menu
+  Building,
+  Shapes,
+  X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -32,74 +32,84 @@ export default function ClientSidebar({ isOpen, onClose }: ClientSidebarProps) {
   // Menu items for client users (normal OKR application users)
   const menuItems = [
     {
-      label: "Goals",
-      icon: Target,
-      path: "/",
-      active: location === "/"
-    },
-    {
       label: "Daily Focus",
       icon: Calendar,
       path: "/daily-focus",
       active: location === "/daily-focus"
     },
     {
-      label: "Analytics",
+      label: "Goals",
+      icon: Target,
+      path: "/",
+      active: location === "/" || location === "/dashboard"
+    },
+    {
+      label: "Goals Perusahaan",
+      icon: Building,
+      path: "/company-okr",
+      active: location === "/company-okr"
+    },
+    {
+      label: "Siklus",
+      icon: Calendar,
+      path: "/cycles",
+      active: location === "/cycles"
+    },
+    {
+      label: "Template",
+      icon: Shapes,
+      path: "/templates",
+      active: location === "/templates"
+    },
+    {
+      label: "Pencapaian",
+      icon: Trophy,
+      path: "/achievements", 
+      active: location === "/achievements"
+    },
+    {
+      label: "Analitik",
       icon: BarChart3,
       path: "/analytics",
       active: location === "/analytics"
     },
     {
-      label: "Achievements",
-      icon: Trophy,
-      path: "/achievements",
-      active: location === "/achievements"
-    },
-    {
       label: "Jaringan Goal",
       icon: Network,
-      path: "/network",
-      active: location === "/network"
+      path: "/goal-network",
+      active: location === "/goal-network"
+    },
+    {
+      label: "Harga",
+      icon: CreditCard,
+      path: "/pricing",
+      active: location === "/pricing"
     }
   ];
 
-  // Add organization management for owners only
+  // Add organization owner specific menu items
   if (isOwner) {
-    menuItems.push(
-      {
-        label: "Pengaturan Organisasi",
-        icon: Settings,
-        path: "/organization-settings",
-        active: location === "/organization-settings"
-      },
-      {
-        label: "Kelola Pengguna",
-        icon: Users,
-        path: "/client-users",
-        active: location === "/client-users"
-      },
-      {
-        label: "Kelola Role",
-        icon: Shield,
-        path: "/role-management",
-        active: location === "/role-management"
-      },
-      {
-        label: "Paket Berlangganan",
-        icon: CreditCard,
-        path: "/pricing",
-        active: location === "/pricing"
-      }
-    );
+    menuItems.push({
+      label: "Pengaturan Organisasi",
+      icon: Settings,
+      path: "/organization-settings",
+      active: location === "/organization-settings"
+    });
+    
+    menuItems.push({
+      label: "Kelola Pengguna",
+      icon: Users,
+      path: "/client-users",
+      active: location === "/client-users"
+    });
+    
+    menuItems.push({
+      label: "Kelola Role",
+      icon: Shield,
+      path: "/client-roles",
+      active: location === "/client-roles"
+    });
   }
-
-  // Add notification settings for all users
-  menuItems.push({
-    label: "Pengaturan Notifikasi",
-    icon: Bell,
-    path: "/notification-settings",
-    active: location === "/notification-settings"
-  });
 
   const handleLogout = async () => {
     try {
@@ -123,7 +133,7 @@ export default function ClientSidebar({ isOpen, onClose }: ClientSidebarProps) {
       <div className={cn(
         "fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-50 transform transition-transform duration-300 ease-in-out",
         isOpen ? "translate-x-0" : "-translate-x-full",
-        "lg:translate-x-0 lg:static lg:z-auto"
+        "lg:translate-x-0 lg:relative lg:z-auto"
       )}>
         <div className="flex flex-col h-full">
           {/* Header */}
@@ -139,7 +149,7 @@ export default function ClientSidebar({ isOpen, onClose }: ClientSidebarProps) {
               onClick={onClose}
               className="lg:hidden p-2 rounded-md hover:bg-gray-100"
             >
-              <Menu className="w-5 h-5" />
+              <X className="w-5 h-5" />
             </button>
           </div>
 
@@ -149,18 +159,15 @@ export default function ClientSidebar({ isOpen, onClose }: ClientSidebarProps) {
               {menuItems.map((item) => (
                 <li key={item.path}>
                   <Link href={item.path}>
-                    <button 
-                      className={cn(
-                        "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full text-left",
-                        item.active
-                          ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
-                          : "text-gray-700 hover:bg-gray-100"
-                      )}
-                      onClick={onClose}
-                    >
+                    <a className={cn(
+                      "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                      item.active
+                        ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
+                        : "text-gray-700 hover:bg-gray-100"
+                    )}>
                       <item.icon className="w-5 h-5" />
                       <span>{item.label}</span>
-                    </button>
+                    </a>
                   </Link>
                 </li>
               ))}
@@ -171,10 +178,10 @@ export default function ClientSidebar({ isOpen, onClose }: ClientSidebarProps) {
           <div className="p-4 border-t border-gray-200">
             <button
               onClick={handleLogout}
-              className="flex items-center space-x-3 w-full px-3 py-2 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+              className="flex items-center space-x-3 w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
             >
               <LogOut className="w-5 h-5" />
-              <span>Keluar</span>
+              <span>Logout</span>
             </button>
           </div>
         </div>

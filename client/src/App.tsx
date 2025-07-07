@@ -99,11 +99,7 @@ function Router() {
           <GlobalHeader onMenuToggle={handleMenuToggle} sidebarOpen={sidebarOpen} />
           
           {/* Main Content */}
-          <div className={cn(
-            "flex-1 min-h-[calc(100vh-4rem)] transition-all duration-300 overflow-x-hidden",
-            "ml-0", // Mobile: no margin left (sidebar is overlay)
-            sidebarOpen ? "lg:ml-64" : "lg:ml-0" // Desktop: margin based on sidebar state
-          )}>
+          <div className="flex-1 min-h-[calc(100vh-4rem)] overflow-x-hidden">
             <div className="p-4">
               <Switch>
                 <Route path="/" component={DailyFocusPage} />
