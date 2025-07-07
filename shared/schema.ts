@@ -51,10 +51,11 @@ export const subscriptionPlans = pgTable("subscription_plans", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(), // "Starter", "Tim 10 (Growth)", "Tim 25 (Scale)", "Enterprise"
   slug: text("slug").notNull().unique(), // "starter", "growth", "scale", "enterprise"
-  basePrice: decimal("base_price", { precision: 10, scale: 2 }).notNull(), // Base monthly price in IDR
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(), // Base monthly price in IDR
   maxUsers: integer("max_users"), // null for enterprise (unlimited)
   features: jsonb("features").notNull(), // Array of feature strings
   stripeProductId: text("stripe_product_id"),
+  stripePriceId: text("stripe_price_id"),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

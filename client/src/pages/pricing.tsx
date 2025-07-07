@@ -137,13 +137,13 @@ export default function Pricing() {
             
             // Get current billing period pricing
             const currentPeriod = plan.billingPeriods?.find(bp => bp.periodType === selectedBillingPeriod);
-            const currentPrice = currentPeriod?.price || plan.basePrice;
+            const currentPrice = currentPeriod?.price || plan.price;
             const discountPercentage = currentPeriod?.discountPercentage || 0;
             const periodMonths = currentPeriod?.periodMonths || 1;
 
             // Calculate monthly price for display
             const monthlyPrice = parseFloat(currentPrice) / periodMonths;
-            const originalMonthlyPrice = parseFloat(plan.basePrice);
+            const originalMonthlyPrice = parseFloat(plan.price);
 
             return (
               <Card

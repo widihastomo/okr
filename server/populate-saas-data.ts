@@ -18,7 +18,7 @@ export async function populateSaaSData() {
       {
         name: "Starter",
         slug: "starter",
-        basePrice: "99000",
+        price: "99000",
         maxUsers: 3,
         features: JSON.stringify([
           "Hingga 3 pengguna",
@@ -32,7 +32,7 @@ export async function populateSaaSData() {
       {
         name: "Tim 10 (Growth)",
         slug: "growth",
-        basePrice: "299000",
+        price: "299000",
         maxUsers: 10,
         features: JSON.stringify([
           "Hingga 10 pengguna",
@@ -47,7 +47,7 @@ export async function populateSaaSData() {
       {
         name: "Tim 25 (Scale)",
         slug: "scale",
-        basePrice: "749000",
+        price: "749000",
         maxUsers: 25,
         features: JSON.stringify([
           "Hingga 25 pengguna",
@@ -63,7 +63,7 @@ export async function populateSaaSData() {
       {
         name: "Enterprise",
         slug: "enterprise",
-        basePrice: "0", // Custom pricing
+        price: "0", // Custom pricing
         maxUsers: null, // Unlimited
         features: JSON.stringify([
           "Unlimited pengguna",
@@ -92,14 +92,14 @@ export async function populateSaaSData() {
         continue;
       }
 
-      const basePrice = parseFloat(plan.basePrice);
+      const basePrice = parseFloat(plan.price);
 
       // Monthly (no discount)
       billingPeriodsData.push({
         planId: plan.id,
         periodType: "monthly",
         periodMonths: 1,
-        price: plan.basePrice,
+        price: plan.price,
         discountPercentage: 0,
       });
 
