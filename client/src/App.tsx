@@ -37,9 +37,6 @@ import ClientUserManagement from "@/pages/client-user-management";
 import NotificationSettings from "@/pages/notification-settings";
 import ClientRegistration from "@/pages/client-registration";
 
-
-
-
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -48,7 +45,7 @@ function Router() {
   // Clear logout flag on app start if user is authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      localStorage.removeItem('isLoggedOut');
+      localStorage.removeItem("isLoggedOut");
     }
   }, [isAuthenticated]);
 
@@ -56,8 +53,8 @@ function Router() {
   useEffect(() => {
     if (isAuthenticated && user && (user as any)?.isSystemOwner) {
       // Only redirect if on root path
-      if (location === '/' || location === '/daily-focus') {
-        window.location.href = '/system-admin';
+      if (location === "/" || location === "/daily-focus") {
+        window.location.href = "/system-admin";
       }
     }
   }, [isAuthenticated, user, location]);
@@ -89,20 +86,25 @@ function Router() {
     <NotificationProvider>
       <div className="min-h-screen bg-gray-50">
         {/* Global Header */}
-        <GlobalHeader onMenuToggle={() => setSidebarOpen(!sidebarOpen)} sidebarOpen={sidebarOpen} />
-        
+        <GlobalHeader
+          onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
+          sidebarOpen={sidebarOpen}
+        />
+
         <div className="flex pt-16">
           {/* Sidebar */}
           <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-          
+
           {/* Main Content */}
-          <div className={cn(
-            "flex-1 min-h-[calc(100vh-4rem)] transition-all duration-300 overflow-x-hidden",
-            // Mobile: no margin left (sidebar is overlay)
-            "ml-0",
-            // Desktop: margin based on sidebar state
-            sidebarOpen ? "lg:ml-64" : "lg:ml-0"
-          )}>
+          <div
+            className={cn(
+              "flex-1 min-h-[calc(100vh-4rem)] transition-all duration-300 overflow-x-hidden",
+              // Mobile: no margin left (sidebar is overlay)
+              "ml-0",
+              // Desktop: margin based on sidebar state
+              sidebarOpen ? "lg:ml-64" : "lg:ml-16",
+            )}
+          >
             <Switch>
               <Route path="/" component={DailyFocusPage} />
               <Route path="/daily-focus" component={DailyFocusPage} />
@@ -122,12 +124,18 @@ function Router() {
               <Route path="/analytics" component={AnalyticsPage} />
               <Route path="/network" component={NetworkVisualization} />
               <Route path="/pricing" component={PricingPage} />
-              <Route path="/organization-settings" component={OrganizationSettings} />
+              <Route
+                path="/organization-settings"
+                component={OrganizationSettings}
+              />
               <Route path="/system-admin" component={SystemAdmin} />
               <Route path="/user-management" component={UserManagement} />
               <Route path="/client-users" component={ClientUserManagement} />
               <Route path="/role-management" component={ClientRoleManagement} />
-              <Route path="/notification-settings" component={NotificationSettings} />
+              <Route
+                path="/notification-settings"
+                component={NotificationSettings}
+              />
               <Route path="/register" component={ClientRegistration} />
               <Route component={NotFound} />
             </Switch>
