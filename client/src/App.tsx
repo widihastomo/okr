@@ -10,8 +10,9 @@ import GlobalHeader from "@/components/global-header";
 import ClientSidebar from "@/components/client-sidebar";
 import { NotificationProvider } from "@/components/notifications/notification-provider";
 import Dashboard from "@/pages/dashboard";
-import CyclesPage from "@/components/cycles-page";
-import TemplatesPage from "@/components/templates-page";
+
+import TemplatesContent from "@/components/templates-content";
+import CyclesContent from "@/components/cycles-content";
 
 import CompanyOKRPage from "@/pages/company-okr";
 import KeyResultDetail from "@/pages/key-result-detail";
@@ -127,8 +128,12 @@ function Router() {
               <Route path="/projects/:id" component={ProjectDetail} />
               <Route path="/task/:id" component={TaskDetail} />
               <Route path="/tasks/:id" component={TaskDetail} />
-              <Route path="/cycles" component={CyclesPage} />
-              <Route path="/templates" component={TemplatesPage} />
+              <Route path="/cycles">
+                <CyclesContent />
+              </Route>
+              <Route path="/templates">
+                <TemplatesContent />
+              </Route>
               <Route path="/achievements" component={AchievementsPage} />
               <Route path="/analytics" component={AnalyticsPage} />
               <Route path="/network" component={NetworkVisualization} />
