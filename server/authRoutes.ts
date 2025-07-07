@@ -7,16 +7,16 @@ export function setupEmailAuth(app: Express) {
   // Setup session middleware
   app.use(getSession());
 
-  // Auto-login for development mode
-  if (process.env.NODE_ENV === 'development') {
-    app.use('/api/*', (req, res, next) => {
-      // Auto-create session for admin user in development
-      if (!req.session.userId && !req.path.includes('/auth/')) {
-        req.session.userId = "550e8400-e29b-41d4-a716-446655440001"; // Admin user ID
-      }
-      next();
-    });
-  }
+  // Auto-login for development mode (disabled for testing)
+  // if (process.env.NODE_ENV === 'development') {
+  //   app.use('/api/*', (req, res, next) => {
+  //     // Auto-create session for admin user in development
+  //     if (!req.session.userId && !req.path.includes('/auth/')) {
+  //       req.session.userId = "550e8400-e29b-41d4-a716-446655440001"; // Admin user ID
+  //     }
+  //     next();
+  //   });
+  // }
 
   // Health check endpoint for debugging auth issues
   app.get('/api/debug/auth-status', (req, res) => {
@@ -87,7 +87,17 @@ export function setupEmailAuth(app: Express) {
         console.error('Logout error:', err);
         return res.status(500).json({ message: "Gagal logout" });
       }
+      // Clear all possible cookie variations
       res.clearCookie('connect.sid');
+      res.clearCookie('connect.sid', { path: '/' });
+      res.clearCookie('connect.sid', { path: '/', domain: '.replit.dev' });
+      res.clearCookie('connect.sid', { path: '/', domain: 'replit.dev' });
+      
+      // Set cache headers to prevent caching
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      
       res.json({ message: "Berhasil logout" });
     });
   });

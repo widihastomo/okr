@@ -311,10 +311,21 @@ export default function GlobalHeader({
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="flex items-center space-x-2 cursor-pointer text-red-600 hover:text-red-700"
-              onClick={() => {
-                fetch("/api/auth/logout", { method: "POST" }).then(
-                  () => (window.location.href = "/"),
-                );
+              onClick={async () => {
+                try {
+                  const response = await fetch("/api/auth/logout", { method: "POST" });
+                  if (response.ok) {
+                    // Clear any local storage or session data
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    // Force page reload to clear auth state
+                    window.location.replace("/");
+                  }
+                } catch (error) {
+                  console.error("Logout error:", error);
+                  // Force redirect even if logout fails
+                  window.location.replace("/");
+                }
               }}
             >
               <LogOut className="h-4 w-4" />
