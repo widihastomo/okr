@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { queryClient } from "./lib/queryClient";
@@ -40,8 +40,9 @@ import NotificationSettings from "@/pages/notification-settings";
 
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [location] = useLocation();
 
   // Clear logout flag on app start if user is authenticated
   useEffect(() => {
@@ -49,6 +50,16 @@ function Router() {
       localStorage.removeItem('isLoggedOut');
     }
   }, [isAuthenticated]);
+
+  // Redirect system owner to system admin dashboard by default
+  useEffect(() => {
+    if (isAuthenticated && user && (user as any)?.isSystemOwner) {
+      // Only redirect if on root path
+      if (location === '/' || location === '/daily-focus') {
+        window.location.href = '/system-admin';
+      }
+    }
+  }, [isAuthenticated, user, location]);
 
   if (isLoading) {
     return (

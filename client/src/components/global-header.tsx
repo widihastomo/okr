@@ -80,6 +80,9 @@ export default function GlobalHeader({
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // Check if user is system owner
+  const isSystemOwner = (user as any)?.isSystemOwner || false;
 
   const form = useForm<z.infer<typeof taskFormSchema>>({
     resolver: zodResolver(taskFormSchema),
@@ -174,7 +177,12 @@ export default function GlobalHeader({
   }, []);
 
   return (
-    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between fixed top-0 left-0 right-0 z-50">
+    <header className={cn(
+      "border-b px-4 py-3 flex items-center justify-between fixed top-0 left-0 right-0 z-50",
+      isSystemOwner 
+        ? "bg-gradient-to-r from-blue-600 to-purple-600 border-blue-700" 
+        : "bg-white border-gray-200"
+    )}>
       {/* Left side - Menu toggle and Logo */}
       <div className="flex items-center space-x-3">
         {/* Hamburger menu button - always visible */}
@@ -182,10 +190,15 @@ export default function GlobalHeader({
           variant="ghost"
           size="sm"
           onClick={onMenuToggle}
-          className="p-2 hover:bg-gray-100 rounded-md"
+          className={cn(
+            "p-2 rounded-md",
+            isSystemOwner 
+              ? "hover:bg-white/20 text-white"
+              : "hover:bg-gray-100 text-gray-600"
+          )}
           aria-label="Toggle sidebar"
         >
-          <Menu className="h-5 w-5 text-gray-600" />
+          <Menu className="h-5 w-5" />
         </Button>
 
         {/* Logo */}
