@@ -32,7 +32,8 @@ import {
   Calendar,
   Globe,
   Users,
-  CreditCard
+  CreditCard,
+  RotateCcw
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { Organization } from "@shared/schema";

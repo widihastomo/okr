@@ -73,26 +73,8 @@ export default function SystemAdminSidebar({ isOpen, onClose }: SystemAdminSideb
     {
       label: "Pengaturan Sistem",
       icon: Settings,
-      path: "/system-admin/settings",
-      active: location === "/system-admin/settings"
-    },
-    {
-      label: "Database Management",
-      icon: Database,
-      path: "/system-admin/database",
-      active: location === "/system-admin/database"
-    },
-    {
-      label: "Security & Logs",
-      icon: Shield,
-      path: "/system-admin/security",
-      active: location === "/system-admin/security"
-    },
-    {
-      label: "Notifikasi Sistem",
-      icon: Bell,
-      path: "/system-admin/notifications",
-      active: location === "/system-admin/notifications"
+      path: "/system-admin",
+      active: location === "/system-admin"
     }
   ];
 
@@ -141,8 +123,8 @@ export default function SystemAdminSidebar({ isOpen, onClose }: SystemAdminSideb
           {/* Navigation */}
           <nav className="flex-1 px-4 py-6 overflow-y-auto">
             <ul className="space-y-2">
-              {menuItems.map((item) => (
-                <li key={item.path}>
+              {menuItems.map((item, index) => (
+                <li key={`${item.label}-${index}`}>
                   <Link href={item.path}>
                     <button 
                       className={cn(
