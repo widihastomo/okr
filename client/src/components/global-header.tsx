@@ -59,6 +59,8 @@ import { NotificationBell } from "@/components/notifications/notification-bell";
 interface GlobalHeaderProps {
   onMenuToggle?: () => void;
   sidebarOpen?: boolean;
+  sidebarCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
 const taskFormSchema = z.object({
@@ -70,7 +72,7 @@ const taskFormSchema = z.object({
   assignedTo: z.string().optional(),
 });
 
-export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeaderProps) {
+export default function GlobalHeader({ onMenuToggle, sidebarOpen, sidebarCollapsed, onToggleCollapse }: GlobalHeaderProps) {
   const [notificationCount] = useState(1);
   const [isOKRModalOpen, setIsOKRModalOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -100,6 +102,18 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
   const { data: users } = useQuery({
     queryKey: ["/api/users"],
   });
+
+  // Handle menu button click - mobile sidebar toggle or desktop collapse
+  const handleMenuClick = () => {
+    // On mobile: toggle sidebar open/close
+    // On desktop: toggle sidebar collapse
+    const isMobile = window.innerWidth < 1024; // lg breakpoint
+    if (isMobile && onMenuToggle) {
+      onMenuToggle();
+    } else if (!isMobile && onToggleCollapse) {
+      onToggleCollapse();
+    }
+  };
 
   // Create task mutation
   const createTaskMutation = useMutation({
@@ -182,7 +196,7 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
         <Button 
           variant="ghost" 
           size="icon" 
-          onClick={onMenuToggle}
+          onClick={handleMenuClick}
           className="hover:bg-gray-100"
         >
           <Menu className="h-5 w-5" />

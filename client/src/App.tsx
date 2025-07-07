@@ -107,7 +107,12 @@ function Router() {
           sidebarCollapsed ? "lg:ml-16" : "lg:ml-64" // 16 = 64px for collapsed, 64 = 256px for expanded
         )}>
           {/* Global Header */}
-          <GlobalHeader onMenuToggle={handleMenuToggle} sidebarOpen={sidebarOpen} />
+          <GlobalHeader 
+            onMenuToggle={handleMenuToggle} 
+            sidebarOpen={sidebarOpen}
+            sidebarCollapsed={sidebarCollapsed}
+            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          />
           
           {/* Main Content */}
           <div className="flex-1 min-h-[calc(100vh-4rem)] overflow-x-hidden">
