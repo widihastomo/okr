@@ -113,6 +113,12 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 07, 2025. Fixed system owner login authentication issue by updating password hash compatibility:
+  * Identified bcrypt version incompatibility - stored hash used $2a$ format while current library expected $2b$
+  * Updated system owner (owner@system.com) password hash to use compatible $2b$ format
+  * Verified authentication working correctly - system owner can now login successfully
+  * System owner credentials remain: email: owner@system.com, password: owner123
+  * Fixed authentication enables full system admin dashboard access at /system-admin
 - July 07, 2025. Successfully completed comprehensive notification system integration and disabled auto-login for testing:
   * Created notifications table in PostgreSQL database with full schema support
   * Disabled auto-login in development mode to allow testing with different users
