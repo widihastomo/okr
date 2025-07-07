@@ -102,12 +102,53 @@ export const users = pgTable("users", {
   firstName: varchar("first_name", { length: 100 }),
   lastName: varchar("last_name", { length: 100 }),
   profileImageUrl: varchar("profile_image_url", { length: 500 }),
-  role: text("role").notNull().default("member"), // "admin", "manager", "member"
+  role: text("role").notNull().default("member"), // "organization_admin", "manager", "member", "viewer"
   isSystemOwner: boolean("is_system_owner").default(false).notNull(), // Super admin for entire system
   organizationId: uuid("organization_id").references(() => organizations.id),
   isActive: boolean("is_active").default(true).notNull(),
+  department: text("department"), // e.g., "Engineering", "Marketing", "Sales"
+  jobTitle: text("job_title"), // e.g., "Software Engineer", "Product Manager"
+  lastLoginAt: timestamp("last_login_at"),
+  invitedBy: uuid("invited_by").references(() => users.id),
+  invitedAt: timestamp("invited_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User Permissions table for granular access control
+export const userPermissions = pgTable("user_permissions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  permission: text("permission").notNull(), // e.g., "create_objectives", "manage_users", "view_analytics"
+  resource: text("resource"), // Optional: specific resource ID for fine-grained control
+  grantedBy: uuid("granted_by").notNull().references(() => users.id),
+  grantedAt: timestamp("granted_at").defaultNow(),
+  expiresAt: timestamp("expires_at"), // Optional: temporary permissions
+});
+
+// Role Templates for predefined permission sets
+export const roleTemplates = pgTable("role_templates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(), // e.g., "Project Manager", "Team Lead", "HR Admin"
+  description: text("description"),
+  permissions: jsonb("permissions").notNull(), // Array of permission strings
+  organizationId: uuid("organization_id").references(() => organizations.id), // null for system-wide templates
+  isSystem: boolean("is_system").default(false), // System-defined vs organization-defined
+  createdBy: uuid("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User Activity Log for audit trail
+export const userActivityLog = pgTable("user_activity_log", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  action: text("action").notNull(), // e.g., "login", "permission_changed", "role_updated"
+  details: jsonb("details"), // Additional context about the action
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  performedBy: uuid("performed_by").references(() => users.id), // null for self-actions
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Teams table
@@ -803,3 +844,82 @@ export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 export type NotificationPreferences = typeof notificationPreferences.$inferSelect;
 export type InsertNotificationPreferences = z.infer<typeof insertNotificationPreferencesSchema>;
+
+// Role Management Schemas
+export const insertUserPermissionSchema = createInsertSchema(userPermissions).omit({
+  id: true,
+  grantedAt: true,
+});
+
+export const insertRoleTemplateSchema = createInsertSchema(roleTemplates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertUserActivityLogSchema = createInsertSchema(userActivityLog).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Enhanced User Schema with additional fields
+export const updateUserSchema = createInsertSchema(users).omit({
+  id: true,
+  password: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  permissions: z.array(z.string()).optional(),
+  roleTemplateId: z.string().uuid().optional(),
+});
+
+// Role Management Types
+export type UserPermission = typeof userPermissions.$inferSelect;
+export type InsertUserPermission = z.infer<typeof insertUserPermissionSchema>;
+export type RoleTemplate = typeof roleTemplates.$inferSelect;
+export type InsertRoleTemplate = z.infer<typeof insertRoleTemplateSchema>;
+export type UserActivityLog = typeof userActivityLog.$inferSelect;
+export type InsertUserActivityLog = z.infer<typeof insertUserActivityLogSchema>;
+export type UpdateUser = z.infer<typeof updateUserSchema>;
+
+// Enhanced User type with permissions
+export type UserWithPermissions = User & {
+  permissions: UserPermission[];
+  roleTemplate?: RoleTemplate | null;
+  activityLog?: UserActivityLog[];
+};
+
+// Permission constants
+export const PERMISSIONS = {
+  // User Management
+  MANAGE_USERS: 'manage_users',
+  INVITE_USERS: 'invite_users',
+  VIEW_USERS: 'view_users',
+  DEACTIVATE_USERS: 'deactivate_users',
+  
+  // OKR Management
+  CREATE_OBJECTIVES: 'create_objectives',
+  EDIT_OBJECTIVES: 'edit_objectives',
+  DELETE_OBJECTIVES: 'delete_objectives',
+  VIEW_OBJECTIVES: 'view_objectives',
+  
+  // Initiative Management
+  CREATE_INITIATIVES: 'create_initiatives',
+  EDIT_INITIATIVES: 'edit_initiatives',
+  DELETE_INITIATIVES: 'delete_initiatives',
+  VIEW_INITIATIVES: 'view_initiatives',
+  
+  // Analytics & Reporting
+  VIEW_ANALYTICS: 'view_analytics',
+  EXPORT_DATA: 'export_data',
+  
+  // Organization Settings
+  MANAGE_ORGANIZATION: 'manage_organization',
+  MANAGE_BILLING: 'manage_billing',
+  
+  // System Administration
+  SYSTEM_ADMIN: 'system_admin',
+  AUDIT_LOGS: 'audit_logs',
+} as const;
+
+export type Permission = typeof PERMISSIONS[keyof typeof PERMISSIONS];

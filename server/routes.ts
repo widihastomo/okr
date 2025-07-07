@@ -3194,6 +3194,169 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register AI routes
   registerAIRoutes(app);
 
+  // Role Management API Routes
+  const { roleManagementService } = await import("./role-management");
+
+  // Get user permissions
+  app.get("/api/users/:id/permissions", requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const userWithPermissions = await roleManagementService.getUserPermissions(userId);
+      res.json(userWithPermissions);
+    } catch (error) {
+      console.error("Error fetching user permissions:", error);
+      res.status(500).json({ message: "Failed to fetch user permissions" });
+    }
+  });
+
+  // Grant permission to user
+  app.post("/api/users/:id/permissions", requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const { permission, resource, expiresAt } = req.body;
+      const grantedBy = req.session.userId;
+
+      await roleManagementService.grantPermission(userId, permission, grantedBy, resource, expiresAt);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error granting permission:", error);
+      res.status(500).json({ message: "Failed to grant permission" });
+    }
+  });
+
+  // Revoke permission from user
+  app.delete("/api/users/:id/permissions/:permission", requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const permission = req.params.permission;
+      const { resource } = req.body;
+      const performedBy = req.session.userId;
+
+      await roleManagementService.revokePermission(userId, permission as any, performedBy, resource);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error revoking permission:", error);
+      res.status(500).json({ message: "Failed to revoke permission" });
+    }
+  });
+
+  // Update user role and permissions
+  app.put("/api/users/:id/role", requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const { role, permissions } = req.body;
+      const performedBy = req.session.userId;
+
+      await roleManagementService.updateUserRole(userId, role, permissions, performedBy);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating user role:", error);
+      res.status(500).json({ message: "Failed to update user role" });
+    }
+  });
+
+  // Get organization users with permissions
+  app.get("/api/organizations/:id/users", requireAuth, async (req, res) => {
+    try {
+      const organizationId = req.params.id;
+      const users = await roleManagementService.getOrganizationUsers(organizationId);
+      res.json(users);
+    } catch (error) {
+      console.error("Error fetching organization users:", error);
+      res.status(500).json({ message: "Failed to fetch organization users" });
+    }
+  });
+
+  // Get role templates
+  app.get("/api/role-templates", requireAuth, async (req, res) => {
+    try {
+      const organizationId = req.query.organizationId as string;
+      const templates = await roleManagementService.getRoleTemplates(organizationId);
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching role templates:", error);
+      res.status(500).json({ message: "Failed to fetch role templates" });
+    }
+  });
+
+  // Create role template
+  app.post("/api/role-templates", requireAuth, async (req, res) => {
+    try {
+      const templateData = {
+        ...req.body,
+        createdBy: req.session.userId,
+      };
+      const templateId = await roleManagementService.createRoleTemplate(templateData);
+      res.json({ id: templateId, success: true });
+    } catch (error) {
+      console.error("Error creating role template:", error);
+      res.status(500).json({ message: "Failed to create role template" });
+    }
+  });
+
+  // Apply role template to user
+  app.post("/api/users/:id/apply-role-template", requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const { templateId } = req.body;
+      const performedBy = req.session.userId;
+
+      await roleManagementService.applyRoleTemplate(userId, templateId, performedBy);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error applying role template:", error);
+      res.status(500).json({ message: "Failed to apply role template" });
+    }
+  });
+
+  // Get user activity log
+  app.get("/api/users/:id/activity", requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const limit = parseInt(req.query.limit as string) || 50;
+      const activityLog = await roleManagementService.getUserActivityLog(userId, limit);
+      res.json(activityLog);
+    } catch (error) {
+      console.error("Error fetching user activity:", error);
+      res.status(500).json({ message: "Failed to fetch user activity" });
+    }
+  });
+
+  // Deactivate/Reactivate user
+  app.patch("/api/users/:id/status", requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const { isActive } = req.body;
+      const performedBy = req.session.userId;
+
+      if (isActive) {
+        await roleManagementService.reactivateUser(userId, performedBy);
+      } else {
+        await roleManagementService.deactivateUser(userId, performedBy);
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating user status:", error);
+      res.status(500).json({ message: "Failed to update user status" });
+    }
+  });
+
+  // Check if user has specific permission
+  app.get("/api/users/:id/has-permission/:permission", requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const permission = req.params.permission;
+      const resource = req.query.resource as string;
+
+      const hasPermission = await roleManagementService.hasPermission(userId, permission as any, resource);
+      res.json({ hasPermission });
+    } catch (error) {
+      console.error("Error checking permission:", error);
+      res.status(500).json({ message: "Failed to check permission" });
+    }
+  });
+
   // Daily Reflections API routes
   app.post("/api/daily-reflections", requireAuth, async (req, res) => {
     try {

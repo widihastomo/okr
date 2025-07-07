@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Building2, Users, CreditCard, Settings, Database, Activity, Loader2 } from "lucide-react";
+import { Building2, Users, CreditCard, Settings, Database, Activity, Loader2, UserPlus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
@@ -33,21 +33,12 @@ export default function SystemAdmin() {
     queryKey: ["/api/admin/stats"],
   });
 
-  // Debug loading states
-  console.log('Loading states:', { loadingOrgs, loadingUsers, loadingStats });
-  console.log('Data:', { organizations, allUsers, stats });
-
   if (loadingOrgs || loadingUsers || loadingStats) {
     return (
       <div className="h-screen flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-600" />
           <p className="text-gray-600">Memuat data sistem...</p>
-          <p className="text-xs text-gray-400 mt-2">
-            Orgs: {loadingOrgs ? 'loading' : 'loaded'}, 
-            Users: {loadingUsers ? 'loading' : 'loaded'}, 
-            Stats: {loadingStats ? 'loading' : 'loaded'}
-          </p>
         </div>
       </div>
     );
@@ -56,9 +47,18 @@ export default function SystemAdmin() {
   return (
     <div className="container mx-auto py-8 px-4 max-w-7xl">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">System Admin Dashboard</h1>
-        <p className="text-gray-600">Kelola seluruh sistem SaaS OKR</p>
+      <div className="mb-8 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">System Admin Dashboard</h1>
+          <p className="text-gray-600">Kelola seluruh sistem SaaS OKR</p>
+        </div>
+        <Button 
+          onClick={() => setLocation("/user-management")}
+          className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+        >
+          <UserPlus className="h-4 w-4 mr-2" />
+          Kelola Pengguna
+        </Button>
       </div>
 
       {/* Stats Cards */}
