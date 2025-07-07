@@ -54,7 +54,16 @@ function Router() {
   }, [isAuthenticated]);
 
   const handleMenuToggle = () => {
-    setSidebarOpen(!sidebarOpen);
+    // Check if we're on desktop (lg breakpoint is 1024px)
+    const isDesktop = window.innerWidth >= 1024;
+    
+    if (isDesktop) {
+      // Desktop: toggle sidebar collapsed state
+      setSidebarCollapsed(!sidebarCollapsed);
+    } else {
+      // Mobile: toggle sidebar open state (overlay)
+      setSidebarOpen(!sidebarOpen);
+    }
   };
 
   // Redirect system owner to system admin dashboard by default
