@@ -43,6 +43,7 @@ import ClientRegistration from "@/pages/client-registration";
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [location] = useLocation();
 
   // Clear logout flag on app start if user is authenticated
@@ -95,13 +96,15 @@ function Router() {
         <ClientSidebar 
           isOpen={sidebarOpen} 
           onClose={() => setSidebarOpen(false)}
+          isCollapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
         />
         
         {/* Main layout with responsive margin to avoid overlap */}
         <div className={cn(
           "flex-1 flex flex-col",
-          // Desktop: Give margin for sidebar, Mobile: full width (sidebar is overlay)
-          "lg:ml-16" // 16 = 64px for collapsed sidebar width
+          // Desktop: Dynamic margin based on sidebar collapsed state, Mobile: full width (sidebar is overlay)
+          sidebarCollapsed ? "lg:ml-16" : "lg:ml-64" // 16 = 64px for collapsed, 64 = 256px for expanded
         )}>
           {/* Global Header */}
           <GlobalHeader onMenuToggle={handleMenuToggle} sidebarOpen={sidebarOpen} />

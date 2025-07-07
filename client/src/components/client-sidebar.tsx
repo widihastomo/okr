@@ -40,13 +40,14 @@ import {
 interface SidebarProps {
   isOpen: boolean;
   onClose?: () => void;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
 }
 
-export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse }: SidebarProps) {
   const [location] = useLocation();
   const { isOwner } = useOrganization();
   const { user } = useAuth();
-  const [isCollapsed, setIsCollapsed] = useState(false);
 
   // Check if user is system owner
   const isSystemOwner = (user as any)?.isSystemOwner || false;
@@ -227,7 +228,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setIsCollapsed(!isCollapsed)}
+              onClick={onToggleCollapse}
               className="h-8 w-8 p-0"
             >
               {isCollapsed ? (
