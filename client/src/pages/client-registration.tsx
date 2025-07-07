@@ -64,10 +64,25 @@ export default function ClientRegistration() {
 
   const registerMutation = useMutation({
     mutationFn: async (data: ClientRegistrationData) => {
-      const response = await apiRequest("POST", "/api/auth/register-client", data);
-      return response.json();
+      console.log('Making API request...');
+      const response = await apiRequest("POST", "/api/client-registration", data);
+      console.log('API response:', response);
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+      
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+      
+      try {
+        return JSON.parse(responseText);
+      } catch (e) {
+        console.error('JSON parse error:', e);
+        console.error('Raw response text:', responseText);
+        throw new Error('Server returned invalid JSON response');
+      }
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Registration successful:', data);
       setIsSubmitted(true);
       toast({
         title: "Pendaftaran Berhasil!",
@@ -75,6 +90,7 @@ export default function ClientRegistration() {
       });
     },
     onError: (error: Error) => {
+      console.error('Registration error:', error);
       toast({
         title: "Pendaftaran Gagal",
         description: error.message || "Terjadi kesalahan saat mendaftar. Silakan coba lagi.",
