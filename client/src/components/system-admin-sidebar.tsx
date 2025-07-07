@@ -43,8 +43,8 @@ export default function SystemAdminSidebar({ isOpen, onClose }: SystemAdminSideb
     {
       label: "Kelola Pengguna",
       icon: Users,
-      path: "/system-admin",
-      active: location === "/system-admin"
+      path: "/system-admin/users",
+      active: location === "/system-admin/users"
     },
     {
       label: "Kelola Paket",
@@ -55,26 +55,26 @@ export default function SystemAdminSidebar({ isOpen, onClose }: SystemAdminSideb
     {
       label: "Database",
       icon: Database,
-      path: "/system-admin",
-      active: location === "/system-admin"
+      path: "/system-admin/database",
+      active: location === "/system-admin/database"
     },
     {
       label: "Keamanan",
       icon: Shield,
-      path: "/system-admin",
-      active: location === "/system-admin"
+      path: "/system-admin/security",
+      active: location === "/system-admin/security"
     },
     {
       label: "Notifikasi Sistem",
       icon: Bell,
-      path: "/system-admin",
-      active: location === "/system-admin"
+      path: "/system-admin/notifications",
+      active: location === "/system-admin/notifications"
     },
     {
       label: "Pengaturan Sistem",
       icon: Settings,
-      path: "/system-admin",
-      active: location === "/system-admin"
+      path: "/system-admin/settings",
+      active: location === "/system-admin/settings"
     }
   ];
 
@@ -123,8 +123,8 @@ export default function SystemAdminSidebar({ isOpen, onClose }: SystemAdminSideb
           {/* Navigation */}
           <nav className="flex-1 px-4 py-6 overflow-y-auto">
             <ul className="space-y-2">
-              {menuItems.map((item, index) => (
-                <li key={`${item.label}-${index}`}>
+              {menuItems.map((item) => (
+                <li key={item.path}>
                   <Link href={item.path}>
                     <button 
                       className={cn(

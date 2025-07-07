@@ -644,7 +644,7 @@ export type InsertBillingPeriod = typeof billingPeriods.$inferInsert;
 export type Organization = typeof organizations.$inferSelect;
 export type OrganizationSubscription = typeof organizationSubscriptions.$inferSelect;
 export type SubscriptionAddOn = typeof subscriptionAddOns.$inferSelect;
-export type OrganizationAddOnSubscription = typeof organizationSubscriptions = typeof organizationAddOnSubscriptions.$inferSelect;
+export type OrganizationAddOnSubscription = typeof organizationAddOnSubscriptions.$inferSelect;
 
 // Gamification Primary Types
 export type Achievement = typeof achievements.$inferSelect;
