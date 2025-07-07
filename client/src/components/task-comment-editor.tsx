@@ -67,8 +67,17 @@ export function TaskCommentEditor({
       return response.json();
     },
     onSuccess: () => {
+      // Reset all form state
       setContent("");
       setMentionedUsers([]);
+      setShowMentionSuggestions(false);
+      setMentionQuery("");
+      
+      // Clear the editor content
+      if (editorRef.current) {
+        editorRef.current.innerHTML = "";
+      }
+      
       queryClient.invalidateQueries({ queryKey: [`/api/tasks/${taskId}/comments`] });
       toast({
         title: "Berhasil",

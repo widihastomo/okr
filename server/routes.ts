@@ -2574,7 +2574,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Notify mentioned users
           if (result.data.mentionedUsers && Array.isArray(result.data.mentionedUsers)) {
             for (const mentionedUserId of result.data.mentionedUsers) {
-              if (mentionedUserId !== currentUser.id) {
+              if (mentionedUserId && mentionedUserId.trim() && mentionedUserId !== currentUser.id) {
                 await NotificationService.notifyUserMentioned(
                   taskId,
                   task.title,
