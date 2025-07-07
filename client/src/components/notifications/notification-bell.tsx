@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Bell, Settings, Check, Trash2, ExternalLink } from "lucide-react";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -19,7 +20,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { Link } from "wouter";
 import { type Notification, type User } from "@shared/schema";
 
 export function NotificationBell() {
@@ -269,9 +269,11 @@ export function NotificationBell() {
         {notifications.length > 0 && (
           <>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="justify-center text-sm">
-              <Settings className="h-4 w-4 mr-2" />
-              Pengaturan Notifikasi
+            <DropdownMenuItem className="justify-center text-sm" asChild>
+              <Link href="/notification-settings">
+                <Settings className="h-4 w-4 mr-2" />
+                Pengaturan Notifikasi
+              </Link>
             </DropdownMenuItem>
           </>
         )}

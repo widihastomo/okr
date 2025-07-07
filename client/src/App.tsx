@@ -31,6 +31,7 @@ import DailyFocusPage from "@/pages/daily-focus";
 import PricingPage from "@/pages/pricing";
 import OrganizationSettings from "@/pages/organization-settings";
 import SystemAdmin from "@/pages/system-admin";
+import NotificationSettings from "@/pages/notification-settings";
 
 
 
@@ -108,6 +109,7 @@ function Router() {
               <Route path="/pricing" component={PricingPage} />
               <Route path="/organization-settings" component={OrganizationSettings} />
               <Route path="/system-admin" component={SystemAdmin} />
+              <Route path="/notification-settings" component={NotificationSettings} />
               <Route component={NotFound} />
             </Switch>
           </div>
