@@ -138,7 +138,7 @@ export default function Login() {
                 Belum punya akun?
               </p>
               <a 
-                href="/client-registration" 
+                href="/register" 
                 className="text-orange-600 hover:text-orange-700 font-medium hover:underline text-sm block"
               >
                 Daftar Organisasi Baru

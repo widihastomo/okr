@@ -79,7 +79,7 @@ function Router() {
     return (
       <Switch>
         <Route path="/landing" component={Landing} />
-        <Route path="/client-registration" component={ClientRegistration} />
+        <Route path="/register" component={ClientRegistration} />
         <Route component={Login} />
       </Switch>
     );
@@ -128,7 +128,7 @@ function Router() {
               <Route path="/client-users" component={ClientUserManagement} />
               <Route path="/role-management" component={ClientRoleManagement} />
               <Route path="/notification-settings" component={NotificationSettings} />
-              <Route path="/client-registration" component={ClientRegistration} />
+              <Route path="/register" component={ClientRegistration} />
               <Route component={NotFound} />
             </Switch>
           </div>
