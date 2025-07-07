@@ -33,12 +33,21 @@ export default function SystemAdmin() {
     queryKey: ["/api/admin/stats"],
   });
 
+  // Debug loading states
+  console.log('Loading states:', { loadingOrgs, loadingUsers, loadingStats });
+  console.log('Data:', { organizations, allUsers, stats });
+
   if (loadingOrgs || loadingUsers || loadingStats) {
     return (
       <div className="h-screen flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-600" />
           <p className="text-gray-600">Memuat data sistem...</p>
+          <p className="text-xs text-gray-400 mt-2">
+            Orgs: {loadingOrgs ? 'loading' : 'loaded'}, 
+            Users: {loadingUsers ? 'loading' : 'loaded'}, 
+            Stats: {loadingStats ? 'loading' : 'loaded'}
+          </p>
         </div>
       </div>
     );
