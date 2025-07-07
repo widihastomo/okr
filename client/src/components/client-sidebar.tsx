@@ -1,11 +1,11 @@
 import React from "react";
 import { Link, useLocation } from "wouter";
-import {
-  Home,
-  Target,
-  Calendar,
-  BarChart3,
-  Trophy,
+import { 
+  Home, 
+  Target, 
+  Calendar, 
+  BarChart3, 
+  Trophy, 
   Network,
   Bell,
   Settings,
@@ -13,11 +13,30 @@ import {
   Shield,
   CreditCard,
   LogOut,
-  Menu,
+  Menu
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { useOrganization } from "@/hooks/useOrganization";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarTrigger,
+  useSidebar,
+} from "@/components/ui/sidebar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ClientSidebarProps {
   isOpen: boolean;
@@ -28,6 +47,7 @@ export default function ClientSidebar({ isOpen, onClose }: ClientSidebarProps) {
   const [location] = useLocation();
   const { logout } = useAuth();
   const { isOwner } = useOrganization();
+  const { state: sidebarState } = useSidebar();
 
   // Menu items for client users (normal OKR application users)
   const menuItems = [
@@ -35,32 +55,32 @@ export default function ClientSidebar({ isOpen, onClose }: ClientSidebarProps) {
       label: "Goals",
       icon: Target,
       path: "/",
-      active: location === "/",
+      active: location === "/"
     },
     {
       label: "Daily Focus",
       icon: Calendar,
       path: "/daily-focus",
-      active: location === "/daily-focus",
+      active: location === "/daily-focus"
     },
     {
       label: "Analytics",
       icon: BarChart3,
       path: "/analytics",
-      active: location === "/analytics",
+      active: location === "/analytics"
     },
     {
       label: "Achievements",
       icon: Trophy,
       path: "/achievements",
-      active: location === "/achievements",
+      active: location === "/achievements"
     },
     {
       label: "Jaringan Goal",
       icon: Network,
       path: "/network",
-      active: location === "/network",
-    },
+      active: location === "/network"
+    }
   ];
 
   // Add organization management for owners only
@@ -70,26 +90,26 @@ export default function ClientSidebar({ isOpen, onClose }: ClientSidebarProps) {
         label: "Pengaturan Organisasi",
         icon: Settings,
         path: "/organization-settings",
-        active: location === "/organization-settings",
+        active: location === "/organization-settings"
       },
       {
         label: "Kelola Pengguna",
         icon: Users,
         path: "/client-users",
-        active: location === "/client-users",
+        active: location === "/client-users"
       },
       {
         label: "Kelola Role",
         icon: Shield,
         path: "/role-management",
-        active: location === "/role-management",
+        active: location === "/role-management"
       },
       {
         label: "Paket Berlangganan",
         icon: CreditCard,
         path: "/pricing",
-        active: location === "/pricing",
-      },
+        active: location === "/pricing"
+      }
     );
   }
 
@@ -98,7 +118,7 @@ export default function ClientSidebar({ isOpen, onClose }: ClientSidebarProps) {
     label: "Pengaturan Notifikasi",
     icon: Bell,
     path: "/notification-settings",
-    active: location === "/notification-settings",
+    active: location === "/notification-settings"
   });
 
   const handleLogout = async () => {
@@ -109,80 +129,84 @@ export default function ClientSidebar({ isOpen, onClose }: ClientSidebarProps) {
     }
   };
 
+  const isCollapsed = sidebarState === "collapsed";
+
   return (
-    <>
-      {/* Mobile overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={onClose}
-        />
-      )}
+    <Sidebar collapsible="icon" className="border-r">
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <Link href="/">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-gradient-to-r from-orange-600 to-orange-500 text-white">
+                  <Target className="size-4" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">OKR Platform</span>
+                  <span className="truncate text-xs">Goal Management</span>
+                </div>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
 
-      {/* Sidebar */}
-      <div
-        className={cn(
-          "fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-50 transform transition-transform duration-300 ease-in-out",
-          isOpen ? "translate-x-0" : "-translate-x-full",
-          "lg:translate-x-0 lg:static lg:z-auto",
-        )}
-      >
-        <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-orange-600 to-orange-500 rounded-lg flex items-center justify-center">
-                <Target className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-gray-900">
-                OKR Platform
-              </span>
-            </div>
-            {/* Mobile close button */}
-            <button
-              onClick={onClose}
-              className="lg:hidden p-2 rounded-md hover:bg-gray-100"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 overflow-y-auto">
-            <ul className="space-y-2">
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
               {menuItems.map((item) => (
-                <li key={item.path}>
-                  <Link href={item.path}>
-                    <button
-                      className={cn(
-                        "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full text-left",
-                        item.active
-                          ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
-                          : "text-gray-700 hover:bg-gray-100",
-                      )}
-                      onClick={onClose}
-                    >
-                      <item.icon className="w-5 h-5" />
-                      <span>{item.label}</span>
-                    </button>
-                  </Link>
-                </li>
+                <SidebarMenuItem key={item.path}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <SidebarMenuButton 
+                        asChild 
+                        isActive={item.active}
+                        className={cn(
+                          item.active && "bg-gradient-to-r from-orange-600 to-orange-500 text-white hover:bg-gradient-to-r hover:from-orange-700 hover:to-orange-600"
+                        )}
+                      >
+                        <Link href={item.path}>
+                          <item.icon className="size-4" />
+                          <span>{item.label}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </TooltipTrigger>
+                    {isCollapsed && (
+                      <TooltipContent side="right" sideOffset={5}>
+                        {item.label}
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                </SidebarMenuItem>
               ))}
-            </ul>
-          </nav>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
 
-          {/* Footer */}
-          <div className="p-4 border-t border-gray-200">
-            <button
-              onClick={handleLogout}
-              className="flex items-center space-x-3 w-full px-3 py-2 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 transition-colors"
-            >
-              <LogOut className="w-5 h-5" />
-              <span>Keluar</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <SidebarMenuButton 
+                  onClick={handleLogout}
+                  className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                >
+                  <LogOut className="size-4" />
+                  <span>Keluar</span>
+                </SidebarMenuButton>
+              </TooltipTrigger>
+              {isCollapsed && (
+                <TooltipContent side="right" sideOffset={5}>
+                  Keluar
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
   );
 }
