@@ -3781,6 +3781,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Client registration endpoint
+  app.post('/api/client-registration', async (req, res) => {
+    try {
+      const registrationData = req.body;
+      
+      // Import clientRegistrationSchema separately to avoid circular imports
+      const { clientRegistrationSchema } = await import("@shared/schema");
+      
+      // Validate input data
+      const validatedData = clientRegistrationSchema.parse(registrationData);
+      
+      // Check if organization slug already exists
+      const existingOrg = await storage.getOrganizationBySlug(validatedData.organizationSlug);
+      if (existingOrg) {
+        return res.status(400).json({ 
+          message: "Slug organisasi sudah digunakan. Silakan pilih yang lain." 
+        });
+      }
+      
+      // Check if email already exists
+      const existingUser = await storage.getUserByEmail(validatedData.email);
+      if (existingUser) {
+        return res.status(400).json({ 
+          message: "Email sudah terdaftar. Silakan gunakan email lain." 
+        });
+      }
+      
+      // Create organization with pending status
+      const organizationData = {
+        name: validatedData.organizationName,
+        slug: validatedData.organizationSlug,
+        website: validatedData.website || null,
+        industry: validatedData.industry,
+        size: validatedData.size,
+        registrationStatus: "pending" as const,
+      };
+      
+      const organization = await storage.createOrganization(organizationData);
+      
+      // Hash password and create user
+      const hashedPassword = await hashPassword(validatedData.password);
+      const userData = {
+        email: validatedData.email,
+        password: hashedPassword,
+        firstName: validatedData.firstName,
+        lastName: validatedData.lastName,
+        role: "organization_admin" as const,
+        organizationId: organization.id,
+        jobTitle: validatedData.jobTitle,
+        department: validatedData.department,
+        isActive: false, // Will be activated when org is approved
+      };
+      
+      const user = await storage.createUser(userData);
+      
+      // Update organization with owner ID
+      await storage.updateOrganization(organization.id, { ownerId: user.id });
+      
+      res.json({ 
+        message: "Pendaftaran berhasil. Permohonan Anda sedang dalam proses review.",
+        organizationId: organization.id,
+        userId: user.id
+      });
+      
+    } catch (error: any) {
+      console.error('Client registration error:', error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ 
+          message: "Data tidak valid",
+          errors: error.errors 
+        });
+      }
+      res.status(500).json({ 
+        message: "Terjadi kesalahan saat mendaftar. Silakan coba lagi." 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

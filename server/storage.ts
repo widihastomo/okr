@@ -148,6 +148,11 @@ export interface IStorage {
 
   // Combined
   getOKRsWithKeyResults(): Promise<OKRWithKeyResults[]>;
+  
+  // Client Registration Support
+  getOrganizationBySlug(slug: string): Promise<any>;
+  createOrganization(org: any): Promise<any>;
+  updateOrganization(id: string, updates: any): Promise<any>;
   getOKRWithKeyResults(id: string): Promise<OKRWithKeyResults | undefined>;
   getOKRsWithFullHierarchy(cycleId?: string): Promise<any[]>;
 }

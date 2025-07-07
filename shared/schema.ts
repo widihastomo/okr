@@ -71,6 +71,12 @@ export const organizations = pgTable("organizations", {
   industry: text("industry"),
   size: text("size"), // "1-10", "11-50", "51-200", "201-500", "500+"
   ownerId: uuid("owner_id"), // Organization owner - will be added via migration
+  registrationStatus: text("registration_status").notNull().default("pending"), // "pending", "approved", "rejected"
+  approvedBy: uuid("approved_by").references(() => users.id),
+  approvedAt: timestamp("approved_at"),
+  rejectedBy: uuid("rejected_by").references(() => users.id),
+  rejectedAt: timestamp("rejected_at"),
+  rejectionReason: text("rejection_reason"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -923,3 +929,27 @@ export const PERMISSIONS = {
 } as const;
 
 export type Permission = typeof PERMISSIONS[keyof typeof PERMISSIONS];
+
+// Client registration schema
+export const clientRegistrationSchema = z.object({
+  // Organization info
+  organizationName: z.string().min(1, "Nama organisasi wajib diisi").max(255),
+  organizationSlug: z.string().min(1, "Slug organisasi wajib diisi").max(100),
+  website: z.string().url("Format website tidak valid").optional().or(z.literal("")),
+  industry: z.string().min(1, "Industri wajib dipilih"),
+  size: z.string().min(1, "Ukuran organisasi wajib dipilih"),
+  
+  // Owner info
+  firstName: z.string().min(1, "Nama depan wajib diisi").max(100),
+  lastName: z.string().min(1, "Nama belakang wajib diisi").max(100),
+  email: z.string().email("Format email tidak valid").max(255),
+  password: z.string().min(8, "Password minimal 8 karakter"),
+  confirmPassword: z.string().min(8, "Konfirmasi password minimal 8 karakter"),
+  jobTitle: z.string().min(1, "Jabatan wajib diisi").max(100),
+  department: z.string().min(1, "Departemen wajib diisi").max(100),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Password dan konfirmasi password tidak cocok",
+  path: ["confirmPassword"],
+});
+
+export type ClientRegistrationData = z.infer<typeof clientRegistrationSchema>;
