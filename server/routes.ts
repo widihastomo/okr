@@ -3070,6 +3070,182 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin API - Get organizations with detailed information
+  app.get("/api/admin/organizations-detailed", requireAuth, isSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { eq, sql } = await import("drizzle-orm");
+      
+      // Get organizations with owner info and user count
+      const result = await db.execute(sql`
+        SELECT 
+          o.*,
+          u.first_name as owner_first_name,
+          u.last_name as owner_last_name,
+          u.email as owner_email,
+          COUNT(DISTINCT org_users.id) as user_count
+        FROM organizations o
+        LEFT JOIN users u ON o.owner_id = u.id
+        LEFT JOIN users org_users ON org_users.organization_id = o.id
+        GROUP BY o.id, u.id
+        ORDER BY o.created_at DESC
+      `);
+      
+      const organizations = result.rows.map((row: any) => ({
+        id: row.id,
+        name: row.name,
+        slug: row.slug,
+        logo: row.logo,
+        website: row.website,
+        industry: row.industry,
+        size: row.size,
+        ownerId: row.owner_id,
+        registrationStatus: row.registration_status,
+        approvedBy: row.approved_by,
+        approvedAt: row.approved_at,
+        rejectedBy: row.rejected_by,
+        rejectedAt: row.rejected_at,
+        rejectionReason: row.rejection_reason,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+        userCount: parseInt(row.user_count) || 0,
+        owner: row.owner_first_name ? {
+          firstName: row.owner_first_name,
+          lastName: row.owner_last_name,
+          email: row.owner_email,
+        } : null,
+      }));
+      
+      res.json(organizations);
+    } catch (error) {
+      console.error("Error fetching detailed organizations:", error);
+      res.status(500).json({ message: "Failed to fetch organizations" });
+    }
+  });
+
+  // Admin API - Approve organization
+  app.post("/api/admin/organizations/:id/approve", requireAuth, isSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      const organizationId = req.params.id;
+      const currentUser = req.user as User;
+      
+      const [updatedOrg] = await db.update(organizations)
+        .set({
+          registrationStatus: 'approved',
+          approvedBy: currentUser.id,
+          approvedAt: new Date(),
+          // Clear rejection fields if previously rejected
+          rejectedBy: null,
+          rejectedAt: null,
+          rejectionReason: null,
+          updatedAt: new Date(),
+        })
+        .where(eq(organizations.id, organizationId))
+        .returning();
+      
+      if (!updatedOrg) {
+        return res.status(404).json({ message: "Organization not found" });
+      }
+      
+      res.json(updatedOrg);
+    } catch (error) {
+      console.error("Error approving organization:", error);
+      res.status(500).json({ message: "Failed to approve organization" });
+    }
+  });
+
+  // Admin API - Reject organization
+  app.post("/api/admin/organizations/:id/reject", requireAuth, isSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      const organizationId = req.params.id;
+      const currentUser = req.user as User;
+      const { reason } = req.body;
+      
+      if (!reason || !reason.trim()) {
+        return res.status(400).json({ message: "Rejection reason is required" });
+      }
+      
+      const [updatedOrg] = await db.update(organizations)
+        .set({
+          registrationStatus: 'rejected',
+          rejectedBy: currentUser.id,
+          rejectedAt: new Date(),
+          rejectionReason: reason.trim(),
+          // Clear approval fields if previously approved
+          approvedBy: null,
+          approvedAt: null,
+          updatedAt: new Date(),
+        })
+        .where(eq(organizations.id, organizationId))
+        .returning();
+      
+      if (!updatedOrg) {
+        return res.status(404).json({ message: "Organization not found" });
+      }
+      
+      res.json(updatedOrg);
+    } catch (error) {
+      console.error("Error rejecting organization:", error);
+      res.status(500).json({ message: "Failed to reject organization" });
+    }
+  });
+
+  // Admin API - Suspend organization
+  app.post("/api/admin/organizations/:id/suspend", requireAuth, isSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      const organizationId = req.params.id;
+      
+      const [updatedOrg] = await db.update(organizations)
+        .set({
+          registrationStatus: 'suspended',
+          updatedAt: new Date(),
+        })
+        .where(eq(organizations.id, organizationId))
+        .returning();
+      
+      if (!updatedOrg) {
+        return res.status(404).json({ message: "Organization not found" });
+      }
+      
+      res.json(updatedOrg);
+    } catch (error) {
+      console.error("Error suspending organization:", error);
+      res.status(500).json({ message: "Failed to suspend organization" });
+    }
+  });
+
+  // Admin API - Reactivate organization
+  app.post("/api/admin/organizations/:id/reactivate", requireAuth, isSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      const organizationId = req.params.id;
+      
+      const [updatedOrg] = await db.update(organizations)
+        .set({
+          registrationStatus: 'approved',
+          updatedAt: new Date(),
+        })
+        .where(eq(organizations.id, organizationId))
+        .returning();
+      
+      if (!updatedOrg) {
+        return res.status(404).json({ message: "Organization not found" });
+      }
+      
+      res.json(updatedOrg);
+    } catch (error) {
+      console.error("Error reactivating organization:", error);
+      res.status(500).json({ message: "Failed to reactivate organization" });
+    }
+  });
+
   // Admin API - Delete subscription plan
   app.delete("/api/admin/subscription-plans/:id", requireAuth, isSystemOwner, async (req, res) => {
     try {

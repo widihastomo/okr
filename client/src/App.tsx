@@ -37,6 +37,7 @@ import ClientUserManagement from "@/pages/client-user-management";
 import NotificationSettings from "@/pages/notification-settings";
 import ClientRegistration from "@/pages/client-registration";
 import SubscriptionPackageManagement from "@/pages/subscription-package-management";
+import SystemOrganizationManagement from "@/pages/system-organization-management";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -151,6 +152,7 @@ function Router() {
                 component={OrganizationSettings}
               />
               <Route path="/system-admin" component={SystemAdmin} />
+              <Route path="/system-admin/organizations" component={SystemOrganizationManagement} />
               <Route path="/client-users" component={ClientUserManagement} />
               <Route
                 path="/notification-settings"

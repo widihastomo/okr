@@ -148,33 +148,19 @@ export default function SystemAdmin() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {organizations?.map((org) => (
-                  <div key={org.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <h3 className="font-semibold">{org.name}</h3>
-                      <p className="text-sm text-gray-600">
-                        {org.userCount || 0} pengguna • {org.plan?.name || "No Plan"}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Badge variant={org.subscription?.status === "active" ? "default" : "secondary"}>
-                        {org.subscription?.status || "Inactive"}
-                      </Badge>
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={() => {
-                          setSelectedOrganization(org);
-                          setIsSubscriptionModalOpen(true);
-                        }}
-                      >
-                        <Package className="w-4 h-4 mr-1" />
-                        Kelola Paket
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+              <div className="text-center py-8">
+                <Building2 className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                <h3 className="text-lg font-semibold mb-2">Kelola Organisasi</h3>
+                <p className="text-gray-600 mb-4">
+                  Gunakan halaman khusus untuk mengelola organisasi dengan fitur lengkap
+                </p>
+                <Button 
+                  onClick={() => setLocation("/system-admin/organizations")}
+                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                >
+                  <Building2 className="w-4 h-4 mr-2" />
+                  Kelola Organisasi
+                </Button>
               </div>
             </CardContent>
           </Card>

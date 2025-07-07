@@ -36,8 +36,8 @@ export default function SystemAdminSidebar({ isOpen, onClose }: SystemAdminSideb
     {
       label: "Kelola Organisasi",
       icon: Building2,
-      path: "/system-admin",
-      active: location === "/system-admin"
+      path: "/system-admin/organizations",
+      active: location === "/system-admin/organizations"
     },
     {
       label: "Kelola Pengguna",
