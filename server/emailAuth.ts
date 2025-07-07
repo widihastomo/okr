@@ -99,13 +99,13 @@ export async function authenticateUser(loginData: LoginData): Promise<User | nul
 }
 
 export const requireAuth: RequestHandler = async (req, res, next) => {
-  // Auto-login for development mode
-  if (process.env.NODE_ENV === 'development') {
-    // Auto-set session if not already set
-    if (!req.session.userId) {
-      req.session.userId = "550e8400-e29b-41d4-a716-446655440001";
-    }
-  }
+  // Auto-login for development mode (disabled for testing)
+  // if (process.env.NODE_ENV === 'development') {
+  //   // Auto-set session if not already set
+  //   if (!req.session.userId) {
+  //     req.session.userId = "550e8400-e29b-41d4-a716-446655440001";
+  //   }
+  // }
   
   if (!req.session?.userId) {
     return res.status(401).json({ message: "Unauthorized" });

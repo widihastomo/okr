@@ -113,6 +113,15 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 07, 2025. Successfully completed comprehensive notification system integration and disabled auto-login for testing:
+  * Created notifications table in PostgreSQL database with full schema support
+  * Disabled auto-login in development mode to allow testing with different users
+  * Integrated notification system with comment system - automatic notifications when comments added or users mentioned
+  * Added NotificationBell component to global header with real-time unread count display
+  * Complete notification API endpoints working properly with database integration
+  * NotificationProvider and NotificationService fully functional with React Query caching
+  * Users can now test login with different accounts without automatic session creation
+  * Notification system creates alerts for comment_added and user_mentioned events automatically
 - July 06, 2025. Successfully implemented comprehensive comment system for tasks with full WYSIWYG editor and user mention functionality:
   * Added taskComments database table with user mentions, edit tracking, and content storage
   * Created complete API routes for CRUD operations (create, read, update, delete comments)
