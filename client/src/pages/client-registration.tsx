@@ -117,7 +117,7 @@ export default function ClientRegistration() {
     if (currentStep === 1) {
       fieldsToValidate = ['organizationName', 'industry', 'size'];
     } else if (currentStep === 2) {
-      fieldsToValidate = ['firstName', 'lastName', 'email', 'password', 'confirmPassword'];
+      fieldsToValidate = ['firstName', 'lastName', 'email', 'password', 'confirmPassword', 'jobTitle', 'department'];
     }
     
     const result = await form.trigger(fieldsToValidate as any);
@@ -602,22 +602,6 @@ export default function ClientRegistration() {
                         type="submit" 
                         disabled={registerMutation.isPending}
                         className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
-                        onClick={async () => {
-                          console.log('Button clicked');
-                          console.log('Form state:', form.formState);
-                          console.log('Form values:', form.getValues());
-                          console.log('Form errors:', form.formState.errors);
-                          
-                          // Trigger validation manually
-                          const isValid = await form.trigger();
-                          console.log('Manual validation result:', isValid);
-                          
-                          if (isValid) {
-                            console.log('Form is valid, will submit');
-                          } else {
-                            console.log('Form is invalid');
-                          }
-                        }}
                       >
                         {registerMutation.isPending ? (
                           <div className="flex items-center gap-2">
