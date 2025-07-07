@@ -116,7 +116,7 @@ function Router() {
           
           {/* Main Content */}
           <div className="flex-1 min-h-[calc(100vh-4rem)] overflow-x-hidden">
-            <div className="max-w-7xl mx-auto p-4">
+            <div className="w-full p-4">
               <Switch>
                 <Route path="/" component={DailyFocusPage} />
                 <Route path="/daily-focus" component={DailyFocusPage} />
