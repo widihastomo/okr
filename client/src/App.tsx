@@ -92,9 +92,17 @@ function Router() {
   return (
     <NotificationProvider>
       <div className="flex h-screen bg-gray-50">
-        <ClientSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <ClientSidebar 
+          isOpen={sidebarOpen} 
+          onClose={() => setSidebarOpen(false)}
+        />
         
-        <div className="flex-1 flex flex-col">
+        {/* Main layout with responsive margin to avoid overlap */}
+        <div className={cn(
+          "flex-1 flex flex-col",
+          // Desktop: Give margin for sidebar, Mobile: full width (sidebar is overlay)
+          "lg:ml-16" // 16 = 64px for collapsed sidebar width
+        )}>
           {/* Global Header */}
           <GlobalHeader onMenuToggle={handleMenuToggle} sidebarOpen={sidebarOpen} />
           
