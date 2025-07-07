@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
+  Menu,
   Bell,
   Plus,
   Settings,
@@ -13,7 +14,6 @@ import {
   Calendar,
   Flag,
 } from "lucide-react";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -180,8 +180,16 @@ export default function GlobalHeader({
     <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between fixed top-0 left-0 right-0 z-50">
       {/* Left side - Menu toggle and Logo */}
       <div className="flex items-center space-x-3">
-        {/* Sidebar toggle button */}
-        <SidebarTrigger className="hover:bg-gray-100" />
+        {/* Hamburger menu button - always visible */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onMenuToggle}
+          className="p-2 hover:bg-gray-100 rounded-md"
+          aria-label="Toggle sidebar"
+        >
+          <Menu className="h-5 w-5 text-gray-600" />
+        </Button>
 
         {/* Logo */}
         <div className="flex items-center space-x-2">
