@@ -1,34 +1,27 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  loginSchema,
-  registerSchema,
-  type LoginData,
-  type RegisterData,
-} from "@shared/schema";
+import { useMutation } from "@tanstack/react-query";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Eye, EyeOff, Mail, Lock, User, UserPlus } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { Eye, EyeOff, Mail, Lock, Sparkles } from "lucide-react";
+import { z } from "zod";
+import { useAuth } from "@/hooks/useAuth";
+
+const loginSchema = z.object({
+  email: z.string().email("Email tidak valid"),
+  password: z.string().min(1, "Password wajib diisi"),
+});
+
+type LoginData = z.infer<typeof loginSchema>;
 
 export default function Login() {
-  const [isRegister, setIsRegister] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   const loginForm = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
@@ -38,292 +31,118 @@ export default function Login() {
     },
   });
 
-  const registerForm = useForm<RegisterData>({
-    resolver: zodResolver(registerSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-      firstName: "",
-      lastName: "",
-    },
-  });
-
   const loginMutation = useMutation({
     mutationFn: async (data: LoginData) => {
-      return apiRequest("POST", "/api/auth/login", data);
+      const response = await apiRequest("POST", "/api/auth/login", data);
+      return response.json();
     },
     onSuccess: () => {
-      // Clear logout flag immediately on successful login
-      localStorage.removeItem("isLoggedOut");
-
       toast({
-        title: "Berhasil masuk",
-        description: "Selamat datang kembali!",
-        variant: "default",
-        className: "border-green-200 bg-green-50 text-green-800",
+        title: "Login berhasil",
+        description: "Selamat datang!",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-      // Small delay to ensure queries are invalidated
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 100);
-    },
-    onError: (error: any) => {
-      console.log("Login error:", error);
-      toast({
-        title: "Gagal masuk",
-        description: error.message || "Email atau password salah",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const registerMutation = useMutation({
-    mutationFn: async (data: RegisterData) => {
-      return apiRequest("POST", "/api/auth/register", data);
-    },
-    onSuccess: () => {
-      // Clear logout flag immediately on successful registration
-      localStorage.removeItem("isLoggedOut");
-
-      toast({
-        title: "Berhasil mendaftar",
-        description: "Akun Anda telah dibuat dan otomatis masuk",
-        variant: "default",
-        className: "border-green-200 bg-green-50 text-green-800",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       window.location.href = "/";
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
-        title: "Gagal mendaftar",
-        description: error.message || "Terjadi kesalahan saat mendaftar",
+        title: "Login gagal",
+        description: error.message,
         variant: "destructive",
       });
     },
   });
 
   const handleLogin = (data: LoginData) => {
-    console.log("Login attempt with data:", data);
     loginMutation.mutate(data);
   };
 
-  const handleRegister = (data: RegisterData) => {
-    registerMutation.mutate(data);
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <Card className="shadow-xl border-0">
-          <CardHeader className="text-center space-y-4">
-            <div className="w-16 h-16 mx-auto bg-indigo-600 rounded-full flex items-center justify-center">
-              {isRegister ? (
-                <UserPlus className="w-8 h-8 text-white" />
-              ) : (
-                <User className="w-8 h-8 text-white" />
-              )}
+        <Card className="border-0 shadow-xl bg-white/80 backdrop-blur">
+          <CardHeader className="text-center pb-8 pt-8">
+            <div className="w-12 h-12 bg-gradient-to-r from-orange-600 to-orange-500 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Sparkles className="w-6 h-6 text-white" />
             </div>
-            <div>
-              <CardTitle className="text-2xl font-bold text-gray-900">
-                {isRegister ? "Buat Akun Baru" : "Masuk ke Akun Anda"}
-              </CardTitle>
-              <CardDescription className="text-gray-600 mt-2">
-                {isRegister
-                  ? "Daftar untuk mulai mengelola OKR tim Anda"
-                  : "Kelola tujuan dan pencapaian tim dengan mudah"}
-              </CardDescription>
-            </div>
+            <CardTitle className="text-2xl font-bold text-gray-900">
+              Masuk ke Akun Anda
+            </CardTitle>
+            <CardDescription className="text-gray-600 mt-2">
+              Kelola objective dan angka target Anda
+            </CardDescription>
           </CardHeader>
+          <CardContent className="space-y-6 px-8 pb-8">
+            <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Masukkan email Anda"
+                    {...loginForm.register("email")}
+                    className="pl-10 h-11"
+                  />
+                </div>
+                {loginForm.formState.errors.email && (
+                  <p className="text-sm text-red-600">
+                    {loginForm.formState.errors.email.message}
+                  </p>
+                )}
+              </div>
 
-          <CardContent className="space-y-6">
-            {isRegister ? (
-              <form
-                onSubmit={registerForm.handleSubmit(handleRegister)}
-                className="space-y-4"
-              >
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">Nama Depan</Label>
-                    <Input
-                      id="firstName"
-                      type="text"
-                      placeholder="John"
-                      {...registerForm.register("firstName")}
-                      className="h-11"
-                    />
-                    {registerForm.formState.errors.firstName && (
-                      <p className="text-sm text-red-600">
-                        {registerForm.formState.errors.firstName.message}
-                      </p>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Masukkan password Anda"
+                    {...loginForm.register("password")}
+                    className="pl-10 pr-10 h-11"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
                     )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Nama Belakang</Label>
-                    <Input
-                      id="lastName"
-                      type="text"
-                      placeholder="Doe"
-                      {...registerForm.register("lastName")}
-                      className="h-11"
-                    />
-                  </div>
+                  </button>
                 </div>
+                {loginForm.formState.errors.password && (
+                  <p className="text-sm text-red-600">
+                    {loginForm.formState.errors.password.message}
+                  </p>
+                )}
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="john@company.com"
-                      {...registerForm.register("email")}
-                      className="pl-10 h-11"
-                    />
-                  </div>
-                  {registerForm.formState.errors.email && (
-                    <p className="text-sm text-red-600">
-                      {registerForm.formState.errors.email.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Minimal 6 karakter"
-                      {...registerForm.register("password")}
-                      className="pl-10 pr-10 h-11"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      {showPassword ? (
-                        <EyeOff className="w-5 h-5" />
-                      ) : (
-                        <Eye className="w-5 h-5" />
-                      )}
-                    </button>
-                  </div>
-                  {registerForm.formState.errors.password && (
-                    <p className="text-sm text-red-600">
-                      {registerForm.formState.errors.password.message}
-                    </p>
-                  )}
-                </div>
-
+              <div className="pt-2">
                 <Button
                   type="submit"
-                  className="w-full h-11 bg-indigo-600 hover:bg-indigo-700"
-                  disabled={registerMutation.isPending}
-                >
-                  {registerMutation.isPending
-                    ? "Mendaftar..."
-                    : "Daftar Sekarang"}
-                </Button>
-              </form>
-            ) : (
-              <form
-                onSubmit={loginForm.handleSubmit(handleLogin)}
-                className="space-y-4"
-              >
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="john@company.com"
-                      {...loginForm.register("email")}
-                      className="pl-10 h-11"
-                    />
-                  </div>
-                  {loginForm.formState.errors.email && (
-                    <p className="text-sm text-red-600">
-                      {loginForm.formState.errors.email.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Masukkan password Anda"
-                      {...loginForm.register("password")}
-                      className="pl-10 pr-10 h-11"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      {showPassword ? (
-                        <EyeOff className="w-5 h-5" />
-                      ) : (
-                        <Eye className="w-5 h-5" />
-                      )}
-                    </button>
-                  </div>
-                  {loginForm.formState.errors.password && (
-                    <p className="text-sm text-red-600">
-                      {loginForm.formState.errors.password.message}
-                    </p>
-                  )}
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full h-11 bg-indigo-600 hover:bg-indigo-700"
                   disabled={loginMutation.isPending}
+                  className="w-full h-11 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium"
                 >
                   {loginMutation.isPending ? "Masuk..." : "Masuk"}
                 </Button>
-              </form>
-            )}
-
-            
+              </div>
+            </form>
 
             <div className="text-center space-y-2">
               <p className="text-sm text-gray-600">
-                {isRegister ? "Sudah punya akun?" : "Belum punya akun?"}
+                Belum punya akun?
               </p>
-              <Button
-                variant="link"
-                onClick={() => {
-                  setIsRegister(!isRegister);
-                  loginForm.reset();
-                  registerForm.reset();
-                }}
-                className="text-indigo-600 hover:text-indigo-700 font-medium"
+              <a 
+                href="/client-registration" 
+                className="text-orange-600 hover:text-orange-700 font-medium hover:underline text-sm block"
               >
-                {isRegister ? "Masuk di sini" : "Daftar sekarang"}
-              </Button>
-              
-              <div className="border-t pt-4">
-                <p className="text-sm text-gray-600 mb-2">
-                  Organisasi baru?
-                </p>
-                <a 
-                  href="/client-registration" 
-                  className="text-orange-600 hover:text-orange-700 font-medium hover:underline text-sm"
-                >
-                  Daftar Organisasi
-                </a>
-              </div>
+                Daftar Organisasi Baru
+              </a>
             </div>
           </CardContent>
         </Card>
