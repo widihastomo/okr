@@ -54,7 +54,7 @@ import OKRFormModal from "./okr-form-modal";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationBell } from "@/components/notifications/notification-bell";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+
 
 interface GlobalHeaderProps {
   onMenuToggle?: () => void;
@@ -70,7 +70,7 @@ const taskFormSchema = z.object({
   assignedTo: z.string().optional(),
 });
 
-export default function GlobalHeader() {
+export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeaderProps) {
   const [notificationCount] = useState(1);
   const [isOKRModalOpen, setIsOKRModalOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -179,7 +179,14 @@ export default function GlobalHeader() {
       {/* Left side - Menu toggle and Logo */}
       <div className="flex items-center space-x-3">
         {/* Sidebar toggle button */}
-        <SidebarTrigger />
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={onMenuToggle}
+          className="hover:bg-gray-100"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
 
         {/* Logo */}
         <div className="flex items-center space-x-2">

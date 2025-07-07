@@ -7,8 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import GlobalHeader from "@/components/global-header";
-import { AppSidebar } from "@/components/app-sidebar";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import ClientSidebar from "@/components/client-sidebar";
 import { NotificationProvider } from "@/components/notifications/notification-provider";
 import Dashboard from "@/pages/dashboard";
 import CyclesPage from "@/components/cycles-page";
@@ -53,6 +52,10 @@ function Router() {
     }
   }, [isAuthenticated]);
 
+  const handleMenuToggle = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   // Redirect system owner to system admin dashboard by default
   useEffect(() => {
     if (isAuthenticated && user && (user as any)?.isSystemOwner) {
@@ -88,49 +91,52 @@ function Router() {
 
   return (
     <NotificationProvider>
-      <SidebarProvider>
-        <div className="min-h-screen bg-gray-50 flex">
-          {/* Sidebar */}
-          <AppSidebar />
+      <div className="flex h-screen bg-gray-50">
+        <ClientSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        
+        <div className="flex-1 flex flex-col">
+          {/* Global Header */}
+          <GlobalHeader onMenuToggle={handleMenuToggle} sidebarOpen={sidebarOpen} />
           
-          <SidebarInset className="flex-1">
-            {/* Global Header */}
-            <GlobalHeader />
-            
-            {/* Main Content */}
-            <div className="flex-1 min-h-[calc(100vh-4rem)] p-4">
-            <Switch>
-              <Route path="/" component={DailyFocusPage} />
-              <Route path="/daily-focus" component={DailyFocusPage} />
-              <Route path="/dashboard" component={Dashboard} />
-              <Route path="/home" component={Home} />
-              <Route path="/profile" component={Profile} />
-              <Route path="/company-okr" component={CompanyOKRPage} />
-              <Route path="/key-results/:id" component={KeyResultDetail} />
-              <Route path="/initiatives/:id" component={InitiativeDetail} />
-              <Route path="/objectives/:id" component={ObjectiveDetail} />
-              <Route path="/projects/:id" component={ProjectDetail} />
-              <Route path="/task/:id" component={TaskDetail} />
-              <Route path="/tasks/:id" component={TaskDetail} />
-              <Route path="/cycles" component={CyclesPage} />
-              <Route path="/templates" component={TemplatesPage} />
-              <Route path="/achievements" component={AchievementsPage} />
-              <Route path="/analytics" component={AnalyticsPage} />
-              <Route path="/network" component={NetworkVisualization} />
-              <Route path="/pricing" component={PricingPage} />
-              <Route path="/organization-settings" component={OrganizationSettings} />
-              <Route path="/system-admin" component={SystemAdmin} />
-              <Route path="/user-management" component={UserManagement} />
-              <Route path="/client-users" component={ClientUserManagement} />
-              <Route path="/role-management" component={ClientRoleManagement} />
-              <Route path="/notification-settings" component={NotificationSettings} />
-              <Route path="/register" component={ClientRegistration} />
-              <Route component={NotFound} />
-            </Switch>
+          {/* Main Content */}
+          <div className={cn(
+            "flex-1 min-h-[calc(100vh-4rem)] transition-all duration-300 overflow-x-hidden",
+            "ml-0", // Mobile: no margin left (sidebar is overlay)
+            sidebarOpen ? "lg:ml-64" : "lg:ml-0" // Desktop: margin based on sidebar state
+          )}>
+            <div className="p-4">
+              <Switch>
+                <Route path="/" component={DailyFocusPage} />
+                <Route path="/daily-focus" component={DailyFocusPage} />
+                <Route path="/dashboard" component={Dashboard} />
+                <Route path="/home" component={Home} />
+                <Route path="/profile" component={Profile} />
+                <Route path="/company-okr" component={CompanyOKRPage} />
+                <Route path="/key-results/:id" component={KeyResultDetail} />
+                <Route path="/initiatives/:id" component={InitiativeDetail} />
+                <Route path="/objectives/:id" component={ObjectiveDetail} />
+                <Route path="/projects/:id" component={ProjectDetail} />
+                <Route path="/task/:id" component={TaskDetail} />
+                <Route path="/tasks/:id" component={TaskDetail} />
+                <Route path="/cycles" component={CyclesPage} />
+                <Route path="/templates" component={TemplatesPage} />
+                <Route path="/achievements" component={AchievementsPage} />
+                <Route path="/analytics" component={AnalyticsPage} />
+                <Route path="/network" component={NetworkVisualization} />
+                <Route path="/pricing" component={PricingPage} />
+                <Route path="/organization-settings" component={OrganizationSettings} />
+                <Route path="/system-admin" component={SystemAdmin} />
+                <Route path="/user-management" component={UserManagement} />
+                <Route path="/client-users" component={ClientUserManagement} />
+                <Route path="/role-management" component={ClientRoleManagement} />
+                <Route path="/notification-settings" component={NotificationSettings} />
+                <Route path="/register" component={ClientRegistration} />
+                <Route component={NotFound} />
+              </Switch>
             </div>
-          </SidebarInset>
+          </div>
         </div>
-      </SidebarProvider>
+      </div>
     </NotificationProvider>
   );
 }
