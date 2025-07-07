@@ -957,8 +957,8 @@ export const clientRegistrationSchema = z.object({
   firstName: z.string().min(1, "Nama depan wajib diisi").max(100),
   lastName: z.string().min(1, "Nama belakang wajib diisi").max(100),
   email: z.string().email("Format email tidak valid").max(255),
-  password: z.string().min(8, "Password minimal 8 karakter"),
-  confirmPassword: z.string().min(8, "Konfirmasi password minimal 8 karakter"),
+  password: z.string().min(6, "Password minimal 6 karakter"),
+  confirmPassword: z.string().min(6, "Konfirmasi password minimal 6 karakter"),
   jobTitle: z.string().min(1, "Jabatan wajib diisi").max(100),
   department: z.string().min(1, "Departemen wajib diisi").max(100),
 }).refine((data) => data.password === data.confirmPassword, {

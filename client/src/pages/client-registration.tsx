@@ -422,7 +422,7 @@ export default function ClientRegistration() {
                                 <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                                 <Input 
                                   type="password"
-                                  placeholder="Minimal 8 karakter" 
+                                  placeholder="Minimal 6 karakter" 
                                   {...field}
                                   className="pl-10"
                                 />
