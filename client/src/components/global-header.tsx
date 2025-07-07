@@ -54,6 +54,7 @@ import OKRFormModal from "./okr-form-modal";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationBell } from "@/components/notifications/notification-bell";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 interface GlobalHeaderProps {
   onMenuToggle?: () => void;
@@ -69,10 +70,7 @@ const taskFormSchema = z.object({
   assignedTo: z.string().optional(),
 });
 
-export default function GlobalHeader({
-  onMenuToggle,
-  sidebarOpen,
-}: GlobalHeaderProps) {
+export default function GlobalHeader() {
   const [notificationCount] = useState(1);
   const [isOKRModalOpen, setIsOKRModalOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -177,19 +175,11 @@ export default function GlobalHeader({
   }, []);
 
   return (
-    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between fixed top-0 left-0 right-0 z-50">
+    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
       {/* Left side - Menu toggle and Logo */}
       <div className="flex items-center space-x-3">
-        {/* Hamburger menu button - always visible */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onMenuToggle}
-          className="p-2 hover:bg-gray-100 rounded-md"
-          aria-label="Toggle sidebar"
-        >
-          <Menu className="h-5 w-5 text-gray-600" />
-        </Button>
+        {/* Sidebar toggle button */}
+        <SidebarTrigger />
 
         {/* Logo */}
         <div className="flex items-center space-x-2">

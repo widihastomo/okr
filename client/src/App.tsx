@@ -7,7 +7,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import GlobalHeader from "@/components/global-header";
-import Sidebar from "@/components/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { NotificationProvider } from "@/components/notifications/notification-provider";
 import Dashboard from "@/pages/dashboard";
 import CyclesPage from "@/components/cycles-page";
@@ -87,22 +88,17 @@ function Router() {
 
   return (
     <NotificationProvider>
-      <div className="min-h-screen bg-gray-50">
-        {/* Global Header */}
-        <GlobalHeader onMenuToggle={() => setSidebarOpen(!sidebarOpen)} sidebarOpen={sidebarOpen} />
-        
-        <div className="flex pt-16">
+      <SidebarProvider>
+        <div className="min-h-screen bg-gray-50 flex">
           {/* Sidebar */}
-          <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+          <AppSidebar />
           
-          {/* Main Content */}
-          <div className={cn(
-            "flex-1 min-h-[calc(100vh-4rem)] transition-all duration-300 overflow-x-hidden",
-            // Mobile: no margin left (sidebar is overlay)
-            "ml-0",
-            // Desktop: margin based on sidebar state
-            sidebarOpen ? "lg:ml-64" : "lg:ml-0"
-          )}>
+          <SidebarInset className="flex-1">
+            {/* Global Header */}
+            <GlobalHeader />
+            
+            {/* Main Content */}
+            <div className="flex-1 min-h-[calc(100vh-4rem)] p-4">
             <Switch>
               <Route path="/" component={DailyFocusPage} />
               <Route path="/daily-focus" component={DailyFocusPage} />
@@ -131,9 +127,10 @@ function Router() {
               <Route path="/register" component={ClientRegistration} />
               <Route component={NotFound} />
             </Switch>
-          </div>
+            </div>
+          </SidebarInset>
         </div>
-      </div>
+      </SidebarProvider>
     </NotificationProvider>
   );
 }
