@@ -45,6 +45,16 @@ export default function OrganizationSettings() {
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [teamSearchTerm, setTeamSearchTerm] = useState("");
 
+  // Role management states
+  const [roles, setRoles] = useState([
+    { id: "1", name: "Admin", description: "Full access to all features", permissions: ["read", "write", "delete", "admin"] },
+    { id: "2", name: "Manager", description: "Can manage team and projects", permissions: ["read", "write", "manage_team"] },
+    { id: "3", name: "Member", description: "Basic access to projects", permissions: ["read", "write"] },
+    { id: "4", name: "Viewer", description: "Read-only access", permissions: ["read"] }
+  ]);
+  const [editingRole, setEditingRole] = useState<any>(null);
+  const [roleSearchTerm, setRoleSearchTerm] = useState("");
+
   // Fetch users for organization
   const { data: users = [], isLoading: usersLoading } = useQuery<User[]>({
     queryKey: ["/api/users"],
@@ -307,6 +317,80 @@ export default function OrganizationSettings() {
       team.description?.toLowerCase().includes(teamSearchTerm.toLowerCase());
   });
 
+  // Role management mutations
+  const createRoleMutation = useMutation({
+    mutationFn: async (roleData: any) => {
+      const newRole = {
+        id: Date.now().toString(),
+        ...roleData
+      };
+      setRoles(prev => [...prev, newRole]);
+      return newRole;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Berhasil",
+        description: "Role baru telah dibuat"
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Gagal",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  });
+
+  const updateRoleMutation = useMutation({
+    mutationFn: async ({ id, ...roleData }: any) => {
+      setRoles(prev => prev.map(role => 
+        role.id === id ? { ...role, ...roleData } : role
+      ));
+      return { id, ...roleData };
+    },
+    onSuccess: () => {
+      setEditingRole(null);
+      toast({
+        title: "Berhasil",
+        description: "Role telah diperbarui"
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Gagal",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  });
+
+  const deleteRoleMutation = useMutation({
+    mutationFn: async (roleId: string) => {
+      setRoles(prev => prev.filter(role => role.id !== roleId));
+      return roleId;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Berhasil",
+        description: "Role telah dihapus"
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Gagal",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Filter roles based on search
+  const filteredRoles = roles.filter(role =>
+    role.name.toLowerCase().includes(roleSearchTerm.toLowerCase()) ||
+    role.description.toLowerCase().includes(roleSearchTerm.toLowerCase())
+  );
+
   // Loading state
   if (isLoading) {
     return (
@@ -334,7 +418,7 @@ export default function OrganizationSettings() {
       </div>
 
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5 max-w-3xl">
+        <TabsList className="grid w-full grid-cols-6 max-w-4xl">
           <TabsTrigger value="general">
             <Building2 className="h-4 w-4 mr-2" />
             Umum
@@ -350,6 +434,10 @@ export default function OrganizationSettings() {
           <TabsTrigger value="teams">
             <Users className="h-4 w-4 mr-2" />
             Tim
+          </TabsTrigger>
+          <TabsTrigger value="roles">
+            <Shield className="h-4 w-4 mr-2" />
+            Roles
           </TabsTrigger>
           <TabsTrigger value="settings">
             <Settings className="h-4 w-4 mr-2" />
@@ -1163,6 +1251,258 @@ export default function OrganizationSettings() {
                             {updateTeamMutation.isPending ? "Memperbarui..." : "Perbarui Tim"}
                           </Button>
                         </div>
+                      </div>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Roles Tab */}
+        <TabsContent value="roles">
+          <Card>
+            <CardHeader>
+              <CardTitle>Kelola Roles</CardTitle>
+              <CardDescription>
+                Kelola roles dan permissions dalam organisasi Anda ({filteredRoles.length} roles)
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {/* Add Role and Search Controls */}
+              <div className="flex justify-between items-center mb-6">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Tambah Role
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Tambah Role Baru</DialogTitle>
+                      <DialogDescription>
+                        Buat role baru dengan permissions khusus
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={(e) => {
+                      e.preventDefault();
+                      const formData = new FormData(e.currentTarget);
+                      const permissions = Array.from(formData.getAll('permissions')) as string[];
+                      const roleData = {
+                        name: formData.get('name') as string,
+                        description: formData.get('description') as string,
+                        permissions,
+                      };
+                      createRoleMutation.mutate(roleData);
+                    }}>
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="name">Nama Role</Label>
+                          <Input name="name" placeholder="Contoh: Project Manager" required />
+                        </div>
+                        <div>
+                          <Label htmlFor="description">Deskripsi</Label>
+                          <Input name="description" placeholder="Deskripsi role dan tanggung jawab" required />
+                        </div>
+                        <div>
+                          <Label>Permissions</Label>
+                          <div className="space-y-2 max-h-40 overflow-y-auto">
+                            {['read', 'write', 'delete', 'admin', 'manage_team', 'manage_projects', 'view_analytics', 'manage_settings'].map((permission) => (
+                              <div key={permission} className="flex items-center space-x-2">
+                                <input
+                                  type="checkbox"
+                                  id={`permission-${permission}`}
+                                  name="permissions"
+                                  value={permission}
+                                  className="rounded border-gray-300"
+                                />
+                                <label htmlFor={`permission-${permission}`} className="text-sm capitalize">
+                                  {permission.replace('_', ' ')}
+                                </label>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <Button 
+                          type="submit" 
+                          className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                          disabled={createRoleMutation.isPending}
+                        >
+                          {createRoleMutation.isPending ? "Membuat..." : "Buat Role"}
+                        </Button>
+                      </div>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              {/* Search Controls */}
+              <div className="flex gap-4 mb-6">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input
+                    placeholder="Cari role berdasarkan nama atau deskripsi..."
+                    value={roleSearchTerm}
+                    onChange={(e) => setRoleSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+
+              {/* Roles Table */}
+              <div className="border rounded-lg">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nama Role</TableHead>
+                      <TableHead>Deskripsi</TableHead>
+                      <TableHead>Permissions</TableHead>
+                      <TableHead className="text-right">Aksi</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredRoles.map((role) => (
+                      <TableRow key={role.id}>
+                        <TableCell>
+                          <div className="font-medium text-gray-900">{role.name}</div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm text-gray-600">{role.description}</div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap gap-1">
+                            {role.permissions.slice(0, 3).map((permission) => (
+                              <Badge key={permission} variant="outline" className="text-xs">
+                                {permission.replace('_', ' ')}
+                              </Badge>
+                            ))}
+                            {role.permissions.length > 3 && (
+                              <Badge variant="outline" className="text-xs">
+                                +{role.permissions.length - 3} lainnya
+                              </Badge>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Buka menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                              <DropdownMenuItem onClick={() => setEditingRole(role)}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                Ubah role
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <DropdownMenuItem 
+                                    className="text-red-600"
+                                    onSelect={(e) => e.preventDefault()}
+                                  >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Hapus role
+                                  </DropdownMenuItem>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Tindakan ini tidak dapat dibatalkan. Ini akan menghapus role 
+                                      "{role.name}" secara permanen.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Batal</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => deleteRoleMutation.mutate(role.id)}
+                                      className="bg-red-600 hover:bg-red-700"
+                                    >
+                                      Hapus
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Edit Role Dialog */}
+              {editingRole && (
+                <Dialog open={!!editingRole} onOpenChange={() => setEditingRole(null)}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Ubah Role</DialogTitle>
+                      <DialogDescription>
+                        Perbarui informasi role untuk {editingRole.name}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={(e) => {
+                      e.preventDefault();
+                      const formData = new FormData(e.currentTarget);
+                      const permissions = Array.from(formData.getAll('permissions')) as string[];
+                      updateRoleMutation.mutate({
+                        id: editingRole.id,
+                        name: formData.get('name') as string,
+                        description: formData.get('description') as string,
+                        permissions,
+                      });
+                    }}>
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="name">Nama Role</Label>
+                          <Input 
+                            name="name" 
+                            defaultValue={editingRole.name} 
+                            required 
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="description">Deskripsi</Label>
+                          <Input 
+                            name="description" 
+                            defaultValue={editingRole.description} 
+                            required 
+                          />
+                        </div>
+                        <div>
+                          <Label>Permissions</Label>
+                          <div className="space-y-2 max-h-40 overflow-y-auto">
+                            {['read', 'write', 'delete', 'admin', 'manage_team', 'manage_projects', 'view_analytics', 'manage_settings'].map((permission) => (
+                              <div key={permission} className="flex items-center space-x-2">
+                                <input
+                                  type="checkbox"
+                                  id={`edit-permission-${permission}`}
+                                  name="permissions"
+                                  value={permission}
+                                  defaultChecked={editingRole.permissions.includes(permission)}
+                                  className="rounded border-gray-300"
+                                />
+                                <label htmlFor={`edit-permission-${permission}`} className="text-sm capitalize">
+                                  {permission.replace('_', ' ')}
+                                </label>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <Button 
+                          type="submit" 
+                          className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                          disabled={updateRoleMutation.isPending}
+                        >
+                          {updateRoleMutation.isPending ? "Memperbarui..." : "Perbarui Role"}
+                        </Button>
                       </div>
                     </form>
                   </DialogContent>
