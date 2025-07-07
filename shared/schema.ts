@@ -948,7 +948,7 @@ export type Permission = typeof PERMISSIONS[keyof typeof PERMISSIONS];
 export const clientRegistrationSchema = z.object({
   // Organization info
   organizationName: z.string().min(1, "Nama organisasi wajib diisi").max(255),
-  organizationSlug: z.string().min(1, "Slug organisasi wajib diisi").max(100),
+  organizationSlug: z.string().optional(),
   website: z.string().url("Format website tidak valid").optional().or(z.literal("")),
   industry: z.string().min(1, "Industri wajib dipilih"),
   size: z.string().min(1, "Ukuran organisasi wajib dipilih"),

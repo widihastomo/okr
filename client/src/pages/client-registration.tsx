@@ -88,14 +88,9 @@ export default function ClientRegistration() {
     registerMutation.mutate(data);
   };
 
-  // Generate slug automatically from organization name
+  // Handle organization name change
   const handleOrganizationNameChange = (value: string) => {
     form.setValue("organizationName", value);
-    const slug = value
-      .toLowerCase()
-      .replace(/[^a-z0-9\s]/g, "")
-      .replace(/\s+/g, "-");
-    form.setValue("organizationSlug", slug);
   };
 
   if (isSubmitted) {
@@ -177,27 +172,7 @@ export default function ClientRegistration() {
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="organizationSlug"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Slug Organisasi</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="pt-contoh-indonesia"
-                            {...field}
-                            readOnly
-                            className="bg-gray-50"
-                          />
-                        </FormControl>
-                        <p className="text-sm text-gray-500">
-                          URL akses: platform.com/{field.value}
-                        </p>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  
 
                   <FormField
                     control={form.control}

@@ -3808,10 +3808,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Auto-generate slug from organization name
+      let baseSlug = validatedData.organizationName
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, "")
+        .replace(/\s+/g, "-");
+      
+      // Ensure unique slug
+      let slug = baseSlug;
+      let counter = 1;
+      while (await storage.getOrganizationBySlug(slug)) {
+        slug = `${baseSlug}-${counter}`;
+        counter++;
+      }
+      
       // Create organization with pending status
       const organizationData = {
         name: validatedData.organizationName,
-        slug: validatedData.organizationSlug,
+        slug: slug,
         website: validatedData.website || null,
         industry: validatedData.industry,
         size: validatedData.size,
