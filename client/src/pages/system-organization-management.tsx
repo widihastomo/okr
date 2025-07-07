@@ -73,12 +73,19 @@ export default function SystemOrganizationManagement() {
   }
 
   // Fetch organizations
-  const { data: organizations = [], isLoading: loadingOrgs, refetch } = useQuery<OrganizationWithDetails[]>({
+  const { data: organizations = [], isLoading: loadingOrgs, error, refetch } = useQuery<OrganizationWithDetails[]>({
     queryKey: ["/api/admin/organizations-detailed"],
     queryFn: async () => {
+      console.log("🔄 Fetching organizations from client...");
       const response = await fetch("/api/admin/organizations-detailed");
-      if (!response.ok) throw new Error('Failed to fetch organizations');
-      return response.json();
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("❌ Failed to fetch organizations:", response.status, errorText);
+        throw new Error(`Failed to fetch organizations: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log("✅ Received organizations data:", data.length, "organizations");
+      return data;
     },
   });
 
@@ -232,6 +239,21 @@ export default function SystemOrganizationManagement() {
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-600" />
           <p className="text-gray-600">Memuat data organisasi...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="text-center">
+          <XCircle className="h-8 w-8 mx-auto mb-4 text-red-600" />
+          <p className="text-red-600 mb-4">Gagal memuat data organisasi</p>
+          <Button onClick={() => refetch()} variant="outline">
+            <RotateCcw className="w-4 h-4 mr-2" />
+            Coba Lagi
+          </Button>
         </div>
       </div>
     );

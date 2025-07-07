@@ -11,7 +11,8 @@ import {
   Bell,
   LogOut,
   Menu,
-  Package
+  Package,
+  LayoutDashboard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -29,7 +30,7 @@ export default function SystemAdminSidebar({ isOpen, onClose }: SystemAdminSideb
   const menuItems = [
     {
       label: "Dashboard Sistem",
-      icon: BarChart3,
+      icon: LayoutDashboard,
       path: "/system-admin",
       active: location === "/system-admin"
     },

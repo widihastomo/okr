@@ -3076,6 +3076,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { db } = await import("./db");
       const { eq, sql } = await import("drizzle-orm");
       
+      console.log("🔍 Fetching organizations with detailed info...");
+      
       // Get organizations with owner info and user count
       const result = await db.execute(sql`
         SELECT 
@@ -3090,6 +3092,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         GROUP BY o.id, u.id
         ORDER BY o.created_at DESC
       `);
+      
+      console.log(`📊 Found ${result.rows.length} organizations in database`);
       
       const organizations = result.rows.map((row: any) => ({
         id: row.id,
@@ -3116,9 +3120,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } : null,
       }));
       
+      console.log(`✅ Returning ${organizations.length} organizations to client`);
       res.json(organizations);
     } catch (error) {
-      console.error("Error fetching detailed organizations:", error);
+      console.error("❌ Error fetching detailed organizations:", error);
       res.status(500).json({ message: "Failed to fetch organizations" });
     }
   });
