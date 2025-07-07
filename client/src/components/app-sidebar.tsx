@@ -58,11 +58,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       url: "/organization-management",
       icon: Settings,
     },
-    {
-      title: "Kelola Pengguna",
-      url: "/user-management",
-      icon: Users,
-    },
+
     {
       title: "Kelola Langganan",
       url: "/subscription-management",

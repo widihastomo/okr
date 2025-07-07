@@ -32,7 +32,6 @@ import DailyFocusPage from "@/pages/daily-focus";
 import PricingPage from "@/pages/pricing";
 import OrganizationSettings from "@/pages/organization-settings";
 import SystemAdmin from "@/pages/system-admin";
-import UserManagement from "@/pages/user-management";
 import ClientUserManagement from "@/pages/client-user-management";
 import NotificationSettings from "@/pages/notification-settings";
 import ClientRegistration from "@/pages/client-registration";
@@ -142,7 +141,6 @@ function Router() {
                 component={OrganizationSettings}
               />
               <Route path="/system-admin" component={SystemAdmin} />
-              <Route path="/user-management" component={UserManagement} />
               <Route path="/client-users" component={ClientUserManagement} />
               <Route
                 path="/notification-settings"

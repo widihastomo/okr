@@ -52,13 +52,7 @@ export default function SystemAdmin() {
           <h1 className="text-3xl font-bold mb-2">System Admin Dashboard</h1>
           <p className="text-gray-600">Kelola seluruh sistem SaaS OKR</p>
         </div>
-        <Button 
-          onClick={() => setLocation("/user-management")}
-          className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
-        >
-          <UserPlus className="h-4 w-4 mr-2" />
-          Kelola Pengguna
-        </Button>
+
       </div>
 
       {/* Stats Cards */}

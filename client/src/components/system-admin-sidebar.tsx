@@ -38,12 +38,7 @@ export default function SystemAdminSidebar({ isOpen, onClose }: SystemAdminSideb
       path: "/system-admin/organizations",
       active: location === "/system-admin/organizations"
     },
-    {
-      label: "Kelola Pengguna",
-      icon: Users,
-      path: "/user-management",
-      active: location === "/user-management"
-    },
+
     {
       label: "Kelola Subscription",
       icon: CreditCard,

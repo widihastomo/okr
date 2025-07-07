@@ -71,12 +71,7 @@ export default function Sidebar({
       path: "/system-admin/organizations",
       active: location === "/system-admin/organizations",
     },
-    {
-      label: "Kelola Pengguna",
-      icon: Users,
-      path: "/user-management",
-      active: location === "/user-management",
-    },
+
     {
       label: "Kelola Langganan",
       icon: CreditCard,
