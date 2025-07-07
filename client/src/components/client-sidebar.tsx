@@ -206,15 +206,27 @@ export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse
             // Mobile: slide in/out
             "lg:translate-x-0", // Desktop: always visible
             isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
-            // Desktop: collapsed/expanded width, Mobile: always full width when open
-            isCollapsed ? "lg:w-16" : "lg:w-64",
-            // Mobile: always full width when open
-            "w-64"
+            // Desktop: collapsed/expanded width
+            isCollapsed ? "lg:w-16" : "lg:w-64"
           )}
         >
           
 
-          
+          {/* Desktop collapse toggle button */}
+          <div className="hidden lg:flex justify-end p-2 border-b border-gray-200">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onToggleCollapse}
+              className="h-8 w-8 p-0"
+            >
+              {isCollapsed ? (
+                <ChevronRight className="h-4 w-4" />
+              ) : (
+                <ChevronLeft className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
 
           <nav className="flex-1 px-2 py-4 overflow-y-auto">
             <ul className="space-y-1">
@@ -227,43 +239,30 @@ export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse
                         item.active
                           ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
                           : "text-gray-700 hover:bg-gray-100",
-                        // Desktop: collapsed = center, expanded = space between
-                        // Mobile: always space between (show labels)
-                        isCollapsed ? "lg:px-3 lg:py-2 lg:justify-center px-3 py-2 space-x-3" : "px-3 py-2 space-x-3"
+                        isCollapsed ? "px-3 py-2 justify-center" : "px-3 py-2 space-x-3"
                       )}
                       onClick={onClose}
                     >
-                      <item.icon className="flex-shrink-0 w-5 h-5" />
-                      {/* Desktop: show label only when not collapsed, Mobile: always show label */}
-                      <span className={cn(
-                        isCollapsed ? "lg:hidden" : "",
-                        "truncate"
-                      )}>{item.label}</span>
+                      <item.icon className={cn("flex-shrink-0", isCollapsed ? "w-5 h-5" : "w-5 h-5")} />
+                      {!isCollapsed && <span>{item.label}</span>}
                     </button>
                   </Link>
                 );
 
                 return (
                   <li key={item.path}>
-                    {/* Show tooltip only on desktop when collapsed */}
                     {isCollapsed ? (
-                      <div className="lg:block hidden">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            {menuItem}
-                          </TooltipTrigger>
-                          <TooltipContent side="right">
-                            <p>{item.label}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          {menuItem}
+                        </TooltipTrigger>
+                        <TooltipContent side="right">
+                          <p>{item.label}</p>
+                        </TooltipContent>
+                      </Tooltip>
                     ) : (
                       menuItem
                     )}
-                    {/* On mobile, always show the menu item without tooltip */}
-                    <div className="lg:hidden">
-                      {menuItem}
-                    </div>
                   </li>
                 );
               })}
@@ -272,36 +271,28 @@ export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse
 
           {/* Profile section at bottom */}
           <div className="border-t border-gray-200 p-2">
-            {/* Desktop: show tooltip when collapsed */}
-            {isCollapsed && (
-              <div className="lg:block hidden">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Link href="/profile">
-                      <button
-                        className={cn(
-                          "flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full",
-                          location === "/profile"
-                            ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
-                            : "text-gray-700 hover:bg-gray-100"
-                        )}
-                        onClick={onClose}
-                      >
-                        <User className="w-5 h-5" />
-                      </button>
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent side="right">
-                    <p>Profile</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-            )}
-
-            {/* Desktop: show expanded when not collapsed, Mobile: always show expanded */}
-            <div className={cn(
-              isCollapsed ? "lg:hidden" : ""
-            )}>
+            {isCollapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link href="/profile">
+                    <button
+                      className={cn(
+                        "flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full",
+                        location === "/profile"
+                          ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
+                          : "text-gray-700 hover:bg-gray-100"
+                      )}
+                      onClick={onClose}
+                    >
+                      <User className="w-5 h-5" />
+                    </button>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p>Profile</p>
+                </TooltipContent>
+              </Tooltip>
+            ) : (
               <Link href="/profile">
                 <button
                   className={cn(
@@ -316,7 +307,7 @@ export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse
                   <span>Profile</span>
                 </button>
               </Link>
-            </div>
+            )}
           </div>
         </div>
       </TooltipProvider>

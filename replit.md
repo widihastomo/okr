@@ -136,11 +136,6 @@ Changelog:
   * Maintained white background header and consistent hover states for all users
   * System owners get comprehensive platform administration tools while regular users focus on OKR management
   * Unified design language maintains clean, professional appearance while providing role-appropriate functionality
-  * Implemented unified sidebar collapse system using GlobalHeader Menu button for both mobile and desktop scenarios
-  * Set default sidebar state to collapsed for cleaner interface and maximum content space
-  * Single Menu button handles mobile sidebar toggle and desktop collapse based on screen size detection
-  * Enhanced mobile sidebar to show both icons and menu names when expanded for better usability
-  * Fixed page layout to be fully responsive with full width utilization for optimal content display
 - July 07, 2025. Successfully implemented complete separation between client users and system/owner users:
   * Created dedicated ClientUserManagement page for organization owners to manage users within their organization
   * Updated routing with /client-users route for client user management and maintained /user-management for system routing

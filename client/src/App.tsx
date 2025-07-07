@@ -43,7 +43,7 @@ import ClientRegistration from "@/pages/client-registration";
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [location] = useLocation();
 
   // Clear logout flag on app start if user is authenticated
@@ -107,16 +107,11 @@ function Router() {
           sidebarCollapsed ? "lg:ml-16" : "lg:ml-64" // 16 = 64px for collapsed, 64 = 256px for expanded
         )}>
           {/* Global Header */}
-          <GlobalHeader 
-            onMenuToggle={handleMenuToggle} 
-            sidebarOpen={sidebarOpen}
-            sidebarCollapsed={sidebarCollapsed}
-            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-          />
+          <GlobalHeader onMenuToggle={handleMenuToggle} sidebarOpen={sidebarOpen} />
           
           {/* Main Content */}
           <div className="flex-1 min-h-[calc(100vh-4rem)] overflow-x-hidden">
-            <div className="w-full p-4">
+            <div className="p-4">
               <Switch>
                 <Route path="/" component={DailyFocusPage} />
                 <Route path="/daily-focus" component={DailyFocusPage} />
