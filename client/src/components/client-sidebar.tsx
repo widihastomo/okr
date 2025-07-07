@@ -210,18 +210,7 @@ export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse
             isCollapsed ? "lg:w-16" : "lg:w-64"
           )}
         >
-          {/* Mobile header with close button */}
-          <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Menu</h2>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-8 w-8 p-0"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          
 
           {/* Desktop collapse toggle button */}
           <div className="hidden lg:flex justify-end p-2 border-b border-gray-200">
