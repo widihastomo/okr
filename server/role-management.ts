@@ -65,7 +65,7 @@ export class RoleManagementService {
       return {
         ...user[0],
         permissions: activePermissions,
-      };
+      } as UserWithPermissions;
     } catch (error) {
       console.error("Error getting user permissions:", error);
       throw error;
@@ -298,7 +298,7 @@ export class RoleManagementService {
         usersWithPermissions.push({
           ...user,
           permissions: activePermissions,
-        });
+        } as UserWithPermissions);
       }
 
       return usersWithPermissions;
