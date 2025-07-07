@@ -3822,7 +3822,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Hash password and create user
       const hashedPassword = await hashPassword(validatedData.password);
-      const userData = {
+      const userData: any = {
         email: validatedData.email,
         password: hashedPassword,
         firstName: validatedData.firstName,

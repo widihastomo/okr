@@ -297,7 +297,7 @@ export default function Login() {
 
             
 
-            <div className="text-center">
+            <div className="text-center space-y-2">
               <p className="text-sm text-gray-600">
                 {isRegister ? "Sudah punya akun?" : "Belum punya akun?"}
               </p>
@@ -312,6 +312,18 @@ export default function Login() {
               >
                 {isRegister ? "Masuk di sini" : "Daftar sekarang"}
               </Button>
+              
+              <div className="border-t pt-4">
+                <p className="text-sm text-gray-600 mb-2">
+                  Organisasi baru?
+                </p>
+                <a 
+                  href="/client-registration" 
+                  className="text-orange-600 hover:text-orange-700 font-medium hover:underline text-sm"
+                >
+                  Daftar Organisasi
+                </a>
+              </div>
             </div>
           </CardContent>
         </Card>

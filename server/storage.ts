@@ -1421,6 +1421,28 @@ export class DatabaseStorage implements IStorage {
       return created;
     }
   }
+  
+  // Client Registration Support Methods
+  async getOrganizationBySlug(slug: string): Promise<any> {
+    const { organizations } = await import("@shared/schema");
+    const result = await db.select().from(organizations).where(eq(organizations.slug, slug));
+    return result[0];
+  }
+
+  async createOrganization(orgData: any): Promise<any> {
+    const { organizations } = await import("@shared/schema");
+    const [organization] = await db.insert(organizations).values(orgData).returning();
+    return organization;
+  }
+
+  async updateOrganization(id: string, updates: any): Promise<any> {
+    const { organizations } = await import("@shared/schema");
+    const [updated] = await db.update(organizations)
+      .set(updates)
+      .where(eq(organizations.id, id))
+      .returning();
+    return updated;
+  }
 }
 
 // Use database storage
