@@ -44,7 +44,12 @@ interface SidebarProps {
   onToggleCollapse: () => void;
 }
 
-export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse }: SidebarProps) {
+export default function Sidebar({
+  isOpen,
+  onClose,
+  isCollapsed,
+  onToggleCollapse,
+}: SidebarProps) {
   const [location] = useLocation();
   const { isOwner } = useOrganization();
   const { user } = useAuth();
@@ -209,13 +214,9 @@ export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse
             // Desktop: collapsed/expanded width, Mobile: always full width when open
             isCollapsed ? "lg:w-16" : "lg:w-64",
             // Mobile: always full width when open
-            "w-64"
+            "w-64",
           )}
         >
-          
-
-          
-
           <nav className="flex-1 px-2 py-4 overflow-y-auto">
             <ul className="space-y-1">
               {menuItems.map((item) => {
@@ -229,16 +230,22 @@ export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse
                           : "text-gray-700 hover:bg-gray-100",
                         // Desktop: collapsed = center, expanded = space between
                         // Mobile: always space between (show labels)
-                        isCollapsed ? "lg:px-3 lg:py-2 lg:justify-center px-3 py-2 space-x-3" : "px-3 py-2 space-x-3"
+                        isCollapsed
+                          ? "lg:px-3 lg:py-2 lg:justify-center px-3 py-2 space-x-3"
+                          : "px-3 py-2 space-x-3",
                       )}
                       onClick={onClose}
                     >
                       <item.icon className="flex-shrink-0 w-5 h-5" />
                       {/* Desktop: show label only when not collapsed, Mobile: always show label */}
-                      <span className={cn(
-                        isCollapsed ? "lg:hidden" : "",
-                        "truncate"
-                      )}>{item.label}</span>
+                      <span
+                        className={cn(
+                          isCollapsed ? "lg:hidden" : "",
+                          "truncate",
+                        )}
+                      >
+                        {item.label}
+                      </span>
                     </button>
                   </Link>
                 );
@@ -249,9 +256,7 @@ export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse
                     {isCollapsed ? (
                       <div className="lg:block hidden">
                         <Tooltip>
-                          <TooltipTrigger asChild>
-                            {menuItem}
-                          </TooltipTrigger>
+                          <TooltipTrigger asChild>{menuItem}</TooltipTrigger>
                           <TooltipContent side="right">
                             <p>{item.label}</p>
                           </TooltipContent>
@@ -261,9 +266,7 @@ export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse
                       menuItem
                     )}
                     {/* On mobile, always show the menu item without tooltip */}
-                    <div className="lg:hidden">
-                      {menuItem}
-                    </div>
+                    <div className="lg:hidden">{menuItem}</div>
                   </li>
                 );
               })}
@@ -283,7 +286,7 @@ export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse
                           "flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full",
                           location === "/profile"
                             ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
-                            : "text-gray-700 hover:bg-gray-100"
+                            : "text-gray-700 hover:bg-gray-100",
                         )}
                         onClick={onClose}
                       >
@@ -299,16 +302,14 @@ export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse
             )}
 
             {/* Desktop: show expanded when not collapsed, Mobile: always show expanded */}
-            <div className={cn(
-              isCollapsed ? "lg:hidden" : ""
-            )}>
+            <div className={cn(isCollapsed ? "lg:hidden" : "")}>
               <Link href="/profile">
                 <button
                   className={cn(
                     "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full text-left",
                     location === "/profile"
                       ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
-                      : "text-gray-700 hover:bg-gray-100"
+                      : "text-gray-700 hover:bg-gray-100",
                   )}
                   onClick={onClose}
                 >

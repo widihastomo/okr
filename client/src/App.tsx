@@ -37,9 +37,6 @@ import ClientUserManagement from "@/pages/client-user-management";
 import NotificationSettings from "@/pages/notification-settings";
 import ClientRegistration from "@/pages/client-registration";
 
-
-
-
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -49,7 +46,7 @@ function Router() {
   // Clear logout flag on app start if user is authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      localStorage.removeItem('isLoggedOut');
+      localStorage.removeItem("isLoggedOut");
     }
   }, [isAuthenticated]);
 
@@ -61,8 +58,8 @@ function Router() {
   useEffect(() => {
     if (isAuthenticated && user && (user as any)?.isSystemOwner) {
       // Only redirect if on root path
-      if (location === '/' || location === '/daily-focus') {
-        window.location.href = '/system-admin';
+      if (location === "/" || location === "/daily-focus") {
+        window.location.href = "/system-admin";
       }
     }
   }, [isAuthenticated, user, location]);
@@ -92,60 +89,65 @@ function Router() {
 
   return (
     <NotificationProvider>
-      <div className="flex h-screen bg-gray-50">
-        <ClientSidebar 
-          isOpen={sidebarOpen} 
+      <div className="min-h-screen bg-gray-50">
+        {/* Global Header */}
+        <GlobalHeader
+          onMenuToggle={handleMenuToggle}
+          sidebarOpen={sidebarOpen}
+          sidebarCollapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        />
+        <ClientSidebar
+          isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
           isCollapsed={sidebarCollapsed}
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
         />
-        
+
         {/* Main layout with responsive margin to avoid overlap */}
-        <div className={cn(
-          "flex-1 flex flex-col",
-          // Desktop: Dynamic margin based on sidebar collapsed state, Mobile: full width (sidebar is overlay)
-          sidebarCollapsed ? "lg:ml-16" : "lg:ml-64" // 16 = 64px for collapsed, 64 = 256px for expanded
-        )}>
-          {/* Global Header */}
-          <GlobalHeader 
-            onMenuToggle={handleMenuToggle} 
-            sidebarOpen={sidebarOpen}
-            sidebarCollapsed={sidebarCollapsed}
-            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-          />
-          
+        <div
+          className={cn(
+            "flex-1 flex flex-col",
+            // Desktop: Dynamic margin based on sidebar collapsed state, Mobile: full width (sidebar is overlay)
+            sidebarCollapsed ? "lg:ml-16" : "lg:ml-64", // 16 = 64px for collapsed, 64 = 256px for expanded
+          )}
+        >
           {/* Main Content */}
           <div className="flex-1 min-h-[calc(100vh-4rem)] overflow-x-hidden">
-            <div className="w-full p-4">
-              <Switch>
-                <Route path="/" component={DailyFocusPage} />
-                <Route path="/daily-focus" component={DailyFocusPage} />
-                <Route path="/dashboard" component={Dashboard} />
-                <Route path="/home" component={Home} />
-                <Route path="/profile" component={Profile} />
-                <Route path="/company-okr" component={CompanyOKRPage} />
-                <Route path="/key-results/:id" component={KeyResultDetail} />
-                <Route path="/initiatives/:id" component={InitiativeDetail} />
-                <Route path="/objectives/:id" component={ObjectiveDetail} />
-                <Route path="/projects/:id" component={ProjectDetail} />
-                <Route path="/task/:id" component={TaskDetail} />
-                <Route path="/tasks/:id" component={TaskDetail} />
-                <Route path="/cycles" component={CyclesPage} />
-                <Route path="/templates" component={TemplatesPage} />
-                <Route path="/achievements" component={AchievementsPage} />
-                <Route path="/analytics" component={AnalyticsPage} />
-                <Route path="/network" component={NetworkVisualization} />
-                <Route path="/pricing" component={PricingPage} />
-                <Route path="/organization-settings" component={OrganizationSettings} />
-                <Route path="/system-admin" component={SystemAdmin} />
-                <Route path="/user-management" component={UserManagement} />
-                <Route path="/client-users" component={ClientUserManagement} />
-                <Route path="/role-management" component={ClientRoleManagement} />
-                <Route path="/notification-settings" component={NotificationSettings} />
-                <Route path="/register" component={ClientRegistration} />
-                <Route component={NotFound} />
-              </Switch>
-            </div>
+            <Switch>
+              <Route path="/" component={DailyFocusPage} />
+              <Route path="/daily-focus" component={DailyFocusPage} />
+              <Route path="/dashboard" component={Dashboard} />
+              <Route path="/home" component={Home} />
+              <Route path="/profile" component={Profile} />
+              <Route path="/company-okr" component={CompanyOKRPage} />
+              <Route path="/key-results/:id" component={KeyResultDetail} />
+              <Route path="/initiatives/:id" component={InitiativeDetail} />
+              <Route path="/objectives/:id" component={ObjectiveDetail} />
+              <Route path="/projects/:id" component={ProjectDetail} />
+              <Route path="/task/:id" component={TaskDetail} />
+              <Route path="/tasks/:id" component={TaskDetail} />
+              <Route path="/cycles" component={CyclesPage} />
+              <Route path="/templates" component={TemplatesPage} />
+              <Route path="/achievements" component={AchievementsPage} />
+              <Route path="/analytics" component={AnalyticsPage} />
+              <Route path="/network" component={NetworkVisualization} />
+              <Route path="/pricing" component={PricingPage} />
+              <Route
+                path="/organization-settings"
+                component={OrganizationSettings}
+              />
+              <Route path="/system-admin" component={SystemAdmin} />
+              <Route path="/user-management" component={UserManagement} />
+              <Route path="/client-users" component={ClientUserManagement} />
+              <Route path="/role-management" component={ClientRoleManagement} />
+              <Route
+                path="/notification-settings"
+                component={NotificationSettings}
+              />
+              <Route path="/register" component={ClientRegistration} />
+              <Route component={NotFound} />
+            </Switch>
           </div>
         </div>
       </div>
