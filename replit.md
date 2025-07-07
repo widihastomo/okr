@@ -113,6 +113,13 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- January 12, 2025. Fixed critical security vulnerability - Cross-tenant data leakage in /api/users endpoint:
+  * Previously `/api/users` endpoint was not protected by authentication and returned ALL users across all organizations
+  * Added `requireAuth` middleware to protect the endpoint
+  * Now properly filters users by current user's organizationId using new `getUsersByOrganization` method
+  * Updated IStorage interface and DatabaseStorage implementation with organization-based filtering
+  * This ensures complete multi-tenant data isolation at API level, preventing unauthorized access to other organizations' user data
+  * Security fix aligns with existing PostgreSQL RLS (Row Level Security) for defense in depth
 - July 07, 2025. Successfully implemented unified sidebar system with role-based menu separation and consistent styling:
   * System owners automatically redirected to /system-admin dashboard on login instead of Daily Focus
   * Created conditional sidebar with different menu items for system owners vs regular users
