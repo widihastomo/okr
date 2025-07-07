@@ -3,14 +3,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Building2, Users, CreditCard, Settings, Database, Activity, Loader2, UserPlus } from "lucide-react";
+import { Building2, Users, CreditCard, Settings, Database, Activity, Loader2, UserPlus, Package } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
+import SubscriptionAssignmentModal from "@/components/subscription-assignment-modal";
+import type { Organization } from "@shared/schema";
 
 export default function SystemAdmin() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
+  const [selectedOrganization, setSelectedOrganization] = useState<Organization | null>(null);
+  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
   
   // Check if user is system owner
   if (!user || !(user as any).isSystemOwner) {
@@ -157,8 +161,16 @@ export default function SystemAdmin() {
                       <Badge variant={org.subscription?.status === "active" ? "default" : "secondary"}>
                         {org.subscription?.status || "Inactive"}
                       </Badge>
-                      <Button size="sm" variant="outline">
-                        Kelola
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedOrganization(org);
+                          setIsSubscriptionModalOpen(true);
+                        }}
+                      >
+                        <Package className="w-4 h-4 mr-1" />
+                        Kelola Paket
                       </Button>
                     </div>
                   </div>
@@ -196,9 +208,17 @@ export default function SystemAdmin() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8 text-gray-600">
+              <div className="text-center py-8">
                 <CreditCard className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                <p>Fitur manajemen langganan akan segera tersedia</p>
+                <h3 className="text-lg font-semibold mb-2">Kelola Paket Berlangganan</h3>
+                <p className="text-gray-600 mb-4">Buat dan kelola paket berlangganan untuk organisasi</p>
+                <Button 
+                  onClick={() => setLocation("/subscription-packages")}
+                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                >
+                  <Package className="w-4 h-4 mr-2" />
+                  Kelola Paket
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -232,6 +252,18 @@ export default function SystemAdmin() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Subscription Assignment Modal */}
+      {selectedOrganization && (
+        <SubscriptionAssignmentModal
+          isOpen={isSubscriptionModalOpen}
+          onClose={() => {
+            setIsSubscriptionModalOpen(false);
+            setSelectedOrganization(null);
+          }}
+          organization={selectedOrganization}
+        />
+      )}
     </div>
   );
 }

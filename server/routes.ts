@@ -3136,6 +3136,133 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Organization subscription assignment endpoints (System Owner only)
+  
+  // Get organization with subscription details
+  app.get("/api/admin/organizations/:id/subscription", isSystemOwner, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      const { organizations, organizationSubscriptions, subscriptionPlans } = await import("@shared/schema");
+
+      const [orgWithSubscription] = await db
+        .select({
+          organization: organizations,
+          subscription: organizationSubscriptions,
+          plan: subscriptionPlans,
+        })
+        .from(organizations)
+        .leftJoin(organizationSubscriptions, eq(organizations.id, organizationSubscriptions.organizationId))
+        .leftJoin(subscriptionPlans, eq(organizationSubscriptions.planId, subscriptionPlans.id))
+        .where(eq(organizations.id, id))
+        .limit(1);
+
+      if (!orgWithSubscription) {
+        return res.status(404).json({ message: "Organization not found" });
+      }
+
+      res.json(orgWithSubscription);
+    } catch (error) {
+      console.error("Error fetching organization subscription:", error);
+      res.status(500).json({ message: "Failed to fetch organization subscription" });
+    }
+  });
+
+  // Assign subscription plan to organization
+  app.post("/api/admin/organizations/:id/subscription", isSystemOwner, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { planId } = req.body;
+
+      if (!planId) {
+        return res.status(400).json({ message: "Plan ID is required" });
+      }
+
+      const { db } = await import("./db");
+      const { eq, and } = await import("drizzle-orm");
+      const { organizations, organizationSubscriptions, subscriptionPlans } = await import("@shared/schema");
+
+      // Verify organization exists
+      const [organization] = await db
+        .select()
+        .from(organizations)
+        .where(eq(organizations.id, id))
+        .limit(1);
+
+      if (!organization) {
+        return res.status(404).json({ message: "Organization not found" });
+      }
+
+      // Verify plan exists and is active
+      const [plan] = await db
+        .select()
+        .from(subscriptionPlans)
+        .where(and(eq(subscriptionPlans.id, planId), eq(subscriptionPlans.isActive, true)))
+        .limit(1);
+
+      if (!plan) {
+        return res.status(404).json({ message: "Subscription plan not found or inactive" });
+      }
+
+      // Check if organization already has a subscription
+      const [existingSubscription] = await db
+        .select()
+        .from(organizationSubscriptions)
+        .where(eq(organizationSubscriptions.organizationId, id))
+        .limit(1);
+
+      let subscription;
+      if (existingSubscription) {
+        // Update existing subscription
+        [subscription] = await db
+          .update(organizationSubscriptions)
+          .set({
+            planId,
+            updatedAt: new Date(),
+          })
+          .where(eq(organizationSubscriptions.organizationId, id))
+          .returning();
+      } else {
+        // Create new subscription
+        [subscription] = await db
+          .insert(organizationSubscriptions)
+          .values({
+            organizationId: id,
+            planId,
+            status: "active",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .returning();
+      }
+
+      res.json({ subscription, plan });
+    } catch (error) {
+      console.error("Error assigning subscription:", error);
+      res.status(500).json({ message: "Failed to assign subscription" });
+    }
+  });
+
+  // Remove subscription from organization
+  app.delete("/api/admin/organizations/:id/subscription", isSystemOwner, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      const { organizationSubscriptions } = await import("@shared/schema");
+
+      await db
+        .delete(organizationSubscriptions)
+        .where(eq(organizationSubscriptions.organizationId, id));
+
+      res.json({ message: "Subscription removed successfully" });
+    } catch (error) {
+      console.error("Error removing subscription:", error);
+      res.status(500).json({ message: "Failed to remove subscription" });
+    }
+  });
+
   // Get current user's organization and subscription
   app.get("/api/my-organization", requireAuth, async (req, res) => {
     try {
