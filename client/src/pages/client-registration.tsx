@@ -45,6 +45,7 @@ export default function ClientRegistration() {
 
   const form = useForm<ClientRegistrationData>({
     resolver: zodResolver(clientRegistrationSchema),
+    mode: "onChange",
     defaultValues: {
       organizationName: "",
       organizationSlug: "",
@@ -83,6 +84,9 @@ export default function ClientRegistration() {
   });
 
   const onSubmit = (data: ClientRegistrationData) => {
+    console.log('Form submitted with data:', data);
+    console.log('Form errors:', form.formState.errors);
+    console.log('Form is valid:', form.formState.isValid);
     registerMutation.mutate(data);
   };
 
@@ -582,6 +586,22 @@ export default function ClientRegistration() {
                         type="submit" 
                         disabled={registerMutation.isPending}
                         className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                        onClick={async () => {
+                          console.log('Button clicked');
+                          console.log('Form state:', form.formState);
+                          console.log('Form values:', form.getValues());
+                          console.log('Form errors:', form.formState.errors);
+                          
+                          // Trigger validation manually
+                          const isValid = await form.trigger();
+                          console.log('Manual validation result:', isValid);
+                          
+                          if (isValid) {
+                            console.log('Form is valid, will submit');
+                          } else {
+                            console.log('Form is invalid');
+                          }
+                        }}
                       >
                         {registerMutation.isPending ? (
                           <div className="flex items-center gap-2">
