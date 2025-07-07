@@ -200,42 +200,7 @@ export default function GlobalHeader({
 
       {/* Right side - Action buttons and notifications */}
       <div className="flex items-center space-x-3">
-        {/* Notification Bell */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="relative p-2 hover:bg-gray-100"
-            >
-              <Bell className="h-5 w-5 text-gray-600" />
-              {notificationCount > 0 && (
-                <Badge
-                  variant="destructive"
-                  className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-                >
-                  {notificationCount}
-                </Badge>
-              )}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-64 z-[70]">
-            <DropdownMenuItem>
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium">Update progress OKR Q1</p>
-                <p className="text-xs text-gray-500">2 jam yang lalu</p>
-              </div>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium">
-                  Deadline key result mendekat
-                </p>
-                <p className="text-xs text-gray-500">1 hari yang lalu</p>
-              </div>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+
 
         {/* Quick Action FAB */}
         <div className="relative">

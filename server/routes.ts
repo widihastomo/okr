@@ -3339,6 +3339,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Test notification creation endpoint
+  app.post("/api/notifications/test", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+
+      const testNotification = await storage.createNotification({
+        userId: currentUser.id,
+        organizationId: currentUser.organizationId || "",
+        type: 'comment_added',
+        title: 'Test Notification',
+        message: 'This is a test notification to verify the system is working',
+        entityType: 'task',
+        entityId: '00000000-0000-0000-0000-000000000000',
+        entityTitle: 'Test Task',
+        actorId: currentUser.id,
+        isRead: false,
+        metadata: { test: true }
+      });
+
+      res.json(testNotification);
+    } catch (error: any) {
+      console.error("Error creating test notification:", error);
+      res.status(500).json({ message: "Failed to create test notification" });
+    }
+  });
+
   app.get("/api/notifications/unread-count", requireAuth, async (req, res) => {
     try {
       const currentUser = req.user as User;
