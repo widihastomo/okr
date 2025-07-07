@@ -83,8 +83,6 @@ export default function ClientRegistration() {
   });
 
   const onSubmit = (data: ClientRegistrationData) => {
-    console.log('Form submitted with data:', data);
-    console.log('Form errors:', form.formState.errors);
     registerMutation.mutate(data);
   };
 
@@ -555,16 +553,6 @@ export default function ClientRegistration() {
                         type="submit" 
                         disabled={registerMutation.isPending}
                         className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
-                        onClick={(e) => {
-                          console.log('Submit button clicked');
-                          console.log('Form state:', form.formState);
-                          console.log('Form values:', form.getValues());
-                          console.log('Form errors:', form.formState.errors);
-                          if (!form.formState.isValid) {
-                            e.preventDefault();
-                            console.log('Form is not valid, preventing submit');
-                          }
-                        }}
                       >
                         {registerMutation.isPending ? (
                           <div className="flex items-center gap-2">
