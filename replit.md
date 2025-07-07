@@ -427,28 +427,13 @@ Changelog:
   * All API endpoints protected with authentication middleware
   * Multi-tenant data isolation ensures queries filtered by organizationId
   * Three-tier role system (system owner, organization owner, members) for access control
-- July 05, 2025. Enhanced Collaborative Goal Visualization with D3.js interactive mindmap:
-  * Upgraded to D3.js-powered hierarchical tree layout for intuitive goal visualization
-  * Created interactive mindmap with root system branching into objectives, key results, and initiatives
-  * Added dynamic node sizing and color coding based on status and progress
-  * Implemented progress rings around nodes showing completion percentage
-  * Added zoom, pan, and fit-to-screen controls for navigation
-  * Enhanced with smooth animations and hover effects for better user interaction
-  * Integrated detailed node information panel with status, progress, and owner details
-  * Added comprehensive legend explaining node types, progress indicators, and controls
-  * Created hierarchical layout showing clear relationships from objectives down to initiatives
-  * Mindmap provides intuitive visual understanding of organizational goal structure
-- July 05, 2025. Implemented Collaborative Goal Visualization Network feature for relationship mapping:
-  * Created interactive network visualization showing connections between objectives, key results, and initiatives
-  * Built hierarchical layout with three levels: Objectives (blue), Angka Target (green), Inisiatif (purple)
-  * Added connection tracking system showing how goals relate to each other and to users
-  * Implemented filtering options: All Connections, Objective Focus, Angka Target Focus, Inisiatif Focus
-  * Created detailed item selection with progress visualization, status badges, and owner information
-  * Added comprehensive legend and details panel for better user understanding
-  * Enhanced with responsive grid layout optimized for different screen sizes
-  * Integrated with existing data model to show real-time connections and relationships
-  * Added "Jaringan Goal" navigation menu item and dedicated /goal-network route
-  * Network visualization helps teams understand collaboration patterns and goal dependencies
+- July 07, 2025. Removed Network Visualization feature per user request:
+  * Deleted network-visualization.tsx page and all related components
+  * Removed "Jaringan Goal" menu item from sidebar navigation
+  * Cleaned up unused Goal icon import from lucide-react
+  * Removed /network route from App.tsx routing configuration
+  * Simplified application by removing complex D3.js visualization system
+  * Application now focuses on core OKR management without network visualization complexity
 - July 05, 2025. Created comprehensive Daily Focus dashboard page for daily activity management:
   * Built dedicated Daily Focus page accessible via sidebar navigation with Calendar icon
   * Integrated overview cards showing today's tasks, overdue tasks, active key results, and active initiatives

@@ -19,7 +19,7 @@ import {
   Focus,
   CheckSquare,
   Sun,
-  Goal,
+
   Database,
   Bell,
   Lock,
@@ -152,12 +152,7 @@ export default function Sidebar({
       path: "/analytics",
       active: location === "/analytics",
     },
-    {
-      label: "Jaringan Goal",
-      icon: Goal,
-      path: "/network",
-      active: location === "/network",
-    },
+
     {
       label: "Harga",
       icon: CreditCard,
