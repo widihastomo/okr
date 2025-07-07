@@ -27,6 +27,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
+import { useOrganization } from "@/hooks/useOrganization";
 // Helper components for role management
 function RoleEditForm({ user, onSave, onCancel, isLoading }: any) {
   return (
@@ -104,6 +105,7 @@ interface RoleTemplate {
 
 export default function ClientRoleManagement() {
   const { user } = useAuth();
+  const { isOwner } = useOrganization();
   const userTyped = user as any;
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -116,8 +118,8 @@ export default function ClientRoleManagement() {
   const [showRoleTemplateModal, setShowRoleTemplateModal] = useState(false);
   const [showBulkAssignModal, setShowBulkAssignModal] = useState(false);
 
-  // Check if current user is organization admin
-  const canManageRoles = userTyped?.role === "organization_admin" || userTyped?.isSystemOwner;
+  // Check if current user is organization owner or system owner
+  const canManageRoles = isOwner || userTyped?.isSystemOwner;
   
   if (!canManageRoles) {
     return (
