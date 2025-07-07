@@ -60,6 +60,36 @@ export const subscriptionPlans = pgTable("subscription_plans", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Add-ons table
+export const subscriptionAddOns = pgTable("subscription_add_ons", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(), // "Additional User"
+  slug: text("slug").notNull().unique(), // "additional-user"
+  description: text("description"),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(), // Price per billing period
+  type: text("type").notNull(), // "per_user", "one_time"
+  stripePriceId: text("stripe_price_id"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Organization Add-on Subscriptions
+export const organizationAddOnSubscriptions = pgTable("organization_add_on_subscriptions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
+  addOnId: uuid("add_on_id").notNull().references(() => subscriptionAddOns.id),
+  quantity: integer("quantity").notNull().default(1), // Number of add-ons (e.g., additional users)
+  billingPeriodId: uuid("billing_period_id").notNull().references(() => billingPeriods.id),
+  status: text("status").notNull().default("active"), // "active", "cancelled"
+  currentPeriodStart: timestamp("current_period_start").notNull(),
+  currentPeriodEnd: timestamp("current_period_end").notNull(),
+  cancelledAt: timestamp("cancelled_at"),
+  stripeSubscriptionItemId: text("stripe_subscription_item_id"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Billing Periods table for flexible pricing
 export const billingPeriods = pgTable("billing_periods", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -251,7 +281,7 @@ export const initiatives = pgTable("initiatives", {
   budget: decimal("budget", { precision: 15, scale: 2 }), // Project budget
   budgetUsed: decimal("budget_used", { precision: 15, scale: 2 }), // Actual budget used when closing
   progressPercentage: integer("progress_percentage").default(0), // 0-100%
-  
+
   // Closure information (filled when status changes to "selesai")
   finalResult: text("final_result"), // "berhasil", "tidak_berhasil", "ulangi"
   learningInsights: text("learning_insights"), // Catatan pembelajaran/insight
@@ -259,7 +289,7 @@ export const initiatives = pgTable("initiatives", {
   attachmentUrls: text("attachment_urls").array(), // Array of file URLs for attachments
   closedBy: uuid("closed_by").references(() => users.id), // Who closed the initiative
   closedAt: timestamp("closed_at"), // When it was closed
-  
+
   // Priority calculation fields (1-5 scale, simplified)
   impactScore: integer("impact_score").default(3), // Business impact: 1=very low, 5=very high
   effortScore: integer("effort_score").default(3), // Implementation effort: 1=very easy, 5=very hard
@@ -613,6 +643,8 @@ export type BillingPeriod = typeof billingPeriods.$inferSelect;
 export type InsertBillingPeriod = typeof billingPeriods.$inferInsert;
 export type Organization = typeof organizations.$inferSelect;
 export type OrganizationSubscription = typeof organizationSubscriptions.$inferSelect;
+export type SubscriptionAddOn = typeof subscriptionAddOns.$inferSelect;
+export type OrganizationAddOnSubscription = typeof organizationSubscriptions = typeof organizationAddOnSubscriptions.$inferSelect;
 
 // Gamification Primary Types
 export type Achievement = typeof achievements.$inferSelect;
@@ -944,27 +976,27 @@ export const PERMISSIONS = {
   INVITE_USERS: 'invite_users',
   VIEW_USERS: 'view_users',
   DEACTIVATE_USERS: 'deactivate_users',
-  
+
   // OKR Management
   CREATE_OBJECTIVES: 'create_objectives',
   EDIT_OBJECTIVES: 'edit_objectives',
   DELETE_OBJECTIVES: 'delete_objectives',
   VIEW_OBJECTIVES: 'view_objectives',
-  
+
   // Initiative Management
   CREATE_INITIATIVES: 'create_initiatives',
   EDIT_INITIATIVES: 'edit_initiatives',
   DELETE_INITIATIVES: 'delete_initiatives',
   VIEW_INITIATIVES: 'view_initiatives',
-  
+
   // Analytics & Reporting
   VIEW_ANALYTICS: 'view_analytics',
   EXPORT_DATA: 'export_data',
-  
+
   // Organization Settings
   MANAGE_ORGANIZATION: 'manage_organization',
   MANAGE_BILLING: 'manage_billing',
-  
+
   // System Administration
   SYSTEM_ADMIN: 'system_admin',
   AUDIT_LOGS: 'audit_logs',
@@ -980,7 +1012,7 @@ export const clientRegistrationSchema = z.object({
   website: z.string().url("Format website tidak valid").optional().or(z.literal("")),
   industry: z.string().min(1, "Industri wajib dipilih"),
   size: z.string().min(1, "Ukuran organisasi wajib dipilih"),
-  
+
   // Owner info
   firstName: z.string().min(1, "Nama depan wajib diisi").max(100),
   lastName: z.string().min(1, "Nama belakang wajib diisi").max(100),

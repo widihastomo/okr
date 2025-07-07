@@ -83,17 +83,17 @@ export async function populateSaaSData() {
 
     // Create billing periods for each plan with different discounts
     const { billingPeriods } = await import("@shared/schema");
-    
+
     const billingPeriodsData = [];
-    
+
     for (const plan of plans) {
       if (plan.slug === "enterprise") {
         // Enterprise has custom pricing, skip automatic billing periods
         continue;
       }
-      
+
       const basePrice = parseFloat(plan.basePrice);
-      
+
       // Monthly (no discount)
       billingPeriodsData.push({
         planId: plan.id,
@@ -102,7 +102,7 @@ export async function populateSaaSData() {
         price: plan.basePrice,
         discountPercentage: 0,
       });
-      
+
       // Quarterly (5% discount)
       const quarterlyPrice = (basePrice * 3 * 0.95).toString();
       billingPeriodsData.push({
@@ -112,7 +112,7 @@ export async function populateSaaSData() {
         price: quarterlyPrice,
         discountPercentage: 5,
       });
-      
+
       // Annual (15% discount)
       const annualPrice = (basePrice * 12 * 0.85).toString();
       billingPeriodsData.push({
@@ -123,7 +123,7 @@ export async function populateSaaSData() {
         discountPercentage: 15,
       });
     }
-    
+
     const createdBillingPeriods = await db.insert(billingPeriods).values(billingPeriodsData).returning();
     console.log("✅ Created billing periods with discounts:", createdBillingPeriods.length);
 
@@ -156,12 +156,12 @@ export async function populateSaaSData() {
 
     // Create subscriptions for organizations with different billing periods
     const now = new Date();
-    
+
     // Find billing periods for each plan
     const starterMonthly = createdBillingPeriods.find(bp => bp.planId === plans[0].id && bp.periodType === "monthly");
     const growthQuarterly = createdBillingPeriods.find(bp => bp.planId === plans[1].id && bp.periodType === "quarterly");
     const scaleAnnual = createdBillingPeriods.find(bp => bp.planId === plans[2].id && bp.periodType === "annual");
-    
+
     const subscriptions = await db.insert(organizationSubscriptions).values([
       {
         organizationId: sampleOrgs[0].id, // PT Teknologi Maju - Growth plan (quarterly)
@@ -199,12 +199,12 @@ export async function populateSaaSData() {
 
     // Update existing users to belong to organizations
     const allUsers = await db.select().from(users);
-    
+
     // First, ensure admin user (550e8400-e29b-41d4-a716-446655440001) is assigned to PT Teknologi Maju
     await db.update(users)
       .set({ organizationId: sampleOrgs[0].id })
       .where(eq(users.id, '550e8400-e29b-41d4-a716-446655440001'));
-    
+
     // Assign first 3 users to PT Teknologi Maju
     if (allUsers.length >= 3) {
       await db.update(users)

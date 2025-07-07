@@ -38,6 +38,7 @@ import NotificationSettings from "@/pages/notification-settings";
 import ClientRegistration from "@/pages/client-registration";
 import SubscriptionPackageManagement from "@/pages/subscription-package-management";
 import SystemOrganizationManagement from "@/pages/system-organization-management";
+import AddOnsManagement from "@/pages/add-ons-management";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -162,6 +163,10 @@ function Router() {
               <Route 
                 path="/subscription-packages" 
                 component={SubscriptionPackageManagement} 
+              />
+              <Route 
+                path="/add-ons" 
+                component={AddOnsManagement} 
               />
               <Route component={NotFound} />
             </Switch>

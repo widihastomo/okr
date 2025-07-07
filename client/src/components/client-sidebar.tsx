@@ -25,6 +25,7 @@ import {
   Lock,
   ChevronLeft,
   ChevronRight,
+  Package,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -153,6 +154,12 @@ export default function Sidebar({
       icon: CreditCard,
       path: "/pricing",
       active: location === "/pricing",
+    },
+    {
+      label: "Add-Ons",
+      icon: Package,
+      path: "/add-ons",
+      active: location === "/add-ons",
     },
   ];
 

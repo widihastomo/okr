@@ -3528,6 +3528,235 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Add-on Management Endpoints
+
+  // Get all available add-ons (public)
+  app.get("/api/subscription-add-ons", async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      const { subscriptionAddOns } = await import("@shared/schema");
+      
+      const planSlug = req.query.planSlug as string;
+      
+      const addOns = await db.select().from(subscriptionAddOns).where(eq(subscriptionAddOns.isActive, true));
+      
+      // Filter add-ons based on plan if specified
+      const filteredAddOns = planSlug 
+        ? addOns.filter(addon => 
+            addon.applicablePlans.length === 0 || // Available for all plans
+            addon.applicablePlans.includes(planSlug)
+          )
+        : addOns;
+      
+      res.json(filteredAddOns);
+    } catch (error) {
+      console.error("Error fetching add-ons:", error);
+      res.status(500).json({ message: "Failed to fetch add-ons" });
+    }
+  });
+
+  // Get organization's add-on subscriptions
+  app.get("/api/organization/add-ons", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      const { organizationAddOnSubscriptions, subscriptionAddOns } = await import("@shared/schema");
+      
+      const user = await storage.getUser(userId);
+      if (!user || !user.organizationId) {
+        return res.status(404).json({ message: "No organization found for user" });
+      }
+
+      const addOnSubs = await db.select({
+        subscription: organizationAddOnSubscriptions,
+        addOn: subscriptionAddOns
+      })
+      .from(organizationAddOnSubscriptions)
+      .leftJoin(subscriptionAddOns, eq(organizationAddOnSubscriptions.addOnId, subscriptionAddOns.id))
+      .where(eq(organizationAddOnSubscriptions.organizationId, user.organizationId));
+
+      res.json(addOnSubs);
+    } catch (error) {
+      console.error("Error fetching organization add-ons:", error);
+      res.status(500).json({ message: "Failed to fetch organization add-ons" });
+    }
+  });
+
+  // Subscribe to an add-on
+  app.post("/api/organization/add-ons/subscribe", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const { addOnId, quantity = 1 } = req.body;
+      
+      if (!addOnId) {
+        return res.status(400).json({ message: "Add-on ID is required" });
+      }
+
+      const { db } = await import("./db");
+      const { eq, and } = await import("drizzle-orm");
+      const { 
+        organizationAddOnSubscriptions, 
+        subscriptionAddOns, 
+        organizations 
+      } = await import("@shared/schema");
+      
+      const user = await storage.getUser(userId);
+      if (!user || !user.organizationId) {
+        return res.status(404).json({ message: "No organization found for user" });
+      }
+
+      // Check if user is organization owner
+      const [organization] = await db.select().from(organizations).where(eq(organizations.id, user.organizationId));
+      if (!organization || organization.ownerId !== user.id) {
+        return res.status(403).json({ message: "Only organization owner can subscribe to add-ons" });
+      }
+
+      // Get add-on details
+      const [addOn] = await db.select().from(subscriptionAddOns).where(eq(subscriptionAddOns.id, addOnId));
+      if (!addOn || !addOn.isActive) {
+        return res.status(404).json({ message: "Add-on not found or inactive" });
+      }
+
+      // Check if already subscribed
+      const [existingSubscription] = await db.select()
+        .from(organizationAddOnSubscriptions)
+        .where(and(
+          eq(organizationAddOnSubscriptions.organizationId, user.organizationId),
+          eq(organizationAddOnSubscriptions.addOnId, addOnId),
+          eq(organizationAddOnSubscriptions.status, "active")
+        ));
+
+      if (existingSubscription) {
+        // Update quantity if already subscribed
+        const newQuantity = existingSubscription.quantity + quantity;
+        const newTotalPrice = (parseFloat(addOn.unitPrice) * newQuantity).toString();
+        
+        const [updatedSubscription] = await db.update(organizationAddOnSubscriptions)
+          .set({
+            quantity: newQuantity,
+            totalPrice: newTotalPrice,
+            updatedAt: new Date(),
+          })
+          .where(eq(organizationAddOnSubscriptions.id, existingSubscription.id))
+          .returning();
+
+        res.json(updatedSubscription);
+      } else {
+        // Create new subscription
+        const totalPrice = (parseFloat(addOn.unitPrice) * quantity).toString();
+        
+        const [newSubscription] = await db.insert(organizationAddOnSubscriptions)
+          .values({
+            organizationId: user.organizationId,
+            addOnId,
+            quantity,
+            unitPrice: addOn.unitPrice,
+            totalPrice,
+            status: "active",
+          })
+          .returning();
+
+        res.json(newSubscription);
+      }
+    } catch (error) {
+      console.error("Error subscribing to add-on:", error);
+      res.status(500).json({ message: "Failed to subscribe to add-on" });
+    }
+  });
+
+  // Update add-on subscription quantity
+  app.patch("/api/organization/add-ons/:subscriptionId", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const { subscriptionId } = req.params;
+      const { quantity } = req.body;
+      
+      if (!quantity || quantity < 0) {
+        return res.status(400).json({ message: "Valid quantity is required" });
+      }
+
+      const { db } = await import("./db");
+      const { eq, and } = await import("drizzle-orm");
+      const { 
+        organizationAddOnSubscriptions, 
+        subscriptionAddOns,
+        organizations 
+      } = await import("@shared/schema");
+      
+      const user = await storage.getUser(userId);
+      if (!user || !user.organizationId) {
+        return res.status(404).json({ message: "No organization found for user" });
+      }
+
+      // Check if user is organization owner
+      const [organization] = await db.select().from(organizations).where(eq(organizations.id, user.organizationId));
+      if (!organization || organization.ownerId !== user.id) {
+        return res.status(403).json({ message: "Only organization owner can modify add-ons" });
+      }
+
+      // Get subscription with add-on details
+      const [subscriptionWithAddOn] = await db.select({
+        subscription: organizationAddOnSubscriptions,
+        addOn: subscriptionAddOns
+      })
+      .from(organizationAddOnSubscriptions)
+      .leftJoin(subscriptionAddOns, eq(organizationAddOnSubscriptions.addOnId, subscriptionAddOns.id))
+      .where(and(
+        eq(organizationAddOnSubscriptions.id, subscriptionId),
+        eq(organizationAddOnSubscriptions.organizationId, user.organizationId)
+      ));
+
+      if (!subscriptionWithAddOn || !subscriptionWithAddOn.addOn) {
+        return res.status(404).json({ message: "Add-on subscription not found" });
+      }
+
+      if (quantity === 0) {
+        // Cancel subscription if quantity is 0
+        const [cancelledSubscription] = await db.update(organizationAddOnSubscriptions)
+          .set({
+            status: "cancelled",
+            cancelledAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .where(eq(organizationAddOnSubscriptions.id, subscriptionId))
+          .returning();
+
+        res.json(cancelledSubscription);
+      } else {
+        // Update quantity
+        const newTotalPrice = (parseFloat(subscriptionWithAddOn.addOn.unitPrice) * quantity).toString();
+        
+        const [updatedSubscription] = await db.update(organizationAddOnSubscriptions)
+          .set({
+            quantity,
+            totalPrice: newTotalPrice,
+            updatedAt: new Date(),
+          })
+          .where(eq(organizationAddOnSubscriptions.id, subscriptionId))
+          .returning();
+
+        res.json(updatedSubscription);
+      }
+    } catch (error) {
+      console.error("Error updating add-on subscription:", error);
+      res.status(500).json({ message: "Failed to update add-on subscription" });
+    }
+  });
+
   // Check organization limits (for enforcing plan restrictions)
   app.get("/api/organization/check-limits", requireAuth, async (req, res) => {
     try {
@@ -3537,7 +3766,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const { db } = await import("./db");
-      const { eq, count } = await import("drizzle-orm");
+      const { eq, count, and } = await import("drizzle-orm");
+      const { organizationAddOnSubscriptions, subscriptionAddOns } = await import("@shared/schema");
       
       const user = await storage.getUser(userId);
       if (!user || !user.organizationId) {
@@ -3559,11 +3789,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .from(users)
         .where(eq(users.organizationId, user.organizationId));
 
+      // Get extra user add-ons
+      const [extraUserAddOn] = await db.select({
+        addOn: subscriptionAddOns,
+        subscription: organizationAddOnSubscriptions
+      })
+      .from(organizationAddOnSubscriptions)
+      .leftJoin(subscriptionAddOns, eq(organizationAddOnSubscriptions.addOnId, subscriptionAddOns.id))
+      .where(and(
+        eq(organizationAddOnSubscriptions.organizationId, user.organizationId),
+        eq(subscriptionAddOns.slug, "extra-user"),
+        eq(organizationAddOnSubscriptions.status, "active")
+      ));
+
       const plan = subscription.subscription_plans;
+      const baseMaxUsers = plan.maxUsers;
+      const extraUsers = extraUserAddOn?.subscription?.quantity || 0;
+      const totalMaxUsers = baseMaxUsers ? baseMaxUsers + extraUsers : null; // null means unlimited
+
       const limits = {
-        maxUsers: plan.maxUsers,
+        maxUsers: totalMaxUsers,
+        baseMaxUsers: baseMaxUsers,
+        extraUsers: extraUsers,
         currentUsers: userCount,
-        canAddUsers: plan.maxUsers ? userCount < plan.maxUsers : true,
+        canAddUsers: totalMaxUsers ? userCount < totalMaxUsers : true,
         planName: plan.name,
         planSlug: plan.slug
       };
