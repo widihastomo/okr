@@ -1,189 +1,258 @@
-import React from "react";
+import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { 
-  Target, 
-  Calendar, 
-  BarChart3, 
-  Trophy, 
-  Network,
-  Settings,
+import {
+  LayoutDashboard,
+  Building2,
+  RotateCcw,
+  FileText,
   Users,
+  Target,
+  BarChart3,
+  User,
+  Settings,
   Shield,
+  X,
+  Trophy,
+  Calendar,
   CreditCard,
-  LogOut,
-  Building,
-  Shapes,
-  X
+  Clock,
+  Focus,
+  CheckSquare,
+  Sun,
+  Goal,
+  Database,
+  Bell,
+  Lock,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/hooks/useAuth";
 import { useOrganization } from "@/hooks/useOrganization";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
-interface ClientSidebarProps {
+interface SidebarProps {
   isOpen: boolean;
   onClose?: () => void;
 }
 
-export default function ClientSidebar({ isOpen, onClose }: ClientSidebarProps) {
+export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [location] = useLocation();
-  const { logout } = useAuth();
   const { isOwner } = useOrganization();
+  const { user } = useAuth();
 
-  // Menu items for client users (normal OKR application users)
-  const menuItems = [
+  // Check if user is system owner
+  const isSystemOwner = (user as any)?.isSystemOwner || false;
+
+  // Different menu items for system owners vs regular users
+  const systemOwnerMenuItems = [
+    {
+      label: "Dashboard Sistem",
+      icon: LayoutDashboard,
+      path: "/system-admin",
+      active: location === "/system-admin",
+    },
+    {
+      label: "Kelola Organisasi",
+      icon: Building2,
+      path: "/system-admin/organizations",
+      active: location === "/system-admin/organizations",
+    },
+    {
+      label: "Kelola Pengguna",
+      icon: Users,
+      path: "/user-management",
+      active: location === "/user-management",
+    },
+    {
+      label: "Kelola Langganan",
+      icon: CreditCard,
+      path: "/system-admin/subscriptions",
+      active: location === "/system-admin/subscriptions",
+    },
+    {
+      label: "Database",
+      icon: Database,
+      path: "/system-admin/database",
+      active: location === "/system-admin/database",
+    },
+    {
+      label: "Keamanan",
+      icon: Lock,
+      path: "/system-admin/security",
+      active: location === "/system-admin/security",
+    },
+    {
+      label: "Notifikasi Sistem",
+      icon: Bell,
+      path: "/system-admin/notifications",
+      active: location === "/system-admin/notifications",
+    },
+    {
+      label: "Pengaturan Sistem",
+      icon: Settings,
+      path: "/system-admin/settings",
+      active: location === "/system-admin/settings",
+    },
+  ];
+
+  const regularUserMenuItems = [
     {
       label: "Daily Focus",
-      icon: Calendar,
-      path: "/daily-focus",
-      active: location === "/daily-focus"
+      icon: Sun,
+      path: "/",
+      active: location === "/" || location === "/daily-focus",
     },
     {
       label: "Goals",
       icon: Target,
-      path: "/",
-      active: location === "/" || location === "/dashboard"
+      path: "/dashboard",
+      active: location === "/dashboard",
     },
     {
       label: "Goals Perusahaan",
-      icon: Building,
+      icon: Building2,
       path: "/company-okr",
-      active: location === "/company-okr"
+      active: location === "/company-okr",
     },
     {
       label: "Siklus",
-      icon: Calendar,
+      icon: RotateCcw,
       path: "/cycles",
-      active: location === "/cycles"
+      active: location === "/cycles",
     },
     {
       label: "Template",
-      icon: Shapes,
+      icon: FileText,
       path: "/templates",
-      active: location === "/templates"
+      active: location === "/templates",
     },
     {
       label: "Pencapaian",
       icon: Trophy,
-      path: "/achievements", 
-      active: location === "/achievements"
+      path: "/achievements",
+      active: location === "/achievements",
     },
     {
       label: "Analitik",
       icon: BarChart3,
       path: "/analytics",
-      active: location === "/analytics"
+      active: location === "/analytics",
     },
     {
       label: "Jaringan Goal",
-      icon: Network,
-      path: "/goal-network",
-      active: location === "/goal-network"
+      icon: Goal,
+      path: "/network",
+      active: location === "/network",
     },
     {
       label: "Harga",
       icon: CreditCard,
       path: "/pricing",
-      active: location === "/pricing"
-    }
+      active: location === "/pricing",
+    },
   ];
 
-  // Add organization owner specific menu items
-  if (isOwner) {
-    menuItems.push({
-      label: "Pengaturan Organisasi",
-      icon: Settings,
-      path: "/organization-settings",
-      active: location === "/organization-settings"
-    });
-    
-    menuItems.push({
-      label: "Kelola Pengguna",
-      icon: Users,
-      path: "/client-users",
-      active: location === "/client-users"
-    });
-    
-    menuItems.push({
-      label: "Kelola Role",
-      icon: Shield,
-      path: "/client-roles",
-      active: location === "/client-roles"
-    });
+  // Add organization management items for organization owners
+  if (isOwner && !isSystemOwner) {
+    regularUserMenuItems.push(
+      {
+        label: "Pengaturan Organisasi",
+        icon: Settings,
+        path: "/organization-settings",
+        active: location === "/organization-settings",
+      },
+      {
+        label: "Kelola Pengguna",
+        icon: Users,
+        path: "/client-users",
+        active: location === "/client-users",
+      },
+      {
+        label: "Kelola Role",
+        icon: Shield,
+        path: "/role-management",
+        active: location === "/role-management",
+      },
+    );
   }
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
-  };
+  // Choose menu items based on user type
+  const menuItems = isSystemOwner ? systemOwnerMenuItems : regularUserMenuItems;
 
   return (
     <>
-      {/* Mobile overlay */}
+      {/* Mobile backdrop */}
       {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
           onClick={onClose}
         />
       )}
 
       {/* Sidebar */}
-      <div className={cn(
-        "fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-50 transform transition-transform duration-300 ease-in-out",
-        isOpen ? "translate-x-0" : "-translate-x-full",
-        "lg:translate-x-0 lg:relative lg:z-auto"
-      )}>
-        <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-orange-600 to-orange-500 rounded-lg flex items-center justify-center">
-                <Target className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-gray-900">OKR Platform</span>
-            </div>
-            {/* Mobile close button */}
-            <button 
-              onClick={onClose}
-              className="lg:hidden p-2 rounded-md hover:bg-gray-100"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+      <div
+        className={cn(
+          "fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out z-30",
+          isOpen ? "translate-x-0" : "-translate-x-full",
+        )}
+      >
+        {/* Mobile header with close button */}
+        <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">Menu</h2>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="h-8 w-8 p-0"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 overflow-y-auto">
-            <ul className="space-y-2">
-              {menuItems.map((item) => (
-                <li key={item.path}>
-                  <Link href={item.path}>
-                    <a className={cn(
-                      "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+        <nav className="flex-1 px-4 py-6 overflow-y-auto">
+          <ul className="space-y-2">
+            {menuItems.map((item) => (
+              <li key={item.path}>
+                <Link href={item.path}>
+                  <button
+                    className={cn(
+                      "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full text-left",
                       item.active
                         ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
-                        : "text-gray-700 hover:bg-gray-100"
-                    )}>
-                      <item.icon className="w-5 h-5" />
-                      <span>{item.label}</span>
-                    </a>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
+                        : "text-gray-700 hover:bg-gray-100",
+                    )}
+                    onClick={onClose}
+                  >
+                    <item.icon className="w-5 h-5" />
+                    <span>{item.label}</span>
+                  </button>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
-          {/* Footer */}
-          <div className="p-4 border-t border-gray-200">
+        {/* Profile section at bottom */}
+        <div className="border-t border-gray-200 p-4">
+          <Link href="/profile">
             <button
-              onClick={handleLogout}
-              className="flex items-center space-x-3 w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+              className={cn(
+                "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full text-left",
+                location === "/profile"
+                  ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
+                  : "text-gray-700 hover:bg-gray-100",
+              )}
+              onClick={onClose}
             >
-              <LogOut className="w-5 h-5" />
-              <span>Logout</span>
+              <User className="w-5 h-5" />
+              <span>Profile</span>
             </button>
-          </div>
+          </Link>
         </div>
       </div>
     </>
