@@ -51,10 +51,23 @@ export const subscriptionPlans = pgTable("subscription_plans", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(), // "Starter", "Tim 10 (Growth)", "Tim 25 (Scale)", "Enterprise"
   slug: text("slug").notNull().unique(), // "starter", "growth", "scale", "enterprise"
-  price: decimal("price", { precision: 10, scale: 2 }).notNull(), // Monthly price in IDR
+  basePrice: decimal("base_price", { precision: 10, scale: 2 }).notNull(), // Base monthly price in IDR
   maxUsers: integer("max_users"), // null for enterprise (unlimited)
   features: jsonb("features").notNull(), // Array of feature strings
   stripeProductId: text("stripe_product_id"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Billing Periods table for flexible pricing
+export const billingPeriods = pgTable("billing_periods", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  planId: uuid("plan_id").notNull().references(() => subscriptionPlans.id),
+  periodType: text("period_type").notNull(), // "monthly", "quarterly", "annual"
+  periodMonths: integer("period_months").notNull(), // 1, 3, 12
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(), // Final price for this period
+  discountPercentage: integer("discount_percentage").default(0), // Discount from base price
   stripePriceId: text("stripe_price_id"),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
@@ -86,6 +99,7 @@ export const organizationSubscriptions = pgTable("organization_subscriptions", {
   id: uuid("id").primaryKey().defaultRandom(),
   organizationId: uuid("organization_id").notNull().references(() => organizations.id),
   planId: uuid("plan_id").notNull().references(() => subscriptionPlans.id),
+  billingPeriodId: uuid("billing_period_id").notNull().references(() => billingPeriods.id),
   status: text("status").notNull().default("active"), // "active", "cancelled", "past_due", "trialing"
   currentPeriodStart: timestamp("current_period_start").notNull(),
   currentPeriodEnd: timestamp("current_period_end").notNull(),
@@ -517,6 +531,12 @@ export const insertSubscriptionPlanSchema = createInsertSchema(subscriptionPlans
   updatedAt: true,
 });
 
+export const insertBillingPeriodSchema = createInsertSchema(billingPeriods).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertOrganizationSchema = createInsertSchema(organizations).omit({
   id: true,
   createdAt: true,
@@ -589,6 +609,8 @@ export type TeamMember = typeof teamMembers.$inferSelect;
 // SaaS Types
 export type SubscriptionPlan = typeof subscriptionPlans.$inferSelect;
 export type InsertSubscriptionPlan = typeof subscriptionPlans.$inferInsert;
+export type BillingPeriod = typeof billingPeriods.$inferSelect;
+export type InsertBillingPeriod = typeof billingPeriods.$inferInsert;
 export type Organization = typeof organizations.$inferSelect;
 export type OrganizationSubscription = typeof organizationSubscriptions.$inferSelect;
 

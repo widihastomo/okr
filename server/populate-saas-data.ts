@@ -13,12 +13,12 @@ export async function populateSaaSData() {
       return;
     }
 
-    // Create subscription plans
+    // Create subscription plans with base pricing
     const plans = await db.insert(subscriptionPlans).values([
       {
         name: "Starter",
         slug: "starter",
-        price: "99000",
+        basePrice: "99000",
         maxUsers: 3,
         features: JSON.stringify([
           "Hingga 3 pengguna",
@@ -28,12 +28,11 @@ export async function populateSaaSData() {
           "Email Support",
         ]),
         stripeProductId: null,
-        stripePriceId: null,
       },
       {
         name: "Tim 10 (Growth)",
         slug: "growth",
-        price: "299000",
+        basePrice: "299000",
         maxUsers: 10,
         features: JSON.stringify([
           "Hingga 10 pengguna",
@@ -44,12 +43,11 @@ export async function populateSaaSData() {
           "Custom Branding",
         ]),
         stripeProductId: null,
-        stripePriceId: null,
       },
       {
         name: "Tim 25 (Scale)",
         slug: "scale",
-        price: "749000",
+        basePrice: "749000",
         maxUsers: 25,
         features: JSON.stringify([
           "Hingga 25 pengguna",
@@ -61,12 +59,11 @@ export async function populateSaaSData() {
           "Multi-team Management",
         ]),
         stripeProductId: null,
-        stripePriceId: null,
       },
       {
         name: "Enterprise",
         slug: "enterprise",
-        price: "0", // Custom pricing
+        basePrice: "0", // Custom pricing
         maxUsers: null, // Unlimited
         features: JSON.stringify([
           "Unlimited pengguna",
@@ -79,11 +76,56 @@ export async function populateSaaSData() {
           "Custom Training",
         ]),
         stripeProductId: null,
-        stripePriceId: null,
       },
     ]).returning();
 
     console.log("✅ Created subscription plans:", plans.map(p => p.name).join(", "));
+
+    // Create billing periods for each plan with different discounts
+    const { billingPeriods } = await import("@shared/schema");
+    
+    const billingPeriodsData = [];
+    
+    for (const plan of plans) {
+      if (plan.slug === "enterprise") {
+        // Enterprise has custom pricing, skip automatic billing periods
+        continue;
+      }
+      
+      const basePrice = parseFloat(plan.basePrice);
+      
+      // Monthly (no discount)
+      billingPeriodsData.push({
+        planId: plan.id,
+        periodType: "monthly",
+        periodMonths: 1,
+        price: plan.basePrice,
+        discountPercentage: 0,
+      });
+      
+      // Quarterly (5% discount)
+      const quarterlyPrice = (basePrice * 3 * 0.95).toString();
+      billingPeriodsData.push({
+        planId: plan.id,
+        periodType: "quarterly",
+        periodMonths: 3,
+        price: quarterlyPrice,
+        discountPercentage: 5,
+      });
+      
+      // Annual (15% discount)
+      const annualPrice = (basePrice * 12 * 0.85).toString();
+      billingPeriodsData.push({
+        planId: plan.id,
+        periodType: "annual",
+        periodMonths: 12,
+        price: annualPrice,
+        discountPercentage: 15,
+      });
+    }
+    
+    const createdBillingPeriods = await db.insert(billingPeriods).values(billingPeriodsData).returning();
+    console.log("✅ Created billing periods with discounts:", createdBillingPeriods.length);
 
     // Create sample organizations
     const sampleOrgs = await db.insert(organizations).values([
@@ -112,36 +154,42 @@ export async function populateSaaSData() {
 
     console.log("✅ Created sample organizations:", sampleOrgs.map(o => o.name).join(", "));
 
-    // Create subscriptions for organizations
+    // Create subscriptions for organizations with different billing periods
     const now = new Date();
-    const oneMonthLater = new Date(now);
-    oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
-
+    
+    // Find billing periods for each plan
+    const starterMonthly = createdBillingPeriods.find(bp => bp.planId === plans[0].id && bp.periodType === "monthly");
+    const growthQuarterly = createdBillingPeriods.find(bp => bp.planId === plans[1].id && bp.periodType === "quarterly");
+    const scaleAnnual = createdBillingPeriods.find(bp => bp.planId === plans[2].id && bp.periodType === "annual");
+    
     const subscriptions = await db.insert(organizationSubscriptions).values([
       {
-        organizationId: sampleOrgs[0].id, // PT Teknologi Maju - Growth plan
+        organizationId: sampleOrgs[0].id, // PT Teknologi Maju - Growth plan (quarterly)
         planId: plans[1].id,
+        billingPeriodId: growthQuarterly!.id,
         status: "active",
         currentPeriodStart: now,
-        currentPeriodEnd: oneMonthLater,
+        currentPeriodEnd: new Date(now.getTime() + (3 * 30 * 24 * 60 * 60 * 1000)), // 3 months
         stripeSubscriptionId: null,
         stripeCustomerId: null,
       },
       {
-        organizationId: sampleOrgs[1].id, // CV Kreatif Indonesia - Starter plan
+        organizationId: sampleOrgs[1].id, // CV Kreatif Indonesia - Starter plan (monthly)
         planId: plans[0].id,
+        billingPeriodId: starterMonthly!.id,
         status: "active",
         currentPeriodStart: now,
-        currentPeriodEnd: oneMonthLater,
+        currentPeriodEnd: new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000)), // 1 month
         stripeSubscriptionId: null,
         stripeCustomerId: null,
       },
       {
-        organizationId: sampleOrgs[2].id, // PT Solusi Digital - Scale plan
+        organizationId: sampleOrgs[2].id, // PT Solusi Digital - Scale plan (annual)
         planId: plans[2].id,
+        billingPeriodId: scaleAnnual!.id,
         status: "active",
         currentPeriodStart: now,
-        currentPeriodEnd: oneMonthLater,
+        currentPeriodEnd: new Date(now.getTime() + (365 * 24 * 60 * 60 * 1000)), // 1 year
         stripeSubscriptionId: null,
         stripeCustomerId: null,
       },
