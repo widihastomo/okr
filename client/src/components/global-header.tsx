@@ -189,7 +189,7 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen, sidebarCollaps
   }, []);
 
   return (
-    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+    <header className="bg-white border-b border-gray-200 pr-4 py-3 flex items-center justify-between sticky top-0 z-50">
       {/* Left side - Menu toggle and Logo */}
       <div className="flex items-center space-x-3">
         {/* Sidebar toggle button */}
