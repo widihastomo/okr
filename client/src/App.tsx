@@ -43,7 +43,7 @@ import ClientRegistration from "@/pages/client-registration";
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [location] = useLocation();
 
   // Clear logout flag on app start if user is authenticated
