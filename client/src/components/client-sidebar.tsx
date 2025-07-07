@@ -10,10 +10,26 @@ import {
   BarChart3,
   User,
   Settings,
+  Shield,
   X,
+  Trophy,
+  Calendar,
+  CreditCard,
+  Clock,
+  Focus,
+  CheckSquare,
+  Sun,
+  Goal,
+  Database,
+  Bell,
+  Lock,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useOrganization } from "@/hooks/useOrganization";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Tooltip,
   TooltipContent,
@@ -28,51 +44,152 @@ interface SidebarProps {
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [location] = useLocation();
+  const { isOwner } = useOrganization();
+  const { user } = useAuth();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const menuItems = [
+  // Check if user is system owner
+  const isSystemOwner = (user as any)?.isSystemOwner || false;
+
+  // Different menu items for system owners vs regular users
+  const systemOwnerMenuItems = [
     {
-      label: "Dashboard",
+      label: "Dashboard Sistem",
       icon: LayoutDashboard,
-      path: "/",
-      active: location === "/" || location === "/",
+      path: "/system-admin",
+      active: location === "/system-admin",
     },
     {
-      label: "Company OKRs",
+      label: "Kelola Organisasi",
+      icon: Building2,
+      path: "/system-admin/organizations",
+      active: location === "/system-admin/organizations",
+    },
+    {
+      label: "Kelola Pengguna",
+      icon: Users,
+      path: "/user-management",
+      active: location === "/user-management",
+    },
+    {
+      label: "Kelola Langganan",
+      icon: CreditCard,
+      path: "/system-admin/subscriptions",
+      active: location === "/system-admin/subscriptions",
+    },
+    {
+      label: "Database",
+      icon: Database,
+      path: "/system-admin/database",
+      active: location === "/system-admin/database",
+    },
+    {
+      label: "Keamanan",
+      icon: Lock,
+      path: "/system-admin/security",
+      active: location === "/system-admin/security",
+    },
+    {
+      label: "Notifikasi Sistem",
+      icon: Bell,
+      path: "/system-admin/notifications",
+      active: location === "/system-admin/notifications",
+    },
+    {
+      label: "Pengaturan Sistem",
+      icon: Settings,
+      path: "/system-admin/settings",
+      active: location === "/system-admin/settings",
+    },
+  ];
+
+  const regularUserMenuItems = [
+    {
+      label: "Daily Focus",
+      icon: Sun,
+      path: "/",
+      active: location === "/" || location === "/daily-focus",
+    },
+    {
+      label: "Goals",
+      icon: Target,
+      path: "/dashboard",
+      active: location === "/dashboard",
+    },
+    {
+      label: "Goals Perusahaan",
       icon: Building2,
       path: "/company-okr",
       active: location === "/company-okr",
     },
-
     {
-      label: "Cycles",
+      label: "Siklus",
       icon: RotateCcw,
       path: "/cycles",
       active: location === "/cycles",
     },
     {
-      label: "Templates",
+      label: "Template",
       icon: FileText,
       path: "/templates",
       active: location === "/templates",
     },
     {
-      label: "Users",
-      icon: Users,
-      path: "/users",
-      active: location === "/users",
+      label: "Pencapaian",
+      icon: Trophy,
+      path: "/achievements",
+      active: location === "/achievements",
     },
-
     {
-      label: "Analytics",
+      label: "Analitik",
       icon: BarChart3,
       path: "/analytics",
       active: location === "/analytics",
     },
+    {
+      label: "Jaringan Goal",
+      icon: Goal,
+      path: "/network",
+      active: location === "/network",
+    },
+    {
+      label: "Harga",
+      icon: CreditCard,
+      path: "/pricing",
+      active: location === "/pricing",
+    },
   ];
 
+  // Add organization management items for organization owners
+  if (isOwner && !isSystemOwner) {
+    regularUserMenuItems.push(
+      {
+        label: "Pengaturan Organisasi",
+        icon: Settings,
+        path: "/organization-settings",
+        active: location === "/organization-settings",
+      },
+      {
+        label: "Kelola Pengguna",
+        icon: Users,
+        path: "/client-users",
+        active: location === "/client-users",
+      },
+      {
+        label: "Kelola Role",
+        icon: Shield,
+        path: "/role-management",
+        active: location === "/role-management",
+      },
+    );
+  }
+
+  // Choose menu items based on user type
+  const menuItems = isSystemOwner ? systemOwnerMenuItems : regularUserMenuItems;
+
   return (
-    <TooltipProvider>
-      {/* Mobile overlay */}
+    <>
+      {/* Mobile backdrop */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
@@ -81,89 +198,129 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       )}
 
       {/* Sidebar */}
-      <div
-        className={cn(
-          "fixed left-0 top-0 h-screen bg-white border-r border-gray-200 transition-all duration-300 ease-in-out z-10",
-          // Mobile: completely hidden when closed, full width when open
-          isOpen
-            ? "w-64 translate-x-0"
-            : "w-0 -translate-x-full lg:translate-x-0",
-          // Desktop: always visible, width changes
-          "lg:fixed lg:left-0 lg:top-0 lg:h-screen lg:w-64 lg:translate-x-0",
-          !isOpen && "lg:w-16",
-        )}
-      >
-        <div className="flex flex-col h-full">
-          {/* Header spacer */}
-          <div className="h-16 flex items-center justify-center border-b border-gray-200">
-            {isOpen ? (
-              <div className="text-sm font-medium text-gray-600">
-                OKR Manager
-              </div>
-            ) : (
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xs">OK</span>
-              </div>
-            )}
+      <TooltipProvider>
+        <div
+          className={cn(
+            "fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 transition-all duration-300 ease-in-out z-30",
+            // Mobile: slide in/out
+            "lg:translate-x-0", // Desktop: always visible
+            isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
+            // Desktop: collapsed/expanded width
+            isCollapsed ? "lg:w-16" : "lg:w-64"
+          )}
+        >
+          {/* Mobile header with close button */}
+          <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">Menu</h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="h-8 w-8 p-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
           </div>
 
-          {/* Navigation Menu */}
-          <nav
-            className={cn(
-              "flex-1 py-4 space-y-1 transition-all duration-300",
-              isOpen ? "px-4" : "px-2 lg:px-2",
-            )}
-          >
-            {menuItems.map((item) => {
-              const isActive =
-                location === item.path ||
-                (item.path !== "/" && location.startsWith(item.path));
+          {/* Desktop collapse toggle button */}
+          <div className="hidden lg:flex justify-end p-2 border-b border-gray-200">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="h-8 w-8 p-0"
+            >
+              {isCollapsed ? (
+                <ChevronRight className="h-4 w-4" />
+              ) : (
+                <ChevronLeft className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
 
-              if (isOpen) {
-                return (
-                  <Link
-                    key={item.path}
-                    href={item.path}
-                    className={cn(
-                      "flex items-center rounded-lg text-sm font-medium transition-colors space-x-3 px-3 py-2",
-                      isActive
-                        ? "bg-blue-600 text-white"
-                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
-                    )}
-                    onClick={onClose}
-                  >
-                    <item.icon className="h-5 w-5 flex-shrink-0" />
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              }
-
-              // Collapsed state with tooltip (desktop only)
-              return (
-                <Tooltip key={item.path}>
-                  <TooltipTrigger asChild>
-                    <Link
-                      href={item.path}
+          <nav className="flex-1 px-2 py-4 overflow-y-auto">
+            <ul className="space-y-1">
+              {menuItems.map((item) => {
+                const menuItem = (
+                  <Link href={item.path}>
+                    <button
                       className={cn(
-                        "hidden lg:flex lg:items-center lg:justify-center lg:rounded-lg lg:text-sm lg:font-medium lg:transition-colors lg:px-2 lg:py-3",
-                        isActive
-                          ? "bg-blue-600 text-white"
-                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+                        "flex items-center rounded-lg text-sm font-medium transition-colors w-full text-left",
+                        item.active
+                          ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
+                          : "text-gray-700 hover:bg-gray-100",
+                        isCollapsed ? "px-3 py-2 justify-center" : "px-3 py-2 space-x-3"
                       )}
                       onClick={onClose}
                     >
-                      <item.icon className="h-5 w-5 flex-shrink-0" />
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent side="right" className="ml-2">
-                    <p>{item.label}</p>
-                  </TooltipContent>
-                </Tooltip>
-              );
-            })}
+                      <item.icon className={cn("flex-shrink-0", isCollapsed ? "w-5 h-5" : "w-5 h-5")} />
+                      {!isCollapsed && <span>{item.label}</span>}
+                    </button>
+                  </Link>
+                );
+
+                return (
+                  <li key={item.path}>
+                    {isCollapsed ? (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          {menuItem}
+                        </TooltipTrigger>
+                        <TooltipContent side="right">
+                          <p>{item.label}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      menuItem
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
           </nav>
+
+          {/* Profile section at bottom */}
+          <div className="border-t border-gray-200 p-2">
+            {isCollapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link href="/profile">
+                    <button
+                      className={cn(
+                        "flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full",
+                        location === "/profile"
+                          ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
+                          : "text-gray-700 hover:bg-gray-100"
+                      )}
+                      onClick={onClose}
+                    >
+                      <User className="w-5 h-5" />
+                    </button>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p>Profile</p>
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <Link href="/profile">
+                <button
+                  className={cn(
+                    "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full text-left",
+                    location === "/profile"
+                      ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
+                      : "text-gray-700 hover:bg-gray-100"
+                  )}
+                  onClick={onClose}
+                >
+                  <User className="w-5 h-5" />
+                  <span>Profile</span>
+                </button>
+              </Link>
+            )}
+          </div>
         </div>
-      </div>
-    </TooltipProvider>
+      </TooltipProvider>
+    </>
   );
 }
