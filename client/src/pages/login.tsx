@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -137,12 +138,12 @@ export default function Login() {
               <p className="text-sm text-gray-600">
                 Belum punya akun?
               </p>
-              <a 
+              <Link 
                 href="/register" 
                 className="text-orange-600 hover:text-orange-700 font-medium hover:underline text-sm block"
               >
                 Daftar Organisasi Baru
-              </a>
+              </Link>
             </div>
           </CardContent>
         </Card>
