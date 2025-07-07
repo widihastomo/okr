@@ -1310,10 +1310,10 @@ export default function DailyFocusPage() {
             </CardHeader>
             <CardContent>
               {/* Check if we have any tasks to show */}
-              {overdueTasks.length === 0 && todayTasks.length === 0 ? (
+              {overdueTasks.length === 0 && todayTasks.length === 0 && tomorrowTasks.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <CheckCircle className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                  <p>Tidak ada task untuk hari ini</p>
+                  <p>Tidak ada task untuk hari ini dan besok</p>
                 </div>
               ) : (
                 <>
@@ -2049,12 +2049,13 @@ export default function DailyFocusPage() {
                     )}
 
                     {/* Tomorrow's Tasks */}
-                    {tomorrowTasks.length > 0 && (
-                      <div className="space-y-3">
-                        <h3 className="text-sm font-medium text-green-700 flex items-center gap-2 pb-2 border-b-2 border-green-200">
-                          <Clock className="h-4 w-4" />
-                          Task Besok ({tomorrowTasks.length})
-                        </h3>
+                    <div className="space-y-3">
+                      <h3 className="text-sm font-medium text-green-700 flex items-center gap-2 pb-2 border-b-2 border-green-200">
+                        <Clock className="h-4 w-4" />
+                        Task Besok ({tomorrowTasks.length})
+                      </h3>
+                      {tomorrowTasks.length > 0 ? (
+                        <>
                         {tomorrowTasks.map((task: any) => (
                           <div
                             key={task.id}
@@ -2180,8 +2181,14 @@ export default function DailyFocusPage() {
                             </div>
                           </div>
                         ))}
-                      </div>
-                    )}
+                        </>
+                      ) : (
+                        <div className="text-center py-4 text-gray-500">
+                          <CheckCircle className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                          <p className="text-sm">Tidak ada task untuk besok</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </>
               )}
