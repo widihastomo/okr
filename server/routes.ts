@@ -3792,16 +3792,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Validate input data
       const validatedData = clientRegistrationSchema.parse(registrationData);
       
-      // Check if organization slug already exists
-      const existingOrg = await storage.getOrganizationBySlug(validatedData.organizationSlug);
+      // Parallel validation checks for better performance
+      const [existingOrg, existingUser] = await Promise.all([
+        storage.getOrganizationBySlug(validatedData.organizationSlug),
+        storage.getUserByEmail(validatedData.email)
+      ]);
+      
       if (existingOrg) {
         return res.status(400).json({ 
           message: "Slug organisasi sudah digunakan. Silakan pilih yang lain." 
         });
       }
       
-      // Check if email already exists
-      const existingUser = await storage.getUserByEmail(validatedData.email);
       if (existingUser) {
         return res.status(400).json({ 
           message: "Email sudah terdaftar. Silakan gunakan email lain." 
@@ -3814,13 +3816,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .replace(/[^a-z0-9\s]/g, "")
         .replace(/\s+/g, "-");
       
-      // Ensure unique slug
-      let slug = baseSlug;
-      let counter = 1;
-      while (await storage.getOrganizationBySlug(slug)) {
-        slug = `${baseSlug}-${counter}`;
-        counter++;
-      }
+      // Use random suffix for better performance
+      const randomSuffix = Math.random().toString(36).substring(2, 8);
+      const slug = `${baseSlug}-${randomSuffix}`;
       
       // Create organization with pending status
       const organizationData = {

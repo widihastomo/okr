@@ -408,7 +408,14 @@ export default function ClientRegistration() {
                     disabled={registerMutation.isPending}
                     className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
                   >
-                    {registerMutation.isPending ? "Mendaftar..." : "Daftar Organisasi"}
+                    {registerMutation.isPending ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Memproses Pendaftaran...
+                      </div>
+                    ) : (
+                      "Daftar Organisasi"
+                    )}
                   </Button>
                 </div>
               </form>
