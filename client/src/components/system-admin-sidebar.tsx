@@ -36,15 +36,38 @@ export default function SystemAdminSidebar({ isOpen, onClose }: SystemAdminSideb
     {
       label: "Kelola Organisasi",
       icon: Building2,
-      path: "/system-admin/organizations",
-      active: location === "/system-admin/organizations"
+      path: "/system-admin",
+      active: location === "/system-admin"
     },
-
+    {
+      label: "Kelola Pengguna",
+      icon: Users,
+      path: "/system-admin",
+      active: location === "/system-admin"
+    },
     {
       label: "Kelola Paket",
       icon: Package,
       path: "/subscription-packages",
       active: location === "/subscription-packages"
+    },
+    {
+      label: "Database",
+      icon: Database,
+      path: "/system-admin",
+      active: location === "/system-admin"
+    },
+    {
+      label: "Keamanan",
+      icon: Shield,
+      path: "/system-admin",
+      active: location === "/system-admin"
+    },
+    {
+      label: "Notifikasi Sistem",
+      icon: Bell,
+      path: "/system-admin",
+      active: location === "/system-admin"
     },
     {
       label: "Pengaturan Sistem",
