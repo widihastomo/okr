@@ -55,7 +55,6 @@ import { Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 
-
 interface GlobalHeaderProps {
   onMenuToggle?: () => void;
   sidebarOpen?: boolean;
@@ -70,7 +69,10 @@ const taskFormSchema = z.object({
   assignedTo: z.string().optional(),
 });
 
-export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeaderProps) {
+export default function GlobalHeader({
+  onMenuToggle,
+  sidebarOpen,
+}: GlobalHeaderProps) {
   const [notificationCount] = useState(1);
   const [isOKRModalOpen, setIsOKRModalOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -175,17 +177,18 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
   }, []);
 
   return (
-    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between fixed top-0 left-0 right-0 z-50">
       {/* Left side - Menu toggle and Logo */}
       <div className="flex items-center space-x-3">
-        {/* Sidebar toggle button */}
-        <Button 
-          variant="ghost" 
-          size="icon" 
+        {/* Hamburger menu button - always visible */}
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={onMenuToggle}
-          className="hover:bg-gray-100"
+          className="p-2 hover:bg-gray-100 rounded-md"
+          aria-label="Toggle sidebar"
         >
-          <Menu className="h-5 w-5" />
+          <Menu className="h-5 w-5 text-gray-600" />
         </Button>
 
         {/* Logo */}
@@ -448,12 +451,13 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen }: GlobalHeader
                             <SelectItem value="unassigned">
                               Belum Ditugaskan
                             </SelectItem>
-                            {Array.isArray(users) &&
+                            {users &&
+                              Array.isArray(users) &&
                               users
-                                .filter((user: any) => user?.id)
+                                .filter((user: any) => user && user.id)
                                 .map((user: any) => (
                                   <SelectItem key={user.id} value={user.id}>
-                                    {user.firstName || ''} {user.lastName || ''}
+                                    {user.firstName} {user.lastName}
                                   </SelectItem>
                                 ))}
                           </SelectContent>
