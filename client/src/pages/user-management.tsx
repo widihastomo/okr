@@ -357,8 +357,8 @@ export default function UserManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
-  const [roleFilter, setRoleFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [selectedUser, setSelectedUser] = useState<UserWithPermissions | null>(null);
   const [showUserModal, setShowUserModal] = useState(false);
   const [showRoleModal, setShowRoleModal] = useState(false);
@@ -384,8 +384,8 @@ export default function UserManagement() {
       u.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       u.email.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesRole = !roleFilter || u.role === roleFilter;
-    const matchesStatus = !statusFilter || (statusFilter === "active" ? u.isActive : !u.isActive);
+    const matchesRole = !roleFilter || roleFilter === "all" || u.role === roleFilter;
+    const matchesStatus = !statusFilter || statusFilter === "all" || (statusFilter === "active" ? u.isActive : !u.isActive);
     
     return matchesSearch && matchesRole && matchesStatus;
   });
@@ -673,7 +673,7 @@ export default function UserManagement() {
                 <SelectValue placeholder="Filter role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Semua Role</SelectItem>
+                <SelectItem value="all">Semua Role</SelectItem>
                 <SelectItem value="organization_admin">Administrator</SelectItem>
                 <SelectItem value="manager">Manager</SelectItem>
                 <SelectItem value="member">Member</SelectItem>
@@ -685,7 +685,7 @@ export default function UserManagement() {
                 <SelectValue placeholder="Filter status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Semua Status</SelectItem>
+                <SelectItem value="all">Semua Status</SelectItem>
                 <SelectItem value="active">Aktif</SelectItem>
                 <SelectItem value="inactive">Tidak Aktif</SelectItem>
               </SelectContent>
