@@ -1448,6 +1448,54 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return updated;
   }
+
+  // Onboarding Progress methods
+  async getUserOnboardingProgress(userId: string): Promise<UserOnboardingProgress | null> {
+    try {
+      const [progress] = await db.select().from(userOnboardingProgress).where(eq(userOnboardingProgress.userId, userId));
+      return progress || null;
+    } catch (error) {
+      console.error("Error fetching onboarding progress:", error);
+      throw error;
+    }
+  }
+
+  async updateUserOnboardingProgress(userId: string, progressData: UpdateOnboardingProgress): Promise<UserOnboardingProgress> {
+    try {
+      // Check if user already has progress data
+      const existingProgress = await this.getUserOnboardingProgress(userId);
+      
+      if (existingProgress) {
+        // Update existing progress
+        const [updatedProgress] = await db
+          .update(userOnboardingProgress)
+          .set({
+            ...progressData,
+            updatedAt: new Date()
+          })
+          .where(eq(userOnboardingProgress.userId, userId))
+          .returning();
+        
+        return updatedProgress;
+      } else {
+        // Create new progress record
+        const [newProgress] = await db
+          .insert(userOnboardingProgress)
+          .values({
+            userId,
+            ...progressData,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          })
+          .returning();
+        
+        return newProgress;
+      }
+    } catch (error) {
+      console.error("Error updating onboarding progress:", error);
+      throw error;
+    }
+  }
 }
 
 // Use database storage

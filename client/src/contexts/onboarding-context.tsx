@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { useOnboardingProgress, useUpdateOnboardingProgress } from "@/hooks/useOnboardingProgress";
 
 export interface OnboardingStep {
   id: string;
@@ -171,25 +170,12 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children
   const [highlightedElement, setHighlightedElement] = useState<string | null>(null);
   const [tooltipVisible, setTooltipVisible] = useState(false);
 
-  // Get user onboarding progress
-  const { data: onboardingProgress } = useQuery({
-    queryKey: ["/api/user/onboarding-progress"],
-    enabled: isAuthenticated,
-    retry: false
-  });
+  // Get user onboarding progress using real API
+  const { data: onboardingProgress } = useOnboardingProgress();
+  const updateProgressMutation = useUpdateOnboardingProgress();
 
-  const completedTours = onboardingProgress?.completedTours || [];
-  const isFirstTimeUser = completedTours.length === 0;
-
-  // Update onboarding progress
-  const updateProgressMutation = useMutation({
-    mutationFn: async (data: { completedTours: string[] }) => {
-      await apiRequest("PUT", "/api/user/onboarding-progress", data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/user/onboarding-progress"] });
-    }
-  });
+  const completedTours = onboardingProgress?.stepsCompleted || [];
+  const isFirstTimeUser = !onboardingProgress?.isWelcomeWizardCompleted;
 
   const currentStep = currentTour?.steps[currentStepIndex] || null;
 
