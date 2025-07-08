@@ -423,40 +423,235 @@ export default function CompanyOnboarding() {
         );
 
       case 4: // Ukuran Keberhasilan
+        const getKeyResultOptions = (objective: string) => {
+          // Key Results untuk objective penjualan
+          const salesKeyResults = {
+            "Meningkatkan omzet penjualan sebesar 25% dalam kuartal ini": [
+              "Mencapai target penjualan Rp 500 juta per bulan",
+              "Meningkatkan rata-rata nilai transaksi menjadi Rp 2 juta",
+              "Menambah 100 transaksi baru setiap bulan"
+            ],
+            "Menambah 50 pelanggan baru dalam 3 bulan ke depan": [
+              "Mendapatkan 20 pelanggan baru setiap bulan",
+              "Mencapai conversion rate 15% dari lead ke customer",
+              "Meningkatkan customer retention rate menjadi 85%"
+            ],
+            "Meningkatkan konversi lead menjadi customer sebesar 20%": [
+              "Mencapai conversion rate 25% dari total lead",
+              "Mengurangi waktu follow-up lead menjadi maksimal 24 jam",
+              "Meningkatkan kualitas lead scoring menjadi 80% akurat"
+            ],
+            "Memperluas pangsa pasar di 3 wilayah baru": [
+              "Membuka kantor cabang di 3 kota baru",
+              "Mencapai 500 customer baru dari wilayah ekspansi",
+              "Meraih market share 10% di setiap wilayah baru"
+            ],
+            "Meningkatkan rata-rata nilai transaksi per customer sebesar 15%": [
+              "Mencapai average order value Rp 1.5 juta",
+              "Meningkatkan cross-selling success rate menjadi 30%",
+              "Mencapai upselling rate 25% dari existing customer"
+            ]
+          };
+
+          // Key Results untuk objective operasional
+          const operationalKeyResults = {
+            "Meningkatkan efisiensi operasional sebesar 30% dalam 6 bulan": [
+              "Mengurangi waktu proses produksi menjadi 4 jam per unit",
+              "Meningkatkan utilitas mesin menjadi 85%",
+              "Mengurangi waste produksi menjadi maksimal 5%"
+            ],
+            "Mengurangi waktu produksi rata-rata sebesar 20%": [
+              "Mencapai cycle time 3 jam per produk",
+              "Meningkatkan throughput menjadi 50 unit per hari",
+              "Mengurangi downtime mesin menjadi maksimal 2%"
+            ],
+            "Meningkatkan kepuasan karyawan mencapai skor 4.5/5": [
+              "Mencapai employee satisfaction score 4.5/5",
+              "Mengurangi turnover rate menjadi di bawah 10%",
+              "Meningkatkan employee engagement score menjadi 80%"
+            ],
+            "Mengimplementasi sistem digital untuk otomasi proses": [
+              "Mendigitalisasi 5 proses manual utama",
+              "Mencapai automation rate 70% untuk proses rutin",
+              "Mengurangi human error menjadi di bawah 2%"
+            ],
+            "Mengurangi biaya operasional sebesar 15% tanpa mengurangi kualitas": [
+              "Menurunkan cost per unit menjadi Rp 50,000",
+              "Meningkatkan efficiency ratio menjadi 90%",
+              "Mengurangi overhead cost sebesar 20%"
+            ]
+          };
+
+          // Key Results untuk objective customer service
+          const customerServiceKeyResults = {
+            "Meningkatkan customer satisfaction score menjadi 4.8/5": [
+              "Mencapai CSAT score 4.8/5 dalam survey bulanan",
+              "Meningkatkan customer retention rate menjadi 95%",
+              "Mengurangi complaint rate menjadi di bawah 1%"
+            ],
+            "Mengurangi response time customer support menjadi maksimal 2 jam": [
+              "Mencapai average response time 1 jam",
+              "Meningkatkan first response rate menjadi 95%",
+              "Mencapai resolution time maksimal 24 jam"
+            ],
+            "Meningkatkan first-call resolution rate sebesar 40%": [
+              "Mencapai FCR rate 80% untuk semua inquiry",
+              "Mengurangi escalation rate menjadi di bawah 10%",
+              "Meningkatkan agent knowledge score menjadi 90%"
+            ],
+            "Menurunkan tingkat keluhan pelanggan sebesar 30%": [
+              "Mengurangi complaint volume menjadi maksimal 20 per bulan",
+              "Meningkatkan complaint resolution rate menjadi 98%",
+              "Mencapai zero repeat complaint rate"
+            ],
+            "Meningkatkan Net Promoter Score (NPS) mencapai 70+": [
+              "Mencapai NPS score 70+ dalam quarterly survey",
+              "Meningkatkan customer advocacy rate menjadi 40%",
+              "Mencapai customer recommendation rate 80%"
+            ]
+          };
+
+          // Key Results untuk objective marketing
+          const marketingKeyResults = {
+            "Meningkatkan brand awareness sebesar 35% di target market": [
+              "Mencapai brand recall 60% dalam market research",
+              "Meningkatkan social media reach menjadi 100,000 per post",
+              "Mencapai top-of-mind awareness 25% di kategori produk"
+            ],
+            "Menambah 10,000 follower media sosial dalam 3 bulan": [
+              "Mencapai 10,000 new followers di Instagram",
+              "Meningkatkan follower growth rate 15% per bulan",
+              "Mencapai engagement rate 8% di semua platform"
+            ],
+            "Meningkatkan engagement rate di social media sebesar 25%": [
+              "Mencapai engagement rate 10% di Instagram",
+              "Meningkatkan comment rate menjadi 3% per post",
+              "Mencapai share rate 5% untuk konten video"
+            ],
+            "Menghasilkan 500 qualified leads per bulan": [
+              "Generate 500 MQL (Marketing Qualified Leads) per bulan",
+              "Mencapai lead quality score 80% dari total leads",
+              "Meningkatkan lead-to-customer conversion rate 20%"
+            ],
+            "Meningkatkan conversion rate website sebesar 20%": [
+              "Mencapai website conversion rate 5%",
+              "Meningkatkan landing page conversion rate menjadi 8%",
+              "Mengurangi bounce rate website menjadi di bawah 40%"
+            ]
+          };
+
+          // Gabungkan semua key results
+          const allKeyResults = {
+            ...salesKeyResults,
+            ...operationalKeyResults,
+            ...customerServiceKeyResults,
+            ...marketingKeyResults
+          };
+
+          return allKeyResults[objective] || [];
+        };
+
+        const keyResultOptions = getKeyResultOptions(onboardingData.objective);
+        const selectedKeyResults = onboardingData.keyResults.filter(kr => kr && kr !== "custom");
+        
         return (
           <div className="space-y-4">
-            <Label>Tambahkan Key Results (ukuran keberhasilan):</Label>
-            <div className="space-y-2">
-              {onboardingData.keyResults.map((kr, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <Input 
-                    placeholder={`Key Result ${index + 1}`}
-                    value={kr}
-                    onChange={(e) => {
-                      const newKeyResults = [...onboardingData.keyResults];
-                      newKeyResults[index] = e.target.value;
+            {keyResultOptions.length > 0 && (
+              <div className="space-y-3">
+                <Label>Pilih Key Results untuk objective: "{onboardingData.objective}"</Label>
+                <div className="space-y-2">
+                  {keyResultOptions.map((option, index) => (
+                    <div key={index} className="flex items-start space-x-2 p-3 rounded-lg border border-gray-200 hover:bg-gray-50">
+                      <Checkbox 
+                        id={`keyresult-${index}`}
+                        checked={selectedKeyResults.includes(option)}
+                        onCheckedChange={(checked) => {
+                          let newKeyResults = [...onboardingData.keyResults];
+                          if (checked) {
+                            newKeyResults.push(option);
+                          } else {
+                            newKeyResults = newKeyResults.filter(kr => kr !== option);
+                          }
+                          setOnboardingData({...onboardingData, keyResults: newKeyResults});
+                        }}
+                      />
+                      <Label htmlFor={`keyresult-${index}`} className="flex-1 cursor-pointer leading-relaxed">
+                        {option}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center space-x-2 pt-2">
+                  <Checkbox 
+                    id="custom-keyresult"
+                    checked={onboardingData.keyResults.includes("custom")}
+                    onCheckedChange={(checked) => {
+                      let newKeyResults = [...onboardingData.keyResults];
+                      if (checked) {
+                        newKeyResults.push("custom");
+                      } else {
+                        newKeyResults = newKeyResults.filter(kr => kr !== "custom");
+                      }
                       setOnboardingData({...onboardingData, keyResults: newKeyResults});
                     }}
                   />
+                  <Label htmlFor="custom-keyresult">Atau tambah Key Result sendiri:</Label>
+                </div>
+              </div>
+            )}
+            
+            {(onboardingData.keyResults.includes("custom") || keyResultOptions.length === 0) && (
+              <div className="space-y-2">
+                <Label>Tambahkan Key Results custom:</Label>
+                <div className="space-y-2">
+                  {onboardingData.keyResults.filter(kr => kr !== "custom" && !keyResultOptions.includes(kr)).map((kr, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Input 
+                        placeholder={`Key Result ${index + 1}`}
+                        value={kr}
+                        onChange={(e) => {
+                          const newKeyResults = [...onboardingData.keyResults];
+                          const customIndex = newKeyResults.findIndex(k => k === kr);
+                          if (customIndex !== -1) {
+                            newKeyResults[customIndex] = e.target.value;
+                          }
+                          setOnboardingData({...onboardingData, keyResults: newKeyResults});
+                        }}
+                      />
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          const newKeyResults = onboardingData.keyResults.filter(k => k !== kr);
+                          setOnboardingData({...onboardingData, keyResults: newKeyResults});
+                        }}
+                      >
+                        Hapus
+                      </Button>
+                    </div>
+                  ))}
                   <Button 
                     variant="outline" 
-                    size="sm"
-                    onClick={() => {
-                      const newKeyResults = onboardingData.keyResults.filter((_, i) => i !== index);
-                      setOnboardingData({...onboardingData, keyResults: newKeyResults});
-                    }}
+                    onClick={() => setOnboardingData({...onboardingData, keyResults: [...onboardingData.keyResults, ""]})}
                   >
-                    Hapus
+                    Tambah Key Result
                   </Button>
                 </div>
-              ))}
-              <Button 
-                variant="outline" 
-                onClick={() => setOnboardingData({...onboardingData, keyResults: [...onboardingData.keyResults, ""]})}
-              >
-                Tambah Key Result
-              </Button>
-            </div>
+              </div>
+            )}
+            
+            {selectedKeyResults.length > 0 && (
+              <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-sm text-blue-800 mb-2">
+                  <strong>Key Results terpilih:</strong>
+                </p>
+                <ul className="text-sm text-blue-700 space-y-1">
+                  {selectedKeyResults.map((kr, index) => (
+                    <li key={index}>• {kr}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         );
 
