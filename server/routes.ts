@@ -6822,6 +6822,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/onboarding/complete", requireAuth, async (req, res) => {
     try {
       const currentUser = req.user as User;
+      const { onboardingData } = req.body;
+      
+      // Create first objective from onboarding data
+      if (onboardingData && onboardingData.objective) {
+        try {
+          await storage.createFirstObjectiveFromOnboarding(currentUser.id, onboardingData);
+        } catch (error) {
+          console.error("Error creating first objective from onboarding:", error);
+          // Continue with completion even if objective creation fails
+        }
+      }
+      
       const result = await storage.completeOrganizationOnboarding(currentUser.organizationId);
       res.json(result);
     } catch (error: any) {

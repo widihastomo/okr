@@ -170,6 +170,9 @@ export interface IStorage {
   // Organization Onboarding Status
   getOrganizationOnboardingStatus(organizationId: string): Promise<{ isCompleted: boolean; completedAt?: Date; data?: any }>;
   completeOrganizationOnboarding(organizationId: string): Promise<{ isCompleted: boolean; completedAt: Date }>;
+  
+  // Create first objective from onboarding data
+  createFirstObjectiveFromOnboarding(userId: string, onboardingData: any): Promise<Objective | undefined>;
 }
 
 // Helper function to calculate and update status automatically
@@ -1613,6 +1616,126 @@ export class DatabaseStorage implements IStorage {
       };
     } catch (error) {
       console.error("Error completing organization onboarding:", error);
+      throw error;
+    }
+  }
+
+  // Create first objective from onboarding data
+  async createFirstObjectiveFromOnboarding(userId: string, onboardingData: any): Promise<Objective | undefined> {
+    try {
+      const user = await this.getUser(userId);
+      if (!user) {
+        throw new Error("User not found");
+      }
+      
+      // Find or create active cycle
+      let activeCycle = await db.select().from(cycles).where(eq(cycles.status, "active")).limit(1);
+      if (!activeCycle.length) {
+        // Create a new cycle if none exists
+        const currentYear = new Date().getFullYear();
+        const currentMonth = new Date().getMonth() + 1;
+        const currentDate = new Date();
+        
+        const cycleData = {
+          name: `Onboarding - ${currentDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}`,
+          type: onboardingData.cadence === 'monthly' ? 'monthly' : 'quarterly',
+          startDate: new Date(currentYear, currentMonth - 1, 1).toISOString(),
+          endDate: new Date(currentYear, currentMonth, 0).toISOString(),
+          status: 'active',
+          description: `Siklus pertama dari hasil onboarding perusahaan`
+        };
+        
+        const [newCycle] = await db.insert(cycles).values(cycleData).returning();
+        activeCycle = [newCycle];
+      }
+      
+      // Create objective from onboarding data
+      const objectiveData = {
+        cycleId: activeCycle[0].id,
+        title: onboardingData.objective,
+        description: `Objective pertama dari hasil onboarding (${onboardingData.teamFocus || 'General'})`,
+        owner: user.firstName || user.email,
+        ownerType: 'user',
+        ownerId: userId,
+        status: 'not_started'
+      };
+      
+      const [newObjective] = await db.insert(objectives).values(objectiveData).returning();
+      
+      if (!newObjective) {
+        throw new Error("Failed to create objective");
+      }
+      
+      // Create key results from onboarding data
+      if (onboardingData.keyResults && onboardingData.keyResults.length > 0) {
+        const keyResultsData = onboardingData.keyResults
+          .filter((kr: string) => kr && kr.trim() !== '' && kr !== 'custom')
+          .map((kr: string) => ({
+            objectiveId: newObjective.id,
+            title: kr,
+            description: `Key result dari hasil onboarding`,
+            currentValue: "0",
+            targetValue: "100",
+            unit: "percentage",
+            keyResultType: "increase_to",
+            status: "on_track",
+            assignedTo: userId
+          }));
+        
+        if (keyResultsData.length > 0) {
+          await db.insert(keyResults).values(keyResultsData);
+        }
+      }
+      
+      // Create initiatives from onboarding data
+      if (onboardingData.initiatives && onboardingData.initiatives.length > 0) {
+        const objectiveKeyResults = await db.select().from(keyResults).where(eq(keyResults.objectiveId, newObjective.id));
+        
+        if (objectiveKeyResults.length > 0) {
+          const initiativesData = onboardingData.initiatives
+            .filter((init: string) => init && init.trim() !== '' && init !== 'custom')
+            .map((init: string) => ({
+              keyResultId: objectiveKeyResults[0].id, // Link to first key result
+              title: init,
+              description: `Inisiatif dari hasil onboarding`,
+              status: 'draft',
+              priority: 'medium',
+              picId: userId,
+              impactScore: 3,
+              effortScore: 3,
+              confidenceScore: 3,
+              priorityScore: "3.00",
+              createdBy: userId
+            }));
+          
+          if (initiativesData.length > 0) {
+            const createdInitiatives = await db.insert(initiatives).values(initiativesData).returning();
+            
+            // Create tasks from onboarding data
+            if (onboardingData.tasks && onboardingData.tasks.length > 0 && createdInitiatives.length > 0) {
+              const tasksData = onboardingData.tasks
+                .filter((task: string) => task && task.trim() !== '' && task !== 'custom')
+                .map((task: string) => ({
+                  initiativeId: createdInitiatives[0].id, // Link to first initiative
+                  title: task,
+                  description: `Task dari hasil onboarding`,
+                  status: 'not_started',
+                  priority: 'medium',
+                  assignedTo: userId,
+                  createdBy: userId
+                }));
+              
+              if (tasksData.length > 0) {
+                await db.insert(tasks).values(tasksData);
+              }
+            }
+          }
+        }
+      }
+      
+      return newObjective;
+    } catch (error) {
+      console.error("Error creating first objective from onboarding:", error);
       throw error;
     }
   }

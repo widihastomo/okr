@@ -213,12 +213,12 @@ export default function CompanyOnboarding() {
   // Complete onboarding
   const completeOnboardingMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest("POST", "/api/onboarding/complete");
+      return apiRequest("POST", "/api/onboarding/complete", { onboardingData });
     },
     onSuccess: () => {
       toast({
         title: "Selamat!",
-        description: "Onboarding berhasil diselesaikan. Selamat datang di platform!",
+        description: "Onboarding berhasil diselesaikan. Objective pertama telah dibuat!",
       });
       // Redirect to main dashboard
       window.location.href = "/";
