@@ -1350,7 +1350,7 @@ export default function CompanyOnboarding() {
             <Progress value={progressPercentage} className="h-2" />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="space-y-8">
             {/* Mascot Assistant */}
             <div className="space-y-4">
               {currentStepData && (
