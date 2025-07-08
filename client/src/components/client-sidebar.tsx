@@ -98,6 +98,12 @@ export default function Sidebar({
       active: location === "/invoices" || location.startsWith("/invoices/"),
     },
     {
+      label: "Kode Referral",
+      icon: Gift,
+      path: "/referral-codes",
+      active: location === "/referral-codes",
+    },
+    {
       label: "Database",
       icon: Database,
       path: "/system-admin/database",
@@ -178,12 +184,6 @@ export default function Sidebar({
       icon: Package,
       path: "/add-ons",
       active: location === "/add-ons",
-    },
-    {
-      label: "Kode Referral",
-      icon: Gift,
-      path: "/referral-codes",
-      active: location === "/referral-codes",
     },
   ];
 

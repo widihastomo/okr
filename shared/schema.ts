@@ -152,8 +152,10 @@ export const invoices = pgTable("invoices", {
   subscriptionPlanId: uuid("subscription_plan_id").references(() => subscriptionPlans.id),
   billingPeriodId: uuid("billing_period_id").references(() => billingPeriods.id),
   organizationSubscriptionId: uuid("organization_subscription_id").references(() => organizationSubscriptions.id),
-  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(), // Total invoice amount
-  subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(), // Amount before tax
+  referralCodeId: uuid("referral_code_id").references(() => referralCodes.id), // Applied referral code
+  referralDiscountAmount: decimal("referral_discount_amount", { precision: 10, scale: 2 }).default("0"), // Discount from referral
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(), // Total invoice amount (after all discounts)
+  subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(), // Amount before tax and discounts
   taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }).default("0"), // Tax amount
   taxRate: decimal("tax_rate", { precision: 5, scale: 2 }).default("0"), // Tax rate percentage
   currency: text("currency").notNull().default("IDR"), // Currency code
@@ -175,6 +177,7 @@ export const invoices = pgTable("invoices", {
 export const invoiceLineItems = pgTable("invoice_line_items", {
   id: uuid("id").primaryKey().defaultRandom(),
   invoiceId: uuid("invoice_id").notNull().references(() => invoices.id, { onDelete: "cascade" }),
+  type: text("type").notNull().default("subscription"), // "subscription", "addon", "one_time", "fee"
   description: text("description").notNull(), // e.g., "Growth Plan - Quarterly Billing", "Additional User"
   quantity: integer("quantity").notNull().default(1),
   unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
@@ -184,7 +187,9 @@ export const invoiceLineItems = pgTable("invoice_line_items", {
   periodStart: timestamp("period_start"), // For subscription billing periods
   periodEnd: timestamp("period_end"), // For subscription billing periods
   subscriptionPlanId: uuid("subscription_plan_id").references(() => subscriptionPlans.id),
+  billingPeriodId: uuid("billing_period_id").references(() => billingPeriods.id),
   addOnId: uuid("add_on_id").references(() => subscriptionAddOns.id),
+  addOnSubscriptionId: uuid("add_on_subscription_id").references(() => organizationAddOnSubscriptions.id),
   metadata: jsonb("metadata"), // Additional data
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -960,10 +965,16 @@ export type InsertInvoiceLineItem = z.infer<typeof insertInvoiceLineItemSchema>;
 
 // Invoice with Line Items
 export type InvoiceWithLineItems = Invoice & {
-  lineItems: InvoiceLineItem[];
+  lineItems: (InvoiceLineItem & {
+    subscriptionPlan?: SubscriptionPlan;
+    billingPeriod?: BillingPeriod;
+    addOn?: SubscriptionAddOn;
+    addOnSubscription?: OrganizationAddOnSubscription;
+  })[];
   organization: Organization;
   subscriptionPlan?: SubscriptionPlan;
   billingPeriod?: BillingPeriod;
+  referralCode?: ReferralCode;
 };
 
 // Notifications System

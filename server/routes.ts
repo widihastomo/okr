@@ -3860,6 +3860,353 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Generate comprehensive invoice with subscription, addons, and referral codes
+  app.post("/api/invoices/generate-comprehensive", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const { db } = await import("./db");
+      const { 
+        invoices, 
+        invoiceLineItems, 
+        organizations, 
+        organizationSubscriptions, 
+        subscriptionPlans, 
+        billingPeriods,
+        organizationAddOnSubscriptions,
+        subscriptionAddOns,
+        referralCodes,
+        referralCodeUsages
+      } = await import("@shared/schema");
+      const { eq, and, inArray } = await import("drizzle-orm");
+      
+      const { 
+        organizationId, 
+        subscriptionId, 
+        addonSubscriptionIds = [], 
+        referralCodeId,
+        description,
+        customLineItems = [] // For additional fees or one-time charges
+      } = req.body;
+      
+      // Validate access
+      if (!currentUser.isSystemOwner && currentUser.organizationId !== organizationId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Get subscription details
+      const subscriptionData = await db
+        .select({
+          subscription: organizationSubscriptions,
+          plan: subscriptionPlans,
+          billing: billingPeriods,
+          organization: organizations,
+        })
+        .from(organizationSubscriptions)
+        .leftJoin(subscriptionPlans, eq(organizationSubscriptions.planId, subscriptionPlans.id))
+        .leftJoin(billingPeriods, eq(organizationSubscriptions.billingPeriodId, billingPeriods.id))
+        .leftJoin(organizations, eq(organizationSubscriptions.organizationId, organizations.id))
+        .where(
+          and(
+            eq(organizationSubscriptions.id, subscriptionId),
+            eq(organizationSubscriptions.organizationId, organizationId)
+          )
+        );
+      
+      if (subscriptionData.length === 0) {
+        return res.status(404).json({ message: "Subscription not found" });
+      }
+      
+      const { subscription, plan, billing, organization } = subscriptionData[0];
+      
+      if (!plan || !billing || !organization) {
+        return res.status(400).json({ message: "Incomplete subscription data" });
+      }
+      
+      // Get addon subscriptions if provided
+      let addonData = [];
+      if (addonSubscriptionIds.length > 0) {
+        addonData = await db
+          .select({
+            addonSubscription: organizationAddOnSubscriptions,
+            addon: subscriptionAddOns,
+          })
+          .from(organizationAddOnSubscriptions)
+          .leftJoin(subscriptionAddOns, eq(organizationAddOnSubscriptions.addOnId, subscriptionAddOns.id))
+          .where(and(
+            eq(organizationAddOnSubscriptions.organizationId, organizationId),
+            inArray(organizationAddOnSubscriptions.id, addonSubscriptionIds)
+          ));
+      }
+      
+      // Get referral code if provided
+      let referralCode = null;
+      if (referralCodeId) {
+        const referralData = await db
+          .select()
+          .from(referralCodes)
+          .where(eq(referralCodes.id, referralCodeId))
+          .limit(1);
+        
+        if (referralData.length > 0) {
+          referralCode = referralData[0];
+        }
+      }
+      
+      // Generate invoice number
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      
+      const { sql, count } = await import("drizzle-orm");
+      const [{ invoiceCount }] = await db
+        .select({ invoiceCount: count() })
+        .from(invoices)
+        .where(sql`EXTRACT(YEAR FROM ${invoices.createdAt}) = ${year} AND EXTRACT(MONTH FROM ${invoices.createdAt}) = ${parseInt(month)}`);
+      
+      const invoiceNumber = `INV-${year}-${month}-${String((invoiceCount || 0) + 1).padStart(3, '0')}`;
+      
+      // Calculate amounts
+      let subtotal = parseFloat(billing.price);
+      
+      // Add addon costs
+      for (const addon of addonData) {
+        if (addon.addon && addon.addonSubscription) {
+          const addonCost = parseFloat(addon.addon.price) * addon.addonSubscription.quantity;
+          subtotal += addonCost;
+        }
+      }
+      
+      // Add custom line items
+      for (const item of customLineItems) {
+        subtotal += parseFloat(item.totalPrice || "0");
+      }
+      
+      // Calculate referral discount
+      let referralDiscountAmount = 0;
+      if (referralCode && referralCode.isActive) {
+        switch (referralCode.discountType) {
+          case "percentage":
+            referralDiscountAmount = (subtotal * parseFloat(referralCode.discountValue)) / 100;
+            break;
+          case "fixed_amount":
+            referralDiscountAmount = parseFloat(referralCode.discountValue);
+            break;
+          case "free_months":
+            // For free months, apply 100% discount to base subscription
+            referralDiscountAmount = parseFloat(billing.price);
+            break;
+        }
+        
+        // Ensure discount doesn't exceed subtotal
+        referralDiscountAmount = Math.min(referralDiscountAmount, subtotal);
+      }
+      
+      const discountedSubtotal = subtotal - referralDiscountAmount;
+      const taxRate = 11; // 11% PPN
+      const taxAmount = (discountedSubtotal * taxRate) / 100;
+      const totalAmount = discountedSubtotal + taxAmount;
+      
+      // Calculate due date (30 days from issue date)
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + 30);
+      
+      // Create invoice
+      const [newInvoice] = await db
+        .insert(invoices)
+        .values({
+          invoiceNumber,
+          organizationId,
+          subscriptionPlanId: plan.id,
+          billingPeriodId: billing.id,
+          organizationSubscriptionId: subscription.id,
+          referralCodeId: referralCode?.id || null,
+          referralDiscountAmount: referralDiscountAmount.toString(),
+          amount: totalAmount.toString(),
+          subtotal: subtotal.toString(),
+          taxAmount: taxAmount.toString(),
+          taxRate: taxRate.toString(),
+          dueDate,
+          description: description || `${plan.name} - ${billing.periodType} billing dengan add-ons`,
+          createdBy: currentUser.id,
+        })
+        .returning();
+      
+      // Create line items
+      const lineItems = [];
+      
+      // Main subscription line item
+      lineItems.push({
+        invoiceId: newInvoice.id,
+        type: "subscription",
+        description: `${plan.name} - ${billing.periodType} billing`,
+        quantity: 1,
+        unitPrice: billing.price,
+        totalPrice: billing.price,
+        subscriptionPlanId: plan.id,
+        billingPeriodId: billing.id,
+        periodStart: subscription.currentPeriodStart,
+        periodEnd: subscription.currentPeriodEnd,
+      });
+      
+      // Addon line items
+      for (const addon of addonData) {
+        if (addon.addon && addon.addonSubscription) {
+          const addonTotal = parseFloat(addon.addon.price) * addon.addonSubscription.quantity;
+          lineItems.push({
+            invoiceId: newInvoice.id,
+            type: "addon",
+            description: `${addon.addon.name} (${addon.addonSubscription.quantity}x)`,
+            quantity: addon.addonSubscription.quantity,
+            unitPrice: addon.addon.price,
+            totalPrice: addonTotal.toString(),
+            addOnId: addon.addon.id,
+            addOnSubscriptionId: addon.addonSubscription.id,
+            periodStart: addon.addonSubscription.currentPeriodStart,
+            periodEnd: addon.addonSubscription.currentPeriodEnd,
+          });
+        }
+      }
+      
+      // Custom line items
+      for (const item of customLineItems) {
+        lineItems.push({
+          invoiceId: newInvoice.id,
+          type: item.type || "fee",
+          description: item.description,
+          quantity: item.quantity || 1,
+          unitPrice: item.unitPrice || "0",
+          totalPrice: item.totalPrice || "0",
+          metadata: item.metadata || null,
+        });
+      }
+      
+      // Insert all line items
+      if (lineItems.length > 0) {
+        await db.insert(invoiceLineItems).values(lineItems);
+      }
+      
+      // Record referral code usage if applied
+      if (referralCode && referralDiscountAmount > 0) {
+        await db.insert(referralCodeUsages).values({
+          referralCodeId: referralCode.id,
+          usedByOrganization: organizationId,
+          usedByUser: currentUser.id,
+          discountApplied: referralDiscountAmount.toString(),
+          status: "applied",
+        });
+        
+        // Update referral code usage count
+        await db
+          .update(referralCodes)
+          .set({ 
+            currentUses: referralCode.currentUses + 1,
+            updatedAt: new Date()
+          })
+          .where(eq(referralCodes.id, referralCode.id));
+      }
+      
+      res.status(201).json(newInvoice);
+    } catch (error) {
+      console.error("Error generating comprehensive invoice:", error);
+      res.status(500).json({ message: "Failed to generate comprehensive invoice" });
+    }
+  });
+
+  // Get organization subscriptions for comprehensive invoice
+  app.get("/api/admin/organization-subscriptions/:organizationId", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const { db } = await import("./db");
+      const { organizationSubscriptions, subscriptionPlans, billingPeriods } = await import("@shared/schema");
+      const { eq } = await import("drizzle-orm");
+      const organizationId = req.params.organizationId;
+      
+      // Validate access
+      if (!currentUser.isSystemOwner && currentUser.organizationId !== organizationId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const subscriptions = await db
+        .select({
+          id: organizationSubscriptions.id,
+          status: organizationSubscriptions.status,
+          subscriptionPlan: subscriptionPlans,
+          billingPeriod: billingPeriods,
+        })
+        .from(organizationSubscriptions)
+        .leftJoin(subscriptionPlans, eq(organizationSubscriptions.planId, subscriptionPlans.id))
+        .leftJoin(billingPeriods, eq(organizationSubscriptions.billingPeriodId, billingPeriods.id))
+        .where(eq(organizationSubscriptions.organizationId, organizationId));
+      
+      res.json(subscriptions);
+    } catch (error) {
+      console.error("Error fetching organization subscriptions:", error);
+      res.status(500).json({ message: "Failed to fetch organization subscriptions" });
+    }
+  });
+
+  // Get organization addon subscriptions for comprehensive invoice
+  app.get("/api/admin/organization-addon-subscriptions/:organizationId", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const { db } = await import("./db");
+      const { organizationAddOnSubscriptions, subscriptionAddOns } = await import("@shared/schema");
+      const { eq } = await import("drizzle-orm");
+      const organizationId = req.params.organizationId;
+      
+      // Validate access
+      if (!currentUser.isSystemOwner && currentUser.organizationId !== organizationId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const addonSubscriptions = await db
+        .select({
+          id: organizationAddOnSubscriptions.id,
+          quantity: organizationAddOnSubscriptions.quantity,
+          status: organizationAddOnSubscriptions.status,
+          currentPeriodStart: organizationAddOnSubscriptions.currentPeriodStart,
+          currentPeriodEnd: organizationAddOnSubscriptions.currentPeriodEnd,
+          addon: subscriptionAddOns,
+        })
+        .from(organizationAddOnSubscriptions)
+        .leftJoin(subscriptionAddOns, eq(organizationAddOnSubscriptions.addOnId, subscriptionAddOns.id))
+        .where(eq(organizationAddOnSubscriptions.organizationId, organizationId));
+      
+      res.json(addonSubscriptions);
+    } catch (error) {
+      console.error("Error fetching organization addon subscriptions:", error);
+      res.status(500).json({ message: "Failed to fetch organization addon subscriptions" });
+    }
+  });
+
+  // Get available referral codes for comprehensive invoice
+  app.get("/api/referral-codes/available", requireAuth, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { referralCodes } = await import("@shared/schema");
+      const { eq, and, or } = await import("drizzle-orm");
+      
+      const availableCodes = await db
+        .select()
+        .from(referralCodes)
+        .where(
+          and(
+            eq(referralCodes.isActive, true),
+            or(
+              eq(referralCodes.maxUses, null), // No usage limit
+              // maxUses > currentUses
+              // TODO: Add this condition when we need usage limits
+            )
+          )
+        );
+      
+      res.json(availableCodes);
+    } catch (error) {
+      console.error("Error fetching available referral codes:", error);
+      res.status(500).json({ message: "Failed to fetch available referral codes" });
+    }
+  });
+
   // Delete invoice (only pending invoices)
   app.delete("/api/invoices/:id", requireAuth, async (req, res) => {
     try {

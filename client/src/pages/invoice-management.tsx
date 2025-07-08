@@ -45,6 +45,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { InvoiceWithLineItems } from "@shared/schema";
 import { CreateInvoiceModal } from "@/components/create-invoice-modal";
+import ComprehensiveInvoiceModal from "@/components/comprehensive-invoice-modal";
 
 interface InvoiceData {
   invoice: {
@@ -122,6 +123,8 @@ export default function InvoiceManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [comprehensiveModalOpen, setComprehensiveModalOpen] = useState(false);
+  const [selectedOrganization, setSelectedOrganization] = useState<{ id: string; name: string } | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -165,6 +168,16 @@ export default function InvoiceManagement() {
 
   const handleMarkPaid = (invoiceId: string) => {
     markPaidMutation.mutate(invoiceId);
+  };
+
+  const handleOpenComprehensiveModal = (organizationId: string, organizationName: string) => {
+    setSelectedOrganization({ id: organizationId, name: organizationName });
+    setComprehensiveModalOpen(true);
+  };
+
+  const handleCloseComprehensiveModal = () => {
+    setComprehensiveModalOpen(false);
+    setSelectedOrganization(null);
   };
 
   const payWithMidtransMutation = useMutation({
@@ -226,13 +239,46 @@ export default function InvoiceManagement() {
           <h1 className="text-3xl font-bold text-gray-900">Manajemen Invoice</h1>
           <p className="text-gray-600 mt-2">Kelola invoice langganan dan pembayaran</p>
         </div>
-        <Button 
-          onClick={() => setCreateModalOpen(true)}
-          className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Buat Invoice
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={() => setCreateModalOpen(true)}
+            variant="outline"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Invoice Sederhana
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
+                <Plus className="w-4 h-4 mr-2" />
+                Invoice Komprehensif
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {invoices
+                .filter((item: InvoiceData) => item.organization)
+                .reduce((orgs: Array<{id: string, name: string}>, item: InvoiceData) => {
+                  const exists = orgs.find(org => org.id === item.organization.id);
+                  if (!exists) {
+                    orgs.push({
+                      id: item.organization.id,
+                      name: item.organization.name
+                    });
+                  }
+                  return orgs;
+                }, [])
+                .map((org) => (
+                  <DropdownMenuItem
+                    key={org.id}
+                    onClick={() => handleOpenComprehensiveModal(org.id, org.name)}
+                  >
+                    {org.name}
+                  </DropdownMenuItem>
+                ))
+              }
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -444,6 +490,16 @@ export default function InvoiceManagement() {
         open={createModalOpen} 
         onOpenChange={setCreateModalOpen} 
       />
+
+      {/* Comprehensive Invoice Modal */}
+      {selectedOrganization && (
+        <ComprehensiveInvoiceModal
+          isOpen={comprehensiveModalOpen}
+          onClose={handleCloseComprehensiveModal}
+          organizationId={selectedOrganization.id}
+          organizationName={selectedOrganization.name}
+        />
+      )}
     </div>
   );
 }
