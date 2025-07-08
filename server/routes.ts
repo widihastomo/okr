@@ -6569,6 +6569,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Additional onboarding endpoints for new frontend
+  app.get("/api/onboarding/progress", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const progress = await storage.getUserOnboardingProgress(currentUser.id);
+      res.json(progress);
+    } catch (error: any) {
+      console.error("Error fetching onboarding progress:", error);
+      res.status(500).json({ message: "Failed to fetch onboarding progress" });
+    }
+  });
+
+  app.put("/api/onboarding/progress", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const updateData = updateOnboardingProgressSchema.parse(req.body);
+      
+      const updatedProgress = await storage.updateUserOnboardingProgress(currentUser.id, updateData);
+      res.json(updatedProgress);
+    } catch (error: any) {
+      console.error("Error updating onboarding progress:", error);
+      res.status(500).json({ message: "Failed to update onboarding progress" });
+    }
+  });
+
+  app.post("/api/onboarding/complete-tour", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const { tourId } = req.body;
+      
+      if (!tourId) {
+        return res.status(400).json({ message: "Tour ID is required" });
+      }
+
+      // Get current progress
+      const currentProgress = await storage.getUserOnboardingProgress(currentUser.id);
+      const completedTours = currentProgress?.completedTours || [];
+      
+      // Add tour to completed if not already there
+      if (!completedTours.includes(tourId)) {
+        completedTours.push(tourId);
+        
+        const updatedProgress = await storage.updateUserOnboardingProgress(currentUser.id, {
+          completedTours,
+          isFirstTimeUser: false
+        });
+        
+        res.json(updatedProgress);
+      } else {
+        res.json(currentProgress);
+      }
+    } catch (error: any) {
+      console.error("Error completing tour:", error);
+      res.status(500).json({ message: "Failed to complete tour" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

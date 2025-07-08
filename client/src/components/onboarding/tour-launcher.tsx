@@ -1,187 +1,188 @@
 import React, { useState } from "react";
-import { useOnboarding, ONBOARDING_TOURS } from "@/contexts/onboarding-context";
+import { useOnboarding } from "@/contexts/onboarding-context";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { 
   HelpCircle, 
   Play, 
   CheckCircle, 
-  MapPin, 
-  Clock,
-  Users,
+  Calendar,
   Target,
-  Calendar
+  Users,
+  BarChart3,
+  Sun,
+  Sparkles
 } from "lucide-react";
 
-const tourIcons = {
-  welcome: Target,
-  "daily-focus": Calendar,
-  "create-okr": Users
-};
+export default function TourLauncher() {
+  const { 
+    startTour, 
+    completedTours, 
+    isOnboardingActive,
+    currentTour
+  } = useOnboarding();
 
-export const TourLauncher: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { startTour, completedTours, isFirstTimeUser } = useOnboarding();
+  // Import tours directly
+  const ONBOARDING_TOURS = [
+    {
+      id: "welcome",
+      name: "Welcome Tour",
+      title: "Selamat Datang di OKR Management!",
+      description: "Mari kenali fitur-fitur utama platform ini",
+      steps: []
+    },
+    {
+      id: "daily-focus",
+      name: "Daily Focus Tour", 
+      title: "Mengelola Aktivitas Harian",
+      description: "Pelajari cara menggunakan Daily Focus untuk produktivitas optimal",
+      steps: []
+    },
+    {
+      id: "okr-creation",
+      name: "OKR Creation Tour",
+      title: "Membuat OKR Pertama",
+      description: "Tutorial lengkap membuat Objective dan Key Results",
+      steps: []
+    },
+    {
+      id: "team-collaboration",
+      name: "Team Collaboration Tour",
+      title: "Kolaborasi Tim",
+      description: "Pelajari cara berkolaborasi dengan tim dalam mencapai objectives",
+      steps: []
+    },
+    {
+      id: "progress-tracking",
+      name: "Progress Tracking Tour",
+      title: "Tracking Progress",
+      description: "Pelajari cara memantau dan update progress objectives",
+      steps: []
+    }
+  ];
 
-  const handleStartTour = (tourId: string) => {
-    startTour(tourId);
-    setIsOpen(false);
+  // Define tour icons
+  const getTourIcon = (tourId: string) => {
+    switch (tourId) {
+      case "welcome":
+        return <Sparkles className="w-4 h-4" />;
+      case "daily-focus":
+        return <Sun className="w-4 h-4" />;
+      case "okr-creation":
+        return <Target className="w-4 h-4" />;
+      case "team-collaboration":
+        return <Users className="w-4 h-4" />;
+      case "progress-tracking":
+        return <BarChart3 className="w-4 h-4" />;
+      default:
+        return <Play className="w-4 h-4" />;
+    }
   };
 
-  const completionPercentage = (completedTours.length / ONBOARDING_TOURS.length) * 100;
-
+  const availableTours = ONBOARDING_TOURS;
+  
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="outline"
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button 
+          variant="outline" 
           size="sm"
           className="relative"
+          disabled={isOnboardingActive}
         >
           <HelpCircle className="w-4 h-4 mr-2" />
           Panduan
-          {isFirstTimeUser && (
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full animate-pulse" />
+          {/* Show notification dot if there are unfinished tours */}
+          {completedTours.length < availableTours.length && (
+            <div className="absolute -top-1 -right-1 w-2 h-2 bg-orange-500 rounded-full" />
           )}
         </Button>
-      </DialogTrigger>
-      
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-orange-600" />
-            Panduan Interaktif
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-6">
-          {/* Progress Overview */}
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Progress Anda</CardTitle>
-                <Badge variant={completionPercentage === 100 ? "default" : "secondary"}>
-                  {completedTours.length}/{ONBOARDING_TOURS.length} Tour
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>Kemajuan Onboarding</span>
-                  <span>{Math.round(completionPercentage)}%</span>
-                </div>
-                <Progress value={completionPercentage} className="h-2" />
-              </div>
-              
-              {completionPercentage === 100 && (
-                <div className="mt-4 p-3 bg-green-50 rounded-lg flex items-center gap-2 text-green-700">
-                  <CheckCircle className="w-5 h-5" />
-                  <span className="text-sm font-medium">
-                    Selamat! Anda telah menyelesaikan semua tour.
-                  </span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Available Tours */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">Tour yang Tersedia</h3>
-            
-            <div className="grid gap-4">
-              {ONBOARDING_TOURS.map((tour) => {
-                const isCompleted = completedTours.includes(tour.id);
-                const Icon = tourIcons[tour.id as keyof typeof tourIcons] || Target;
-                
-                return (
-                  <Card 
-                    key={tour.id} 
-                    className={`transition-all ${isCompleted ? 'bg-green-50 border-green-200' : 'hover:shadow-md'}`}
-                  >
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-lg ${isCompleted ? 'bg-green-100' : 'bg-orange-100'}`}>
-                            {isCompleted ? (
-                              <CheckCircle className="w-5 h-5 text-green-600" />
-                            ) : (
-                              <Icon className="w-5 h-5 text-orange-600" />
-                            )}
-                          </div>
-                          <div>
-                            <CardTitle className="text-base flex items-center gap-2">
-                              {tour.title}
-                              {isCompleted && (
-                                <Badge variant="default" className="text-xs bg-green-600">
-                                  Selesai
-                                </Badge>
-                              )}
-                            </CardTitle>
-                            <CardDescription className="text-sm">
-                              {tour.description}
-                            </CardDescription>
-                          </div>
-                        </div>
-                      </div>
-                    </CardHeader>
-
-                    <CardContent className="pt-0">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 text-sm text-gray-500">
-                          <div className="flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
-                            <span>{tour.steps.length} langkah</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <span>~{Math.ceil(tour.steps.length * 0.5)} menit</span>
-                          </div>
-                        </div>
-
-                        <Button
-                          onClick={() => handleStartTour(tour.id)}
-                          size="sm"
-                          variant={isCompleted ? "outline" : "default"}
-                          className={!isCompleted ? "bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600" : ""}
-                        >
-                          <Play className="w-4 h-4 mr-1" />
-                          {isCompleted ? "Ulangi Tour" : "Mulai Tour"}
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Quick Tips */}
-          <Card className="bg-blue-50 border-blue-200">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base text-blue-900">Tips Cepat</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <ul className="space-y-2 text-sm text-blue-800">
-                <li className="flex items-start gap-2">
-                  <span className="w-1 h-1 bg-blue-600 rounded-full mt-2 flex-shrink-0"></span>
-                  <span>Anda dapat mengakses panduan kapan saja melalui tombol "Panduan" di header</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="w-1 h-1 bg-blue-600 rounded-full mt-2 flex-shrink-0"></span>
-                  <span>Tour dapat dilewati atau dihentikan kapan saja dengan tombol X</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="w-1 h-1 bg-blue-600 rounded-full mt-2 flex-shrink-0"></span>
-                  <span>Tour yang sudah selesai dapat diulang untuk refresher</span>
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-80">
+        <DropdownMenuLabel className="font-semibold">
+          Tutorial Interaktif
+        </DropdownMenuLabel>
+        <div className="px-2 pb-2 text-xs text-gray-500">
+          Pilih tutorial yang ingin Anda pelajari
         </div>
-      </DialogContent>
-    </Dialog>
+        <DropdownMenuSeparator />
+        
+        {availableTours.map((tour) => {
+          const isCompleted = completedTours.includes(tour.id);
+          const isCurrent = currentTour?.id === tour.id;
+          
+          return (
+            <DropdownMenuItem
+              key={tour.id}
+              onClick={() => !isOnboardingActive && startTour(tour.id)}
+              className="flex items-start p-3 cursor-pointer hover:bg-gray-50"
+              disabled={isOnboardingActive}
+            >
+              <div className="flex items-center w-full">
+                <div className="flex-shrink-0 mr-3">
+                  {isCompleted ? (
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                  ) : (
+                    getTourIcon(tour.id)
+                  )}
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <h4 className="text-sm font-medium text-gray-900 truncate">
+                      {tour.title}
+                    </h4>
+                    {isCompleted && (
+                      <Badge variant="secondary" className="ml-2 text-xs bg-green-100 text-green-700">
+                        Selesai
+                      </Badge>
+                    )}
+                    {isCurrent && (
+                      <Badge variant="default" className="ml-2 text-xs bg-orange-100 text-orange-700">
+                        Aktif
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500 line-clamp-2">
+                    {tour.description}
+                  </p>
+                  <div className="flex items-center mt-1">
+                    <span className="text-xs text-gray-400">
+                      {tour.steps.length} langkah
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </DropdownMenuItem>
+          );
+        })}
+        
+        <DropdownMenuSeparator />
+        
+        <div className="p-3">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-gray-500">Progress:</span>
+            <span className="font-medium">
+              {completedTours.length}/{availableTours.length} selesai
+            </span>
+          </div>
+          <div className="mt-2 w-full bg-gray-200 rounded-full h-1.5">
+            <div 
+              className="bg-gradient-to-r from-orange-600 to-orange-500 h-1.5 rounded-full transition-all duration-300"
+              style={{ width: `${(completedTours.length / availableTours.length) * 100}%` }}
+            />
+          </div>
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
-};
+}

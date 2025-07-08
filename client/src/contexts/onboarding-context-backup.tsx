@@ -247,26 +247,72 @@ export const ONBOARDING_TOURS: OnboardingTour[] = [
     ]
   }
 ];
+        description: "Lihat dan kelola task yang perlu diselesaikan hari ini.",
+        target: "[data-tour='today-tasks']",
+        action: "observe"
+      },
+      {
+        id: "daily-3",
+        title: "Update Progress",
+        description: "Gunakan fitur ini untuk memperbarui progress key results Anda.",
+        target: "[data-tour='progress-update']",
+        action: "observe"
+      }
+    ]
+  },
+  {
+    id: "create-okr",
+    name: "Create OKR Tour",
+    title: "Membuat OKR Pertama",
+    description: "Panduan lengkap membuat Objective dan Key Results",
+    steps: [
+      {
+        id: "okr-1",
+        title: "Form Objective",
+        description: "Mulai dengan menulis objective yang jelas dan menginspirasi.",
+        target: "[data-tour='objective-title']",
+        action: "input"
+      },
+      {
+        id: "okr-2", 
+        title: "Tambah Key Results",
+        description: "Key Results adalah angka target yang dapat diukur untuk mencapai objective.",
+        target: "[data-tour='add-key-result']",
+        action: "click"
+      },
+      {
+        id: "okr-3",
+        title: "Simpan OKR",
+        description: "Setelah selesai, simpan OKR Anda untuk mulai tracking progress.",
+        target: "[data-tour='save-okr']",
+        action: "click"
+      }
+    ]
+  }
+];
 
 interface OnboardingProviderProps {
   children: React.ReactNode;
 }
 
 export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
-  const { data: onboardingProgress } = useOnboardingProgress();
-  const updateProgressMutation = useUpdateOnboardingProgress();
-
-  // Local state
+  const { user, isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
+  
+  // State management
   const [isOnboardingActive, setIsOnboardingActive] = useState(false);
   const [currentTour, setCurrentTour] = useState<OnboardingTour | null>(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [highlightedElement, setHighlightedElement] = useState<string | null>(null);
   const [tooltipVisible, setTooltipVisible] = useState(false);
 
-  // Derived state
-  const completedTours = onboardingProgress?.completedTours || [];
-  const isFirstTimeUser = onboardingProgress?.isFirstTimeUser !== false;
+  // Get user onboarding progress using real API
+  const { data: onboardingProgress } = useOnboardingProgress();
+  const updateProgressMutation = useUpdateOnboardingProgress();
+
+  const completedTours = onboardingProgress?.stepsCompleted || [];
+  const isFirstTimeUser = !onboardingProgress?.isWelcomeWizardCompleted;
+
   const currentStep = currentTour?.steps[currentStepIndex] || null;
 
   // Tour management functions
@@ -276,6 +322,11 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children
       setCurrentTour(tour);
       setCurrentStepIndex(0);
       setIsOnboardingActive(true);
+      
+      // Navigate to tour start route if specified
+      if (tour.steps[0]?.nextRoute) {
+        window.location.href = tour.steps[0].nextRoute;
+      }
     }
   };
 

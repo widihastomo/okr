@@ -10,6 +10,8 @@ import GlobalHeader from "@/components/global-header";
 import ClientSidebar from "@/components/client-sidebar";
 import SystemAdminSidebar from "@/components/system-admin-sidebar";
 import { NotificationProvider } from "@/components/notifications/notification-provider";
+import { OnboardingProvider } from "@/contexts/onboarding-context";
+import TourTooltip from "@/components/onboarding/tour-tooltip";
 import Dashboard from "@/pages/dashboard";
 
 import TemplatesContent from "@/components/templates-content";
@@ -195,8 +197,11 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Router />
+        <OnboardingProvider>
+          <Toaster />
+          <Router />
+          <TourTooltip />
+        </OnboardingProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

@@ -28,6 +28,7 @@ import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 import { Plus, Target, CheckSquare, Building2, Trophy } from "lucide-react";
 import MyTugas from "@/components/my-tasks";
 import Inisiatif from "@/components/initiatives";
+import TourLauncher from "@/components/onboarding/tour-launcher";
 import { useAuth } from "@/hooks/useAuth";
 import { DashboardHelpBubble } from "@/components/help-bubble";
 import AIHelpBubble from "@/components/ai-help-bubble";
@@ -512,7 +513,7 @@ export default function Dashboard() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
             <div className="flex items-center">
               <div>
-                <h1 className="text-lg sm:text-2xl font-semibold text-gray-900">Goals</h1>
+                <h1 className="text-lg sm:text-2xl font-semibold text-gray-900" data-tour="dashboard-header">Goals</h1>
                 <p className="text-gray-600 mt-0.5 sm:mt-1 text-xs sm:text-base">Kelola objective, angka target, dan inisiatif Anda</p>
               </div>
               {currentUser && (currentUser as any).id ? (
@@ -520,8 +521,8 @@ export default function Dashboard() {
               ) : null}
             </div>
             <div className="flex-shrink-0 flex gap-2">
-
-              <CreateOKRButton />
+              <TourLauncher />
+              <CreateOKRButton data-tour="create-okr-button" />
             </div>
           </div>
           

@@ -80,3 +80,67 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 }
+
+/* Onboarding Tour Styles */
+.onboarding-highlight {
+  position: relative;
+  z-index: 40;
+  animation: pulse-highlight 2s infinite;
+}
+
+.onboarding-highlight::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  background: rgba(251, 146, 60, 0.3);
+  border: 2px solid #fb923c;
+  border-radius: 8px;
+  animation: pulse-border 2s infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes pulse-highlight {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(251, 146, 60, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(251, 146, 60, 0);
+  }
+}
+
+@keyframes pulse-border {
+  0%, 100% {
+    border-color: #fb923c;
+    background: rgba(251, 146, 60, 0.3);
+  }
+  50% {
+    border-color: #f97316;
+    background: rgba(251, 146, 60, 0.5);
+  }
+}
+
+/* Onboarding overlay */
+.onboarding-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 30;
+  pointer-events: none;
+}
+
+.onboarding-spotlight {
+  position: absolute;
+  background: transparent;
+  border-radius: 8px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  z-index: 35;
+}
