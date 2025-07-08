@@ -169,6 +169,7 @@ function Router() {
               <Route path="/add-ons" component={AddOnsManagement} />
               <Route path="/system-admin/add-ons" component={SystemAddonManagement} />
           <Route path="/system-admin/subscriptions" component={SystemSubscriptionManagement} />
+          <Route path="/subscription-addon-integration" component={lazy(() => import("@/pages/subscription-addon-integration"))} />
               <Route path="/invoices" component={InvoiceManagement} />
               <Route path="/invoices/:id" component={InvoiceDetail} />
               <Route path="/invoice-payment-finish" component={InvoicePaymentFinish} />
