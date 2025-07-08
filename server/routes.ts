@@ -3381,7 +3381,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const planId = req.params.id;
       
       // Check if any organizations are using this plan
-      const { organizationSubscriptions, billingPeriods } = await import("@shared/schema");
+      const { organizationSubscriptions, billingPeriods, subscriptionPlans } = await import("@shared/schema");
       const [activeSubscription] = await db.select()
         .from(organizationSubscriptions)
         .where(eq(organizationSubscriptions.planId, planId))
@@ -3393,17 +3393,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // First, delete all billing periods associated with this plan
-      await db.delete(billingPeriods).where(eq(billingPeriods.planId, planId));
-      
-      // Then delete the subscription plan
-      const [deletedPlan] = await db.delete(subscriptionPlans)
-        .where(eq(subscriptionPlans.id, planId))
-        .returning();
-      
-      if (!deletedPlan) {
-        return res.status(404).json({ message: "Subscription plan not found" });
-      }
+      // Use transaction to ensure atomic deletion
+      await db.transaction(async (tx) => {
+        // First, delete all billing periods associated with this plan
+        console.log("Deleting billing periods for plan:", planId);
+        const deletedBillingPeriods = await tx.delete(billingPeriods)
+          .where(eq(billingPeriods.planId, planId))
+          .returning();
+        console.log("Deleted billing periods:", deletedBillingPeriods.length);
+        
+        // Then delete the subscription plan
+        console.log("Deleting subscription plan:", planId);
+        const [deletedPlan] = await tx.delete(subscriptionPlans)
+          .where(eq(subscriptionPlans.id, planId))
+          .returning();
+          
+        if (!deletedPlan) {
+          throw new Error("Subscription plan not found");
+        }
+        
+        return deletedPlan;
+      });
+
       
       res.json({ message: "Subscription plan deleted successfully" });
     } catch (error) {
