@@ -46,6 +46,7 @@ import InvoiceManagement from "@/pages/invoice-management";
 import InvoiceDetail from "@/pages/invoice-detail";
 import InvoicePaymentFinish from "@/pages/invoice-payment-finish";
 import SubscriptionAddonIntegration from "@/pages/subscription-addon-integration";
+import DummyClientExamples from "@/pages/dummy-client-examples";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -172,6 +173,9 @@ function Router() {
           <Route path="/system-admin/subscriptions" component={SystemSubscriptionManagement} />
           <Route path="/subscription-addon-integration">
             <SubscriptionAddonIntegration />
+          </Route>
+          <Route path="/dummy-client-examples">
+            <DummyClientExamples />
           </Route>
               <Route path="/invoices" component={InvoiceManagement} />
               <Route path="/invoices/:id" component={InvoiceDetail} />
