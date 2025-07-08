@@ -121,9 +121,7 @@ function PackageFormModal({
       
       // Then, create billing periods if this is a new plan
       if (!pkg && data.billingPeriods.length > 0) {
-        console.log("Plan creation response:", planResponse);
         const planId = planResponse.id;
-        console.log("Extracted planId:", planId);
         
         if (!planId) {
           throw new Error("Plan ID not found in response - cannot create billing periods");
@@ -131,18 +129,14 @@ function PackageFormModal({
         
         // Create each billing period
         for (const period of data.billingPeriods) {
-          const billingPeriodData = {
+          await apiRequest("POST", "/api/admin/billing-periods", {
             planId: planId,
             periodType: period.periodType,
             periodMonths: period.periodMonths,
             price: period.price.toString(),
             discountPercentage: period.discountPercentage || 0,
             isActive: period.isActive !== false
-          };
-          
-          console.log("Creating billing period with data:", billingPeriodData);
-          
-          await apiRequest("POST", "/api/admin/billing-periods", billingPeriodData);
+          });
         }
       }
       
