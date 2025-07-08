@@ -42,6 +42,14 @@ const ONBOARDING_STEPS = [
   },
   {
     id: 2,
+    title: "Undang Tim",
+    description: "Siapa saja yang akan berkolaborasi dengan Anda?",
+    icon: UserPlus,
+    mascotMessage: "Capai hasil besar nggak harus sendirian. Anda bisa ajak anggota tim untuk bantu jalanin inisiatif bareng.",
+    mascotState: "encouraging"
+  },
+  {
+    id: 3,
     title: "Tentukan OKR Cycle",
     description: "Berapa lama Anda ingin goal ini tercapai?",
     icon: Calendar,
@@ -49,7 +57,7 @@ const ONBOARDING_STEPS = [
     mascotState: "thinking"
   },
   {
-    id: 3,
+    id: 4,
     title: "Buat Objective",
     description: "Tulis satu tujuan yang penting dan bermakna",
     icon: Target,
@@ -57,7 +65,7 @@ const ONBOARDING_STEPS = [
     mascotState: "encouraging"
   },
   {
-    id: 4,
+    id: 5,
     title: "Ukuran Keberhasilan",
     description: "Tentukan cara mengukur keberhasilan",
     icon: TrendingUp,
@@ -65,7 +73,31 @@ const ONBOARDING_STEPS = [
     mascotState: "pointing"
   },
   {
-    id: 5,
+    id: 6,
+    title: "Pilih Inisiatif Prioritas",
+    description: "Tentukan langkah-langkah strategis untuk mencapai tujuan",
+    icon: CheckCircle,
+    mascotMessage: "Sekarang, mari kita pilih langkah-langkah konkret yang akan Anda ambil. Saya bantu pilih mana yang paling berdampak dan realistis.",
+    mascotState: "pointing"
+  },
+  {
+    id: 7,
+    title: "Task untuk Inisiatif",
+    description: "Tentukan task-task yang harus dikerjakan",
+    icon: BarChart,
+    mascotMessage: "Yuk kita mulai! Coba update progres pertama Anda.",
+    mascotState: "celebrating"
+  },
+  {
+    id: 8,
+    title: "Reminder & Review",
+    description: "Atur reminder dan review berkala",
+    icon: Zap,
+    mascotMessage: "Di akhir periode, kita akan review hasilnya bareng. Kalau butuh penyesuaian, saya bantu reset tujuannya.",
+    mascotState: "celebrating"
+  },
+  {
+    id: 9,
     title: "Pilih Cadence",
     description: "Seberapa sering Anda ingin update progress?",
     icon: Clock,
@@ -73,44 +105,12 @@ const ONBOARDING_STEPS = [
     mascotState: "thinking"
   },
   {
-    id: 6,
-    title: "Invite Member",
-    description: "Ajak anggota tim untuk bergabung",
-    icon: UserPlus,
-    mascotMessage: "Capai hasil besar nggak harus sendirian. Anda bisa ajak anggota tim untuk bantu jalanin inisiatif bareng.",
-    mascotState: "encouraging"
-  },
-  {
-    id: 7,
-    title: "Pilih Inisiatif Prioritas",
-    description: "Tentukan langkah konkret yang akan diambil",
-    icon: CheckCircle,
-    mascotMessage: "Sekarang, mari kita pilih langkah-langkah konkret yang akan Anda ambil. Saya bantu pilih mana yang paling berdampak dan realistis.",
-    mascotState: "pointing"
-  },
-  {
-    id: 8,
-    title: "Check-in Pertama",
-    description: "Mulai dengan update progress pertama",
-    icon: BarChart,
-    mascotMessage: "Yuk kita mulai! Coba update progres pertama Anda.",
-    mascotState: "celebrating"
-  },
-  {
-    id: 9,
+    id: 10,
     title: "Dashboard Ringkas",
     description: "Lihat semua progress secara ringkas",
     icon: MessageSquare,
     mascotMessage: "Ini tempat Anda bisa lihat semua progres secara ringkas.",
     mascotState: "encouraging"
-  },
-  {
-    id: 10,
-    title: "Reminder & Review",
-    description: "Atur reminder dan review berkala",
-    icon: Zap,
-    mascotMessage: "Di akhir periode, kita akan review hasilnya bareng. Kalau butuh penyesuaian, saya bantu reset tujuannya.",
-    mascotState: "celebrating"
   }
 ];
 
@@ -299,7 +299,24 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 2: // Tentukan OKR Cycle
+      case 2: // Undang Tim
+        return (
+          <div className="space-y-4">
+            <Label htmlFor="team-members">Undang anggota tim (pisahkan dengan koma):</Label>
+            <Textarea 
+              id="team-members"
+              placeholder="Masukkan email anggota tim yang ingin diundang, pisahkan dengan koma"
+              value={onboardingData.invitedMembers.join(", ")}
+              onChange={(e) => setOnboardingData({...onboardingData, invitedMembers: e.target.value.split(",").map(email => email.trim()).filter(email => email)})}
+              className="min-h-[100px]"
+            />
+            <div className="text-sm text-gray-500">
+              Contoh: john@example.com, jane@example.com
+            </div>
+          </div>
+        );
+
+      case 3: // Tentukan OKR Cycle
         return (
           <div className="space-y-4">
             <Label htmlFor="cycle-duration">Pilih durasi cycle:</Label>
@@ -339,7 +356,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 3: // Buat Objective
+      case 4: // Buat Objective
         const getObjectiveOptions = (teamFocus: string) => {
           const options = {
             penjualan: [
@@ -424,7 +441,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 4: // Ukuran Keberhasilan
+      case 5: // Ukuran Keberhasilan
         const getKeyResultOptions = (objective: string) => {
           // Key Results untuk objective penjualan
           const salesKeyResults = {
@@ -657,7 +674,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 5: // Pilih Cadence
+      case 9: // Pilih Cadence
         return (
           <div className="space-y-4">
             <Label>Pilih ritme check-in:</Label>
@@ -692,45 +709,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 6: // Invite Member
-        return (
-          <div className="space-y-4">
-            <Label>Undang anggota tim:</Label>
-            <div className="space-y-2">
-              {onboardingData.invitedMembers.map((email, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <Input 
-                    placeholder="Email anggota tim"
-                    value={email}
-                    onChange={(e) => {
-                      const newMembers = [...onboardingData.invitedMembers];
-                      newMembers[index] = e.target.value;
-                      setOnboardingData({...onboardingData, invitedMembers: newMembers});
-                    }}
-                  />
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => {
-                      const newMembers = onboardingData.invitedMembers.filter((_, i) => i !== index);
-                      setOnboardingData({...onboardingData, invitedMembers: newMembers});
-                    }}
-                  >
-                    Hapus
-                  </Button>
-                </div>
-              ))}
-              <Button 
-                variant="outline" 
-                onClick={() => setOnboardingData({...onboardingData, invitedMembers: [...onboardingData.invitedMembers, ""]})}
-              >
-                Tambah Email
-              </Button>
-            </div>
-          </div>
-        );
-
-      case 7: // Pilih Inisiatif Prioritas
+      case 6: // Pilih Inisiatif Prioritas
         const getInitiativeOptions = (keyResults: string[]) => {
           const initiativeMapping = {
             // Penjualan - Omzet
@@ -952,7 +931,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 8: // Task untuk Inisiatif
+      case 7: // Task untuk Inisiatif
         const getTaskOptions = (initiatives: string[]) => {
           const taskMapping = {
             // Penjualan & Marketing Tasks
@@ -1180,7 +1159,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 9: // Dashboard Ringkas
+      case 10: // Dashboard Ringkas
         return (
           <div className="space-y-6">
             <div className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
@@ -1304,7 +1283,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 10: // Reminder & Review
+      case 8: // Reminder & Review
         return (
           <div className="space-y-4">
             <div className="p-4 bg-green-50 rounded-lg border border-green-200">
