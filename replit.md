@@ -113,13 +113,15 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
-- July 08, 2025. Successfully implemented comprehensive addon package system with user capacity addons at 25,000 IDR per month:
-  * Created 5 addon packages: Penambahan User (25k), Storage Tambahan 10GB (15k), Advanced Analytics (50k), Priority Support (75k), API Access Extended (35k)
-  * Enhanced addon management page with proper icon mapping for new addon slugs (additional-user, extra-storage-10gb, advanced-analytics, priority-support, api-access-extended)
-  * Integrated addon system with subscription billing periods and organization management
-  * Users can now subscribe to optional addons through sidebar navigation "Add-Ons" menu with Package icon
-  * Addon subscription system supports quantity management, billing period integration, and organization-level restrictions
-  * Complete addon lifecycle: browse available addons → subscribe with quantity → manage active subscriptions → billing integration
+- July 08, 2025. Successfully implemented comprehensive addon package system with system admin management:
+  * Created 5 addon packages: Penambahan User (25k IDR), Storage Tambahan 10GB (15k), Advanced Analytics (50k), Priority Support (75k), API Access Extended (35k)
+  * Built complete system admin addon management dashboard at /system-admin/add-ons with full CRUD functionality
+  * System owners can create, edit, delete, activate/deactivate addon packages with comprehensive statistics dashboard
+  * Enhanced addon management with real-time stats: total addons, active subscriptions, monthly revenue, and top performing addons
+  * Added protection against deleting addons with active subscriptions (deactivation suggested instead)
+  * Integrated admin addon management into system owner sidebar navigation with Package icon
+  * Enhanced existing user addon management page with proper icon mapping for new addon slugs
+  * Complete addon ecosystem: system admin creates packages → users subscribe → billing integration → revenue tracking
   * Addon pricing structure supports per_user, one_time, and monthly billing types for flexible subscription models
 - July 08, 2025. Successfully completed full Midtrans payment gateway integration with finish redirect functionality:
   * Added complete finish redirect URL configuration with success/error/unfinish callbacks pointing to appropriate frontend pages

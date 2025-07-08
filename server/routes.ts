@@ -4655,6 +4655,242 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all users (system admin)
+  // System Admin Add-On Management Routes
+  app.get("/api/admin/addon-stats", requireSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { count, sum, eq } = await import("drizzle-orm");
+      const { subscriptionAddOns, organizationAddOnSubscriptions } = await import("@shared/schema");
+      
+      // Get basic counts
+      const [totalAddOns] = await db.select({ count: count() }).from(subscriptionAddOns);
+      const [activeAddOns] = await db.select({ count: count() })
+        .from(subscriptionAddOns)
+        .where(eq(subscriptionAddOns.isActive, true));
+      
+      const [totalSubscriptions] = await db.select({ count: count() })
+        .from(organizationAddOnSubscriptions)
+        .where(eq(organizationAddOnSubscriptions.status, 'active'));
+      
+      // Calculate monthly revenue from active subscriptions
+      const subscriptionsWithAddOns = await db.select({
+        addOnPrice: subscriptionAddOns.price,
+        quantity: organizationAddOnSubscriptions.quantity
+      })
+      .from(organizationAddOnSubscriptions)
+      .leftJoin(subscriptionAddOns, eq(organizationAddOnSubscriptions.addOnId, subscriptionAddOns.id))
+      .where(eq(organizationAddOnSubscriptions.status, 'active'));
+      
+      const monthlyRevenue = subscriptionsWithAddOns.reduce((total, sub) => {
+        return total + (parseFloat(sub.addOnPrice || '0') * (sub.quantity || 1));
+      }, 0);
+      
+      // Get top add-ons by subscription count
+      const topAddOns = await db.select({
+        name: subscriptionAddOns.name,
+        subscriptionCount: count(organizationAddOnSubscriptions.id),
+        revenue: sum(subscriptionAddOns.price)
+      })
+      .from(subscriptionAddOns)
+      .leftJoin(organizationAddOnSubscriptions, eq(subscriptionAddOns.id, organizationAddOnSubscriptions.addOnId))
+      .groupBy(subscriptionAddOns.id, subscriptionAddOns.name, subscriptionAddOns.price)
+      .orderBy(count(organizationAddOnSubscriptions.id))
+      .limit(5);
+      
+      res.json({
+        totalAddOns: totalAddOns.count,
+        activeAddOns: activeAddOns.count,
+        totalSubscriptions: totalSubscriptions.count,
+        monthlyRevenue: monthlyRevenue.toString(),
+        topAddOns: topAddOns.map(addon => ({
+          name: addon.name,
+          subscriptionCount: addon.subscriptionCount,
+          revenue: addon.revenue || '0'
+        }))
+      });
+    } catch (error) {
+      console.error("Error fetching addon stats:", error);
+      res.status(500).json({ message: "Failed to fetch addon statistics" });
+    }
+  });
+
+  app.get("/api/admin/add-ons", requireSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { count, sum, eq } = await import("drizzle-orm");
+      const { subscriptionAddOns, organizationAddOnSubscriptions } = await import("@shared/schema");
+      
+      const addOnsWithStats = await db.select({
+        addOn: subscriptionAddOns,
+        subscriptionCount: count(organizationAddOnSubscriptions.id),
+        totalRevenue: sum(subscriptionAddOns.price)
+      })
+      .from(subscriptionAddOns)
+      .leftJoin(organizationAddOnSubscriptions, eq(subscriptionAddOns.id, organizationAddOnSubscriptions.addOnId))
+      .groupBy(
+        subscriptionAddOns.id,
+        subscriptionAddOns.name,
+        subscriptionAddOns.slug,
+        subscriptionAddOns.description,
+        subscriptionAddOns.price,
+        subscriptionAddOns.type,
+        subscriptionAddOns.stripePriceId,
+        subscriptionAddOns.isActive,
+        subscriptionAddOns.createdAt,
+        subscriptionAddOns.updatedAt
+      )
+      .orderBy(subscriptionAddOns.createdAt);
+      
+      const result = addOnsWithStats.map(row => ({
+        ...row.addOn,
+        subscriptionCount: row.subscriptionCount,
+        totalRevenue: row.totalRevenue || '0'
+      }));
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error fetching admin add-ons:", error);
+      res.status(500).json({ message: "Failed to fetch add-ons" });
+    }
+  });
+
+  app.post("/api/admin/add-ons", requireSystemOwner, async (req, res) => {
+    try {
+      const { name, slug, description, price, type } = req.body;
+      
+      if (!name || !slug || !price || !type) {
+        return res.status(400).json({ message: "Name, slug, price, and type are required" });
+      }
+      
+      const { db } = await import("./db");
+      const { subscriptionAddOns } = await import("@shared/schema");
+      
+      const [newAddOn] = await db.insert(subscriptionAddOns).values({
+        name,
+        slug,
+        description: description || null,
+        price: price.toString(),
+        type,
+        isActive: true
+      }).returning();
+      
+      res.json(newAddOn);
+    } catch (error) {
+      console.error("Error creating add-on:", error);
+      if (error.code === '23505') { // Unique constraint violation
+        res.status(400).json({ message: "Add-on with this slug already exists" });
+      } else {
+        res.status(500).json({ message: "Failed to create add-on" });
+      }
+    }
+  });
+
+  app.put("/api/admin/add-ons/:id", requireSystemOwner, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { name, slug, description, price, type } = req.body;
+      
+      if (!name || !slug || !price || !type) {
+        return res.status(400).json({ message: "Name, slug, price, and type are required" });
+      }
+      
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      const { subscriptionAddOns } = await import("@shared/schema");
+      
+      const [updatedAddOn] = await db.update(subscriptionAddOns)
+        .set({
+          name,
+          slug,
+          description: description || null,
+          price: price.toString(),
+          type,
+          updatedAt: new Date()
+        })
+        .where(eq(subscriptionAddOns.id, id))
+        .returning();
+      
+      if (!updatedAddOn) {
+        return res.status(404).json({ message: "Add-on not found" });
+      }
+      
+      res.json(updatedAddOn);
+    } catch (error) {
+      console.error("Error updating add-on:", error);
+      if (error.code === '23505') { // Unique constraint violation
+        res.status(400).json({ message: "Add-on with this slug already exists" });
+      } else {
+        res.status(500).json({ message: "Failed to update add-on" });
+      }
+    }
+  });
+
+  app.patch("/api/admin/add-ons/:id/status", requireSystemOwner, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { isActive } = req.body;
+      
+      if (typeof isActive !== 'boolean') {
+        return res.status(400).json({ message: "isActive must be a boolean" });
+      }
+      
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      const { subscriptionAddOns } = await import("@shared/schema");
+      
+      const [updatedAddOn] = await db.update(subscriptionAddOns)
+        .set({
+          isActive,
+          updatedAt: new Date()
+        })
+        .where(eq(subscriptionAddOns.id, id))
+        .returning();
+      
+      if (!updatedAddOn) {
+        return res.status(404).json({ message: "Add-on not found" });
+      }
+      
+      res.json(updatedAddOn);
+    } catch (error) {
+      console.error("Error updating add-on status:", error);
+      res.status(500).json({ message: "Failed to update add-on status" });
+    }
+  });
+
+  app.delete("/api/admin/add-ons/:id", requireSystemOwner, async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      const { db } = await import("./db");
+      const { eq, count } = await import("drizzle-orm");
+      const { subscriptionAddOns, organizationAddOnSubscriptions } = await import("@shared/schema");
+      
+      // Check if add-on has active subscriptions
+      const [activeSubscriptions] = await db.select({ count: count() })
+        .from(organizationAddOnSubscriptions)
+        .where(eq(organizationAddOnSubscriptions.addOnId, id));
+      
+      if (activeSubscriptions.count > 0) {
+        return res.status(400).json({ 
+          message: `Cannot delete add-on with ${activeSubscriptions.count} active subscriptions. Deactivate the add-on instead.` 
+        });
+      }
+      
+      const [deletedAddOn] = await db.delete(subscriptionAddOns)
+        .where(eq(subscriptionAddOns.id, id))
+        .returning();
+      
+      if (!deletedAddOn) {
+        return res.status(404).json({ message: "Add-on not found" });
+      }
+      
+      res.json({ message: "Add-on deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting add-on:", error);
+      res.status(500).json({ message: "Failed to delete add-on" });
+    }
+  });
+
   app.get("/api/admin/users", requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");

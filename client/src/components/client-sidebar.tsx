@@ -85,6 +85,12 @@ export default function Sidebar({
       active: location === "/system-admin/subscriptions",
     },
     {
+      label: "Kelola Add-Ons",
+      icon: Package,
+      path: "/system-admin/add-ons",
+      active: location === "/system-admin/add-ons",
+    },
+    {
       label: "Kelola Invoice",
       icon: Receipt,
       path: "/invoices",
