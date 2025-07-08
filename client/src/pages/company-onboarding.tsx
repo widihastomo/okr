@@ -1050,7 +1050,68 @@ export default function CompanyOnboarding() {
         };
 
         const selectedInitiativesForTasks = onboardingData.initiatives.filter(init => init && init !== "custom");
-        const taskOptions = getTaskOptions(selectedInitiativesForTasks);
+        
+        // Create task groups by initiative
+        const getTaskGroupsByInitiative = (initiatives: string[]) => {
+          const taskGroups: { [key: string]: string[] } = {};
+          
+          initiatives.forEach(initiative => {
+            if (initiative.toLowerCase().includes('social media') || initiative.toLowerCase().includes('media sosial')) {
+              taskGroups[initiative] = [
+                'Buat konten untuk Instagram',
+                'Posting regular di Facebook',
+                'Engagement dengan audience',
+                'Analisis performa konten'
+              ];
+            } else if (initiative.toLowerCase().includes('website') || initiative.toLowerCase().includes('landing page')) {
+              taskGroups[initiative] = [
+                'Desain wireframe halaman',
+                'Develop halaman utama',
+                'Optimasi SEO',
+                'Testing responsivitas'
+              ];
+            } else if (initiative.toLowerCase().includes('email') || initiative.toLowerCase().includes('newsletter')) {
+              taskGroups[initiative] = [
+                'Setup email campaign',
+                'Buat template email',
+                'Segmentasi target audience',
+                'Analisis open rate'
+              ];
+            } else if (initiative.toLowerCase().includes('product') || initiative.toLowerCase().includes('produk')) {
+              taskGroups[initiative] = [
+                'Riset kebutuhan pasar',
+                'Develop prototype',
+                'User testing',
+                'Iterasi berdasarkan feedback'
+              ];
+            } else if (initiative.toLowerCase().includes('sales') || initiative.toLowerCase().includes('penjualan')) {
+              taskGroups[initiative] = [
+                'Identifikasi prospek',
+                'Buat sales pitch',
+                'Follow up leads',
+                'Closing deals'
+              ];
+            } else if (initiative.toLowerCase().includes('team') || initiative.toLowerCase().includes('tim')) {
+              taskGroups[initiative] = [
+                'Rekrut anggota tim',
+                'Training onboarding',
+                'Setup workflow',
+                'Evaluasi performa'
+              ];
+            } else {
+              taskGroups[initiative] = [
+                'Perencanaan strategi',
+                'Eksekusi tahap pertama',
+                'Monitoring progress',
+                'Evaluasi dan optimasi'
+              ];
+            }
+          });
+          
+          return taskGroups;
+        };
+        
+        const taskGroups = getTaskGroupsByInitiative(selectedInitiativesForTasks);
         
         if (!onboardingData.tasks) {
           onboardingData.tasks = [];
@@ -1059,32 +1120,43 @@ export default function CompanyOnboarding() {
         const selectedTasks = onboardingData.tasks.filter(task => task && task !== "custom");
         
         return (
-          <div className="space-y-4">
-            {taskOptions.length > 0 && (
-              <div className="space-y-3">
-                <Label>Pilih task untuk inisiatif yang sudah dipilih:</Label>
-                <div className="space-y-2">
-                  {taskOptions.map((option, index) => (
-                    <div key={index} className="flex items-start space-x-2 p-3 rounded-lg border border-gray-200 hover:bg-gray-50">
-                      <Checkbox 
-                        id={`task-${index}`}
-                        checked={selectedTasks.includes(option)}
-                        onCheckedChange={(checked) => {
-                          let newTasks = [...(onboardingData.tasks || [])];
-                          if (checked) {
-                            newTasks.push(option);
-                          } else {
-                            newTasks = newTasks.filter(task => task !== option);
-                          }
-                          setOnboardingData({...onboardingData, tasks: newTasks});
-                        }}
-                      />
-                      <Label htmlFor={`task-${index}`} className="flex-1 cursor-pointer leading-relaxed">
-                        {option}
-                      </Label>
+          <div className="space-y-6">
+            {selectedInitiativesForTasks.length > 0 && (
+              <div className="space-y-4">
+                <Label className="text-lg font-semibold">Pilih task untuk setiap inisiatif yang sudah dipilih:</Label>
+                
+                {Object.entries(taskGroups).map(([initiative, tasks], groupIndex) => (
+                  <div key={groupIndex} className="border border-purple-200 rounded-lg p-4 space-y-3 bg-purple-50">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                      <h4 className="font-semibold text-purple-800">{initiative}</h4>
                     </div>
-                  ))}
-                </div>
+                    
+                    <div className="space-y-2 ml-4">
+                      {tasks.map((task, taskIndex) => (
+                        <div key={taskIndex} className="flex items-start space-x-2 p-3 rounded-lg border border-gray-200 hover:bg-white bg-white">
+                          <Checkbox 
+                            id={`task-${groupIndex}-${taskIndex}`}
+                            checked={selectedTasks.includes(task)}
+                            onCheckedChange={(checked) => {
+                              let newTasks = [...(onboardingData.tasks || [])];
+                              if (checked) {
+                                newTasks.push(task);
+                              } else {
+                                newTasks = newTasks.filter(t => t !== task);
+                              }
+                              setOnboardingData({...onboardingData, tasks: newTasks});
+                            }}
+                          />
+                          <Label htmlFor={`task-${groupIndex}-${taskIndex}`} className="flex-1 cursor-pointer leading-relaxed text-sm">
+                            {task}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+                
                 <div className="flex items-center space-x-2 pt-2">
                   <Checkbox 
                     id="custom-task"
@@ -1145,15 +1217,34 @@ export default function CompanyOnboarding() {
             )}
             
             {selectedTasks.length > 0 && (
-              <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
-                <p className="text-sm text-purple-800 mb-2">
-                  <strong>Task terpilih:</strong>
+              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                <h4 className="font-semibold text-green-800 mb-3">📋 Task yang Dipilih ({selectedTasks.length})</h4>
+                <div className="space-y-2">
+                  {Object.entries(taskGroups).map(([initiative, tasks]) => {
+                    const initiativeTasks = tasks.filter(task => selectedTasks.includes(task));
+                    if (initiativeTasks.length === 0) return null;
+                    
+                    return (
+                      <div key={initiative} className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                          <span className="text-sm font-medium text-purple-700">{initiative}</span>
+                        </div>
+                        <div className="ml-4 space-y-1">
+                          {initiativeTasks.map((task, index) => (
+                            <div key={index} className="flex items-center gap-2">
+                              <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
+                              <span className="text-sm text-gray-700">{task}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="text-sm text-green-700 mt-3">
+                  <strong>Total: {selectedTasks.length} task terpilih</strong>
                 </p>
-                <ul className="text-sm text-purple-700 space-y-1">
-                  {selectedTasks.map((task, index) => (
-                    <li key={index}>• {task}</li>
-                  ))}
-                </ul>
               </div>
             )}
           </div>
