@@ -16,7 +16,8 @@ import {
   User,
   Home,
   FileText,
-  Lock
+  Lock,
+  Gift
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -132,6 +133,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       title: "Harga",
       url: "/pricing",
       icon: CreditCard,
+    },
+    {
+      title: "Kode Referral",
+      url: "/referral-codes",
+      icon: Gift,
     },
   ]
 

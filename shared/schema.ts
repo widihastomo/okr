@@ -189,6 +189,36 @@ export const invoiceLineItems = pgTable("invoice_line_items", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Referral Codes table for tracking referral system
+export const referralCodes = pgTable("referral_codes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  code: varchar("code", { length: 50 }).unique().notNull(), // Unique referral code
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
+  createdBy: uuid("created_by").notNull().references(() => users.id),
+  discountType: text("discount_type").notNull(), // "percentage", "fixed_amount", "free_months"
+  discountValue: decimal("discount_value", { precision: 10, scale: 2 }).notNull(), // Discount amount or percentage
+  maxUses: integer("max_uses").default(null), // null = unlimited
+  currentUses: integer("current_uses").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+  expiresAt: timestamp("expires_at"), // null = no expiration
+  description: text("description"), // Optional description
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Referral Usage tracking
+export const referralUsage = pgTable("referral_usage", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  referralCodeId: uuid("referral_code_id").notNull().references(() => referralCodes.id),
+  usedByOrganizationId: uuid("used_by_organization_id").notNull().references(() => organizations.id),
+  usedByUserId: uuid("used_by_user_id").notNull().references(() => users.id),
+  discountApplied: decimal("discount_applied", { precision: 10, scale: 2 }).notNull(),
+  subscriptionId: uuid("subscription_id").references(() => organizationSubscriptions.id),
+  status: text("status").notNull().default("applied"), // "applied", "expired", "cancelled"
+  appliedAt: timestamp("applied_at").defaultNow(),
+  expiresAt: timestamp("expires_at"), // For free months tracking
+});
+
 // Users table with email/password authentication
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -1114,3 +1144,21 @@ export const updateOnboardingProgressSchema = z.object({
 });
 
 export type UpdateOnboardingProgress = z.infer<typeof updateOnboardingProgressSchema>;
+
+// Referral Code schemas
+export const insertReferralCodeSchema = createInsertSchema(referralCodes).omit({
+  id: true,
+  currentUses: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertReferralUsageSchema = createInsertSchema(referralUsage).omit({
+  id: true,
+  appliedAt: true,
+});
+
+export type InsertReferralCode = z.infer<typeof insertReferralCodeSchema>;
+export type ReferralCode = typeof referralCodes.$inferSelect;
+export type InsertReferralUsage = z.infer<typeof insertReferralUsageSchema>;
+export type ReferralUsage = typeof referralUsage.$inferSelect;

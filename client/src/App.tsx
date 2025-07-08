@@ -47,6 +47,7 @@ import InvoiceDetail from "@/pages/invoice-detail";
 import InvoicePaymentFinish from "@/pages/invoice-payment-finish";
 import SubscriptionAddonIntegration from "@/pages/subscription-addon-integration";
 import DummyClientExamples from "@/pages/dummy-client-examples";
+import ReferralCodes from "@/pages/referral-codes";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -177,6 +178,7 @@ function Router() {
           <Route path="/dummy-client-examples">
             <DummyClientExamples />
           </Route>
+          <Route path="/referral-codes" component={ReferralCodes} />
               <Route path="/invoices" component={InvoiceManagement} />
               <Route path="/invoices/:id" component={InvoiceDetail} />
               <Route path="/invoice-payment-finish" component={InvoicePaymentFinish} />

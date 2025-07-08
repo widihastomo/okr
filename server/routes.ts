@@ -5144,6 +5144,389 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register AI routes
   registerAIRoutes(app);
 
+  // Referral Codes Management Routes
+  
+  // Get referral codes for current organization
+  app.get("/api/referral-codes", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const { db } = await import("./db");
+      const { referralCodes, users, organizations } = await import("@shared/schema");
+      const { eq, desc } = await import("drizzle-orm");
+      
+      const userOrg = await db.select().from(organizations).where(eq(organizations.ownerId, user.id)).limit(1);
+      
+      if (!userOrg.length) {
+        return res.status(404).json({ message: "No organization found for user" });
+      }
+
+      const codes = await db.select({
+        id: referralCodes.id,
+        code: referralCodes.code,
+        discountType: referralCodes.discountType,
+        discountValue: referralCodes.discountValue,
+        maxUses: referralCodes.maxUses,
+        currentUses: referralCodes.currentUses,
+        isActive: referralCodes.isActive,
+        expiresAt: referralCodes.expiresAt,
+        description: referralCodes.description,
+        createdAt: referralCodes.createdAt,
+        createdBy: users.firstName,
+        createdByEmail: users.email
+      })
+      .from(referralCodes)
+      .leftJoin(users, eq(referralCodes.createdBy, users.id))
+      .where(eq(referralCodes.organizationId, userOrg[0].id))
+      .orderBy(desc(referralCodes.createdAt));
+
+      res.json(codes);
+    } catch (error) {
+      console.error("Error fetching referral codes:", error);
+      res.status(500).json({ message: "Failed to fetch referral codes" });
+    }
+  });
+
+  // Create new referral code
+  app.post("/api/referral-codes", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const { db } = await import("./db");
+      const { referralCodes, organizations } = await import("@shared/schema");
+      const { eq } = await import("drizzle-orm");
+      
+      const userOrg = await db.select().from(organizations).where(eq(organizations.ownerId, user.id)).limit(1);
+      
+      if (!userOrg.length) {
+        return res.status(404).json({ message: "No organization found for user" });
+      }
+
+      const { code, discountType, discountValue, maxUses, expiresAt, description } = req.body;
+
+      // Validate input
+      if (!code || !discountType || !discountValue) {
+        return res.status(400).json({ message: "Code, discount type, and discount value are required" });
+      }
+
+      // Check if code already exists
+      const existingCode = await db.select().from(referralCodes).where(eq(referralCodes.code, code)).limit(1);
+      if (existingCode.length > 0) {
+        return res.status(400).json({ message: "Referral code already exists" });
+      }
+
+      const [newCode] = await db.insert(referralCodes).values({
+        code,
+        organizationId: userOrg[0].id,
+        createdBy: user.id,
+        discountType,
+        discountValue: discountValue.toString(),
+        maxUses: maxUses || null,
+        expiresAt: expiresAt ? new Date(expiresAt) : null,
+        description: description || null,
+      }).returning();
+
+      res.status(201).json(newCode);
+    } catch (error) {
+      console.error("Error creating referral code:", error);
+      res.status(500).json({ message: "Failed to create referral code" });
+    }
+  });
+
+  // Update referral code
+  app.put("/api/referral-codes/:id", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const { id } = req.params;
+      const { discountType, discountValue, maxUses, expiresAt, description, isActive } = req.body;
+      const { db } = await import("./db");
+      const { referralCodes, organizations } = await import("@shared/schema");
+      const { eq, and } = await import("drizzle-orm");
+
+      const userOrg = await db.select().from(organizations).where(eq(organizations.ownerId, user.id)).limit(1);
+      
+      if (!userOrg.length) {
+        return res.status(404).json({ message: "No organization found for user" });
+      }
+
+      // Check if code exists and belongs to user's organization
+      const existingCode = await db.select().from(referralCodes)
+        .where(and(eq(referralCodes.id, id), eq(referralCodes.organizationId, userOrg[0].id)))
+        .limit(1);
+
+      if (!existingCode.length) {
+        return res.status(404).json({ message: "Referral code not found" });
+      }
+
+      const [updatedCode] = await db.update(referralCodes)
+        .set({
+          discountType,
+          discountValue: discountValue?.toString(),
+          maxUses: maxUses || null,
+          expiresAt: expiresAt ? new Date(expiresAt) : null,
+          description: description || null,
+          isActive: isActive !== undefined ? isActive : existingCode[0].isActive,
+          updatedAt: new Date(),
+        })
+        .where(eq(referralCodes.id, id))
+        .returning();
+
+      res.json(updatedCode);
+    } catch (error) {
+      console.error("Error updating referral code:", error);
+      res.status(500).json({ message: "Failed to update referral code" });
+    }
+  });
+
+  // Delete referral code
+  app.delete("/api/referral-codes/:id", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const { id } = req.params;
+      const { db } = await import("./db");
+      const { referralCodes, organizations } = await import("@shared/schema");
+      const { eq, and } = await import("drizzle-orm");
+
+      const userOrg = await db.select().from(organizations).where(eq(organizations.ownerId, user.id)).limit(1);
+      
+      if (!userOrg.length) {
+        return res.status(404).json({ message: "No organization found for user" });
+      }
+
+      // Check if code exists and belongs to user's organization
+      const existingCode = await db.select().from(referralCodes)
+        .where(and(eq(referralCodes.id, id), eq(referralCodes.organizationId, userOrg[0].id)))
+        .limit(1);
+
+      if (!existingCode.length) {
+        return res.status(404).json({ message: "Referral code not found" });
+      }
+
+      await db.delete(referralCodes).where(eq(referralCodes.id, id));
+
+      res.json({ message: "Referral code deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting referral code:", error);
+      res.status(500).json({ message: "Failed to delete referral code" });
+    }
+  });
+
+  // Get referral code usage analytics
+  app.get("/api/referral-codes/:id/analytics", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const { id } = req.params;
+      const { db } = await import("./db");
+      const { referralCodes, referralUsage, organizations, users } = await import("@shared/schema");
+      const { eq, and, desc } = await import("drizzle-orm");
+
+      const userOrg = await db.select().from(organizations).where(eq(organizations.ownerId, user.id)).limit(1);
+      
+      if (!userOrg.length) {
+        return res.status(404).json({ message: "No organization found for user" });
+      }
+
+      // Get referral code details
+      const code = await db.select().from(referralCodes)
+        .where(and(eq(referralCodes.id, id), eq(referralCodes.organizationId, userOrg[0].id)))
+        .limit(1);
+
+      if (!code.length) {
+        return res.status(404).json({ message: "Referral code not found" });
+      }
+
+      // Get usage details
+      const usageDetails = await db.select({
+        id: referralUsage.id,
+        usedByOrganization: organizations.name,
+        usedByUser: users.firstName,
+        usedByEmail: users.email,
+        discountApplied: referralUsage.discountApplied,
+        status: referralUsage.status,
+        appliedAt: referralUsage.appliedAt,
+        expiresAt: referralUsage.expiresAt,
+      })
+      .from(referralUsage)
+      .leftJoin(organizations, eq(referralUsage.usedByOrganizationId, organizations.id))
+      .leftJoin(users, eq(referralUsage.usedByUserId, users.id))
+      .where(eq(referralUsage.referralCodeId, id))
+      .orderBy(desc(referralUsage.appliedAt));
+
+      // Calculate analytics
+      const totalUsages = usageDetails.length;
+      const totalDiscountGiven = usageDetails.reduce((sum, usage) => 
+        sum + parseFloat(usage.discountApplied || "0"), 0
+      );
+
+      const analytics = {
+        code: code[0],
+        totalUsages,
+        totalDiscountGiven,
+        remainingUses: code[0].maxUses ? Math.max(0, code[0].maxUses - code[0].currentUses) : null,
+        usageDetails,
+      };
+
+      res.json(analytics);
+    } catch (error) {
+      console.error("Error fetching referral analytics:", error);
+      res.status(500).json({ message: "Failed to fetch referral analytics" });
+    }
+  });
+
+  // Validate and apply referral code (for registration)
+  app.post("/api/referral-codes/validate", async (req, res) => {
+    try {
+      const { code } = req.body;
+      const { db } = await import("./db");
+      const { referralCodes } = await import("@shared/schema");
+      const { eq, and } = await import("drizzle-orm");
+
+      if (!code) {
+        return res.status(400).json({ message: "Referral code is required" });
+      }
+
+      // Find active referral code
+      const referralCode = await db.select()
+        .from(referralCodes)
+        .where(and(
+          eq(referralCodes.code, code),
+          eq(referralCodes.isActive, true)
+        ))
+        .limit(1);
+
+      if (!referralCode.length) {
+        return res.status(404).json({ message: "Invalid or inactive referral code" });
+      }
+
+      const codeData = referralCode[0];
+
+      // Check if code has expired
+      if (codeData.expiresAt && new Date() > codeData.expiresAt) {
+        return res.status(400).json({ message: "Referral code has expired" });
+      }
+
+      // Check if code has reached usage limit
+      if (codeData.maxUses && codeData.currentUses >= codeData.maxUses) {
+        return res.status(400).json({ message: "Referral code usage limit exceeded" });
+      }
+
+      res.json({
+        valid: true,
+        discountType: codeData.discountType,
+        discountValue: codeData.discountValue,
+        description: codeData.description,
+      });
+    } catch (error) {
+      console.error("Error validating referral code:", error);
+      res.status(500).json({ message: "Failed to validate referral code" });
+    }
+  });
+
+  // Apply referral code (called during subscription creation)
+  app.post("/api/referral-codes/apply", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const { code, subscriptionId } = req.body;
+      const { db } = await import("./db");
+      const { referralCodes, referralUsage, organizations } = await import("@shared/schema");
+      const { eq, and } = await import("drizzle-orm");
+
+      if (!code) {
+        return res.status(400).json({ message: "Referral code is required" });
+      }
+
+      const userOrg = await db.select().from(organizations).where(eq(organizations.ownerId, user.id)).limit(1);
+      
+      if (!userOrg.length) {
+        return res.status(404).json({ message: "No organization found for user" });
+      }
+
+      // Find and validate referral code
+      const referralCode = await db.select()
+        .from(referralCodes)
+        .where(and(
+          eq(referralCodes.code, code),
+          eq(referralCodes.isActive, true)
+        ))
+        .limit(1);
+
+      if (!referralCode.length) {
+        return res.status(404).json({ message: "Invalid or inactive referral code" });
+      }
+
+      const codeData = referralCode[0];
+
+      // Check if code has expired
+      if (codeData.expiresAt && new Date() > codeData.expiresAt) {
+        return res.status(400).json({ message: "Referral code has expired" });
+      }
+
+      // Check if code has reached usage limit
+      if (codeData.maxUses && codeData.currentUses >= codeData.maxUses) {
+        return res.status(400).json({ message: "Referral code usage limit exceeded" });
+      }
+
+      // Check if organization has already used this code
+      const existingUsage = await db.select()
+        .from(referralUsage)
+        .where(and(
+          eq(referralUsage.referralCodeId, codeData.id),
+          eq(referralUsage.usedByOrganizationId, userOrg[0].id)
+        ))
+        .limit(1);
+
+      if (existingUsage.length > 0) {
+        return res.status(400).json({ message: "This organization has already used this referral code" });
+      }
+
+      // Calculate discount applied
+      let discountApplied = "0";
+      let expiresAt = null;
+
+      if (codeData.discountType === "percentage") {
+        // For percentage, we'll calculate based on subscription plan price
+        // This would need integration with subscription creation logic
+        discountApplied = codeData.discountValue;
+      } else if (codeData.discountType === "fixed_amount") {
+        discountApplied = codeData.discountValue;
+      } else if (codeData.discountType === "free_months") {
+        // For free months, set expiration date
+        const months = parseInt(codeData.discountValue);
+        expiresAt = new Date();
+        expiresAt.setMonth(expiresAt.getMonth() + months);
+        discountApplied = "0"; // No immediate discount, but subscription extends
+      }
+
+      // Create usage record
+      await db.insert(referralUsage).values({
+        referralCodeId: codeData.id,
+        usedByOrganizationId: userOrg[0].id,
+        usedByUserId: user.id,
+        discountApplied,
+        subscriptionId: subscriptionId || null,
+        status: "applied",
+        expiresAt,
+      });
+
+      // Update referral code usage count
+      await db.update(referralCodes)
+        .set({
+          currentUses: codeData.currentUses + 1,
+          updatedAt: new Date(),
+        })
+        .where(eq(referralCodes.id, codeData.id));
+
+      res.json({
+        message: "Referral code applied successfully",
+        discountType: codeData.discountType,
+        discountValue: codeData.discountValue,
+        discountApplied,
+        expiresAt,
+      });
+    } catch (error) {
+      console.error("Error applying referral code:", error);
+      res.status(500).json({ message: "Failed to apply referral code" });
+    }
+  });
+
   // Role Management API Routes
   const { roleManagementService } = await import("./role-management");
 
