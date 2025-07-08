@@ -26,6 +26,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Package,
+  Gift,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -177,6 +178,12 @@ export default function Sidebar({
       icon: Package,
       path: "/add-ons",
       active: location === "/add-ons",
+    },
+    {
+      label: "Kode Referral",
+      icon: Gift,
+      path: "/referral-codes",
+      active: location === "/referral-codes",
     },
   ];
 
