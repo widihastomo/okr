@@ -51,6 +51,7 @@ import SubscriptionAddonIntegration from "@/pages/subscription-addon-integration
 import TrialSettingsPage from "@/pages/system-admin/trial-settings";
 import DummyClientExamples from "@/pages/dummy-client-examples";
 import ReferralCodes from "@/pages/referral-codes";
+import TrialAchievements from "@/pages/trial-achievements";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -149,6 +150,7 @@ function Router() {
                 <TemplatesContent />
               </Route>
               <Route path="/achievements" component={AchievementsPage} />
+              <Route path="/trial-achievements" component={TrialAchievements} />
               <Route path="/analytics" component={AnalyticsPage} />
 
               <Route path="/pricing" component={PricingPage} />

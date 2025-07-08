@@ -840,6 +840,45 @@ export const tasksRelations = relations(tasks, ({ one }) => ({
   }),
 }));
 
+// Trial Achievement System
+export const trialAchievements = pgTable("trial_achievements", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  icon: text("icon").notNull(), // lucide icon name
+  category: text("category").notNull(), // "setup", "engagement", "progress", "completion"
+  points: integer("points").notNull().default(10),
+  triggerType: text("trigger_type").notNull(), // "action", "milestone", "streak"
+  triggerCondition: jsonb("trigger_condition").notNull(), // JSON with conditions
+  isActive: boolean("is_active").default(true),
+  trialOnly: boolean("trial_only").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const userTrialAchievements = pgTable("user_trial_achievements", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  achievementId: uuid("achievement_id").references(() => trialAchievements.id, { onDelete: "cascade" }).notNull(),
+  unlockedAt: timestamp("unlocked_at").defaultNow(),
+  pointsEarned: integer("points_earned").notNull(),
+  metadata: jsonb("metadata"), // Additional data about how achievement was earned
+});
+
+export const trialProgress = pgTable("trial_progress", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  organizationId: uuid("organization_id").references(() => organizations.id, { onDelete: "cascade" }).notNull(),
+  totalPoints: integer("total_points").default(0),
+  achievementsUnlocked: integer("achievements_unlocked").default(0),
+  currentStreak: integer("current_streak").default(0),
+  longestStreak: integer("longest_streak").default(0),
+  lastActivityDate: timestamp("last_activity_date"),
+  progressData: jsonb("progress_data"), // Track various progress metrics
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Gamification Relations
 export const achievementsRelations = relations(achievements, ({ many }) => ({
   userAchievements: many(userAchievements),
@@ -867,6 +906,33 @@ export const activityLogsRelations = relations(activityLogs, ({ one }) => ({
   user: one(users, {
     fields: [activityLogs.userId],
     references: [users.id],
+  }),
+}));
+
+// Trial Achievement Relations
+export const trialAchievementsRelations = relations(trialAchievements, ({ many }) => ({
+  userAchievements: many(userTrialAchievements),
+}));
+
+export const userTrialAchievementsRelations = relations(userTrialAchievements, ({ one }) => ({
+  user: one(users, {
+    fields: [userTrialAchievements.userId],
+    references: [users.id],
+  }),
+  achievement: one(trialAchievements, {
+    fields: [userTrialAchievements.achievementId],
+    references: [trialAchievements.id],
+  }),
+}));
+
+export const trialProgressRelations = relations(trialProgress, ({ one }) => ({
+  user: one(users, {
+    fields: [trialProgress.userId],
+    references: [users.id],
+  }),
+  organization: one(organizations, {
+    fields: [trialProgress.organizationId],
+    references: [organizations.id],
   }),
 }));
 
@@ -929,6 +995,21 @@ export type CycleWithOKRs = Cycle & {
   totalObjectives: number;
   completedObjectives: number;
   avgProgress: number;
+};
+
+// Trial Achievement System Types
+export type TrialAchievement = typeof trialAchievements.$inferSelect;
+export type InsertTrialAchievement = typeof trialAchievements.$inferInsert;
+export type UserTrialAchievement = typeof userTrialAchievements.$inferSelect;
+export type InsertUserTrialAchievement = typeof userTrialAchievements.$inferInsert;
+export type TrialProgress = typeof trialProgress.$inferSelect;
+export type InsertTrialProgress = typeof trialProgress.$inferInsert;
+
+export type TrialAchievementWithDetails = TrialAchievement & {
+  unlocked: boolean;
+  unlockedAt?: string;
+  pointsEarned?: number;
+  metadata?: any;
 };
 
 // Types for success metrics

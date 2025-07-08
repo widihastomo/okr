@@ -704,6 +704,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create objective
       const objective = await storage.createObjective(objectiveData);
       console.log("Created objective:", objective);
+
+      // Track achievement for trial users
+      try {
+        const { trialAchievementService } = await import("./trial-achievement-service");
+        await trialAchievementService.checkAndAwardAchievements(
+          (req as any).user?.id || validatedData.objective.ownerId, 
+          "create_objective", 
+          { objectiveId: objective.id }
+        );
+      } catch (achievementError) {
+        console.error("Error tracking achievement:", achievementError);
+        // Don't fail the main request if achievement tracking fails
+      }
       
       // Create key results
       const keyResults = [];
@@ -721,6 +734,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
         const keyResult = await storage.createKeyResult(processedKrData);
         keyResults.push(keyResult);
+
+        // Track achievement for key result creation
+        try {
+          const { trialAchievementService } = await import("./trial-achievement-service");
+          await trialAchievementService.checkAndAwardAchievements(
+            krData.assignedTo || (req as any).user?.id || validatedData.objective.ownerId, 
+            "create_key_result", 
+            { keyResultId: keyResult.id, objectiveId: objective.id }
+          );
+        } catch (achievementError) {
+          console.error("Error tracking key result achievement:", achievementError);
+        }
       }
       console.log("Created key results:", keyResults);
       
@@ -6892,6 +6917,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error generating registration invoice:", error);
       res.status(500).json({ message: "Failed to generate invoice" });
+    }
+  });
+
+  // Trial Achievement System Routes
+  app.get("/api/trial/achievements", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { trialAchievementService } = await import("./trial-achievement-service");
+      
+      const achievements = await trialAchievementService.getUserTrialAchievements(user.id);
+      res.json(achievements);
+    } catch (error) {
+      console.error("Error fetching trial achievements:", error);
+      res.status(500).json({ error: "Failed to fetch trial achievements" });
+    }
+  });
+
+  app.get("/api/trial/progress", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { trialAchievementService } = await import("./trial-achievement-service");
+      
+      const progress = await trialAchievementService.getUserTrialProgress(user.id);
+      res.json(progress);
+    } catch (error) {
+      console.error("Error fetching trial progress:", error);
+      res.status(500).json({ error: "Failed to fetch trial progress" });
+    }
+  });
+
+  app.post("/api/trial/track-action", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { action, metadata } = req.body;
+      const { trialAchievementService } = await import("./trial-achievement-service");
+      
+      // Update activity streak
+      await trialAchievementService.updateActivityStreak(user.id);
+      
+      // Check and award achievements
+      const newAchievements = await trialAchievementService.checkAndAwardAchievements(user.id, action, metadata);
+      
+      res.json({ 
+        success: true, 
+        newAchievements: newAchievements.length,
+        achievements: newAchievements 
+      });
+    } catch (error) {
+      console.error("Error tracking trial action:", error);
+      res.status(500).json({ error: "Failed to track action" });
     }
   });
 
