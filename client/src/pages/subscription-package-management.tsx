@@ -14,11 +14,7 @@ import {
   Crown,
   Check,
   X,
-  Calendar,
-  Percent,
-  Clock,
-  ChevronRight,
-  ChevronDown
+  Eye
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -57,7 +53,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { SubscriptionPlan, BillingPeriod } from "@shared/schema";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BillingPeriodFormModal } from "../components/billing-period-form-modal";
+
 
 interface PackageFormData {
   name: string;
@@ -392,8 +388,7 @@ function PackageFormModal({
           <div className="space-y-4 pt-6 border-t">
             <div className="flex items-center justify-between">
               <div>
-                <Label className="text-sm font-medium flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
+                <Label className="text-sm font-medium">
                   Periode Billing
                 </Label>
                 <p className="text-xs text-gray-500 mt-1">Atur opsi periode dan harga untuk paket ini</p>
@@ -522,10 +517,7 @@ export default function SubscriptionPackageManagement() {
   const [selectedPackage, setSelectedPackage] = useState<SubscriptionPlan | undefined>();
   const [showFormModal, setShowFormModal] = useState(false);
   const [deletePackageId, setDeletePackageId] = useState<string | null>(null);
-  const [showBillingPeriodModal, setShowBillingPeriodModal] = useState(false);
-  const [selectedBillingPeriod, setSelectedBillingPeriod] = useState<BillingPeriod | null>(null);
-  const [billingPeriodPlanId, setBillingPeriodPlanId] = useState<string | null>(null);
-  const [expandedPackages, setExpandedPackages] = useState<Set<string>>(new Set());
+
 
   // Fetch subscription plans with billing periods
   const { data: packages = [], isLoading } = useQuery<(SubscriptionPlan & { billingPeriods: BillingPeriod[] })[]>({
@@ -603,33 +595,7 @@ export default function SubscriptionPackageManagement() {
     setSelectedPackage(undefined);
   };
 
-  const handleCreateBillingPeriod = (planId: string) => {
-    setBillingPeriodPlanId(planId);
-    setSelectedBillingPeriod(null);
-    setShowBillingPeriodModal(true);
-  };
 
-  const handleEditBillingPeriod = (period: BillingPeriod) => {
-    setSelectedBillingPeriod(period);
-    setBillingPeriodPlanId(period.planId);
-    setShowBillingPeriodModal(true);
-  };
-
-  const closeBillingPeriodModal = () => {
-    setSelectedBillingPeriod(null);
-    setBillingPeriodPlanId(null);
-    setShowBillingPeriodModal(false);
-  };
-
-  const togglePackageExpansion = (packageId: string) => {
-    const newExpanded = new Set(expandedPackages);
-    if (newExpanded.has(packageId)) {
-      newExpanded.delete(packageId);
-    } else {
-      newExpanded.add(packageId);
-    }
-    setExpandedPackages(newExpanded);
-  };
 
   if (isLoading) {
     return (
@@ -757,23 +723,9 @@ export default function SubscriptionPackageManagement() {
                 <>
                   <TableRow key={`${pkg.id}-row`}>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => togglePackageExpansion(pkg.id)}
-                          className="h-6 w-6 p-0"
-                        >
-                          {expandedPackages.has(pkg.id) ? (
-                            <ChevronDown className="h-4 w-4" />
-                          ) : (
-                            <ChevronRight className="h-4 w-4" />
-                          )}
-                        </Button>
-                        <div>
-                          <div className="font-medium">{pkg.name}</div>
-                          <div className="text-sm text-gray-500">{pkg.slug}</div>
-                        </div>
+                      <div>
+                        <div className="font-medium">{pkg.name}</div>
+                        <div className="text-sm text-gray-500">{pkg.slug}</div>
                       </div>
                     </TableCell>
                   <TableCell>
@@ -825,6 +777,13 @@ export default function SubscriptionPackageManagement() {
                       <Button 
                         variant="outline" 
                         size="sm"
+                        onClick={() => window.location.href = `/package-detail/${pkg.id}`}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
                         onClick={() => toggleStatusMutation.mutate(pkg.id)}
                         disabled={toggleStatusMutation.isPending}
                       >
@@ -847,76 +806,7 @@ export default function SubscriptionPackageManagement() {
                     </div>
                   </TableCell>
                 </TableRow>
-                
-                {/* Billing Periods Row */}
-                {expandedPackages.has(pkg.id) && (
-                  <TableRow key={`${pkg.id}-expanded`} className="bg-gray-50">
-                    <TableCell colSpan={7} className="p-4">
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4 text-blue-600" />
-                            <span className="font-medium text-sm">Periode Billing</span>
-                          </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleCreateBillingPeriod(pkg.id)}
-                            className="text-blue-600 border-blue-600 hover:bg-blue-50"
-                          >
-                            <Plus className="h-4 w-4 mr-1" />
-                            Tambah Periode
-                          </Button>
-                        </div>
-                        
-                        {pkg.billingPeriods && pkg.billingPeriods.length > 0 ? (
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                            {pkg.billingPeriods.map((period) => (
-                              <div key={period.id} className="border rounded-lg p-3 bg-white">
-                                <div className="flex items-center justify-between mb-2">
-                                  <Badge variant="outline" className="text-xs">
-                                    {period.periodType === 'monthly' && 'Bulanan'}
-                                    {period.periodType === 'quarterly' && 'Triwulan'}
-                                    {period.periodType === 'semiannual' && 'Semester'}
-                                    {period.periodType === 'annual' && 'Tahunan'}
-                                  </Badge>
-                                  <div className="flex items-center gap-1">
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => handleEditBillingPeriod(period)}
-                                      className="h-6 w-6 p-0"
-                                    >
-                                      <Edit className="h-3 w-3" />
-                                    </Button>
-                                  </div>
-                                </div>
-                                <div className="space-y-1">
-                                  <div className="text-sm font-medium">
-                                    {formatPrice(period.price)}
-                                  </div>
-                                  <div className="text-xs text-gray-500">
-                                    {period.periodMonths} bulan
-                                  </div>
-                                  {period.discountPercentage > 0 && (
-                                    <div className="flex items-center gap-1 text-xs text-green-600">
-                                      <Percent className="h-3 w-3" />
-                                      {period.discountPercentage}% diskon
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="text-center py-4 text-gray-500 text-sm">
-                            Belum ada periode billing. Klik "Tambah Periode" untuk menambahkan.
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )}
+
                 </>
               ))}
             </TableBody>
@@ -979,13 +869,7 @@ export default function SubscriptionPackageManagement() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Billing Period Form Modal */}
-      <BillingPeriodFormModal
-        billingPeriod={selectedBillingPeriod}
-        planId={billingPeriodPlanId}
-        isOpen={showBillingPeriodModal}
-        onClose={closeBillingPeriodModal}
-      />
+
     </div>
   );
 }

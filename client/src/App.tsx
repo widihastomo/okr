@@ -37,6 +37,7 @@ import ClientUserManagement from "@/pages/client-user-management";
 import NotificationSettings from "@/pages/notification-settings";
 import ClientRegistration from "@/pages/client-registration";
 import SubscriptionPackageManagement from "@/pages/subscription-package-management";
+import PackageDetail from "@/pages/package-detail";
 import SystemOrganizationManagement from "@/pages/system-organization-management";
 import AddOnsManagement from "@/pages/add-ons-management";
 
@@ -159,6 +160,7 @@ function Router() {
                 path="/subscription-packages"
                 component={SubscriptionPackageManagement}
               />
+              <Route path="/package-detail/:id" component={PackageDetail} />
               <Route path="/add-ons" component={AddOnsManagement} />
               <Route component={NotFound} />
             </Switch>

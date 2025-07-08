@@ -3091,6 +3091,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get single subscription plan with billing periods
+  app.get("/api/admin/subscription-plans/:id/with-periods", requireAuth, isSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { billingPeriods } = await import("@shared/schema");
+      
+      const planId = req.params.id;
+      
+      // Get the subscription plan
+      const [plan] = await db.select().from(subscriptionPlans).where(eq(subscriptionPlans.id, planId));
+      
+      if (!plan) {
+        return res.status(404).json({ message: "Subscription plan not found" });
+      }
+      
+      // Get billing periods for this plan
+      const periods = await db.select().from(billingPeriods)
+        .where(eq(billingPeriods.planId, plan.id))
+        .orderBy(billingPeriods.periodMonths);
+      
+      res.json({ ...plan, billingPeriods: periods });
+    } catch (error) {
+      console.error("Error fetching subscription plan with billing periods:", error);
+      res.status(500).json({ message: "Failed to fetch subscription plan with billing periods" });
+    }
+  });
+
   // Admin API - Create new subscription plan
   app.post("/api/admin/subscription-plans", requireAuth, isSystemOwner, async (req, res) => {
     try {
