@@ -113,6 +113,16 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 08, 2025. Successfully created comprehensive dummy client data examples for subscription + addon integration testing:
+  * Created 2 dummy organizations: CV Digital Kreatif (startup) and PT Solusi Tech (enterprise) with complete subscription + addon setups
+  * CV Digital Kreatif: Growth plan (Rp 299k) + 3 add-ons (extra users, storage, analytics) = Rp 439k/month total
+  * PT Solusi Tech: Scale plan (Rp 749k) + 3 premium add-ons (priority support, API access, analytics) = Rp 909k/month total
+  * Built demo page /dummy-client-examples showcasing detailed client profiles, subscription plans, add-on combinations, billing calculations, and payment history
+  * Created login credentials for testing: owner@digitalkreatif.com and ceo@solusitecht.com (password: password123)
+  * Demonstrates real-world usage scenarios: budget-conscious startup vs enterprise with premium requirements
+  * Complete integration example showing how organizations can mix base plans with multiple add-ons for flexible pricing
+  * Database script creates users, subscriptions, and add-on combinations with proper foreign key relationships
+Changelog:
 - July 08, 2025. Successfully implemented comprehensive addon package system with system admin management:
   * Created 5 addon packages: Penambahan User (25k IDR), Storage Tambahan 10GB (15k), Advanced Analytics (50k), Priority Support (75k), API Access Extended (35k)
   * Built complete system admin addon management dashboard at /system-admin/add-ons with full CRUD functionality
