@@ -1,627 +1,267 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
-import { Link } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight, Building, User, Package, CreditCard } from "lucide-react";
+import { CompanyDataForm } from "@/components/registration/company-data-form";
+import { AdminDataForm } from "@/components/registration/admin-data-form";
+import { PackageSelection } from "@/components/registration/package-selection";
+import { PaymentProcess } from "@/components/registration/payment-process";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import { clientRegistrationSchema, type ClientRegistrationData } from "@shared/schema";
-import { Building2, User, Mail, Lock, Globe, MapPin, Users, Briefcase, ChevronRight, ChevronLeft, Check } from "lucide-react";
 
-const industries = [
-  "Teknologi & Software",
-  "Keuangan & Perbankan",
-  "Kesehatan & Farmasi",
-  "Pendidikan",
-  "Ritel & E-commerce",
-  "Manufaktur",
-  "Konstruksi & Real Estate",
-  "Media & Hiburan",
-  "Transportasi & Logistik",
-  "Energi & Utilities",
-  "Konsultan & Layanan Profesional",
-  "Lainnya"
-];
+export type CompanyData = {
+  name: string;
+  industry: string;
+  size: string;
+  phone: string;
+  address: string;
+  website?: string;
+  description?: string;
+};
 
-const organizationSizes = [
-  "1-10 karyawan",
-  "11-50 karyawan",
-  "51-200 karyawan",
-  "201-500 karyawan",
-  "500+ karyawan"
+export type AdminData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  position: string;
+  password: string;
+  confirmPassword: string;
+};
+
+export type SelectedPackage = {
+  planId: string;
+  billingPeriodId: string;
+  addonIds: string[];
+};
+
+export type InvoiceData = {
+  invoiceId: string;
+  invoiceNumber: string;
+  totalAmount: number;
+  dueDate: string;
+};
+
+const steps = [
+  { id: 1, title: "Data Perusahaan", icon: Building, description: "Informasi dasar perusahaan" },
+  { id: 2, title: "Data Administrator", icon: User, description: "Informasi admin utama" },
+  { id: 3, title: "Pilih Paket", icon: Package, description: "Pilih paket berlangganan" },
+  { id: 4, title: "Pembayaran", icon: CreditCard, description: "Proses pembayaran" },
 ];
 
 export default function ClientRegistration() {
-  const { toast } = useToast();
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 3;
+  const [companyData, setCompanyData] = useState<CompanyData | null>(null);
+  const [adminData, setAdminData] = useState<AdminData | null>(null);
+  const [selectedPackage, setSelectedPackage] = useState<SelectedPackage | null>(null);
+  const [invoiceData, setInvoiceData] = useState<InvoiceData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
-  const form = useForm<ClientRegistrationData>({
-    resolver: zodResolver(clientRegistrationSchema),
-    mode: "onChange",
-    defaultValues: {
-      organizationName: "",
-      organizationSlug: "",
-      website: "",
-      industry: "",
-      size: "",
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      jobTitle: "",
-      department: "",
-    },
-  });
-
-  const registerMutation = useMutation({
-    mutationFn: async (data: ClientRegistrationData) => {
-      console.log('Making API request...');
-      const response = await apiRequest("POST", "/api/client-registration", data);
-      console.log('API response:', response);
-      console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
-      
-      const responseText = await response.text();
-      console.log('Response text:', responseText);
-      
-      try {
-        return JSON.parse(responseText);
-      } catch (e) {
-        console.error('JSON parse error:', e);
-        console.error('Raw response text:', responseText);
-        throw new Error('Server returned invalid JSON response');
-      }
-    },
-    onSuccess: (data) => {
-      console.log('Registration successful:', data);
-      setIsSubmitted(true);
-      toast({
-        title: "Pendaftaran Berhasil!",
-        description: "Organisasi Anda telah berhasil didaftarkan. Tim kami akan meninjau dalam 1-2 hari kerja.",
-      });
-    },
-    onError: (error: Error) => {
-      console.error('Registration error:', error);
-      toast({
-        title: "Pendaftaran Gagal",
-        description: error.message || "Terjadi kesalahan saat mendaftar. Silakan coba lagi.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const onSubmit = (data: ClientRegistrationData) => {
-    console.log('Form submitted with data:', data);
-    console.log('Form errors:', form.formState.errors);
-    console.log('Form is valid:', form.formState.isValid);
-    registerMutation.mutate(data);
-  };
-
-  // Handle organization name change
-  const handleOrganizationNameChange = (value: string) => {
-    form.setValue("organizationName", value);
-  };
-
-  const nextStep = async (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent form submission
-    e.stopPropagation(); // Stop event bubbling
-    
-    let fieldsToValidate: string[] = [];
-    
-    if (currentStep === 1) {
-      fieldsToValidate = ['organizationName', 'industry', 'size'];
-    } else if (currentStep === 2) {
-      fieldsToValidate = ['firstName', 'lastName', 'email', 'password', 'confirmPassword', 'jobTitle', 'department'];
-    }
-    
-    const result = await form.trigger(fieldsToValidate as any);
-    if (result) {
+  const handleNext = () => {
+    if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
     }
   };
 
-  const prevStep = () => {
-    setCurrentStep(currentStep - 1);
-  };
-
-  const getStepTitle = () => {
-    switch (currentStep) {
-      case 1:
-        return "Informasi Organisasi";
-      case 2:
-        return "Informasi Admin";
-      case 3:
-        return "Konfirmasi & Selesai";
-      default:
-        return "Pendaftaran";
+  const handlePrevious = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
     }
   };
 
-  const getStepDescription = () => {
-    switch (currentStep) {
-      case 1:
-        return "Masukkan detail organisasi Anda";
-      case 2:
-        return "Buat akun admin untuk organisasi";
-      case 3:
-        return "Tinjau dan konfirmasi pendaftaran";
-      default:
-        return "Lengkapi form pendaftaran";
+  const handleCompanyDataSubmit = (data: CompanyData) => {
+    setCompanyData(data);
+    handleNext();
+  };
+
+  const handleAdminDataSubmit = (data: AdminData) => {
+    setAdminData(data);
+    handleNext();
+  };
+
+  const handlePackageSelection = async (packageData: SelectedPackage) => {
+    setIsLoading(true);
+    try {
+      setSelectedPackage(packageData);
+      
+      // Generate invoice
+      const response = await fetch('/api/registration/generate-invoice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          companyData,
+          adminData,
+          packageData,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate invoice');
+      }
+
+      const invoice = await response.json();
+      setInvoiceData(invoice);
+      handleNext();
+      
+      toast({
+        title: "Invoice Generated",
+        description: "Invoice berhasil dibuat, silakan lanjutkan ke pembayaran",
+      });
+    } catch (error) {
+      console.error('Error generating invoice:', error);
+      toast({
+        title: "Error",
+        description: "Gagal membuat invoice, silakan coba lagi",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  if (isSubmitted) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="mx-auto mb-4 w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-              <Building2 className="w-6 h-6 text-green-600" />
-            </div>
-            <CardTitle className="text-2xl text-green-600">Pendaftaran Berhasil!</CardTitle>
-            <CardDescription className="text-center">
-              Terima kasih telah mendaftar. Tim kami akan meninjau permohonan Anda dalam 1-2 hari kerja.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <h4 className="font-medium text-blue-900 mb-2">Langkah Selanjutnya:</h4>
-              <ul className="text-sm text-blue-700 space-y-1">
-                <li>• Kami akan meninjau informasi organisasi Anda</li>
-                <li>• Konfirmasi melalui email dalam 1-2 hari kerja</li>
-                <li>• Akses ke platform akan diberikan setelah disetujui</li>
-              </ul>
-            </div>
-            <Button asChild className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
-              <Link href="/login">Kembali ke Login</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  const handlePaymentComplete = () => {
+    toast({
+      title: "Registration Complete",
+      description: "Pendaftaran berhasil! Silakan login dengan akun yang telah dibuat.",
+    });
+    // Redirect to login page
+    window.location.href = '/login';
+  };
+
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <CompanyDataForm 
+            onSubmit={handleCompanyDataSubmit}
+            initialData={companyData}
+            isLoading={isLoading}
+          />
+        );
+      case 2:
+        return (
+          <AdminDataForm 
+            onSubmit={handleAdminDataSubmit}
+            initialData={adminData}
+            isLoading={isLoading}
+          />
+        );
+      case 3:
+        return (
+          <PackageSelection 
+            onSelect={handlePackageSelection}
+            selectedPackage={selectedPackage}
+            isLoading={isLoading}
+          />
+        );
+      case 4:
+        return (
+          <PaymentProcess 
+            invoiceData={invoiceData}
+            onPaymentComplete={handlePaymentComplete}
+            isLoading={isLoading}
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-gray-900">
-            Daftar Organisasi Baru
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Bergabunglah dengan platform OKR management terdepan
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-4xl mx-auto px-4">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Pendaftaran Client Baru
+          </h1>
+          <p className="text-gray-600">
+            Ikuti langkah-langkah berikut untuk mendaftar sebagai client
           </p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{getStepTitle()}</CardTitle>
-            <CardDescription>
-              {getStepDescription()}
-            </CardDescription>
-            
-            {/* Step Indicator */}
-            <div className="flex items-center justify-center space-x-4 mt-6">
-              {[1, 2, 3].map((step) => (
-                <div key={step} className="flex items-center">
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                      currentStep > step
-                        ? 'bg-green-500 text-white'
-                        : currentStep === step
-                        ? 'bg-orange-500 text-white'
-                        : 'bg-gray-200 text-gray-600'
-                    }`}
-                  >
-                    {currentStep > step ? <Check className="w-4 h-4" /> : step}
+        {/* Step Progress */}
+        <div className="mb-8">
+          <div className="flex justify-between items-center">
+            {steps.map((step) => {
+              const Icon = step.icon;
+              const isActive = currentStep === step.id;
+              const isCompleted = currentStep > step.id;
+              
+              return (
+                <div key={step.id} className="flex flex-col items-center flex-1">
+                  <div className={`
+                    w-12 h-12 rounded-full flex items-center justify-center mb-2
+                    ${isActive ? 'bg-gradient-to-r from-orange-600 to-orange-500 text-white' : 
+                      isCompleted ? 'bg-green-500 text-white' : 
+                      'bg-gray-200 text-gray-400'}
+                  `}>
+                    <Icon className="w-6 h-6" />
                   </div>
-                  {step < 3 && (
-                    <div
-                      className={`w-8 h-1 ${
-                        currentStep > step ? 'bg-green-500' : 'bg-gray-200'
-                      }`}
-                    />
+                  <div className="text-center">
+                    <div className={`font-medium text-sm ${isActive ? 'text-orange-600' : isCompleted ? 'text-green-600' : 'text-gray-400'}`}>
+                      {step.title}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {step.description}
+                    </div>
+                  </div>
+                  {step.id < steps.length && (
+                    <div className={`hidden md:block w-full h-0.5 mt-6 ${isCompleted ? 'bg-green-500' : 'bg-gray-200'}`} />
                   )}
                 </div>
-              ))}
-            </div>
-            
-            <div className="flex justify-center space-x-8 mt-2">
-              <span className={`text-xs ${currentStep >= 1 ? 'text-orange-600 font-medium' : 'text-gray-500'}`}>
-                Organisasi
-              </span>
-              <span className={`text-xs ${currentStep >= 2 ? 'text-orange-600 font-medium' : 'text-gray-500'}`}>
-                Admin
-              </span>
-              <span className={`text-xs ${currentStep >= 3 ? 'text-orange-600 font-medium' : 'text-gray-500'}`}>
-                Konfirmasi
-              </span>
-            </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Step Content */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              {(() => {
+                const StepIcon = steps[currentStep - 1].icon;
+                return <StepIcon className="w-5 h-5" />;
+              })()}
+              {steps[currentStep - 1].title}
+            </CardTitle>
+            <CardDescription>
+              {steps[currentStep - 1].description}
+            </CardDescription>
           </CardHeader>
-          
           <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                
-                {/* Step 1: Organization Information */}
-                {currentStep === 1 && (
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-2 mb-4">
-                      <Building2 className="w-5 h-5 text-orange-600" />
-                      <h3 className="text-lg font-medium text-gray-900">Informasi Organisasi</h3>
-                    </div>
-
-                    <FormField
-                      control={form.control}
-                      name="organizationName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Nama Organisasi</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="PT. Contoh Indonesia"
-                              {...field}
-                              onChange={(e) => handleOrganizationNameChange(e.target.value)}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="website"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Website (Opsional)</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Globe className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                              <Input 
-                                placeholder="https://contoh.com" 
-                                {...field}
-                                className="pl-10"
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="industry"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Industri</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Pilih industri" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {industries.map((industry) => (
-                                  <SelectItem key={industry} value={industry}>
-                                    {industry}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="size"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Ukuran Organisasi</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Pilih ukuran" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {organizationSizes.map((size) => (
-                                  <SelectItem key={size} value={size}>
-                                    {size}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Step 2: Admin Information */}
-                {currentStep === 2 && (
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-2 mb-4">
-                      <User className="w-5 h-5 text-orange-600" />
-                      <h3 className="text-lg font-medium text-gray-900">Informasi Admin Organisasi</h3>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="firstName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Nama Depan</FormLabel>
-                            <FormControl>
-                              <Input placeholder="John" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="lastName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Nama Belakang</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Doe" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                              <Input 
-                                type="email"
-                                placeholder="john@contoh.com" 
-                                {...field}
-                                className="pl-10"
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="password"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Password</FormLabel>
-                            <FormControl>
-                              <div className="relative">
-                                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                                <Input 
-                                  type="password"
-                                  placeholder="Minimal 6 karakter" 
-                                  {...field}
-                                  className="pl-10"
-                                />
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="confirmPassword"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Konfirmasi Password</FormLabel>
-                            <FormControl>
-                              <div className="relative">
-                                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                                <Input 
-                                  type="password"
-                                  placeholder="Ulangi password" 
-                                  {...field}
-                                  className="pl-10"
-                                />
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="jobTitle"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Jabatan</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Pilih jabatan Anda" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="CEO">CEO</SelectItem>
-                                <SelectItem value="CTO">CTO</SelectItem>
-                                <SelectItem value="CFO">CFO</SelectItem>
-                                <SelectItem value="COO">COO</SelectItem>
-                                <SelectItem value="Direktur">Direktur</SelectItem>
-                                <SelectItem value="General Manager">General Manager</SelectItem>
-                                <SelectItem value="Manager">Manager</SelectItem>
-                                <SelectItem value="Senior Manager">Senior Manager</SelectItem>
-                                <SelectItem value="Assistant Manager">Assistant Manager</SelectItem>
-                                <SelectItem value="Supervisor">Supervisor</SelectItem>
-                                <SelectItem value="Team Lead">Team Lead</SelectItem>
-                                <SelectItem value="Senior Staff">Senior Staff</SelectItem>
-                                <SelectItem value="Staff">Staff</SelectItem>
-                                <SelectItem value="Admin">Admin</SelectItem>
-                                <SelectItem value="Lainnya">Lainnya</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="department"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Departemen</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Pilih departemen Anda" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="Teknologi Informasi">Teknologi Informasi</SelectItem>
-                                <SelectItem value="Human Resources">Human Resources</SelectItem>
-                                <SelectItem value="Sales & Marketing">Sales & Marketing</SelectItem>
-                                <SelectItem value="Finance & Accounting">Finance & Accounting</SelectItem>
-                                <SelectItem value="Operations">Operations</SelectItem>
-                                <SelectItem value="Research & Development">Research & Development</SelectItem>
-                                <SelectItem value="Customer Service">Customer Service</SelectItem>
-                                <SelectItem value="Quality Assurance">Quality Assurance</SelectItem>
-                                <SelectItem value="Supply Chain">Supply Chain</SelectItem>
-                                <SelectItem value="Legal">Legal</SelectItem>
-                                <SelectItem value="Procurement">Procurement</SelectItem>
-                                <SelectItem value="Business Development">Business Development</SelectItem>
-                                <SelectItem value="Product Management">Product Management</SelectItem>
-                                <SelectItem value="Project Management">Project Management</SelectItem>
-                                <SelectItem value="General Management">General Management</SelectItem>
-                                <SelectItem value="Lainnya">Lainnya</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Step 3: Confirmation */}
-                {currentStep === 3 && (
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-2 mb-4">
-                      <Check className="w-5 h-5 text-orange-600" />
-                      <h3 className="text-lg font-medium text-gray-900">Konfirmasi Pendaftaran</h3>
-                    </div>
-
-                    <div className="bg-gray-50 p-4 rounded-lg space-y-3">
-                      <div>
-                        <h4 className="font-medium text-gray-900">Organisasi</h4>
-                        <p className="text-sm text-gray-600">{form.watch("organizationName")}</p>
-                        <p className="text-sm text-gray-600">{form.watch("industry")} • {form.watch("size")}</p>
-                      </div>
-                      
-                      <div>
-                        <h4 className="font-medium text-gray-900">Admin</h4>
-                        <p className="text-sm text-gray-600">{form.watch("firstName")} {form.watch("lastName")}</p>
-                        <p className="text-sm text-gray-600">{form.watch("email")}</p>
-                        <p className="text-sm text-gray-600">{form.watch("jobTitle")} • {form.watch("department")}</p>
-                      </div>
-                    </div>
-
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                      <h4 className="font-medium text-blue-900 mb-2">Dengan mendaftar, Anda menyetujui:</h4>
-                      <ul className="text-sm text-blue-700 space-y-1">
-                        <li>• Syarat dan ketentuan penggunaan platform</li>
-                        <li>• Kebijakan privasi data organisasi</li>
-                        <li>• Proses verifikasi organisasi 1-2 hari kerja</li>
-                      </ul>
-                    </div>
-                  </div>
-                )}
-
-                {/* Navigation Buttons */}
-                <div className="flex items-center justify-between pt-6">
-                  <div className="flex space-x-2">
-                    {currentStep > 1 && (
-                      <Button 
-                        type="button"
-                        variant="outline" 
-                        onClick={prevStep}
-                        className="flex items-center space-x-2"
-                      >
-                        <ChevronLeft className="w-4 h-4" />
-                        <span>Sebelumnya</span>
-                      </Button>
-                    )}
-                    
-                    {currentStep === 1 && (
-                      <Button variant="outline" asChild>
-                        <Link href="/login">Kembali ke Login</Link>
-                      </Button>
-                    )}
-                  </div>
-                  
-                  <div className="flex space-x-2">
-                    {currentStep < totalSteps ? (
-                      <Button 
-                        type="button"
-                        onClick={nextStep}
-                        className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 flex items-center space-x-2"
-                      >
-                        <span>Selanjutnya</span>
-                        <ChevronRight className="w-4 h-4" />
-                      </Button>
-                    ) : (
-                      <Button 
-                        type="submit" 
-                        disabled={registerMutation.isPending}
-                        className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
-                      >
-                        {registerMutation.isPending ? (
-                          <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                            Memproses Pendaftaran...
-                          </div>
-                        ) : (
-                          "Daftar Organisasi"
-                        )}
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </form>
-            </Form>
+            {renderStepContent()}
           </CardContent>
         </Card>
+
+        {/* Navigation */}
+        <div className="flex justify-between">
+          <Button
+            variant="outline"
+            onClick={handlePrevious}
+            disabled={currentStep === 1 || isLoading}
+          >
+            <ChevronLeft className="w-4 h-4 mr-2" />
+            Sebelumnya
+          </Button>
+          
+          <div className="text-sm text-gray-500">
+            Langkah {currentStep} dari {steps.length}
+          </div>
+          
+          {currentStep < steps.length && (
+            <Button
+              onClick={handleNext}
+              disabled={isLoading}
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+            >
+              Selanjutnya
+              <ChevronRight className="w-4 h-4 ml-2" />
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

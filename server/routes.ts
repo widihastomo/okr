@@ -6641,6 +6641,119 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Client Registration API
+  app.post("/api/registration/generate-invoice", async (req, res) => {
+    try {
+      const { companyData, adminData, packageData } = req.body;
+      
+      // Get subscription plan and billing period
+      const { subscriptionPlans, billingPeriods, organizations, users, invoices, invoiceLineItems } = await import("@shared/schema");
+      const { eq } = await import("drizzle-orm");
+      const { db } = await import("./db");
+      
+      const [selectedPlan] = await db.select()
+        .from(subscriptionPlans)
+        .where(eq(subscriptionPlans.id, packageData.planId));
+      
+      const [selectedBillingPeriod] = await db.select()
+        .from(billingPeriods)
+        .where(eq(billingPeriods.id, packageData.billingPeriodId));
+      
+      if (!selectedPlan || !selectedBillingPeriod) {
+        return res.status(400).json({ message: "Invalid subscription plan or billing period" });
+      }
+      
+      // Get addon packages
+      const { addonPackages } = await import("@shared/schema");
+      const selectedAddons = packageData.addonIds.length > 0 
+        ? await db.select()
+            .from(addonPackages)
+            .where(eq(addonPackages.id, packageData.addonIds[0])) // Simple approach for now
+        : [];
+      
+      // Create organization
+      const [newOrganization] = await db.insert(organizations).values({
+        name: companyData.name,
+        industry: companyData.industry,
+        size: companyData.size,
+        phone: companyData.phone,
+        address: companyData.address,
+        website: companyData.website,
+        description: companyData.description,
+        isActive: false, // Will be activated after payment
+      }).returning();
+      
+      // Create admin user (but inactive)
+      const { hashPassword } = await import("./emailAuth");
+      const hashedPassword = await hashPassword(adminData.password);
+      
+      const [newUser] = await db.insert(users).values({
+        email: adminData.email,
+        firstName: adminData.firstName,
+        lastName: adminData.lastName,
+        phone: adminData.phone,
+        position: adminData.position,
+        passwordHash: hashedPassword,
+        organizationId: newOrganization.id,
+        role: "organization_admin",
+        isActive: false, // Will be activated after payment
+      }).returning();
+      
+      // Calculate total amount
+      const planPrice = selectedBillingPeriod.price;
+      const addonsPrice = selectedAddons.reduce((sum, addon) => sum + addon.price, 0);
+      const totalAmount = planPrice + addonsPrice;
+      
+      // Generate invoice number
+      const invoiceNumber = `INV-${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 999) + 1).padStart(3, '0')}`;
+      
+      // Create invoice
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + 7); // 7 days to pay
+      
+      const [newInvoice] = await db.insert(invoices).values({
+        invoiceNumber,
+        organizationId: newOrganization.id,
+        totalAmount,
+        dueDate: dueDate.toISOString().split('T')[0],
+        status: "pending",
+        notes: `Registration invoice for ${companyData.name}`,
+      }).returning();
+      
+      // Create invoice line items
+      await db.insert(invoiceLineItems).values({
+        invoiceId: newInvoice.id,
+        description: `${selectedPlan.name} - ${selectedBillingPeriod.durationMonths} bulan`,
+        quantity: 1,
+        unitPrice: selectedBillingPeriod.price,
+        totalPrice: selectedBillingPeriod.price,
+      });
+      
+      // Add addon line items
+      for (const addon of selectedAddons) {
+        await db.insert(invoiceLineItems).values({
+          invoiceId: newInvoice.id,
+          description: addon.name,
+          quantity: 1,
+          unitPrice: addon.price,
+          totalPrice: addon.price,
+        });
+      }
+      
+      res.json({
+        invoiceId: newInvoice.id,
+        invoiceNumber: newInvoice.invoiceNumber,
+        totalAmount: newInvoice.totalAmount,
+        dueDate: newInvoice.dueDate,
+        organizationId: newOrganization.id,
+        userId: newUser.id,
+      });
+    } catch (error) {
+      console.error("Error generating registration invoice:", error);
+      res.status(500).json({ message: "Failed to generate invoice" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
