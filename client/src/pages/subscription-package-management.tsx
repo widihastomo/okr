@@ -186,123 +186,164 @@ function PackageFormModal({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-4">
             <div>
-              <Label htmlFor="name">Nama Paket *</Label>
+              <Label htmlFor="name" className="text-sm font-medium">Nama Paket *</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => handleNameChange(e.target.value)}
-                placeholder="e.g., Starter, Growth, Enterprise"
+                placeholder="Contoh: Starter, Growth, Enterprise"
+                className="mt-1"
                 required
               />
+              <p className="text-xs text-gray-500 mt-1">Nama paket yang akan ditampilkan kepada pengguna</p>
             </div>
+            
             <div>
-              <Label htmlFor="slug">Slug *</Label>
+              <Label htmlFor="slug" className="text-sm font-medium">Slug *</Label>
               <Input
                 id="slug"
                 value={formData.slug}
                 onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                placeholder="e.g., starter, growth, enterprise"
+                placeholder="Contoh: starter, growth, enterprise"
+                className="mt-1"
                 required
               />
+              <p className="text-xs text-gray-500 mt-1">Identifier unik untuk paket (otomatis dibuat dari nama)</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="price" className="text-sm font-medium">Harga per Bulan (IDR) *</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  placeholder="99000"
+                  className="mt-1"
+                  required
+                />
+                <p className="text-xs text-gray-500 mt-1">Harga bulanan dalam rupiah (tanpa titik atau koma)</p>
+              </div>
+              <div>
+                <Label htmlFor="maxUsers" className="text-sm font-medium">Maksimal Pengguna</Label>
+                <Input
+                  id="maxUsers"
+                  type="number"
+                  value={formData.maxUsers || ""}
+                  onChange={(e) => setFormData({ 
+                    ...formData, 
+                    maxUsers: e.target.value ? parseInt(e.target.value) : null 
+                  })}
+                  placeholder="Kosongkan untuk unlimited"
+                  className="mt-1"
+                />
+                <p className="text-xs text-gray-500 mt-1">Batas maksimal pengguna (kosongkan untuk unlimited)</p>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="text-sm font-medium mb-3">Integrasi Stripe (Opsional)</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="stripeProductId" className="text-sm font-medium">Stripe Product ID</Label>
+                  <Input
+                    id="stripeProductId"
+                    value={formData.stripeProductId}
+                    onChange={(e) => setFormData({ ...formData, stripeProductId: e.target.value })}
+                    placeholder="prod_xxxxx"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="stripePriceId" className="text-sm font-medium">Stripe Price ID</Label>
+                  <Input
+                    id="stripePriceId"
+                    value={formData.stripePriceId}
+                    onChange={(e) => setFormData({ ...formData, stripePriceId: e.target.value })}
+                    placeholder="price_xxxxx"
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">ID produk dan harga dari Stripe untuk integrasi pembayaran</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="price">Harga per Bulan (IDR) *</Label>
-              <Input
-                id="price"
-                type="number"
-                value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                placeholder="99000"
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="maxUsers">Maksimal Pengguna</Label>
-              <Input
-                id="maxUsers"
-                type="number"
-                value={formData.maxUsers || ""}
-                onChange={(e) => setFormData({ 
-                  ...formData, 
-                  maxUsers: e.target.value ? parseInt(e.target.value) : null 
-                })}
-                placeholder="Kosongkan untuk unlimited"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="stripeProductId">Stripe Product ID</Label>
-              <Input
-                id="stripeProductId"
-                value={formData.stripeProductId}
-                onChange={(e) => setFormData({ ...formData, stripeProductId: e.target.value })}
-                placeholder="prod_xxxxx"
-              />
-            </div>
-            <div>
-              <Label htmlFor="stripePriceId">Stripe Price ID</Label>
-              <Input
-                id="stripePriceId"
-                value={formData.stripePriceId}
-                onChange={(e) => setFormData({ ...formData, stripePriceId: e.target.value })}
-                placeholder="price_xxxxx"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
             <Switch
               id="isActive"
               checked={formData.isActive}
               onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
             />
-            <Label htmlFor="isActive">Paket Aktif</Label>
-          </div>
-
-          <div>
-            <Label>Fitur Paket</Label>
-            <div className="flex space-x-2 mt-2">
-              <Input
-                value={newFeature}
-                onChange={(e) => setNewFeature(e.target.value)}
-                placeholder="Tambah fitur baru"
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addFeature())}
-              />
-              <Button type="button" onClick={addFeature} variant="outline">
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
-            <div className="flex flex-wrap gap-2 mt-3">
-              {formData.features.map((feature, index) => (
-                <Badge key={index} variant="secondary" className="flex items-center gap-1">
-                  {feature}
-                  <X 
-                    className="h-3 w-3 cursor-pointer" 
-                    onClick={() => removeFeature(feature)}
-                  />
-                </Badge>
-              ))}
+            <div>
+              <Label htmlFor="isActive" className="text-sm font-medium">Paket Aktif</Label>
+              <p className="text-xs text-gray-500">Centang untuk mengaktifkan paket ini di sistem</p>
             </div>
           </div>
 
-          <div className="flex justify-end space-x-2 pt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+          <div className="space-y-3">
+            <div>
+              <Label className="text-sm font-medium">Fitur Paket</Label>
+              <p className="text-xs text-gray-500 mb-3">Daftar fitur yang akan ditampilkan pada paket ini</p>
+              
+              <div className="flex space-x-2">
+                <Input
+                  value={newFeature}
+                  onChange={(e) => setNewFeature(e.target.value)}
+                  placeholder="Contoh: Hingga 10 pengguna, OKR Unlimited, Email Support"
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addFeature())}
+                  className="flex-1"
+                />
+                <Button 
+                  type="button" 
+                  onClick={addFeature} 
+                  variant="outline"
+                  className="px-3"
+                  disabled={!newFeature.trim()}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            
+            {formData.features.length > 0 && (
+              <div className="space-y-2">
+                <Label className="text-xs text-gray-600">Fitur yang sudah ditambahkan:</Label>
+                <div className="flex flex-wrap gap-2">
+                  {formData.features.map((feature, index) => (
+                    <Badge key={index} variant="secondary" className="flex items-center gap-2 py-1 px-3">
+                      <span>{feature}</span>
+                      <X 
+                        className="h-3 w-3 cursor-pointer hover:text-red-600" 
+                        onClick={() => removeFeature(feature)}
+                      />
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-end space-x-2 pt-6 border-t">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose}
+              className="px-6"
+              disabled={mutation.isPending}
+            >
               Batal
             </Button>
             <Button 
               type="submit" 
-              disabled={mutation.isPending}
-              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+              disabled={mutation.isPending || !formData.name || !formData.slug || !formData.price}
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 px-6"
             >
               {mutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {pkg ? "Perbarui" : "Buat"} Paket
+              {pkg ? "Perbarui Paket" : "Buat Paket Baru"}
             </Button>
           </div>
         </form>

@@ -210,42 +210,60 @@ export function BillingPeriodFormModal({
               </p>
             </div>
             <div>
-              <Label htmlFor="discountPercentage" className="flex items-center gap-2">
+              <Label htmlFor="discountPercentage" className="text-sm font-medium flex items-center gap-2">
                 <Percent className="h-4 w-4" />
                 Diskon (%)
               </Label>
-              <Input
-                id="discountPercentage"
-                type="number"
-                value={formData.discountPercentage}
-                onChange={(e) => setFormData({ ...formData, discountPercentage: parseInt(e.target.value) || 0 })}
-                placeholder="0"
-                min="0"
-                max="50"
-              />
+              <Select
+                value={formData.discountPercentage.toString()}
+                onValueChange={(value) => setFormData({ ...formData, discountPercentage: parseInt(value) })}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0">0% - Tanpa Diskon</SelectItem>
+                  <SelectItem value="10">10% - Diskon Triwulan</SelectItem>
+                  <SelectItem value="15">15% - Diskon Semester</SelectItem>
+                  <SelectItem value="20">20% - Diskon Tahunan</SelectItem>
+                  <SelectItem value="25">25% - Diskon Khusus</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-blue-600 mt-1 font-medium">
+                {formData.discountPercentage > 0 ? `Hemat ${formData.discountPercentage}%` : "Tanpa diskon"}
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
             <Switch
               id="isActive"
               checked={formData.isActive}
               onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
             />
-            <Label htmlFor="isActive">Periode aktif</Label>
+            <div>
+              <Label htmlFor="isActive" className="text-sm font-medium">Periode Aktif</Label>
+              <p className="text-xs text-gray-500">Centang untuk mengaktifkan periode billing ini</p>
+            </div>
           </div>
 
-          <div className="flex justify-end space-x-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+          <div className="flex justify-end space-x-2 pt-6 border-t">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose}
+              className="px-6"
+              disabled={mutation.isPending}
+            >
               Batal
             </Button>
             <Button 
               type="submit" 
-              disabled={mutation.isPending}
-              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+              disabled={mutation.isPending || !formData.periodType || !formData.price}
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 px-6"
             >
               {mutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {billingPeriod ? "Perbarui" : "Buat"} Periode
+              {billingPeriod ? "Perbarui Periode" : "Buat Periode Baru"}
             </Button>
           </div>
         </form>
