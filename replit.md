@@ -113,6 +113,12 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 08, 2025. Successfully disabled auto-login in development mode for registration testing:
+  * Commented out auto-login middleware in authRoutes.ts to prevent automatic system owner login
+  * Disabled auto-session creation in emailAuth.ts requireAuth middleware
+  * Users can now test registration flow without being automatically logged in as system owner
+  * Client registration page at /client-registration is now accessible for testing without authentication
+  * Auto-login can be re-enabled by uncommenting the code blocks when needed for normal development
 - July 08, 2025. Fixed subscription plan deletion issue caused by foreign key constraint:
   * Added proper cascade deletion using database transactions for atomic operations
   * Updated DELETE /api/admin/subscription-plans/:id endpoint with transaction-based deletion

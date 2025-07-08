@@ -100,21 +100,21 @@ export async function authenticateUser(loginData: LoginData): Promise<User | nul
 }
 
 export const requireAuth: RequestHandler = async (req, res, next) => {
-  // Auto-login for development mode - set to system owner
-  if (process.env.NODE_ENV === 'development') {
-    // Auto-set session to system owner if not already set
-    if (!req.session.userId) {
-      req.session.userId = "11111111-1111-1111-1111-111111111111"; // System owner ID
-      // Force session save for persistence
-      req.session.save((err) => {
-        if (err) {
-          console.error('Session save error:', err);
-        } else {
-          console.log('🔄 Auto-login session created and saved for system owner');
-        }
-      });
-    }
-  }
+  // Auto-login for development mode - DISABLED for registration testing
+  // if (process.env.NODE_ENV === 'development') {
+  //   // Auto-set session to system owner if not already set
+  //   if (!req.session.userId) {
+  //     req.session.userId = "11111111-1111-1111-1111-111111111111"; // System owner ID
+  //     // Force session save for persistence
+  //     req.session.save((err) => {
+  //       if (err) {
+  //         console.error('Session save error:', err);
+  //       } else {
+  //         console.log('🔄 Auto-login session created and saved for system owner');
+  //       }
+  //     });
+  //   }
+  // }
   
   if (!req.session?.userId) {
     return res.status(401).json({ message: "Unauthorized" });

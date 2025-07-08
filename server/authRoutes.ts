@@ -7,17 +7,17 @@ export function setupEmailAuth(app: Express) {
   // Setup session middleware
   app.use(getSession());
 
-  // Auto-login for development mode
-  if (process.env.NODE_ENV === 'development') {
-    app.use('/api', (req, res, next) => {
-      // Auto-create session for system owner in development
-      if (!req.session.userId && !req.path.includes('/auth/')) {
-        req.session.userId = "11111111-1111-1111-1111-111111111111"; // System owner ID
-        console.log('🔄 Auto-login activated for development mode');
-      }
-      next();
-    });
-  }
+  // Auto-login for development mode - DISABLED for registration testing
+  // if (process.env.NODE_ENV === 'development') {
+  //   app.use('/api', (req, res, next) => {
+  //     // Auto-create session for system owner in development
+  //     if (!req.session.userId && !req.path.includes('/auth/')) {
+  //       req.session.userId = "11111111-1111-1111-1111-111111111111"; // System owner ID
+  //       console.log('🔄 Auto-login activated for development mode');
+  //     }
+  //     next();
+  //   });
+  // }
 
   // Health check endpoint for debugging auth issues
   app.get('/api/debug/auth-status', (req, res) => {
