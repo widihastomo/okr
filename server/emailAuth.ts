@@ -15,12 +15,13 @@ export function getSession() {
   
   let store;
   
-  if (isProduction && process.env.DATABASE_URL) {
-    // Use PostgreSQL session storage for production
+  if (process.env.DATABASE_URL) {
+    // Use PostgreSQL session storage for persistent sessions
     store = new PgSession({
       conString: process.env.DATABASE_URL,
       tableName: 'sessions',
       createTableIfMissing: true,
+      ttl: sessionTtl / 1000, // PostgreSQL store expects TTL in seconds
     });
   } else {
     // Use memory store for development
@@ -104,6 +105,14 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
     // Auto-set session to system owner if not already set
     if (!req.session.userId) {
       req.session.userId = "11111111-1111-1111-1111-111111111111"; // System owner ID
+      // Force session save for persistence
+      req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+        } else {
+          console.log('🔄 Auto-login session created and saved for system owner');
+        }
+      });
     }
   }
   

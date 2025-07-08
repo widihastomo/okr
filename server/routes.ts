@@ -41,6 +41,17 @@ const isSystemOwner = (req: any, res: any, next: any) => {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
   setupEmailAuth(app);
+  
+  // Auto-login middleware for development (before auth routes)
+  if (process.env.NODE_ENV === 'development') {
+    app.use((req, res, next) => {
+      if (!req.session.userId && req.path.startsWith('/api/')) {
+        req.session.userId = "11111111-1111-1111-1111-111111111111"; // System owner ID
+        console.log('🔄 Auto-login middleware: session set for development');
+      }
+      next();
+    });
+  }
 
   // Debug endpoint to check users
   app.get("/api/debug/users", async (req, res) => {
