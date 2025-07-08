@@ -130,8 +130,12 @@ function PackageFormModal({
         // Create each billing period
         for (const period of data.billingPeriods) {
           await apiRequest("POST", "/api/admin/billing-periods", {
-            ...period,
             planId,
+            periodType: period.periodType,
+            periodMonths: period.periodMonths,
+            price: parseFloat(period.price) || 0,
+            discountPercentage: period.discountPercentage || 0,
+            isActive: period.isActive !== false
           });
         }
       }

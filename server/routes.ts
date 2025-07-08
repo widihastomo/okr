@@ -3397,6 +3397,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { billingPeriods } = await import("@shared/schema");
       const { createInsertSchema } = await import("drizzle-zod");
       
+      console.log("Creating billing period with data:", req.body);
+      
       const insertBillingPeriodSchema = createInsertSchema(billingPeriods);
       const validatedData = insertBillingPeriodSchema.parse(req.body);
       
