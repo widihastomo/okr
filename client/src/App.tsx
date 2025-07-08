@@ -1,5 +1,5 @@
 import { Switch, Route, useLocation } from "wouter";
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import { cn } from "@/lib/utils";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
