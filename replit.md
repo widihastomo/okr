@@ -121,6 +121,17 @@ Trial user untuk testing achievement system:
 ## Changelog
 ```
 Changelog:
+- July 08, 2025. Successfully transformed trial achievements interface to expandable/collapsible mission cards:
+  * Redesigned trial achievements page to use mission card interface similar to objective detail page
+  * Implemented expandable/collapsible mission cards with header that shows progress and description
+  * Added 4 mission categories: "Onboarding Dasar", "Manajemen Tim", "Eksekusi Strategi", "Monitoring & Evaluasi"
+  * Each mission card shows completion progress bar, mission count badge, and detailed mission list when expanded
+  * Individual missions display with icons, descriptions, point rewards, and "Mulai Misi" action buttons
+  * Completed missions show checkmark icon and strike-through styling with green background
+  * Enhanced user experience with smooth expand/collapse transitions and proper visual feedback
+  * Mission action buttons redirect users to appropriate pages for completing each onboarding task
+  * Successfully migrated from generic gamified achievement system to practical onboarding-focused mission system
+  * All missions now guide users through actual platform features with clear descriptions and actionable next steps
 - July 08, 2025. Successfully created trial user for testing gamified achievement system:
   * Created trial organization "Startup Trial Company" with 14-day trial subscription
   * Created trial user (trial@startup.com / password: password) linked to trial organization  
