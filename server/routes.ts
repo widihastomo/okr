@@ -3405,7 +3405,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("Creating billing period with data:", req.body);
       
-      const insertBillingPeriodSchema = createInsertSchema(billingPeriods);
+      const insertBillingPeriodSchema = createInsertSchema(billingPeriods).omit({
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+      });
       const validatedData = insertBillingPeriodSchema.parse(req.body);
       
       const [newPeriod] = await db.insert(billingPeriods)

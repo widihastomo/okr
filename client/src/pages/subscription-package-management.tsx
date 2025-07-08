@@ -130,10 +130,10 @@ function PackageFormModal({
         // Create each billing period
         for (const period of data.billingPeriods) {
           await apiRequest("POST", "/api/admin/billing-periods", {
-            planId,
+            planId: planId,
             periodType: period.periodType,
             periodMonths: period.periodMonths,
-            price: parseFloat(period.price) || 0,
+            price: period.price.toString(),
             discountPercentage: period.discountPercentage || 0,
             isActive: period.isActive !== false
           });
