@@ -219,17 +219,81 @@ function Router() {
   );
 }
 
+function GlobalRouter() {
+  const [location] = useLocation();
+  const { isAuthenticated, user } = useAuth();
+  
+  // If accessing root or /login, show global login page
+  if (location === "/" || location === "/login") {
+    if (isAuthenticated) {
+      // If user is authenticated, redirect to their organization
+      if ((user as any)?.isSystemOwner) {
+        return <SystemAdmin />;
+      } else {
+        // Get user's organization slug and redirect
+        return <OrganizationRedirect />;
+      }
+    } else {
+      return <Login />;
+    }
+  }
+
+  // If accessing /client-registration, show it without slug
+  if (location === "/client-registration") {
+    return <ClientRegistration />;
+  }
+
+  // For slug-based routes, use the slug router
+  return (
+    <OrganizationProvider>
+      <SlugRouter>
+        <Router />
+      </SlugRouter>
+    </OrganizationProvider>
+  );
+}
+
+function OrganizationRedirect() {
+  const { user } = useAuth();
+  const [location, setLocation] = useLocation();
+  
+  useEffect(() => {
+    if (user) {
+      fetch('/api/auth/me')
+        .then(res => res.json())
+        .then(userData => {
+          if (userData.organizationSlug) {
+            setLocation(`/${userData.organizationSlug}/dashboard`);
+          } else {
+            setLocation("/select-organization");
+          }
+        })
+        .catch(error => {
+          console.error("Error getting user data:", error);
+          setLocation("/login");
+        });
+    }
+  }, [user, setLocation]);
+  
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4">
+          <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+        </div>
+        <p className="text-gray-600">Redirecting to your organization...</p>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <OnboardingProvider>
           <Toaster />
-          <OrganizationProvider>
-            <SlugRouter>
-              <Router />
-            </SlugRouter>
-          </OrganizationProvider>
+          <GlobalRouter />
           <TourTooltip />
         </OnboardingProvider>
       </TooltipProvider>
