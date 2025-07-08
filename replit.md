@@ -121,17 +121,15 @@ Trial user untuk testing achievement system:
 ## Changelog
 ```
 Changelog:
-- July 08, 2025. Successfully transformed trial achievements interface to expandable/collapsible mission cards:
-  * Redesigned trial achievements page to use mission card interface similar to objective detail page
-  * Implemented expandable/collapsible mission cards with header that shows progress and description
-  * Added 4 mission categories: "Onboarding Dasar", "Manajemen Tim", "Eksekusi Strategi", "Monitoring & Evaluasi"
-  * Each mission card shows completion progress bar, mission count badge, and detailed mission list when expanded
-  * Individual missions display with icons, descriptions, point rewards, and "Mulai Misi" action buttons
-  * Completed missions show checkmark icon and strike-through styling with green background
-  * Enhanced user experience with smooth expand/collapse transitions and proper visual feedback
-  * Mission action buttons redirect users to appropriate pages for completing each onboarding task
-  * Successfully migrated from generic gamified achievement system to practical onboarding-focused mission system
-  * All missions now guide users through actual platform features with clear descriptions and actionable next steps
+- July 08, 2025. Successfully simplified onboarding mission system with sequential numbered steps:
+  * Removed points system and gamification elements for cleaner, more focused interface
+  * Consolidated all missions into single expandable card titled "Panduan Onboarding Platform"
+  * Implemented numbered sequence (1-10) for clear progression: 1. Menambahkan Member, 2. Membuat Tim, 3. Membuat Objective, 4. Menambahkan Key Result, 5. Menambahkan Inisiatif, 6. Menambahkan Task, 7. Update Capaian Key Result, 8. Update Capaian Metrik Inisiatif, 9. Update Status Task, 10. Update Harian Instan
+  * Simplified action buttons from "Mulai Misi" to just "Mulai" for cleaner design
+  * Fixed toast undefined error by removing unused toast dependency from MissionCard component
+  * Created custom mission ordering system that overrides API category grouping for user-defined sequence
+  * Enhanced user experience with clear step-by-step guidance through platform features
+  * Maintained expandable/collapsible functionality with progress tracking and completion indicators
 - July 08, 2025. Successfully created trial user for testing gamified achievement system:
   * Created trial organization "Startup Trial Company" with 14-day trial subscription
   * Created trial user (trial@startup.com / password: password) linked to trial organization  

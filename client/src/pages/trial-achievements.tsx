@@ -12,20 +12,16 @@ import { useEffect, useState } from "react";
 
 // Mission action functions
 const missionActions = {
-  addUser: () => window.location.href = "/client-users",
+  addMember: () => window.location.href = "/client-users",
   createTeam: () => window.location.href = "/teams", 
-  manageCycle: () => window.location.href = "/cycles",
   createObjective: () => window.location.href = "/",
-  addKeyResults: () => window.location.href = "/",
-  createInitiative: () => window.location.href = "/",
+  addKeyResult: () => window.location.href = "/",
+  addInitiative: () => window.location.href = "/",
   addTask: () => window.location.href = "/daily-focus",
-  firstCheckin: () => window.location.href = "/",
-  updateProgress: () => window.location.href = "/",
-  completeTask: () => window.location.href = "/daily-focus",
-  consistency: () => window.location.href = "/daily-focus",
-  completeObjective: () => window.location.href = "/",
-  masterInitiative: () => window.location.href = "/",
-  graduateOnboarding: () => toast({ title: "Selamat!", description: "Anda telah menyelesaikan semua misi onboarding!" }),
+  updateKeyResult: () => window.location.href = "/",
+  updateMetrics: () => window.location.href = "/",
+  updateTaskStatus: () => window.location.href = "/daily-focus",
+  dailyUpdate: () => window.location.href = "/daily-focus",
 };
 
 // Icon mapping
@@ -54,7 +50,6 @@ interface MissionCardProps {
 }
 
 function MissionCard({ missions, title, description, className }: MissionCardProps) {
-  const { toast } = useToast();
   const completedMissions = missions.filter(m => m.unlocked).length;
   const totalMissions = missions.length;
   const [isExpanded, setIsExpanded] = useState(false);
@@ -101,22 +96,19 @@ function MissionCard({ missions, title, description, className }: MissionCardPro
         
         {isExpanded && (
           <CardContent className="space-y-3 pt-0">
-            {missions.map((mission) => {
+            {missions.map((mission, index) => {
               const IconComponent = iconMapping[mission.icon] || Target;
-              const missionKey = mission.name.includes("Tambah Pengguna") ? "addUser" :
-                                mission.name.includes("Buat Tim") ? "createTeam" :
-                                mission.name.includes("Kelola Cycle") ? "manageCycle" :
-                                mission.name.includes("Buat Objective") ? "createObjective" :
-                                mission.name.includes("Tambah Key Results") ? "addKeyResults" :
-                                mission.name.includes("Buat Inisiatif") ? "createInitiative" :
-                                mission.name.includes("Tambah Task") ? "addTask" :
-                                mission.name.includes("Lakukan Check-in") ? "firstCheckin" :
-                                mission.name.includes("Update Progress") ? "updateProgress" :
-                                mission.name.includes("Selesaikan Task") ? "completeTask" :
-                                mission.name.includes("Konsistensi") ? "consistency" :
-                                mission.name.includes("Selesaikan Objective") ? "completeObjective" :
-                                mission.name.includes("Master Inisiatif") ? "masterInitiative" :
-                                "graduateOnboarding";
+              const missionKey = mission.name.includes("Tambah Pengguna") || mission.name.includes("Menambahkan Member") ? "addMember" :
+                                mission.name.includes("Buat Tim") || mission.name.includes("Membuat Tim") ? "createTeam" :
+                                mission.name.includes("Buat Objective") || mission.name.includes("Membuat Objective") ? "createObjective" :
+                                mission.name.includes("Tambah Key Result") || mission.name.includes("Menambahkan Key Result") ? "addKeyResult" :
+                                mission.name.includes("Buat Inisiatif") || mission.name.includes("Menambahkan Inisiatif") ? "addInitiative" :
+                                mission.name.includes("Tambah Task") || mission.name.includes("Menambahkan Task") ? "addTask" :
+                                mission.name.includes("Update Capaian Key Result") ? "updateKeyResult" :
+                                mission.name.includes("Update Capaian Metrik") ? "updateMetrics" :
+                                mission.name.includes("Update Status Task") ? "updateTaskStatus" :
+                                mission.name.includes("Update Harian") ? "dailyUpdate" :
+                                "addMember";
               
               return (
                 <div
@@ -142,14 +134,14 @@ function MissionCard({ missions, title, description, className }: MissionCardPro
                     
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-bold text-orange-600 min-w-[20px]">
+                          {index + 1}.
+                        </span>
                         <h4 className={`font-medium text-sm ${
                           mission.unlocked ? "text-green-700 line-through" : "text-gray-800"
                         }`}>
-                          {mission.name}
+                          {mission.name.replace(/🎯 Misi: |📊 Misi: |💡 Misi: |✅ Misi: |🔄 Misi: |📈 Misi: |⚡ Misi: |🎖️ Misi: /g, "")}
                         </h4>
-                        <Badge variant="secondary" className="text-xs">
-                          +{mission.points} poin
-                        </Badge>
                       </div>
                       <p className="text-xs text-gray-600 mb-2">
                         {mission.description}
@@ -160,7 +152,7 @@ function MissionCard({ missions, title, description, className }: MissionCardPro
                           className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white text-xs h-7"
                           onClick={() => missionActions[missionKey]()}
                         >
-                          Mulai Misi
+                          Mulai
                         </Button>
                       )}
                     </div>
@@ -243,32 +235,70 @@ export default function TrialAchievements() {
     return acc;
   }, {});
 
-  const categoryInfo = {
-    setup: { 
-      title: "Onboarding Dasar", 
-      description: "Menyiapkan fondasi untuk penggunaan platform",
-      icon: Target,
-      color: "bg-blue-500"
-    },
-    workflow: { 
-      title: "Manajemen Tim", 
-      description: "Menguasai alur kerja manajemen tim dan goal",
-      icon: Users,
-      color: "bg-green-500"
-    },
-    monitoring: { 
-      title: "Eksekusi Strategi", 
-      description: "Memantau progress dan melakukan eksekusi",
-      icon: TrendingUp,
-      color: "bg-purple-500"
-    },
-    mastery: { 
-      title: "Monitoring & Evaluasi", 
-      description: "Menguasai sistem evaluasi dan pencapaian",
-      icon: Award,
-      color: "bg-orange-500"
-    }
-  };
+  // Manually define mission order based on user requirements
+  const orderedMissions = [
+    { key: "add_member", title: "1. Menambahkan Member", description: "Tambahkan anggota tim untuk memulai kolaborasi" },
+    { key: "create_team", title: "2. Membuat Tim", description: "Buat tim untuk mengorganisir anggota" },
+    { key: "create_objective", title: "3. Membuat Objective", description: "Tetapkan tujuan yang ingin dicapai" },
+    { key: "add_key_result", title: "4. Menambahkan Key Result", description: "Tambahkan metrik untuk mengukur progress" },
+    { key: "add_initiative", title: "5. Menambahkan Inisiatif", description: "Buat rencana aksi untuk mencapai objective" },
+    { key: "add_task", title: "6. Menambahkan Task", description: "Pecah inisiatif menjadi tugas konkret" },
+    { key: "update_key_result", title: "7. Update Capaian Key Result", description: "Perbarui progress metrik pencapaian" },
+    { key: "update_metrics", title: "8. Update Capaian Metrik Inisiatif", description: "Pantau dan update metrik inisiatif" },
+    { key: "update_task", title: "9. Update Status Task", description: "Ubah status tugas yang sedang dikerjakan" },
+    { key: "daily_update", title: "10. Update Harian Instan", description: "Lakukan update harian untuk progress tracking" },
+  ];
+
+  // Create single mission card with all missions ordered
+  const allMissionsOrdered = orderedMissions.map(orderedMission => {
+    // Find matching achievement from API data
+    const matchingAchievement = achievements.find(achievement => {
+      const name = achievement.name.toLowerCase();
+      return (
+        (orderedMission.key === "add_member" && (name.includes("tambah pengguna") || name.includes("member"))) ||
+        (orderedMission.key === "create_team" && name.includes("tim")) ||
+        (orderedMission.key === "create_objective" && name.includes("objective")) ||
+        (orderedMission.key === "add_key_result" && name.includes("key result")) ||
+        (orderedMission.key === "add_initiative" && name.includes("inisiatif")) ||
+        (orderedMission.key === "add_task" && name.includes("task")) ||
+        (orderedMission.key === "update_key_result" && name.includes("check-in")) ||
+        (orderedMission.key === "update_metrics" && name.includes("update progress")) ||
+        (orderedMission.key === "update_task" && name.includes("selesaikan task")) ||
+        (orderedMission.key === "daily_update" && name.includes("konsistensi"))
+      );
+    });
+
+    return matchingAchievement ? {
+      ...matchingAchievement,
+      name: orderedMission.title,
+      description: orderedMission.description,
+      icon: orderedMission.key === "add_member" ? "UserPlus" :
+            orderedMission.key === "create_team" ? "Users" :
+            orderedMission.key === "create_objective" ? "Target" :
+            orderedMission.key === "add_key_result" ? "BarChart3" :
+            orderedMission.key === "add_initiative" ? "Lightbulb" :
+            orderedMission.key === "add_task" ? "CheckSquare" :
+            orderedMission.key === "update_key_result" ? "TrendingUp" :
+            orderedMission.key === "update_metrics" ? "LineChart" :
+            orderedMission.key === "update_task" ? "CheckCircle2" :
+            "Zap"
+    } : {
+      id: orderedMission.key,
+      name: orderedMission.title,
+      description: orderedMission.description,
+      unlocked: false,
+      icon: orderedMission.key === "add_member" ? "UserPlus" :
+            orderedMission.key === "create_team" ? "Users" :
+            orderedMission.key === "create_objective" ? "Target" :
+            orderedMission.key === "add_key_result" ? "BarChart3" :
+            orderedMission.key === "add_initiative" ? "Lightbulb" :
+            orderedMission.key === "add_task" ? "CheckSquare" :
+            orderedMission.key === "update_key_result" ? "TrendingUp" :
+            orderedMission.key === "update_metrics" ? "LineChart" :
+            orderedMission.key === "update_task" ? "CheckCircle2" :
+            "Zap"
+    };
+  });
 
   return (
     <div className="container mx-auto p-6 space-y-8">
@@ -286,22 +316,13 @@ export default function TrialAchievements() {
       {/* Progress Overview */}
       <TrialProgressOverview progress={userProgress} />
 
-      {/* Mission Cards by Category */}
+      {/* Onboarding Mission Card */}
       <div className="space-y-6">
-        {Object.entries(categoryInfo).map(([categoryKey, info]) => {
-          const categoryMissions = achievementsByCategory[categoryKey] || [];
-          
-          if (categoryMissions.length === 0) return null;
-          
-          return (
-            <MissionCard
-              key={categoryKey}
-              missions={categoryMissions}
-              title={info.title}
-              description={info.description}
-            />
-          );
-        })}
+        <MissionCard
+          missions={allMissionsOrdered}
+          title="Panduan Onboarding Platform"
+          description="Ikuti langkah-langkah berikut secara berurutan untuk menguasai platform"
+        />
       </div>
     </div>
   );
