@@ -117,6 +117,7 @@ import { DailyAchievements } from "@/components/daily-achievements";
 import { DailyInstantUpdate } from "@/components/daily-instant-update";
 import { useAuth } from "@/hooks/useAuth";
 import TrialStatusBanner from "@/components/trial-status-banner";
+import TrialMascot from "@/components/trial-mascot";
 
 // Icon mapping for mission cards
 const iconMapping = {
@@ -957,13 +958,18 @@ export default function DailyFocusPage() {
         {/* Trial Status Banner */}
         <TrialStatusBanner />
 
+        {/* Trial Mascot Guide */}
+        <TrialMascot className="mb-6" />
+
         {/* Onboarding Missions Section */}
-        <MissionCard
-          missions={orderlyMissions}
-          title="Panduan Onboarding Platform"
-          description="Ikuti langkah-langkah ini untuk memulai menggunakan platform"
-          className="mb-6"
-        />
+        <div data-testid="onboarding-missions">
+          <MissionCard
+            missions={orderlyMissions}
+            title="Panduan Onboarding Platform"
+            description="Ikuti langkah-langkah ini untuk memulai menggunakan platform"
+            className="mb-6"
+          />
+        </div>
 
         {/* Controls */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
