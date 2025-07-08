@@ -134,7 +134,7 @@ function Router() {
           )}
         >
           {/* Main Content */}
-          <div className="flex-1 min-h-[calc(100vh-6rem)] py-3 overflow-x-hidden" style={{ paddingTop: '108px' }}>
+          <div className="flex-1 min-h-[calc(100vh-6rem)] py-3 overflow-x-hidden pt-[108px] sm:pt-[108px]">
             <Switch>
               <Route path="/" component={DailyFocusPage} />
               <Route path="/daily-focus" component={DailyFocusPage} />
