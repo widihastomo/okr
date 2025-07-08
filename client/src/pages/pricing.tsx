@@ -32,7 +32,12 @@ export default function Pricing() {
 
   const handleSelectPlan = async (plan: SubscriptionPlan) => {
     if (!user) {
-      // Redirect to login
+      // For free trial, redirect to registration
+      if (plan.slug === "free-trial") {
+        window.location.href = "/client-registration";
+        return;
+      }
+      // For other plans, redirect to login
       window.location.href = "/login?redirect=/pricing";
       return;
     }
@@ -40,6 +45,12 @@ export default function Pricing() {
     if (plan.slug === "enterprise") {
       // Contact sales for enterprise
       window.location.href = "mailto:sales@okr-app.id?subject=Enterprise Plan Inquiry";
+      return;
+    }
+
+    if (plan.slug === "free-trial") {
+      // If already logged in, they can't get another trial
+      alert("Free trial sudah digunakan. Silakan pilih paket berlangganan.");
       return;
     }
 
@@ -130,10 +141,18 @@ export default function Pricing() {
 
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
-          {plans.map((plan) => {
+          {plans
+            .sort((a, b) => {
+              // Sort order: free-trial first, then others
+              if (a.slug === "free-trial") return -1;
+              if (b.slug === "free-trial") return 1;
+              return 0;
+            })
+            .map((plan) => {
             const features = plan.features as string[];
             const isCurrentPlan = plan.slug === currentPlanSlug;
             const isEnterprise = plan.slug === "enterprise";
+            const isTrial = plan.slug === "free-trial";
             
             // Get current billing period pricing
             const currentPeriod = plan.billingPeriods?.find(bp => bp.periodType === selectedBillingPeriod);
@@ -149,12 +168,21 @@ export default function Pricing() {
               <Card
                 key={plan.id}
                 className={`relative flex flex-col ${
-                  plan.slug === "growth"
+                  isTrial
+                    ? "border-green-500 shadow-xl scale-105 bg-gradient-to-b from-green-50 to-white"
+                    : plan.slug === "growth"
                     ? "border-blue-500 shadow-xl scale-105"
                     : "border-gray-200"
                 }`}
               >
-                {plan.slug === "growth" && (
+                {isTrial && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <Badge className="bg-green-500 text-white px-4 py-1 text-sm font-bold">
+                      🎯 GRATIS 7 HARI
+                    </Badge>
+                  </div>
+                )}
+                {plan.slug === "growth" && !isTrial && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                     <Badge className="bg-blue-500 text-white px-4 py-1">
                       Paling Populer
@@ -185,6 +213,18 @@ export default function Pricing() {
                   <div className="mb-6">
                     {isEnterprise ? (
                       <div className="text-3xl font-bold text-gray-900">Negosiasi</div>
+                    ) : isTrial ? (
+                      <div className="space-y-2">
+                        <div className="flex items-baseline">
+                          <span className="text-3xl font-bold text-green-600">GRATIS</span>
+                        </div>
+                        <div className="text-sm text-green-600 font-medium">
+                          Selama 7 hari pertama
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          Akses penuh ke semua fitur
+                        </div>
+                      </div>
                     ) : (
                       <div className="space-y-2">
                         <div className="flex items-baseline">
@@ -227,7 +267,7 @@ export default function Pricing() {
 
                 <CardFooter>
                   <Button
-                    className="w-full"
+                    className={`w-full ${isTrial && !user ? "bg-green-600 hover:bg-green-700" : ""}`}
                     variant={isCurrentPlan ? "outline" : "default"}
                     disabled={isCurrentPlan || loadingPlan === plan.slug}
                     onClick={() => handleSelectPlan(plan)}
@@ -238,6 +278,10 @@ export default function Pricing() {
                       "Paket Saat Ini"
                     ) : isEnterprise ? (
                       "Hubungi Sales"
+                    ) : isTrial && !user ? (
+                      "🚀 Mulai Trial Gratis"
+                    ) : isTrial && user ? (
+                      "Trial Sudah Digunakan"
                     ) : (
                       "Pilih Paket"
                     )}

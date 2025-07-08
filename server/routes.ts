@@ -4194,6 +4194,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Trial Status Check API
+  app.get('/api/trial-status', requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const { organizationSubscriptions, subscriptionPlans } = await import("@shared/schema");
+      const { eq, and } = await import("drizzle-orm");
+      const { db } = await import("./db");
+      
+      // Get user's organization subscription
+      const [orgSubscription] = await db.select()
+        .from(organizationSubscriptions)
+        .leftJoin(subscriptionPlans, eq(organizationSubscriptions.planId, subscriptionPlans.id))
+        .where(eq(organizationSubscriptions.organizationId, user.organizationId));
+      
+      if (!orgSubscription) {
+        return res.json({ isTrialActive: false, daysRemaining: 0 });
+      }
+      
+      const subscription = orgSubscription.organization_subscriptions;
+      const plan = orgSubscription.subscription_plans;
+      
+      // Check if it's a trial
+      if (subscription.status !== 'trialing' || !subscription.trialEnd) {
+        return res.json({ isTrialActive: false, daysRemaining: 0, currentPlan: plan?.name });
+      }
+      
+      // Calculate days remaining
+      const now = new Date();
+      const trialEnd = new Date(subscription.trialEnd);
+      const daysRemaining = Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      
+      res.json({
+        isTrialActive: daysRemaining > 0,
+        daysRemaining: Math.max(0, daysRemaining),
+        trialEndDate: subscription.trialEnd,
+        currentPlan: plan?.name
+      });
+      
+    } catch (error) {
+      console.error('Error checking trial status:', error);
+      res.status(500).json({ message: 'Failed to check trial status' });
+    }
+  });
+
+  // User Limit Check API
+  app.get('/api/user-limit-status', requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const { users, organizationSubscriptions, subscriptionPlans } = await import("@shared/schema");
+      const { eq, and, count } = await import("drizzle-orm");
+      const { db } = await import("./db");
+      
+      // Get current user count in organization
+      const [userCount] = await db.select({ count: count() })
+        .from(users)
+        .where(and(
+          eq(users.organizationId, user.organizationId),
+          eq(users.isActive, true)
+        ));
+      
+      // Get organization subscription plan
+      const [orgSubscription] = await db.select()
+        .from(organizationSubscriptions)
+        .leftJoin(subscriptionPlans, eq(organizationSubscriptions.planId, subscriptionPlans.id))
+        .where(eq(organizationSubscriptions.organizationId, user.organizationId));
+      
+      const currentUsers = userCount.count || 0;
+      const maxUsers = orgSubscription?.subscription_plans?.maxUsers || 3; // Default to trial limit
+      
+      res.json({
+        currentUsers,
+        maxUsers,
+        canAddUsers: currentUsers < maxUsers,
+        usersRemaining: Math.max(0, maxUsers - currentUsers)
+      });
+      
+    } catch (error) {
+      console.error('Error checking user limit:', error);
+      res.status(500).json({ message: 'Failed to check user limit' });
+    }
+  });
+
   // Get available referral codes for comprehensive invoice
   app.get("/api/referral-codes/available", requireAuth, async (req, res) => {
     try {
@@ -6364,6 +6446,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!isOwner) {
         return res.status(403).json({ error: "Access denied. Only organization owners can invite users." });
       }
+      
+      // Check user limit for current organization
+      const { organizationSubscriptions, subscriptionPlans } = await import("@shared/schema");
+      const { count, and } = await import("drizzle-orm");
+      
+      // Get current user count in organization
+      const [userCount] = await db.select({ count: count() })
+        .from(users)
+        .where(and(
+          eq(users.organizationId, user.organizationId),
+          eq(users.isActive, true)
+        ));
+      
+      // Get organization subscription plan
+      const [orgSubscription] = await db.select()
+        .from(organizationSubscriptions)
+        .leftJoin(subscriptionPlans, eq(organizationSubscriptions.planId, subscriptionPlans.id))
+        .where(eq(organizationSubscriptions.organizationId, user.organizationId));
+      
+      const currentUsers = userCount.count || 0;
+      const maxUsers = orgSubscription?.subscription_plans?.maxUsers || 3; // Default to trial limit
+      
+      // Check if adding new user would exceed limit
+      if (currentUsers >= maxUsers) {
+        return res.status(400).json({ 
+          error: `Batas pengguna tercapai. Paket Anda memungkinkan maksimal ${maxUsers} pengguna aktif. Upgrade paket untuk menambah lebih banyak pengguna.`,
+          currentUsers,
+          maxUsers
+        });
+      }
 
       // Check if user already exists
       const existingUser = await db.select().from(users).where(eq(users.email, email)).limit(1);
@@ -6539,10 +6651,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update organization with owner ID
       await storage.updateOrganization(organization.id, { ownerId: user.id });
       
+      // Automatically assign free trial subscription
+      const { subscriptionPlans, organizationSubscriptions } = await import("@shared/schema");
+      const { eq } = await import("drizzle-orm");
+      const { db } = await import("./db");
+      
+      const freeTrialPlan = await db.select()
+        .from(subscriptionPlans)
+        .where(eq(subscriptionPlans.slug, 'free-trial'))
+        .limit(1);
+      
+      if (freeTrialPlan.length > 0) {
+        const trialPlan = freeTrialPlan[0];
+        const trialStartDate = new Date();
+        const trialEndDate = new Date(trialStartDate.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days from now
+        
+        // Create organization subscription for free trial
+        await db.insert(organizationSubscriptions).values({
+          organizationId: organization.id,
+          planId: trialPlan.id,
+          status: "trialing",
+          currentPeriodStart: trialStartDate,
+          currentPeriodEnd: trialEndDate,
+          trialStart: trialStartDate,
+          trialEnd: trialEndDate,
+        });
+      }
+      
       res.json({ 
-        message: "Pendaftaran berhasil. Permohonan Anda sedang dalam proses review.",
+        message: "Pendaftaran berhasil! Akun trial 7 hari Anda telah aktif. Permohonan organisasi sedang dalam proses review.",
         organizationId: organization.id,
-        userId: user.id
+        userId: user.id,
+        trialActive: true,
+        trialDaysRemaining: 7
       });
       
     } catch (error: any) {

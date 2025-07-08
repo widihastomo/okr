@@ -107,6 +107,7 @@ import { UserStatsCard } from "@/components/gamification/user-stats-card";
 import { DailyAchievements } from "@/components/daily-achievements";
 import { DailyInstantUpdate } from "@/components/daily-instant-update";
 import { useAuth } from "@/hooks/useAuth";
+import TrialStatusBanner from "@/components/trial-status-banner";
 
 export default function DailyFocusPage() {
   const { user } = useAuth();
@@ -747,6 +748,9 @@ export default function DailyFocusPage() {
             </span>
           </div>
         </div>
+
+        {/* Trial Status Banner */}
+        <TrialStatusBanner />
 
         {/* Controls */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
