@@ -338,16 +338,87 @@ export default function CompanyOnboarding() {
         );
 
       case 3: // Buat Objective
+        const getObjectiveOptions = (teamFocus: string) => {
+          const options = {
+            penjualan: [
+              "Meningkatkan omzet penjualan sebesar 25% dalam kuartal ini",
+              "Menambah 50 pelanggan baru dalam 3 bulan ke depan",
+              "Meningkatkan konversi lead menjadi customer sebesar 20%",
+              "Memperluas pangsa pasar di 3 wilayah baru",
+              "Meningkatkan rata-rata nilai transaksi per customer sebesar 15%"
+            ],
+            operasional: [
+              "Meningkatkan efisiensi operasional sebesar 30% dalam 6 bulan",
+              "Mengurangi waktu produksi rata-rata sebesar 20%",
+              "Meningkatkan kepuasan karyawan mencapai skor 4.5/5",
+              "Mengimplementasi sistem digital untuk otomasi proses",
+              "Mengurangi biaya operasional sebesar 15% tanpa mengurangi kualitas"
+            ],
+            customer_service: [
+              "Meningkatkan customer satisfaction score menjadi 4.8/5",
+              "Mengurangi response time customer support menjadi maksimal 2 jam",
+              "Meningkatkan first-call resolution rate sebesar 40%",
+              "Menurunkan tingkat keluhan pelanggan sebesar 30%",
+              "Meningkatkan Net Promoter Score (NPS) mencapai 70+"
+            ],
+            marketing: [
+              "Meningkatkan brand awareness sebesar 35% di target market",
+              "Menambah 10,000 follower media sosial dalam 3 bulan",
+              "Meningkatkan engagement rate di social media sebesar 25%",
+              "Menghasilkan 500 qualified leads per bulan",
+              "Meningkatkan conversion rate website sebesar 20%"
+            ]
+          };
+          return options[teamFocus] || [];
+        };
+
+        const objectiveOptions = getObjectiveOptions(onboardingData.teamFocus);
+        
         return (
           <div className="space-y-4">
-            <Label htmlFor="objective">Tulis objective Anda:</Label>
-            <Textarea 
-              id="objective"
-              placeholder="Contoh: Meningkatkan omzet penjualan produk A sebesar 20% dalam bulan Juli"
-              value={onboardingData.objective}
-              onChange={(e) => setOnboardingData({...onboardingData, objective: e.target.value})}
-              className="min-h-[100px]"
-            />
+            {objectiveOptions.length > 0 && (
+              <div className="space-y-3">
+                <Label>Pilih objective yang sesuai untuk fokus {onboardingData.teamFocus}:</Label>
+                <RadioGroup 
+                  value={onboardingData.objective} 
+                  onValueChange={(value) => setOnboardingData({...onboardingData, objective: value})}
+                >
+                  {objectiveOptions.map((option, index) => (
+                    <div key={index} className="flex items-start space-x-2 p-3 rounded-lg border border-gray-200 hover:bg-gray-50">
+                      <RadioGroupItem value={option} id={`objective-${index}`} className="mt-1" />
+                      <Label htmlFor={`objective-${index}`} className="flex-1 cursor-pointer leading-relaxed">
+                        {option}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+                <div className="flex items-center space-x-2 pt-2">
+                  <RadioGroupItem value="custom" id="custom-objective" />
+                  <Label htmlFor="custom-objective">Atau tulis objective sendiri:</Label>
+                </div>
+              </div>
+            )}
+            
+            {(onboardingData.objective === "custom" || objectiveOptions.length === 0) && (
+              <div className="space-y-2">
+                <Label htmlFor="objective">Tulis objective Anda:</Label>
+                <Textarea 
+                  id="objective"
+                  placeholder="Contoh: Meningkatkan omzet penjualan produk A sebesar 20% dalam bulan Juli"
+                  value={onboardingData.objective === "custom" ? "" : onboardingData.objective}
+                  onChange={(e) => setOnboardingData({...onboardingData, objective: e.target.value})}
+                  className="min-h-[100px]"
+                />
+              </div>
+            )}
+            
+            {onboardingData.objective && onboardingData.objective !== "custom" && objectiveOptions.includes(onboardingData.objective) && (
+              <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-sm text-blue-800">
+                  <strong>Objective terpilih:</strong> {onboardingData.objective}
+                </p>
+              </div>
+            )}
           </div>
         );
 
