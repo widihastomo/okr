@@ -42,6 +42,7 @@ import SystemOrganizationManagement from "@/pages/system-organization-management
 import AddOnsManagement from "@/pages/add-ons-management";
 import InvoiceManagement from "@/pages/invoice-management";
 import InvoiceDetail from "@/pages/invoice-detail";
+import InvoicePaymentFinish from "@/pages/invoice-payment-finish";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -166,6 +167,7 @@ function Router() {
               <Route path="/add-ons" component={AddOnsManagement} />
               <Route path="/invoices" component={InvoiceManagement} />
               <Route path="/invoices/:id" component={InvoiceDetail} />
+              <Route path="/invoice-payment-finish" component={InvoicePaymentFinish} />
               <Route component={NotFound} />
             </Switch>
           </div>

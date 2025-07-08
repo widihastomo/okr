@@ -3994,6 +3994,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Midtrans payment status check
+  app.get('/api/midtrans/payment-status/:orderId', async (req, res) => {
+    try {
+      const { orderId } = req.params;
+      
+      const transactionStatus = await getTransactionStatus(orderId);
+      
+      res.json(transactionStatus);
+    } catch (error) {
+      console.error('Error checking payment status:', error);
+      res.status(500).json({ message: 'Failed to check payment status' });
+    }
+  });
+
   // Midtrans notification webhook
   app.post("/api/midtrans/notification", async (req, res) => {
     try {

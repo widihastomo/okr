@@ -64,7 +64,12 @@ export async function createSnapTransaction(paymentData: MidtransPaymentRequest,
         secure: true
       },
       customer_details: paymentData.customerDetails,
-      item_details: paymentData.itemDetails
+      item_details: paymentData.itemDetails,
+      callbacks: {
+        finish: `${baseUrl}/invoice-payment-finish?order_id=${paymentData.orderId}`,
+        unfinish: `${baseUrl}/invoices`,
+        error: `${baseUrl}/invoices`
+      }
     };
 
     const transaction = await snap.createTransaction(parameter);
