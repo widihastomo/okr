@@ -68,6 +68,15 @@ interface PackageFormData {
   stripeProductId?: string;
   stripePriceId?: string;
   isActive: boolean;
+  billingPeriods: BillingPeriodData[];
+}
+
+interface BillingPeriodData {
+  periodType: string;
+  periodMonths: number;
+  price: string;
+  discountPercentage: number;
+  isActive: boolean;
 }
 
 function PackageFormModal({ 
@@ -90,8 +99,16 @@ function PackageFormModal({
     stripeProductId: pkg?.stripeProductId || "",
     stripePriceId: pkg?.stripePriceId || "",
     isActive: pkg?.isActive ?? true,
+    billingPeriods: [],
   });
   const [newFeature, setNewFeature] = useState("");
+  
+  const PERIOD_OPTIONS = [
+    { value: "monthly", label: "Bulanan", months: 1 },
+    { value: "quarterly", label: "Triwulan (3 Bulan)", months: 3 },
+    { value: "semiannual", label: "Semester (6 Bulan)", months: 6 },
+    { value: "annual", label: "Tahunan (12 Bulan)", months: 12 },
+  ];
 
   const mutation = useMutation({
     mutationFn: async (data: PackageFormData) => {
@@ -100,18 +117,36 @@ function PackageFormModal({
         : "/api/admin/subscription-plans";
       const method = pkg ? "PUT" : "POST";
       
-      return await apiRequest(method, endpoint, {
+      // First, create or update the subscription plan
+      const planResponse = await apiRequest(method, endpoint, {
         ...data,
         features: JSON.stringify(data.features),
       });
+      
+      // Then, create billing periods if this is a new plan
+      if (!pkg && data.billingPeriods.length > 0) {
+        const planId = planResponse.id;
+        
+        // Create each billing period
+        for (const period of data.billingPeriods) {
+          await apiRequest("POST", "/api/admin/billing-periods", {
+            ...period,
+            planId,
+          });
+        }
+      }
+      
+      return planResponse;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/subscription-plans"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/subscription-plans-with-periods"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/billing-periods"] });
       toast({
         title: pkg ? "Paket berhasil diperbarui" : "Paket berhasil dibuat",
         description: pkg 
           ? "Perubahan paket telah disimpan." 
-          : "Paket subscription baru telah dibuat.",
+          : "Paket subscription dan periode billing telah berhasil dibuat.",
       });
       onClose();
     },
@@ -152,6 +187,33 @@ function PackageFormModal({
       ...formData, 
       features: formData.features.filter(f => f !== feature) 
     });
+  };
+  
+  const addBillingPeriod = () => {
+    const newPeriod: BillingPeriodData = {
+      periodType: "monthly",
+      periodMonths: 1,
+      price: formData.price,
+      discountPercentage: 0,
+      isActive: true,
+    };
+    setFormData({ 
+      ...formData, 
+      billingPeriods: [...formData.billingPeriods, newPeriod] 
+    });
+  };
+
+  const removeBillingPeriod = (index: number) => {
+    setFormData({ 
+      ...formData, 
+      billingPeriods: formData.billingPeriods.filter((_, i) => i !== index) 
+    });
+  };
+
+  const updateBillingPeriod = (index: number, updatedPeriod: BillingPeriodData) => {
+    const updatedPeriods = [...formData.billingPeriods];
+    updatedPeriods[index] = updatedPeriod;
+    setFormData({ ...formData, billingPeriods: updatedPeriods });
   };
 
   const generateSlug = (name: string) => {
@@ -327,6 +389,119 @@ function PackageFormModal({
             )}
           </div>
 
+          {/* Billing Periods Section */}
+          <div className="space-y-4 pt-6 border-t">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-sm font-medium flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Periode Billing
+                </Label>
+                <p className="text-xs text-gray-500 mt-1">Atur opsi periode dan harga untuk paket ini</p>
+              </div>
+              <Button
+                type="button"
+                onClick={addBillingPeriod}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Tambah Periode
+              </Button>
+            </div>
+
+            {formData.billingPeriods.length > 0 && (
+              <div className="space-y-3">
+                {formData.billingPeriods.map((period, index) => (
+                  <div key={index} className="p-4 border rounded-lg bg-gray-50">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div>
+                        <Label className="text-xs text-gray-600">Jenis Periode</Label>
+                        <Select
+                          value={period.periodType}
+                          onValueChange={(value) => {
+                            const option = PERIOD_OPTIONS.find(opt => opt.value === value);
+                            updateBillingPeriod(index, {
+                              ...period,
+                              periodType: value,
+                              periodMonths: option?.months || 1
+                            });
+                          }}
+                        >
+                          <SelectTrigger className="h-8 text-sm">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {PERIOD_OPTIONS.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <Label className="text-xs text-gray-600">Harga (IDR)</Label>
+                        <Input
+                          type="number"
+                          value={period.price}
+                          onChange={(e) => updateBillingPeriod(index, { ...period, price: e.target.value })}
+                          className="h-8 text-sm"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label className="text-xs text-gray-600">Diskon (%)</Label>
+                        <Select
+                          value={period.discountPercentage.toString()}
+                          onValueChange={(value) => updateBillingPeriod(index, { 
+                            ...period, 
+                            discountPercentage: parseInt(value) 
+                          })}
+                        >
+                          <SelectTrigger className="h-8 text-sm">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="0">0%</SelectItem>
+                            <SelectItem value="10">10%</SelectItem>
+                            <SelectItem value="15">15%</SelectItem>
+                            <SelectItem value="20">20%</SelectItem>
+                            <SelectItem value="25">25%</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <Switch
+                            checked={period.isActive}
+                            onCheckedChange={(checked) => updateBillingPeriod(index, { 
+                              ...period, 
+                              isActive: checked 
+                            })}
+                          />
+                          <Label className="text-xs text-gray-600">Aktif</Label>
+                        </div>
+                        <Button
+                          type="button"
+                          onClick={() => removeBillingPeriod(index)}
+                          variant="ghost"
+                          size="sm"
+                          className="text-red-600 hover:text-red-700 p-1"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div className="flex justify-end space-x-2 pt-6 border-t">
             <Button 
               type="button" 
@@ -343,7 +518,7 @@ function PackageFormModal({
               className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 px-6"
             >
               {mutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {pkg ? "Perbarui Paket" : "Buat Paket Baru"}
+              {pkg ? "Perbarui Paket" : `Buat Paket${formData.billingPeriods.length > 0 ? ` & ${formData.billingPeriods.length} Periode` : ""}`}
             </Button>
           </div>
         </form>
