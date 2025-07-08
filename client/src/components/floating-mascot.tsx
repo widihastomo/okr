@@ -206,6 +206,11 @@ export default function FloatingMascot({ className }: FloatingMascotProps) {
   const tips = getPageContextualTips(location, achievements, trialStatus);
   const currentTip = tips[currentTipIndex] || tips[0];
 
+  // Don't show mascot on onboarding page
+  if (location === "/onboarding") {
+    return null;
+  }
+
   // Auto-cycle through tips
   useEffect(() => {
     if (tips.length > 1) {
