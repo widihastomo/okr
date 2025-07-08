@@ -372,34 +372,17 @@ export default function SystemSubscriptionManagement() {
                           <Package className="mr-2 h-4 w-4" />
                           {subscription.status === 'active' ? 'Batalkan' : 'Aktifkan'}
                         </DropdownMenuItem>
-                        <AlertDialogTrigger asChild>
-                          <DropdownMenuItem className="text-red-600">
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Hapus
-                          </DropdownMenuItem>
-                        </AlertDialogTrigger>
+                        <DropdownMenuItem 
+                          className="text-red-600"
+                          onClick={() => setSelectedSubscription(subscription)}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Hapus
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
 
-                    <AlertDialog>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Hapus Subscription</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Apakah Anda yakin ingin menghapus subscription ini? Tindakan ini tidak dapat dibatalkan.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Batal</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => deleteMutation.mutate(subscription.id)}
-                            className="bg-red-600 hover:bg-red-700"
-                          >
-                            Hapus
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+
                   </TableCell>
                 </TableRow>
               ))}
@@ -407,6 +390,34 @@ export default function SystemSubscriptionManagement() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Modal */}
+      <AlertDialog open={!!selectedSubscription && !isEditModalOpen} onOpenChange={() => setSelectedSubscription(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Subscription</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus subscription untuk {selectedSubscription?.organization?.name}? Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setSelectedSubscription(null)}>
+              Batal
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (selectedSubscription) {
+                  deleteMutation.mutate(selectedSubscription.id);
+                  setSelectedSubscription(null);
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Edit Plan Modal */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>

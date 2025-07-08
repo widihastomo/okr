@@ -4895,88 +4895,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/admin/subscription-stats", requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
-      const { count, sum, eq, and, gte, lte } = await import("drizzle-orm");
-      const { organizationSubscriptions, subscriptionPlans, organizations } = await import("@shared/schema");
+      const { count, eq, and, gte, lte, sql } = await import("drizzle-orm");
+      const { organizationSubscriptions, subscriptionPlans } = await import("@shared/schema");
       
-      // Basic subscription counts
-      const [totalSubscriptions] = await db.select({ count: count() }).from(organizationSubscriptions);
-      const [activeSubscriptions] = await db.select({ count: count() })
-        .from(organizationSubscriptions)
-        .where(eq(organizationSubscriptions.status, 'active'));
-      const [expiredSubscriptions] = await db.select({ count: count() })
-        .from(organizationSubscriptions)
-        .where(eq(organizationSubscriptions.status, 'expired'));
+      // Use raw SQL for reliability
+      const totalSubscriptionsResult = await db.execute(sql`SELECT COUNT(*) as count FROM organization_subscriptions`);
+      const activeSubscriptionsResult = await db.execute(sql`SELECT COUNT(*) as count FROM organization_subscriptions WHERE status = 'active'`);
+      const expiredSubscriptionsResult = await db.execute(sql`SELECT COUNT(*) as count FROM organization_subscriptions WHERE status = 'expired'`);
       
-      // Monthly recurring revenue
-      const activeSubsWithPlans = await db.select({
-        planPrice: subscriptionPlans.price,
-        billingCycle: subscriptionPlans.billingCycle
-      })
-      .from(organizationSubscriptions)
-      .leftJoin(subscriptionPlans, eq(organizationSubscriptions.planId, subscriptionPlans.id))
-      .where(eq(organizationSubscriptions.status, 'active'));
+      const totalSubscriptions = Number(totalSubscriptionsResult[0]?.count || 0);
+      const activeSubscriptions = Number(activeSubscriptionsResult[0]?.count || 0);
+      const expiredSubscriptions = Number(expiredSubscriptionsResult[0]?.count || 0);
       
-      const monthlyRevenue = activeSubsWithPlans.reduce((total, sub) => {
-        const price = parseFloat(sub.planPrice || '0');
-        // Convert to monthly if needed
-        if (sub.billingCycle === 'annual') {
+      // Calculate monthly revenue
+      const revenueResult = await db.execute(sql`
+        SELECT sp.price, sp.billing_cycle
+        FROM organization_subscriptions os
+        JOIN subscription_plans sp ON os.plan_id = sp.id
+        WHERE os.status = 'active'
+      `);
+      
+      const monthlyRevenue = revenueResult.reduce((total: number, row: any) => {
+        const price = parseFloat(row.price || '0');
+        const billingCycle = row.billing_cycle;
+        
+        if (billingCycle === 'annual') {
           return total + (price / 12);
-        } else if (sub.billingCycle === 'quarterly') {
+        } else if (billingCycle === 'quarterly') {
           return total + (price / 3);
         }
         return total + price;
       }, 0);
       
       // Plan distribution
-      const planStats = await db.select({
-        planId: subscriptionPlans.id,
-        planName: subscriptionPlans.name,
-        planSlug: subscriptionPlans.slug,
-        planPrice: subscriptionPlans.price,
-      })
-      .from(subscriptionPlans)
-      .where(eq(subscriptionPlans.isActive, true));
+      const planDistributionResult = await db.execute(sql`
+        SELECT 
+          sp.name as plan_name,
+          sp.slug as plan_slug,
+          sp.price as plan_price,
+          COUNT(os.id) as subscription_count
+        FROM subscription_plans sp
+        LEFT JOIN organization_subscriptions os ON sp.id = os.plan_id AND os.status = 'active'
+        WHERE sp.is_active = true
+        GROUP BY sp.id, sp.name, sp.slug, sp.price
+      `);
       
-      // Get subscription counts for each plan
-      const subscriptionCounts = await db.select({
-        planId: organizationSubscriptions.planId,
-        subscriptionCount: count(organizationSubscriptions.id),
-      })
-      .from(organizationSubscriptions)
-      .where(eq(organizationSubscriptions.status, 'active'))
-      .groupBy(organizationSubscriptions.planId);
-      
-      // Combine plan data with subscription counts
-      const planDistribution = planStats.map(plan => {
-        const countData = subscriptionCounts.find(c => c.planId === plan.planId);
-        const subscriptionCount = countData?.subscriptionCount || 0;
-        const revenue = parseFloat(plan.planPrice || '0') * subscriptionCount;
-        return {
-          planName: plan.planName,
-          planSlug: plan.planSlug,
-          subscriptionCount,
-          revenue: revenue.toFixed(2)
-        };
-      });
+      const planDistribution = planDistributionResult.map((row: any) => ({
+        planName: row.plan_name,
+        planSlug: row.plan_slug,
+        subscriptionCount: Number(row.subscription_count || 0),
+        revenue: (parseFloat(row.plan_price || '0') * Number(row.subscription_count || 0)).toFixed(2)
+      }));
       
       // Expiring soon (next 30 days)
       const today = new Date();
       const thirtyDaysFromNow = new Date();
       thirtyDaysFromNow.setDate(today.getDate() + 30);
       
-      const [expiringSoon] = await db.select({ count: count() })
-        .from(organizationSubscriptions)
-        .where(and(
-          eq(organizationSubscriptions.status, 'active'),
-          gte(organizationSubscriptions.currentPeriodEnd, today),
-          lte(organizationSubscriptions.currentPeriodEnd, thirtyDaysFromNow)
-        ));
+      const expiringSoonResult = await db.execute(sql`
+        SELECT COUNT(*) as count 
+        FROM organization_subscriptions 
+        WHERE status = 'active' 
+        AND current_period_end >= ${today.toISOString()}
+        AND current_period_end <= ${thirtyDaysFromNow.toISOString()}
+      `);
+      
+      const expiringSoon = Number(expiringSoonResult[0]?.count || 0);
       
       res.json({
-        totalSubscriptions: totalSubscriptions.count,
-        activeSubscriptions: activeSubscriptions.count,
-        expiredSubscriptions: expiredSubscriptions.count,
-        expiringSoon: expiringSoon.count,
+        totalSubscriptions,
+        activeSubscriptions,
+        expiredSubscriptions,
+        expiringSoon,
         monthlyRevenue: monthlyRevenue.toFixed(2),
         planDistribution
       });
