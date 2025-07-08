@@ -121,7 +121,8 @@ Trial user untuk testing achievement system:
 ## Changelog
 ```
 Changelog:
-- July 08, 2025. Successfully simplified onboarding mission system with sequential numbered steps:
+- July 08, 2025. Successfully migrated onboarding mission system to Daily Focus page (root "/" route) with sequential numbered steps:
+  * Completed migration from trial-achievements.tsx to daily-focus.tsx as main application homepage
   * Removed points system and gamification elements for cleaner, more focused interface
   * Consolidated all missions into single expandable card titled "Panduan Onboarding Platform"
   * Implemented numbered sequence (1-10) for clear progression: 1. Menambahkan Member, 2. Membuat Tim, 3. Membuat Objective, 4. Menambahkan Key Result, 5. Menambahkan Inisiatif, 6. Menambahkan Task, 7. Update Capaian Key Result, 8. Update Capaian Metrik Inisiatif, 9. Update Status Task, 10. Update Harian Instan
@@ -130,6 +131,7 @@ Changelog:
   * Created custom mission ordering system that overrides API category grouping for user-defined sequence
   * Enhanced user experience with clear step-by-step guidance through platform features
   * Maintained expandable/collapsible functionality with progress tracking and completion indicators
+  * Onboarding missions now prominently displayed on root "/" page for immediate user guidance
 - July 08, 2025. Successfully created trial user for testing gamified achievement system:
   * Created trial organization "Startup Trial Company" with 14-day trial subscription
   * Created trial user (trial@startup.com / password: password) linked to trial organization  

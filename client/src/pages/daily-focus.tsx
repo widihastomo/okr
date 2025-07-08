@@ -37,6 +37,15 @@ import {
   ExternalLink,
   Plus,
   ChevronsUpDown,
+  Rocket,
+  Sparkles,
+  CheckCircle2,
+  UserPlus,
+  Users,
+  Lightbulb,
+  CheckSquare,
+  LineChart,
+  Zap,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -108,6 +117,166 @@ import { DailyAchievements } from "@/components/daily-achievements";
 import { DailyInstantUpdate } from "@/components/daily-instant-update";
 import { useAuth } from "@/hooks/useAuth";
 import TrialStatusBanner from "@/components/trial-status-banner";
+
+// Icon mapping for mission cards
+const iconMapping = {
+  UserPlus: UserPlus,
+  Users: Users,
+  Target: Target,
+  BarChart3: BarChart3,
+  Lightbulb: Lightbulb,
+  CheckSquare: CheckSquare,
+  TrendingUp: TrendingUp,
+  LineChart: LineChart,
+  CheckCircle2: CheckCircle2,
+  Zap: Zap,
+};
+
+// Mission action functions
+const missionActions = {
+  addMember: () => window.location.href = "/client-users",
+  createTeam: () => window.location.href = "/teams", 
+  createObjective: () => window.location.href = "/",
+  addKeyResult: () => window.location.href = "/",
+  addInitiative: () => window.location.href = "/",
+  addTask: () => window.location.href = "/daily-focus",
+  updateKeyResult: () => window.location.href = "/",
+  updateMetrics: () => window.location.href = "/",
+  updateTaskStatus: () => window.location.href = "/daily-focus",
+  dailyUpdate: () => window.location.href = "/daily-focus",
+};
+
+// Mission Card Component
+interface MissionCardProps {
+  missions: Array<{
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+    unlocked: boolean;
+  }>;
+  title: string;
+  description: string;
+  className?: string;
+}
+
+function MissionCard({ missions, title, description, className }: MissionCardProps) {
+  const completedMissions = missions.filter(m => m.unlocked).length;
+  const totalMissions = missions.length;
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  return (
+    <div className={className}>
+      <Card className="border-2 border-dashed border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50 shadow-lg">
+        <CardHeader 
+          className="pb-3 cursor-pointer"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-orange-100 rounded-full">
+              <Rocket className="h-5 w-5 text-orange-600" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-base font-bold text-orange-800 flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-yellow-500" />
+                {title}
+                <Badge variant="outline" className="text-xs bg-orange-100 text-orange-700 border-orange-300">
+                  {completedMissions}/{totalMissions}
+                </Badge>
+              </CardTitle>
+              <p className="text-sm text-orange-600 mt-1">{description}</p>
+              <div className="flex items-center gap-3 mt-2">
+                <Progress 
+                  value={(completedMissions / totalMissions) * 100} 
+                  className="h-1.5 bg-orange-100 flex-1"
+                />
+                <span className="text-xs text-orange-600 font-medium">
+                  {Math.round((completedMissions / totalMissions) * 100)}%
+                </span>
+              </div>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="text-orange-600 hover:bg-orange-100 p-1"
+            >
+              {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+            </Button>
+          </div>
+        </CardHeader>
+        
+        {isExpanded && (
+          <CardContent className="space-y-3 pt-0">
+            {missions.map((mission, index) => {
+              const IconComponent = iconMapping[mission.icon] || Target;
+              const missionKey = mission.name.includes("Tambah Pengguna") || mission.name.includes("Menambahkan Member") ? "addMember" :
+                                mission.name.includes("Buat Tim") || mission.name.includes("Membuat Tim") ? "createTeam" :
+                                mission.name.includes("Buat Objective") || mission.name.includes("Membuat Objective") ? "createObjective" :
+                                mission.name.includes("Tambah Key Result") || mission.name.includes("Menambahkan Key Result") ? "addKeyResult" :
+                                mission.name.includes("Buat Inisiatif") || mission.name.includes("Menambahkan Inisiatif") ? "addInitiative" :
+                                mission.name.includes("Tambah Task") || mission.name.includes("Menambahkan Task") ? "addTask" :
+                                mission.name.includes("Update Capaian Key Result") ? "updateKeyResult" :
+                                mission.name.includes("Update Capaian Metrik") ? "updateMetrics" :
+                                mission.name.includes("Update Status Task") ? "updateTaskStatus" :
+                                mission.name.includes("Update Harian") ? "dailyUpdate" :
+                                "addMember";
+              
+              return (
+                <div
+                  key={mission.id}
+                  className={`p-3 rounded-lg border transition-all duration-200 hover:shadow-sm ${
+                    mission.unlocked 
+                      ? "bg-green-50 border-green-200 opacity-75" 
+                      : "bg-white border-orange-200 hover:border-orange-300"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`p-1.5 rounded-full flex-shrink-0 ${
+                      mission.unlocked 
+                        ? "bg-green-100 text-green-600" 
+                        : "bg-orange-100 text-orange-600"
+                    }`}>
+                      {mission.unlocked ? (
+                        <CheckCircle2 className="h-4 w-4" />
+                      ) : (
+                        <IconComponent className="h-4 w-4" />
+                      )}
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-bold text-orange-600 min-w-[20px]">
+                          {index + 1}.
+                        </span>
+                        <h4 className={`font-medium text-sm ${
+                          mission.unlocked ? "text-green-700 line-through" : "text-gray-800"
+                        }`}>
+                          {mission.name.replace(/🎯 Misi: |📊 Misi: |💡 Misi: |✅ Misi: |🔄 Misi: |📈 Misi: |⚡ Misi: |🎖️ Misi: /g, "")}
+                        </h4>
+                      </div>
+                      <p className="text-xs text-gray-600 mb-2">
+                        {mission.description}
+                      </p>
+                      {!mission.unlocked && (
+                        <Button 
+                          size="sm" 
+                          className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white text-xs h-7"
+                          onClick={() => missionActions[missionKey]()}
+                        >
+                          Mulai
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </CardContent>
+        )}
+      </Card>
+    </div>
+  );
+}
 
 export default function DailyFocusPage() {
   const { user } = useAuth();
@@ -205,6 +374,42 @@ export default function DailyFocusPage() {
 
   const { data: users = [] } = useQuery({
     queryKey: ["/api/users"],
+  });
+
+  // Trial achievements query for missions
+  const { data: achievements = [] } = useQuery({
+    queryKey: ["/api/trial-achievements"],
+    enabled: !!userId,
+  });
+
+  // Specific 10-step sequential missions configuration
+  const missionSequence = [
+    { name: "Menambahkan Member", icon: "UserPlus", description: "Tambahkan anggota baru ke tim Anda untuk memulai kolaborasi" },
+    { name: "Membuat Tim", icon: "Users", description: "Buat tim dengan struktur yang jelas untuk mengelola proyek" },
+    { name: "Membuat Objective", icon: "Target", description: "Definisikan tujuan utama yang ingin dicapai tim Anda" },
+    { name: "Menambahkan Key Result", icon: "BarChart3", description: "Tentukan indikator pencapaian yang dapat diukur secara kuantitatif" },
+    { name: "Menambahkan Inisiatif", icon: "Lightbulb", description: "Buat rencana aksi konkret untuk mencapai tujuan" },
+    { name: "Menambahkan Task", icon: "CheckSquare", description: "Breakdown inisiatif menjadi tugas-tugas yang dapat dikerjakan" },
+    { name: "Update Capaian Key Result", icon: "TrendingUp", description: "Pantau dan update progress pencapaian target angka" },
+    { name: "Update Capaian Metrik Inisiatif", icon: "LineChart", description: "Evaluasi kemajuan pelaksanaan inisiatif secara berkala" },
+    { name: "Update Status Task", icon: "CheckCircle2", description: "Pantau dan update status penyelesaian tugas harian" },
+    { name: "Update Harian Instan", icon: "Zap", description: "Lakukan review harian untuk memastikan kemajuan yang konsisten" },
+  ];
+
+  // Transform achievements to match mission sequence order
+  const orderlyMissions = missionSequence.map((mission, index) => {
+    const achievement = achievements.find(a => 
+      a.name.includes(mission.name) || 
+      a.description.includes(mission.name.toLowerCase())
+    );
+    
+    return {
+      id: `mission-${index + 1}`,
+      name: mission.name,
+      description: mission.description,
+      icon: mission.icon,
+      unlocked: achievement ? achievement.unlocked : false,
+    };
   });
 
   // Task creation mutation
@@ -751,6 +956,14 @@ export default function DailyFocusPage() {
 
         {/* Trial Status Banner */}
         <TrialStatusBanner />
+
+        {/* Onboarding Missions Section */}
+        <MissionCard
+          missions={orderlyMissions}
+          title="Panduan Onboarding Platform"
+          description="Ikuti langkah-langkah ini untuk memulai menggunakan platform"
+          className="mb-6"
+        />
 
         {/* Controls */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
