@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -17,18 +22,12 @@ import {
   Rocket,
   Gift,
   UserPlus,
-  LineChart,
+  LineChart
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Mascot expressions and states
-type MascotState =
-  | "welcome"
-  | "encouraging"
-  | "celebrating"
-  | "thinking"
-  | "waving"
-  | "pointing";
+type MascotState = "welcome" | "encouraging" | "celebrating" | "thinking" | "waving" | "pointing";
 
 interface MascotProps {
   className?: string;
@@ -43,10 +42,7 @@ interface MascotProps {
 }
 
 // SVG Mascot Character Component
-const MascotCharacter: React.FC<{ state: MascotState; className?: string }> = ({
-  state,
-  className,
-}) => {
+const MascotCharacter: React.FC<{ state: MascotState; className?: string }> = ({ state, className }) => {
   const getExpression = () => {
     switch (state) {
       case "welcome":
@@ -79,18 +75,18 @@ const MascotCharacter: React.FC<{ state: MascotState; className?: string }> = ({
           <Sparkles className="absolute -bottom-2 right-1 h-3 w-3 text-yellow-400 animate-pulse delay-300" />
         </div>
       )}
-
+      
       {/* Main mascot body */}
       <svg
         viewBox="0 0 100 100"
         className={cn(
           "w-16 h-16 drop-shadow-lg",
-          isAnimated && "animate-bounce",
+          isAnimated && "animate-bounce"
         )}
       >
         {/* Shadow */}
         <ellipse cx="50" cy="85" rx="15" ry="3" fill="#00000020" />
-
+        
         {/* Body */}
         <circle
           cx="50"
@@ -99,7 +95,7 @@ const MascotCharacter: React.FC<{ state: MascotState; className?: string }> = ({
           fill={expression.color}
           className="transition-colors duration-300"
         />
-
+        
         {/* Head */}
         <circle
           cx="50"
@@ -108,81 +104,50 @@ const MascotCharacter: React.FC<{ state: MascotState; className?: string }> = ({
           fill={expression.color}
           className="transition-colors duration-300"
         />
-
+        
         {/* Eyes */}
         <circle cx="44" cy="30" r="2" fill="white" />
         <circle cx="56" cy="30" r="2" fill="white" />
         <circle cx="44" cy="30" r="1" fill="black" />
         <circle cx="56" cy="30" r="1" fill="black" />
-
+        
         {/* Mouth */}
         <path
-          d={
-            expression.mouth === "smile"
-              ? "M 42 40 Q 50 45 58 40"
-              : expression.mouth === "joy"
-                ? "M 40 40 Q 50 48 60 40"
-                : expression.mouth === "determined"
-                  ? "M 45 40 L 55 40"
-                  : expression.mouth === "thinking"
-                    ? "M 45 40 Q 50 42 55 40"
-                    : expression.mouth === "excited"
-                      ? "M 42 38 Q 50 46 58 38"
-                      : "M 42 40 Q 50 45 58 40"
-          }
+          d={expression.mouth === "smile" ? "M 42 40 Q 50 45 58 40" :
+              expression.mouth === "joy" ? "M 40 40 Q 50 48 60 40" :
+              expression.mouth === "determined" ? "M 45 40 L 55 40" :
+              expression.mouth === "thinking" ? "M 45 40 Q 50 42 55 40" :
+              expression.mouth === "excited" ? "M 42 38 Q 50 46 58 38" :
+              "M 42 40 Q 50 45 58 40"}
           stroke="white"
           strokeWidth="2"
           fill="none"
           strokeLinecap="round"
         />
-
+        
         {/* Arms */}
-        <circle
-          cx="28"
-          cy="55"
-          r="6"
-          fill={expression.color}
-          className="transition-colors duration-300"
-        />
-        <circle
-          cx="72"
-          cy="55"
-          r="6"
-          fill={expression.color}
-          className="transition-colors duration-300"
-        />
-
+        <circle cx="28" cy="55" r="6" fill={expression.color} className="transition-colors duration-300" />
+        <circle cx="72" cy="55" r="6" fill={expression.color} className="transition-colors duration-300" />
+        
         {/* Legs */}
-        <circle
-          cx="42"
-          cy="75"
-          r="6"
-          fill={expression.color}
-          className="transition-colors duration-300"
-        />
-        <circle
-          cx="58"
-          cy="75"
-          r="6"
-          fill={expression.color}
-          className="transition-colors duration-300"
-        />
-
+        <circle cx="42" cy="75" r="6" fill={expression.color} className="transition-colors duration-300" />
+        <circle cx="58" cy="75" r="6" fill={expression.color} className="transition-colors duration-300" />
+        
         {/* Special accessories based on state */}
         {state === "celebrating" && (
           <circle cx="50" cy="20" r="3" fill="#fbbf24" />
         )}
-
+        
         {state === "thinking" && (
           <circle cx="58" cy="25" r="1" fill="#e5e7eb" />
         )}
       </svg>
-
+      
       {/* Floating heart for encouraging state */}
       {state === "encouraging" && (
         <Heart className="absolute -top-2 -right-2 h-4 w-4 text-red-400 animate-ping" />
       )}
-
+      
       {/* Pointing hand for pointing state */}
       {state === "pointing" && (
         <div className="absolute -right-4 top-1/2 transform -translate-y-1/2">
@@ -193,11 +158,7 @@ const MascotCharacter: React.FC<{ state: MascotState; className?: string }> = ({
   );
 };
 
-export default function TrialMascot({
-  className,
-  missions = [],
-  onMissionAction,
-}: MascotProps) {
+export default function TrialMascot({ className, missions = [], onMissionAction }: MascotProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [currentState, setCurrentState] = useState<MascotState>("welcome");
   const [messageIndex, setMessageIndex] = useState(0);
@@ -214,23 +175,22 @@ export default function TrialMascot({
   // Calculate progress from missions data first, fallback to achievements
   const completedMissions = missions.filter((m: any) => m.unlocked).length;
   const totalMissions = missions.length;
-  const progressPercentage =
-    totalMissions > 0 ? (completedMissions / totalMissions) * 100 : 0;
+  const progressPercentage = totalMissions > 0 ? (completedMissions / totalMissions) * 100 : 0;
   const daysRemaining = trialStatus?.daysRemaining || 14;
 
   // Get current mission step from passed missions data
   const getCurrentMissionStep = () => {
     if (!missions.length) return 0;
-
-    const completedMissions = missions.filter((m) => m.unlocked).length;
+    
+    const completedMissions = missions.filter(m => m.unlocked).length;
     return completedMissions;
   };
 
   // Get next mission to complete
   const getNextMission = () => {
     if (!missions.length) return null;
-
-    return missions.find((m) => !m.unlocked) || null;
+    
+    return missions.find(m => !m.unlocked) || null;
   };
 
   // Mission icon mapping
@@ -257,80 +217,70 @@ export default function TrialMascot({
       {
         state: "welcome" as MascotState,
         title: "Halo! Saya Orby 👋",
-        message:
-          "Selamat datang di Refokus! Saya Orby, asisten virtual yang akan membantu Anda mencapai tujuan dengan lebih mudah. Mari saya pandu Anda melalui 10 langkah onboarding untuk memaksimalkan penggunaan platform ini!",
+        message: "Selamat datang di platform OKR! Saya Orby, asisten virtual yang akan membantu Anda menguasai sistem manajemen tujuan. Mari saya pandu Anda melalui 10 langkah onboarding untuk memaksimalkan penggunaan platform ini!",
         action: "Mulai Perjalanan",
         icon: Sparkles,
       },
       {
         state: "encouraging" as MascotState,
         title: "2. Menambahkan Member",
-        message:
-          "Langkah 2 dari 10: Mari mulai dengan menambahkan anggota tim. Tim yang solid adalah fondasi kesuksesan OKR! Klik tombol untuk mulai menambahkan member pertama Anda.",
+        message: "Langkah 2 dari 10: Mari mulai dengan menambahkan anggota tim. Tim yang solid adalah fondasi kesuksesan OKR! Klik tombol untuk mulai menambahkan member pertama Anda.",
         action: "Mulai",
         icon: UserPlus,
       },
       {
         state: "pointing" as MascotState,
         title: "3. Membuat Tim",
-        message:
-          "Langkah 3 dari 10: Sekarang buat tim dengan struktur yang jelas. Tim yang terorganisir akan lebih mudah mencapai tujuan bersama.",
+        message: "Langkah 3 dari 10: Sekarang buat tim dengan struktur yang jelas. Tim yang terorganisir akan lebih mudah mencapai tujuan bersama.",
         action: "Mulai",
         icon: Target,
       },
       {
         state: "thinking" as MascotState,
         title: "4. Membuat Objective",
-        message:
-          "Langkah 4 dari 10: Waktunya membuat Goal/Objective pertama! Goal adalah tujuan utama yang ingin dicapai tim dalam periode tertentu.",
+        message: "Langkah 4 dari 10: Waktunya membuat Goal/Objective pertama! Goal adalah tujuan utama yang ingin dicapai tim dalam periode tertentu.",
         action: "Mulai",
         icon: Target,
       },
       {
         state: "encouraging" as MascotState,
         title: "5. Menambahkan Key Result",
-        message:
-          "Langkah 5 dari 10: Tambahkan Key Result (Target Angka). Ini adalah indikator pencapaian yang dapat diukur secara kuantitatif untuk setiap objective.",
+        message: "Langkah 5 dari 10: Tambahkan Key Result (Target Angka). Ini adalah indikator pencapaian yang dapat diukur secara kuantitatif untuk setiap objective.",
         action: "Mulai",
         icon: Target,
       },
       {
         state: "pointing" as MascotState,
         title: "6. Menambahkan Inisiatif",
-        message:
-          "Langkah 6 dari 10: Buat inisiatif sebagai rencana aksi konkret. Inisiatif adalah HOW untuk mencapai tujuan yang telah ditetapkan.",
+        message: "Langkah 6 dari 10: Buat inisiatif sebagai rencana aksi konkret. Inisiatif adalah HOW untuk mencapai tujuan yang telah ditetapkan.",
         action: "Mulai",
         icon: Lightbulb,
       },
       {
         state: "celebrating" as MascotState,
         title: "7. Menambahkan Task",
-        message:
-          "Langkah 7 dari 10: Breakdown inisiatif menjadi task-task kecil. Task adalah unit kerja yang dapat dikerjakan harian oleh tim.",
+        message: "Langkah 7 dari 10: Breakdown inisiatif menjadi task-task kecil. Task adalah unit kerja yang dapat dikerjakan harian oleh tim.",
         action: "Mulai",
         icon: Target,
       },
       {
         state: "encouraging" as MascotState,
         title: "8. Update Capaian Key Result",
-        message:
-          "Langkah 8 dari 10: Update progress Key Result Anda. Pantau apakah target angka sudah tercapai atau masih perlu diperbaiki.",
+        message: "Langkah 8 dari 10: Update progress Key Result Anda. Pantau apakah target angka sudah tercapai atau masih perlu diperbaiki.",
         action: "Mulai",
         icon: Target,
       },
       {
         state: "pointing" as MascotState,
         title: "9. Update Capaian Metrik Inisiatif",
-        message:
-          "Langkah 9 dari 10: Update metrik inisiatif untuk evaluasi kemajuan pelaksanaan rencana aksi yang telah dibuat.",
+        message: "Langkah 9 dari 10: Update metrik inisiatif untuk evaluasi kemajuan pelaksanaan rencana aksi yang telah dibuat.",
         action: "Mulai",
         icon: LineChart,
       },
       {
         state: "celebrating" as MascotState,
         title: "10. Update Status Task & Harian Instan",
-        message:
-          "Langkah 10 dari 10: Update status task harian dan lakukan review harian untuk memastikan kemajuan yang konsisten setiap hari. Selamat, Anda telah menyelesaikan onboarding!",
+        message: "Langkah 10 dari 10: Update status task harian dan lakukan review harian untuk memastikan kemajuan yang konsisten setiap hari. Selamat, Anda telah menyelesaikan onboarding!",
         action: "Selesai",
         icon: Zap,
       },
@@ -378,16 +328,10 @@ export default function TrialMascot({
                   {currentMessage.title}
                 </CardTitle>
                 <div className="flex items-center gap-2 mt-1">
-                  <Badge
-                    variant="outline"
-                    className="text-xs bg-blue-100 text-blue-700 border-blue-300"
-                  >
+                  <Badge variant="outline" className="text-xs bg-blue-100 text-blue-700 border-blue-300">
                     {completedMissions}/{totalMissions} selesai
                   </Badge>
-                  <Badge
-                    variant="outline"
-                    className="text-xs bg-orange-100 text-orange-700 border-orange-300"
-                  >
+                  <Badge variant="outline" className="text-xs bg-orange-100 text-orange-700 border-orange-300">
                     {daysRemaining} hari tersisa
                   </Badge>
                 </div>
@@ -403,13 +347,13 @@ export default function TrialMascot({
             </Button>
           </div>
         </CardHeader>
-
+        
         <CardContent className="pt-0">
           <div className="space-y-4">
             <p className="text-sm text-indigo-700 leading-relaxed">
               {currentMessage.message}
             </p>
-
+            
             {/* Progress bar */}
             <div className="space-y-2">
               <div className="flex justify-between text-xs text-indigo-600">
@@ -423,7 +367,7 @@ export default function TrialMascot({
                 />
               </div>
             </div>
-
+            
             {/* Action buttons */}
             <div className="flex items-center gap-2">
               <Button
@@ -433,27 +377,18 @@ export default function TrialMascot({
                   // Action based on current message
                   const action = currentMessage.action;
                   console.log("Mascot button clicked with action:", action);
-
+                  
                   if (action === "Mulai") {
                     // Handle mission actions for step-by-step guidance
                     const currentMission = getNextMission();
                     if (onMissionAction && currentMission) {
                       onMissionAction(currentMission.name);
                     }
-                  } else if (
-                    action.includes("Analytics") ||
-                    action.includes("Explore Analytics")
-                  ) {
+                  } else if (action.includes("Analytics") || action.includes("Explore Analytics")) {
                     window.location.href = "/analytics";
-                  } else if (
-                    action.includes("Paket") ||
-                    action.includes("Premium")
-                  ) {
+                  } else if (action.includes("Paket") || action.includes("Premium")) {
                     window.location.href = "/pricing";
-                  } else if (
-                    action.includes("Lanjutkan") ||
-                    action.includes("Terus")
-                  ) {
+                  } else if (action.includes("Lanjutkan") || action.includes("Terus")) {
                     // Stay on current page and cycle to next message
                     setMessageIndex((prev) => (prev + 1) % messages.length);
                   } else if (action.includes("Pahami Lebih Lanjut")) {
@@ -466,19 +401,17 @@ export default function TrialMascot({
                 {IconComponent && <IconComponent className="h-3 w-3 mr-1" />}
                 {currentMessage.action}
               </Button>
-
+              
               <Button
                 variant="outline"
                 size="sm"
                 className="text-xs h-8 w-8 p-0 border-indigo-200 hover:bg-indigo-50"
-                onClick={() =>
-                  setMessageIndex((prev) => (prev + 1) % messages.length)
-                }
+                onClick={() => setMessageIndex((prev) => (prev + 1) % messages.length)}
               >
                 <ChevronRight className="h-3 w-3" />
               </Button>
             </div>
-
+            
             {/* Message dots indicator */}
             <div className="flex justify-center gap-1">
               {messages.map((_, index) => (
@@ -488,7 +421,7 @@ export default function TrialMascot({
                     "w-2 h-2 rounded-full transition-all duration-300",
                     index === messageIndex
                       ? "bg-indigo-500"
-                      : "bg-indigo-200 hover:bg-indigo-300",
+                      : "bg-indigo-200 hover:bg-indigo-300"
                   )}
                   onClick={() => setMessageIndex(index)}
                 />
@@ -496,7 +429,7 @@ export default function TrialMascot({
             </div>
           </div>
         </CardContent>
-
+        
         {/* Floating message bubble */}
         <div className="absolute -top-2 -right-2 opacity-75">
           <MessageCircle className="h-6 w-6 text-indigo-400 animate-pulse" />
