@@ -360,32 +360,32 @@ export default function CompanyOnboarding() {
         const getObjectiveOptions = (teamFocus: string) => {
           const options = {
             penjualan: [
-              "Meningkatkan omzet penjualan sebesar 25% dalam kuartal ini",
-              "Menambah 50 pelanggan baru dalam 3 bulan ke depan",
-              "Meningkatkan konversi lead menjadi customer sebesar 20%",
-              "Memperluas pangsa pasar di 3 wilayah baru",
-              "Meningkatkan rata-rata nilai transaksi per customer sebesar 15%"
+              "Menciptakan pertumbuhan penjualan yang berkelanjutan dan signifikan",
+              "Membangun basis pelanggan yang kuat dan loyal",
+              "Mengoptimalkan konversi prospek menjadi pelanggan",
+              "Memperluas jangkauan pasar ke wilayah baru",
+              "Meningkatkan nilai transaksi rata-rata pelanggan"
             ],
             operasional: [
-              "Meningkatkan efisiensi operasional sebesar 30% dalam 6 bulan",
-              "Mengurangi waktu produksi rata-rata sebesar 20%",
-              "Meningkatkan kepuasan karyawan mencapai skor 4.5/5",
-              "Mengimplementasi sistem digital untuk otomasi proses",
-              "Mengurangi biaya operasional sebesar 15% tanpa mengurangi kualitas"
+              "Mencapai efisiensi operasional yang optimal dan berkelanjutan",
+              "Mempercepat proses produksi dengan kualitas terjaga",
+              "Menciptakan lingkungan kerja yang produktif dan memuaskan",
+              "Mengimplementasi transformasi digital untuk otomasi proses",
+              "Mengoptimalkan biaya operasional tanpa mengurangi kualitas"
             ],
             customer_service: [
-              "Meningkatkan customer satisfaction score menjadi 4.8/5",
-              "Mengurangi response time customer support menjadi maksimal 2 jam",
-              "Meningkatkan first-call resolution rate sebesar 40%",
-              "Menurunkan tingkat keluhan pelanggan sebesar 30%",
-              "Meningkatkan Net Promoter Score (NPS) mencapai 70+"
+              "Mencapai kepuasan pelanggan yang luar biasa dan berkelanjutan",
+              "Memberikan respon pelanggan yang cepat dan efektif",
+              "Meningkatkan kemampuan penyelesaian masalah dengan sekali kontak",
+              "Mengurangi keluhan pelanggan secara signifikan",
+              "Membangun loyalitas pelanggan dan advokasi yang tinggi"
             ],
             marketing: [
-              "Meningkatkan brand awareness sebesar 35% di target market",
-              "Menambah 10,000 follower media sosial dalam 3 bulan",
-              "Meningkatkan engagement rate di social media sebesar 25%",
-              "Menghasilkan 500 qualified leads per bulan",
-              "Meningkatkan conversion rate website sebesar 20%"
+              "Meningkatkan kesadaran merek di pasar target",
+              "Membangun komunitas yang aktif dan engaged di media sosial",
+              "Meningkatkan engagement yang berkualitas dengan audiens",
+              "Menghasilkan lead berkualitas tinggi secara konsisten",
+              "Meningkatkan konversi website yang efektif"
             ]
           };
           return options[teamFocus] || [];
@@ -428,27 +428,27 @@ export default function CompanyOnboarding() {
         const getKeyResultOptions = (objective: string) => {
           // Key Results untuk objective penjualan
           const salesKeyResults = {
-            "Meningkatkan omzet penjualan sebesar 25% dalam kuartal ini": [
+            "Menciptakan pertumbuhan penjualan yang berkelanjutan dan signifikan": [
               "Mencapai target penjualan Rp 500 juta per bulan",
               "Meningkatkan rata-rata nilai transaksi menjadi Rp 2 juta",
               "Menambah 100 transaksi baru setiap bulan"
             ],
-            "Menambah 50 pelanggan baru dalam 3 bulan ke depan": [
+            "Membangun basis pelanggan yang kuat dan loyal": [
               "Mendapatkan 20 pelanggan baru setiap bulan",
               "Mencapai conversion rate 15% dari lead ke customer",
               "Meningkatkan customer retention rate menjadi 85%"
             ],
-            "Meningkatkan konversi lead menjadi customer sebesar 20%": [
+            "Mengoptimalkan konversi prospek menjadi pelanggan": [
               "Mencapai conversion rate 25% dari total lead",
               "Mengurangi waktu follow-up lead menjadi maksimal 24 jam",
               "Meningkatkan kualitas lead scoring menjadi 80% akurat"
             ],
-            "Memperluas pangsa pasar di 3 wilayah baru": [
+            "Memperluas jangkauan pasar ke wilayah baru": [
               "Membuka kantor cabang di 3 kota baru",
               "Mencapai 500 customer baru dari wilayah ekspansi",
               "Meraih market share 10% di setiap wilayah baru"
             ],
-            "Meningkatkan rata-rata nilai transaksi per customer sebesar 15%": [
+            "Meningkatkan nilai transaksi rata-rata pelanggan": [
               "Mencapai average order value Rp 1.5 juta",
               "Meningkatkan cross-selling success rate menjadi 30%",
               "Mencapai upselling rate 25% dari existing customer"
@@ -457,27 +457,27 @@ export default function CompanyOnboarding() {
 
           // Key Results untuk objective operasional
           const operationalKeyResults = {
-            "Meningkatkan efisiensi operasional sebesar 30% dalam 6 bulan": [
+            "Mencapai efisiensi operasional yang optimal dan berkelanjutan": [
               "Mengurangi waktu proses produksi menjadi 4 jam per unit",
               "Meningkatkan utilitas mesin menjadi 85%",
               "Mengurangi waste produksi menjadi maksimal 5%"
             ],
-            "Mengurangi waktu produksi rata-rata sebesar 20%": [
+            "Mempercepat proses produksi dengan kualitas terjaga": [
               "Mencapai cycle time 3 jam per produk",
               "Meningkatkan throughput menjadi 50 unit per hari",
               "Mengurangi downtime mesin menjadi maksimal 2%"
             ],
-            "Meningkatkan kepuasan karyawan mencapai skor 4.5/5": [
+            "Menciptakan lingkungan kerja yang produktif dan memuaskan": [
               "Mencapai employee satisfaction score 4.5/5",
               "Mengurangi turnover rate menjadi di bawah 10%",
               "Meningkatkan employee engagement score menjadi 80%"
             ],
-            "Mengimplementasi sistem digital untuk otomasi proses": [
+            "Mengimplementasi transformasi digital untuk otomasi proses": [
               "Mendigitalisasi 5 proses manual utama",
               "Mencapai automation rate 70% untuk proses rutin",
               "Mengurangi human error menjadi di bawah 2%"
             ],
-            "Mengurangi biaya operasional sebesar 15% tanpa mengurangi kualitas": [
+            "Mengoptimalkan biaya operasional tanpa mengurangi kualitas": [
               "Menurunkan cost per unit menjadi Rp 50,000",
               "Meningkatkan efficiency ratio menjadi 90%",
               "Mengurangi overhead cost sebesar 20%"
@@ -486,27 +486,27 @@ export default function CompanyOnboarding() {
 
           // Key Results untuk objective customer service
           const customerServiceKeyResults = {
-            "Meningkatkan customer satisfaction score menjadi 4.8/5": [
+            "Mencapai kepuasan pelanggan yang luar biasa dan berkelanjutan": [
               "Mencapai CSAT score 4.8/5 dalam survey bulanan",
               "Meningkatkan customer retention rate menjadi 95%",
               "Mengurangi complaint rate menjadi di bawah 1%"
             ],
-            "Mengurangi response time customer support menjadi maksimal 2 jam": [
+            "Memberikan respon pelanggan yang cepat dan efektif": [
               "Mencapai average response time 1 jam",
               "Meningkatkan first response rate menjadi 95%",
               "Mencapai resolution time maksimal 24 jam"
             ],
-            "Meningkatkan first-call resolution rate sebesar 40%": [
+            "Meningkatkan kemampuan penyelesaian masalah dengan sekali kontak": [
               "Mencapai FCR rate 80% untuk semua inquiry",
               "Mengurangi escalation rate menjadi di bawah 10%",
               "Meningkatkan agent knowledge score menjadi 90%"
             ],
-            "Menurunkan tingkat keluhan pelanggan sebesar 30%": [
+            "Mengurangi keluhan pelanggan secara signifikan": [
               "Mengurangi complaint volume menjadi maksimal 20 per bulan",
               "Meningkatkan complaint resolution rate menjadi 98%",
               "Mencapai zero repeat complaint rate"
             ],
-            "Meningkatkan Net Promoter Score (NPS) mencapai 70+": [
+            "Membangun loyalitas pelanggan dan advokasi yang tinggi": [
               "Mencapai NPS score 70+ dalam quarterly survey",
               "Meningkatkan customer advocacy rate menjadi 40%",
               "Mencapai customer recommendation rate 80%"
@@ -515,27 +515,27 @@ export default function CompanyOnboarding() {
 
           // Key Results untuk objective marketing
           const marketingKeyResults = {
-            "Meningkatkan brand awareness sebesar 35% di target market": [
+            "Meningkatkan kesadaran merek di pasar target": [
               "Mencapai brand recall 60% dalam market research",
               "Meningkatkan social media reach menjadi 100,000 per post",
               "Mencapai top-of-mind awareness 25% di kategori produk"
             ],
-            "Menambah 10,000 follower media sosial dalam 3 bulan": [
+            "Membangun komunitas yang aktif dan engaged di media sosial": [
               "Mencapai 10,000 new followers di Instagram",
               "Meningkatkan follower growth rate 15% per bulan",
               "Mencapai engagement rate 8% di semua platform"
             ],
-            "Meningkatkan engagement rate di social media sebesar 25%": [
+            "Meningkatkan engagement yang berkualitas dengan audiens": [
               "Mencapai engagement rate 10% di Instagram",
               "Meningkatkan comment rate menjadi 3% per post",
               "Mencapai share rate 5% untuk konten video"
             ],
-            "Menghasilkan 500 qualified leads per bulan": [
+            "Menghasilkan lead berkualitas tinggi secara konsisten": [
               "Generate 500 MQL (Marketing Qualified Leads) per bulan",
               "Mencapai lead quality score 80% dari total leads",
               "Meningkatkan lead-to-customer conversion rate 20%"
             ],
-            "Meningkatkan conversion rate website sebesar 20%": [
+            "Meningkatkan konversi website yang efektif": [
               "Mencapai website conversion rate 5%",
               "Meningkatkan landing page conversion rate menjadi 8%",
               "Mengurangi bounce rate website menjadi di bawah 40%"
@@ -756,6 +756,70 @@ export default function CompanyOnboarding() {
         const selectedKeyResultsForInitiatives = onboardingData.keyResults.filter(kr => kr && kr.trim() !== "");
         const initiativeOptions = getInitiativeOptions(selectedKeyResultsForInitiatives);
         const selectedInitiatives = onboardingData.initiatives.filter(init => init && init.trim() !== "");
+        
+        // Create mapping from key results to initiatives
+        const initiativeKeyResultMapping: { [key: string]: string[] } = {
+          // Sales key results
+          "Mencapai target penjualan Rp 500 juta per bulan": [
+            "Lead scoring system untuk prioritas",
+            "Personalisasi approach berdasarkan lead profile",
+            "A/B testing untuk sales pitch"
+          ],
+          "Meningkatkan rata-rata nilai transaksi menjadi Rp 2 juta": [
+            "Automated lead notification system",
+            "Dedicated lead response team",
+            "Mobile app untuk quick response"
+          ],
+          "Mencapai conversion rate 25% dari total lead": [
+            "Lead scoring system untuk prioritas",
+            "Personalisasi approach berdasarkan lead profile",
+            "A/B testing untuk sales pitch"
+          ],
+          "Mengurangi waktu follow-up lead menjadi maksimal 24 jam": [
+            "Automated lead notification system",
+            "Dedicated lead response team",
+            "Mobile app untuk quick response"
+          ],
+          "Meningkatkan kualitas lead scoring menjadi 80% akurat": [
+            "Machine learning untuk lead analysis",
+            "Feedback loop dari sales ke marketing",
+            "Regular review dan update criteria"
+          ],
+          
+          // Operational key results
+          "Mengurangi waktu proses produksi menjadi 4 jam per unit": [
+            "Implementasi lean manufacturing principles",
+            "Automated production line setup",
+            "Time and motion study untuk bottleneck"
+          ],
+          "Meningkatkan utilitas mesin menjadi 85%": [
+            "Preventive maintenance schedule",
+            "Operator training untuk efisiensi maksimal",
+            "Real-time monitoring system"
+          ],
+          "Mengurangi waste produksi menjadi maksimal 5%": [
+            "Quality control di setiap stage produksi",
+            "Recycling program untuk material waste",
+            "Supplier evaluation untuk kualitas raw material"
+          ],
+          
+          // Customer service key results
+          "Mencapai CSAT score 4.8/5 dalam survey bulanan": [
+            "Training customer service excellence",
+            "Implementasi feedback system yang real-time",
+            "Reward program untuk high performing agent"
+          ],
+          "Meningkatkan customer retention rate menjadi 95%": [
+            "Proactive customer outreach program",
+            "Personalized customer journey mapping",
+            "Churn prediction dan prevention strategy"
+          ],
+          "Mengurangi complaint rate menjadi di bawah 1%": [
+            "Root cause analysis untuk recurring issues",
+            "Preventive quality assurance program",
+            "Customer education dan self-service portal"
+          ]
+        };
         
         // Group initiatives by their corresponding key results
         const getInitiativesByKeyResult = (keyResults: string[]) => {
