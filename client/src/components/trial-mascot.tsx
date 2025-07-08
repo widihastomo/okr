@@ -21,6 +21,8 @@ import {
   Lightbulb,
   Rocket,
   Gift,
+  UserPlus,
+  LineChart
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -29,6 +31,14 @@ type MascotState = "welcome" | "encouraging" | "celebrating" | "thinking" | "wav
 
 interface MascotProps {
   className?: string;
+  missions?: Array<{
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+    unlocked: boolean;
+  }>;
+  onMissionAction?: (missionName: string) => void;
 }
 
 // SVG Mascot Character Component
@@ -148,7 +158,7 @@ const MascotCharacter: React.FC<{ state: MascotState; className?: string }> = ({
   );
 };
 
-export default function TrialMascot({ className }: MascotProps) {
+export default function TrialMascot({ className, missions = [], onMissionAction }: MascotProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [currentState, setCurrentState] = useState<MascotState>("welcome");
   const [messageIndex, setMessageIndex] = useState(0);
@@ -162,15 +172,52 @@ export default function TrialMascot({ className }: MascotProps) {
     queryKey: ["/api/trial-achievements"],
   });
 
-  // Calculate progress
-  const completedAchievements = achievements.filter((a: any) => a.unlocked).length;
-  const totalAchievements = achievements.length;
-  const progressPercentage = totalAchievements > 0 ? (completedAchievements / totalAchievements) * 100 : 0;
+  // Calculate progress from missions data first, fallback to achievements
+  const completedMissions = missions.filter((m: any) => m.unlocked).length;
+  const totalMissions = missions.length;
+  const progressPercentage = totalMissions > 0 ? (completedMissions / totalMissions) * 100 : 0;
   const daysRemaining = trialStatus?.daysRemaining || 14;
 
-  // Contextual messages based on progress and trial status
+  // Get current mission step from passed missions data
+  const getCurrentMissionStep = () => {
+    if (!missions.length) return 0;
+    
+    const completedMissions = missions.filter(m => m.unlocked).length;
+    return completedMissions;
+  };
+
+  // Get next mission to complete
+  const getNextMission = () => {
+    if (!missions.length) return null;
+    
+    return missions.find(m => !m.unlocked) || null;
+  };
+
+  // Mission icon mapping
+  const getMissionIcon = (iconName: string) => {
+    const iconMap: Record<string, any> = {
+      UserPlus,
+      Users,
+      Target,
+      BarChart3: Target,
+      Lightbulb,
+      CheckSquare: Target,
+      TrendingUp: Target,
+      LineChart,
+      CheckCircle2: Target,
+      Zap,
+    };
+    return iconMap[iconName] || Target;
+  };
+
+  // Contextual messages based on progress and mission status
   const getContextualMessages = () => {
-    if (progressPercentage === 0) {
+    const currentStep = getCurrentMissionStep();
+    const nextMission = getNextMission();
+    const totalMissions = missions.length || 10;
+    const progressPercent = Math.round((currentStep / totalMissions) * 100);
+
+    if (currentStep === 0) {
       return [
         {
           state: "welcome" as MascotState,
@@ -314,7 +361,7 @@ export default function TrialMascot({ className }: MascotProps) {
                 </CardTitle>
                 <div className="flex items-center gap-2 mt-1">
                   <Badge variant="outline" className="text-xs bg-blue-100 text-blue-700 border-blue-300">
-                    {completedAchievements}/{totalAchievements} selesai
+                    {completedMissions}/{totalMissions} selesai
                   </Badge>
                   <Badge variant="outline" className="text-xs bg-orange-100 text-orange-700 border-orange-300">
                     {daysRemaining} hari tersisa
@@ -384,6 +431,14 @@ export default function TrialMascot({ className }: MascotProps) {
                   } else if (action.includes("Pahami Lebih Lanjut")) {
                     // Cycle to next educational message
                     setMessageIndex((prev) => (prev + 1) % messages.length);
+                  } else if (action.includes("Mulai") || action.includes("Lanjut") || action.includes("Selesaikan")) {
+                    // Handle mission actions
+                    const currentMission = getNextMission();
+                    if (onMissionAction && currentMission) {
+                      onMissionAction(currentMission.name);
+                    }
+                    // Also scroll to onboarding section
+                    document.querySelector('[data-testid="onboarding-missions"]')?.scrollIntoView({ behavior: 'smooth' });
                   } else {
                     // Default action - scroll to onboarding
                     document.querySelector('[data-testid="onboarding-missions"]')?.scrollIntoView({ behavior: 'smooth' });

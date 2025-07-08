@@ -959,7 +959,32 @@ export default function DailyFocusPage() {
         <TrialStatusBanner />
 
         {/* Trial Mascot Guide */}
-        <TrialMascot className="mb-6" />
+        <TrialMascot 
+          className="mb-6"
+          missions={orderlyMissions}
+          onMissionAction={(missionName) => {
+            console.log("Mission action triggered:", missionName);
+            // Handle mission-specific actions here
+            if (missionName.includes("Member")) {
+              window.location.href = "/client-users";
+            } else if (missionName.includes("Tim")) {
+              window.location.href = "/teams";
+            } else if (missionName.includes("Objective")) {
+              window.location.href = "/dashboard";
+            } else if (missionName.includes("Key Result")) {
+              window.location.href = "/dashboard";
+            } else if (missionName.includes("Inisiatif")) {
+              window.location.href = "/dashboard";
+            } else if (missionName.includes("Task")) {
+              setIsTaskModalOpen(true);
+            } else if (missionName.includes("Update")) {
+              setIsInstantUpdateOpen(true);
+            } else {
+              // Default scroll to missions
+              document.querySelector('[data-testid="onboarding-missions"]')?.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
+        />
 
         {/* Onboarding Missions Section */}
         <div data-testid="onboarding-missions">
