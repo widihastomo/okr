@@ -40,6 +40,8 @@ import SubscriptionPackageManagement from "@/pages/subscription-package-manageme
 import PackageDetail from "@/pages/package-detail";
 import SystemOrganizationManagement from "@/pages/system-organization-management";
 import AddOnsManagement from "@/pages/add-ons-management";
+import InvoiceManagement from "@/pages/invoice-management";
+import InvoiceDetail from "@/pages/invoice-detail";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -162,6 +164,8 @@ function Router() {
               />
               <Route path="/package-detail/:id" component={PackageDetail} />
               <Route path="/add-ons" component={AddOnsManagement} />
+              <Route path="/invoices" component={InvoiceManagement} />
+              <Route path="/invoices/:id" component={InvoiceDetail} />
               <Route component={NotFound} />
             </Switch>
           </div>

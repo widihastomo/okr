@@ -5,6 +5,7 @@ import {
   Building2,
   RotateCcw,
   FileText,
+  Receipt,
   Users,
   Target,
   BarChart3,
@@ -82,6 +83,12 @@ export default function Sidebar({
       icon: CreditCard,
       path: "/system-admin/subscriptions",
       active: location === "/system-admin/subscriptions",
+    },
+    {
+      label: "Kelola Invoice",
+      icon: Receipt,
+      path: "/invoices",
+      active: location === "/invoices" || location.startsWith("/invoices/"),
     },
     {
       label: "Database",
@@ -174,6 +181,12 @@ export default function Sidebar({
       icon: Users,
       path: "/client-users",
       active: location === "/client-users",
+    });
+    regularUserMenuItems.push({
+      label: "Invoice",
+      icon: Receipt,
+      path: "/invoices",
+      active: location === "/invoices" || location.startsWith("/invoices/"),
     });
   }
 

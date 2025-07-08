@@ -3521,6 +3521,378 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Invoice Management Endpoints
+  
+  // Get all invoices (System Owner: all invoices, Organization owners: their org invoices)
+  app.get("/api/invoices", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const { db } = await import("./db");
+      const { invoices, invoiceLineItems, organizations, subscriptionPlans, billingPeriods } = await import("@shared/schema");
+      const { eq, and, desc } = await import("drizzle-orm");
+      
+      let query = db
+        .select({
+          invoice: invoices,
+          organization: organizations,
+          subscriptionPlan: subscriptionPlans,
+          billingPeriod: billingPeriods,
+        })
+        .from(invoices)
+        .leftJoin(organizations, eq(invoices.organizationId, organizations.id))
+        .leftJoin(subscriptionPlans, eq(invoices.subscriptionPlanId, subscriptionPlans.id))
+        .leftJoin(billingPeriods, eq(invoices.billingPeriodId, billingPeriods.id))
+        .orderBy(desc(invoices.createdAt));
+      
+      // Filter by organization for non-system owners
+      if (!currentUser.isSystemOwner) {
+        if (!currentUser.organizationId) {
+          return res.status(400).json({ message: "User not associated with an organization" });
+        }
+        query = query.where(eq(invoices.organizationId, currentUser.organizationId));
+      }
+      
+      const invoicesData = await query;
+      res.json(invoicesData);
+    } catch (error) {
+      console.error("Error fetching invoices:", error);
+      res.status(500).json({ message: "Failed to fetch invoices" });
+    }
+  });
+
+  // Get specific invoice with line items
+  app.get("/api/invoices/:id", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const { db } = await import("./db");
+      const { invoices, invoiceLineItems, organizations, subscriptionPlans, billingPeriods } = await import("@shared/schema");
+      const { eq, and } = await import("drizzle-orm");
+      const invoiceId = req.params.id;
+      
+      // Get invoice with related data
+      let invoiceQuery = db
+        .select({
+          invoice: invoices,
+          organization: organizations,
+          subscriptionPlan: subscriptionPlans,
+          billingPeriod: billingPeriods,
+        })
+        .from(invoices)
+        .leftJoin(organizations, eq(invoices.organizationId, organizations.id))
+        .leftJoin(subscriptionPlans, eq(invoices.subscriptionPlanId, subscriptionPlans.id))
+        .leftJoin(billingPeriods, eq(invoices.billingPeriodId, billingPeriods.id))
+        .where(eq(invoices.id, invoiceId));
+      
+      // Filter by organization for non-system owners
+      if (!currentUser.isSystemOwner) {
+        if (!currentUser.organizationId) {
+          return res.status(400).json({ message: "User not associated with an organization" });
+        }
+        invoiceQuery = invoiceQuery.where(and(
+          eq(invoices.id, invoiceId),
+          eq(invoices.organizationId, currentUser.organizationId)
+        ));
+      }
+      
+      const [invoiceData] = await invoiceQuery;
+      
+      if (!invoiceData) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+      
+      // Get line items
+      const lineItems = await db
+        .select()
+        .from(invoiceLineItems)
+        .where(eq(invoiceLineItems.invoiceId, invoiceId));
+      
+      res.json({
+        ...invoiceData,
+        lineItems
+      });
+    } catch (error) {
+      console.error("Error fetching invoice:", error);
+      res.status(500).json({ message: "Failed to fetch invoice" });
+    }
+  });
+
+  // Create new invoice
+  app.post("/api/invoices", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const { db } = await import("./db");
+      const { invoices, invoiceLineItems } = await import("@shared/schema");
+      const { createInsertSchema } = await import("drizzle-zod");
+      
+      const insertInvoiceSchema = createInsertSchema(invoices).omit({
+        id: true,
+        invoiceNumber: true,
+        createdAt: true,
+        updatedAt: true,
+      });
+      
+      const insertLineItemSchema = createInsertSchema(invoiceLineItems).omit({
+        id: true,
+        createdAt: true,
+      });
+      
+      const { lineItems, ...invoiceData } = req.body;
+      
+      // Validate invoice data
+      const validatedInvoiceData = insertInvoiceSchema.parse({
+        ...invoiceData,
+        createdBy: currentUser.id,
+        // If not system owner, enforce their organization
+        organizationId: currentUser.isSystemOwner ? invoiceData.organizationId : currentUser.organizationId
+      });
+      
+      // Generate invoice number
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      
+      // Get count of invoices this month
+      const { sql, count } = await import("drizzle-orm");
+      const [{ invoiceCount }] = await db
+        .select({ invoiceCount: count() })
+        .from(invoices)
+        .where(sql`EXTRACT(YEAR FROM ${invoices.createdAt}) = ${year} AND EXTRACT(MONTH FROM ${invoices.createdAt}) = ${parseInt(month)}`);
+      
+      const invoiceNumber = `INV-${year}-${month}-${String((invoiceCount || 0) + 1).padStart(3, '0')}`;
+      
+      // Create invoice
+      const [newInvoice] = await db
+        .insert(invoices)
+        .values({
+          ...validatedInvoiceData,
+          invoiceNumber,
+        })
+        .returning();
+      
+      // Create line items if provided
+      if (lineItems && lineItems.length > 0) {
+        const validatedLineItems = lineItems.map((item: any) => 
+          insertLineItemSchema.parse({
+            ...item,
+            invoiceId: newInvoice.id,
+          })
+        );
+        
+        await db.insert(invoiceLineItems).values(validatedLineItems);
+      }
+      
+      res.status(201).json(newInvoice);
+    } catch (error) {
+      console.error("Error creating invoice:", error);
+      res.status(500).json({ message: "Failed to create invoice" });
+    }
+  });
+
+  // Update invoice
+  app.put("/api/invoices/:id", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const { db } = await import("./db");
+      const { invoices } = await import("@shared/schema");
+      const { eq, and } = await import("drizzle-orm");
+      const { createInsertSchema } = await import("drizzle-zod");
+      const invoiceId = req.params.id;
+      
+      const updateInvoiceSchema = createInsertSchema(invoices).partial().omit({
+        id: true,
+        invoiceNumber: true,
+        createdAt: true,
+        createdBy: true,
+      });
+      
+      const validatedData = updateInvoiceSchema.parse(req.body);
+      
+      // Build where condition
+      let whereCondition = eq(invoices.id, invoiceId);
+      if (!currentUser.isSystemOwner) {
+        if (!currentUser.organizationId) {
+          return res.status(400).json({ message: "User not associated with an organization" });
+        }
+        whereCondition = and(whereCondition, eq(invoices.organizationId, currentUser.organizationId));
+      }
+      
+      const [updatedInvoice] = await db
+        .update(invoices)
+        .set({
+          ...validatedData,
+          updatedAt: new Date(),
+        })
+        .where(whereCondition)
+        .returning();
+      
+      if (!updatedInvoice) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+      
+      res.json(updatedInvoice);
+    } catch (error) {
+      console.error("Error updating invoice:", error);
+      res.status(500).json({ message: "Failed to update invoice" });
+    }
+  });
+
+  // Mark invoice as paid
+  app.post("/api/invoices/:id/mark-paid", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const { db } = await import("./db");
+      const { invoices } = await import("@shared/schema");
+      const { eq, and } = await import("drizzle-orm");
+      const invoiceId = req.params.id;
+      const { paymentMethod, paidDate } = req.body;
+      
+      // Build where condition
+      let whereCondition = eq(invoices.id, invoiceId);
+      if (!currentUser.isSystemOwner) {
+        if (!currentUser.organizationId) {
+          return res.status(400).json({ message: "User not associated with an organization" });
+        }
+        whereCondition = and(whereCondition, eq(invoices.organizationId, currentUser.organizationId));
+      }
+      
+      const [updatedInvoice] = await db
+        .update(invoices)
+        .set({
+          status: 'paid',
+          paidDate: paidDate ? new Date(paidDate) : new Date(),
+          paymentMethod: paymentMethod || 'manual',
+          updatedAt: new Date(),
+        })
+        .where(whereCondition)
+        .returning();
+      
+      if (!updatedInvoice) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+      
+      res.json(updatedInvoice);
+    } catch (error) {
+      console.error("Error marking invoice as paid:", error);
+      res.status(500).json({ message: "Failed to mark invoice as paid" });
+    }
+  });
+
+  // Generate invoice from subscription
+  app.post("/api/invoices/generate-subscription", requireAuth, isSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { invoices, invoiceLineItems, organizationSubscriptions, subscriptionPlans, billingPeriods } = await import("@shared/schema");
+      const { eq } = await import("drizzle-orm");
+      const { organizationSubscriptionId } = req.body;
+      
+      // Get subscription with plan and billing period
+      const [subscription] = await db
+        .select({
+          subscription: organizationSubscriptions,
+          plan: subscriptionPlans,
+          billingPeriod: billingPeriods,
+        })
+        .from(organizationSubscriptions)
+        .leftJoin(subscriptionPlans, eq(organizationSubscriptions.planId, subscriptionPlans.id))
+        .leftJoin(billingPeriods, eq(subscriptionPlans.id, billingPeriods.planId))
+        .where(eq(organizationSubscriptions.id, organizationSubscriptionId));
+      
+      if (!subscription) {
+        return res.status(404).json({ message: "Subscription not found" });
+      }
+      
+      // Generate invoice number
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      
+      const { sql, count } = await import("drizzle-orm");
+      const [{ invoiceCount }] = await db
+        .select({ invoiceCount: count() })
+        .from(invoices)
+        .where(sql`EXTRACT(YEAR FROM ${invoices.createdAt}) = ${year} AND EXTRACT(MONTH FROM ${invoices.createdAt}) = ${parseInt(month)}`);
+      
+      const invoiceNumber = `INV-${year}-${month}-${String((invoiceCount || 0) + 1).padStart(3, '0')}`;
+      
+      // Calculate due date (30 days from issue date)
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + 30);
+      
+      const billingPrice = subscription.billingPeriod?.price || subscription.plan?.price || '0';
+      const amount = parseFloat(billingPrice);
+      
+      // Create invoice
+      const [newInvoice] = await db
+        .insert(invoices)
+        .values({
+          invoiceNumber,
+          organizationId: subscription.subscription.organizationId,
+          subscriptionPlanId: subscription.subscription.planId,
+          billingPeriodId: subscription.billingPeriod?.id,
+          organizationSubscriptionId: subscription.subscription.id,
+          amount: billingPrice,
+          subtotal: billingPrice,
+          currency: 'IDR',
+          status: 'pending',
+          dueDate,
+          description: `Subscription: ${subscription.plan?.name}`,
+          createdBy: (req.user as User).id,
+        })
+        .returning();
+      
+      // Create line item
+      await db.insert(invoiceLineItems).values({
+        invoiceId: newInvoice.id,
+        description: `${subscription.plan?.name} - ${subscription.billingPeriod?.periodType || 'monthly'} billing`,
+        quantity: 1,
+        unitPrice: billingPrice,
+        totalPrice: billingPrice,
+        periodStart: subscription.subscription.currentPeriodStart,
+        periodEnd: subscription.subscription.currentPeriodEnd,
+        subscriptionPlanId: subscription.subscription.planId,
+      });
+      
+      res.status(201).json(newInvoice);
+    } catch (error) {
+      console.error("Error generating invoice from subscription:", error);
+      res.status(500).json({ message: "Failed to generate invoice from subscription" });
+    }
+  });
+
+  // Delete invoice (only pending invoices)
+  app.delete("/api/invoices/:id", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const { db } = await import("./db");
+      const { invoices } = await import("@shared/schema");
+      const { eq, and } = await import("drizzle-orm");
+      const invoiceId = req.params.id;
+      
+      // Check if invoice exists and is pending
+      let whereCondition = and(eq(invoices.id, invoiceId), eq(invoices.status, 'pending'));
+      if (!currentUser.isSystemOwner) {
+        if (!currentUser.organizationId) {
+          return res.status(400).json({ message: "User not associated with an organization" });
+        }
+        whereCondition = and(whereCondition, eq(invoices.organizationId, currentUser.organizationId));
+      }
+      
+      const [deletedInvoice] = await db
+        .delete(invoices)
+        .where(whereCondition)
+        .returning();
+      
+      if (!deletedInvoice) {
+        return res.status(404).json({ message: "Invoice not found or cannot be deleted" });
+      }
+      
+      res.json({ message: "Invoice deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting invoice:", error);
+      res.status(500).json({ message: "Failed to delete invoice" });
+    }
+  });
+
   // Organization subscription assignment endpoints (System Owner only)
   
   // Get organization with subscription details

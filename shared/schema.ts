@@ -144,6 +144,51 @@ export const organizationSubscriptions = pgTable("organization_subscriptions", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Invoices table for billing and subscription management
+export const invoices = pgTable("invoices", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  invoiceNumber: text("invoice_number").notNull().unique(), // e.g., "INV-2025-001"
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
+  subscriptionPlanId: uuid("subscription_plan_id").references(() => subscriptionPlans.id),
+  billingPeriodId: uuid("billing_period_id").references(() => billingPeriods.id),
+  organizationSubscriptionId: uuid("organization_subscription_id").references(() => organizationSubscriptions.id),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(), // Total invoice amount
+  subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(), // Amount before tax
+  taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }).default("0"), // Tax amount
+  taxRate: decimal("tax_rate", { precision: 5, scale: 2 }).default("0"), // Tax rate percentage
+  currency: text("currency").notNull().default("IDR"), // Currency code
+  status: text("status").notNull().default("pending"), // "pending", "sent", "paid", "overdue", "cancelled", "refunded"
+  issueDate: timestamp("issue_date").notNull().defaultNow(),
+  dueDate: timestamp("due_date").notNull(),
+  paidDate: timestamp("paid_date"),
+  description: text("description"), // Optional description for custom invoices
+  notes: text("notes"), // Internal notes
+  paymentMethod: text("payment_method"), // "stripe", "bank_transfer", "cash", etc.
+  stripeInvoiceId: text("stripe_invoice_id"), // Stripe invoice ID for integration
+  stripePaymentIntentId: text("stripe_payment_intent_id"), // Stripe payment intent ID
+  createdBy: uuid("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Invoice Line Items for detailed billing breakdown
+export const invoiceLineItems = pgTable("invoice_line_items", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  invoiceId: uuid("invoice_id").notNull().references(() => invoices.id, { onDelete: "cascade" }),
+  description: text("description").notNull(), // e.g., "Growth Plan - Quarterly Billing", "Additional User"
+  quantity: integer("quantity").notNull().default(1),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  totalPrice: decimal("total_price", { precision: 10, scale: 2 }).notNull(), // quantity * unitPrice
+  discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }).default("0"),
+  discountPercentage: integer("discount_percentage").default(0),
+  periodStart: timestamp("period_start"), // For subscription billing periods
+  periodEnd: timestamp("period_end"), // For subscription billing periods
+  subscriptionPlanId: uuid("subscription_plan_id").references(() => subscriptionPlans.id),
+  addOnId: uuid("add_on_id").references(() => subscriptionAddOns.id),
+  metadata: jsonb("metadata"), // Additional data
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Users table with email/password authentication
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -579,6 +624,18 @@ export const insertOrganizationSubscriptionSchema = createInsertSchema(organizat
   updatedAt: true,
 });
 
+export const insertInvoiceSchema = createInsertSchema(invoices).omit({
+  id: true,
+  invoiceNumber: true, // Auto-generated
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertInvoiceLineItemSchema = createInsertSchema(invoiceLineItems).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Daily Reflections table
 export const dailyReflections = pgTable("daily_reflections", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -864,6 +921,20 @@ export type Organization = typeof organizations.$inferSelect;
 export type InsertOrganization = z.infer<typeof insertOrganizationSchema>;
 export type OrganizationSubscription = typeof organizationSubscriptions.$inferSelect;
 export type InsertOrganizationSubscription = z.infer<typeof insertOrganizationSubscriptionSchema>;
+
+// Invoice Types
+export type Invoice = typeof invoices.$inferSelect;
+export type InsertInvoice = z.infer<typeof insertInvoiceSchema>;
+export type InvoiceLineItem = typeof invoiceLineItems.$inferSelect;
+export type InsertInvoiceLineItem = z.infer<typeof insertInvoiceLineItemSchema>;
+
+// Invoice with Line Items
+export type InvoiceWithLineItems = Invoice & {
+  lineItems: InvoiceLineItem[];
+  organization: Organization;
+  subscriptionPlan?: SubscriptionPlan;
+  billingPeriod?: BillingPeriod;
+};
 
 // Notifications System
 export const notifications = pgTable("notifications", {
