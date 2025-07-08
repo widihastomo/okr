@@ -127,6 +127,7 @@ interface OnboardingData {
   reminderTime: string;
   invitedMembers: string[];
   initiatives: string[];
+  tasks: string[];
   firstCheckIn: string;
   isCompleted: boolean;
 }
@@ -181,6 +182,7 @@ export default function CompanyOnboarding() {
     reminderTime: "",
     invitedMembers: [],
     initiatives: [],
+    tasks: [],
     firstCheckIn: "",
     isCompleted: false
   });
@@ -729,54 +731,452 @@ export default function CompanyOnboarding() {
         );
 
       case 7: // Pilih Inisiatif Prioritas
+        const getInitiativeOptions = (keyResults: string[]) => {
+          const initiativeMapping = {
+            // Penjualan - Omzet
+            "Mencapai target penjualan Rp 500 juta per bulan": [
+              "Kampanye promosi bulanan dengan diskon 20%",
+              "Training sales team untuk closing technique",
+              "Implementasi CRM untuk follow-up lead"
+            ],
+            "Meningkatkan rata-rata nilai transaksi menjadi Rp 2 juta": [
+              "Program bundling produk dengan harga spesial",
+              "Pelatihan upselling untuk tim sales",
+              "Strategi cross-selling kepada existing customer"
+            ],
+            "Menambah 100 transaksi baru setiap bulan": [
+              "Digital marketing campaign di social media",
+              "Referral program dengan reward menarik",
+              "Partnership dengan marketplace online"
+            ],
+            
+            // Penjualan - Pelanggan Baru
+            "Mendapatkan 20 pelanggan baru setiap bulan": [
+              "Content marketing strategy di blog dan sosmed",
+              "Event networking dan product demo",
+              "Program trial gratis untuk prospek"
+            ],
+            "Mencapai conversion rate 15% dari lead ke customer": [
+              "Optimasi landing page untuk konversi",
+              "Follow-up sequence email marketing",
+              "Telemarketing campaign yang lebih personal"
+            ],
+            "Meningkatkan customer retention rate menjadi 85%": [
+              "Program loyalty dengan point reward",
+              "Customer success manager untuk onboarding",
+              "Survey kepuasan dan improvement action"
+            ],
+            
+            // Penjualan - Konversi Lead
+            "Mencapai conversion rate 25% dari total lead": [
+              "Lead scoring system untuk prioritas",
+              "Personalisasi approach berdasarkan lead profile",
+              "A/B testing untuk sales pitch"
+            ],
+            "Mengurangi waktu follow-up lead menjadi maksimal 24 jam": [
+              "Automated lead notification system",
+              "Dedicated lead response team",
+              "Mobile app untuk quick response"
+            ],
+            "Meningkatkan kualitas lead scoring menjadi 80% akurat": [
+              "Machine learning untuk lead analysis",
+              "Feedback loop dari sales ke marketing",
+              "Regular review dan update criteria"
+            ],
+            
+            // Operasional - Efisiensi
+            "Mengurangi waktu proses produksi menjadi 4 jam per unit": [
+              "Implementasi lean manufacturing principles",
+              "Automated production line setup",
+              "Time and motion study untuk bottleneck"
+            ],
+            "Meningkatkan utilitas mesin menjadi 85%": [
+              "Preventive maintenance schedule",
+              "Operator training untuk efisiensi maksimal",
+              "Real-time monitoring system"
+            ],
+            "Mengurangi waste produksi menjadi maksimal 5%": [
+              "Quality control di setiap stage produksi",
+              "Recycling program untuk material waste",
+              "Supplier evaluation untuk kualitas raw material"
+            ],
+            
+            // Customer Service - Satisfaction
+            "Mencapai CSAT score 4.8/5 dalam survey bulanan": [
+              "Training customer service excellence",
+              "Implementasi feedback system yang real-time",
+              "Reward program untuk high performing agent"
+            ],
+            "Meningkatkan customer retention rate menjadi 95%": [
+              "Proactive customer outreach program",
+              "Personalized customer journey mapping",
+              "Churn prediction dan prevention strategy"
+            ],
+            "Mengurangi complaint rate menjadi di bawah 1%": [
+              "Root cause analysis untuk recurring issues",
+              "Preventive quality assurance program",
+              "Customer education dan self-service portal"
+            ],
+            
+            // Marketing - Brand Awareness
+            "Mencapai brand recall 60% dalam market research": [
+              "Integrated marketing campaign di multiple channel",
+              "Influencer partnership program",
+              "Brand activation event di target market"
+            ],
+            "Meningkatkan social media reach menjadi 100,000 per post": [
+              "Content calendar dengan viral potential",
+              "Paid social media advertising campaign",
+              "Community building dan engagement program"
+            ],
+            "Mencapai top-of-mind awareness 25% di kategori produk": [
+              "Consistent brand messaging across all touchpoint",
+              "Thought leadership content strategy",
+              "Strategic partnership dengan industry leader"
+            ]
+          };
+          
+          let allInitiatives = [];
+          keyResults.forEach(kr => {
+            if (initiativeMapping[kr]) {
+              allInitiatives.push(...initiativeMapping[kr]);
+            }
+          });
+          
+          // Remove duplicates
+          return [...new Set(allInitiatives)];
+        };
+
+        const selectedKeyResultsForInitiatives = onboardingData.keyResults.filter(kr => kr && kr !== "custom");
+        const initiativeOptions = getInitiativeOptions(selectedKeyResultsForInitiatives);
+        const selectedInitiatives = onboardingData.initiatives.filter(init => init && init !== "custom");
+        
         return (
           <div className="space-y-4">
-            <Label>Tambahkan inisiatif prioritas:</Label>
-            <div className="space-y-2">
-              {onboardingData.initiatives.map((initiative, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <Input 
-                    placeholder={`Inisiatif ${index + 1}`}
-                    value={initiative}
-                    onChange={(e) => {
-                      const newInitiatives = [...onboardingData.initiatives];
-                      newInitiatives[index] = e.target.value;
+            {initiativeOptions.length > 0 && (
+              <div className="space-y-3">
+                <Label>Pilih inisiatif yang sesuai dengan Key Results Anda:</Label>
+                <div className="space-y-2">
+                  {initiativeOptions.map((option, index) => (
+                    <div key={index} className="flex items-start space-x-2 p-3 rounded-lg border border-gray-200 hover:bg-gray-50">
+                      <Checkbox 
+                        id={`initiative-${index}`}
+                        checked={selectedInitiatives.includes(option)}
+                        onCheckedChange={(checked) => {
+                          let newInitiatives = [...onboardingData.initiatives];
+                          if (checked) {
+                            newInitiatives.push(option);
+                          } else {
+                            newInitiatives = newInitiatives.filter(init => init !== option);
+                          }
+                          setOnboardingData({...onboardingData, initiatives: newInitiatives});
+                        }}
+                      />
+                      <Label htmlFor={`initiative-${index}`} className="flex-1 cursor-pointer leading-relaxed">
+                        {option}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center space-x-2 pt-2">
+                  <Checkbox 
+                    id="custom-initiative"
+                    checked={onboardingData.initiatives.includes("custom")}
+                    onCheckedChange={(checked) => {
+                      let newInitiatives = [...onboardingData.initiatives];
+                      if (checked) {
+                        newInitiatives.push("custom");
+                      } else {
+                        newInitiatives = newInitiatives.filter(init => init !== "custom");
+                      }
                       setOnboardingData({...onboardingData, initiatives: newInitiatives});
                     }}
                   />
+                  <Label htmlFor="custom-initiative">Atau tambah inisiatif sendiri:</Label>
+                </div>
+              </div>
+            )}
+            
+            {(onboardingData.initiatives.includes("custom") || initiativeOptions.length === 0) && (
+              <div className="space-y-2">
+                <Label>Tambahkan inisiatif custom:</Label>
+                <div className="space-y-2">
+                  {onboardingData.initiatives.filter(init => init !== "custom" && !initiativeOptions.includes(init)).map((init, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Input 
+                        placeholder={`Inisiatif ${index + 1}`}
+                        value={init}
+                        onChange={(e) => {
+                          const newInitiatives = [...onboardingData.initiatives];
+                          const customIndex = newInitiatives.findIndex(i => i === init);
+                          if (customIndex !== -1) {
+                            newInitiatives[customIndex] = e.target.value;
+                          }
+                          setOnboardingData({...onboardingData, initiatives: newInitiatives});
+                        }}
+                      />
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          const newInitiatives = onboardingData.initiatives.filter(i => i !== init);
+                          setOnboardingData({...onboardingData, initiatives: newInitiatives});
+                        }}
+                      >
+                        Hapus
+                      </Button>
+                    </div>
+                  ))}
                   <Button 
                     variant="outline" 
-                    size="sm"
-                    onClick={() => {
-                      const newInitiatives = onboardingData.initiatives.filter((_, i) => i !== index);
-                      setOnboardingData({...onboardingData, initiatives: newInitiatives});
-                    }}
+                    onClick={() => setOnboardingData({...onboardingData, initiatives: [...onboardingData.initiatives, ""]})}
                   >
-                    Hapus
+                    Tambah Inisiatif
                   </Button>
                 </div>
-              ))}
-              <Button 
-                variant="outline" 
-                onClick={() => setOnboardingData({...onboardingData, initiatives: [...onboardingData.initiatives, ""]})}
-              >
-                Tambah Inisiatif
-              </Button>
-            </div>
+              </div>
+            )}
+            
+            {selectedInitiatives.length > 0 && (
+              <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                <p className="text-sm text-green-800 mb-2">
+                  <strong>Inisiatif terpilih:</strong>
+                </p>
+                <ul className="text-sm text-green-700 space-y-1">
+                  {selectedInitiatives.map((init, index) => (
+                    <li key={index}>• {init}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         );
 
-      case 8: // Check-in Pertama
+      case 8: // Task untuk Inisiatif
+        const getTaskOptions = (initiatives: string[]) => {
+          const taskMapping = {
+            // Penjualan & Marketing Tasks
+            "Kampanye promosi bulanan dengan diskon 20%": [
+              "Buat creative design untuk promosi diskon",
+              "Setup campaign di Facebook Ads dan Google Ads",
+              "Siapkan landing page untuk campaign"
+            ],
+            "Training sales team untuk closing technique": [
+              "Buat materi training closing technique",
+              "Jadwalkan session training dengan sales team",
+              "Evaluasi dan feedback setelah training"
+            ],
+            "Implementasi CRM untuk follow-up lead": [
+              "Pilih dan setup CRM software",
+              "Import database lead ke CRM",
+              "Training tim untuk menggunakan CRM"
+            ],
+            "Program bundling produk dengan harga spesial": [
+              "Analisis produk yang cocok untuk bundling",
+              "Tentukan harga bundling yang kompetitif",
+              "Buat marketing material untuk bundling"
+            ],
+            "Digital marketing campaign di social media": [
+              "Buat content calendar untuk social media",
+              "Design konten visual untuk campaign",
+              "Schedule posting di multiple platform"
+            ],
+            "Content marketing strategy di blog dan sosmed": [
+              "Riset keyword untuk content strategy",
+              "Buat content calendar bulanan",
+              "Tulis dan publish artikel blog"
+            ],
+            "Event networking dan product demo": [
+              "Cari dan daftar event networking yang relevan",
+              "Siapkan booth material dan product demo",
+              "Follow up dengan kontak dari event"
+            ],
+            
+            // Operasional Tasks
+            "Implementasi lean manufacturing principles": [
+              "Analisis current process dan identifikasi waste",
+              "Training karyawan tentang lean principles",
+              "Implementasi 5S di area produksi"
+            ],
+            "Automated production line setup": [
+              "Evaluasi kebutuhan automation equipment",
+              "Install dan setup automated system",
+              "Training operator untuk automated system"
+            ],
+            "Preventive maintenance schedule": [
+              "Buat schedule maintenance untuk semua mesin",
+              "Siapkan checklist maintenance routine",
+              "Training teknisi untuk preventive maintenance"
+            ],
+            "Quality control di setiap stage produksi": [
+              "Buat SOP quality control untuk setiap stage",
+              "Setup quality checkpoint di production line",
+              "Training quality control inspector"
+            ],
+            
+            // Customer Service Tasks
+            "Training customer service excellence": [
+              "Buat modul training customer service",
+              "Conduct training session untuk CS team",
+              "Evaluasi performance setelah training"
+            ],
+            "Implementasi feedback system yang real-time": [
+              "Setup feedback system di website",
+              "Buat dashboard untuk monitoring feedback",
+              "Training tim untuk respond feedback"
+            ],
+            "Proactive customer outreach program": [
+              "Buat database customer untuk outreach",
+              "Buat script untuk customer outreach",
+              "Schedule regular customer check-in"
+            ],
+            "Root cause analysis untuk recurring issues": [
+              "Analisis data complaint untuk pattern",
+              "Buat action plan untuk fix root cause",
+              "Implementasi solution dan monitoring"
+            ],
+            
+            // Marketing & Branding Tasks
+            "Integrated marketing campaign di multiple channel": [
+              "Buat campaign strategy untuk multiple channel",
+              "Coordinate campaign launch across channel",
+              "Monitor dan optimize campaign performance"
+            ],
+            "Content calendar dengan viral potential": [
+              "Riset trending topic untuk content inspiration",
+              "Buat content calendar dengan viral angle",
+              "Analyze performance dan optimize content"
+            ],
+            "Influencer partnership program": [
+              "Identifikasi influencer yang sesuai dengan brand",
+              "Nego collaboration terms dengan influencer",
+              "Monitor campaign performance dari influencer"
+            ],
+            "Brand activation event di target market": [
+              "Plan concept dan venue untuk brand activation",
+              "Execute brand activation event",
+              "Follow up dengan participant setelah event"
+            ]
+          };
+          
+          let allTasks = [];
+          initiatives.forEach(init => {
+            if (taskMapping[init]) {
+              allTasks.push(...taskMapping[init]);
+            }
+          });
+          
+          // Remove duplicates
+          return [...new Set(allTasks)];
+        };
+
+        const selectedInitiativesForTasks = onboardingData.initiatives.filter(init => init && init !== "custom");
+        const taskOptions = getTaskOptions(selectedInitiativesForTasks);
+        
+        if (!onboardingData.tasks) {
+          onboardingData.tasks = [];
+        }
+        
+        const selectedTasks = onboardingData.tasks.filter(task => task && task !== "custom");
+        
         return (
           <div className="space-y-4">
-            <Label htmlFor="first-checkin">Update progress pertama Anda:</Label>
-            <Textarea 
-              id="first-checkin"
-              placeholder="Contoh: Hari ini broadcast dikirim ke 50 kontak lama. Leads masuk: 7 orang"
-              value={onboardingData.firstCheckIn}
-              onChange={(e) => setOnboardingData({...onboardingData, firstCheckIn: e.target.value})}
-              className="min-h-[100px]"
-            />
+            {taskOptions.length > 0 && (
+              <div className="space-y-3">
+                <Label>Pilih task untuk inisiatif yang sudah dipilih:</Label>
+                <div className="space-y-2">
+                  {taskOptions.map((option, index) => (
+                    <div key={index} className="flex items-start space-x-2 p-3 rounded-lg border border-gray-200 hover:bg-gray-50">
+                      <Checkbox 
+                        id={`task-${index}`}
+                        checked={selectedTasks.includes(option)}
+                        onCheckedChange={(checked) => {
+                          let newTasks = [...(onboardingData.tasks || [])];
+                          if (checked) {
+                            newTasks.push(option);
+                          } else {
+                            newTasks = newTasks.filter(task => task !== option);
+                          }
+                          setOnboardingData({...onboardingData, tasks: newTasks});
+                        }}
+                      />
+                      <Label htmlFor={`task-${index}`} className="flex-1 cursor-pointer leading-relaxed">
+                        {option}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center space-x-2 pt-2">
+                  <Checkbox 
+                    id="custom-task"
+                    checked={onboardingData.tasks && onboardingData.tasks.includes("custom")}
+                    onCheckedChange={(checked) => {
+                      let newTasks = [...(onboardingData.tasks || [])];
+                      if (checked) {
+                        newTasks.push("custom");
+                      } else {
+                        newTasks = newTasks.filter(task => task !== "custom");
+                      }
+                      setOnboardingData({...onboardingData, tasks: newTasks});
+                    }}
+                  />
+                  <Label htmlFor="custom-task">Atau tambah task sendiri:</Label>
+                </div>
+              </div>
+            )}
+            
+            {((onboardingData.tasks && onboardingData.tasks.includes("custom")) || taskOptions.length === 0) && (
+              <div className="space-y-2">
+                <Label>Tambahkan task custom:</Label>
+                <div className="space-y-2">
+                  {onboardingData.tasks && onboardingData.tasks.filter(task => task !== "custom" && !taskOptions.includes(task)).map((task, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Input 
+                        placeholder={`Task ${index + 1}`}
+                        value={task}
+                        onChange={(e) => {
+                          const newTasks = [...(onboardingData.tasks || [])];
+                          const customIndex = newTasks.findIndex(t => t === task);
+                          if (customIndex !== -1) {
+                            newTasks[customIndex] = e.target.value;
+                          }
+                          setOnboardingData({...onboardingData, tasks: newTasks});
+                        }}
+                      />
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          const newTasks = (onboardingData.tasks || []).filter(t => t !== task);
+                          setOnboardingData({...onboardingData, tasks: newTasks});
+                        }}
+                      >
+                        Hapus
+                      </Button>
+                    </div>
+                  ))}
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setOnboardingData({...onboardingData, tasks: [...(onboardingData.tasks || []), ""]})}
+                  >
+                    Tambah Task
+                  </Button>
+                </div>
+              </div>
+            )}
+            
+            {selectedTasks.length > 0 && (
+              <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                <p className="text-sm text-purple-800 mb-2">
+                  <strong>Task terpilih:</strong>
+                </p>
+                <ul className="text-sm text-purple-700 space-y-1">
+                  {selectedTasks.map((task, index) => (
+                    <li key={index}>• {task}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         );
 
@@ -790,6 +1190,7 @@ export default function CompanyOnboarding() {
                 <p><strong>📏 Key Results:</strong> {onboardingData.keyResults.length} target</p>
                 <p><strong>📅 Cadence:</strong> {onboardingData.cadence || "Belum dipilih"}</p>
                 <p><strong>🧩 Inisiatif:</strong> {onboardingData.initiatives.length} langkah</p>
+                <p><strong>✅ Task:</strong> {onboardingData.tasks ? onboardingData.tasks.length : 0} task</p>
                 <p><strong>👥 Tim:</strong> {onboardingData.invitedMembers.length} anggota</p>
               </div>
             </div>
