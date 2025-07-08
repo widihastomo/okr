@@ -94,6 +94,12 @@ export default function SystemAdminSidebar({
       active: location === "/system-admin/add-ons"
     },
     {
+      label: "Pengaturan Free Trial",
+      icon: Clock,
+      path: "/system-admin/trial-settings",
+      active: location === "/system-admin/trial-settings"
+    },
+    {
       label: "Database",
       icon: Database,
       path: "/system-admin/database",

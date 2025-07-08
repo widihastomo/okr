@@ -6895,6 +6895,116 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Trial Configuration Management - System Admin Only
+  app.get("/api/admin/trial-configuration", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      
+      // Only system owners can access trial configuration
+      if (!user.isSystemOwner) {
+        return res.status(403).json({ error: "Access denied. System owner required." });
+      }
+      
+      // Get the free trial subscription plan
+      const [trialPlan] = await db.select()
+        .from(subscriptionPlans)
+        .where(eq(subscriptionPlans.name, "Free Trial"));
+      
+      if (!trialPlan) {
+        return res.status(404).json({ error: "Free trial plan not found" });
+      }
+      
+      // Get trial billing period
+      const [billingPeriod] = await db.select()
+        .from(billingPeriods)
+        .where(eq(billingPeriods.planId, trialPlan.id));
+      
+      // Format response
+      const trialConfig = {
+        id: trialPlan.id,
+        name: trialPlan.name,
+        description: trialPlan.description || "Paket uji coba gratis dengan akses penuh ke semua fitur",
+        maxUsers: trialPlan.maxUsers,
+        trialDurationDays: billingPeriod?.durationMonths ? billingPeriod.durationMonths * 30 : 7, // Convert to days
+        isActive: trialPlan.isActive,
+        features: {
+          fullAccess: true,
+          analyticsEnabled: true,
+          supportEnabled: true,
+          exportEnabled: true
+        }
+      };
+      
+      res.json(trialConfig);
+    } catch (error) {
+      console.error("Error fetching trial configuration:", error);
+      res.status(500).json({ error: "Failed to fetch trial configuration" });
+    }
+  });
+  
+  app.put("/api/admin/trial-configuration", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      
+      // Only system owners can update trial configuration
+      if (!user.isSystemOwner) {
+        return res.status(403).json({ error: "Access denied. System owner required." });
+      }
+      
+      const { name, description, maxUsers, trialDurationDays, isActive, features } = req.body;
+      
+      // Validate input
+      if (!name || typeof maxUsers !== 'number' || typeof trialDurationDays !== 'number') {
+        return res.status(400).json({ error: "Invalid input data" });
+      }
+      
+      // Get the free trial subscription plan
+      const [trialPlan] = await db.select()
+        .from(subscriptionPlans)
+        .where(eq(subscriptionPlans.name, "Free Trial"));
+      
+      if (!trialPlan) {
+        return res.status(404).json({ error: "Free trial plan not found" });
+      }
+      
+      // Update subscription plan
+      await db.update(subscriptionPlans)
+        .set({
+          name,
+          description,
+          maxUsers,
+          isActive,
+          updatedAt: new Date().toISOString()
+        })
+        .where(eq(subscriptionPlans.id, trialPlan.id));
+      
+      // Update billing period (convert days to months for storage)
+      const durationMonths = Math.ceil(trialDurationDays / 30);
+      await db.update(billingPeriods)
+        .set({
+          durationMonths,
+          updatedAt: new Date().toISOString()
+        })
+        .where(eq(billingPeriods.planId, trialPlan.id));
+      
+      // Return updated configuration
+      const updatedConfig = {
+        id: trialPlan.id,
+        name,
+        description,
+        maxUsers,
+        trialDurationDays,
+        isActive,
+        features
+      };
+      
+      res.json(updatedConfig);
+    } catch (error) {
+      console.error("Error updating trial configuration:", error);
+      res.status(500).json({ error: "Failed to update trial configuration" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
