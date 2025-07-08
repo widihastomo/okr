@@ -55,7 +55,6 @@ import { Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 
-
 interface GlobalHeaderProps {
   onMenuToggle?: () => void;
   sidebarOpen?: boolean;
@@ -72,7 +71,12 @@ const taskFormSchema = z.object({
   assignedTo: z.string().optional(),
 });
 
-export default function GlobalHeader({ onMenuToggle, sidebarOpen, sidebarCollapsed, onToggleCollapse }: GlobalHeaderProps) {
+export default function GlobalHeader({
+  onMenuToggle,
+  sidebarOpen,
+  sidebarCollapsed,
+  onToggleCollapse,
+}: GlobalHeaderProps) {
   const [notificationCount] = useState(1);
   const [isOKRModalOpen, setIsOKRModalOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -80,7 +84,7 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen, sidebarCollaps
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   // Check if user is system owner
   const isSystemOwner = (user as any)?.isSystemOwner || false;
 
@@ -189,13 +193,13 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen, sidebarCollaps
   }, []);
 
   return (
-    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between fixed top-0 left-0 right-0 z-50">
       {/* Left side - Menu toggle and Logo */}
       <div className="flex items-center space-x-3">
         {/* Sidebar toggle button */}
-        <Button 
-          variant="ghost" 
-          size="icon" 
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={handleMenuClick}
           className="hover:bg-gray-100"
         >
@@ -204,18 +208,12 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen, sidebarCollaps
 
         {/* Logo */}
         <div className="flex items-center space-x-2">
-          <img 
-            src="/refokus-logo.png" 
-            alt="Refokus" 
-            className="h-10 w-auto"
-          />
+          <img src="/refokus-logo.png" alt="Refokus" className="h-10 w-auto" />
         </div>
       </div>
 
       {/* Right side - Action buttons and notifications */}
       <div className="flex items-center space-x-3">
-
-
         {/* Quick Action FAB */}
         <div className="relative">
           {/* Expanded Action Buttons */}
@@ -292,7 +290,9 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen, sidebarCollaps
               className="flex items-center space-x-2 cursor-pointer text-red-600 hover:text-red-700"
               onClick={async () => {
                 try {
-                  const response = await fetch("/api/auth/logout", { method: "POST" });
+                  const response = await fetch("/api/auth/logout", {
+                    method: "POST",
+                  });
                   if (response.ok) {
                     // Clear any local storage or session data
                     localStorage.clear();
@@ -467,7 +467,7 @@ export default function GlobalHeader({ onMenuToggle, sidebarOpen, sidebarCollaps
                                 .filter((user: any) => user?.id)
                                 .map((user: any) => (
                                   <SelectItem key={user.id} value={user.id}>
-                                    {user.firstName || ''} {user.lastName || ''}
+                                    {user.firstName || ""} {user.lastName || ""}
                                   </SelectItem>
                                 ))}
                           </SelectContent>
