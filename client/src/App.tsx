@@ -45,6 +45,7 @@ import SystemSubscriptionManagement from "@/pages/system-subscription-management
 import InvoiceManagement from "@/pages/invoice-management";
 import InvoiceDetail from "@/pages/invoice-detail";
 import InvoicePaymentFinish from "@/pages/invoice-payment-finish";
+import SubscriptionAddonIntegration from "@/pages/subscription-addon-integration";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -169,7 +170,9 @@ function Router() {
               <Route path="/add-ons" component={AddOnsManagement} />
               <Route path="/system-admin/add-ons" component={SystemAddonManagement} />
           <Route path="/system-admin/subscriptions" component={SystemSubscriptionManagement} />
-          <Route path="/subscription-addon-integration" component={lazy(() => import("@/pages/subscription-addon-integration"))} />
+          <Route path="/subscription-addon-integration">
+            <SubscriptionAddonIntegration />
+          </Route>
               <Route path="/invoices" component={InvoiceManagement} />
               <Route path="/invoices/:id" component={InvoiceDetail} />
               <Route path="/invoice-payment-finish" component={InvoicePaymentFinish} />
