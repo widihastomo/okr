@@ -80,6 +80,12 @@ export default function Sidebar({
       active: location === "/subscription-packages",
     },
     {
+      label: "Pengaturan Free Trial",
+      icon: Clock,
+      path: "/system-admin/trial-settings",
+      active: location === "/system-admin/trial-settings",
+    },
+    {
       label: "Kelola Langganan",
       icon: CreditCard,
       path: "/system-admin/subscriptions",
@@ -131,6 +137,12 @@ export default function Sidebar({
   ];
 
   const regularUserMenuItems = [
+    {
+      label: "Achievement Trial",
+      icon: Trophy,
+      path: "/trial-achievements",
+      active: location === "/trial-achievements",
+    },
     {
       label: "Daily Focus",
       icon: Sun,

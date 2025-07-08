@@ -97,9 +97,9 @@ export default function TrialAchievements() {
 
   const categories = [
     { key: "setup", label: "Setup", icon: Target, color: "text-blue-600" },
-    { key: "engagement", label: "Keterlibatan", icon: Sparkles, color: "text-green-600" },
-    { key: "progress", label: "Progress", icon: Trophy, color: "text-orange-600" },
-    { key: "completion", label: "Penyelesaian", icon: Award, color: "text-purple-600" },
+    { key: "workflow", label: "Workflow", icon: Sparkles, color: "text-green-600" },
+    { key: "monitoring", label: "Monitoring", icon: Trophy, color: "text-purple-600" },
+    { key: "mastery", label: "Mastery", icon: Award, color: "text-orange-600" },
   ];
 
   return (
