@@ -1168,20 +1168,20 @@ export default function CompanyOnboarding() {
               {/* Summary Cards */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
-                  <div className="text-2xl font-bold text-blue-600">{onboardingData.keyResults.length}</div>
+                  <div className="text-2xl font-bold text-blue-600">1</div>
+                  <div className="text-sm text-gray-600">Objective</div>
+                </div>
+                <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
+                  <div className="text-2xl font-bold text-green-600">{onboardingData.keyResults.length}</div>
                   <div className="text-sm text-gray-600">Key Results</div>
                 </div>
                 <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
-                  <div className="text-2xl font-bold text-green-600">{onboardingData.initiatives.length}</div>
+                  <div className="text-2xl font-bold text-purple-600">{onboardingData.initiatives.length}</div>
                   <div className="text-sm text-gray-600">Inisiatif</div>
                 </div>
                 <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
-                  <div className="text-2xl font-bold text-purple-600">{onboardingData.tasks ? onboardingData.tasks.length : 0}</div>
+                  <div className="text-2xl font-bold text-orange-600">{onboardingData.tasks ? onboardingData.tasks.length : 0}</div>
                   <div className="text-sm text-gray-600">Task</div>
-                </div>
-                <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
-                  <div className="text-2xl font-bold text-orange-600">{onboardingData.invitedMembers.length}</div>
-                  <div className="text-sm text-gray-600">Anggota Tim</div>
                 </div>
               </div>
 
@@ -1197,47 +1197,64 @@ export default function CompanyOnboarding() {
                     <span className="inline-block bg-green-100 text-green-800 px-2 py-1 rounded ml-2">
                       {onboardingData.cadence || "Belum dipilih"}
                     </span>
+                    <span className="inline-block bg-purple-100 text-purple-800 px-2 py-1 rounded ml-2">
+                      {onboardingData.cycleDuration || "Belum dipilih"}
+                    </span>
                   </div>
                 </div>
 
                 {onboardingData.keyResults.length > 0 && (
                   <div className="bg-white p-4 rounded-lg border border-gray-200">
-                    <h4 className="font-semibold text-green-800 mb-2">📏 Key Results yang Dipilih</h4>
-                    <div className="space-y-2">
-                      {onboardingData.keyResults.filter(kr => kr && kr !== "custom").map((kr, index) => (
-                        <div key={index} className="flex items-center space-x-2">
-                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                          <span className="text-sm text-gray-700">{kr}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {onboardingData.initiatives.length > 0 && (
-                  <div className="bg-white p-4 rounded-lg border border-gray-200">
-                    <h4 className="font-semibold text-purple-800 mb-2">🧩 Inisiatif yang Akan Dijalankan</h4>
-                    <div className="space-y-2">
-                      {onboardingData.initiatives.filter(init => init && init !== "custom").map((init, index) => (
-                        <div key={index} className="flex items-center space-x-2">
-                          <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                          <span className="text-sm text-gray-700">{init}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {onboardingData.tasks && onboardingData.tasks.length > 0 && (
-                  <div className="bg-white p-4 rounded-lg border border-gray-200">
-                    <h4 className="font-semibold text-orange-800 mb-2">✅ Task yang Akan Dikerjakan</h4>
-                    <div className="space-y-2">
-                      {onboardingData.tasks.filter(task => task && task !== "custom").map((task, index) => (
-                        <div key={index} className="flex items-center space-x-2">
-                          <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                          <span className="text-sm text-gray-700">{task}</span>
-                        </div>
-                      ))}
+                    <h4 className="font-semibold text-green-800 mb-3">📏 Key Results & Hierarki Pelaksanaan</h4>
+                    <div className="space-y-4">
+                      {onboardingData.keyResults.filter(kr => kr && kr !== "custom").map((kr, krIndex) => {
+                        // Get initiatives related to this key result (simplified: divide initiatives equally)
+                        const initiativesPerKR = Math.ceil(onboardingData.initiatives.filter(init => init && init !== "custom").length / onboardingData.keyResults.filter(kr => kr && kr !== "custom").length);
+                        const relatedInitiatives = onboardingData.initiatives.filter(init => init && init !== "custom").slice(krIndex * initiativesPerKR, (krIndex + 1) * initiativesPerKR);
+                        
+                        return (
+                          <div key={krIndex} className="border-l-2 border-green-200 pl-4 space-y-3">
+                            {/* Key Result */}
+                            <div className="flex items-start space-x-2">
+                              <div className="w-2 h-2 bg-green-500 rounded-full mt-1.5"></div>
+                              <div>
+                                <span className="text-sm font-semibold text-green-800">Key Result {krIndex + 1}</span>
+                                <p className="text-sm text-gray-700">{kr}</p>
+                              </div>
+                            </div>
+                            
+                            {/* Initiatives for this Key Result */}
+                            {relatedInitiatives.map((init, initIndex) => {
+                              // Get tasks related to this initiative (simplified: divide tasks equally)
+                              const tasksPerInit = Math.ceil((onboardingData.tasks?.filter(task => task && task !== "custom")?.length || 0) / relatedInitiatives.length);
+                              const relatedTasks = onboardingData.tasks?.filter(task => task && task !== "custom")?.slice(initIndex * tasksPerInit, (initIndex + 1) * tasksPerInit) || [];
+                              
+                              return (
+                                <div key={initIndex} className="ml-4 border-l-2 border-purple-200 pl-4 space-y-2">
+                                  <div className="flex items-start space-x-2">
+                                    <div className="w-1.5 h-1.5 bg-purple-500 rounded-full mt-1.5"></div>
+                                    <div>
+                                      <span className="text-xs font-medium text-purple-600">Inisiatif {initIndex + 1}</span>
+                                      <p className="text-sm text-purple-700">{init}</p>
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Tasks for this Initiative */}
+                                  {relatedTasks.map((task, taskIndex) => (
+                                    <div key={taskIndex} className="ml-4 flex items-start space-x-2">
+                                      <div className="w-1 h-1 bg-orange-500 rounded-full mt-2"></div>
+                                      <div>
+                                        <span className="text-xs font-medium text-orange-600">Task {taskIndex + 1}</span>
+                                        <p className="text-xs text-orange-700">{task}</p>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
