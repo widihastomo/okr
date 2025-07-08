@@ -180,11 +180,25 @@ export default function TrialMascot({ className }: MascotProps) {
           icon: Rocket,
         },
         {
+          state: "thinking" as MascotState,
+          title: "Apa itu Goal dan Angka Target? 🎯",
+          message: "Goal adalah tujuan yang ingin dicapai organisasi, sedangkan Angka Target adalah metrik terukur untuk mengevaluasi pencapaian goal tersebut. Contoh: Goal 'Meningkatkan Kepuasan Pelanggan' dengan target 'Rating 4.5/5'.",
+          action: "Lihat Panduan",
+          icon: Target,
+        },
+        {
           state: "encouraging" as MascotState,
           title: "Ayo mulai! 🚀",
           message: "Ikuti panduan onboarding di bawah untuk memulai perjalanan Anda. Saya akan membantu setiap langkahnya!",
           action: "Lihat Panduan",
           icon: Target,
+        },
+        {
+          state: "pointing" as MascotState,
+          title: "Contoh Goal yang Baik 💡",
+          message: "Goal yang efektif adalah SMART: Specific (spesifik), Measurable (terukur), Achievable (dapat dicapai), Relevant (relevan), Time-bound (berbatas waktu). Contoh: 'Meningkatkan pendapatan bulanan sebesar 25% dalam 6 bulan ke depan'.",
+          action: "Buat Goal Pertama",
+          icon: Lightbulb,
         },
       ];
     } else if (progressPercentage < 30) {
@@ -197,11 +211,25 @@ export default function TrialMascot({ className }: MascotProps) {
           icon: Zap,
         },
         {
+          state: "thinking" as MascotState,
+          title: "Memahami Angka Target 📊",
+          message: "Angka Target (Key Result) mengukur kemajuan goal secara kuantitatif. Contoh untuk goal 'Meningkatkan Brand Awareness': Target 'Followers Instagram naik 1000 orang', 'Engagement rate naik 15%', 'Reach bulanan 50K'.",
+          action: "Tambah Angka Target",
+          icon: Target,
+        },
+        {
           state: "pointing" as MascotState,
           title: "Tip dari Orby! 💡",
           message: "Coba buat objective pertama Anda! Ini akan membantu tim fokus pada tujuan yang jelas.",
           action: "Buat Objective",
           icon: Lightbulb,
+        },
+        {
+          state: "encouraging" as MascotState,
+          title: "Hubungan Goal dan Target 🔗",
+          message: "Setiap Goal sebaiknya memiliki 2-4 Angka Target untuk mengukur kesuksesan. Target harus spesifik, terukur, dan realistis. Contoh Goal 'Meningkatkan Produktivitas Tim': Target 'Menyelesaikan 90% task tepat waktu', 'Mengurangi meeting 30%'.",
+          action: "Pahami Lebih Lanjut",
+          icon: Target,
         },
       ];
     } else if (progressPercentage < 70) {
@@ -349,6 +377,13 @@ export default function TrialMascot({ className }: MascotProps) {
                     setMessageIndex((prev) => (prev + 1) % messages.length);
                   } else if (action.includes("Explore")) {
                     window.location.href = "/analytics";
+                  } else if (action.includes("Tambah Angka Target")) {
+                    window.location.href = "/dashboard";
+                  } else if (action.includes("Buat Goal") || action.includes("Goal Pertama")) {
+                    window.location.href = "/dashboard";
+                  } else if (action.includes("Pahami Lebih Lanjut")) {
+                    // Cycle to next educational message
+                    setMessageIndex((prev) => (prev + 1) % messages.length);
                   } else {
                     // Default action - scroll to onboarding
                     document.querySelector('[data-testid="onboarding-missions"]')?.scrollIntoView({ behavior: 'smooth' });

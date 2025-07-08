@@ -10,7 +10,7 @@ export const MascotFloatingAnimation: React.FC<{ children: React.ReactNode; clas
     animation: "float 3s ease-in-out infinite",
   }}>
     {children}
-    <style jsx>{`
+    <style jsx global>{`
       @keyframes float {
         0%, 100% { transform: translateY(0px); }
         50% { transform: translateY(-10px); }
@@ -36,7 +36,7 @@ export const MascotWaveAnimation: React.FC<{ children: React.ReactNode; classNam
     animation: "wave 2s ease-in-out infinite",
   }}>
     {children}
-    <style jsx>{`
+    <style jsx global>{`
       @keyframes wave {
         0%, 100% { transform: rotate(0deg); }
         25% { transform: rotate(10deg); }
