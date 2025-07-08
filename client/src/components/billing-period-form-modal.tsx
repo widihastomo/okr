@@ -54,7 +54,7 @@ export function BillingPeriodFormModal({
     planId: planId || "",
     periodType: "monthly",
     periodMonths: 1,
-    price: "0",
+    price: "",
     discountPercentage: 0,
     isActive: true,
   });
@@ -74,7 +74,7 @@ export function BillingPeriodFormModal({
         planId,
         periodType: "monthly",
         periodMonths: 1,
-        price: "0",
+        price: "",
         discountPercentage: 0,
         isActive: true,
       });
@@ -111,10 +111,26 @@ export function BillingPeriodFormModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.planId || !formData.price || parseFloat(formData.price) <= 0 || formData.periodMonths <= 0) {
+    
+    // Debug logging
+    console.log("Form data:", formData);
+    console.log("Validation checks:", {
+      planId: formData.planId,
+      price: formData.price,
+      priceFloat: parseFloat(formData.price),
+      periodMonths: formData.periodMonths
+    });
+    
+    if (!formData.planId || !formData.price || isNaN(parseFloat(formData.price)) || parseFloat(formData.price) < 0 || formData.periodMonths <= 0) {
+      let missingFields = [];
+      if (!formData.planId) missingFields.push("Plan ID");
+      if (!formData.price || formData.price.trim() === "") missingFields.push("Harga tidak boleh kosong");
+      if (!isNaN(parseFloat(formData.price)) && parseFloat(formData.price) < 0) missingFields.push("Harga tidak boleh negatif");
+      if (formData.periodMonths <= 0) missingFields.push("Periode bulan harus lebih dari 0");
+      
       toast({
         title: "Data tidak lengkap",
-        description: "Mohon lengkapi semua field yang wajib diisi.",
+        description: `Field yang perlu diperbaiki: ${missingFields.join(", ")}`,
         variant: "destructive",
       });
       return;

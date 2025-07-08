@@ -203,7 +203,7 @@ function PackageFormModal({
     const newPeriod: BillingPeriodData = {
       periodType: "monthly",
       periodMonths: 1,
-      price: "0",
+      price: "",
       discountPercentage: 0,
       isActive: true,
     };
