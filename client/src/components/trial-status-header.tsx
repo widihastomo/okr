@@ -37,11 +37,8 @@ export default function TrialStatusHeader() {
             <Clock className={`h-4 w-4 ${isExpiring ? 'text-red-600' : 'text-yellow-600'}`} />
           </div>
           <span className="text-sm font-medium text-gray-700">
-            Trial Period Active
+            Masa uji coba akan berakhir dalam {daysRemaining} hari
           </span>
-          <Badge variant={isExpiring ? "destructive" : "secondary"} className="text-xs">
-            {daysRemaining} hari tersisa
-          </Badge>
         </div>
 
         <Link to="/pricing">
@@ -55,7 +52,7 @@ export default function TrialStatusHeader() {
 
         {isExpiring && (
           <div className="text-sm text-red-600 font-medium">
-            ⚠️ Trial berakhir dalam {daysRemaining} hari!
+            ⚠️ Masa uji coba akan berakhir dalam {daysRemaining} hari!
           </div>
         )}
       </div>
@@ -69,11 +66,8 @@ export default function TrialStatusHeader() {
               <Clock className={`h-3 w-3 ${isExpiring ? 'text-red-600' : 'text-yellow-600'}`} />
             </div>
             <span className="text-xs font-medium text-gray-700">
-              Trial
+              Masa uji coba akan berakhir dalam {daysRemaining} hari
             </span>
-            <Badge variant={isExpiring ? "destructive" : "secondary"} className="text-xs px-1.5 py-0.5">
-              {daysRemaining} hari
-            </Badge>
           </div>
           <Link to="/pricing">
             <Button 
@@ -101,7 +95,7 @@ export default function TrialStatusHeader() {
         {/* Expiring warning for mobile */}
         {isExpiring && (
           <div className="text-xs text-red-600 font-medium mt-1 text-center">
-            ⚠️ Trial berakhir dalam {daysRemaining} hari!
+            ⚠️ Masa uji coba akan berakhir dalam {daysRemaining} hari!
           </div>
         )}
       </div>
