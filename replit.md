@@ -113,6 +113,13 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 08, 2025. Successfully simplified company registration form and fixed Daily Focus header overlap:
+  * Removed phone, address, and description fields from company registration form for streamlined UX
+  * Updated database schema by dropping phone, address, description columns from organizations table
+  * Cleaned up TypeScript interfaces and validation schemas for simplified registration process
+  * Added top padding (pt-16) to Daily Focus page to prevent header overlap issue
+  * Company registration now only requires essential fields: name, industry, size, website (optional)
+  * Form validation and component imports cleaned up to remove unused fields
 - July 08, 2025. Successfully disabled auto-login in development mode for registration testing:
   * Commented out auto-login middleware in authRoutes.ts to prevent automatic system owner login
   * Disabled auto-session creation in emailAuth.ts requireAuth middleware

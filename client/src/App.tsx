@@ -127,7 +127,7 @@ function Router() {
           )}
         >
           {/* Main Content */}
-          <div className="flex-1 min-h-[calc(100vh-4rem)] overflow-x-hidden">
+          <div className="flex-1 min-h-[calc(100vh-4rem)] py-3 overflow-x-hidden">
             <Switch>
               <Route path="/" component={DailyFocusPage} />
               <Route path="/daily-focus" component={DailyFocusPage} />
@@ -172,18 +172,27 @@ function Router() {
               />
               <Route path="/package-detail/:id" component={PackageDetail} />
               <Route path="/add-ons" component={AddOnsManagement} />
-              <Route path="/system-admin/add-ons" component={SystemAddonManagement} />
-          <Route path="/system-admin/subscriptions" component={SystemSubscriptionManagement} />
-          <Route path="/subscription-addon-integration">
-            <SubscriptionAddonIntegration />
-          </Route>
-          <Route path="/dummy-client-examples">
-            <DummyClientExamples />
-          </Route>
-          <Route path="/referral-codes" component={ReferralCodes} />
+              <Route
+                path="/system-admin/add-ons"
+                component={SystemAddonManagement}
+              />
+              <Route
+                path="/system-admin/subscriptions"
+                component={SystemSubscriptionManagement}
+              />
+              <Route path="/subscription-addon-integration">
+                <SubscriptionAddonIntegration />
+              </Route>
+              <Route path="/dummy-client-examples">
+                <DummyClientExamples />
+              </Route>
+              <Route path="/referral-codes" component={ReferralCodes} />
               <Route path="/invoices" component={InvoiceManagement} />
               <Route path="/invoices/:id" component={InvoiceDetail} />
-              <Route path="/invoice-payment-finish" component={InvoicePaymentFinish} />
+              <Route
+                path="/invoice-payment-finish"
+                component={InvoicePaymentFinish}
+              />
               <Route component={NotFound} />
             </Switch>
           </div>
