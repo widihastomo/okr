@@ -236,12 +236,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(userData: InsertUser): Promise<User> {
-    const [user] = await db.insert(users).values(userData).returning();
-    return user;
+    const result = await db.insert(users).values(userData).returning() as User[];
+    if (!result || result.length === 0) {
+      throw new Error("Failed to create user");
+    }
+    return result[0];
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
-    const [user] = await db
+    const result = await db
       .insert(users)
       .values(userData)
       .onConflictDoUpdate({
@@ -251,8 +254,11 @@ export class DatabaseStorage implements IStorage {
           updatedAt: new Date(),
         },
       })
-      .returning();
-    return user;
+      .returning() as User[];
+    if (!result || result.length === 0) {
+      throw new Error("Failed to upsert user");
+    }
+    return result[0];
   }
 
   async updateUser(id: string, userData: Partial<UpsertUser>): Promise<User | undefined> {
@@ -1495,8 +1501,11 @@ export class DatabaseStorage implements IStorage {
 
   async createOrganization(orgData: any): Promise<any> {
     const { organizations } = await import("@shared/schema");
-    const [organization] = await db.insert(organizations).values(orgData).returning();
-    return organization;
+    const result = await db.insert(organizations).values(orgData).returning() as any[];
+    if (!result || result.length === 0) {
+      throw new Error("Failed to create organization");
+    }
+    return result[0];
   }
 
   async updateOrganization(id: string, updates: any): Promise<any> {

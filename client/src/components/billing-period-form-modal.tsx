@@ -54,7 +54,7 @@ export function BillingPeriodFormModal({
     planId: planId || "",
     periodType: "monthly",
     periodMonths: 1,
-    price: "",
+    price: "0",
     discountPercentage: 0,
     isActive: true,
   });
@@ -74,7 +74,7 @@ export function BillingPeriodFormModal({
         planId,
         periodType: "monthly",
         periodMonths: 1,
-        price: "",
+        price: "0",
         discountPercentage: 0,
         isActive: true,
       });
@@ -111,7 +111,7 @@ export function BillingPeriodFormModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.planId || !formData.price || formData.periodMonths === 0) {
+    if (!formData.planId || !formData.price || parseFloat(formData.price) <= 0 || formData.periodMonths <= 0) {
       toast({
         title: "Data tidak lengkap",
         description: "Mohon lengkapi semua field yang wajib diisi.",

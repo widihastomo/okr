@@ -203,7 +203,7 @@ function PackageFormModal({
     const newPeriod: BillingPeriodData = {
       periodType: "monthly",
       periodMonths: 1,
-      price: formData.price,
+      price: "0",
       discountPercentage: 0,
       isActive: true,
     };
@@ -439,8 +439,9 @@ function PackageFormModal({
                         <Label className="text-xs text-gray-600">Harga (IDR)</Label>
                         <Input
                           type="number"
-                          value={period.price}
-                          onChange={(e) => updateBillingPeriod(index, { ...period, price: e.target.value })}
+                          value={period.price || "0"}
+                          onChange={(e) => updateBillingPeriod(index, { ...period, price: e.target.value || "0" })}
+                          placeholder="0"
                           className="h-8 text-sm"
                         />
                       </div>
