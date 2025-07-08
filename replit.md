@@ -121,7 +121,7 @@ Trial user untuk testing achievement system:
 ## Changelog
 ```
 Changelog:
-- July 08, 2025. Successfully implemented playful mascot character system for trial user guidance:
+- July 08, 2025. Successfully implemented playful mascot character system for trial user guidance with step-by-step mission alignment:
   * Created comprehensive trial mascot component (TrialMascot) with SVG character animations and multiple emotional states
   * Developed floating mascot system (FloatingMascot) that appears on all pages with contextual tips and draggable interface
   * Built mascot animation library with floating, pulse, wave, sparkle effects, and contextual tooltips
@@ -136,8 +136,10 @@ Changelog:
   * Added comprehensive trial progress tracking with visual progress bar and contextual achievement feedback
   * Enhanced mascot with educational content explaining goals vs targets with practical examples
   * Added detailed explanations of SMART goals methodology and Key Result relationships
-  * Fixed button functionality with comprehensive action handlers and console logging for debugging
-  * Resolved React JSX styling warnings in animation components for cleaner console output
+  * Updated mascot guidance to match exact 10-step onboarding mission sequence with step-by-step progression
+  * Replaced general progress-based messaging with mission-specific guidance aligned with onboarding tasks
+  * Fixed button functionality with comprehensive action handlers and removed auto-scroll behavior for better UX
+  * Resolved React JSX styling warnings and state management issues for cleaner console output
 - July 08, 2025. Successfully migrated onboarding mission system to Daily Focus page (root "/" route) with sequential numbered steps:
   * Completed migration from trial-achievements.tsx to daily-focus.tsx as main application homepage
   * Removed points system and gamification elements for cleaner, more focused interface

@@ -450,13 +450,7 @@ export default function TrialMascot({ className, missions = [], onMissionAction 
                     const currentMission = getNextMission();
                     if (onMissionAction && currentMission) {
                       onMissionAction(currentMission.name);
-                    } else {
-                      // Scroll to onboarding section if no mission action
-                      document.querySelector('[data-testid="onboarding-missions"]')?.scrollIntoView({ behavior: 'smooth' });
                     }
-                  } else if (action.includes("Panduan") || action.includes("Petualangan")) {
-                    // Scroll to onboarding section
-                    document.querySelector('[data-testid="onboarding-missions"]')?.scrollIntoView({ behavior: 'smooth' });
                   } else if (action.includes("Analytics") || action.includes("Explore Analytics")) {
                     window.location.href = "/analytics";
                   } else if (action.includes("Paket") || action.includes("Premium")) {
@@ -467,10 +461,8 @@ export default function TrialMascot({ className, missions = [], onMissionAction 
                   } else if (action.includes("Pahami Lebih Lanjut")) {
                     // Cycle to next educational message
                     setMessageIndex((prev) => (prev + 1) % messages.length);
-                  } else {
-                    // Default action - scroll to onboarding
-                    document.querySelector('[data-testid="onboarding-missions"]')?.scrollIntoView({ behavior: 'smooth' });
                   }
+                  // Removed all auto-scroll behavior
                 }}
               >
                 {IconComponent && <IconComponent className="h-3 w-3 mr-1" />}
