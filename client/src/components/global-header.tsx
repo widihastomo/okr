@@ -13,9 +13,6 @@ import {
   Target,
   Calendar,
   Flag,
-  Clock,
-  Users,
-  AlertTriangle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -110,14 +107,7 @@ export default function GlobalHeader({
     queryKey: ["/api/users"],
   });
 
-  // Fetch trial status and user limit for header display
-  const { data: trialStatus } = useQuery({
-    queryKey: ["/api/trial-status"],
-  });
 
-  const { data: userLimit } = useQuery({
-    queryKey: ["/api/user-limit-status"],
-  });
 
   // Handle menu button click - mobile sidebar toggle or desktop collapse
   const handleMenuClick = () => {
@@ -204,14 +194,8 @@ export default function GlobalHeader({
     };
   }, []);
 
-  // Trial status display logic
-  const isTrialActive = trialStatus?.isTrialActive;
-  const daysRemaining = trialStatus?.daysRemaining || 0;
-  const isExpiring = daysRemaining <= 2;
-  const isNearUserLimit = userLimit && userLimit.usersRemaining <= 1;
-
   return (
-    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between fixed top-0 left-0 right-0 z-50">
+    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between fixed left-0 right-0 z-40" style={{ top: '44px' }}>
       {/* Left side - Menu toggle and Logo */}
       <div className="flex items-center space-x-3">
         {/* Sidebar toggle button */}
@@ -229,43 +213,6 @@ export default function GlobalHeader({
           <img src="/refokus-logo.png" alt="Refokus" className="h-10 w-auto" />
         </div>
       </div>
-
-      {/* Center - Trial Status (visible only during trial) */}
-      {isTrialActive && (
-        <div className="flex items-center space-x-3 flex-1 justify-center">
-          <div className="flex items-center space-x-2">
-            <div className={`p-1.5 rounded-full ${isExpiring ? 'bg-red-100' : 'bg-yellow-100'}`}>
-              <Clock className={`h-4 w-4 ${isExpiring ? 'text-red-600' : 'text-yellow-600'}`} />
-            </div>
-            <div className="flex items-center space-x-2">
-              <span className="text-sm font-medium text-gray-700">Trial:</span>
-              <Badge variant={isExpiring ? "destructive" : "secondary"} className="text-xs">
-                {daysRemaining} hari tersisa
-              </Badge>
-              <span className="text-sm text-gray-600">
-                {trialStatus?.currentPlan}
-              </span>
-              {userLimit && (
-                <div className="flex items-center space-x-1 text-sm text-gray-600">
-                  <Users className="h-3 w-3" />
-                  <span>{userLimit.currentUsers}/{userLimit.maxUsers}</span>
-                  {isNearUserLimit && (
-                    <AlertTriangle className="h-3 w-3 text-yellow-600" />
-                  )}
-                </div>
-              )}
-              <Link to="/pricing">
-                <Button 
-                  size="sm" 
-                  className="h-6 px-2 text-xs bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
-                >
-                  Upgrade
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Right side - Action buttons and notifications */}
       <div className="flex items-center space-x-3">

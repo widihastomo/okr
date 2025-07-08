@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import GlobalHeader from "@/components/global-header";
+import TrialStatusHeader from "@/components/trial-status-header";
 import ClientSidebar from "@/components/client-sidebar";
 import SystemAdminSidebar from "@/components/system-admin-sidebar";
 import { NotificationProvider } from "@/components/notifications/notification-provider";
@@ -107,6 +108,9 @@ function Router() {
   return (
     <NotificationProvider>
       <div className="min-h-screen bg-gray-50">
+        {/* Trial Status Header - Shows above main header */}
+        <TrialStatusHeader />
+        
         {/* Global Header */}
         <GlobalHeader
           onMenuToggle={handleMenuToggle}
@@ -130,7 +134,7 @@ function Router() {
           )}
         >
           {/* Main Content */}
-          <div className="flex-1 min-h-[calc(100vh-4rem)] py-3 overflow-x-hidden">
+          <div className="flex-1 min-h-[calc(100vh-6rem)] py-3 overflow-x-hidden" style={{ paddingTop: '108px' }}>
             <Switch>
               <Route path="/" component={DailyFocusPage} />
               <Route path="/daily-focus" component={DailyFocusPage} />
