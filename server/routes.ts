@@ -3095,13 +3095,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/subscription-plans", requireAuth, isSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
-      const insertSubscriptionPlanSchema = createInsertSchema(subscriptionPlans);
+      const insertSubscriptionPlanSchema = createInsertSchema(subscriptionPlans).omit({
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        price: true, // Price is now handled through billing periods
+      });
       
       const validatedData = insertSubscriptionPlanSchema.parse(req.body);
       
       const [newPlan] = await db.insert(subscriptionPlans)
         .values({
           ...validatedData,
+          price: "0", // Default price, actual pricing handled by billing periods
           createdAt: new Date(),
           updatedAt: new Date(),
         })

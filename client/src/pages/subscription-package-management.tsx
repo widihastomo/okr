@@ -62,7 +62,6 @@ import { BillingPeriodFormModal } from "../components/billing-period-form-modal"
 interface PackageFormData {
   name: string;
   slug: string;
-  price: string;
   maxUsers: number | null;
   features: string[];
   stripeProductId?: string;
@@ -93,7 +92,6 @@ function PackageFormModal({
   const [formData, setFormData] = useState<PackageFormData>({
     name: pkg?.name || "",
     slug: pkg?.slug || "",
-    price: pkg?.price || "0",
     maxUsers: pkg?.maxUsers || null,
     features: pkg?.features as string[] || [],
     stripeProductId: pkg?.stripeProductId || "",
@@ -290,35 +288,20 @@ function PackageFormModal({
               <p className="text-xs text-gray-500 mt-1">Identifier unik untuk paket (otomatis dibuat dari nama)</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="price" className="text-sm font-medium">Harga per Bulan (IDR) *</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                  placeholder="99000"
-                  className="mt-1"
-                  required
-                />
-                <p className="text-xs text-gray-500 mt-1">Harga bulanan dalam rupiah (tanpa titik atau koma)</p>
-              </div>
-              <div>
-                <Label htmlFor="maxUsers" className="text-sm font-medium">Maksimal Pengguna</Label>
-                <Input
-                  id="maxUsers"
-                  type="number"
-                  value={formData.maxUsers || ""}
-                  onChange={(e) => setFormData({ 
-                    ...formData, 
-                    maxUsers: e.target.value ? parseInt(e.target.value) : null 
-                  })}
-                  placeholder="Kosongkan untuk unlimited"
-                  className="mt-1"
-                />
-                <p className="text-xs text-gray-500 mt-1">Batas maksimal pengguna (kosongkan untuk unlimited)</p>
-              </div>
+            <div>
+              <Label htmlFor="maxUsers" className="text-sm font-medium">Maksimal Pengguna</Label>
+              <Input
+                id="maxUsers"
+                type="number"
+                value={formData.maxUsers || ""}
+                onChange={(e) => setFormData({ 
+                  ...formData, 
+                  maxUsers: e.target.value ? parseInt(e.target.value) : null 
+                })}
+                placeholder="Kosongkan untuk unlimited"
+                className="mt-1"
+              />
+              <p className="text-xs text-gray-500 mt-1">Batas maksimal pengguna (kosongkan untuk unlimited)</p>
             </div>
 
             <div className="bg-gray-50 p-4 rounded-lg">
@@ -523,7 +506,7 @@ function PackageFormModal({
             </Button>
             <Button 
               type="submit" 
-              disabled={mutation.isPending || !formData.name || !formData.slug || !formData.price}
+              disabled={mutation.isPending || !formData.name || !formData.slug}
               className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 px-6"
             >
               {mutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
