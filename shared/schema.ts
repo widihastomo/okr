@@ -116,6 +116,9 @@ export const organizations = pgTable("organizations", {
   size: text("size"), // "1-10", "11-50", "51-200", "201-500", "500+"
   ownerId: uuid("owner_id"), // Organization owner - will be added via migration
   registrationStatus: text("registration_status").notNull().default("pending"), // "pending", "approved", "rejected", "suspended"
+  onboardingCompleted: boolean("onboarding_completed").default(false), // Track if organization has completed onboarding
+  onboardingCompletedAt: timestamp("onboarding_completed_at"),
+  onboardingData: jsonb("onboarding_data"), // Store onboarding progress data
   approvedBy: uuid("approved_by").references(() => users.id),
   approvedAt: timestamp("approved_at"),
   rejectedBy: uuid("rejected_by").references(() => users.id),

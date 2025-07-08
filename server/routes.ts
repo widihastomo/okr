@@ -6807,6 +6807,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Company onboarding endpoints
+  app.get("/api/onboarding/status", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const status = await storage.getOrganizationOnboardingStatus(currentUser.organizationId);
+      res.json(status);
+    } catch (error: any) {
+      console.error("Error fetching onboarding status:", error);
+      res.status(500).json({ message: "Failed to fetch onboarding status" });
+    }
+  });
+
+  app.post("/api/onboarding/complete", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const result = await storage.completeOrganizationOnboarding(currentUser.organizationId);
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error completing onboarding:", error);
+      res.status(500).json({ message: "Failed to complete onboarding" });
+    }
+  });
+
   // Client Registration API
   app.post("/api/registration/generate-invoice", async (req, res) => {
     try {

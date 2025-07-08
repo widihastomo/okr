@@ -2,7 +2,7 @@ import { Switch, Route, useLocation } from "wouter";
 import { useState, useEffect, lazy } from "react";
 import { cn } from "@/lib/utils";
 import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
@@ -54,12 +54,20 @@ import TrialSettingsPage from "@/pages/system-admin/trial-settings";
 import DummyClientExamples from "@/pages/dummy-client-examples";
 import ReferralCodes from "@/pages/referral-codes";
 import TrialAchievements from "@/pages/trial-achievements";
+import CompanyOnboarding from "@/pages/company-onboarding";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [location] = useLocation();
+  
+  // Check onboarding status
+  const { data: onboardingStatus, isLoading: isOnboardingLoading } = useQuery({
+    queryKey: ["/api/onboarding/status"],
+    enabled: isAuthenticated && !isLoading,
+    retry: false,
+  });
 
   // Clear logout flag on app start if user is authenticated
   useEffect(() => {
@@ -81,6 +89,16 @@ function Router() {
       }
     }
   }, [isAuthenticated, user, location]);
+  
+  // Redirect non-system owner users to onboarding if they haven't completed it
+  useEffect(() => {
+    if (isAuthenticated && user && !(user as any)?.isSystemOwner && !isOnboardingLoading) {
+      // Check if user's organization has completed onboarding
+      if (onboardingStatus && !onboardingStatus.isCompleted && location !== "/onboarding") {
+        window.location.href = "/onboarding";
+      }
+    }
+  }, [isAuthenticated, user, onboardingStatus, isOnboardingLoading, location]);
 
   if (isLoading) {
     return (
@@ -136,6 +154,7 @@ function Router() {
           {/* Main Content */}
           <div className="flex-1 min-h-[calc(100vh-6rem)] py-3 overflow-x-hidden pt-[108px] sm:pt-[108px]">
             <Switch>
+              <Route path="/onboarding" component={CompanyOnboarding} />
               <Route path="/" component={DailyFocusPage} />
               <Route path="/daily-focus" component={DailyFocusPage} />
               <Route path="/dashboard" component={Dashboard} />

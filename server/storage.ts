@@ -1,7 +1,7 @@
 import { 
   cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives, tasks, taskComments,
   initiativeMembers, initiativeDocuments, initiativeNotes, initiativeSuccessMetrics, successMetricUpdates,
-  notifications, notificationPreferences, userOnboardingProgress,
+  notifications, notificationPreferences, userOnboardingProgress, organizations,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
   type CheckIn, type Initiative, type Task, type TaskComment, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
   type InitiativeNote, type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
@@ -166,6 +166,10 @@ export interface IStorage {
   // Onboarding Progress
   getUserOnboardingProgress(userId: string): Promise<UserOnboardingProgress | null>;
   updateUserOnboardingProgress(userId: string, progress: UpdateOnboardingProgress): Promise<UserOnboardingProgress>;
+  
+  // Organization Onboarding Status
+  getOrganizationOnboardingStatus(organizationId: string): Promise<{ isCompleted: boolean; completedAt?: Date; data?: any }>;
+  completeOrganizationOnboarding(organizationId: string): Promise<{ isCompleted: boolean; completedAt: Date }>;
 }
 
 // Helper function to calculate and update status automatically
@@ -1561,6 +1565,54 @@ export class DatabaseStorage implements IStorage {
       }
     } catch (error) {
       console.error("Error updating onboarding progress:", error);
+      throw error;
+    }
+  }
+  
+  // Organization Onboarding Status
+  async getOrganizationOnboardingStatus(organizationId: string): Promise<{ isCompleted: boolean; completedAt?: Date; data?: any }> {
+    try {
+      const [organization] = await db.select().from(organizations).where(eq(organizations.id, organizationId));
+      
+      if (!organization) {
+        return { isCompleted: false };
+      }
+      
+      return {
+        isCompleted: organization.onboardingCompleted || false,
+        completedAt: organization.onboardingCompletedAt || undefined,
+        data: organization.onboardingData || undefined
+      };
+    } catch (error) {
+      console.error("Error fetching organization onboarding status:", error);
+      throw error;
+    }
+  }
+  
+  async completeOrganizationOnboarding(organizationId: string): Promise<{ isCompleted: boolean; completedAt: Date }> {
+    try {
+      const completedAt = new Date();
+      
+      const [updatedOrganization] = await db
+        .update(organizations)
+        .set({
+          onboardingCompleted: true,
+          onboardingCompletedAt: completedAt,
+          updatedAt: completedAt
+        })
+        .where(eq(organizations.id, organizationId))
+        .returning();
+      
+      if (!updatedOrganization) {
+        throw new Error("Organization not found");
+      }
+      
+      return {
+        isCompleted: true,
+        completedAt: completedAt
+      };
+    } catch (error) {
+      console.error("Error completing organization onboarding:", error);
       throw error;
     }
   }
