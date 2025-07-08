@@ -150,16 +150,32 @@ function PackageFormModal({
       onClose();
     },
     onError: (error: any) => {
+      console.error("Package creation/update error:", error);
       let errorMessage = error.message;
       
       // Handle specific error cases
       if (error.message.includes("Slug sudah digunakan")) {
         errorMessage = "Slug sudah digunakan. Sistem akan membuat slug unik otomatis.";
+      } else if (error.message.includes("validation")) {
+        errorMessage = "Data tidak valid. Periksa kembali input Anda.";
+      } else if (error.message.includes("billing-periods")) {
+        errorMessage = "Gagal membuat periode billing. Periksa data periode billing.";
+      } else if (error.message.includes("network") || error.message.includes("fetch")) {
+        errorMessage = "Gagal terhubung ke server. Coba lagi dalam beberapa saat.";
       }
       
       toast({
         title: "Gagal menyimpan paket",
-        description: errorMessage,
+        description: (
+          <div className="space-y-2">
+            <div>{errorMessage}</div>
+            {error.details && (
+              <div className="text-sm opacity-75">
+                Detail: {typeof error.details === 'string' ? error.details : JSON.stringify(error.details)}
+              </div>
+            )}
+          </div>
+        ),
         variant: "destructive",
       });
     },
@@ -167,14 +183,60 @@ function PackageFormModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.slug || !formData.price) {
+    
+    // Enhanced validation with specific field error messages
+    let missingFields: string[] = [];
+    let billingErrors: string[] = [];
+    
+    // Check required basic fields
+    if (!formData.name || formData.name.trim() === "") {
+      missingFields.push("Nama paket");
+    }
+    if (!formData.slug || formData.slug.trim() === "") {
+      missingFields.push("Slug paket");
+    }
+    if (formData.features.length === 0) {
+      missingFields.push("Minimal 1 fitur paket");
+    }
+    
+    // Validate billing periods for new packages
+    if (!pkg && formData.billingPeriods.length === 0) {
+      billingErrors.push("Minimal 1 periode billing harus ditambahkan");
+    }
+    
+    // Validate each billing period
+    formData.billingPeriods.forEach((period, index) => {
+      if (!period.price || period.price.toString().trim() === "" || parseFloat(period.price.toString()) < 0) {
+        billingErrors.push(`Periode ${index + 1}: Harga tidak valid`);
+      }
+      if (period.periodMonths <= 0 || period.periodMonths > 60) {
+        billingErrors.push(`Periode ${index + 1}: Jumlah bulan harus antara 1-60`);
+      }
+      if (period.discountPercentage < 0 || period.discountPercentage > 100) {
+        billingErrors.push(`Periode ${index + 1}: Diskon harus antara 0-100%`);
+      }
+    });
+    
+    // Show specific error messages
+    if (missingFields.length > 0 || billingErrors.length > 0) {
+      const allErrors = [...missingFields, ...billingErrors];
       toast({
-        title: "Data tidak lengkap",
-        description: "Mohon lengkapi semua field yang wajib diisi.",
+        title: "Validasi Error",
+        description: (
+          <div className="space-y-1">
+            <div className="font-medium">Field yang bermasalah:</div>
+            <ul className="list-disc list-inside text-sm">
+              {allErrors.map((error, index) => (
+                <li key={index}>{error}</li>
+              ))}
+            </ul>
+          </div>
+        ),
         variant: "destructive",
       });
       return;
     }
+    
     mutation.mutate(formData);
   };
 
@@ -497,7 +559,7 @@ function PackageFormModal({
             </Button>
             <Button 
               type="submit" 
-              disabled={mutation.isPending || !formData.name || !formData.slug}
+              disabled={mutation.isPending || !formData.name || !formData.slug || formData.features.length === 0}
               className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 px-6"
             >
               {mutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
