@@ -45,10 +45,6 @@ export default function TrialStatusHeader() {
         </div>
 
         <div className="flex items-center space-x-4">
-          <span className="text-sm text-gray-600">
-            Paket: {trialStatus?.currentPlan}
-          </span>
-          
           {userLimit && (
             <div className="flex items-center space-x-1 text-sm text-gray-600">
               <Users className="h-3 w-3" />
@@ -101,10 +97,9 @@ export default function TrialStatusHeader() {
           </Link>
         </div>
 
-        {/* Second row - Plan and user info */}
-        <div className="flex items-center justify-between text-xs text-gray-600">
-          <span>Paket: {trialStatus?.currentPlan}</span>
-          {userLimit && (
+        {/* Second row - User info */}
+        {userLimit && (
+          <div className="flex items-center justify-end text-xs text-gray-600">
             <div className="flex items-center space-x-1">
               <Users className="h-3 w-3" />
               <span>{userLimit.currentUsers}/{userLimit.maxUsers}</span>
@@ -112,8 +107,8 @@ export default function TrialStatusHeader() {
                 <AlertTriangle className="h-3 w-3 text-yellow-600" />
               )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Expiring warning for mobile */}
         {isExpiring && (
