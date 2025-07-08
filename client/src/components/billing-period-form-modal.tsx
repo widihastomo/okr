@@ -132,26 +132,30 @@ export function BillingPeriodFormModal({
     
     let missingFields = [];
     
-    // Check planId
+    // Check planId - formData.planId should have the value
     if (!formData.planId || formData.planId.trim() === "") {
       missingFields.push("Plan ID kosong");
       console.log("❌ Plan ID validation failed:", formData.planId);
     }
     
-    // Check price
-    if (!formData.price || formData.price.trim() === "") {
+    // Check price - more lenient validation
+    const priceValue = formData.price ? formData.price.toString().trim() : "";
+    if (!priceValue) {
       missingFields.push("Harga tidak boleh kosong");
       console.log("❌ Price empty validation failed:", formData.price);
-    } else if (isNaN(parseFloat(formData.price))) {
-      missingFields.push("Harga harus berupa angka");
-      console.log("❌ Price NaN validation failed:", formData.price);
-    } else if (parseFloat(formData.price) < 0) {
-      missingFields.push("Harga tidak boleh negatif");
-      console.log("❌ Price negative validation failed:", parseFloat(formData.price));
+    } else {
+      const numericPrice = parseFloat(priceValue);
+      if (isNaN(numericPrice)) {
+        missingFields.push("Harga harus berupa angka yang valid");
+        console.log("❌ Price NaN validation failed:", priceValue, "->", numericPrice);
+      } else if (numericPrice <= 0) {
+        missingFields.push("Harga harus lebih besar dari 0");
+        console.log("❌ Price must be positive validation failed:", numericPrice);
+      }
     }
     
     // Check period months
-    if (formData.periodMonths <= 0) {
+    if (!formData.periodMonths || formData.periodMonths <= 0) {
       missingFields.push("Periode bulan harus lebih dari 0");
       console.log("❌ Period months validation failed:", formData.periodMonths);
     }
