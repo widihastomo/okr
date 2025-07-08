@@ -57,12 +57,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const currentUser = req.user as User;
       
-      if (!currentUser.organizationId) {
+      // System owners can access all cycles, regular users need organization
+      if (!currentUser.isSystemOwner && !currentUser.organizationId) {
         return res.status(400).json({ message: "User not associated with an organization" });
       }
       
-      const cycles = await storage.getCyclesByOrganization(currentUser.organizationId);
-      res.json(cycles);
+      // If system owner, return all cycles, otherwise filter by organization
+      if (currentUser.isSystemOwner) {
+        const cycles = await storage.getCycles();
+        res.json(cycles);
+      } else {
+        const cycles = await storage.getCyclesByOrganization(currentUser.organizationId!);
+        res.json(cycles);
+      }
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch cycles" });
     }
@@ -224,11 +231,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const currentUser = req.user as User;
       
-      if (!currentUser.organizationId) {
+      // System owners can access all objectives, regular users need organization
+      if (!currentUser.isSystemOwner && !currentUser.organizationId) {
         return res.status(400).json({ message: "User not associated with an organization" });
       }
       
-      const objectives = await storage.getObjectivesByOrganization(currentUser.organizationId);
+      let objectives;
+      if (currentUser.isSystemOwner) {
+        objectives = await storage.getObjectives();
+      } else {
+        objectives = await storage.getObjectivesByOrganization(currentUser.organizationId!);
+      }
       res.json(objectives);
     } catch (error) {
       console.error("Error fetching objectives:", error);
@@ -319,13 +332,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const currentUser = req.user as User;
       
-      // Only return users from the same organization
-      if (!currentUser.organizationId) {
+      // System owners can access all users, regular users need organization
+      if (!currentUser.isSystemOwner && !currentUser.organizationId) {
         return res.status(400).json({ message: "User not associated with an organization" });
       }
       
-      // Filter users by organization
-      const orgUsers = await storage.getUsersByOrganization(currentUser.organizationId);
+      let orgUsers;
+      if (currentUser.isSystemOwner) {
+        orgUsers = await storage.getUsers();
+      } else {
+        orgUsers = await storage.getUsersByOrganization(currentUser.organizationId!);
+      }
       res.json(orgUsers);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -423,11 +440,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const currentUser = req.user as User;
       
-      if (!currentUser.organizationId) {
+      // System owners can access all teams, regular users need organization
+      if (!currentUser.isSystemOwner && !currentUser.organizationId) {
         return res.status(400).json({ message: "User not associated with an organization" });
       }
       
-      const teams = await storage.getTeamsByOrganization(currentUser.organizationId);
+      let teams;
+      if (currentUser.isSystemOwner) {
+        teams = await storage.getTeams();
+      } else {
+        teams = await storage.getTeamsByOrganization(currentUser.organizationId!);
+      }
+      
       // Include member data for each team
       const teamsWithMembers = await Promise.all(teams.map(async (team) => {
         const members = await storage.getTeamMembers(team.id);
@@ -1893,11 +1917,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const currentUser = req.user as User;
       
-      if (!currentUser.organizationId) {
+      // System owners can access all initiatives, regular users need organization
+      if (!currentUser.isSystemOwner && !currentUser.organizationId) {
         return res.status(400).json({ message: "User not associated with an organization" });
       }
       
-      const initiatives = await storage.getInitiativesByOrganization(currentUser.organizationId);
+      let initiatives;
+      if (currentUser.isSystemOwner) {
+        initiatives = await storage.getInitiatives();
+      } else {
+        initiatives = await storage.getInitiativesByOrganization(currentUser.organizationId!);
+      }
       res.json(initiatives);
     } catch (error) {
       console.error("Error fetching initiatives:", error);
@@ -2208,11 +2238,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const currentUser = req.user as User;
       
-      if (!currentUser.organizationId) {
+      // System owners can access all tasks, regular users need organization
+      if (!currentUser.isSystemOwner && !currentUser.organizationId) {
         return res.status(400).json({ message: "User not associated with an organization" });
       }
       
-      const allTasks = await storage.getTasksByOrganization(currentUser.organizationId);
+      let allTasks;
+      if (currentUser.isSystemOwner) {
+        allTasks = await storage.getTasks();
+      } else {
+        allTasks = await storage.getTasksByOrganization(currentUser.organizationId!);
+      }
       res.json(allTasks);
     } catch (error) {
       console.error("Error fetching tasks:", error);

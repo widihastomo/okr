@@ -130,7 +130,6 @@ export const organizationSubscriptions = pgTable("organization_subscriptions", {
   id: uuid("id").primaryKey().defaultRandom(),
   organizationId: uuid("organization_id").notNull().references(() => organizations.id),
   planId: uuid("plan_id").notNull().references(() => subscriptionPlans.id),
-  billingPeriodId: uuid("billing_period_id").notNull().references(() => billingPeriods.id),
   status: text("status").notNull().default("active"), // "active", "cancelled", "past_due", "trialing"
   currentPeriodStart: timestamp("current_period_start").notNull(),
   currentPeriodEnd: timestamp("current_period_end").notNull(),
