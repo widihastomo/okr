@@ -3381,7 +3381,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const planId = req.params.id;
       
       // Check if any organizations are using this plan
-      const { organizationSubscriptions } = await import("@shared/schema");
+      const { organizationSubscriptions, billingPeriods } = await import("@shared/schema");
       const [activeSubscription] = await db.select()
         .from(organizationSubscriptions)
         .where(eq(organizationSubscriptions.planId, planId))
@@ -3393,6 +3393,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // First, delete all billing periods associated with this plan
+      await db.delete(billingPeriods).where(eq(billingPeriods.planId, planId));
+      
+      // Then delete the subscription plan
       const [deletedPlan] = await db.delete(subscriptionPlans)
         .where(eq(subscriptionPlans.id, planId))
         .returning();

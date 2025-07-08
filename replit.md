@@ -113,6 +113,14 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 08, 2025. Fixed subscription plan deletion issue caused by foreign key constraint:
+  * Added proper cascade deletion by removing billing periods before deleting subscription plans
+  * Updated DELETE /api/admin/subscription-plans/:id endpoint to handle foreign key dependencies
+  * Fixed "update or delete on table subscription_plans violates foreign key constraint billing_periods_plan_id_fkey" error
+  * System admin can now successfully delete subscription plans that have billing periods
+  * Maintained data integrity by checking for active organization subscriptions before deletion
+  * Proper cleanup sequence: check active subscriptions → delete billing periods → delete subscription plan
+Changelog:
 - July 08, 2025. Successfully simplified referral code system by removing organization ownership for system admin-only management:
   * Removed organizationId column from referralCodes table schema - referral codes are now created and managed by system admin only
   * Updated all API endpoints (GET, POST, PUT, DELETE, analytics) to require system owner authentication instead of organization ownership
