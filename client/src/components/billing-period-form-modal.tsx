@@ -114,7 +114,11 @@ export function BillingPeriodFormModal({
     
     // Debug logging
     console.log("=== BILLING PERIOD FORM VALIDATION ===");
-    console.log("Form data:", formData);
+    console.log("Raw formData:", formData);
+    console.log("Type of formData:", typeof formData);
+    console.log("Type of formData.planId:", typeof formData.planId);
+    console.log("Type of formData.price:", typeof formData.price);
+    console.log("Type of formData.periodMonths:", typeof formData.periodMonths);
     console.log("planId prop:", planId);
     console.log("billingPeriod prop:", billingPeriod);
     console.log("Validation checks:", {

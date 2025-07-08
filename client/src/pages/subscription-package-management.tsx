@@ -754,8 +754,8 @@ export default function SubscriptionPackageManagement() {
             </TableHeader>
             <TableBody>
               {filteredPackages.map((pkg) => (
-                <React.Fragment key={pkg.id}>
-                  <TableRow>
+                <>
+                  <TableRow key={`${pkg.id}-row`}>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Button
@@ -850,7 +850,7 @@ export default function SubscriptionPackageManagement() {
                 
                 {/* Billing Periods Row */}
                 {expandedPackages.has(pkg.id) && (
-                  <TableRow className="bg-gray-50">
+                  <TableRow key={`${pkg.id}-expanded`} className="bg-gray-50">
                     <TableCell colSpan={7} className="p-4">
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
@@ -917,7 +917,7 @@ export default function SubscriptionPackageManagement() {
                     </TableCell>
                   </TableRow>
                 )}
-              </React.Fragment>
+                </>
               ))}
             </TableBody>
           </Table>
