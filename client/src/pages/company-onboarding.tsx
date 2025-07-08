@@ -1182,17 +1182,124 @@ export default function CompanyOnboarding() {
 
       case 9: // Dashboard Ringkas
         return (
-          <div className="space-y-4">
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <h3 className="font-semibold mb-2">Preview Dashboard Anda</h3>
-              <div className="space-y-2 text-sm">
-                <p><strong>🎯 Objective:</strong> {onboardingData.objective || "Belum diisi"}</p>
-                <p><strong>📏 Key Results:</strong> {onboardingData.keyResults.length} target</p>
-                <p><strong>📅 Cadence:</strong> {onboardingData.cadence || "Belum dipilih"}</p>
-                <p><strong>🧩 Inisiatif:</strong> {onboardingData.initiatives.length} langkah</p>
-                <p><strong>✅ Task:</strong> {onboardingData.tasks ? onboardingData.tasks.length : 0} task</p>
-                <p><strong>👥 Tim:</strong> {onboardingData.invitedMembers.length} anggota</p>
+          <div className="space-y-6">
+            <div className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+              <h3 className="font-semibold text-lg mb-4 text-blue-900">📊 Rekap Data Onboarding Anda</h3>
+              
+              {/* Summary Cards */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
+                  <div className="text-2xl font-bold text-blue-600">{onboardingData.keyResults.length}</div>
+                  <div className="text-sm text-gray-600">Key Results</div>
+                </div>
+                <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
+                  <div className="text-2xl font-bold text-green-600">{onboardingData.initiatives.length}</div>
+                  <div className="text-sm text-gray-600">Inisiatif</div>
+                </div>
+                <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
+                  <div className="text-2xl font-bold text-purple-600">{onboardingData.tasks ? onboardingData.tasks.length : 0}</div>
+                  <div className="text-sm text-gray-600">Task</div>
+                </div>
+                <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
+                  <div className="text-2xl font-bold text-orange-600">{onboardingData.invitedMembers.length}</div>
+                  <div className="text-sm text-gray-600">Anggota Tim</div>
+                </div>
               </div>
+
+              {/* Detailed Information */}
+              <div className="space-y-4">
+                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <h4 className="font-semibold text-blue-800 mb-2">🎯 Objective Utama</h4>
+                  <p className="text-gray-700">{onboardingData.objective || "Belum diisi"}</p>
+                  <div className="mt-2 text-sm text-gray-500">
+                    <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                      {onboardingData.teamFocus || "General"}
+                    </span>
+                    <span className="inline-block bg-green-100 text-green-800 px-2 py-1 rounded ml-2">
+                      {onboardingData.cadence || "Belum dipilih"}
+                    </span>
+                  </div>
+                </div>
+
+                {onboardingData.keyResults.length > 0 && (
+                  <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <h4 className="font-semibold text-green-800 mb-2">📏 Key Results yang Dipilih</h4>
+                    <div className="space-y-2">
+                      {onboardingData.keyResults.filter(kr => kr && kr !== "custom").map((kr, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          <span className="text-sm text-gray-700">{kr}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {onboardingData.initiatives.length > 0 && (
+                  <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <h4 className="font-semibold text-purple-800 mb-2">🧩 Inisiatif yang Akan Dijalankan</h4>
+                    <div className="space-y-2">
+                      {onboardingData.initiatives.filter(init => init && init !== "custom").map((init, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                          <span className="text-sm text-gray-700">{init}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {onboardingData.tasks && onboardingData.tasks.length > 0 && (
+                  <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <h4 className="font-semibold text-orange-800 mb-2">✅ Task yang Akan Dikerjakan</h4>
+                    <div className="space-y-2">
+                      {onboardingData.tasks.filter(task => task && task !== "custom").map((task, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                          <span className="text-sm text-gray-700">{task}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {onboardingData.invitedMembers.length > 0 && (
+                  <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <h4 className="font-semibold text-blue-800 mb-2">👥 Anggota Tim yang Diundang</h4>
+                    <div className="space-y-2">
+                      {onboardingData.invitedMembers.map((member, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          <span className="text-sm text-gray-700">{member}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <h4 className="font-semibold text-gray-800 mb-2">📅 Pengaturan Siklus</h4>
+                  <div className="text-sm text-gray-700 space-y-1">
+                    <p><strong>Durasi Siklus:</strong> {onboardingData.cycleDuration || "Belum dipilih"}</p>
+                    <p><strong>Tanggal Mulai:</strong> {onboardingData.cycleStartDate || "Belum diatur"}</p>
+                    <p><strong>Tanggal Selesai:</strong> {onboardingData.cycleEndDate || "Belum diatur"}</p>
+                    <p><strong>Cadence Review:</strong> {onboardingData.cadence || "Belum dipilih"}</p>
+                    <p><strong>Waktu Reminder:</strong> {onboardingData.reminderTime || "Belum diatur"}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+              <h4 className="font-semibold text-yellow-800 mb-2">💡 Yang Akan Terjadi Selanjutnya</h4>
+              <ul className="text-sm text-yellow-700 space-y-1">
+                <li>• Objective pertama akan dibuat otomatis di sistem</li>
+                <li>• Key results akan diatur sebagai target yang dapat diukur</li>
+                <li>• Inisiatif akan dihubungkan dengan key results</li>
+                <li>• Task akan diatur sebagai langkah-langkah konkret</li>
+                <li>• Anggota tim akan diundang untuk berkolaborasi</li>
+                <li>• Reminder otomatis akan dimulai sesuai cadence</li>
+              </ul>
             </div>
           </div>
         );
