@@ -352,14 +352,7 @@ export default function TrialMascot({ className, missions = [], onMissionAction 
   const messages = getContextualMessages();
   const currentMessage = messages[messageIndex] || messages[0];
 
-  // Auto-rotate messages every 8 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setMessageIndex((prev) => (prev + 1) % messages.length);
-    }, 8000);
-
-    return () => clearInterval(interval);
-  }, [messages.length]);
+  // Auto-rotate messages disabled - user controls message cycling manually
 
   // Update mascot state based on current message
   useEffect(() => {

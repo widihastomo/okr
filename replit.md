@@ -139,6 +139,7 @@ Changelog:
   * Updated mascot guidance to match exact 10-step onboarding mission sequence with step-by-step progression
   * Replaced general progress-based messaging with mission-specific guidance aligned with onboarding tasks
   * Fixed button functionality with comprehensive action handlers and removed auto-scroll behavior for better UX
+  * Disabled auto-slide functionality for mascot messages to give users full control over message cycling and interface interaction
   * Resolved React JSX styling warnings and state management issues for cleaner console output
 - July 08, 2025. Successfully migrated onboarding mission system to Daily Focus page (root "/" route) with sequential numbered steps:
   * Completed migration from trial-achievements.tsx to daily-focus.tsx as main application homepage
