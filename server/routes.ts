@@ -28,6 +28,7 @@ import {
 } from "./habit-alignment";
 import { db } from "./db";
 import { eq, and, desc, inArray } from "drizzle-orm";
+import { extractOrganizationFromSlug, verifyOrganizationAccess } from "./slug-middleware";
 import { createSnapTransaction } from "./midtrans";
 
 // System Owner middleware to protect admin endpoints
@@ -65,6 +66,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Note: Auth routes are handled in authRoutes.ts
+  
+  // Slug-based organization middleware
+  app.use("/api/org/:slug", extractOrganizationFromSlug);
+  
+  // Slug-based organization routes
+  app.get("/api/org/:slug/details", verifyOrganizationAccess, async (req, res) => {
+    try {
+      const organization = req.organization;
+      const currentUser = req.user as User;
+      
+      // Get organization subscription
+      const subscription = await db
+        .select({
+          id: organizationSubscriptions.id,
+          planId: organizationSubscriptions.planId,
+          status: organizationSubscriptions.status,
+          currentPeriodStart: organizationSubscriptions.currentPeriodStart,
+          currentPeriodEnd: organizationSubscriptions.currentPeriodEnd,
+          plan: subscriptionPlans,
+        })
+        .from(organizationSubscriptions)
+        .leftJoin(subscriptionPlans, eq(organizationSubscriptions.planId, subscriptionPlans.id))
+        .where(eq(organizationSubscriptions.organizationId, organization.id))
+        .orderBy(desc(organizationSubscriptions.createdAt));
+      
+      const isOwner = currentUser.isSystemOwner || organization.ownerId === currentUser.id;
+      
+      res.json({
+        organization,
+        subscription: subscription[0] || null,
+        isOwner
+      });
+    } catch (error) {
+      console.error("Error fetching organization details:", error);
+      res.status(500).json({ message: "Failed to fetch organization details" });
+    }
+  });
+  
+  // Slug-based organization data endpoints
+  app.get("/api/org/:slug/dashboard", verifyOrganizationAccess, async (req, res) => {
+    try {
+      const organization = req.organization;
+      
+      // Get organization-specific data
+      const objectives = await storage.getObjectivesByOrganization(organization.id);
+      const cycles = await storage.getCyclesByOrganization(organization.id);
+      const tasks = await storage.getTasksByOrganization(organization.id);
+      const initiatives = await storage.getInitiativesByOrganization(organization.id);
+      
+      res.json({
+        objectives,
+        cycles,
+        tasks,
+        initiatives
+      });
+    } catch (error) {
+      console.error("Error fetching organization dashboard:", error);
+      res.status(500).json({ message: "Failed to fetch organization dashboard" });
+    }
+  });
+  
   // Cycles endpoints
   app.get("/api/cycles", requireAuth, async (req, res) => {
     try {

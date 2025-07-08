@@ -132,9 +132,29 @@ export function setupEmailAuth(app: Express) {
         return res.status(401).json({ message: "Unauthorized" });
       }
       
+      // Include organization slug in user response
+      let organizationSlug = null;
+      if (user.organizationId) {
+        const { organizations } = await import("@shared/schema");
+        const { db } = await import("./db");
+        const { eq } = await import("drizzle-orm");
+        
+        const organization = await db
+          .select({ slug: organizations.slug })
+          .from(organizations)
+          .where(eq(organizations.id, user.organizationId));
+        
+        if (organization.length > 0) {
+          organizationSlug = organization[0].slug;
+        }
+      }
+      
       // Don't send password in response
       const { password, ...userWithoutPassword } = user;
-      res.json(userWithoutPassword);
+      res.json({
+        ...userWithoutPassword,
+        organizationSlug
+      });
     } catch (error) {
       console.error('Error in /api/auth/me:', error);
       res.status(500).json({ message: "Gagal mengambil data user" });

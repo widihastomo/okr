@@ -12,8 +12,10 @@ import ClientSidebar from "@/components/client-sidebar";
 import SystemAdminSidebar from "@/components/system-admin-sidebar";
 import { NotificationProvider } from "@/components/notifications/notification-provider";
 import { OnboardingProvider } from "@/contexts/onboarding-context";
+import { OrganizationProvider } from "@/contexts/organization-context";
 import TourTooltip from "@/components/onboarding/tour-tooltip";
 import FloatingMascot from "@/components/floating-mascot";
+import SlugRouter from "@/components/slug-router";
 import Dashboard from "@/pages/dashboard";
 
 import TemplatesContent from "@/components/templates-content";
@@ -223,7 +225,11 @@ function App() {
       <TooltipProvider>
         <OnboardingProvider>
           <Toaster />
-          <Router />
+          <OrganizationProvider>
+            <SlugRouter>
+              <Router />
+            </SlugRouter>
+          </OrganizationProvider>
           <TourTooltip />
         </OnboardingProvider>
       </TooltipProvider>
