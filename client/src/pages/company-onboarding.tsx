@@ -391,11 +391,11 @@ export default function CompanyOnboarding() {
                       </Label>
                     </div>
                   ))}
+                  <div className="flex items-center space-x-2 pt-2">
+                    <RadioGroupItem value="custom" id="custom-objective" />
+                    <Label htmlFor="custom-objective">Atau tulis objective sendiri:</Label>
+                  </div>
                 </RadioGroup>
-                <div className="flex items-center space-x-2 pt-2">
-                  <RadioGroupItem value="custom" id="custom-objective" />
-                  <Label htmlFor="custom-objective">Atau tulis objective sendiri:</Label>
-                </div>
               </div>
             )}
             
