@@ -44,6 +44,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { InvoiceWithLineItems } from "@shared/schema";
+import { CreateInvoiceModal } from "@/components/create-invoice-modal";
 
 interface InvoiceData {
   invoice: {
@@ -120,6 +121,7 @@ function formatDate(dateString: string) {
 export default function InvoiceManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [createModalOpen, setCreateModalOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -224,7 +226,10 @@ export default function InvoiceManagement() {
           <h1 className="text-3xl font-bold text-gray-900">Manajemen Invoice</h1>
           <p className="text-gray-600 mt-2">Kelola invoice langganan dan pembayaran</p>
         </div>
-        <Button className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
+        <Button 
+          onClick={() => setCreateModalOpen(true)}
+          className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+        >
           <Plus className="w-4 h-4 mr-2" />
           Buat Invoice
         </Button>
@@ -433,6 +438,12 @@ export default function InvoiceManagement() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Create Invoice Modal */}
+      <CreateInvoiceModal 
+        open={createModalOpen} 
+        onOpenChange={setCreateModalOpen} 
+      />
     </div>
   );
 }
