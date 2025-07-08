@@ -113,6 +113,17 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 08, 2025. Successfully implemented comprehensive billing period management system with duration options and discount functionality:
+  * Created billing_periods database table with proper foreign key relationships to subscription_plans
+  * Built BillingPeriodFormModal component with form validation for creating/editing billing periods
+  * Added API endpoints for CRUD operations: GET, POST, PUT billing periods with proper authentication
+  * Implemented expandable table rows in subscription package management showing billing periods with discount information
+  * Added support for 4 duration options: monthly (1 month), quarterly (3 months), semiannual (6 months), annual (12 months)
+  * Integrated discount percentage settings (0%, 10%, 15%, 20%) with automatic price calculations
+  * Populated sample billing period data for all existing subscription plans with proper pricing
+  * Enhanced subscription plans API to include billing periods data using proper database joins
+  * Fixed database schema alignment issue and ensured billing period functionality works correctly
+  * System owners can now manage flexible billing periods with duration options and discount settings as requested
 - January 12, 2025. COMPREHENSIVE SECURITY OVERHAUL - Fixed cross-tenant data leakage across ALL major endpoints:
   * Previously multiple endpoints (`/api/users`, `/api/objectives`, `/api/cycles`, `/api/initiatives`, `/api/tasks`, `/api/teams`) exposed data from all organizations
   * Added `requireAuth` middleware to ALL data endpoints preventing unauthorized access
