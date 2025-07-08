@@ -110,9 +110,23 @@ The system implements multiple layers of security for data protection:
 - **Role-based Access**: Three-tier system (system owner, organization owner, members)
 - **API Protection**: All endpoints require authentication via requireAuth middleware
 
+## Trial User Credentials
+Trial user untuk testing achievement system:
+- **Email**: trial@startup.com
+- **Password**: password  
+- **Organization**: Startup Trial Company (Trial Status - 14 hari)
+- **User ID**: f47ac10b-58cc-4372-a567-0e02b2c3d480
+- **Achievement Status**: 2 achievements sudah terbuka (Welcome achievement)
+
 ## Changelog
 ```
 Changelog:
+- July 08, 2025. Successfully created trial user for testing gamified achievement system:
+  * Created trial organization "Startup Trial Company" with 14-day trial subscription
+  * Created trial user (trial@startup.com / password: password) linked to trial organization  
+  * Initialized trial progress tracking and awarded welcome achievements automatically
+  * Trial user can now test all achievement features including objective creation, key result tracking, and progress monitoring
+  * System automatically tracks user actions and awards points/achievements for trial engagement
 - July 08, 2025. Successfully simplified company registration form and fixed Daily Focus header overlap:
   * Removed phone, address, and description fields from company registration form for streamlined UX
   * Updated database schema by dropping phone, address, description columns from organizations table
