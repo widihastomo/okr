@@ -101,12 +101,13 @@ function PackageFormModal({
   });
   const [newFeature, setNewFeature] = useState("");
   
-  const PERIOD_OPTIONS = [
-    { value: "monthly", label: "Bulanan", months: 1 },
-    { value: "quarterly", label: "Triwulan (3 Bulan)", months: 3 },
-    { value: "semiannual", label: "Semester (6 Bulan)", months: 6 },
-    { value: "annual", label: "Tahunan (12 Bulan)", months: 12 },
-  ];
+  const getPeriodTypeFromMonths = (months: number): string => {
+    if (months === 1) return "monthly";
+    if (months === 3) return "quarterly";
+    if (months === 6) return "semiannual";
+    if (months === 12) return "annual";
+    return "custom";
+  };
 
   const mutation = useMutation({
     mutationFn: async (data: PackageFormData) => {
@@ -415,29 +416,23 @@ function PackageFormModal({
                   <div key={index} className="p-4 border rounded-lg bg-gray-50">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                       <div>
-                        <Label className="text-xs text-gray-600">Jenis Periode</Label>
-                        <Select
-                          value={period.periodType}
-                          onValueChange={(value) => {
-                            const option = PERIOD_OPTIONS.find(opt => opt.value === value);
+                        <Label className="text-xs text-gray-600">Jumlah Bulan</Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          max="60"
+                          value={period.periodMonths}
+                          onChange={(e) => {
+                            const months = parseInt(e.target.value) || 1;
                             updateBillingPeriod(index, {
                               ...period,
-                              periodType: value,
-                              periodMonths: option?.months || 1
+                              periodMonths: months,
+                              periodType: getPeriodTypeFromMonths(months)
                             });
                           }}
-                        >
-                          <SelectTrigger className="h-8 text-sm">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {PERIOD_OPTIONS.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                          placeholder="1"
+                          className="h-8 text-sm"
+                        />
                       </div>
                       
                       <div>

@@ -33,12 +33,13 @@ interface BillingPeriodFormModalProps {
   onClose: () => void;
 }
 
-const PERIOD_OPTIONS = [
-  { value: "monthly", label: "Bulanan", months: 1 },
-  { value: "quarterly", label: "Triwulan (3 Bulan)", months: 3 },
-  { value: "semiannual", label: "Semester (6 Bulan)", months: 6 },
-  { value: "annual", label: "Tahunan (12 Bulan)", months: 12 },
-];
+const getPeriodTypeFromMonths = (months: number): string => {
+  if (months === 1) return "monthly";
+  if (months === 3) return "quarterly";
+  if (months === 6) return "semiannual";
+  if (months === 12) return "annual";
+  return "custom";
+};
 
 export function BillingPeriodFormModal({ 
   billingPeriod, 
@@ -121,15 +122,12 @@ export function BillingPeriodFormModal({
     mutation.mutate(formData);
   };
 
-  const handlePeriodTypeChange = (periodType: string) => {
-    const option = PERIOD_OPTIONS.find(opt => opt.value === periodType);
-    if (option) {
-      setFormData({
-        ...formData,
-        periodType,
-        periodMonths: option.months,
-      });
-    }
+  const handleMonthsChange = (months: number) => {
+    setFormData({
+      ...formData,
+      periodMonths: months,
+      periodType: getPeriodTypeFromMonths(months),
+    });
   };
 
   const formatPrice = (price: string) => {
@@ -161,38 +159,19 @@ export function BillingPeriodFormModal({
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="periodType">Tipe Periode *</Label>
-              <Select 
-                value={formData.periodType} 
-                onValueChange={handlePeriodTypeChange}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih tipe periode" />
-                </SelectTrigger>
-                <SelectContent>
-                  {PERIOD_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="periodMonths">Durasi (Bulan)</Label>
+              <Label htmlFor="periodMonths">Jumlah Bulan *</Label>
               <Input
                 id="periodMonths"
                 type="number"
-                value={formData.periodMonths}
-                onChange={(e) => setFormData({ ...formData, periodMonths: parseInt(e.target.value) || 0 })}
                 min="1"
-                max="12"
+                max="60"
+                value={formData.periodMonths}
+                onChange={(e) => handleMonthsChange(parseInt(e.target.value) || 1)}
+                placeholder="1"
                 required
               />
+              <p className="text-xs text-gray-500 mt-1">Durasi periode dalam bulan (1-60)</p>
             </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="price">Harga Total (IDR) *</Label>
               <Input
@@ -209,6 +188,9 @@ export function BillingPeriodFormModal({
                 {formatPrice(formData.price)}
               </p>
             </div>
+          </div>
+
+          <div>
             <div>
               <Label htmlFor="discountPercentage" className="text-sm font-medium flex items-center gap-2">
                 <Percent className="h-4 w-4" />
