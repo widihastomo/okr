@@ -100,20 +100,12 @@ function Router() {
           sidebarCollapsed={sidebarCollapsed}
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
         />
-        {/* Conditional Sidebar: SystemAdminSidebar for system owners, ClientSidebar for regular users */}
-        {user?.isSystemOwner ? (
-          <SystemAdminSidebar
-            isOpen={sidebarOpen}
-            onClose={() => setSidebarOpen(false)}
-          />
-        ) : (
-          <ClientSidebar
-            isOpen={sidebarOpen}
-            onClose={() => setSidebarOpen(false)}
-            isCollapsed={sidebarCollapsed}
-            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-          />
-        )}
+        <ClientSidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          isCollapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        />
 
         {/* Main layout with responsive margin to avoid overlap */}
         <div
@@ -153,21 +145,21 @@ function Router() {
                 component={OrganizationSettings}
               />
               <Route path="/system-admin" component={SystemAdmin} />
-              <Route path="/system-admin/organizations" component={SystemOrganizationManagement} />
+              <Route
+                path="/system-admin/organizations"
+                component={SystemOrganizationManagement}
+              />
               <Route path="/client-users" component={ClientUserManagement} />
               <Route
                 path="/notification-settings"
                 component={NotificationSettings}
               />
               <Route path="/register" component={ClientRegistration} />
-              <Route 
-                path="/subscription-packages" 
-                component={SubscriptionPackageManagement} 
+              <Route
+                path="/subscription-packages"
+                component={SubscriptionPackageManagement}
               />
-              <Route 
-                path="/add-ons" 
-                component={AddOnsManagement} 
-              />
+              <Route path="/add-ons" component={AddOnsManagement} />
               <Route component={NotFound} />
             </Switch>
           </div>

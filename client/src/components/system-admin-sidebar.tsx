@@ -1,30 +1,59 @@
-import React from "react";
+import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { 
-  Settings, 
-  Users, 
-  Building2, 
-  CreditCard, 
-  BarChart3, 
-  Database,
+import {
+  LayoutDashboard,
+  Building2,
+  RotateCcw,
+  FileText,
+  Users,
+  Target,
+  BarChart3,
+  User,
+  Settings,
   Shield,
-  Bell,
-  LogOut,
-  Menu,
-  Package,
-  LayoutDashboard
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useAuth } from "@/hooks/useAuth";
+  X,
+  Trophy,
+  Calendar,
+  CreditCard,
+  Clock,
+  Focus,
+  CheckSquare,
+  Sun,
 
-interface SystemAdminSidebarProps {
+  Database,
+  Bell,
+  Lock,
+  ChevronLeft,
+  ChevronRight,
+  Package,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useOrganization } from "@/hooks/useOrganization";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+interface SidebarProps {
   isOpen: boolean;
   onClose?: () => void;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
 }
 
-export default function SystemAdminSidebar({ isOpen, onClose }: SystemAdminSidebarProps) {
+export default function SystemAdminSidebar({
+  isOpen,
+  onClose,
+  isCollapsed,
+  onToggleCollapse,
+}: SidebarProps) {
   const [location] = useLocation();
-  const { logout } = useAuth();
+  const { isOwner } = useOrganization();
+  const { user } = useAuth();
 
   // Menu items for system owners (platform administrators)
   const menuItems = [

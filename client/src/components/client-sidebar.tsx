@@ -19,7 +19,6 @@ import {
   Focus,
   CheckSquare,
   Sun,
-
   Database,
   Bell,
   Lock,
@@ -72,7 +71,12 @@ export default function Sidebar({
       path: "/system-admin/organizations",
       active: location === "/system-admin/organizations",
     },
-
+    {
+      label: "Kelola Paket",
+      icon: Package,
+      path: "/subscription-packages",
+      active: location === "/subscription-packages",
+    },
     {
       label: "Kelola Langganan",
       icon: CreditCard,
@@ -165,21 +169,12 @@ export default function Sidebar({
 
   // Add organization management items for organization owners
   if (isOwner && !isSystemOwner) {
-    regularUserMenuItems.push(
-      {
-        label: "Pengaturan Organisasi",
-        icon: Settings,
-        path: "/organization-settings",
-        active: location === "/organization-settings",
-      },
-      {
-        label: "Kelola Pengguna",
-        icon: Users,
-        path: "/client-users",
-        active: location === "/client-users",
-      },
-
-    );
+    regularUserMenuItems.push({
+      label: "Kelola Pengguna",
+      icon: Users,
+      path: "/client-users",
+      active: location === "/client-users",
+    });
   }
 
   // Choose menu items based on user type

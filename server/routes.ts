@@ -3054,6 +3054,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get subscription plans with billing periods
+  app.get("/api/admin/subscription-plans-with-periods", requireAuth, isSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { billingPeriods } = await import("@shared/schema");
+      
+      const plans = await db.select().from(subscriptionPlans).orderBy(subscriptionPlans.createdAt);
+      
+      // Get billing periods for each plan
+      const plansWithPeriods = await Promise.all(
+        plans.map(async (plan) => {
+          const periods = await db.select().from(billingPeriods)
+            .where(eq(billingPeriods.planId, plan.id))
+            .orderBy(billingPeriods.periodMonths);
+          return { ...plan, billingPeriods: periods };
+        })
+      );
+      
+      res.json(plansWithPeriods);
+    } catch (error) {
+      console.error("Error fetching subscription plans with billing periods:", error);
+      res.status(500).json({ message: "Failed to fetch subscription plans with billing periods" });
+    }
+  });
+
   // Admin API - Create new subscription plan
   app.post("/api/admin/subscription-plans", requireAuth, isSystemOwner, async (req, res) => {
     try {
@@ -3350,6 +3375,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error toggling subscription plan status:", error);
       res.status(500).json({ message: "Failed to toggle subscription plan status" });
+    }
+  });
+
+  // Billing Period Management Endpoints
+  app.post("/api/admin/billing-periods", requireAuth, isSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { billingPeriods } = await import("@shared/schema");
+      const { createInsertSchema } = await import("drizzle-zod");
+      
+      const insertBillingPeriodSchema = createInsertSchema(billingPeriods);
+      const validatedData = insertBillingPeriodSchema.parse(req.body);
+      
+      const [newPeriod] = await db.insert(billingPeriods)
+        .values({
+          ...validatedData,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .returning();
+      
+      res.status(201).json(newPeriod);
+    } catch (error) {
+      console.error("Error creating billing period:", error);
+      res.status(500).json({ message: "Failed to create billing period" });
+    }
+  });
+
+  app.put("/api/admin/billing-periods/:id", requireAuth, isSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { billingPeriods } = await import("@shared/schema");
+      const { createInsertSchema } = await import("drizzle-zod");
+      const { eq } = await import("drizzle-orm");
+      const periodId = req.params.id;
+      
+      const updateBillingPeriodSchema = createInsertSchema(billingPeriods).partial();
+      const validatedData = updateBillingPeriodSchema.parse(req.body);
+      
+      const [updatedPeriod] = await db.update(billingPeriods)
+        .set({
+          ...validatedData,
+          updatedAt: new Date(),
+        })
+        .where(eq(billingPeriods.id, periodId))
+        .returning();
+      
+      if (!updatedPeriod) {
+        return res.status(404).json({ message: "Billing period not found" });
+      }
+      
+      res.json(updatedPeriod);
+    } catch (error) {
+      console.error("Error updating billing period:", error);
+      res.status(500).json({ message: "Failed to update billing period" });
+    }
+  });
+
+  app.delete("/api/admin/billing-periods/:id", requireAuth, isSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { billingPeriods } = await import("@shared/schema");
+      const { eq } = await import("drizzle-orm");
+      const periodId = req.params.id;
+      
+      const [deletedPeriod] = await db.delete(billingPeriods)
+        .where(eq(billingPeriods.id, periodId))
+        .returning();
+      
+      if (!deletedPeriod) {
+        return res.status(404).json({ message: "Billing period not found" });
+      }
+      
+      res.json({ message: "Billing period deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting billing period:", error);
+      res.status(500).json({ message: "Failed to delete billing period" });
     }
   });
 
