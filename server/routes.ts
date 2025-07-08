@@ -5498,13 +5498,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const user = req.user as User;
       const { db } = await import("./db");
-      const { referralCodes, users, organizations } = await import("@shared/schema");
+      const { referralCodes, users } = await import("@shared/schema");
       const { eq, desc } = await import("drizzle-orm");
       
-      const userOrg = await db.select().from(organizations).where(eq(organizations.ownerId, user.id)).limit(1);
-      
-      if (!userOrg.length) {
-        return res.status(404).json({ message: "No organization found for user" });
+      // Only system owners can view referral codes since they're created by system admin only
+      if (!user.isSystemOwner) {
+        return res.status(403).json({ message: "Access denied. Only system admin can view referral codes." });
       }
 
       const codes = await db.select({
@@ -5523,7 +5522,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       })
       .from(referralCodes)
       .leftJoin(users, eq(referralCodes.createdBy, users.id))
-      .where(eq(referralCodes.organizationId, userOrg[0].id))
       .orderBy(desc(referralCodes.createdAt));
 
       res.json(codes);
@@ -5538,13 +5536,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const user = req.user as User;
       const { db } = await import("./db");
-      const { referralCodes, organizations } = await import("@shared/schema");
+      const { referralCodes } = await import("@shared/schema");
       const { eq } = await import("drizzle-orm");
       
-      const userOrg = await db.select().from(organizations).where(eq(organizations.ownerId, user.id)).limit(1);
-      
-      if (!userOrg.length) {
-        return res.status(404).json({ message: "No organization found for user" });
+      // Only system owners can create referral codes
+      if (!user.isSystemOwner) {
+        return res.status(403).json({ message: "Access denied. Only system admin can create referral codes." });
       }
 
       const { code, discountType, discountValue, maxUses, expiresAt, description } = req.body;
@@ -5562,7 +5559,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const [newCode] = await db.insert(referralCodes).values({
         code,
-        organizationId: userOrg[0].id,
         createdBy: user.id,
         discountType,
         discountValue: discountValue.toString(),
@@ -5585,18 +5581,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { id } = req.params;
       const { discountType, discountValue, maxUses, expiresAt, description, isActive } = req.body;
       const { db } = await import("./db");
-      const { referralCodes, organizations } = await import("@shared/schema");
-      const { eq, and } = await import("drizzle-orm");
+      const { referralCodes } = await import("@shared/schema");
+      const { eq } = await import("drizzle-orm");
 
-      const userOrg = await db.select().from(organizations).where(eq(organizations.ownerId, user.id)).limit(1);
-      
-      if (!userOrg.length) {
-        return res.status(404).json({ message: "No organization found for user" });
+      // Only system owners can update referral codes
+      if (!user.isSystemOwner) {
+        return res.status(403).json({ message: "Access denied. Only system admin can update referral codes." });
       }
 
-      // Check if code exists and belongs to user's organization
+      // Check if code exists
       const existingCode = await db.select().from(referralCodes)
-        .where(and(eq(referralCodes.id, id), eq(referralCodes.organizationId, userOrg[0].id)))
+        .where(eq(referralCodes.id, id))
         .limit(1);
 
       if (!existingCode.length) {
@@ -5629,18 +5624,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = req.user as User;
       const { id } = req.params;
       const { db } = await import("./db");
-      const { referralCodes, organizations } = await import("@shared/schema");
-      const { eq, and } = await import("drizzle-orm");
+      const { referralCodes } = await import("@shared/schema");
+      const { eq } = await import("drizzle-orm");
 
-      const userOrg = await db.select().from(organizations).where(eq(organizations.ownerId, user.id)).limit(1);
-      
-      if (!userOrg.length) {
-        return res.status(404).json({ message: "No organization found for user" });
+      // Only system owners can delete referral codes
+      if (!user.isSystemOwner) {
+        return res.status(403).json({ message: "Access denied. Only system admin can delete referral codes." });
       }
 
-      // Check if code exists and belongs to user's organization
+      // Check if code exists
       const existingCode = await db.select().from(referralCodes)
-        .where(and(eq(referralCodes.id, id), eq(referralCodes.organizationId, userOrg[0].id)))
+        .where(eq(referralCodes.id, id))
         .limit(1);
 
       if (!existingCode.length) {
@@ -5665,15 +5659,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { referralCodes, referralUsage, organizations, users } = await import("@shared/schema");
       const { eq, and, desc } = await import("drizzle-orm");
 
-      const userOrg = await db.select().from(organizations).where(eq(organizations.ownerId, user.id)).limit(1);
-      
-      if (!userOrg.length) {
-        return res.status(404).json({ message: "No organization found for user" });
+      // Only system owners can view analytics
+      if (!user.isSystemOwner) {
+        return res.status(403).json({ message: "Access denied. Only system admin can view referral code analytics." });
       }
 
       // Get referral code details
       const code = await db.select().from(referralCodes)
-        .where(and(eq(referralCodes.id, id), eq(referralCodes.organizationId, userOrg[0].id)))
+        .where(eq(referralCodes.id, id))
         .limit(1);
 
       if (!code.length) {

@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { Gift, Plus, Pencil, Trash2, Eye, BarChart3, ExternalLink, Copy, Check } from "lucide-react";
+import { Gift, Plus, Pencil, Trash2, Eye, BarChart3, ExternalLink, Copy, Check, Shield } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ReferralCodeFormModal } from "@/components/referral-code-form-modal";
 import { ReferralAnalyticsModal } from "@/components/referral-analytics-modal";
+import { useAuth } from "@/hooks/useAuth";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -51,6 +52,51 @@ export default function ReferralCodes() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { user, isLoading: isAuthLoading } = useAuth();
+
+  // Check if user is system admin
+  useEffect(() => {
+    if (!isAuthLoading && (!user || !user.isSystemOwner)) {
+      toast({
+        title: "Akses Ditolak",
+        description: "Halaman ini hanya bisa diakses oleh admin sistem.",
+        variant: "destructive",
+      });
+      // Redirect to home
+      window.location.href = "/";
+    }
+  }, [user, isAuthLoading, toast]);
+
+  // Show loading while checking auth
+  if (isAuthLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  // Show access denied if not system admin
+  if (!user || !user.isSystemOwner) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <Card className="max-w-md mx-auto">
+          <CardHeader className="text-center">
+            <Shield className="w-12 h-12 text-red-500 mx-auto mb-4" />
+            <CardTitle className="text-xl">Akses Ditolak</CardTitle>
+            <CardDescription>
+              Halaman ini hanya bisa diakses oleh admin sistem.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center">
+            <Button asChild>
+              <Link href="/">Kembali ke Dashboard</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   // Fetch referral codes
   const { data: codes = [], isLoading } = useQuery({
@@ -169,8 +215,8 @@ export default function ReferralCodes() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Kode Referral</h1>
-          <p className="text-gray-600">Kelola kode referral untuk menarik klien baru dengan diskon dan promo</p>
+          <h1 className="text-2xl font-bold text-gray-900">Kode Referral (Admin Sistem)</h1>
+          <p className="text-gray-600">Kelola kode referral sistem untuk menarik klien baru dengan diskon dan promo</p>
         </div>
         <Button
           onClick={() => setIsCreateModalOpen(true)}

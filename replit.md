@@ -113,6 +113,16 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 08, 2025. Successfully simplified referral code system by removing organization ownership for system admin-only management:
+  * Removed organizationId column from referralCodes table schema - referral codes are now created and managed by system admin only
+  * Updated all API endpoints (GET, POST, PUT, DELETE, analytics) to require system owner authentication instead of organization ownership
+  * Moved referral code menu from general sidebar to system admin section for proper access control
+  * Added comprehensive access control to referral codes page with system admin authentication check and proper error handling
+  * Enhanced page title to indicate "Kode Referral (Admin Sistem)" for clarity on admin-only access
+  * Simplified system architecture: only system administrators can create referral codes for the entire platform
+  * Removed complex organization-based filtering logic since all referral codes are now system-wide
+  * Complete migration from multi-tenant referral codes to centralized system admin management model
+  * Database schema update removes organizationId dependency while maintaining all other referral code functionality
 - July 08, 2025. Successfully created comprehensive dummy client data examples for subscription + addon integration testing:
   * Created 2 dummy organizations: CV Digital Kreatif (startup) and PT Solusi Tech (enterprise) with complete subscription + addon setups
   * CV Digital Kreatif: Growth plan (Rp 299k) + 3 add-ons (extra users, storage, analytics) = Rp 439k/month total

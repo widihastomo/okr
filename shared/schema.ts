@@ -152,7 +152,7 @@ export const invoices = pgTable("invoices", {
   subscriptionPlanId: uuid("subscription_plan_id").references(() => subscriptionPlans.id),
   billingPeriodId: uuid("billing_period_id").references(() => billingPeriods.id),
   organizationSubscriptionId: uuid("organization_subscription_id").references(() => organizationSubscriptions.id),
-  referralCodeId: uuid("referral_code_id").references(() => referralCodes.id), // Applied referral code
+  // referralCodeId: uuid("referral_code_id").references(() => referralCodes.id), // Applied referral code - removed for now
   referralDiscountAmount: decimal("referral_discount_amount", { precision: 10, scale: 2 }).default("0"), // Discount from referral
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(), // Total invoice amount (after all discounts)
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(), // Amount before tax and discounts
@@ -198,7 +198,7 @@ export const invoiceLineItems = pgTable("invoice_line_items", {
 export const referralCodes = pgTable("referral_codes", {
   id: uuid("id").primaryKey().defaultRandom(),
   code: varchar("code", { length: 50 }).unique().notNull(), // Unique referral code
-  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
+  // organizationId removed - referral codes are created by system admin only
   createdBy: uuid("created_by").notNull().references(() => users.id),
   discountType: text("discount_type").notNull(), // "percentage", "fixed_amount", "free_months"
   discountValue: decimal("discount_value", { precision: 10, scale: 2 }).notNull(), // Discount amount or percentage

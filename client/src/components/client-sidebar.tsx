@@ -92,17 +92,18 @@ export default function Sidebar({
       active: location === "/system-admin/add-ons",
     },
     {
-      label: "Kelola Invoice",
-      icon: Receipt,
-      path: "/invoices",
-      active: location === "/invoices" || location.startsWith("/invoices/"),
-    },
-    {
       label: "Kode Referral",
       icon: Gift,
       path: "/referral-codes",
       active: location === "/referral-codes",
     },
+    {
+      label: "Kelola Invoice",
+      icon: Receipt,
+      path: "/invoices",
+      active: location === "/invoices" || location.startsWith("/invoices/"),
+    },
+    // Referral codes menu is moved to system admin only - removed from general menu
     {
       label: "Database",
       icon: Database,
