@@ -13,7 +13,8 @@ import {
   Clock, 
   XCircle,
   AlertCircle,
-  MoreVertical
+  MoreVertical,
+  CreditCard
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -162,6 +163,33 @@ export default function InvoiceManagement() {
 
   const handleMarkPaid = (invoiceId: string) => {
     markPaidMutation.mutate(invoiceId);
+  };
+
+  const payWithMidtransMutation = useMutation({
+    mutationFn: async (invoiceId: string) => {
+      const response = await apiRequest("POST", `/api/invoices/${invoiceId}/pay`);
+      return response.json();
+    },
+    onSuccess: (data, invoiceId) => {
+      // Redirect to Midtrans payment page
+      window.open(data.redirectUrl, '_blank');
+      queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
+      toast({
+        title: "Pembayaran Dimulai",
+        description: "Anda akan diarahkan ke halaman pembayaran Midtrans",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error Pembayaran",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handlePayWithMidtrans = (invoiceId: string) => {
+    payWithMidtransMutation.mutate(invoiceId);
   };
 
   if (isLoading) {
@@ -371,14 +399,23 @@ export default function InvoiceManagement() {
                                 <Download className="w-4 h-4 mr-2" />
                                 Download PDF
                               </DropdownMenuItem>
-                              {item.invoice.status === 'pending' && (
-                                <DropdownMenuItem
-                                  onClick={() => handleMarkPaid(item.invoice.id)}
-                                  disabled={markPaidMutation.isPending}
-                                >
-                                  <CheckCircle className="w-4 h-4 mr-2" />
-                                  Tandai Dibayar
-                                </DropdownMenuItem>
+                              {(item.invoice.status === 'pending' || item.invoice.status === 'sent') && (
+                                <>
+                                  <DropdownMenuItem
+                                    onClick={() => handlePayWithMidtrans(item.invoice.id)}
+                                    disabled={payWithMidtransMutation.isPending}
+                                  >
+                                    <CreditCard className="w-4 h-4 mr-2" />
+                                    Bayar dengan Midtrans
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleMarkPaid(item.invoice.id)}
+                                    disabled={markPaidMutation.isPending}
+                                  >
+                                    <CheckCircle className="w-4 h-4 mr-2" />
+                                    Tandai Dibayar Manual
+                                  </DropdownMenuItem>
+                                </>
                               )}
                               <DropdownMenuItem>
                                 <Edit className="w-4 h-4 mr-2" />

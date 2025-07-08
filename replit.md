@@ -113,6 +113,17 @@ The system implements multiple layers of security for data protection:
 ## Changelog
 ```
 Changelog:
+- July 08, 2025. Successfully integrated Midtrans payment gateway for invoice payments with Indonesian payment methods:
+  * Added midtrans-client package and created comprehensive Midtrans service configuration
+  * Created API endpoints for payment processing: POST /api/invoices/:id/pay (create transaction), POST /api/midtrans/notification (webhook), GET /api/invoices/:id/payment-status (status check)
+  * Enhanced invoice detail page with dual payment options: "Bayar dengan Midtrans" (primary blue button) and "Tandai Dibayar Manual" (secondary outline button)
+  * Enhanced invoice management table with Midtrans payment option in dropdown menu for pending/sent invoices
+  * Fixed missing discount_amount column in invoice_line_items table to resolve database errors
+  * Integrated payment flow: create Snap transaction → redirect to Midtrans → webhook updates invoice status → automatic status tracking
+  * Added comprehensive status mapping from Midtrans transaction status to invoice status (capture/settlement → paid, pending → sent, deny/cancel/expire → cancelled)
+  * Created frontend Midtrans utility library for future Snap integration and popup payment handling
+  * Payment gateway supports all Indonesian payment methods: credit cards, bank transfers, e-wallets (GoPay, OVO, DANA), and convenience stores
+  * Complete invoice payment lifecycle with automatic status updates and payment method tracking
 - July 08, 2025. Successfully implemented comprehensive invoicing system with complete SaaS billing integration:
   * Created complete invoice database schema with invoices and invoice_line_items tables linked to existing subscription infrastructure
   * Built comprehensive invoice API endpoints: GET /api/invoices (list with filtering), GET /api/invoices/:id (detail), POST /api/invoices (create), PUT /api/invoices/:id (update), POST /api/invoices/:id/mark-paid (payment), POST /api/invoices/generate-subscription (auto-generate), DELETE /api/invoices/:id (delete pending)

@@ -3893,6 +3893,190 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create Midtrans payment transaction for invoice
+  app.post("/api/invoices/:id/pay", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const invoiceId = req.params.id;
+      const { db } = await import("./db");
+      const { invoices, invoiceLineItems, users } = await import("@shared/schema");
+      const { eq, and } = await import("drizzle-orm");
+      const { createSnapTransaction } = await import("./midtrans");
+      
+      // Get invoice details with organization info
+      const invoiceQuery = db
+        .select({
+          invoice: invoices,
+          user: {
+            id: users.id,
+            email: users.email,
+            firstName: users.firstName,
+            lastName: users.lastName,
+          }
+        })
+        .from(invoices)
+        .leftJoin(users, eq(invoices.createdBy, users.id))
+        .where(
+          currentUser.isSystemOwner 
+            ? eq(invoices.id, invoiceId)
+            : and(
+                eq(invoices.id, invoiceId),
+                eq(invoices.organizationId, currentUser.organizationId!)
+              )
+        );
+        
+      const invoiceData = await invoiceQuery;
+      
+      if (invoiceData.length === 0) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+      
+      const invoice = invoiceData[0];
+      
+      // Check if invoice is payable
+      if (invoice.invoice.status !== 'pending' && invoice.invoice.status !== 'sent') {
+        return res.status(400).json({ 
+          message: "Invoice cannot be paid. Status: " + invoice.invoice.status 
+        });
+      }
+      
+      // Get line items
+      const lineItems = await db
+        .select()
+        .from(invoiceLineItems)
+        .where(eq(invoiceLineItems.invoiceId, invoiceId));
+      
+      // Prepare Midtrans payment data
+      const paymentData = {
+        orderId: invoice.invoice.invoiceNumber,
+        grossAmount: parseInt(invoice.invoice.amount),
+        customerDetails: {
+          firstName: invoice.user?.firstName || "Customer",
+          lastName: invoice.user?.lastName || "",
+          email: invoice.user?.email || "customer@example.com"
+        },
+        itemDetails: lineItems.map(item => ({
+          id: item.id,
+          price: parseInt(item.unitPrice),
+          quantity: item.quantity,
+          name: item.description
+        }))
+      };
+      
+      // Create Snap transaction
+      const snapTransaction = await createSnapTransaction(paymentData);
+      
+      // Update invoice status to 'sent'
+      await db
+        .update(invoices)
+        .set({ 
+          status: 'sent',
+          updatedAt: new Date()
+        })
+        .where(eq(invoices.id, invoiceId));
+      
+      res.json({
+        token: snapTransaction.token,
+        redirectUrl: snapTransaction.redirect_url
+      });
+    } catch (error) {
+      console.error("Error creating payment:", error);
+      res.status(500).json({ message: "Failed to create payment" });
+    }
+  });
+
+  // Midtrans notification webhook
+  app.post("/api/midtrans/notification", async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { invoices } = await import("@shared/schema");
+      const { eq } = await import("drizzle-orm");
+      const { getTransactionStatus, mapMidtransStatusToInvoiceStatus } = await import("./midtrans");
+      
+      const notification = req.body;
+      const orderId = notification.order_id;
+      
+      // Get transaction status from Midtrans
+      const transactionStatus = await getTransactionStatus(orderId);
+      
+      // Map to invoice status
+      const invoiceStatus = mapMidtransStatusToInvoiceStatus(
+        transactionStatus.transaction_status,
+        transactionStatus.fraud_status
+      );
+      
+      // Update invoice status
+      const updateData: any = {
+        status: invoiceStatus,
+        updatedAt: new Date()
+      };
+      
+      // If paid, set payment details
+      if (invoiceStatus === 'paid') {
+        updateData.paidDate = new Date();
+        updateData.paymentMethod = 'midtrans';
+      }
+      
+      await db
+        .update(invoices)
+        .set(updateData)
+        .where(eq(invoices.invoiceNumber, orderId));
+      
+      res.json({ status: 'ok' });
+    } catch (error) {
+      console.error("Error handling Midtrans notification:", error);
+      res.status(500).json({ message: "Failed to process notification" });
+    }
+  });
+
+  // Get payment status for invoice
+  app.get("/api/invoices/:id/payment-status", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const invoiceId = req.params.id;
+      const { db } = await import("./db");
+      const { invoices } = await import("@shared/schema");
+      const { eq, and } = await import("drizzle-orm");
+      const { getTransactionStatus } = await import("./midtrans");
+      
+      // Get invoice
+      const invoice = await db
+        .select()
+        .from(invoices)
+        .where(
+          currentUser.isSystemOwner 
+            ? eq(invoices.id, invoiceId)
+            : and(
+                eq(invoices.id, invoiceId),
+                eq(invoices.organizationId, currentUser.organizationId!)
+              )
+        );
+      
+      if (invoice.length === 0) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+      
+      try {
+        // Try to get latest status from Midtrans
+        const transactionStatus = await getTransactionStatus(invoice[0].invoiceNumber);
+        
+        res.json({
+          invoiceStatus: invoice[0].status,
+          midtransStatus: transactionStatus
+        });
+      } catch (error) {
+        // If Midtrans fails, just return invoice status
+        res.json({
+          invoiceStatus: invoice[0].status,
+          midtransStatus: null
+        });
+      }
+    } catch (error) {
+      console.error("Error getting payment status:", error);
+      res.status(500).json({ message: "Failed to get payment status" });
+    }
+  });
+
   // Organization subscription assignment endpoints (System Owner only)
   
   // Get organization with subscription details

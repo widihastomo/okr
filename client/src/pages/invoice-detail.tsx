@@ -99,6 +99,31 @@ export default function InvoiceDetail() {
     },
   });
 
+  const payWithMidtransMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", `/api/invoices/${id}/pay`);
+      return response.json();
+    },
+    onSuccess: (data) => {
+      // Redirect to Midtrans payment page
+      window.open(data.redirectUrl, '_blank');
+      // Update status to 'sent' and refresh data
+      queryClient.invalidateQueries({ queryKey: [`/api/invoices/${id}`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
+      toast({
+        title: "Pembayaran Dimulai",
+        description: "Anda akan diarahkan ke halaman pembayaran Midtrans",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error Pembayaran",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   if (isLoading) {
     return (
       <div className="p-8">
@@ -186,15 +211,25 @@ export default function InvoiceDetail() {
             <Download className="w-4 h-4 mr-2" />
             Download PDF
           </Button>
-          {invoice.status === 'pending' && (
-            <Button 
-              onClick={() => markPaidMutation.mutate()}
-              disabled={markPaidMutation.isPending}
-              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
-            >
-              <CheckCircle className="w-4 h-4 mr-2" />
-              {markPaidMutation.isPending ? "Memproses..." : "Tandai Dibayar"}
-            </Button>
+          {(invoice.status === 'pending' || invoice.status === 'sent') && (
+            <>
+              <Button 
+                onClick={() => payWithMidtransMutation.mutate()}
+                disabled={payWithMidtransMutation.isPending}
+                className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600"
+              >
+                <CreditCard className="w-4 h-4 mr-2" />
+                {payWithMidtransMutation.isPending ? "Memproses..." : "Bayar dengan Midtrans"}
+              </Button>
+              <Button 
+                onClick={() => markPaidMutation.mutate()}
+                disabled={markPaidMutation.isPending}
+                variant="outline"
+              >
+                <CheckCircle className="w-4 h-4 mr-2" />
+                {markPaidMutation.isPending ? "Memproses..." : "Tandai Dibayar Manual"}
+              </Button>
+            </>
           )}
         </div>
       </div>

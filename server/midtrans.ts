@@ -1,0 +1,123 @@
+const { CoreApi, Snap } = require('midtrans-client');
+
+// Konfigurasi Midtrans
+const isProduction = process.env.NODE_ENV === 'production';
+
+if (!process.env.MIDTRANS_SERVER_KEY || !process.env.MIDTRANS_CLIENT_KEY) {
+  console.warn('Midtrans credentials not found. Payment features will not work.');
+}
+
+// Core API untuk server-to-server
+export const coreApi = new CoreApi({
+  isProduction,
+  serverKey: process.env.MIDTRANS_SERVER_KEY!,
+  clientKey: process.env.MIDTRANS_CLIENT_KEY!
+});
+
+// Snap API untuk redirect payment
+export const snap = new Snap({
+  isProduction,
+  serverKey: process.env.MIDTRANS_SERVER_KEY!,
+  clientKey: process.env.MIDTRANS_CLIENT_KEY!
+});
+
+export interface MidtransPaymentRequest {
+  orderId: string;
+  grossAmount: number;
+  customerDetails: {
+    firstName: string;
+    lastName?: string;
+    email: string;
+    phone?: string;
+  };
+  itemDetails: Array<{
+    id: string;
+    price: number;
+    quantity: number;
+    name: string;
+  }>;
+}
+
+export interface MidtransTransactionStatus {
+  transaction_status: string;
+  status_code: string;
+  payment_type: string;
+  transaction_id: string;
+  order_id: string;
+  gross_amount: string;
+  fraud_status?: string;
+}
+
+/**
+ * Membuat transaksi Snap untuk pembayaran invoice
+ */
+export async function createSnapTransaction(paymentData: MidtransPaymentRequest) {
+  try {
+    const parameter = {
+      transaction_details: {
+        order_id: paymentData.orderId,
+        gross_amount: paymentData.grossAmount
+      },
+      credit_card: {
+        secure: true
+      },
+      customer_details: paymentData.customerDetails,
+      item_details: paymentData.itemDetails,
+      callbacks: {
+        finish: `${process.env.BASE_URL}/invoices/${paymentData.orderId.replace('INV-', '')}/payment-success`,
+        error: `${process.env.BASE_URL}/invoices/${paymentData.orderId.replace('INV-', '')}/payment-error`,
+        pending: `${process.env.BASE_URL}/invoices/${paymentData.orderId.replace('INV-', '')}/payment-pending`
+      }
+    };
+
+    const transaction = await snap.createTransaction(parameter);
+    return transaction;
+  } catch (error) {
+    console.error('Error creating Midtrans transaction:', error);
+    throw new Error('Failed to create payment transaction');
+  }
+}
+
+/**
+ * Mendapatkan status transaksi dari Midtrans
+ */
+export async function getTransactionStatus(orderId: string): Promise<MidtransTransactionStatus> {
+  try {
+    const statusResponse = await coreApi.transaction.status(orderId);
+    return statusResponse as MidtransTransactionStatus;
+  } catch (error) {
+    console.error('Error getting transaction status:', error);
+    throw new Error('Failed to get transaction status');
+  }
+}
+
+/**
+ * Memverifikasi signature notification dari Midtrans
+ */
+export function verifySignature(orderId: string, statusCode: string, grossAmount: string, serverKey: string): string {
+  const crypto = require('crypto');
+  const input = orderId + statusCode + grossAmount + serverKey;
+  return crypto.createHash('sha512').update(input).digest('hex');
+}
+
+/**
+ * Menentukan status invoice berdasarkan status transaksi Midtrans
+ */
+export function mapMidtransStatusToInvoiceStatus(transactionStatus: string, fraudStatus?: string): string {
+  switch (transactionStatus) {
+    case 'capture':
+      return fraudStatus === 'challenge' ? 'pending' : 'paid';
+    case 'settlement':
+      return 'paid';
+    case 'pending':
+      return 'sent';
+    case 'deny':
+    case 'cancel':
+    case 'expire':
+      return 'cancelled';
+    case 'failure':
+      return 'pending';
+    default:
+      return 'pending';
+  }
+}
