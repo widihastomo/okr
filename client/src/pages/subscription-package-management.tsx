@@ -154,10 +154,17 @@ function PackageFormModal({
       });
       onClose();
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      let errorMessage = error.message;
+      
+      // Handle specific error cases
+      if (error.message.includes("Slug sudah digunakan")) {
+        errorMessage = "Slug sudah digunakan. Sistem akan membuat slug unik otomatis.";
+      }
+      
       toast({
         title: "Gagal menyimpan paket",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     },
@@ -221,11 +228,15 @@ function PackageFormModal({
   };
 
   const generateSlug = (name: string) => {
-    return name.toLowerCase()
+    const baseSlug = name.toLowerCase()
       .replace(/\s+/g, '-')
       .replace(/[^a-z0-9-]/g, '')
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '');
+    
+    // Add timestamp suffix to ensure uniqueness
+    const timestamp = Date.now().toString().slice(-4);
+    return `${baseSlug}-${timestamp}`;
   };
 
   const handleNameChange = (name: string) => {

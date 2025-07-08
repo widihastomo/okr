@@ -3108,9 +3108,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .returning();
       
       res.status(201).json(newPlan);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating subscription plan:", error);
-      res.status(500).json({ message: "Failed to create subscription plan" });
+      
+      // Handle duplicate slug error specifically
+      if (error.code === '23505' && error.constraint === 'subscription_plans_slug_key') {
+        res.status(400).json({ message: "Slug sudah digunakan. Silakan gunakan slug yang berbeda." });
+      } else {
+        res.status(500).json({ message: "Failed to create subscription plan" });
+      }
     }
   });
 
