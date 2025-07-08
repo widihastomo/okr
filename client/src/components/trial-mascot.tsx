@@ -332,19 +332,30 @@ export default function TrialMascot({ className }: MascotProps) {
                 className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white text-xs h-8 flex-1"
                 onClick={() => {
                   // Action based on current message
-                  if (currentMessage.action.includes("Panduan")) {
+                  const action = currentMessage.action;
+                  console.log("Mascot button clicked with action:", action);
+                  
+                  if (action.includes("Panduan") || action.includes("Petualangan")) {
                     // Scroll to onboarding section
                     document.querySelector('[data-testid="onboarding-missions"]')?.scrollIntoView({ behavior: 'smooth' });
-                  } else if (currentMessage.action.includes("Objective")) {
+                  } else if (action.includes("Objective") || action.includes("Buat")) {
                     window.location.href = "/dashboard";
-                  } else if (currentMessage.action.includes("Analytics")) {
+                  } else if (action.includes("Analytics") || action.includes("Lihat Analytics")) {
                     window.location.href = "/analytics";
-                  } else if (currentMessage.action.includes("Paket")) {
+                  } else if (action.includes("Paket") || action.includes("Lihat Paket")) {
                     window.location.href = "/pricing";
+                  } else if (action.includes("Lanjutkan") || action.includes("Terus")) {
+                    // Stay on current page and cycle to next message
+                    setMessageIndex((prev) => (prev + 1) % messages.length);
+                  } else if (action.includes("Explore")) {
+                    window.location.href = "/analytics";
+                  } else {
+                    // Default action - scroll to onboarding
+                    document.querySelector('[data-testid="onboarding-missions"]')?.scrollIntoView({ behavior: 'smooth' });
                   }
                 }}
               >
-                <IconComponent className="h-3 w-3 mr-1" />
+                {IconComponent && <IconComponent className="h-3 w-3 mr-1" />}
                 {currentMessage.action}
               </Button>
               

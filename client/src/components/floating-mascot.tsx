@@ -402,18 +402,30 @@ export default function FloatingMascot({ className }: FloatingMascotProps) {
                   className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs h-8"
                   onClick={() => {
                     // Handle tip actions
-                    if (currentTip.action.includes("Daily Focus")) {
+                    const action = currentTip.action;
+                    console.log("Floating mascot button clicked with action:", action);
+                    
+                    if (action.includes("Daily Focus") || action.includes("Ke Daily")) {
                       window.location.href = "/";
-                    } else if (currentTip.action.includes("Template")) {
+                    } else if (action.includes("Template") || action.includes("Lihat Template")) {
                       window.location.href = "/templates";
-                    } else if (currentTip.action.includes("Objective")) {
+                    } else if (action.includes("Objective") || action.includes("Buat Objective")) {
                       window.location.href = "/dashboard";
-                    } else if (currentTip.action.includes("Analytics")) {
+                    } else if (action.includes("Analytics") || action.includes("Pelajari Metric")) {
                       window.location.href = "/analytics";
-                    } else if (currentTip.action.includes("Paket")) {
+                    } else if (action.includes("Paket") || action.includes("Lihat Paket")) {
                       window.location.href = "/pricing";
-                    } else if (currentTip.action.includes("Panduan")) {
+                    } else if (action.includes("Panduan") || action.includes("Lihat Panduan")) {
                       document.querySelector('[data-testid="onboarding-missions"]')?.scrollIntoView({ behavior: 'smooth' });
+                    } else if (action.includes("Tour") || action.includes("Mulai Tour")) {
+                      document.querySelector('[data-testid="onboarding-missions"]')?.scrollIntoView({ behavior: 'smooth' });
+                    } else if (action.includes("Member") || action.includes("Undang Member")) {
+                      window.location.href = "/client-users";
+                    } else if (action.includes("Pencapaian") || action.includes("Lihat Pencapaian")) {
+                      window.location.href = "/trial-achievements";
+                    } else {
+                      // Default action - go to dashboard
+                      window.location.href = "/dashboard";
                     }
                   }}
                 >
