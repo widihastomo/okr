@@ -458,24 +458,18 @@ function PackageFormModal({
                       
                       <div>
                         <Label className="text-xs text-gray-600">Diskon (%)</Label>
-                        <Select
-                          value={period.discountPercentage.toString()}
-                          onValueChange={(value) => updateBillingPeriod(index, { 
+                        <Input
+                          type="number"
+                          min="0"
+                          max="100"
+                          value={period.discountPercentage}
+                          onChange={(e) => updateBillingPeriod(index, { 
                             ...period, 
-                            discountPercentage: parseInt(value) 
+                            discountPercentage: parseInt(e.target.value) || 0 
                           })}
-                        >
-                          <SelectTrigger className="h-8 text-sm">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="0">0%</SelectItem>
-                            <SelectItem value="10">10%</SelectItem>
-                            <SelectItem value="15">15%</SelectItem>
-                            <SelectItem value="20">20%</SelectItem>
-                            <SelectItem value="25">25%</SelectItem>
-                          </SelectContent>
-                        </Select>
+                          placeholder="0"
+                          className="h-8 text-sm"
+                        />
                       </div>
                       
                       <div className="flex items-center justify-between">
