@@ -51,9 +51,12 @@ export default function PackageDetail() {
   const [deleteBillingPeriodId, setDeleteBillingPeriodId] = useState<string | null>(null);
 
   // Fetch package with billing periods
-  const { data: pkg, isLoading } = useQuery<SubscriptionPlan & { billingPeriods: BillingPeriod[] }>({
+  const { data: pkg, isLoading, error } = useQuery<SubscriptionPlan & { billingPeriods: BillingPeriod[] }>({
     queryKey: [`/api/admin/subscription-plans/${packageId}/with-periods`],
     enabled: !!packageId,
+    staleTime: 30000, // 30 seconds
+    refetchOnWindowFocus: false,
+    retry: 1,
   });
 
   const formatPrice = (price: string) => {
@@ -102,10 +105,65 @@ export default function PackageDetail() {
 
   if (isLoading) {
     return (
+      <div className="container mx-auto p-6 space-y-6">
+        {/* Header Skeleton */}
+        <div className="flex items-center gap-4">
+          <div className="w-20 h-10 bg-gray-200 rounded animate-pulse"></div>
+          <div>
+            <div className="w-64 h-8 bg-gray-200 rounded animate-pulse mb-2"></div>
+            <div className="w-96 h-4 bg-gray-200 rounded animate-pulse"></div>
+          </div>
+        </div>
+
+        {/* Package Info Skeleton */}
+        <div className="border rounded-lg p-6">
+          <div className="w-48 h-6 bg-gray-200 rounded animate-pulse mb-4"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i}>
+                <div className="w-24 h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
+                <div className="w-32 h-5 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Billing Periods Skeleton */}
+        <div className="border rounded-lg p-6">
+          <div className="w-48 h-6 bg-gray-200 rounded animate-pulse mb-4"></div>
+          <div className="space-y-3">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex gap-4">
+                <div className="w-20 h-4 bg-gray-200 rounded animate-pulse"></div>
+                <div className="w-16 h-4 bg-gray-200 rounded animate-pulse"></div>
+                <div className="w-24 h-4 bg-gray-200 rounded animate-pulse"></div>
+                <div className="w-12 h-4 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
       <div className="h-screen flex items-center justify-center">
         <div className="text-center">
-          <Package className="h-12 w-12 text-gray-400 mx-auto mb-4 animate-pulse" />
-          <p className="text-gray-500">Memuat detail paket...</p>
+          <Package className="h-12 w-12 text-red-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Error memuat paket</h3>
+          <p className="text-gray-500 mb-4">
+            {error.message.includes('404') ? 'Paket tidak ditemukan' : 'Gagal memuat detail paket'}
+          </p>
+          <div className="space-x-2">
+            <Button variant="outline" onClick={() => window.location.reload()}>
+              Coba Lagi
+            </Button>
+            <Button onClick={() => window.location.href = '/subscription-packages'}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Kembali ke Daftar Paket
+            </Button>
+          </div>
         </div>
       </div>
     );

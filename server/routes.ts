@@ -3091,27 +3091,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get single subscription plan with billing periods
+  // Get single subscription plan with billing periods (optimized)
   app.get("/api/admin/subscription-plans/:id/with-periods", requireAuth, isSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
       const { billingPeriods } = await import("@shared/schema");
+      const { eq } = await import("drizzle-orm");
       
       const planId = req.params.id;
       
-      // Get the subscription plan
-      const [plan] = await db.select().from(subscriptionPlans).where(eq(subscriptionPlans.id, planId));
+      // Validate UUID format quickly
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(planId)) {
+        return res.status(400).json({ message: "Invalid plan ID format" });
+      }
       
+      // Use Promise.all to fetch plan and periods concurrently
+      const [planResult, periodsResult] = await Promise.all([
+        db.select().from(subscriptionPlans).where(eq(subscriptionPlans.id, planId)).limit(1),
+        db.select().from(billingPeriods)
+          .where(eq(billingPeriods.planId, planId))
+          .orderBy(billingPeriods.periodMonths)
+      ]);
+      
+      const plan = planResult[0];
       if (!plan) {
         return res.status(404).json({ message: "Subscription plan not found" });
       }
       
-      // Get billing periods for this plan
-      const periods = await db.select().from(billingPeriods)
-        .where(eq(billingPeriods.planId, plan.id))
-        .orderBy(billingPeriods.periodMonths);
-      
-      res.json({ ...plan, billingPeriods: periods });
+      // Set cache headers for better performance
+      res.set('Cache-Control', 'public, max-age=300'); // 5 minutes
+      res.json({ ...plan, billingPeriods: periodsResult });
     } catch (error) {
       console.error("Error fetching subscription plan with billing periods:", error);
       res.status(500).json({ message: "Failed to fetch subscription plan with billing periods" });
