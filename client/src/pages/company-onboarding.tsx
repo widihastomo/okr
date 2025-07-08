@@ -757,46 +757,91 @@ export default function CompanyOnboarding() {
         const initiativeOptions = getInitiativeOptions(selectedKeyResultsForInitiatives);
         const selectedInitiatives = onboardingData.initiatives.filter(init => init && init.trim() !== "");
         
+        // Group initiatives by their corresponding key results
+        const getInitiativesByKeyResult = (keyResults: string[]) => {
+          const initiativesByKR: { [key: string]: string[] } = {};
+          
+          keyResults.forEach(keyResult => {
+            const relatedInitiatives = initiativeKeyResultMapping[keyResult] || [];
+            if (relatedInitiatives.length > 0) {
+              initiativesByKR[keyResult] = relatedInitiatives;
+            }
+          });
+          
+          return initiativesByKR;
+        };
+        
+        const initiativesByKeyResult = getInitiativesByKeyResult(selectedKeyResultsForInitiatives);
+        
         return (
-          <div className="space-y-4">
-            {initiativeOptions.length > 0 && (
-              <div className="space-y-3">
-                <Label>Pilih inisiatif yang sesuai dengan Key Results Anda:</Label>
-                <div className="space-y-2">
-                  {initiativeOptions.map((option, index) => (
-                    <div key={index} className="flex items-start space-x-2 p-3 rounded-lg border border-gray-200 hover:bg-gray-50">
-                      <Checkbox 
-                        id={`initiative-${index}`}
-                        checked={selectedInitiatives.includes(option)}
-                        onCheckedChange={(checked) => {
-                          let newInitiatives = [...onboardingData.initiatives];
-                          if (checked) {
-                            newInitiatives.push(option);
-                          } else {
-                            newInitiatives = newInitiatives.filter(init => init !== option);
-                          }
-                          setOnboardingData({...onboardingData, initiatives: newInitiatives});
-                        }}
-                      />
-                      <Label htmlFor={`initiative-${index}`} className="flex-1 cursor-pointer leading-relaxed">
-                        {option}
-                      </Label>
+          <div className="space-y-6">
+            {Object.keys(initiativesByKeyResult).length > 0 && (
+              <div className="space-y-4">
+                <Label className="text-lg font-semibold">Pilih inisiatif untuk setiap Key Result yang sudah dipilih:</Label>
+                
+                {Object.entries(initiativesByKeyResult).map(([keyResult, initiatives], groupIndex) => (
+                  <div key={groupIndex} className="border border-blue-200 rounded-lg p-4 space-y-3 bg-blue-50">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <h4 className="font-semibold text-blue-800">{keyResult}</h4>
                     </div>
-                  ))}
-                </div>
+                    
+                    <div className="space-y-2 ml-4">
+                      {initiatives.map((initiative, initIndex) => (
+                        <div key={initIndex} className="flex items-start space-x-2 p-3 rounded-lg border border-gray-200 hover:bg-white bg-white">
+                          <Checkbox 
+                            id={`initiative-${groupIndex}-${initIndex}`}
+                            checked={selectedInitiatives.includes(initiative)}
+                            onCheckedChange={(checked) => {
+                              let newInitiatives = [...onboardingData.initiatives];
+                              if (checked) {
+                                newInitiatives.push(initiative);
+                              } else {
+                                newInitiatives = newInitiatives.filter(init => init !== initiative);
+                              }
+                              setOnboardingData({...onboardingData, initiatives: newInitiatives});
+                            }}
+                          />
+                          <Label htmlFor={`initiative-${groupIndex}-${initIndex}`} className="flex-1 cursor-pointer leading-relaxed text-sm">
+                            {initiative}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
             
             {selectedInitiatives.length > 0 && (
-              <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                <p className="text-sm text-green-800 mb-2">
-                  <strong>Inisiatif terpilih:</strong>
+              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                <h4 className="font-semibold text-green-800 mb-3">🎯 Inisiatif yang Dipilih ({selectedInitiatives.length})</h4>
+                <div className="space-y-2">
+                  {Object.entries(initiativesByKeyResult).map(([keyResult, initiatives]) => {
+                    const selectedInThisKR = initiatives.filter(init => selectedInitiatives.includes(init));
+                    if (selectedInThisKR.length === 0) return null;
+                    
+                    return (
+                      <div key={keyResult} className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                          <span className="text-sm font-medium text-blue-700">{keyResult}</span>
+                        </div>
+                        <div className="ml-4 space-y-1">
+                          {selectedInThisKR.map((init, index) => (
+                            <div key={index} className="flex items-center gap-2">
+                              <div className="w-1 h-1 bg-green-500 rounded-full"></div>
+                              <span className="text-sm text-gray-700">{init}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="text-sm text-green-700 mt-3">
+                  <strong>Total: {selectedInitiatives.length} inisiatif terpilih</strong>
                 </p>
-                <ul className="text-sm text-green-700 space-y-1">
-                  {selectedInitiatives.map((init, index) => (
-                    <li key={index}>• {init}</li>
-                  ))}
-                </ul>
               </div>
             )}
           </div>
