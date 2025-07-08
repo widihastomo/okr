@@ -720,14 +720,13 @@ export default function SubscriptionPackageManagement() {
             </TableHeader>
             <TableBody>
               {filteredPackages.map((pkg) => (
-                <>
-                  <TableRow key={`${pkg.id}-row`}>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{pkg.name}</div>
-                        <div className="text-sm text-gray-500">{pkg.slug}</div>
-                      </div>
-                    </TableCell>
+                <TableRow key={pkg.id}>
+                  <TableCell>
+                    <div>
+                      <div className="font-medium">{pkg.name}</div>
+                      <div className="text-sm text-gray-500">{pkg.slug}</div>
+                    </div>
+                  </TableCell>
                   <TableCell>
                     {parseFloat(pkg.price) === 0 
                       ? <Badge variant="outline">Custom</Badge>
@@ -806,8 +805,6 @@ export default function SubscriptionPackageManagement() {
                     </div>
                   </TableCell>
                 </TableRow>
-
-                </>
               ))}
             </TableBody>
           </Table>
