@@ -210,143 +210,83 @@ export default function TrialMascot({ className, missions = [], onMissionAction 
     return iconMap[iconName] || Target;
   };
 
-  // Contextual messages based on exact mission steps
+  // Generate 10 slides for onboarding platform steps
   const getContextualMessages = () => {
-    const currentStep = getCurrentMissionStep();
-    const nextMission = getNextMission();
-    const totalMissions = missions.length || 10;
-    
-    // Define the exact 10 mission steps with step-by-step guidance
-    const missionSteps = [
+    // Create exactly 10 slides for the onboarding platform steps
+    const slides = [
       {
-        step: 1,
-        name: "Menambahkan Member",
-        message: "Langkah 1 dari 10: Mari mulai dengan menambahkan anggota tim. Tim yang solid adalah fondasi kesuksesan OKR!",
+        state: "welcome" as MascotState,
+        title: "1. Menambahkan Member",
+        message: "Langkah 1 dari 10: Mari mulai dengan menambahkan anggota tim. Tim yang solid adalah fondasi kesuksesan OKR! Klik tombol untuk mulai menambahkan member pertama Anda.",
         action: "Mulai",
         icon: UserPlus,
       },
       {
-        step: 2,
-        name: "Membuat Tim",
-        message: "Langkah 2 dari 10: Sekarang buat tim dengan struktur yang jelas. Tim yang terorganisir akan lebih mudah mencapai tujuan.",
+        state: "encouraging" as MascotState,
+        title: "2. Membuat Tim",
+        message: "Langkah 2 dari 10: Sekarang buat tim dengan struktur yang jelas. Tim yang terorganisir akan lebih mudah mencapai tujuan bersama.",
         action: "Mulai",
         icon: Target,
       },
       {
-        step: 3,
-        name: "Membuat Objective",
-        message: "Langkah 3 dari 10: Waktunya membuat Goal/Objective pertama! Goal adalah tujuan utama yang ingin dicapai tim.",
+        state: "pointing" as MascotState,
+        title: "3. Membuat Objective",
+        message: "Langkah 3 dari 10: Waktunya membuat Goal/Objective pertama! Goal adalah tujuan utama yang ingin dicapai tim dalam periode tertentu.",
         action: "Mulai",
         icon: Target,
       },
       {
-        step: 4,
-        name: "Menambahkan Key Result",
-        message: "Langkah 4 dari 10: Tambahkan Key Result (Target Angka). Ini adalah indikator pencapaian yang dapat diukur secara kuantitatif.",
+        state: "thinking" as MascotState,
+        title: "4. Menambahkan Key Result",
+        message: "Langkah 4 dari 10: Tambahkan Key Result (Target Angka). Ini adalah indikator pencapaian yang dapat diukur secara kuantitatif untuk setiap objective.",
         action: "Mulai",
         icon: Target,
       },
       {
-        step: 5,
-        name: "Menambahkan Inisiatif",
-        message: "Langkah 5 dari 10: Buat inisiatif sebagai rencana aksi konkret. Inisiatif adalah HOW untuk mencapai tujuan.",
+        state: "encouraging" as MascotState,
+        title: "5. Menambahkan Inisiatif",
+        message: "Langkah 5 dari 10: Buat inisiatif sebagai rencana aksi konkret. Inisiatif adalah HOW untuk mencapai tujuan yang telah ditetapkan.",
         action: "Mulai",
         icon: Lightbulb,
       },
       {
-        step: 6,
-        name: "Menambahkan Task",
-        message: "Langkah 6 dari 10: Breakdown inisiatif menjadi task-task kecil. Task adalah unit kerja yang dapat dikerjakan harian.",
+        state: "pointing" as MascotState,
+        title: "6. Menambahkan Task",
+        message: "Langkah 6 dari 10: Breakdown inisiatif menjadi task-task kecil. Task adalah unit kerja yang dapat dikerjakan harian oleh tim.",
         action: "Mulai",
         icon: Target,
       },
       {
-        step: 7,
-        name: "Update Capaian Key Result",
-        message: "Langkah 7 dari 10: Update progress Key Result Anda. Pantau apakah target angka sudah tercapai atau belum.",
+        state: "celebrating" as MascotState,
+        title: "7. Update Capaian Key Result",
+        message: "Langkah 7 dari 10: Update progress Key Result Anda. Pantau apakah target angka sudah tercapai atau masih perlu diperbaiki.",
         action: "Mulai",
         icon: Target,
       },
       {
-        step: 8,
-        name: "Update Capaian Metrik Inisiatif",
-        message: "Langkah 8 dari 10: Update metrik inisiatif untuk evaluasi kemajuan pelaksanaan rencana aksi.",
+        state: "encouraging" as MascotState,
+        title: "8. Update Capaian Metrik Inisiatif",
+        message: "Langkah 8 dari 10: Update metrik inisiatif untuk evaluasi kemajuan pelaksanaan rencana aksi yang telah dibuat.",
         action: "Mulai",
         icon: LineChart,
       },
       {
-        step: 9,
-        name: "Update Status Task",
-        message: "Langkah 9 dari 10: Update status task harian Anda. Pastikan task bergerak dari 'Belum Mulai' ke 'Selesai'.",
+        state: "pointing" as MascotState,
+        title: "9. Update Status Task",
+        message: "Langkah 9 dari 10: Update status task harian Anda. Pastikan task bergerak dari 'Belum Mulai' ke 'Sedang Berjalan' hingga 'Selesai'.",
         action: "Mulai",
         icon: Target,
       },
       {
-        step: 10,
-        name: "Update Harian Instan",
-        message: "Langkah 10 dari 10: Lakukan review harian untuk memastikan kemajuan yang konsisten setiap hari.",
+        state: "celebrating" as MascotState,
+        title: "10. Update Harian Instan",
+        message: "Langkah 10 dari 10: Lakukan review harian untuk memastikan kemajuan yang konsisten setiap hari. Selamat, Anda telah menyelesaikan onboarding!",
         action: "Mulai",
         icon: Zap,
       },
     ];
 
-    // If all steps completed
-    if (currentStep >= 10) {
-      return [
-        {
-          state: "celebrating" as MascotState,
-          title: "Selamat! 🎉",
-          message: "Anda telah menyelesaikan semua 10 langkah onboarding! Sekarang Anda siap menggunakan platform secara penuh.",
-          action: "Lihat Paket Premium",
-          icon: Trophy,
-        },
-        {
-          state: "waving" as MascotState,
-          title: "Saya bangga! 🌟", 
-          message: "Platform OKR ini akan membantu tim Anda mencapai tujuan dengan lebih terstruktur dan terukur. Terus semangat!",
-          action: "Explore Analytics",
-          icon: Target,
-        },
-      ];
-    }
-
-    // Get current and next step messages
-    const currentStepData = missionSteps[currentStep] || missionSteps[0];
-    const nextStepData = missionSteps[currentStep + 1];
-    
-    const messages = [
-      {
-        state: "pointing" as MascotState,
-        title: currentStepData.name,
-        message: currentStepData.message,
-        action: currentStepData.action,
-        icon: currentStepData.icon,
-      },
-    ];
-
-    // Add progress message
-    if (currentStep > 0) {
-      messages.push({
-        state: "encouraging" as MascotState,
-        title: "Progress Anda",
-        message: `Bagus! Anda sudah menyelesaikan ${currentStep} dari 10 langkah. ${nextStepData ? `Selanjutnya: ${nextStepData.name}` : 'Hampir selesai!'}`,
-        action: "Lanjutkan",
-        icon: Trophy,
-      });
-    }
-
-    // Add educational content for beginners
-    if (currentStep === 0) {
-      messages.push({
-        state: "thinking" as MascotState,
-        title: "Apa itu Goal dan Angka Target? 🎯",
-        message: "Goal adalah tujuan yang ingin dicapai organisasi, sedangkan Angka Target adalah metrik terukur untuk mengevaluasi pencapaian goal tersebut. Contoh: Goal 'Meningkatkan Kepuasan Pelanggan' dengan target 'Rating 4.5/5'.",
-        action: "Pahami Lebih Lanjut",
-        icon: Target,
-      });
-    }
-
-    return messages;
+    return slides;
   };
 
   const messages = getContextualMessages();
