@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRoute } from "wouter";
+import { useRoute, useLocation } from "wouter";
 import { 
   ArrowLeft,
   Plus, 
@@ -44,6 +44,7 @@ export default function PackageDetail() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, params] = useRoute("/package-detail/:id");
+  const [, setLocation] = useLocation();
   const packageId = params?.id;
 
   const [selectedBillingPeriod, setSelectedBillingPeriod] = useState<BillingPeriod | null>(null);
@@ -159,7 +160,7 @@ export default function PackageDetail() {
             <Button variant="outline" onClick={() => window.location.reload()}>
               Coba Lagi
             </Button>
-            <Button onClick={() => window.location.href = '/subscription-packages'}>
+            <Button onClick={() => setLocation('/subscription-packages')}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Kembali ke Daftar Paket
             </Button>
@@ -176,7 +177,7 @@ export default function PackageDetail() {
           <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">Paket tidak ditemukan</h3>
           <p className="text-gray-500 mb-4">Paket yang Anda cari tidak tersedia.</p>
-          <Button onClick={() => window.location.href = '/subscription-packages'}>
+          <Button onClick={() => setLocation('/subscription-packages')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Kembali ke Daftar Paket
           </Button>
@@ -191,7 +192,7 @@ export default function PackageDetail() {
       <div className="flex items-center gap-4">
         <Button 
           variant="outline" 
-          onClick={() => window.location.href = '/subscription-packages'}
+          onClick={() => setLocation('/subscription-packages')}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Kembali

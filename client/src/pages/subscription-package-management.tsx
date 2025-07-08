@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { 
   Plus, 
   Edit, 
@@ -580,6 +581,7 @@ function PackageFormModal({
 export default function SubscriptionPackageManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPackage, setSelectedPackage] = useState<SubscriptionPlan | undefined>();
   const [showFormModal, setShowFormModal] = useState(false);
@@ -843,7 +845,7 @@ export default function SubscriptionPackageManagement() {
                       <Button 
                         variant="outline" 
                         size="sm"
-                        onClick={() => window.location.href = `/package-detail/${pkg.id}`}
+                        onClick={() => setLocation(`/package-detail/${pkg.id}`)}
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
