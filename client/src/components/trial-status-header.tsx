@@ -44,26 +44,14 @@ export default function TrialStatusHeader() {
           </Badge>
         </div>
 
-        <div className="flex items-center space-x-4">
-          {userLimit && (
-            <div className="flex items-center space-x-1 text-sm text-gray-600">
-              <Users className="h-3 w-3" />
-              <span>{userLimit.currentUsers}/{userLimit.maxUsers} users</span>
-              {isNearUserLimit && (
-                <AlertTriangle className="h-3 w-3 text-yellow-600" />
-              )}
-            </div>
-          )}
-
-          <Link to="/pricing">
-            <Button 
-              size="sm" 
-              className="h-7 px-3 text-xs bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
-            >
-              Upgrade Sekarang
-            </Button>
-          </Link>
-        </div>
+        <Link to="/pricing">
+          <Button 
+            size="sm" 
+            className="h-7 px-3 text-xs bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+          >
+            Upgrade Sekarang
+          </Button>
+        </Link>
 
         {isExpiring && (
           <div className="text-sm text-red-600 font-medium">
