@@ -410,28 +410,11 @@ export default function CompanyOnboarding() {
                       </Label>
                     </div>
                   ))}
-                  <div className="flex items-center space-x-2 pt-2">
-                    <RadioGroupItem value="custom" id="custom-objective" />
-                    <Label htmlFor="custom-objective">Atau tulis objective sendiri:</Label>
-                  </div>
                 </RadioGroup>
               </div>
             )}
             
-            {(onboardingData.objective === "custom" || objectiveOptions.length === 0) && (
-              <div className="space-y-2">
-                <Label htmlFor="objective">Tulis objective Anda:</Label>
-                <Textarea 
-                  id="objective"
-                  placeholder="Contoh: Meningkatkan omzet penjualan produk A sebesar 20% dalam bulan Juli"
-                  value={onboardingData.objective === "custom" ? "" : onboardingData.objective}
-                  onChange={(e) => setOnboardingData({...onboardingData, objective: e.target.value})}
-                  className="min-h-[100px]"
-                />
-              </div>
-            )}
-            
-            {onboardingData.objective && onboardingData.objective !== "custom" && objectiveOptions.includes(onboardingData.objective) && (
+            {onboardingData.objective && objectiveOptions.includes(onboardingData.objective) && (
               <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
                 <p className="text-sm text-blue-800">
                   <strong>Objective terpilih:</strong> {onboardingData.objective}
@@ -571,7 +554,7 @@ export default function CompanyOnboarding() {
         };
 
         const keyResultOptions = getKeyResultOptions(onboardingData.objective);
-        const selectedKeyResults = onboardingData.keyResults.filter(kr => kr && kr !== "custom");
+        const selectedKeyResults = onboardingData.keyResults.filter(kr => kr && kr.trim() !== "");
         
         return (
           <div className="space-y-4">
@@ -599,62 +582,6 @@ export default function CompanyOnboarding() {
                       </Label>
                     </div>
                   ))}
-                </div>
-                <div className="flex items-center space-x-2 pt-2">
-                  <Checkbox 
-                    id="custom-keyresult"
-                    checked={onboardingData.keyResults.includes("custom")}
-                    onCheckedChange={(checked) => {
-                      let newKeyResults = [...onboardingData.keyResults];
-                      if (checked) {
-                        newKeyResults.push("custom");
-                      } else {
-                        newKeyResults = newKeyResults.filter(kr => kr !== "custom");
-                      }
-                      setOnboardingData({...onboardingData, keyResults: newKeyResults});
-                    }}
-                  />
-                  <Label htmlFor="custom-keyresult">Atau tambah Key Result sendiri:</Label>
-                </div>
-              </div>
-            )}
-            
-            {(onboardingData.keyResults.includes("custom") || keyResultOptions.length === 0) && (
-              <div className="space-y-2">
-                <Label>Tambahkan Key Results custom:</Label>
-                <div className="space-y-2">
-                  {onboardingData.keyResults.filter(kr => kr !== "custom" && !keyResultOptions.includes(kr)).map((kr, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Input 
-                        placeholder={`Key Result ${index + 1}`}
-                        value={kr}
-                        onChange={(e) => {
-                          const newKeyResults = [...onboardingData.keyResults];
-                          const customIndex = newKeyResults.findIndex(k => k === kr);
-                          if (customIndex !== -1) {
-                            newKeyResults[customIndex] = e.target.value;
-                          }
-                          setOnboardingData({...onboardingData, keyResults: newKeyResults});
-                        }}
-                      />
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          const newKeyResults = onboardingData.keyResults.filter(k => k !== kr);
-                          setOnboardingData({...onboardingData, keyResults: newKeyResults});
-                        }}
-                      >
-                        Hapus
-                      </Button>
-                    </div>
-                  ))}
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setOnboardingData({...onboardingData, keyResults: [...onboardingData.keyResults, ""]})}
-                  >
-                    Tambah Key Result
-                  </Button>
                 </div>
               </div>
             )}
@@ -826,9 +753,9 @@ export default function CompanyOnboarding() {
           return [...new Set(allInitiatives)];
         };
 
-        const selectedKeyResultsForInitiatives = onboardingData.keyResults.filter(kr => kr && kr !== "custom");
+        const selectedKeyResultsForInitiatives = onboardingData.keyResults.filter(kr => kr && kr.trim() !== "");
         const initiativeOptions = getInitiativeOptions(selectedKeyResultsForInitiatives);
-        const selectedInitiatives = onboardingData.initiatives.filter(init => init && init !== "custom");
+        const selectedInitiatives = onboardingData.initiatives.filter(init => init && init.trim() !== "");
         
         return (
           <div className="space-y-4">
@@ -856,62 +783,6 @@ export default function CompanyOnboarding() {
                       </Label>
                     </div>
                   ))}
-                </div>
-                <div className="flex items-center space-x-2 pt-2">
-                  <Checkbox 
-                    id="custom-initiative"
-                    checked={onboardingData.initiatives.includes("custom")}
-                    onCheckedChange={(checked) => {
-                      let newInitiatives = [...onboardingData.initiatives];
-                      if (checked) {
-                        newInitiatives.push("custom");
-                      } else {
-                        newInitiatives = newInitiatives.filter(init => init !== "custom");
-                      }
-                      setOnboardingData({...onboardingData, initiatives: newInitiatives});
-                    }}
-                  />
-                  <Label htmlFor="custom-initiative">Atau tambah inisiatif sendiri:</Label>
-                </div>
-              </div>
-            )}
-            
-            {(onboardingData.initiatives.includes("custom") || initiativeOptions.length === 0) && (
-              <div className="space-y-2">
-                <Label>Tambahkan inisiatif custom:</Label>
-                <div className="space-y-2">
-                  {onboardingData.initiatives.filter(init => init !== "custom" && !initiativeOptions.includes(init)).map((init, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Input 
-                        placeholder={`Inisiatif ${index + 1}`}
-                        value={init}
-                        onChange={(e) => {
-                          const newInitiatives = [...onboardingData.initiatives];
-                          const customIndex = newInitiatives.findIndex(i => i === init);
-                          if (customIndex !== -1) {
-                            newInitiatives[customIndex] = e.target.value;
-                          }
-                          setOnboardingData({...onboardingData, initiatives: newInitiatives});
-                        }}
-                      />
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          const newInitiatives = onboardingData.initiatives.filter(i => i !== init);
-                          setOnboardingData({...onboardingData, initiatives: newInitiatives});
-                        }}
-                      >
-                        Hapus
-                      </Button>
-                    </div>
-                  ))}
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setOnboardingData({...onboardingData, initiatives: [...onboardingData.initiatives, ""]})}
-                  >
-                    Tambah Inisiatif
-                  </Button>
                 </div>
               </div>
             )}
@@ -1049,7 +920,7 @@ export default function CompanyOnboarding() {
           return [...new Set(allTasks)];
         };
 
-        const selectedInitiativesForTasks = onboardingData.initiatives.filter(init => init && init !== "custom");
+        const selectedInitiativesForTasks = onboardingData.initiatives.filter(init => init && init.trim() !== "");
         
         // Create task groups by initiative
         const getTaskGroupsByInitiative = (initiatives: string[]) => {
@@ -1117,7 +988,7 @@ export default function CompanyOnboarding() {
           onboardingData.tasks = [];
         }
         
-        const selectedTasks = onboardingData.tasks.filter(task => task && task !== "custom");
+        const selectedTasks = onboardingData.tasks.filter(task => task && task.trim() !== "");
         
         return (
           <div className="space-y-6">
@@ -1157,64 +1028,11 @@ export default function CompanyOnboarding() {
                   </div>
                 ))}
                 
-                <div className="flex items-center space-x-2 pt-2">
-                  <Checkbox 
-                    id="custom-task"
-                    checked={onboardingData.tasks && onboardingData.tasks.includes("custom")}
-                    onCheckedChange={(checked) => {
-                      let newTasks = [...(onboardingData.tasks || [])];
-                      if (checked) {
-                        newTasks.push("custom");
-                      } else {
-                        newTasks = newTasks.filter(task => task !== "custom");
-                      }
-                      setOnboardingData({...onboardingData, tasks: newTasks});
-                    }}
-                  />
-                  <Label htmlFor="custom-task">Atau tambah task sendiri:</Label>
-                </div>
+
               </div>
             )}
             
-            {((onboardingData.tasks && onboardingData.tasks.includes("custom")) || taskOptions.length === 0) && (
-              <div className="space-y-2">
-                <Label>Tambahkan task custom:</Label>
-                <div className="space-y-2">
-                  {onboardingData.tasks && onboardingData.tasks.filter(task => task !== "custom" && !taskOptions.includes(task)).map((task, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Input 
-                        placeholder={`Task ${index + 1}`}
-                        value={task}
-                        onChange={(e) => {
-                          const newTasks = [...(onboardingData.tasks || [])];
-                          const customIndex = newTasks.findIndex(t => t === task);
-                          if (customIndex !== -1) {
-                            newTasks[customIndex] = e.target.value;
-                          }
-                          setOnboardingData({...onboardingData, tasks: newTasks});
-                        }}
-                      />
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          const newTasks = (onboardingData.tasks || []).filter(t => t !== task);
-                          setOnboardingData({...onboardingData, tasks: newTasks});
-                        }}
-                      >
-                        Hapus
-                      </Button>
-                    </div>
-                  ))}
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setOnboardingData({...onboardingData, tasks: [...(onboardingData.tasks || []), ""]})}
-                  >
-                    Tambah Task
-                  </Button>
-                </div>
-              </div>
-            )}
+
             
             {selectedTasks.length > 0 && (
               <div className="p-4 bg-green-50 rounded-lg border border-green-200">
