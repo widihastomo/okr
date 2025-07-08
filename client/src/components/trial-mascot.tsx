@@ -210,114 +210,147 @@ export default function TrialMascot({ className, missions = [], onMissionAction 
     return iconMap[iconName] || Target;
   };
 
-  // Contextual messages based on progress and mission status
+  // Contextual messages based on exact mission steps
   const getContextualMessages = () => {
     const currentStep = getCurrentMissionStep();
     const nextMission = getNextMission();
     const totalMissions = missions.length || 10;
-    const progressPercent = Math.round((currentStep / totalMissions) * 100);
+    
+    // Define the exact 10 mission steps with step-by-step guidance
+    const missionSteps = [
+      {
+        step: 1,
+        name: "Menambahkan Member",
+        message: "Langkah 1 dari 10: Mari mulai dengan menambahkan anggota tim. Tim yang solid adalah fondasi kesuksesan OKR!",
+        action: "Mulai",
+        icon: UserPlus,
+      },
+      {
+        step: 2,
+        name: "Membuat Tim",
+        message: "Langkah 2 dari 10: Sekarang buat tim dengan struktur yang jelas. Tim yang terorganisir akan lebih mudah mencapai tujuan.",
+        action: "Mulai",
+        icon: Target,
+      },
+      {
+        step: 3,
+        name: "Membuat Objective",
+        message: "Langkah 3 dari 10: Waktunya membuat Goal/Objective pertama! Goal adalah tujuan utama yang ingin dicapai tim.",
+        action: "Mulai",
+        icon: Target,
+      },
+      {
+        step: 4,
+        name: "Menambahkan Key Result",
+        message: "Langkah 4 dari 10: Tambahkan Key Result (Target Angka). Ini adalah indikator pencapaian yang dapat diukur secara kuantitatif.",
+        action: "Mulai",
+        icon: Target,
+      },
+      {
+        step: 5,
+        name: "Menambahkan Inisiatif",
+        message: "Langkah 5 dari 10: Buat inisiatif sebagai rencana aksi konkret. Inisiatif adalah HOW untuk mencapai tujuan.",
+        action: "Mulai",
+        icon: Lightbulb,
+      },
+      {
+        step: 6,
+        name: "Menambahkan Task",
+        message: "Langkah 6 dari 10: Breakdown inisiatif menjadi task-task kecil. Task adalah unit kerja yang dapat dikerjakan harian.",
+        action: "Mulai",
+        icon: Target,
+      },
+      {
+        step: 7,
+        name: "Update Capaian Key Result",
+        message: "Langkah 7 dari 10: Update progress Key Result Anda. Pantau apakah target angka sudah tercapai atau belum.",
+        action: "Mulai",
+        icon: Target,
+      },
+      {
+        step: 8,
+        name: "Update Capaian Metrik Inisiatif",
+        message: "Langkah 8 dari 10: Update metrik inisiatif untuk evaluasi kemajuan pelaksanaan rencana aksi.",
+        action: "Mulai",
+        icon: LineChart,
+      },
+      {
+        step: 9,
+        name: "Update Status Task",
+        message: "Langkah 9 dari 10: Update status task harian Anda. Pastikan task bergerak dari 'Belum Mulai' ke 'Selesai'.",
+        action: "Mulai",
+        icon: Target,
+      },
+      {
+        step: 10,
+        name: "Update Harian Instan",
+        message: "Langkah 10 dari 10: Lakukan review harian untuk memastikan kemajuan yang konsisten setiap hari.",
+        action: "Mulai",
+        icon: Zap,
+      },
+    ];
 
-    if (currentStep === 0) {
-      return [
-        {
-          state: "welcome" as MascotState,
-          title: "Halo! Selamat datang! 👋",
-          message: "Saya Orby, panduan virtual Anda! Mari jelajahi fitur-fitur platform ini bersama-sama.",
-          action: "Mulai Petualangan",
-          icon: Rocket,
-        },
-        {
-          state: "thinking" as MascotState,
-          title: "Apa itu Goal dan Angka Target? 🎯",
-          message: "Goal adalah tujuan yang ingin dicapai organisasi, sedangkan Angka Target adalah metrik terukur untuk mengevaluasi pencapaian goal tersebut. Contoh: Goal 'Meningkatkan Kepuasan Pelanggan' dengan target 'Rating 4.5/5'.",
-          action: "Lihat Panduan",
-          icon: Target,
-        },
-        {
-          state: "encouraging" as MascotState,
-          title: "Ayo mulai! 🚀",
-          message: "Ikuti panduan onboarding di bawah untuk memulai perjalanan Anda. Saya akan membantu setiap langkahnya!",
-          action: "Lihat Panduan",
-          icon: Target,
-        },
-        {
-          state: "pointing" as MascotState,
-          title: "Contoh Goal yang Baik 💡",
-          message: "Goal yang efektif adalah SMART: Specific (spesifik), Measurable (terukur), Achievable (dapat dicapai), Relevant (relevan), Time-bound (berbatas waktu). Contoh: 'Meningkatkan pendapatan bulanan sebesar 25% dalam 6 bulan ke depan'.",
-          action: "Buat Goal Pertama",
-          icon: Lightbulb,
-        },
-      ];
-    } else if (progressPercentage < 30) {
-      return [
-        {
-          state: "encouraging" as MascotState,
-          title: "Mulai yang bagus! 💪",
-          message: "Anda sudah menyelesaikan beberapa langkah. Terus semangat, masih ada banyak fitur menarik yang menanti!",
-          action: "Lanjutkan",
-          icon: Zap,
-        },
-        {
-          state: "thinking" as MascotState,
-          title: "Memahami Angka Target 📊",
-          message: "Angka Target (Key Result) mengukur kemajuan goal secara kuantitatif. Contoh untuk goal 'Meningkatkan Brand Awareness': Target 'Followers Instagram naik 1000 orang', 'Engagement rate naik 15%', 'Reach bulanan 50K'.",
-          action: "Tambah Angka Target",
-          icon: Target,
-        },
-        {
-          state: "pointing" as MascotState,
-          title: "Tip dari Orby! 💡",
-          message: "Coba buat objective pertama Anda! Ini akan membantu tim fokus pada tujuan yang jelas.",
-          action: "Buat Objective",
-          icon: Lightbulb,
-        },
-        {
-          state: "encouraging" as MascotState,
-          title: "Hubungan Goal dan Target 🔗",
-          message: "Setiap Goal sebaiknya memiliki 2-4 Angka Target untuk mengukur kesuksesan. Target harus spesifik, terukur, dan realistis. Contoh Goal 'Meningkatkan Produktivitas Tim': Target 'Menyelesaikan 90% task tepat waktu', 'Mengurangi meeting 30%'.",
-          action: "Pahami Lebih Lanjut",
-          icon: Target,
-        },
-      ];
-    } else if (progressPercentage < 70) {
+    // If all steps completed
+    if (currentStep >= 10) {
       return [
         {
           state: "celebrating" as MascotState,
-          title: "Luar biasa! 🎉",
-          message: "Anda sudah mahir menggunakan platform ini! Tim Anda pasti akan terkesan dengan progress yang dibuat.",
-          action: "Terus Maju",
-          icon: Trophy,
-        },
-        {
-          state: "thinking" as MascotState,
-          title: "Saatnya optimasi! 🔧",
-          message: "Sekarang coba eksplorasi fitur analytics untuk melihat perkembangan tim secara detail.",
-          action: "Lihat Analytics",
-          icon: Star,
-        },
-      ];
-    } else {
-      return [
-        {
-          state: "celebrating" as MascotState,
-          title: "Anda sudah ahli! 🏆",
-          message: "Luar biasa! Anda sudah menguasai sebagian besar fitur. Siap untuk mengelola tim dengan efektif!",
-          action: "Explore Lebih",
+          title: "Selamat! 🎉",
+          message: "Anda telah menyelesaikan semua 10 langkah onboarding! Sekarang Anda siap menggunakan platform secara penuh.",
+          action: "Lihat Paket Premium",
           icon: Trophy,
         },
         {
           state: "waving" as MascotState,
-          title: "Saya bangga! 🌟",
-          message: "Upgrade ke paket premium untuk membuka fitur-fitur advanced dan mengelola tim yang lebih besar!",
-          action: "Lihat Paket",
-          icon: Gift,
+          title: "Saya bangga! 🌟", 
+          message: "Platform OKR ini akan membantu tim Anda mencapai tujuan dengan lebih terstruktur dan terukur. Terus semangat!",
+          action: "Explore Analytics",
+          icon: Target,
         },
       ];
     }
+
+    // Get current and next step messages
+    const currentStepData = missionSteps[currentStep] || missionSteps[0];
+    const nextStepData = missionSteps[currentStep + 1];
+    
+    const messages = [
+      {
+        state: "pointing" as MascotState,
+        title: currentStepData.name,
+        message: currentStepData.message,
+        action: currentStepData.action,
+        icon: currentStepData.icon,
+      },
+    ];
+
+    // Add progress message
+    if (currentStep > 0) {
+      messages.push({
+        state: "encouraging" as MascotState,
+        title: "Progress Anda",
+        message: `Bagus! Anda sudah menyelesaikan ${currentStep} dari 10 langkah. ${nextStepData ? `Selanjutnya: ${nextStepData.name}` : 'Hampir selesai!'}`,
+        action: "Lanjutkan",
+        icon: Trophy,
+      });
+    }
+
+    // Add educational content for beginners
+    if (currentStep === 0) {
+      messages.push({
+        state: "thinking" as MascotState,
+        title: "Apa itu Goal dan Angka Target? 🎯",
+        message: "Goal adalah tujuan yang ingin dicapai organisasi, sedangkan Angka Target adalah metrik terukur untuk mengevaluasi pencapaian goal tersebut. Contoh: Goal 'Meningkatkan Kepuasan Pelanggan' dengan target 'Rating 4.5/5'.",
+        action: "Pahami Lebih Lanjut",
+        icon: Target,
+      });
+    }
+
+    return messages;
   };
 
   const messages = getContextualMessages();
-  const currentMessage = messages[messageIndex];
+  const currentMessage = messages[messageIndex] || messages[0];
 
   // Auto-rotate messages every 8 seconds
   useEffect(() => {
@@ -330,8 +363,10 @@ export default function TrialMascot({ className, missions = [], onMissionAction 
 
   // Update mascot state based on current message
   useEffect(() => {
-    setCurrentState(currentMessage.state);
-  }, [currentMessage.state]);
+    if (currentMessage && currentMessage.state) {
+      setCurrentState(currentMessage.state);
+    }
+  }, [currentMessage]);
 
   // Auto-hide after 30 seconds for returning users
   useEffect(() => {
@@ -410,35 +445,28 @@ export default function TrialMascot({ className, missions = [], onMissionAction 
                   const action = currentMessage.action;
                   console.log("Mascot button clicked with action:", action);
                   
-                  if (action.includes("Panduan") || action.includes("Petualangan")) {
+                  if (action === "Mulai") {
+                    // Handle mission actions for step-by-step guidance
+                    const currentMission = getNextMission();
+                    if (onMissionAction && currentMission) {
+                      onMissionAction(currentMission.name);
+                    } else {
+                      // Scroll to onboarding section if no mission action
+                      document.querySelector('[data-testid="onboarding-missions"]')?.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  } else if (action.includes("Panduan") || action.includes("Petualangan")) {
                     // Scroll to onboarding section
                     document.querySelector('[data-testid="onboarding-missions"]')?.scrollIntoView({ behavior: 'smooth' });
-                  } else if (action.includes("Objective") || action.includes("Buat")) {
-                    window.location.href = "/dashboard";
-                  } else if (action.includes("Analytics") || action.includes("Lihat Analytics")) {
+                  } else if (action.includes("Analytics") || action.includes("Explore Analytics")) {
                     window.location.href = "/analytics";
-                  } else if (action.includes("Paket") || action.includes("Lihat Paket")) {
+                  } else if (action.includes("Paket") || action.includes("Premium")) {
                     window.location.href = "/pricing";
                   } else if (action.includes("Lanjutkan") || action.includes("Terus")) {
                     // Stay on current page and cycle to next message
                     setMessageIndex((prev) => (prev + 1) % messages.length);
-                  } else if (action.includes("Explore")) {
-                    window.location.href = "/analytics";
-                  } else if (action.includes("Tambah Angka Target")) {
-                    window.location.href = "/dashboard";
-                  } else if (action.includes("Buat Goal") || action.includes("Goal Pertama")) {
-                    window.location.href = "/dashboard";
                   } else if (action.includes("Pahami Lebih Lanjut")) {
                     // Cycle to next educational message
                     setMessageIndex((prev) => (prev + 1) % messages.length);
-                  } else if (action.includes("Mulai") || action.includes("Lanjut") || action.includes("Selesaikan")) {
-                    // Handle mission actions
-                    const currentMission = getNextMission();
-                    if (onMissionAction && currentMission) {
-                      onMissionAction(currentMission.name);
-                    }
-                    // Also scroll to onboarding section
-                    document.querySelector('[data-testid="onboarding-missions"]')?.scrollIntoView({ behavior: 'smooth' });
                   } else {
                     // Default action - scroll to onboarding
                     document.querySelector('[data-testid="onboarding-missions"]')?.scrollIntoView({ behavior: 'smooth' });
