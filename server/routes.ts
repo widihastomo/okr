@@ -28,6 +28,7 @@ import {
 } from "./habit-alignment";
 import { db } from "./db";
 import { eq, and, desc, inArray } from "drizzle-orm";
+import { createSnapTransaction } from "./midtrans";
 
 // System Owner middleware to protect admin endpoints
 const isSystemOwner = (req: any, res: any, next: any) => {
@@ -3898,10 +3899,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const currentUser = req.user as User;
       const invoiceId = req.params.id;
-      const { db } = await import("./db");
       const { invoices, invoiceLineItems, users } = await import("@shared/schema");
-      const { eq, and } = await import("drizzle-orm");
-      const { createSnapTransaction } = await import("./midtrans");
       
       // Get invoice details with organization info
       const invoiceQuery = db
@@ -3947,24 +3945,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .where(eq(invoiceLineItems.invoiceId, invoiceId));
       
       // Prepare Midtrans payment data
+      // Use simpler order_id format for testing
+      const simpleOrderId = `INV${Date.now()}`;
+      
+      // Calculate correct amounts and fix item name length
+      const calculatedItemDetails = lineItems.map(item => ({
+        id: item.id,
+        price: parseInt(item.unitPrice),
+        quantity: item.quantity,
+        name: item.description.length > 50 ? item.description.substring(0, 47) + "..." : item.description
+      }));
+      
+      const totalAmount = calculatedItemDetails.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      
       const paymentData = {
-        orderId: invoice.invoice.invoiceNumber,
-        grossAmount: parseInt(invoice.invoice.amount),
+        orderId: simpleOrderId,
+        grossAmount: totalAmount,
         customerDetails: {
-          firstName: invoice.user?.firstName || "Customer",
-          lastName: invoice.user?.lastName || "",
+          first_name: invoice.user?.firstName || "Customer",
+          last_name: invoice.user?.lastName || "",
           email: invoice.user?.email || "customer@example.com"
         },
-        itemDetails: lineItems.map(item => ({
-          id: item.id,
-          price: parseInt(item.unitPrice),
-          quantity: item.quantity,
-          name: item.description
-        }))
+        itemDetails: calculatedItemDetails
       };
       
+      // Construct base URL from request
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      
       // Create Snap transaction
-      const snapTransaction = await createSnapTransaction(paymentData);
+      const snapTransaction = await createSnapTransaction(paymentData, baseUrl);
       
       // Update invoice status to 'sent'
       await db

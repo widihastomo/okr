@@ -1,3 +1,5 @@
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 const { CoreApi, Snap } = require('midtrans-client');
 
 // Konfigurasi Midtrans
@@ -25,8 +27,8 @@ export interface MidtransPaymentRequest {
   orderId: string;
   grossAmount: number;
   customerDetails: {
-    firstName: string;
-    lastName?: string;
+    first_name: string;
+    last_name?: string;
     email: string;
     phone?: string;
   };
@@ -51,7 +53,7 @@ export interface MidtransTransactionStatus {
 /**
  * Membuat transaksi Snap untuk pembayaran invoice
  */
-export async function createSnapTransaction(paymentData: MidtransPaymentRequest) {
+export async function createSnapTransaction(paymentData: MidtransPaymentRequest, baseUrl?: string) {
   try {
     const parameter = {
       transaction_details: {
@@ -62,19 +64,20 @@ export async function createSnapTransaction(paymentData: MidtransPaymentRequest)
         secure: true
       },
       customer_details: paymentData.customerDetails,
-      item_details: paymentData.itemDetails,
-      callbacks: {
-        finish: `${process.env.BASE_URL}/invoices/${paymentData.orderId.replace('INV-', '')}/payment-success`,
-        error: `${process.env.BASE_URL}/invoices/${paymentData.orderId.replace('INV-', '')}/payment-error`,
-        pending: `${process.env.BASE_URL}/invoices/${paymentData.orderId.replace('INV-', '')}/payment-pending`
-      }
+      item_details: paymentData.itemDetails
     };
 
     const transaction = await snap.createTransaction(parameter);
     return transaction;
-  } catch (error) {
-    console.error('Error creating Midtrans transaction:', error);
-    throw new Error('Failed to create payment transaction');
+  } catch (error: any) {
+    console.error('Error creating Midtrans transaction:', error.message);
+    
+    if (error.ApiResponse?.error_messages) {
+      console.error('Midtrans error messages:', error.ApiResponse.error_messages);
+      throw new Error(`Midtrans error: ${error.ApiResponse.error_messages.join(', ')}`);
+    }
+    
+    throw new Error(`Failed to create payment transaction: ${error.message}`);
   }
 }
 
