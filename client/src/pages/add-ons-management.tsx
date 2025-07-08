@@ -55,14 +55,16 @@ interface AddOnSubscription {
 
 const AddOnIcon = ({ slug }: { slug: string }) => {
   switch (slug) {
-    case 'extra-user':
+    case 'additional-user':
       return <Users className="w-5 h-5" />;
-    case 'storage-10gb':
+    case 'extra-storage-10gb':
       return <HardDrive className="w-5 h-5" />;
-    case 'api-calls-10k':
+    case 'advanced-analytics':
       return <Zap className="w-5 h-5" />;
     case 'priority-support':
       return <Shield className="w-5 h-5" />;
+    case 'api-access-extended':
+      return <Zap className="w-5 h-5" />;
     default:
       return <Package className="w-5 h-5" />;
   }
