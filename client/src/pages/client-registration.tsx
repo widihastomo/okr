@@ -12,10 +12,7 @@ export type CompanyData = {
   name: string;
   industry: string;
   size: string;
-  phone: string;
-  address: string;
   website?: string;
-  description?: string;
 };
 
 export type AdminData = {

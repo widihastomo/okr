@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { CompanyData } from "@/pages/client-registration";
@@ -12,10 +12,7 @@ const companyDataSchema = z.object({
   name: z.string().min(2, "Nama perusahaan minimal 2 karakter"),
   industry: z.string().min(1, "Industri wajib dipilih"),
   size: z.string().min(1, "Ukuran perusahaan wajib dipilih"),
-  phone: z.string().min(10, "Nomor telepon minimal 10 karakter"),
-  address: z.string().min(10, "Alamat minimal 10 karakter"),
   website: z.string().url("Format website tidak valid").optional().or(z.literal("")),
-  description: z.string().optional(),
 });
 
 type CompanyDataFormData = z.infer<typeof companyDataSchema>;
@@ -52,10 +49,7 @@ export function CompanyDataForm({ onSubmit, initialData, isLoading }: CompanyDat
       name: initialData?.name || "",
       industry: initialData?.industry || "",
       size: initialData?.size || "",
-      phone: initialData?.phone || "",
-      address: initialData?.address || "",
       website: initialData?.website || "",
-      description: initialData?.description || "",
     },
   });
 
@@ -133,20 +127,6 @@ export function CompanyDataForm({ onSubmit, initialData, isLoading }: CompanyDat
 
           <FormField
             control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nomor Telepon *</FormLabel>
-                <FormControl>
-                  <Input placeholder="021-1234567" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
             name="website"
             render={({ field }) => (
               <FormItem>
@@ -162,45 +142,6 @@ export function CompanyDataForm({ onSubmit, initialData, isLoading }: CompanyDat
             )}
           />
         </div>
-
-        <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Alamat Perusahaan *</FormLabel>
-              <FormControl>
-                <Textarea 
-                  placeholder="Jl. Sudirman No. 123, Jakarta Pusat 10270"
-                  className="min-h-[80px]"
-                  {...field} 
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Deskripsi Perusahaan</FormLabel>
-              <FormControl>
-                <Textarea 
-                  placeholder="Deskripsi singkat tentang perusahaan..."
-                  className="min-h-[100px]"
-                  {...field} 
-                />
-              </FormControl>
-              <FormDescription>
-                Opsional - ceritakan sedikit tentang perusahaan Anda
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
         <Button 
           type="submit" 
