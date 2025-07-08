@@ -712,7 +712,7 @@ export default function DailyFocusPage() {
   const relatedObjectives = getRelatedObjectives();
 
   return (
-    <div className="pt-16 p-3 md:p-6 space-y-4 md:space-y-6">
+    <div className="p-3 md:p-6 space-y-4 md:space-y-6 ml-[4px] mr-[4px] mt-[55px] mb-[55px] pt-[10px] pb-[10px]">
       {/* Header */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -776,7 +776,6 @@ export default function DailyFocusPage() {
           </div>
         </div>
       </div>
-
       {/* Filter Indicator - Only show when viewing another user's data */}
       {selectedUserId !== "all" && selectedUserId !== userId && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
@@ -794,7 +793,6 @@ export default function DailyFocusPage() {
           </div>
         </div>
       )}
-
       {/* Overview Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <Card>
@@ -878,7 +876,6 @@ export default function DailyFocusPage() {
           </CardContent>
         </Card>
       </div>
-
       {/* Compact Progress & Motivation */}
       <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
         <CardContent className="p-3 md:p-4">
@@ -975,9 +972,6 @@ export default function DailyFocusPage() {
           </div>
         </CardContent>
       </Card>
-
-      
-
       {/* Objective Awareness Section */}
       {relatedObjectives.length > 0 && (
         <Card className="border-blue-200 bg-blue-50">
@@ -1084,7 +1078,6 @@ export default function DailyFocusPage() {
           </CardContent>
         </Card>
       )}
-
       {/* Main Content Tabs */}
       <Tabs defaultValue="tasks" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
@@ -2855,7 +2848,6 @@ export default function DailyFocusPage() {
           </Card>
         </TabsContent>
       </Tabs>
-
       {/* Modals */}
       {selectedKeyResult && (
         <CheckInModal
@@ -2869,7 +2861,6 @@ export default function DailyFocusPage() {
           keyResultType={selectedKeyResult.keyResultType}
         />
       )}
-
       {selectedInitiative && (
         <MetricsUpdateModal
           open={isSuccessMetricsModalOpen}
@@ -2877,7 +2868,6 @@ export default function DailyFocusPage() {
           initiativeId={selectedInitiative.id}
         />
       )}
-
       {/* Edit Task Modal */}
       <Dialog open={isEditTaskModalOpen} onOpenChange={setIsEditTaskModalOpen}>
         <DialogContent className="sm:max-w-[500px]">
@@ -3018,7 +3008,6 @@ export default function DailyFocusPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
