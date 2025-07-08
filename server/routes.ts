@@ -10,6 +10,7 @@ import {
   type User, type SubscriptionPlan, type Organization, type OrganizationSubscription, type UserOnboardingProgress, type UpdateOnboardingProgress
 } from "@shared/schema";
 import { z } from "zod";
+import { createInsertSchema } from "drizzle-zod";
 import { setupEmailAuth } from "./authRoutes";
 import { requireAuth, hashPassword } from "./emailAuth";
 import { calculateProgressStatus } from "./progress-tracker";
