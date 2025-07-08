@@ -4891,6 +4891,223 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // System Admin Subscription Management Routes
+  app.get("/api/admin/subscription-stats", requireSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { count, sum, eq, and, gte, lte } = await import("drizzle-orm");
+      const { organizationSubscriptions, subscriptionPlans, organizations } = await import("@shared/schema");
+      
+      // Basic subscription counts
+      const [totalSubscriptions] = await db.select({ count: count() }).from(organizationSubscriptions);
+      const [activeSubscriptions] = await db.select({ count: count() })
+        .from(organizationSubscriptions)
+        .where(eq(organizationSubscriptions.status, 'active'));
+      const [expiredSubscriptions] = await db.select({ count: count() })
+        .from(organizationSubscriptions)
+        .where(eq(organizationSubscriptions.status, 'expired'));
+      
+      // Monthly recurring revenue
+      const activeSubsWithPlans = await db.select({
+        planPrice: subscriptionPlans.price,
+        billingCycle: subscriptionPlans.billingCycle
+      })
+      .from(organizationSubscriptions)
+      .leftJoin(subscriptionPlans, eq(organizationSubscriptions.planId, subscriptionPlans.id))
+      .where(eq(organizationSubscriptions.status, 'active'));
+      
+      const monthlyRevenue = activeSubsWithPlans.reduce((total, sub) => {
+        const price = parseFloat(sub.planPrice || '0');
+        // Convert to monthly if needed
+        if (sub.billingCycle === 'annual') {
+          return total + (price / 12);
+        } else if (sub.billingCycle === 'quarterly') {
+          return total + (price / 3);
+        }
+        return total + price;
+      }, 0);
+      
+      // Plan distribution
+      const planStats = await db.select({
+        planId: subscriptionPlans.id,
+        planName: subscriptionPlans.name,
+        planSlug: subscriptionPlans.slug,
+        planPrice: subscriptionPlans.price,
+      })
+      .from(subscriptionPlans)
+      .where(eq(subscriptionPlans.isActive, true));
+      
+      // Get subscription counts for each plan
+      const subscriptionCounts = await db.select({
+        planId: organizationSubscriptions.planId,
+        subscriptionCount: count(organizationSubscriptions.id),
+      })
+      .from(organizationSubscriptions)
+      .where(eq(organizationSubscriptions.status, 'active'))
+      .groupBy(organizationSubscriptions.planId);
+      
+      // Combine plan data with subscription counts
+      const planDistribution = planStats.map(plan => {
+        const countData = subscriptionCounts.find(c => c.planId === plan.planId);
+        const subscriptionCount = countData?.subscriptionCount || 0;
+        const revenue = parseFloat(plan.planPrice || '0') * subscriptionCount;
+        return {
+          planName: plan.planName,
+          planSlug: plan.planSlug,
+          subscriptionCount,
+          revenue: revenue.toFixed(2)
+        };
+      });
+      
+      // Expiring soon (next 30 days)
+      const today = new Date();
+      const thirtyDaysFromNow = new Date();
+      thirtyDaysFromNow.setDate(today.getDate() + 30);
+      
+      const [expiringSoon] = await db.select({ count: count() })
+        .from(organizationSubscriptions)
+        .where(and(
+          eq(organizationSubscriptions.status, 'active'),
+          gte(organizationSubscriptions.currentPeriodEnd, today),
+          lte(organizationSubscriptions.currentPeriodEnd, thirtyDaysFromNow)
+        ));
+      
+      res.json({
+        totalSubscriptions: totalSubscriptions.count,
+        activeSubscriptions: activeSubscriptions.count,
+        expiredSubscriptions: expiredSubscriptions.count,
+        expiringSoon: expiringSoon.count,
+        monthlyRevenue: monthlyRevenue.toFixed(2),
+        planDistribution
+      });
+    } catch (error) {
+      console.error("Error fetching subscription stats:", error);
+      res.status(500).json({ message: "Failed to fetch subscription statistics" });
+    }
+  });
+
+  app.get("/api/admin/subscriptions", requireSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { eq, desc } = await import("drizzle-orm");
+      const { organizationSubscriptions, subscriptionPlans, organizations } = await import("@shared/schema");
+      
+      const subscriptionsWithDetails = await db.select({
+        subscription: organizationSubscriptions,
+        plan: subscriptionPlans,
+        organization: organizations
+      })
+      .from(organizationSubscriptions)
+      .leftJoin(subscriptionPlans, eq(organizationSubscriptions.planId, subscriptionPlans.id))
+      .leftJoin(organizations, eq(organizationSubscriptions.organizationId, organizations.id))
+      .orderBy(desc(organizationSubscriptions.createdAt));
+      
+      const result = subscriptionsWithDetails.map(row => ({
+        ...row.subscription,
+        plan: row.plan,
+        organization: row.organization
+      }));
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error fetching admin subscriptions:", error);
+      res.status(500).json({ message: "Failed to fetch subscriptions" });
+    }
+  });
+
+  app.patch("/api/admin/subscriptions/:id/status", requireSystemOwner, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+      
+      if (!['active', 'expired', 'cancelled', 'trial'].includes(status)) {
+        return res.status(400).json({ message: "Invalid status" });
+      }
+      
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      const { organizationSubscriptions } = await import("@shared/schema");
+      
+      const [updatedSubscription] = await db.update(organizationSubscriptions)
+        .set({
+          status,
+          updatedAt: new Date()
+        })
+        .where(eq(organizationSubscriptions.id, id))
+        .returning();
+      
+      if (!updatedSubscription) {
+        return res.status(404).json({ message: "Subscription not found" });
+      }
+      
+      res.json(updatedSubscription);
+    } catch (error) {
+      console.error("Error updating subscription status:", error);
+      res.status(500).json({ message: "Failed to update subscription status" });
+    }
+  });
+
+  app.put("/api/admin/subscriptions/:id/plan", requireSystemOwner, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { planId } = req.body;
+      
+      if (!planId) {
+        return res.status(400).json({ message: "Plan ID is required" });
+      }
+      
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      const { organizationSubscriptions, subscriptionPlans } = await import("@shared/schema");
+      
+      // Verify plan exists
+      const [plan] = await db.select().from(subscriptionPlans).where(eq(subscriptionPlans.id, planId));
+      if (!plan) {
+        return res.status(404).json({ message: "Plan not found" });
+      }
+      
+      const [updatedSubscription] = await db.update(organizationSubscriptions)
+        .set({
+          planId,
+          updatedAt: new Date()
+        })
+        .where(eq(organizationSubscriptions.id, id))
+        .returning();
+      
+      if (!updatedSubscription) {
+        return res.status(404).json({ message: "Subscription not found" });
+      }
+      
+      res.json(updatedSubscription);
+    } catch (error) {
+      console.error("Error updating subscription plan:", error);
+      res.status(500).json({ message: "Failed to update subscription plan" });
+    }
+  });
+
+  app.delete("/api/admin/subscriptions/:id", requireSystemOwner, async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      const { organizationSubscriptions } = await import("@shared/schema");
+      
+      const [deletedSubscription] = await db.delete(organizationSubscriptions)
+        .where(eq(organizationSubscriptions.id, id))
+        .returning();
+      
+      if (!deletedSubscription) {
+        return res.status(404).json({ message: "Subscription not found" });
+      }
+      
+      res.json({ message: "Subscription deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting subscription:", error);
+      res.status(500).json({ message: "Failed to delete subscription" });
+    }
+  });
+
   app.get("/api/admin/users", requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");

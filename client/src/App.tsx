@@ -41,6 +41,7 @@ import PackageDetail from "@/pages/package-detail";
 import SystemOrganizationManagement from "@/pages/system-organization-management";
 import AddOnsManagement from "@/pages/add-ons-management";
 import SystemAddonManagement from "@/pages/system-addon-management";
+import SystemSubscriptionManagement from "@/pages/system-subscription-management";
 import InvoiceManagement from "@/pages/invoice-management";
 import InvoiceDetail from "@/pages/invoice-detail";
 import InvoicePaymentFinish from "@/pages/invoice-payment-finish";
@@ -167,6 +168,7 @@ function Router() {
               <Route path="/package-detail/:id" component={PackageDetail} />
               <Route path="/add-ons" component={AddOnsManagement} />
               <Route path="/system-admin/add-ons" component={SystemAddonManagement} />
+          <Route path="/system-admin/subscriptions" component={SystemSubscriptionManagement} />
               <Route path="/invoices" component={InvoiceManagement} />
               <Route path="/invoices/:id" component={InvoiceDetail} />
               <Route path="/invoice-payment-finish" component={InvoicePaymentFinish} />

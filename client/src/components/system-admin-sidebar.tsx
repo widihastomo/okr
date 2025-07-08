@@ -82,6 +82,18 @@ export default function SystemAdminSidebar({
       active: location === "/subscription-packages"
     },
     {
+      label: "Kelola Subscription",
+      icon: CreditCard,
+      path: "/system-admin/subscriptions",
+      active: location === "/system-admin/subscriptions"
+    },
+    {
+      label: "Kelola Add-Ons",
+      icon: Package,
+      path: "/system-admin/add-ons",
+      active: location === "/system-admin/add-ons"
+    },
+    {
       label: "Database",
       icon: Database,
       path: "/system-admin/database",
