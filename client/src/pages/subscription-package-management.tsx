@@ -113,10 +113,11 @@ function PackageFormModal({
       const method = pkg ? "PUT" : "POST";
       
       // First, create or update the subscription plan
-      const planResponse = await apiRequest(method, endpoint, {
+      const response = await apiRequest(method, endpoint, {
         ...data,
         features: JSON.stringify(data.features),
       });
+      const planResponse = await response.json();
       
       // Then, create billing periods if this is a new plan
       if (!pkg && data.billingPeriods.length > 0) {
