@@ -177,6 +177,68 @@ export default function CompanyOnboarding() {
     }
   }, [progress]);
 
+  // Validation function for each step
+  const validateStep = (step: number, data: OnboardingData): { isValid: boolean; message?: string } => {
+    switch (step) {
+      case 1:
+        if (!data.teamFocus) {
+          return { isValid: false, message: "Silakan pilih fokus tim terlebih dahulu" };
+        }
+        break;
+      case 2:
+        // Step 2 is optional - users can skip inviting members
+        // No validation needed for this step
+        break;
+      case 3:
+        if (!data.cycleDuration) {
+          return { isValid: false, message: "Silakan pilih durasi siklus goal" };
+        }
+        if (!data.cycleStartDate) {
+          return { isValid: false, message: "Silakan pilih tanggal mulai siklus" };
+        }
+        if (!data.cycleEndDate) {
+          return { isValid: false, message: "Silakan pilih tanggal berakhir siklus" };
+        }
+        break;
+      case 4:
+        if (!data.objective.trim()) {
+          return { isValid: false, message: "Silakan pilih atau tulis goal yang ingin dicapai" };
+        }
+        break;
+      case 5:
+        if (data.keyResults.length === 0) {
+          return { isValid: false, message: "Silakan pilih minimal 1 angka target" };
+        }
+        break;
+      case 6:
+        if (data.initiatives.length === 0) {
+          return { isValid: false, message: "Silakan pilih minimal 1 inisiatif prioritas" };
+        }
+        break;
+      case 7:
+        if (data.tasks.length === 0) {
+          return { isValid: false, message: "Silakan pilih minimal 1 tugas untuk inisiatif" };
+        }
+        break;
+      case 8:
+        if (!data.cadence) {
+          return { isValid: false, message: "Silakan pilih ritme check-in" };
+        }
+        if (!data.reminderTime) {
+          return { isValid: false, message: "Silakan pilih waktu reminder" };
+        }
+        break;
+      case 9:
+        if (!data.firstCheckIn.trim()) {
+          return { isValid: false, message: "Silakan tulis rencana check-in pertama Anda" };
+        }
+        break;
+      default:
+        break;
+    }
+    return { isValid: true };
+  };
+
   // Save onboarding progress
   const saveProgressMutation = useMutation({
     mutationFn: async (data: Partial<OnboardingData>) => {
@@ -246,6 +308,19 @@ export default function CompanyOnboarding() {
   };
 
   const handleNext = () => {
+    // Validate current step before proceeding (skip validation for welcome screen)
+    if (onboardingData.currentStep > 0) {
+      const validation = validateStep(onboardingData.currentStep, onboardingData);
+      if (!validation.isValid) {
+        toast({
+          title: "Input tidak lengkap",
+          description: validation.message,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     if (onboardingData.currentStep < ONBOARDING_STEPS.length) {
       const newCompletedSteps =
         onboardingData.currentStep === 0
@@ -1957,6 +2032,38 @@ export default function CompanyOnboarding() {
                 <li>• Rekomendasi penyesuaian jika diperlukan</li>
               </ul>
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="first-checkin">
+                Tulis rencana check-in pertama Anda:
+              </Label>
+              <Textarea
+                id="first-checkin"
+                placeholder="Contoh: Minggu pertama fokus setup sistem CRM, evaluasi performa tim sales, dan mulai training closing technique..."
+                value={onboardingData.firstCheckIn}
+                onChange={(e) =>
+                  setOnboardingData({
+                    ...onboardingData,
+                    firstCheckIn: e.target.value,
+                  })
+                }
+                className="min-h-[120px] resize-none"
+              />
+              <p className="text-xs text-gray-500">
+                Tuliskan rencana aktivitas yang akan Anda lakukan dalam periode check-in pertama sesuai dengan ritme yang sudah dipilih.
+              </p>
+            </div>
+
+            {onboardingData.firstCheckIn && (
+              <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-sm text-blue-800">
+                  <strong>Rencana check-in pertama:</strong>
+                </p>
+                <p className="text-sm text-blue-700 mt-1">
+                  {onboardingData.firstCheckIn}
+                </p>
+              </div>
+            )}
           </div>
         );
 
