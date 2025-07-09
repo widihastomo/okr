@@ -477,6 +477,172 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Forgot Password endpoint
+  app.post("/api/auth/forgot-password", async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ 
+          message: "Email harus diisi" 
+        });
+      }
+      
+      // Find user by email
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(404).json({ 
+          message: "Email tidak ditemukan" 
+        });
+      }
+      
+      // Generate reset code
+      const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // Update user with reset code
+      await storage.updateUser(user.id, {
+        verificationCode: resetCode,
+        verificationCodeExpiry: new Date(Date.now() + 1 * 60 * 60 * 1000), // 1 hour
+        updatedAt: new Date(),
+      });
+      
+      // Send reset email
+      try {
+        const emailHtml = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <title>Reset Password - Platform OKR</title>
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+              .header { background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+              .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px; }
+              .code { background: #fff; border: 2px solid #2563eb; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; color: #2563eb; border-radius: 5px; margin: 20px 0; }
+              .button { display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 20px 0; }
+              .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 14px; color: #666; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1>Reset Password</h1>
+              </div>
+              <div class="content">
+                <p>Halo <strong>${user.firstName}</strong>!</p>
+                <p>Anda telah meminta reset password untuk akun Anda.</p>
+                
+                <p>Kode reset password Anda adalah:</p>
+                
+                <div class="code">${resetCode}</div>
+                
+                <p>Masukkan kode ini di halaman reset password untuk membuat password baru.</p>
+                
+                <p>Kode ini akan kedaluwarsa dalam 1 jam.</p>
+                
+                <p>Jika Anda tidak meminta reset password, silakan abaikan email ini.</p>
+              </div>
+              <div class="footer">
+                <p>Email ini dikirim secara otomatis oleh sistem. Jangan balas email ini.</p>
+                <p>© 2025 Platform OKR. Semua hak dilindungi.</p>
+              </div>
+            </div>
+          </body>
+          </html>
+        `;
+        
+        await emailService.sendEmail({
+          from: "no-reply@platform-okr.com",
+          to: email,
+          subject: "Reset Password - Platform OKR",
+          html: emailHtml,
+        });
+        
+        console.log("Reset password email sent successfully");
+        
+      } catch (emailError) {
+        console.error("Error sending reset password email:", emailError);
+        return res.status(500).json({ 
+          message: "Gagal mengirim email reset password. Silakan coba lagi." 
+        });
+      }
+      
+      res.json({
+        message: "Kode reset password telah dikirim ke email Anda.",
+        success: true,
+      });
+      
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      res.status(500).json({ 
+        message: "Gagal mengirim kode reset password. Silakan coba lagi." 
+      });
+    }
+  });
+  
+  // Reset Password endpoint
+  app.post("/api/auth/reset-password", async (req, res) => {
+    try {
+      const { email, code, newPassword } = req.body;
+      
+      if (!email || !code || !newPassword) {
+        return res.status(400).json({ 
+          message: "Email, kode, dan password baru harus diisi" 
+        });
+      }
+      
+      if (newPassword.length < 6) {
+        return res.status(400).json({ 
+          message: "Password minimal 6 karakter" 
+        });
+      }
+      
+      // Find user by email
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(404).json({ 
+          message: "Email tidak ditemukan" 
+        });
+      }
+      
+      // Verify reset code
+      if (user.verificationCode !== code) {
+        return res.status(400).json({ 
+          message: "Kode reset tidak valid" 
+        });
+      }
+      
+      if (user.verificationCodeExpiry && new Date() > user.verificationCodeExpiry) {
+        return res.status(400).json({ 
+          message: "Kode reset sudah kedaluwarsa" 
+        });
+      }
+      
+      // Hash new password
+      const hashedPassword = await hashPassword(newPassword);
+      
+      // Update user password and clear reset code
+      await storage.updateUser(user.id, {
+        password: hashedPassword,
+        verificationCode: null,
+        verificationCodeExpiry: null,
+        updatedAt: new Date(),
+      });
+      
+      res.json({
+        message: "Password berhasil direset.",
+        success: true,
+      });
+      
+    } catch (error) {
+      console.error("Reset password error:", error);
+      res.status(500).json({ 
+        message: "Gagal reset password. Silakan coba lagi." 
+      });
+    }
+  });
+  
   // Reminder System API Routes
   app.get("/api/reminders/config", requireAuth, async (req, res) => {
     try {

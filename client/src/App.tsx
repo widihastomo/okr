@@ -27,6 +27,9 @@ import ProjectDetail from "@/pages/project-detail";
 import TaskDetail from "@/pages/task-detail";
 import Landing from "@/pages/landing";
 import Login from "@/pages/login";
+import Register from "@/pages/register";
+import ForgotPassword from "@/pages/forgot-password";
+import ResetPassword from "@/pages/reset-password";
 import Home from "@/pages/home";
 import Profile from "@/pages/profile";
 import NotFound from "@/pages/not-found";
@@ -136,10 +139,13 @@ function Router() {
     return (
       <Switch>
         <Route path="/landing" component={Landing} />
-        <Route path="/register" component={Registration} />
+        <Route path="/register" component={Register} />
+        <Route path="/registration" component={Registration} />
         <Route path="/verify-email" component={EmailVerification} />
         <Route path="/email-verification" component={EmailVerification} />
         <Route path="/client-registration" component={ClientRegistration} />
+        <Route path="/forgot-password" component={ForgotPassword} />
+        <Route path="/reset-password" component={ResetPassword} />
         <Route component={Login} />
       </Switch>
     );
