@@ -282,12 +282,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           </html>
         `;
         
-        await emailService.sendEmail({
+        console.log(`📧 Attempting to send verification email to: ${email}`);
+        
+        const emailResult = await emailService.sendEmail({
           from: "no-reply@platform-okr.com",
           to: email,
           subject: `Verifikasi Email - ${businessName}`,
           html: emailHtml,
         });
+        
+        console.log(`📧 Email send result:`, emailResult);
+        
+        if (emailResult.success) {
+          console.log(`✅ Verification email sent successfully to ${email} using ${emailResult.provider}`);
+        } else {
+          console.error(`❌ Failed to send verification email to ${email}:`, emailResult.error);
+        }
         
       } catch (emailError) {
         console.error("Error sending verification email:", emailError);
@@ -448,14 +458,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           </html>
         `;
         
-        await emailService.sendEmail({
+        console.log(`📧 Attempting to send resend verification email to: ${email}`);
+        
+        const emailResult = await emailService.sendEmail({
           from: "no-reply@platform-okr.com",
           to: email,
           subject: "Kode Verifikasi Baru - Platform OKR",
           html: emailHtml,
         });
         
-        console.log("Resend verification email sent successfully");
+        console.log(`📧 Resend email result:`, emailResult);
+        
+        if (emailResult.success) {
+          console.log(`✅ Resend verification email sent successfully to ${email} using ${emailResult.provider}`);
+        } else {
+          console.error(`❌ Failed to send resend verification email to ${email}:`, emailResult.error);
+        }
         
       } catch (emailError) {
         console.error("Error sending resend verification email:", emailError);
