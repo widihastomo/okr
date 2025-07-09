@@ -886,24 +886,44 @@ export default function CompanyOnboarding() {
       case 8: // Pilih Cadence
         return (
           <div className="space-y-4">
-            <Label>Pilih ritme update progres:</Label>
+            <div className="space-y-2">
+              <Label className="text-lg font-semibold">Pilih frekuensi check-in progress:</Label>
+              <p className="text-sm text-gray-600">
+                Seberapa sering Anda ingin menerima reminder dan melakukan update progress goal?
+              </p>
+            </div>
             <RadioGroup
               value={onboardingData.cadence}
               onValueChange={(value) =>
                 setOnboardingData({ ...onboardingData, cadence: value })
               }
             >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="harian" id="harian" />
-                <Label htmlFor="harian">Harian</Label>
+              <div className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50">
+                <RadioGroupItem value="harian" id="harian" className="mt-1" />
+                <div className="flex-1">
+                  <Label htmlFor="harian" className="font-medium cursor-pointer">Setiap Hari</Label>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Cocok untuk goal yang memerlukan perhatian harian dan monitoring ketat
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="mingguan" id="mingguan" />
-                <Label htmlFor="mingguan">Mingguan</Label>
+              <div className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50">
+                <RadioGroupItem value="mingguan" id="mingguan" className="mt-1" />
+                <div className="flex-1">
+                  <Label htmlFor="mingguan" className="font-medium cursor-pointer">Setiap Minggu</Label>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Ideal untuk goal jangka menengah dengan review progress mingguan
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="bulanan" id="bulanan" />
-                <Label htmlFor="bulanan">Bulanan</Label>
+              <div className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50">
+                <RadioGroupItem value="bulanan" id="bulanan" className="mt-1" />
+                <div className="flex-1">
+                  <Label htmlFor="bulanan" className="font-medium cursor-pointer">Setiap Bulan</Label>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Tepat untuk goal strategis dengan evaluasi bulanan yang komprehensif
+                  </p>
+                </div>
               </div>
             </RadioGroup>
             {onboardingData.cadence && (
@@ -1757,13 +1777,13 @@ export default function CompanyOnboarding() {
                   </p>
                   <div className="mt-2 text-sm text-gray-500">
                     <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                      {onboardingData.teamFocus || "General"}
+                      Fokus: {onboardingData.teamFocus || "General"}
                     </span>
                     <span className="inline-block bg-green-100 text-green-800 px-2 py-1 rounded ml-2">
-                      {onboardingData.cadence || "Belum dipilih"}
+                      Check-in: {onboardingData.cadence || "Belum dipilih"}
                     </span>
                     <span className="inline-block bg-purple-100 text-purple-800 px-2 py-1 rounded ml-2">
-                      {onboardingData.cycleDuration || "Belum dipilih"}
+                      Periode: {onboardingData.cycleDuration || "Belum dipilih"}
                     </span>
                   </div>
                 </div>
@@ -2031,30 +2051,54 @@ export default function CompanyOnboarding() {
                 )}
 
                 <div className="bg-white p-4 rounded-lg border border-gray-200">
-                  <h4 className="font-semibold text-gray-800 mb-2">
-                    📅 Pengaturan Siklus
+                  <h4 className="font-semibold text-gray-800 mb-3">
+                    📅 Pengaturan Siklus & Monitoring
                   </h4>
-                  <div className="text-sm text-gray-700 space-y-1">
-                    <p>
-                      <strong>Durasi Siklus:</strong>{" "}
-                      {onboardingData.cycleDuration || "Belum dipilih"}
-                    </p>
-                    <p>
-                      <strong>Tanggal Mulai:</strong>{" "}
-                      {onboardingData.cycleStartDate || "Belum diatur"}
-                    </p>
-                    <p>
-                      <strong>Tanggal Selesai:</strong>{" "}
-                      {onboardingData.cycleEndDate || "Belum diatur"}
-                    </p>
-                    <p>
-                      <strong>Habit Review:</strong>{" "}
-                      {onboardingData.cadence || "Belum dipilih"}
-                    </p>
-                    <p>
-                      <strong>Waktu Reminder:</strong>{" "}
-                      {onboardingData.reminderTime || "Belum diatur"}
-                    </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700">
+                    <div className="space-y-2">
+                      <p>
+                        <strong>Periode Goal:</strong>{" "}
+                        <span className="inline-block bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-xs">
+                          {onboardingData.cycleDuration === "1_bulan" ? "1 Bulan" : 
+                           onboardingData.cycleDuration === "3_bulan" ? "3 Bulan" : 
+                           onboardingData.cycleDuration === "6_bulan" ? "6 Bulan" : 
+                           onboardingData.cycleDuration === "1_tahun" ? "1 Tahun" : 
+                           "Belum dipilih"}
+                        </span>
+                      </p>
+                      <p>
+                        <strong>Tanggal Mulai:</strong>{" "}
+                        <span className="text-gray-900">
+                          {onboardingData.cycleStartDate || "Belum diatur"}
+                        </span>
+                      </p>
+                      <p>
+                        <strong>Tanggal Selesai:</strong>{" "}
+                        <span className="text-gray-900">
+                          {onboardingData.cycleEndDate || "Belum diatur"}
+                        </span>
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <p>
+                        <strong>Frekuensi Check-in:</strong>{" "}
+                        <span className="inline-block bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs">
+                          {onboardingData.cadence === "harian" ? "Setiap Hari" : 
+                           onboardingData.cadence === "mingguan" ? "Setiap Minggu" : 
+                           onboardingData.cadence === "bulanan" ? "Setiap Bulan" : 
+                           "Belum dipilih"}
+                        </span>
+                      </p>
+                      <p>
+                        <strong>Waktu Reminder:</strong>{" "}
+                        <span className="text-gray-900 font-mono">
+                          {onboardingData.reminderTime || "Belum diatur"}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-3 p-2 bg-gray-50 rounded text-xs text-gray-600">
+                    💡 <strong>Info:</strong> Sistem akan mengirim reminder sesuai jadwal yang dipilih untuk membantu Anda melacak progress goal secara konsisten.
                   </div>
                 </div>
               </div>
