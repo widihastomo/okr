@@ -1,51 +1,56 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Building, User, Mail, Rocket } from "lucide-react";
-import { UserRegistrationForm } from "@/components/registration/user-registration-form";
-import { EmailVerificationForm } from "@/components/registration/email-verification-form";
-import { ClientOnboardingForm } from "@/components/registration/client-onboarding-form";
+import { ChevronLeft, ChevronRight, Building, User, Package, CreditCard } from "lucide-react";
+import { CompanyDataForm } from "@/components/registration/company-data-form";
+import { AdminDataForm } from "@/components/registration/admin-data-form";
+import { PackageSelection } from "@/components/registration/package-selection";
+import { PaymentProcess } from "@/components/registration/payment-process";
 import { useToast } from "@/hooks/use-toast";
 
-export type UserRegistrationData = {
-  userName: string;
-  businessName: string;
-  whatsappNumber: string;
+export type CompanyData = {
+  name: string;
+  industry: string;
+  size: string;
+  website?: string;
+};
+
+export type AdminData = {
+  firstName: string;
+  lastName: string;
   email: string;
+  phone: string;
+  position: string;
   password: string;
   confirmPassword: string;
 };
 
-export type EmailVerificationData = {
-  verificationCode: string;
-  email: string;
+export type SelectedPackage = {
+  planId: string;
+  billingPeriodId: string;
+  addonIds: string[];
 };
 
-export type OnboardingData = {
-  teamFocus: string;
-  cycleDuration: string;
-  cycleStartDate: string;
-  cycleEndDate: string;
-  objective: string;
-  keyResults: string[];
-  cadence: string;
-  reminderTime: string;
-  invitedMembers: string[];
-  initiatives: string[];
-  tasks: string[];
+export type InvoiceData = {
+  invoiceId: string;
+  invoiceNumber: string;
+  totalAmount: number;
+  dueDate: string;
 };
 
 const steps = [
-  { id: 1, title: "Data Pengguna", icon: User, description: "Informasi dasar pengguna dan usaha" },
-  { id: 2, title: "Verifikasi Email", icon: Mail, description: "Konfirmasi alamat email" },
-  { id: 3, title: "Onboarding", icon: Rocket, description: "Setup awal platform" },
+  { id: 1, title: "Data Perusahaan", icon: Building, description: "Informasi dasar perusahaan" },
+  { id: 2, title: "Data Administrator", icon: User, description: "Informasi admin utama" },
+  { id: 3, title: "Pilih Paket", icon: Package, description: "Pilih paket berlangganan" },
+  { id: 4, title: "Pembayaran", icon: CreditCard, description: "Proses pembayaran" },
 ];
 
 export default function ClientRegistration() {
   const [currentStep, setCurrentStep] = useState(1);
-  const [userRegistrationData, setUserRegistrationData] = useState<UserRegistrationData | null>(null);
-  const [emailVerificationData, setEmailVerificationData] = useState<EmailVerificationData | null>(null);
-  const [onboardingData, setOnboardingData] = useState<OnboardingData | null>(null);
+  const [companyData, setCompanyData] = useState<CompanyData | null>(null);
+  const [adminData, setAdminData] = useState<AdminData | null>(null);
+  const [selectedPackage, setSelectedPackage] = useState<SelectedPackage | null>(null);
+  const [invoiceData, setInvoiceData] = useState<InvoiceData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -61,137 +66,98 @@ export default function ClientRegistration() {
     }
   };
 
-  const handleUserRegistrationSubmit = async (data: UserRegistrationData) => {
-    setIsLoading(true);
-    try {
-      // Send registration request and email verification
-      const response = await fetch('/api/registration/send-verification', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send verification email');
-      }
-
-      setUserRegistrationData(data);
-      toast({
-        title: "Kode Verifikasi Dikirim",
-        description: `Kode verifikasi telah dikirim ke ${data.email}. Silakan cek email Anda.`,
-      });
-      handleNext();
-    } catch (error: any) {
-      toast({
-        title: "Gagal Mengirim Verifikasi",
-        description: error.message || "Terjadi kesalahan saat mengirim kode verifikasi.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const handleCompanyDataSubmit = (data: CompanyData) => {
+    setCompanyData(data);
+    handleNext();
   };
 
-  const handleEmailVerificationSubmit = async (data: EmailVerificationData) => {
+  const handleAdminDataSubmit = (data: AdminData) => {
+    setAdminData(data);
+    handleNext();
+  };
+
+  const handlePackageSelection = async (packageData: SelectedPackage) => {
     setIsLoading(true);
     try {
-      // Verify email and create user account
-      const response = await fetch('/api/registration/verify-email', {
+      setSelectedPackage(packageData);
+      
+      // Generate invoice
+      const response = await fetch('/api/registration/generate-invoice', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ...data,
-          userRegistrationData,
+          companyData,
+          adminData,
+          packageData,
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Invalid verification code');
+        throw new Error('Failed to generate invoice');
       }
 
-      setEmailVerificationData(data);
-      toast({
-        title: "Email Terverifikasi",
-        description: "Email berhasil diverifikasi. Silakan lanjutkan dengan onboarding.",
-      });
+      const invoice = await response.json();
+      setInvoiceData(invoice);
       handleNext();
-    } catch (error: any) {
-      toast({
-        title: "Kode Verifikasi Salah",
-        description: error.message || "Kode verifikasi tidak valid atau sudah kedaluwarsa.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleOnboardingSubmit = async (data: OnboardingData) => {
-    setIsLoading(true);
-    try {
-      // Complete registration and onboarding
-      const response = await fetch('/api/registration/complete', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userRegistrationData,
-          emailVerificationData,
-          onboardingData: data,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to complete registration');
-      }
-
-      const result = await response.json();
       
       toast({
-        title: "Registrasi Berhasil",
-        description: "Akun Anda berhasil dibuat. Selamat datang di platform kami!",
+        title: "Invoice Generated",
+        description: "Invoice berhasil dibuat, silakan lanjutkan ke pembayaran",
       });
-
-      // Redirect to login or dashboard
-      window.location.href = '/login';
-    } catch (error: any) {
+    } catch (error) {
+      console.error('Error generating invoice:', error);
       toast({
-        title: "Gagal Menyelesaikan Registrasi",
-        description: error.message || "Terjadi kesalahan saat menyelesaikan registrasi.",
+        title: "Error",
+        description: "Gagal membuat invoice, silakan coba lagi",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handlePaymentComplete = () => {
+    toast({
+      title: "Registration Complete",
+      description: "Pendaftaran berhasil! Silakan login dengan akun yang telah dibuat.",
+    });
+    // Redirect to login page
+    window.location.href = '/login';
   };
 
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
         return (
-          <UserRegistrationForm 
-            onSubmit={handleUserRegistrationSubmit}
-            initialData={userRegistrationData}
+          <CompanyDataForm 
+            onSubmit={handleCompanyDataSubmit}
+            initialData={companyData}
             isLoading={isLoading}
           />
         );
       case 2:
         return (
-          <EmailVerificationForm 
-            onSubmit={handleEmailVerificationSubmit}
-            email={userRegistrationData?.email || ''}
+          <AdminDataForm 
+            onSubmit={handleAdminDataSubmit}
+            initialData={adminData}
             isLoading={isLoading}
           />
         );
       case 3:
         return (
-          <ClientOnboardingForm 
-            onSubmit={handleOnboardingSubmit}
+          <PackageSelection 
+            onSelect={handlePackageSelection}
+            selectedPackage={selectedPackage}
+            isLoading={isLoading}
+          />
+        );
+      case 4:
+        return (
+          <PaymentProcess 
+            invoiceData={invoiceData}
+            onPaymentComplete={handlePaymentComplete}
             isLoading={isLoading}
           />
         );

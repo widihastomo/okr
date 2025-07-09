@@ -18,15 +18,7 @@ class SendGridProvider implements EmailProvider {
   
   async sendEmail(config: EmailConfig): Promise<boolean> {
     try {
-      // For development, we'll simulate email sending
-      if (process.env.NODE_ENV === 'development') {
-        console.log('📧 Development Mode - Email would be sent to:', config.to);
-        console.log('📧 Subject:', config.subject);
-        console.log('📧 HTML content length:', config.html.length);
-        return true;
-      }
-      
-      const sgMail = (await import('@sendgrid/mail')).default;
+      const sgMail = require('@sendgrid/mail');
       
       if (!process.env.SENDGRID_API_KEY) {
         throw new Error('SENDGRID_API_KEY is not configured');
@@ -174,24 +166,6 @@ class EmailService {
     }
   }
 
-  async sendVerificationEmail(email: string, verificationCode: string, userName: string): Promise<boolean> {
-    try {
-      const emailHtml = this.generateVerificationEmail(userName, verificationCode);
-      
-      const result = await this.sendEmail({
-        from: "no-reply@platform-okr.com",
-        to: email,
-        subject: "Kode Verifikasi Registrasi - Platform OKR",
-        html: emailHtml,
-      });
-      
-      return result.success;
-    } catch (error) {
-      console.error("Error sending verification email:", error);
-      return false;
-    }
-  }
-
   generateInvitationEmail(inviterName: string, organizationName: string, invitationLink: string): string {
     return `
       <!DOCTYPE html>
@@ -237,59 +211,6 @@ class EmailService {
           <div class="footer">
             <p>Email ini dikirim secara otomatis oleh sistem. Jangan balas email ini.</p>
             <p>Jika Anda memiliki pertanyaan, hubungi administrator tim Anda.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
-  }
-
-  generateVerificationEmail(userName: string, verificationCode: string): string {
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <title>Kode Verifikasi Registrasi - Platform OKR</title>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #ea580c 0%, #fb923c 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-          .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px; }
-          .verification-code { background: #fff; border: 2px solid #ea580c; padding: 20px; text-align: center; border-radius: 10px; margin: 20px 0; }
-          .code { font-size: 32px; font-weight: bold; color: #ea580c; letter-spacing: 8px; font-family: monospace; }
-          .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 14px; color: #666; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>Verifikasi Email Registrasi</h1>
-          </div>
-          <div class="content">
-            <p>Halo <strong>${userName}</strong>!</p>
-            
-            <p>Terima kasih telah mendaftar di Platform OKR. Untuk menyelesaikan registrasi Anda, silakan gunakan kode verifikasi berikut:</p>
-            
-            <div class="verification-code">
-              <div class="code">${verificationCode}</div>
-              <p style="margin: 10px 0 0 0; font-size: 14px; color: #666;">Kode verifikasi 6 digit</p>
-            </div>
-            
-            <p><strong>Penting:</strong></p>
-            <ul>
-              <li>Kode ini hanya valid selama 5 menit</li>
-              <li>Jangan bagikan kode ini kepada siapa pun</li>
-              <li>Masukkan kode ini di halaman verifikasi registrasi</li>
-            </ul>
-            
-            <p>Jika Anda tidak melakukan registrasi, silakan abaikan email ini.</p>
-            
-            <p>Selamat datang di platform manajemen goal yang akan membantu Anda mencapai tujuan bisnis!</p>
-          </div>
-          <div class="footer">
-            <p>Email ini dikirim secara otomatis oleh sistem. Jangan balas email ini.</p>
-            <p>Jika Anda memiliki pertanyaan, hubungi tim support kami.</p>
           </div>
         </div>
       </body>
