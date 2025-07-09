@@ -109,21 +109,21 @@ const ONBOARDING_STEPS = [
   },
   {
     id: 8,
-    title: "Reminder & Review",
-    description: "Atur reminder dan review berkala",
-    icon: Zap,
-    mascotMessage:
-      "Di akhir periode, kita akan review hasilnya bareng. Kalau butuh penyesuaian, saya bantu reset tujuannya.",
-    mascotState: "celebrating",
-  },
-  {
-    id: 9,
     title: "Pilih Ritme",
     description: "Seberapa sering Anda ingin update progress?",
     icon: Clock,
     mascotMessage:
       "Ritme adalah kunci konsistensi. Seperti olahraga, lebih baik dilakukan rutin meski ringan. Dengan cadence yang pas, Anda tidak akan kehilangan momentum. Bayangkan sistem ini seperti partner yang selalu mengingatkan, bukan menghakimi.",
     mascotState: "thinking",
+  },
+  {
+    id: 9,
+    title: "Reminder & Review",
+    description: "Atur reminder dan review berkala",
+    icon: Zap,
+    mascotMessage:
+      "Di akhir periode, kita akan review hasilnya bareng. Kalau butuh penyesuaian, saya bantu reset tujuannya.",
+    mascotState: "celebrating",
   },
   {
     id: 10,
@@ -720,7 +720,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 9: // Pilih Cadence
+      case 8: // Pilih Cadence
         return (
           <div className="space-y-4">
             <Label>Pilih ritme check-in:</Label>
@@ -1811,7 +1811,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 8: // Reminder & Review
+      case 9: // Reminder & Review
         return (
           <div className="space-y-4">
             <div className="p-4 bg-green-50 rounded-lg border border-green-200">
