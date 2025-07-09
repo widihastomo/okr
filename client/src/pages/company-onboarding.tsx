@@ -227,7 +227,7 @@ export default function CompanyOnboarding() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
-    currentStep: 1,
+    currentStep: 0, // Start at welcome screen
     completedSteps: [],
     teamFocus: "",
     cycleDuration: "",
@@ -249,6 +249,17 @@ export default function CompanyOnboarding() {
     queryKey: ["/api/onboarding/progress"],
     retry: false,
   });
+
+  // Update local state when progress data is loaded
+  useEffect(() => {
+    if (progress) {
+      setOnboardingData(prevData => ({
+        ...prevData,
+        ...progress,
+        currentStep: progress.currentStep || 0, // Ensure it starts at 0 if no progress
+      }));
+    }
+  }, [progress]);
 
   // Save onboarding progress
   const saveProgressMutation = useMutation({
@@ -293,12 +304,22 @@ export default function CompanyOnboarding() {
   const currentStepData = ONBOARDING_STEPS.find(
     (step) => step.id === onboardingData.currentStep,
   );
-  const progressPercentage =
+  
+  // Welcome screen data
+  const welcomeScreenData = {
+    title: "Selamat Datang di Refokus",
+    description: "Mari kita mulai perjalanan menuju tim yang lebih terarah dan produktif",
+    mascotMessage: "Halo! Saya Orby, asisten virtual yang akan membantu Anda menyiapkan sistem OKR yang tepat untuk tim Anda. Proses onboarding ini dirancang khusus untuk memastikan Anda mendapatkan hasil maksimal dari platform Refokus.",
+    mascotState: "welcome",
+    icon: Sparkles,
+  };
+  
+  const progressPercentage = onboardingData.currentStep === 0 ? 0 : 
     (onboardingData.completedSteps.length / ONBOARDING_STEPS.length) * 100;
 
   const handleNext = () => {
     if (onboardingData.currentStep < ONBOARDING_STEPS.length) {
-      const newCompletedSteps = [
+      const newCompletedSteps = onboardingData.currentStep === 0 ? [] : [
         ...onboardingData.completedSteps,
         onboardingData.currentStep,
       ];
@@ -308,18 +329,23 @@ export default function CompanyOnboarding() {
         completedSteps: newCompletedSteps,
       };
       setOnboardingData(newData);
-      saveProgressMutation.mutate(newData);
+      // Only save progress if we're past the welcome screen
+      if (onboardingData.currentStep > 0) {
+        saveProgressMutation.mutate(newData);
+      }
     }
   };
 
   const handlePrevious = () => {
-    if (onboardingData.currentStep > 1) {
+    if (onboardingData.currentStep > 0) {
       const newData = {
         ...onboardingData,
         currentStep: onboardingData.currentStep - 1,
       };
       setOnboardingData(newData);
-      saveProgressMutation.mutate(newData);
+      if (onboardingData.currentStep > 1) {
+        saveProgressMutation.mutate(newData);
+      }
     }
   };
 
@@ -338,6 +364,52 @@ export default function CompanyOnboarding() {
 
   const renderStepContent = () => {
     switch (onboardingData.currentStep) {
+      case 0: // Welcome Screen
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <blockquote className="text-gray-600 italic border-l-4 border-orange-500 pl-4 bg-orange-50 p-6 rounded-r-lg">
+                "Tim hebat bukan hanya tentang kerja keras, tapi tentang kerja yang
+                selaras dan terarah. Refokus hadir untuk menyelaraskan tujuan,
+                waktu, dan tindakan tim agar benar-benar bergerak menuju tujuan."
+              </blockquote>
+            </div>
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Proses Onboarding yang Akan Anda Lalui:
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {ONBOARDING_STEPS.map((step) => (
+                  <div
+                    key={step.id}
+                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+                  >
+                    <div className="p-2 bg-orange-100 rounded-lg">
+                      <step.icon className="w-4 h-4 text-orange-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900">{step.title}</h4>
+                      <p className="text-sm text-gray-600">{step.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="w-5 h-5 text-blue-600" />
+                  <span className="font-medium text-blue-900">
+                    Dampingi oleh Orby, Asisten Virtual Anda
+                  </span>
+                </div>
+                <p className="text-sm text-blue-700">
+                  Selama proses onboarding, Orby akan membantu menjelaskan setiap
+                  langkah dan memberikan panduan yang dipersonalisasi untuk tim
+                  Anda.
+                </p>
+              </div>
+            </div>
+          </div>
+        );
       case 1: // Fokus Tim
         return (
           <div className="space-y-4">
@@ -1919,62 +1991,92 @@ export default function CompanyOnboarding() {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Selamat Datang di Refokus
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+              {onboardingData.currentStep === 0 ? "Selamat Datang di Refokus" : "Onboarding Perusahaan"}
             </h1>
-            <blockquote className="text-gray-600 italic border-l-4 border-orange-500 pl-4 bg-orange-50 p-4 rounded-r-lg">
-              "Tim hebat bukan hanya tentang kerja keras, tapi tentang kerja yang
-              selaras dan terarah. Refokus hadir untuk menyelaraskan tujuan,
-              waktu, dan tindakan tim agar benar-benar bergerak menuju tujuan."
-            </blockquote>
+            {onboardingData.currentStep > 0 && (
+              <p className="text-gray-600">
+                Mari kita siapkan sistem OKR yang tepat untuk tim Anda
+              </p>
+            )}
           </div>
 
           {/* Progress Bar */}
-          <div className="mb-8">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-gray-600">
-                Langkah {onboardingData.currentStep} dari{" "}
-                {ONBOARDING_STEPS.length}
-              </span>
-              <span className="text-sm text-gray-600">
-                {Math.round(progressPercentage)}% selesai
-              </span>
+          {onboardingData.currentStep > 0 && (
+            <div className="mb-8">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm text-gray-600">
+                  Langkah {onboardingData.currentStep} dari{" "}
+                  {ONBOARDING_STEPS.length}
+                </span>
+                <span className="text-sm text-gray-600">
+                  {Math.round(progressPercentage)}% selesai
+                </span>
+              </div>
+              <Progress value={progressPercentage} className="h-2" />
             </div>
-            <Progress value={progressPercentage} className="h-2" />
-          </div>
+          )}
 
           <div className="space-y-8">
             {/* Mascot Assistant */}
             <div className="space-y-4">
-              {currentStepData && (
+              {onboardingData.currentStep === 0 ? (
                 <MascotCharacter
-                  state={currentStepData.mascotState as MascotState}
-                  message={currentStepData.mascotMessage}
+                  state={welcomeScreenData.mascotState as MascotState}
+                  message={welcomeScreenData.mascotMessage}
                 />
+              ) : (
+                currentStepData && (
+                  <MascotCharacter
+                    state={currentStepData.mascotState as MascotState}
+                    message={currentStepData.mascotMessage}
+                  />
+                )
               )}
             </div>
 
             {/* Step Content */}
             <div className="space-y-6">
-              {currentStepData && (
+              {onboardingData.currentStep === 0 ? (
                 <Card>
                   <CardHeader>
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-orange-100 rounded-lg">
-                        <currentStepData.icon className="w-5 h-5 text-orange-600" />
+                        <welcomeScreenData.icon className="w-5 h-5 text-orange-600" />
                       </div>
                       <div>
                         <CardTitle className="text-lg">
-                          {currentStepData.title}
+                          {welcomeScreenData.title}
                         </CardTitle>
                         <CardDescription>
-                          {currentStepData.description}
+                          {welcomeScreenData.description}
                         </CardDescription>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent>{renderStepContent()}</CardContent>
                 </Card>
+              ) : (
+                currentStepData && (
+                  <Card>
+                    <CardHeader>
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-orange-100 rounded-lg">
+                          <currentStepData.icon className="w-5 h-5 text-orange-600" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-lg">
+                            {currentStepData.title}
+                          </CardTitle>
+                          <CardDescription>
+                            {currentStepData.description}
+                          </CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>{renderStepContent()}</CardContent>
+                  </Card>
+                )
               )}
 
               {/* Navigation */}
@@ -1982,7 +2084,7 @@ export default function CompanyOnboarding() {
                 <Button
                   variant="outline"
                   onClick={handlePrevious}
-                  disabled={onboardingData.currentStep === 1}
+                  disabled={onboardingData.currentStep === 0}
                 >
                   Sebelumnya
                 </Button>
@@ -2002,7 +2104,7 @@ export default function CompanyOnboarding() {
                     onClick={handleNext}
                     className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
                   >
-                    Selanjutnya
+                    {onboardingData.currentStep === 0 ? "Mulai Onboarding" : "Selanjutnya"}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 )}
