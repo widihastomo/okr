@@ -91,6 +91,12 @@ export default function SystemAdminSidebar({
       active: location === "/system-admin/email-settings",
     },
     {
+      label: "Pengaturan Aplikasi",
+      icon: Settings,
+      path: "/system-admin/application-settings",
+      active: location === "/system-admin/application-settings",
+    },
+    {
       label: "Kelola Langganan",
       icon: CreditCard,
       path: "/system-admin/subscriptions",

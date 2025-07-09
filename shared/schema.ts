@@ -1336,3 +1336,33 @@ export type InsertReferralCode = z.infer<typeof insertReferralCodeSchema>;
 export type ReferralCode = typeof referralCodes.$inferSelect;
 export type InsertReferralUsage = z.infer<typeof insertReferralUsageSchema>;
 export type ReferralUsage = typeof referralUsage.$inferSelect;
+
+// Application Settings table
+export const applicationSettings = pgTable("application_settings", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  key: text("key").notNull().unique(), // "app_name", "app_description", "app_logo", "app_favicon", etc.
+  value: text("value"), // Setting value
+  type: text("type").notNull().default("text"), // "text", "url", "boolean", "number", "json", "file"
+  category: text("category").notNull().default("general"), // "general", "branding", "authentication", "email", "notification"
+  description: text("description"), // Human-readable description
+  isPublic: boolean("is_public").default(false), // Whether this setting can be viewed by non-admin users
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Application Settings types
+export type ApplicationSetting = typeof applicationSettings.$inferSelect;
+export const insertApplicationSettingSchema = createInsertSchema(applicationSettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertApplicationSetting = z.infer<typeof insertApplicationSettingSchema>;
+
+// Application Settings update schema
+export const updateApplicationSettingSchema = z.object({
+  value: z.string().optional(),
+  description: z.string().optional(),
+  isPublic: z.boolean().optional(),
+});
+export type UpdateApplicationSetting = z.infer<typeof updateApplicationSettingSchema>;

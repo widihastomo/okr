@@ -60,6 +60,7 @@ import CompanyOnboarding from "@/pages/company-onboarding";
 import MemberInvitations from "@/pages/member-invitations";
 import EmailSettings from "@/pages/system-admin/email-settings";
 import ClientStatusMapping from "@/pages/client-status-mapping";
+import ApplicationSettings from "@/pages/system-admin/application-settings";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -265,6 +266,10 @@ function Router() {
               <Route
                 path="/system-admin/client-status-mapping"
                 component={ClientStatusMapping}
+              />
+              <Route
+                path="/system-admin/application-settings"
+                component={ApplicationSettings}
               />
               <Route
                 path="/system-admin/subscriptions"

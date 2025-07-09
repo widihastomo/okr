@@ -8,8 +8,9 @@ import {
   insertSuccessMetricSchema, insertSuccessMetricUpdateSchema, insertDailyReflectionSchema, updateOnboardingProgressSchema,
   subscriptionPlans, organizations, organizationSubscriptions, users, dailyReflections, companyOnboardingDataSchema,
   insertMemberInvitationSchema, trialAchievements, userTrialAchievements, billingPeriods,
+  applicationSettings, insertApplicationSettingSchema, updateApplicationSettingSchema,
   type User, type SubscriptionPlan, type Organization, type OrganizationSubscription, type UserOnboardingProgress, type UpdateOnboardingProgress, type CompanyOnboardingData,
-  type MemberInvitation, type InsertUser
+  type MemberInvitation, type InsertUser, type ApplicationSetting, type InsertApplicationSetting, type UpdateApplicationSetting
 } from "@shared/schema";
 import { z } from "zod";
 import { createInsertSchema } from "drizzle-zod";
@@ -8335,6 +8336,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Failed to fetch client status mapping",
         error: error.message 
       });
+    }
+  });
+
+  // Application Settings Management Routes (System Owner only)
+  app.get("/api/admin/application-settings", requireSystemOwner, async (req, res) => {
+    try {
+      const settings = await storage.getApplicationSettings();
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching application settings:", error);
+      res.status(500).json({ message: "Failed to fetch application settings" });
+    }
+  });
+
+  app.get("/api/admin/application-settings/:key", requireSystemOwner, async (req, res) => {
+    try {
+      const { key } = req.params;
+      const setting = await storage.getApplicationSetting(key);
+      
+      if (!setting) {
+        return res.status(404).json({ message: "Setting not found" });
+      }
+      
+      res.json(setting);
+    } catch (error) {
+      console.error("Error fetching application setting:", error);
+      res.status(500).json({ message: "Failed to fetch application setting" });
+    }
+  });
+
+  app.post("/api/admin/application-settings", requireSystemOwner, async (req, res) => {
+    try {
+      const result = insertApplicationSettingSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ 
+          message: "Invalid application setting data", 
+          errors: result.error.errors 
+        });
+      }
+
+      const setting = await storage.createApplicationSetting(result.data);
+      res.status(201).json(setting);
+    } catch (error) {
+      console.error("Error creating application setting:", error);
+      if (error.code === '23505') { // Unique constraint violation
+        res.status(400).json({ message: "Setting with this key already exists" });
+      } else {
+        res.status(500).json({ message: "Failed to create application setting" });
+      }
+    }
+  });
+
+  app.put("/api/admin/application-settings/:key", requireSystemOwner, async (req, res) => {
+    try {
+      const { key } = req.params;
+      const result = updateApplicationSettingSchema.safeParse(req.body);
+      
+      if (!result.success) {
+        return res.status(400).json({ 
+          message: "Invalid application setting data", 
+          errors: result.error.errors 
+        });
+      }
+
+      const setting = await storage.updateApplicationSetting(key, result.data);
+      
+      if (!setting) {
+        return res.status(404).json({ message: "Setting not found" });
+      }
+      
+      res.json(setting);
+    } catch (error) {
+      console.error("Error updating application setting:", error);
+      res.status(500).json({ message: "Failed to update application setting" });
+    }
+  });
+
+  app.delete("/api/admin/application-settings/:key", requireSystemOwner, async (req, res) => {
+    try {
+      const { key } = req.params;
+      const deleted = await storage.deleteApplicationSetting(key);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Setting not found" });
+      }
+      
+      res.json({ message: "Setting deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting application setting:", error);
+      res.status(500).json({ message: "Failed to delete application setting" });
+    }
+  });
+
+  // Public application settings endpoint (accessible to all users)
+  app.get("/api/public/application-settings", async (req, res) => {
+    try {
+      const settings = await storage.getPublicApplicationSettings();
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching public application settings:", error);
+      res.status(500).json({ message: "Failed to fetch public application settings" });
     }
   });
 

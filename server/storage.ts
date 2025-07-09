@@ -1,7 +1,7 @@
 import { 
   cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives, tasks, taskComments,
   initiativeMembers, initiativeDocuments, initiativeNotes, initiativeSuccessMetrics, successMetricUpdates,
-  notifications, notificationPreferences, userOnboardingProgress, organizations, memberInvitations,
+  notifications, notificationPreferences, userOnboardingProgress, organizations, memberInvitations, applicationSettings,
   insertMemberInvitationSchema,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
   type CheckIn, type Initiative, type Task, type TaskComment, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
@@ -12,7 +12,7 @@ import {
   type SuccessMetric, type InsertSuccessMetric, type SuccessMetricUpdate, type InsertSuccessMetricUpdate,
   type Notification, type InsertNotification, type NotificationPreferences, type InsertNotificationPreferences,
   type UserOnboardingProgress, type InsertUserOnboardingProgress, type UpdateOnboardingProgress,
-  type MemberInvitation, type InsertMemberInvitation
+  type MemberInvitation, type InsertMemberInvitation, type ApplicationSetting, type InsertApplicationSetting, type UpdateApplicationSetting
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, inArray, count } from "drizzle-orm";
@@ -185,6 +185,14 @@ export interface IStorage {
   updateMemberInvitation(id: string, invitation: Partial<InsertMemberInvitation>): Promise<MemberInvitation | undefined>;
   deleteMemberInvitation(id: string): Promise<boolean>;
   acceptMemberInvitation(token: string, userData: InsertUser): Promise<User | undefined>;
+  
+  // Application Settings
+  getApplicationSettings(): Promise<ApplicationSetting[]>;
+  getApplicationSetting(key: string): Promise<ApplicationSetting | undefined>;
+  createApplicationSetting(setting: InsertApplicationSetting): Promise<ApplicationSetting>;
+  updateApplicationSetting(key: string, setting: UpdateApplicationSetting): Promise<ApplicationSetting | undefined>;
+  deleteApplicationSetting(key: string): Promise<boolean>;
+  getPublicApplicationSettings(): Promise<ApplicationSetting[]>;
 }
 
 // Helper function to calculate and update status automatically
@@ -1915,6 +1923,95 @@ export class DatabaseStorage implements IStorage {
       return newUser;
     } catch (error) {
       console.error("Error accepting member invitation:", error);
+      throw error;
+    }
+  }
+  
+  // Application Settings methods
+  async getApplicationSettings(): Promise<ApplicationSetting[]> {
+    try {
+      const settings = await db
+        .select()
+        .from(applicationSettings)
+        .orderBy(applicationSettings.category, applicationSettings.key);
+      
+      return settings;
+    } catch (error) {
+      console.error("Error fetching application settings:", error);
+      throw error;
+    }
+  }
+  
+  async getApplicationSetting(key: string): Promise<ApplicationSetting | undefined> {
+    try {
+      const [setting] = await db
+        .select()
+        .from(applicationSettings)
+        .where(eq(applicationSettings.key, key));
+      
+      return setting;
+    } catch (error) {
+      console.error("Error fetching application setting:", error);
+      throw error;
+    }
+  }
+  
+  async createApplicationSetting(setting: InsertApplicationSetting): Promise<ApplicationSetting> {
+    try {
+      const [newSetting] = await db
+        .insert(applicationSettings)
+        .values(setting)
+        .returning();
+      
+      return newSetting;
+    } catch (error) {
+      console.error("Error creating application setting:", error);
+      throw error;
+    }
+  }
+  
+  async updateApplicationSetting(key: string, setting: UpdateApplicationSetting): Promise<ApplicationSetting | undefined> {
+    try {
+      const [updatedSetting] = await db
+        .update(applicationSettings)
+        .set({
+          ...setting,
+          updatedAt: new Date(),
+        })
+        .where(eq(applicationSettings.key, key))
+        .returning();
+      
+      return updatedSetting;
+    } catch (error) {
+      console.error("Error updating application setting:", error);
+      throw error;
+    }
+  }
+  
+  async deleteApplicationSetting(key: string): Promise<boolean> {
+    try {
+      const result = await db
+        .delete(applicationSettings)
+        .where(eq(applicationSettings.key, key));
+      
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error("Error deleting application setting:", error);
+      throw error;
+    }
+  }
+  
+  async getPublicApplicationSettings(): Promise<ApplicationSetting[]> {
+    try {
+      const settings = await db
+        .select()
+        .from(applicationSettings)
+        .where(eq(applicationSettings.isPublic, true))
+        .orderBy(applicationSettings.category, applicationSettings.key);
+      
+      return settings;
+    } catch (error) {
+      console.error("Error fetching public application settings:", error);
       throw error;
     }
   }
