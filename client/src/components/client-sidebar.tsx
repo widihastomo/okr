@@ -26,6 +26,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Package,
+  MapPin,
   Gift,
   Mail,
 } from "lucide-react";

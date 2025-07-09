@@ -7,7 +7,7 @@ import {
   insertTaskSchema, insertTaskCommentSchema, insertInitiativeNoteSchema, updateKeyResultProgressSchema, createOKRFromTemplateSchema,
   insertSuccessMetricSchema, insertSuccessMetricUpdateSchema, insertDailyReflectionSchema, updateOnboardingProgressSchema,
   subscriptionPlans, organizations, organizationSubscriptions, users, dailyReflections, companyOnboardingDataSchema,
-  insertMemberInvitationSchema,
+  insertMemberInvitationSchema, trialAchievements, userTrialAchievements,
   type User, type SubscriptionPlan, type Organization, type OrganizationSubscription, type UserOnboardingProgress, type UpdateOnboardingProgress, type CompanyOnboardingData,
   type MemberInvitation, type InsertUser
 } from "@shared/schema";
@@ -29,7 +29,7 @@ import {
   type HabitAlignmentRequest 
 } from "./habit-alignment";
 import { db } from "./db";
-import { eq, and, desc, inArray } from "drizzle-orm";
+import { eq, and, desc, inArray, isNotNull } from "drizzle-orm";
 import { createSnapTransaction } from "./midtrans";
 import { reminderSystem } from "./reminder-system";
 import { emailService } from "./email-service";
@@ -8101,12 +8101,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Only allow system owners to access this endpoint
       const { user } = req as any;
-      if (!user?.claims?.sub) {
+      console.log('Client status mapping - user check:', { user: user ? 'exists' : 'null', id: user?.id, isSystemOwner: user?.isSystemOwner });
+      
+      if (!user?.id) {
+        console.log('Client status mapping - no user ID');
         return res.status(401).json({ message: "Unauthorized" });
       }
 
-      const currentUser = await storage.getUser(user.claims.sub);
-      if (!currentUser?.isSystemOwner) {
+      // Check if user is system owner
+      if (!user.isSystemOwner) {
+        console.log('Client status mapping - not system owner');
         return res.status(403).json({ message: "Access denied. System owner required." });
       }
 
