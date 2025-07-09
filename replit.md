@@ -132,6 +132,7 @@ Changelog:
   * Added confirmation feedback sections showing selected options with CheckCircle icons
   * **Added onClick handlers to all cards** - clicking anywhere on card automatically selects the radio button
   * Enhanced UX with full card clickability for easier interaction and better accessibility
+  * Added smooth scroll to top functionality when navigating between steps to ensure virtual assistant is always visible
 - July 09, 2025. Fixed ResizeObserver loop error with comprehensive error handling:
   * Added window error listener to prevent ResizeObserver loop completed notifications
   * Implemented console.error suppression for ResizeObserver warnings

@@ -408,6 +408,12 @@ export default function CompanyOnboarding() {
         console.log("Saving progress data:", newData);
         saveProgressMutation.mutate(newData);
       }
+      
+      // Scroll to top to show virtual assistant
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     }
   };
 
@@ -421,6 +427,12 @@ export default function CompanyOnboarding() {
       if (onboardingData.currentStep > 1) {
         saveProgressMutation.mutate(newData);
       }
+      
+      // Scroll to top to show virtual assistant
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     }
   };
 
