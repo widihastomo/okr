@@ -1173,7 +1173,21 @@ export default function CompanyOnboarding() {
         // Create task groups by initiative
         const getTaskGroupsByInitiative = (initiatives: string[]) => {
           const taskGroups: { [key: string]: string[] } = {
-            // Sales initiatives
+            // Sales & Marketing initiatives
+            "Mengoptimalkan landing page untuk konversi": [
+              "Analisis current landing page performance",
+              "Buat wireframe design untuk landing page baru",
+              "Implementasi A/B testing untuk conversion rate",
+              "Optimasi loading speed dan mobile responsiveness",
+              "Setup tracking dan analytics untuk monitoring",
+            ],
+            "Membuat program loyalty dengan point reward": [
+              "Design struktur point reward system",
+              "Develop backend system untuk point tracking",
+              "Buat UI/UX untuk loyalty program dashboard",
+              "Integrasikan dengan payment system",
+              "Launch campaign dan monitor adoption rate",
+            ],
             "Lead scoring system untuk prioritas": [
               "Setup lead scoring criteria berdasarkan behavior",
               "Konfigurasi automated scoring dalam CRM",
