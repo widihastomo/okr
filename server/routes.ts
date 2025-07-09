@@ -204,7 +204,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         if (freeTrialPlan && freeTrialPlan.isActive) {
           const trialStartDate = new Date();
-          const trialEndDate = new Date(trialStartDate.getTime() + (14 * 24 * 60 * 60 * 1000)); // 14 days trial
+          const trialEndDate = new Date(trialStartDate.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days trial
           
           // Create organization subscription for free trial
           await db.insert(organizationSubscriptions).values({

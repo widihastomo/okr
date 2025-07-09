@@ -121,6 +121,12 @@ Trial user untuk testing achievement system:
 ## Changelog
 ```
 Changelog:
+- July 09, 2025. Successfully updated trial duration from 14 days to 7 days for all new registrations:
+  * Changed trial period calculation from 14 days to 7 days in registration endpoint
+  * Updated existing trial subscriptions to use 7-day duration instead of 14 days
+  * All new registrations now receive 7-day Free Trial period with maximum 3 users
+  * Trial subscription automatically created during registration process with proper start/end dates
+  * Verified all existing trial users now have consistent 7-day trial periods
 - July 09, 2025. Successfully fixed registration organization owner assignment and improved registration endpoint:
   * Fixed critical bug where organization owner_id was not being set correctly during registration
   * Rewrote registration endpoint to set organization owner from the beginning during organization creation
