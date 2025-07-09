@@ -372,8 +372,6 @@ export default function CompanyOnboarding() {
       case 0: // Welcome Screen
         return (
           <div className="space-y-6">
-            <div className="text-center">
-            </div>
           </div>
         );
       case 1: // Fokus Tim
@@ -1623,7 +1621,7 @@ export default function CompanyOnboarding() {
               <div className="space-y-4">
                 <div className="bg-white p-4 rounded-lg border border-gray-200">
                   <h4 className="font-semibold text-blue-800 mb-2">
-                    🎯 Objective Utama
+                    🎯 Goal Utama
                   </h4>
                   <p className="text-gray-700">
                     {onboardingData.objective || "Belum diisi"}
@@ -1644,7 +1642,7 @@ export default function CompanyOnboarding() {
                 {onboardingData.keyResults.length > 0 && (
                   <div className="bg-white p-4 rounded-lg border border-gray-200">
                     <h4 className="font-semibold text-green-800 mb-3">
-                      📏 Key Results & Hierarki Pelaksanaan
+                      📏 Angka Target & Hierarki Pelaksanaan
                     </h4>
                     <div className="space-y-4">
                       {onboardingData.keyResults
@@ -1676,7 +1674,7 @@ export default function CompanyOnboarding() {
                                 <div className="w-2 h-2 bg-green-500 rounded-full mt-1.5"></div>
                                 <div>
                                   <span className="text-sm font-semibold text-green-800">
-                                    Key Result {krIndex + 1}
+                                    Angka Target {krIndex + 1}
                                   </span>
                                   <p className="text-sm text-gray-700">{kr}</p>
                                 </div>
@@ -1806,11 +1804,22 @@ export default function CompanyOnboarding() {
                                     ],
                                 };
 
+                                // Get all tasks for this initiative from the mapping
                                 const relatedTasks = taskGroups[init] || [];
-                                const selectedTasksForThisInit =
-                                  relatedTasks.filter((task) =>
-                                    onboardingData.tasks?.includes(task),
-                                  );
+                                
+                                // Get tasks that match the predefined mapping
+                                let selectedTasksForThisInit = relatedTasks.filter((task) =>
+                                  onboardingData.tasks?.includes(task),
+                                );
+                                
+                                // If no tasks are mapped to this initiative, 
+                                // distribute remaining tasks evenly among initiatives
+                                if (selectedTasksForThisInit.length === 0 && onboardingData.tasks?.length > 0) {
+                                  const tasksPerInitiative = Math.ceil(onboardingData.tasks.length / relatedInitiatives.length);
+                                  const startIndex = initIndex * tasksPerInitiative;
+                                  const endIndex = startIndex + tasksPerInitiative;
+                                  selectedTasksForThisInit = onboardingData.tasks.slice(startIndex, endIndex);
+                                }
 
                                 return (
                                   <div
@@ -1897,7 +1906,7 @@ export default function CompanyOnboarding() {
                       {onboardingData.cycleEndDate || "Belum diatur"}
                     </p>
                     <p>
-                      <strong>Cadence Review:</strong>{" "}
+                      <strong>Habit Review:</strong>{" "}
                       {onboardingData.cadence || "Belum dipilih"}
                     </p>
                     <p>
@@ -1914,14 +1923,19 @@ export default function CompanyOnboarding() {
                 💡 Yang Akan Terjadi Selanjutnya
               </h4>
               <ul className="text-sm text-yellow-700 space-y-1">
-                <li>• Objective pertama akan dibuat otomatis di sistem</li>
                 <li>
-                  • Key results akan diatur sebagai target yang dapat diukur
+                  • Goal pertama akan dibuat otomatis di sistem berdasarkan
+                  pilihan anda
                 </li>
-                <li>• Inisiatif akan dihubungkan dengan key results</li>
-                <li>• Task akan diatur sebagai langkah-langkah konkret</li>
                 <li>• Anggota tim akan diundang untuk berkolaborasi</li>
-                <li>• Reminder otomatis akan dimulai sesuai cadence</li>
+                <li>
+                  • Reminder otomatis akan dimulai sesuai ketentuan yang sudah
+                  dimasukkan
+                </li>
+                <li>
+                  • Anda dapat menambah / merubah konfigurasi setelah onboarding
+                  selesai
+                </li>
               </ul>
             </div>
           </div>
