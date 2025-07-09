@@ -254,7 +254,7 @@ export default function CompanyOnboarding() {
   // Update local state when progress data is loaded
   useEffect(() => {
     if (progress) {
-      setOnboardingData(prevData => ({
+      setOnboardingData((prevData) => ({
         ...prevData,
         ...progress,
         currentStep: progress.currentStep || 0, // Ensure it starts at 0 if no progress
@@ -305,25 +305,29 @@ export default function CompanyOnboarding() {
   const currentStepData = ONBOARDING_STEPS.find(
     (step) => step.id === onboardingData.currentStep,
   );
-  
+
   // Welcome screen data
   const welcomeScreenData = {
     title: "Selamat Datang di Platform Refokus",
-    description: "Mari kita mulai perjalanan menuju tim yang lebih terarah dan produktif",
-    mascotMessage: "Halo! Saya Orby, asisten virtual yang akan membantu Anda menyiapkan sistem OKR yang tepat untuk tim Anda. Proses onboarding ini dirancang khusus untuk memastikan Anda mendapatkan hasil maksimal dari platform Refokus.",
+    description:
+      "Tim hebat bukan hanya tentang kerja keras, tapi tentang kerja yang selaras dan terarah. Refokus hadir untuk menyelaraskan tujuan, waktu, dan tindakan tim agar benar-benar bergerak menuju tujuan.",
+    mascotMessage:
+      "Halo! Saya Orby, asisten virtual yang akan membantu Anda menyususun tujuan dan aksi nyata yang terukur. Proses onboarding ini dirancang khusus untuk memastikan Anda mendapatkan hasil maksimal dari platform Refokus.",
     mascotState: "welcome",
     icon: Sparkles,
   };
-  
-  const progressPercentage = onboardingData.currentStep === 0 ? 0 : 
-    (onboardingData.completedSteps.length / ONBOARDING_STEPS.length) * 100;
+
+  const progressPercentage =
+    onboardingData.currentStep === 0
+      ? 0
+      : (onboardingData.completedSteps.length / ONBOARDING_STEPS.length) * 100;
 
   const handleNext = () => {
     if (onboardingData.currentStep < ONBOARDING_STEPS.length) {
-      const newCompletedSteps = onboardingData.currentStep === 0 ? [] : [
-        ...onboardingData.completedSteps,
-        onboardingData.currentStep,
-      ];
+      const newCompletedSteps =
+        onboardingData.currentStep === 0
+          ? []
+          : [...onboardingData.completedSteps, onboardingData.currentStep];
       const newData = {
         ...onboardingData,
         currentStep: onboardingData.currentStep + 1,
@@ -369,13 +373,7 @@ export default function CompanyOnboarding() {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <blockquote className="text-gray-600 italic border-l-4 border-orange-500 pl-4 bg-orange-50 p-6 rounded-r-lg">
-                "Tim hebat bukan hanya tentang kerja keras, tapi tentang kerja yang
-                selaras dan terarah. Refokus hadir untuk menyelaraskan tujuan,
-                waktu, dan tindakan tim agar benar-benar bergerak menuju tujuan."
-              </blockquote>
             </div>
-
           </div>
         );
       case 1: // Fokus Tim
@@ -1960,13 +1958,12 @@ export default function CompanyOnboarding() {
           {/* Header */}
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
-              <img 
-                src={refokusLogo} 
-                alt="Refokus Logo" 
+              <img
+                src={refokusLogo}
+                alt="Refokus Logo"
                 className="h-12 w-auto"
               />
             </div>
-            
           </div>
 
           {/* Progress Bar */}
@@ -2072,7 +2069,9 @@ export default function CompanyOnboarding() {
                     onClick={handleNext}
                     className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
                   >
-                    {onboardingData.currentStep === 0 ? "Mulai Onboarding" : "Selanjutnya"}
+                    {onboardingData.currentStep === 0
+                      ? "Mulai Onboarding"
+                      : "Selanjutnya"}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 )}
