@@ -443,34 +443,120 @@ export default function CompanyOnboarding() {
         return <div className="space-y-6"></div>;
       case 1: // Fokus Tim
         return (
-          <div className="space-y-4">
-            <Label htmlFor="team-focus">Pilih fokus bisnis Anda:</Label>
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Label className="text-lg font-semibold">Pilih fokus bisnis Anda:</Label>
+              <p className="text-sm text-gray-600">
+                Pilih area yang paling ingin Anda tingkatkan dalam organisasi
+              </p>
+            </div>
             <RadioGroup
               value={onboardingData.teamFocus}
               onValueChange={(value) =>
                 setOnboardingData({ ...onboardingData, teamFocus: value })
               }
+              className="grid grid-cols-1 sm:grid-cols-2 gap-4"
             >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="penjualan" id="penjualan" />
-                <Label htmlFor="penjualan">Penjualan</Label>
+              <div className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                onboardingData.teamFocus === "penjualan" 
+                  ? "border-orange-500 bg-orange-50 shadow-md" 
+                  : "border-gray-200 bg-white hover:border-orange-300"
+              }`}>
+                <div className="flex items-start space-x-3">
+                  <RadioGroupItem value="penjualan" id="penjualan" className="mt-1" />
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <TrendingUp className="w-5 h-5 text-orange-600" />
+                      <Label htmlFor="penjualan" className="font-medium cursor-pointer">
+                        Penjualan
+                      </Label>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      Tingkatkan performa penjualan, konversi, dan pertumbuhan revenue
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="operasional" id="operasional" />
-                <Label htmlFor="operasional">Operasional</Label>
+
+              <div className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                onboardingData.teamFocus === "operasional" 
+                  ? "border-orange-500 bg-orange-50 shadow-md" 
+                  : "border-gray-200 bg-white hover:border-orange-300"
+              }`}>
+                <div className="flex items-start space-x-3">
+                  <RadioGroupItem value="operasional" id="operasional" className="mt-1" />
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <BarChart className="w-5 h-5 text-orange-600" />
+                      <Label htmlFor="operasional" className="font-medium cursor-pointer">
+                        Operasional
+                      </Label>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      Optimalisasi proses, efisiensi, dan produktivitas operasional
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value="customer_service"
-                  id="customer_service"
-                />
-                <Label htmlFor="customer_service">Customer Service</Label>
+
+              <div className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                onboardingData.teamFocus === "customer_service" 
+                  ? "border-orange-500 bg-orange-50 shadow-md" 
+                  : "border-gray-200 bg-white hover:border-orange-300"
+              }`}>
+                <div className="flex items-start space-x-3">
+                  <RadioGroupItem value="customer_service" id="customer_service" className="mt-1" />
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Users className="w-5 h-5 text-orange-600" />
+                      <Label htmlFor="customer_service" className="font-medium cursor-pointer">
+                        Customer Service
+                      </Label>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      Tingkatkan kepuasan pelanggan, respon time, dan loyalitas
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="marketing" id="marketing" />
-                <Label htmlFor="marketing">Marketing</Label>
+
+              <div className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                onboardingData.teamFocus === "marketing" 
+                  ? "border-orange-500 bg-orange-50 shadow-md" 
+                  : "border-gray-200 bg-white hover:border-orange-300"
+              }`}>
+                <div className="flex items-start space-x-3">
+                  <RadioGroupItem value="marketing" id="marketing" className="mt-1" />
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Target className="w-5 h-5 text-orange-600" />
+                      <Label htmlFor="marketing" className="font-medium cursor-pointer">
+                        Marketing
+                      </Label>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      Perluas jangkauan, engagement, dan brand awareness
+                    </p>
+                  </div>
+                </div>
               </div>
             </RadioGroup>
+
+            {onboardingData.teamFocus && (
+              <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-5 h-5 text-orange-600" />
+                  <p className="text-sm text-orange-800">
+                    <strong>Fokus terpilih:</strong> {
+                      onboardingData.teamFocus === "penjualan" ? "Penjualan" :
+                      onboardingData.teamFocus === "operasional" ? "Operasional" :
+                      onboardingData.teamFocus === "customer_service" ? "Customer Service" :
+                      onboardingData.teamFocus === "marketing" ? "Marketing" : ""
+                    }
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         );
 
@@ -919,7 +1005,7 @@ export default function CompanyOnboarding() {
 
       case 8: // Pilih Cadence
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="space-y-2">
               <Label className="text-lg font-semibold">Pilih frekuensi check-in progress:</Label>
               <p className="text-sm text-gray-600">
@@ -931,32 +1017,68 @@ export default function CompanyOnboarding() {
               onValueChange={(value) =>
                 setOnboardingData({ ...onboardingData, cadence: value })
               }
+              className="space-y-4"
             >
-              <div className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50 transition-all duration-300 hover:shadow-md hover:scale-[1.02]">
-                <RadioGroupItem value="harian" id="harian" className="mt-1 transition-all duration-200" />
-                <div className="flex-1">
-                  <Label htmlFor="harian" className="font-medium cursor-pointer transition-all duration-200 hover:text-orange-600">Setiap Hari</Label>
-                  <p className="text-sm text-gray-500 mt-1 transition-all duration-200">
-                    Cocok untuk goal yang memerlukan perhatian harian dan monitoring ketat
-                  </p>
+              <div className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                onboardingData.cadence === "harian" 
+                  ? "border-orange-500 bg-orange-50 shadow-md" 
+                  : "border-gray-200 bg-white hover:border-orange-300"
+              }`}>
+                <div className="flex items-start space-x-3">
+                  <RadioGroupItem value="harian" id="harian" className="mt-1" />
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Clock className="w-5 h-5 text-orange-600" />
+                      <Label htmlFor="harian" className="font-medium cursor-pointer">
+                        Setiap Hari
+                      </Label>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      Cocok untuk goal yang memerlukan perhatian harian dan monitoring ketat
+                    </p>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50 transition-all duration-300 hover:shadow-md hover:scale-[1.02]">
-                <RadioGroupItem value="mingguan" id="mingguan" className="mt-1 transition-all duration-200" />
-                <div className="flex-1">
-                  <Label htmlFor="mingguan" className="font-medium cursor-pointer transition-all duration-200 hover:text-orange-600">Setiap Minggu</Label>
-                  <p className="text-sm text-gray-500 mt-1 transition-all duration-200">
-                    Ideal untuk goal jangka menengah dengan review progress mingguan
-                  </p>
+
+              <div className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                onboardingData.cadence === "mingguan" 
+                  ? "border-orange-500 bg-orange-50 shadow-md" 
+                  : "border-gray-200 bg-white hover:border-orange-300"
+              }`}>
+                <div className="flex items-start space-x-3">
+                  <RadioGroupItem value="mingguan" id="mingguan" className="mt-1" />
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Calendar className="w-5 h-5 text-orange-600" />
+                      <Label htmlFor="mingguan" className="font-medium cursor-pointer">
+                        Setiap Minggu
+                      </Label>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      Ideal untuk goal jangka menengah dengan review progress mingguan
+                    </p>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50 transition-all duration-300 hover:shadow-md hover:scale-[1.02]">
-                <RadioGroupItem value="bulanan" id="bulanan" className="mt-1 transition-all duration-200" />
-                <div className="flex-1">
-                  <Label htmlFor="bulanan" className="font-medium cursor-pointer transition-all duration-200 hover:text-orange-600">Setiap Bulan</Label>
-                  <p className="text-sm text-gray-500 mt-1 transition-all duration-200">
-                    Tepat untuk goal strategis dengan evaluasi bulanan yang komprehensif
-                  </p>
+
+              <div className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                onboardingData.cadence === "bulanan" 
+                  ? "border-orange-500 bg-orange-50 shadow-md" 
+                  : "border-gray-200 bg-white hover:border-orange-300"
+              }`}>
+                <div className="flex items-start space-x-3">
+                  <RadioGroupItem value="bulanan" id="bulanan" className="mt-1" />
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <CalendarIcon className="w-5 h-5 text-orange-600" />
+                      <Label htmlFor="bulanan" className="font-medium cursor-pointer">
+                        Setiap Bulan
+                      </Label>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      Tepat untuk goal strategis dengan evaluasi bulanan yang komprehensif
+                    </p>
+                  </div>
                 </div>
               </div>
             </RadioGroup>

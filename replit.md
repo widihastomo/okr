@@ -121,6 +121,20 @@ Trial user untuk testing achievement system:
 ## Changelog
 ```
 Changelog:
+- July 09, 2025. Enhanced RadioGroup UI components with modern card-based design for better user experience:
+  * Transformed step 1 (Fokus Tim) from basic radio buttons to attractive card-based layout with icons and descriptions
+  * Added conditional styling with orange gradient theme for selected states (border-orange-500 bg-orange-50)
+  * Integrated relevant icons for each option (TrendingUp, BarChart, Users, Target) with consistent orange color scheme
+  * Enhanced step 8 (Pilih Cadence) with matching card-based design and Clock/Calendar icons
+  * Added hover effects (shadow-lg, scale-[1.02]) and smooth transitions for better interactivity
+  * Improved visual hierarchy with proper spacing, typography, and description text
+  * Consistent grid layout for responsive design (grid-cols-1 sm:grid-cols-2 for focus selection)
+  * Added confirmation feedback sections showing selected options with CheckCircle icons
+- July 09, 2025. Fixed ResizeObserver loop error with comprehensive error handling:
+  * Added window error listener to prevent ResizeObserver loop completed notifications
+  * Implemented console.error suppression for ResizeObserver warnings
+  * Added proper cleanup for event listeners in useEffect
+  * Enhanced error handling prevents console spam without affecting functionality
 - July 09, 2025. Removed input field for first check-in planning from step 9 and cleaned up validation:
   * Removed Textarea input field for rencana check-in pertama from step 9
   * Removed validation requirement for firstCheckIn field in step 9 
