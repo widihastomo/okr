@@ -129,6 +129,8 @@ interface OnboardingData {
   keyResults: string[];
   cadence: string;
   reminderTime: string;
+  reminderDay?: string; // For weekly reminders
+  reminderDate?: string; // For monthly reminders
   invitedMembers: string[];
   initiatives: string[];
   tasks: string[];
@@ -262,6 +264,13 @@ export default function CompanyOnboarding() {
         }
         if (!data.reminderTime) {
           return { isValid: false, message: "Silakan pilih waktu reminder" };
+        }
+        // Additional validation based on cadence type
+        if (data.cadence === "mingguan" && !data.reminderDay) {
+          return { isValid: false, message: "Silakan pilih hari reminder untuk check-in mingguan" };
+        }
+        if (data.cadence === "bulanan" && !data.reminderDate) {
+          return { isValid: false, message: "Silakan pilih tanggal reminder untuk check-in bulanan" };
         }
         break;
       case 9:
@@ -928,97 +937,263 @@ export default function CompanyOnboarding() {
             </RadioGroup>
             {onboardingData.cadence && (
               <div className="space-y-3">
-                <Label htmlFor="reminder-time">Waktu reminder:</Label>
-                <div className="space-y-3">
-                  {/* Common time options */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-                    {[
-                      { value: "08:00", label: "08:00 - Pagi" },
-                      { value: "12:00", label: "12:00 - Siang" },
-                      { value: "17:00", label: "17:00 - Sore" },
-                      { value: "09:00", label: "09:00 - Pagi" },
-                      { value: "15:00", label: "15:00 - Siang" },
-                      { value: "19:00", label: "19:00 - Malam" },
-                    ].map((timeOption) => (
-                      <Button
-                        key={timeOption.value}
-                        variant={
-                          onboardingData.reminderTime === timeOption.value
-                            ? "default"
-                            : "outline"
-                        }
-                        size="sm"
-                        onClick={() =>
-                          setOnboardingData({
-                            ...onboardingData,
-                            reminderTime: timeOption.value,
-                          })
-                        }
-                        className={
-                          onboardingData.reminderTime === timeOption.value
-                            ? "bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white transition-all duration-300 transform hover:scale-105 shadow-md"
-                            : "hover:bg-orange-50 hover:border-orange-300 text-gray-700 transition-all duration-300 transform hover:scale-105 hover:shadow-md"
-                        }
-                      >
-                        {timeOption.label}
-                      </Button>
-                    ))}
-                  </div>
-
-                  {/* Custom time input */}
+                {/* Harian - Waktu reminder */}
+                {onboardingData.cadence === "harian" && (
                   <div className="space-y-3">
-                    <Label className="text-sm text-gray-600">
-                      Atau pilih waktu custom:
-                    </Label>
-                    <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
-                      <div className="flex items-center space-x-2">
-                        <Input
-                          id="custom-time"
-                          type="time"
-                          value={onboardingData.reminderTime}
-                          onChange={(e) =>
-                            setOnboardingData({
-                              ...onboardingData,
-                              reminderTime: e.target.value,
-                            })
-                          }
-                          className="w-32 cursor-pointer focus:ring-2 focus:ring-orange-500 transition-all duration-300 hover:shadow-md focus:shadow-lg focus:scale-[1.02]"
-                          placeholder="HH:MM"
-                          step="60"
-                          min="00:00"
-                          max="23:59"
-                        />
-                        <span className="text-sm text-gray-500">Format: HH:MM</span>
+                    <Label htmlFor="reminder-time">Waktu reminder harian:</Label>
+                    <div className="space-y-3">
+                      {/* Common time options */}
+                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+                        {[
+                          { value: "08:00", label: "08:00 - Pagi" },
+                          { value: "12:00", label: "12:00 - Siang" },
+                          { value: "17:00", label: "17:00 - Sore" },
+                          { value: "09:00", label: "09:00 - Pagi" },
+                          { value: "15:00", label: "15:00 - Siang" },
+                          { value: "19:00", label: "19:00 - Malam" },
+                        ].map((timeOption) => (
+                          <Button
+                            key={timeOption.value}
+                            variant={
+                              onboardingData.reminderTime === timeOption.value
+                                ? "default"
+                                : "outline"
+                            }
+                            size="sm"
+                            onClick={() =>
+                              setOnboardingData({
+                                ...onboardingData,
+                                reminderTime: timeOption.value,
+                              })
+                            }
+                            className={
+                              onboardingData.reminderTime === timeOption.value
+                                ? "bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white transition-all duration-300 transform hover:scale-105 shadow-md"
+                                : "hover:bg-orange-50 hover:border-orange-300 text-gray-700 transition-all duration-300 transform hover:scale-105 hover:shadow-md"
+                            }
+                          >
+                            {timeOption.label}
+                          </Button>
+                        ))}
                       </div>
-                    </div>
 
-                    {/* Alternative manual input for better compatibility */}
-                    <div className="text-xs text-gray-500 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                      <div className="flex items-start space-x-2">
-                        <span className="text-orange-500">💡</span>
-                        <div>
-                          <strong>Tips:</strong> Klik pada input field untuk membuka time picker. 
-                          Jika tidak muncul, ketik langsung format waktu (contoh: 08:00, 14:30, 20:00)
+                      {/* Custom time input */}
+                      <div className="space-y-3">
+                        <Label className="text-sm text-gray-600">
+                          Atau pilih waktu custom:
+                        </Label>
+                        <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+                          <div className="flex items-center space-x-2">
+                            <Input
+                              id="custom-time"
+                              type="time"
+                              value={onboardingData.reminderTime}
+                              onChange={(e) =>
+                                setOnboardingData({
+                                  ...onboardingData,
+                                  reminderTime: e.target.value,
+                                })
+                              }
+                              className="w-32 cursor-pointer focus:ring-2 focus:ring-orange-500 transition-all duration-300 hover:shadow-md focus:shadow-lg focus:scale-[1.02]"
+                              placeholder="HH:MM"
+                              step="60"
+                              min="00:00"
+                              max="23:59"
+                            />
+                            <span className="text-sm text-gray-500">Format: HH:MM</span>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
+                )}
 
-                  {/* Selected time display */}
-                  {onboardingData.reminderTime && (
-                    <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                        <p className="text-sm text-orange-800">
-                          <strong>Waktu reminder terpilih:</strong>{" "}
-                          <span className="font-mono bg-orange-100 px-2 py-1 rounded">
-                            {onboardingData.reminderTime}
-                          </span>
-                        </p>
+                {/* Mingguan - Hari dan waktu reminder */}
+                {onboardingData.cadence === "mingguan" && (
+                  <div className="space-y-4">
+                    <Label>Pengaturan reminder mingguan:</Label>
+                    
+                    {/* Pilih hari */}
+                    <div className="space-y-3">
+                      <Label className="text-sm text-gray-600">Pilih hari reminder:</Label>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+                        {[
+                          { value: "senin", label: "Senin" },
+                          { value: "selasa", label: "Selasa" },
+                          { value: "rabu", label: "Rabu" },
+                          { value: "kamis", label: "Kamis" },
+                          { value: "jumat", label: "Jumat" },
+                          { value: "sabtu", label: "Sabtu" },
+                          { value: "minggu", label: "Minggu" },
+                        ].map((dayOption) => (
+                          <Button
+                            key={dayOption.value}
+                            variant={
+                              onboardingData.reminderDay === dayOption.value
+                                ? "default"
+                                : "outline"
+                            }
+                            size="sm"
+                            onClick={() =>
+                              setOnboardingData({
+                                ...onboardingData,
+                                reminderDay: dayOption.value,
+                              })
+                            }
+                            className={
+                              onboardingData.reminderDay === dayOption.value
+                                ? "bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white transition-all duration-300 transform hover:scale-105 shadow-md"
+                                : "hover:bg-blue-50 hover:border-blue-300 text-gray-700 transition-all duration-300 transform hover:scale-105 hover:shadow-md"
+                            }
+                          >
+                            {dayOption.label}
+                          </Button>
+                        ))}
                       </div>
                     </div>
-                  )}
-                </div>
+
+                    {/* Pilih waktu */}
+                    <div className="space-y-3">
+                      <Label className="text-sm text-gray-600">Pilih waktu reminder:</Label>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+                        {[
+                          { value: "08:00", label: "08:00 - Pagi" },
+                          { value: "12:00", label: "12:00 - Siang" },
+                          { value: "17:00", label: "17:00 - Sore" },
+                          { value: "09:00", label: "09:00 - Pagi" },
+                          { value: "15:00", label: "15:00 - Siang" },
+                          { value: "19:00", label: "19:00 - Malam" },
+                        ].map((timeOption) => (
+                          <Button
+                            key={timeOption.value}
+                            variant={
+                              onboardingData.reminderTime === timeOption.value
+                                ? "default"
+                                : "outline"
+                            }
+                            size="sm"
+                            onClick={() =>
+                              setOnboardingData({
+                                ...onboardingData,
+                                reminderTime: timeOption.value,
+                              })
+                            }
+                            className={
+                              onboardingData.reminderTime === timeOption.value
+                                ? "bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white transition-all duration-300 transform hover:scale-105 shadow-md"
+                                : "hover:bg-orange-50 hover:border-orange-300 text-gray-700 transition-all duration-300 transform hover:scale-105 hover:shadow-md"
+                            }
+                          >
+                            {timeOption.label}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Bulanan - Tanggal dan waktu reminder */}
+                {onboardingData.cadence === "bulanan" && (
+                  <div className="space-y-4">
+                    <Label>Pengaturan reminder bulanan:</Label>
+                    
+                    {/* Pilih tanggal */}
+                    <div className="space-y-3">
+                      <Label className="text-sm text-gray-600">Pilih tanggal reminder setiap bulan:</Label>
+                      <div className="grid grid-cols-5 sm:grid-cols-8 lg:grid-cols-10 gap-2">
+                        {Array.from({ length: 31 }, (_, i) => i + 1).map((date) => (
+                          <Button
+                            key={date}
+                            variant={
+                              onboardingData.reminderDate === date.toString()
+                                ? "default"
+                                : "outline"
+                            }
+                            size="sm"
+                            onClick={() =>
+                              setOnboardingData({
+                                ...onboardingData,
+                                reminderDate: date.toString(),
+                              })
+                            }
+                            className={
+                              onboardingData.reminderDate === date.toString()
+                                ? "bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white transition-all duration-300 transform hover:scale-105 shadow-md"
+                                : "hover:bg-purple-50 hover:border-purple-300 text-gray-700 transition-all duration-300 transform hover:scale-105 hover:shadow-md"
+                            }
+                          >
+                            {date}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Pilih waktu */}
+                    <div className="space-y-3">
+                      <Label className="text-sm text-gray-600">Pilih waktu reminder:</Label>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+                        {[
+                          { value: "08:00", label: "08:00 - Pagi" },
+                          { value: "12:00", label: "12:00 - Siang" },
+                          { value: "17:00", label: "17:00 - Sore" },
+                          { value: "09:00", label: "09:00 - Pagi" },
+                          { value: "15:00", label: "15:00 - Siang" },
+                          { value: "19:00", label: "19:00 - Malam" },
+                        ].map((timeOption) => (
+                          <Button
+                            key={timeOption.value}
+                            variant={
+                              onboardingData.reminderTime === timeOption.value
+                                ? "default"
+                                : "outline"
+                            }
+                            size="sm"
+                            onClick={() =>
+                              setOnboardingData({
+                                ...onboardingData,
+                                reminderTime: timeOption.value,
+                              })
+                            }
+                            className={
+                              onboardingData.reminderTime === timeOption.value
+                                ? "bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white transition-all duration-300 transform hover:scale-105 shadow-md"
+                                : "hover:bg-orange-50 hover:border-orange-300 text-gray-700 transition-all duration-300 transform hover:scale-105 hover:shadow-md"
+                            }
+                          >
+                            {timeOption.label}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Selected reminder display */}
+                {onboardingData.reminderTime && (
+                  <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                      <p className="text-sm text-orange-800">
+                        <strong>Pengaturan reminder:</strong>{" "}
+                        {onboardingData.cadence === "harian" && (
+                          <span className="font-mono bg-orange-100 px-2 py-1 rounded">
+                            Setiap hari jam {onboardingData.reminderTime}
+                          </span>
+                        )}
+                        {onboardingData.cadence === "mingguan" && (
+                          <span className="font-mono bg-orange-100 px-2 py-1 rounded">
+                            Setiap {onboardingData.reminderDay} jam {onboardingData.reminderTime}
+                          </span>
+                        )}
+                        {onboardingData.cadence === "bulanan" && (
+                          <span className="font-mono bg-orange-100 px-2 py-1 rounded">
+                            Setiap tanggal {onboardingData.reminderDate} jam {onboardingData.reminderTime}
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
