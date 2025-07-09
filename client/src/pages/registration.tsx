@@ -15,8 +15,11 @@ import {
   EyeOff, 
   CheckCircle, 
   ArrowRight,
-  Sparkles
+  Sparkles,
+  ShieldCheck
 } from "lucide-react";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { apiRequest } from "@/lib/queryClient";
 
 type RegistrationData = {
   name: string;
@@ -40,6 +43,8 @@ export default function Registration() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [verificationSent, setVerificationSent] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
   const { toast } = useToast();
 
   const handleInputChange = (field: keyof RegistrationData, value: string) => {
@@ -165,6 +170,69 @@ export default function Registration() {
     }
   };
 
+  const handleVerificationSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (verificationCode.length !== 6) {
+      toast({
+        title: "Kode tidak valid",
+        description: "Silakan masukkan kode verifikasi 6 digit",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsVerifying(true);
+    
+    try {
+      const response = await apiRequest('POST', '/api/auth/verify-email', {
+        email: formData.email,
+        code: verificationCode
+      });
+      
+      toast({
+        title: "Verifikasi berhasil!",
+        description: "Akun Anda telah diaktifkan. Silakan login.",
+      });
+      
+      // Redirect to login page
+      window.location.href = '/login';
+    } catch (error: any) {
+      console.error('Verification error:', error);
+      toast({
+        title: "Verifikasi gagal",
+        description: error.message || "Kode verifikasi tidak valid",
+        variant: "destructive",
+      });
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    setIsLoading(true);
+    
+    try {
+      await apiRequest('POST', '/api/auth/resend-verification', {
+        email: formData.email
+      });
+      
+      toast({
+        title: "Kode dikirim ulang",
+        description: "Silakan cek email Anda untuk kode verifikasi baru",
+      });
+    } catch (error: any) {
+      console.error('Resend error:', error);
+      toast({
+        title: "Gagal mengirim ulang",
+        description: error.message || "Terjadi kesalahan saat mengirim ulang kode",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (verificationSent) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex items-center justify-center p-4">
@@ -181,25 +249,76 @@ export default function Registration() {
                 Kode verifikasi telah dikirim ke email Anda
               </CardDescription>
             </CardHeader>
-            <CardContent className="text-center">
+            <CardContent>
               <div className="bg-orange-50 rounded-lg p-6 mb-6">
                 <Mail className="h-12 w-12 text-orange-600 mx-auto mb-4" />
-                <p className="text-sm text-gray-700 mb-2">
+                <p className="text-sm text-gray-700 mb-2 text-center">
                   Kami telah mengirim kode verifikasi ke:
                 </p>
-                <p className="font-semibold text-orange-600">{formData.email}</p>
+                <p className="font-semibold text-orange-600 text-center">{formData.email}</p>
               </div>
               
-              <div className="text-sm text-gray-600 mb-6">
-                <p>Silakan cek inbox email Anda dan ikuti instruksi untuk mengaktifkan akun.</p>
-                <p className="mt-2">Jika tidak menerima email, cek folder spam atau junk.</p>
-              </div>
+              <form onSubmit={handleVerificationSubmit} className="space-y-6">
+                <div className="space-y-4">
+                  <Label htmlFor="verificationCode" className="text-sm font-medium text-gray-700 block text-center">
+                    Masukkan Kode Verifikasi (6 digit)
+                  </Label>
+                  <div className="flex justify-center">
+                    <InputOTP
+                      value={verificationCode}
+                      onChange={setVerificationCode}
+                      maxLength={6}
+                      render={({ slots }) => (
+                        <InputOTPGroup>
+                          {slots.map((slot, index) => (
+                            <InputOTPSlot key={index} {...slot} />
+                          ))}
+                        </InputOTPGroup>
+                      )}
+                    />
+                  </div>
+                </div>
 
-              <Link href="/login">
-                <Button className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
-                  Kembali ke Login
+                <Button 
+                  type="submit" 
+                  className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                  disabled={isVerifying || verificationCode.length !== 6}
+                >
+                  {isVerifying ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Memverifikasi...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-2">
+                      <ShieldCheck className="h-5 w-5" />
+                      <span>Verifikasi Akun</span>
+                    </div>
+                  )}
                 </Button>
-              </Link>
+              </form>
+
+              <div className="mt-6 text-center space-y-3">
+                <p className="text-sm text-gray-600">
+                  Tidak menerima email? Cek folder spam atau junk
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleResendCode}
+                  disabled={isLoading}
+                  className="text-orange-600 border-orange-600 hover:bg-orange-50"
+                >
+                  {isLoading ? "Mengirim..." : "Kirim Ulang Kode"}
+                </Button>
+                <div className="pt-4 border-t">
+                  <Link href="/login">
+                    <Button variant="ghost" className="text-gray-600 hover:text-orange-600">
+                      Kembali ke Login
+                    </Button>
+                  </Link>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>

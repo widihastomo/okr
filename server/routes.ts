@@ -317,6 +317,122 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Resend verification code endpoint
+  app.post("/api/auth/resend-verification", async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ 
+          message: "Email harus diisi" 
+        });
+      }
+      
+      // Find user by email
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(404).json({ 
+          message: "User tidak ditemukan" 
+        });
+      }
+      
+      if (user.isActive) {
+        return res.status(400).json({ 
+          message: "Akun sudah aktif" 
+        });
+      }
+      
+      // Generate new verification code
+      const newVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // Update user with new verification code
+      await storage.updateUser(user.id, {
+        verificationCode: newVerificationCode,
+        verificationCodeExpiry: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+        updatedAt: new Date(),
+      });
+      
+      // Send new verification email
+      try {
+        const verificationLink = `${process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000'}/verify-email?code=${newVerificationCode}&email=${encodeURIComponent(email)}`;
+        
+        const emailHtml = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <title>Kode Verifikasi Baru - Platform OKR</title>
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+              .header { background: linear-gradient(135deg, #ea580c 0%, #fb923c 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+              .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px; }
+              .code { background: #fff; border: 2px solid #ea580c; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; color: #ea580c; border-radius: 5px; margin: 20px 0; }
+              .button { display: inline-block; background: linear-gradient(135deg, #ea580c 0%, #fb923c 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 20px 0; }
+              .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 14px; color: #666; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1>Kode Verifikasi Baru</h1>
+              </div>
+              <div class="content">
+                <p>Halo <strong>${user.firstName}</strong>!</p>
+                <p>Anda telah meminta kode verifikasi baru untuk akun Anda.</p>
+                
+                <p>Kode verifikasi baru Anda adalah:</p>
+                
+                <div class="code">${newVerificationCode}</div>
+                
+                <p>Atau klik tombol di bawah untuk verifikasi otomatis:</p>
+                
+                <div style="text-align: center;">
+                  <a href="${verificationLink}" class="button">Verifikasi Email</a>
+                </div>
+                
+                <p>Kode verifikasi ini akan kedaluwarsa dalam 24 jam.</p>
+                
+                <p>Jika Anda tidak meminta kode verifikasi baru, silakan abaikan email ini.</p>
+              </div>
+              <div class="footer">
+                <p>Email ini dikirim secara otomatis oleh sistem. Jangan balas email ini.</p>
+                <p>© 2025 Platform OKR. Semua hak dilindungi.</p>
+              </div>
+            </div>
+          </body>
+          </html>
+        `;
+        
+        await emailService.sendEmail({
+          from: "no-reply@platform-okr.com",
+          to: email,
+          subject: "Kode Verifikasi Baru - Platform OKR",
+          html: emailHtml,
+        });
+        
+        console.log("Resend verification email sent successfully");
+        
+      } catch (emailError) {
+        console.error("Error sending resend verification email:", emailError);
+        return res.status(500).json({ 
+          message: "Gagal mengirim email verifikasi baru. Silakan coba lagi." 
+        });
+      }
+      
+      res.json({
+        message: "Kode verifikasi baru telah dikirim ke email Anda.",
+        success: true,
+      });
+      
+    } catch (error) {
+      console.error("Resend verification error:", error);
+      res.status(500).json({ 
+        message: "Gagal mengirim ulang kode verifikasi. Silakan coba lagi." 
+      });
+    }
+  });
+  
   // Reminder System API Routes
   app.get("/api/reminders/config", requireAuth, async (req, res) => {
     try {
