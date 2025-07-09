@@ -457,11 +457,14 @@ export default function CompanyOnboarding() {
               }
               className="grid grid-cols-1 sm:grid-cols-2 gap-4"
             >
-              <div className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
-                onboardingData.teamFocus === "penjualan" 
-                  ? "border-orange-500 bg-orange-50 shadow-md" 
-                  : "border-gray-200 bg-white hover:border-orange-300"
-              }`}>
+              <div 
+                className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                  onboardingData.teamFocus === "penjualan" 
+                    ? "border-orange-500 bg-orange-50 shadow-md" 
+                    : "border-gray-200 bg-white hover:border-orange-300"
+                }`}
+                onClick={() => setOnboardingData({ ...onboardingData, teamFocus: "penjualan" })}
+              >
                 <div className="flex items-start space-x-3">
                   <RadioGroupItem value="penjualan" id="penjualan" className="mt-1" />
                   <div className="flex-1">
@@ -478,11 +481,14 @@ export default function CompanyOnboarding() {
                 </div>
               </div>
 
-              <div className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
-                onboardingData.teamFocus === "operasional" 
-                  ? "border-orange-500 bg-orange-50 shadow-md" 
-                  : "border-gray-200 bg-white hover:border-orange-300"
-              }`}>
+              <div 
+                className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                  onboardingData.teamFocus === "operasional" 
+                    ? "border-orange-500 bg-orange-50 shadow-md" 
+                    : "border-gray-200 bg-white hover:border-orange-300"
+                }`}
+                onClick={() => setOnboardingData({ ...onboardingData, teamFocus: "operasional" })}
+              >
                 <div className="flex items-start space-x-3">
                   <RadioGroupItem value="operasional" id="operasional" className="mt-1" />
                   <div className="flex-1">
@@ -499,11 +505,14 @@ export default function CompanyOnboarding() {
                 </div>
               </div>
 
-              <div className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
-                onboardingData.teamFocus === "customer_service" 
-                  ? "border-orange-500 bg-orange-50 shadow-md" 
-                  : "border-gray-200 bg-white hover:border-orange-300"
-              }`}>
+              <div 
+                className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                  onboardingData.teamFocus === "customer_service" 
+                    ? "border-orange-500 bg-orange-50 shadow-md" 
+                    : "border-gray-200 bg-white hover:border-orange-300"
+                }`}
+                onClick={() => setOnboardingData({ ...onboardingData, teamFocus: "customer_service" })}
+              >
                 <div className="flex items-start space-x-3">
                   <RadioGroupItem value="customer_service" id="customer_service" className="mt-1" />
                   <div className="flex-1">
@@ -520,11 +529,14 @@ export default function CompanyOnboarding() {
                 </div>
               </div>
 
-              <div className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
-                onboardingData.teamFocus === "marketing" 
-                  ? "border-orange-500 bg-orange-50 shadow-md" 
-                  : "border-gray-200 bg-white hover:border-orange-300"
-              }`}>
+              <div 
+                className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                  onboardingData.teamFocus === "marketing" 
+                    ? "border-orange-500 bg-orange-50 shadow-md" 
+                    : "border-gray-200 bg-white hover:border-orange-300"
+                }`}
+                onClick={() => setOnboardingData({ ...onboardingData, teamFocus: "marketing" })}
+              >
                 <div className="flex items-start space-x-3">
                   <RadioGroupItem value="marketing" id="marketing" className="mt-1" />
                   <div className="flex-1">
@@ -1019,11 +1031,14 @@ export default function CompanyOnboarding() {
               }
               className="space-y-4"
             >
-              <div className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
-                onboardingData.cadence === "harian" 
-                  ? "border-orange-500 bg-orange-50 shadow-md" 
-                  : "border-gray-200 bg-white hover:border-orange-300"
-              }`}>
+              <div 
+                className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                  onboardingData.cadence === "harian" 
+                    ? "border-orange-500 bg-orange-50 shadow-md" 
+                    : "border-gray-200 bg-white hover:border-orange-300"
+                }`}
+                onClick={() => setOnboardingData({ ...onboardingData, cadence: "harian" })}
+              >
                 <div className="flex items-start space-x-3">
                   <RadioGroupItem value="harian" id="harian" className="mt-1" />
                   <div className="flex-1">
@@ -1040,11 +1055,14 @@ export default function CompanyOnboarding() {
                 </div>
               </div>
 
-              <div className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
-                onboardingData.cadence === "mingguan" 
-                  ? "border-orange-500 bg-orange-50 shadow-md" 
-                  : "border-gray-200 bg-white hover:border-orange-300"
-              }`}>
+              <div 
+                className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                  onboardingData.cadence === "mingguan" 
+                    ? "border-orange-500 bg-orange-50 shadow-md" 
+                    : "border-gray-200 bg-white hover:border-orange-300"
+                }`}
+                onClick={() => setOnboardingData({ ...onboardingData, cadence: "mingguan" })}
+              >
                 <div className="flex items-start space-x-3">
                   <RadioGroupItem value="mingguan" id="mingguan" className="mt-1" />
                   <div className="flex-1">
@@ -1061,11 +1079,14 @@ export default function CompanyOnboarding() {
                 </div>
               </div>
 
-              <div className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
-                onboardingData.cadence === "bulanan" 
-                  ? "border-orange-500 bg-orange-50 shadow-md" 
-                  : "border-gray-200 bg-white hover:border-orange-300"
-              }`}>
+              <div 
+                className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                  onboardingData.cadence === "bulanan" 
+                    ? "border-orange-500 bg-orange-50 shadow-md" 
+                    : "border-gray-200 bg-white hover:border-orange-300"
+                }`}
+                onClick={() => setOnboardingData({ ...onboardingData, cadence: "bulanan" })}
+              >
                 <div className="flex items-start space-x-3">
                   <RadioGroupItem value="bulanan" id="bulanan" className="mt-1" />
                   <div className="flex-1">

@@ -121,7 +121,7 @@ Trial user untuk testing achievement system:
 ## Changelog
 ```
 Changelog:
-- July 09, 2025. Enhanced RadioGroup UI components with modern card-based design for better user experience:
+- July 09, 2025. Enhanced RadioGroup UI components with modern card-based design and click functionality:
   * Transformed step 1 (Fokus Tim) from basic radio buttons to attractive card-based layout with icons and descriptions
   * Added conditional styling with orange gradient theme for selected states (border-orange-500 bg-orange-50)
   * Integrated relevant icons for each option (TrendingUp, BarChart, Users, Target) with consistent orange color scheme
@@ -130,6 +130,8 @@ Changelog:
   * Improved visual hierarchy with proper spacing, typography, and description text
   * Consistent grid layout for responsive design (grid-cols-1 sm:grid-cols-2 for focus selection)
   * Added confirmation feedback sections showing selected options with CheckCircle icons
+  * **Added onClick handlers to all cards** - clicking anywhere on card automatically selects the radio button
+  * Enhanced UX with full card clickability for easier interaction and better accessibility
 - July 09, 2025. Fixed ResizeObserver loop error with comprehensive error handling:
   * Added window error listener to prevent ResizeObserver loop completed notifications
   * Implemented console.error suppression for ResizeObserver warnings
