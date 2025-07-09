@@ -55,6 +55,7 @@ import DummyClientExamples from "@/pages/dummy-client-examples";
 import ReferralCodes from "@/pages/referral-codes";
 import TrialAchievements from "@/pages/trial-achievements";
 import CompanyOnboarding from "@/pages/company-onboarding";
+import MemberInvitations from "@/pages/member-invitations";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -202,6 +203,7 @@ function Router() {
                 component={SystemOrganizationManagement}
               />
               <Route path="/client-users" component={ClientUserManagement} />
+              <Route path="/member-invitations" component={MemberInvitations} />
               <Route
                 path="/notification-settings"
                 component={NotificationSettings}

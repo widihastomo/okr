@@ -7,7 +7,9 @@ import {
   insertTaskSchema, insertTaskCommentSchema, insertInitiativeNoteSchema, updateKeyResultProgressSchema, createOKRFromTemplateSchema,
   insertSuccessMetricSchema, insertSuccessMetricUpdateSchema, insertDailyReflectionSchema, updateOnboardingProgressSchema,
   subscriptionPlans, organizations, organizationSubscriptions, users, dailyReflections, companyOnboardingDataSchema,
-  type User, type SubscriptionPlan, type Organization, type OrganizationSubscription, type UserOnboardingProgress, type UpdateOnboardingProgress, type CompanyOnboardingData
+  insertMemberInvitationSchema,
+  type User, type SubscriptionPlan, type Organization, type OrganizationSubscription, type UserOnboardingProgress, type UpdateOnboardingProgress, type CompanyOnboardingData,
+  type MemberInvitation, type InsertUser
 } from "@shared/schema";
 import { z } from "zod";
 import { createInsertSchema } from "drizzle-zod";
@@ -30,6 +32,7 @@ import { db } from "./db";
 import { eq, and, desc, inArray } from "drizzle-orm";
 import { createSnapTransaction } from "./midtrans";
 import { reminderSystem } from "./reminder-system";
+import { emailService } from "./email-service";
 
 // System Owner middleware to protect admin endpoints
 const isSystemOwner = (req: any, res: any, next: any) => {
@@ -7353,6 +7356,210 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating trial configuration:", error);
       res.status(500).json({ error: "Failed to update trial configuration" });
+    }
+  });
+
+  // Member Invitation API Routes
+
+  // Get member invitations for current organization
+  app.get("/api/member-invitations", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      
+      if (!user.organizationId) {
+        return res.status(400).json({ message: "User not associated with an organization" });
+      }
+      
+      const invitations = await storage.getMemberInvitations(user.organizationId);
+      res.json(invitations);
+    } catch (error) {
+      console.error("Error fetching member invitations:", error);
+      res.status(500).json({ message: "Failed to fetch member invitations" });
+    }
+  });
+
+  // Create member invitation
+  app.post("/api/member-invitations", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      
+      if (!user.organizationId) {
+        return res.status(400).json({ message: "User not associated with an organization" });
+      }
+      
+      const invitationData = {
+        ...req.body,
+        organizationId: user.organizationId,
+        invitedBy: user.id,
+        invitationToken: Math.random().toString(36).substr(2, 9) + Date.now().toString(36),
+      };
+      
+      const result = insertMemberInvitationSchema.safeParse(invitationData);
+      if (!result.success) {
+        return res.status(400).json({ 
+          message: "Invalid invitation data", 
+          errors: result.error.errors 
+        });
+      }
+      
+      const invitation = await storage.createMemberInvitation(result.data);
+      
+      // Send invitation email
+      try {
+        const organization = await storage.getOrganization(user.organizationId);
+        const inviterName = `${user.firstName} ${user.lastName}`.trim() || user.email;
+        const organizationName = organization?.name || "Organization";
+        
+        // Construct the invitation link
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        const invitationLink = `${baseUrl}/accept-invitation?token=${invitation.invitationToken}`;
+        
+        const emailHtml = emailService.generateInvitationEmail(
+          inviterName,
+          organizationName,
+          invitationLink
+        );
+        
+        await emailService.sendEmail({
+          from: "no-reply@yourcompany.com",
+          to: invitation.email,
+          subject: `Undangan Bergabung dengan ${organizationName}`,
+          html: emailHtml,
+        });
+      } catch (emailError) {
+        console.error("Error sending invitation email:", emailError);
+        // Don't fail the invitation creation if email fails
+      }
+      
+      res.status(201).json(invitation);
+    } catch (error) {
+      console.error("Error creating member invitation:", error);
+      res.status(500).json({ message: "Failed to create member invitation" });
+    }
+  });
+
+  // Update member invitation
+  app.put("/api/member-invitations/:id", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const { id } = req.params;
+      
+      if (!user.organizationId) {
+        return res.status(400).json({ message: "User not associated with an organization" });
+      }
+      
+      const result = insertMemberInvitationSchema.partial().safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ 
+          message: "Invalid invitation data", 
+          errors: result.error.errors 
+        });
+      }
+      
+      const invitation = await storage.updateMemberInvitation(id, result.data);
+      
+      if (!invitation) {
+        return res.status(404).json({ message: "Invitation not found" });
+      }
+      
+      res.json(invitation);
+    } catch (error) {
+      console.error("Error updating member invitation:", error);
+      res.status(500).json({ message: "Failed to update member invitation" });
+    }
+  });
+
+  // Delete member invitation
+  app.delete("/api/member-invitations/:id", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const { id } = req.params;
+      
+      if (!user.organizationId) {
+        return res.status(400).json({ message: "User not associated with an organization" });
+      }
+      
+      const deleted = await storage.deleteMemberInvitation(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Invitation not found" });
+      }
+      
+      res.json({ message: "Invitation deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting member invitation:", error);
+      res.status(500).json({ message: "Failed to delete member invitation" });
+    }
+  });
+
+  // Get invitation details by token (public)
+  app.get("/api/member-invitations/token/:token", async (req, res) => {
+    try {
+      const { token } = req.params;
+      
+      const invitation = await storage.getMemberInvitationByToken(token);
+      
+      if (!invitation) {
+        return res.status(404).json({ message: "Invitation not found" });
+      }
+      
+      // Check if invitation is expired
+      if (invitation.expiresAt && new Date() > invitation.expiresAt) {
+        return res.status(400).json({ message: "Invitation has expired" });
+      }
+      
+      // Check if invitation is already accepted
+      if (invitation.status === "accepted") {
+        return res.status(400).json({ message: "Invitation has already been accepted" });
+      }
+      
+      // Return invitation details without sensitive information
+      res.json({
+        id: invitation.id,
+        email: invitation.email,
+        role: invitation.role,
+        department: invitation.department,
+        jobTitle: invitation.jobTitle,
+        organizationId: invitation.organizationId,
+        status: invitation.status,
+        createdAt: invitation.createdAt,
+        expiresAt: invitation.expiresAt,
+      });
+    } catch (error) {
+      console.error("Error fetching invitation:", error);
+      res.status(500).json({ message: "Failed to fetch invitation" });
+    }
+  });
+
+  // Accept invitation (public)
+  app.post("/api/member-invitations/accept", async (req, res) => {
+    try {
+      const { token, userData } = req.body;
+      
+      if (!token || !userData) {
+        return res.status(400).json({ message: "Token and user data are required" });
+      }
+      
+      const user = await storage.acceptMemberInvitation(token, userData);
+      
+      if (!user) {
+        return res.status(400).json({ message: "Failed to accept invitation" });
+      }
+      
+      res.json({
+        message: "Invitation accepted successfully",
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+          organizationId: user.organizationId,
+        },
+      });
+    } catch (error) {
+      console.error("Error accepting invitation:", error);
+      res.status(500).json({ message: error.message || "Failed to accept invitation" });
     }
   });
 

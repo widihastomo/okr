@@ -27,6 +27,7 @@ import {
   ChevronRight,
   Package,
   Gift,
+  Mail,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -207,6 +208,12 @@ export default function Sidebar({
       icon: Users,
       path: "/client-users",
       active: location === "/client-users",
+    });
+    regularUserMenuItems.push({
+      label: "Undangan Member",
+      icon: Mail,
+      path: "/member-invitations",
+      active: location === "/member-invitations",
     });
     regularUserMenuItems.push({
       label: "Invoice",

@@ -249,6 +249,23 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Member Invitations table for email invitations
+export const memberInvitations = pgTable("member_invitations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  email: varchar("email", { length: 255 }).notNull(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
+  invitedBy: uuid("invited_by").notNull().references(() => users.id),
+  role: text("role").notNull().default("member"), // "organization_admin", "manager", "member", "viewer"
+  department: text("department"),
+  jobTitle: text("job_title"),
+  invitationToken: uuid("invitation_token").defaultRandom().unique(),
+  status: text("status").notNull().default("pending"), // "pending", "accepted", "expired", "cancelled"
+  expiresAt: timestamp("expires_at").notNull(),
+  acceptedAt: timestamp("accepted_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // User Permissions table for granular access control
 export const userPermissions = pgTable("user_permissions", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -1263,6 +1280,17 @@ export const companyOnboardingDataSchema = z.object({
 });
 
 export type CompanyOnboardingData = z.infer<typeof companyOnboardingDataSchema>;
+
+// Member Invitation schemas
+export const insertMemberInvitationSchema = createInsertSchema(memberInvitations).omit({
+  id: true,
+  invitationToken: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertMemberInvitation = z.infer<typeof insertMemberInvitationSchema>;
+export type MemberInvitation = typeof memberInvitations.$inferSelect;
 
 // Referral Code schemas
 export const insertReferralCodeSchema = createInsertSchema(referralCodes).omit({

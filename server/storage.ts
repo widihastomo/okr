@@ -1,7 +1,8 @@
 import { 
   cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives, tasks, taskComments,
   initiativeMembers, initiativeDocuments, initiativeNotes, initiativeSuccessMetrics, successMetricUpdates,
-  notifications, notificationPreferences, userOnboardingProgress, organizations,
+  notifications, notificationPreferences, userOnboardingProgress, organizations, memberInvitations,
+  insertMemberInvitationSchema,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
   type CheckIn, type Initiative, type Task, type TaskComment, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
   type InitiativeNote, type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
@@ -10,7 +11,8 @@ import {
   type InsertTaskComment, type InsertInitiativeNote, type OKRWithKeyResults, type CycleWithOKRs, type UpdateKeyResultProgress, type CreateOKRFromTemplate,
   type SuccessMetric, type InsertSuccessMetric, type SuccessMetricUpdate, type InsertSuccessMetricUpdate,
   type Notification, type InsertNotification, type NotificationPreferences, type InsertNotificationPreferences,
-  type UserOnboardingProgress, type InsertUserOnboardingProgress, type UpdateOnboardingProgress
+  type UserOnboardingProgress, type InsertUserOnboardingProgress, type UpdateOnboardingProgress,
+  type MemberInvitation, type InsertMemberInvitation
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, inArray, count } from "drizzle-orm";
@@ -175,6 +177,14 @@ export interface IStorage {
   
   // Create first objective from onboarding data
   createFirstObjectiveFromOnboarding(userId: string, onboardingData: any): Promise<Objective | undefined>;
+  
+  // Member Invitations
+  getMemberInvitations(organizationId: string): Promise<MemberInvitation[]>;
+  getMemberInvitationByToken(token: string): Promise<MemberInvitation | undefined>;
+  createMemberInvitation(invitation: InsertMemberInvitation): Promise<MemberInvitation>;
+  updateMemberInvitation(id: string, invitation: Partial<InsertMemberInvitation>): Promise<MemberInvitation | undefined>;
+  deleteMemberInvitation(id: string): Promise<boolean>;
+  acceptMemberInvitation(token: string, userData: InsertUser): Promise<User | undefined>;
 }
 
 // Helper function to calculate and update status automatically
@@ -1774,6 +1784,129 @@ export class DatabaseStorage implements IStorage {
       return newObjective;
     } catch (error) {
       console.error("Error creating first objective from onboarding:", error);
+      throw error;
+    }
+  }
+  
+  // Member Invitation methods
+  async getMemberInvitations(organizationId: string): Promise<MemberInvitation[]> {
+    try {
+      const invitations = await db
+        .select()
+        .from(memberInvitations)
+        .where(eq(memberInvitations.organizationId, organizationId))
+        .orderBy(desc(memberInvitations.createdAt));
+      
+      return invitations;
+    } catch (error) {
+      console.error("Error fetching member invitations:", error);
+      throw error;
+    }
+  }
+  
+  async getMemberInvitationByToken(token: string): Promise<MemberInvitation | undefined> {
+    try {
+      const [invitation] = await db
+        .select()
+        .from(memberInvitations)
+        .where(eq(memberInvitations.invitationToken, token));
+      
+      return invitation;
+    } catch (error) {
+      console.error("Error fetching member invitation by token:", error);
+      throw error;
+    }
+  }
+  
+  async createMemberInvitation(invitation: InsertMemberInvitation): Promise<MemberInvitation> {
+    try {
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiration
+      
+      const [newInvitation] = await db
+        .insert(memberInvitations)
+        .values({
+          ...invitation,
+          expiresAt,
+        })
+        .returning();
+      
+      return newInvitation;
+    } catch (error) {
+      console.error("Error creating member invitation:", error);
+      throw error;
+    }
+  }
+  
+  async updateMemberInvitation(id: string, invitation: Partial<InsertMemberInvitation>): Promise<MemberInvitation | undefined> {
+    try {
+      const [updatedInvitation] = await db
+        .update(memberInvitations)
+        .set({
+          ...invitation,
+          updatedAt: new Date(),
+        })
+        .where(eq(memberInvitations.id, id))
+        .returning();
+      
+      return updatedInvitation;
+    } catch (error) {
+      console.error("Error updating member invitation:", error);
+      throw error;
+    }
+  }
+  
+  async deleteMemberInvitation(id: string): Promise<boolean> {
+    try {
+      const result = await db
+        .delete(memberInvitations)
+        .where(eq(memberInvitations.id, id));
+      
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error("Error deleting member invitation:", error);
+      throw error;
+    }
+  }
+  
+  async acceptMemberInvitation(token: string, userData: InsertUser): Promise<User | undefined> {
+    try {
+      // Get the invitation
+      const invitation = await this.getMemberInvitationByToken(token);
+      if (!invitation) {
+        throw new Error("Invalid invitation token");
+      }
+      
+      // Check if invitation is expired
+      if (invitation.expiresAt && new Date() > invitation.expiresAt) {
+        throw new Error("Invitation has expired");
+      }
+      
+      // Check if invitation is already accepted
+      if (invitation.status === "accepted") {
+        throw new Error("Invitation has already been accepted");
+      }
+      
+      // Create the user
+      const newUser = await this.createUser({
+        ...userData,
+        organizationId: invitation.organizationId,
+        role: invitation.role,
+        department: invitation.department,
+        jobTitle: invitation.jobTitle,
+        invitedBy: invitation.invitedBy,
+        invitedAt: new Date(),
+      });
+      
+      // Update invitation status
+      await this.updateMemberInvitation(invitation.id, {
+        status: "accepted",
+        acceptedAt: new Date(),
+      });
+      
+      return newUser;
+    } catch (error) {
+      console.error("Error accepting member invitation:", error);
       throw error;
     }
   }
