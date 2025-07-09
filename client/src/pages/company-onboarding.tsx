@@ -377,7 +377,7 @@ export default function CompanyOnboarding() {
               </SelectContent>
             </Select>
             {onboardingData.cycleDuration && (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="start-date">Tanggal Mulai</Label>
                   <Popover>
