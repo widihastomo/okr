@@ -187,7 +187,13 @@ export default function CompanyOnboarding() {
         break;
       case 2:
         // Step 2 is optional - users can skip inviting members
-        // No validation needed for this step
+        // But if they enter emails, they must be valid
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        for (const email of data.invitedMembers) {
+          if (email && email.trim() && !emailRegex.test(email.trim())) {
+            return { isValid: false, message: `Format email tidak valid: ${email}` };
+          }
+        }
         break;
       case 3:
         if (!data.cycleDuration) {
@@ -404,26 +410,39 @@ export default function CompanyOnboarding() {
       case 2: // Undang Tim
         return (
           <div className="space-y-4">
-            <Label htmlFor="team-members">
-              Undang anggota tim (pisahkan dengan koma):
+            <Label>
+              Undang anggota tim (opsional):
             </Label>
-            <Textarea
-              id="team-members"
-              placeholder="Masukkan email anggota tim yang ingin diundang, pisahkan dengan koma"
-              value={onboardingData.invitedMembers.join(", ")}
-              onChange={(e) =>
-                setOnboardingData({
-                  ...onboardingData,
-                  invitedMembers: e.target.value
-                    .split(",")
-                    .map((email) => email.trim())
-                    .filter((email) => email),
-                })
-              }
-              className="min-h-[100px]"
-            />
+            <div className="space-y-3">
+              {[0, 1, 2].map((index) => (
+                <div key={index} className="space-y-1">
+                  <Label htmlFor={`email-${index}`} className="text-sm text-gray-600">
+                    Email anggota tim {index + 1}:
+                  </Label>
+                  <Input
+                    id={`email-${index}`}
+                    type="email"
+                    placeholder={`Contoh: member${index + 1}@company.com`}
+                    value={onboardingData.invitedMembers[index] || ""}
+                    onChange={(e) => {
+                      const newMembers = [...onboardingData.invitedMembers];
+                      // Extend array if necessary
+                      while (newMembers.length <= index) {
+                        newMembers.push("");
+                      }
+                      newMembers[index] = e.target.value;
+                      setOnboardingData({
+                        ...onboardingData,
+                        invitedMembers: newMembers,
+                      });
+                    }}
+                    className="w-full"
+                  />
+                </div>
+              ))}
+            </div>
             <div className="text-sm text-gray-500">
-              Contoh: john@example.com, jane@example.com
+              Semua field email bersifat opsional. Anda dapat mengisi sebagian atau mengosongkan semua field.
             </div>
           </div>
         );
