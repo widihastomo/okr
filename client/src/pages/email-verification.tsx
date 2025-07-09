@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, Mail, AlertCircle, ArrowRight, RefreshCw } from "lucide-react";
+import { CheckCircle, Mail, AlertCircle, ArrowRight, RefreshCw, ArrowLeft } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { apiRequest } from "@/lib/queryClient";
 import { LoadingButton } from "@/components/ui/playful-loading";
@@ -240,7 +240,7 @@ export default function EmailVerification() {
                 Verifikasi Email
               </LoadingButton>
               
-              <div className="text-center">
+              <div className="text-center space-y-3">
                 <p className="text-sm text-gray-600 mb-2">
                   Tidak menerima kode?
                 </p>
@@ -253,6 +253,17 @@ export default function EmailVerification() {
                   <RefreshCw className="h-4 w-4 mr-2" />
                   Kirim Ulang Kode
                 </Button>
+                
+                <div className="pt-2 border-t border-gray-200">
+                  <Button
+                    variant="outline"
+                    onClick={() => window.location.href = '/login'}
+                    className="text-gray-600 hover:text-gray-800 border-gray-300 hover:border-gray-400"
+                  >
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Kembali ke Login
+                  </Button>
+                </div>
               </div>
             </div>
           </CardContent>
