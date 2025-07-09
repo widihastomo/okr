@@ -74,12 +74,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Registration API with email verification
   app.post("/api/auth/register", async (req, res) => {
     try {
+      console.log("Registration request received");
+      console.log("Request headers:", req.headers);
+      console.log("Request body:", req.body);
+      console.log("Request body type:", typeof req.body);
+      
+      if (!req.body || typeof req.body !== 'object') {
+        console.log("Invalid request body");
+        return res.status(400).json({ 
+          message: "Invalid request body" 
+        });
+      }
+      
       const { name, businessName, whatsappNumber, email, password } = req.body;
       
-      // Validate required fields
-      if (!name || !businessName || !whatsappNumber || !email || !password) {
+      // Validate required fields with specific error messages
+      if (!name) {
         return res.status(400).json({ 
-          message: "Semua field harus diisi" 
+          message: "Nama diperlukan" 
+        });
+      }
+      
+      if (!businessName) {
+        return res.status(400).json({ 
+          message: "Nama usaha diperlukan" 
+        });
+      }
+      
+      if (!whatsappNumber) {
+        return res.status(400).json({ 
+          message: "Nomor WhatsApp diperlukan" 
+        });
+      }
+      
+      if (!email) {
+        return res.status(400).json({ 
+          message: "Email diperlukan" 
+        });
+      }
+      
+      if (!password) {
+        return res.status(400).json({ 
+          message: "Password diperlukan" 
         });
       }
       
@@ -99,18 +135,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create organization first
       const organizationId = crypto.randomUUID();
-      const newOrganization = await db.insert(organizations).values({
+      
+      // Generate slug from business name
+      let organizationSlug = businessName.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+        .replace(/\s+/g, '-') // Replace spaces with hyphens
+        .replace(/-+/g, '-') // Replace multiple hyphens with single
+        .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+      
+      // If slug is empty, use fallback
+      if (!organizationSlug || organizationSlug.trim() === '') {
+        organizationSlug = `org-${organizationId.slice(0, 8)}`;
+      }
+      
+      console.log("Generated slug:", organizationSlug);
+      console.log("Business name:", businessName);
+      
+      const orgValues = {
         id: organizationId,
         name: businessName,
+        slug: organizationSlug,
         industry: "other",
         size: "1-10",
         registrationStatus: "pending",
-        subscriptionStatus: "trial",
-        trialStartDate: new Date(),
-        trialEndDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days
         createdAt: new Date(),
         updatedAt: new Date(),
-      }).returning();
+      };
+      
+      console.log("Organization values:", orgValues);
+      
+      const newOrganization = await db.insert(organizations).values(orgValues).returning();
       
       // Create user
       const userId = crypto.randomUUID();

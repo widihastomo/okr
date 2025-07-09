@@ -30,25 +30,7 @@ export function setupEmailAuth(app: Express) {
     });
   });
 
-  // Register endpoint
-  app.post('/api/auth/register', async (req, res) => {
-    try {
-      const validatedData = registerSchema.parse(req.body);
-      const user = await registerUser(validatedData);
-      
-      // Auto login after registration
-      req.session.userId = user.id;
-      
-      // Don't send password in response
-      const { password, ...userWithoutPassword } = user;
-      res.status(201).json(userWithoutPassword);
-    } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: error.errors[0].message });
-      }
-      res.status(400).json({ message: error.message || "Gagal mendaftar" });
-    }
-  });
+  // Register endpoint - REMOVED: Now handled in routes.ts with email verification
 
   // Login endpoint
   app.post('/api/auth/login', async (req, res) => {
