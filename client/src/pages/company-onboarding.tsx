@@ -59,27 +59,21 @@ const ONBOARDING_STEPS = [
     title: "Fokus Tim",
     description: "Bagian mana di bisnis Anda yang ingin ditingkatkan?",
     icon: Building,
-    mascotMessage:
-      "Setiap bisnis pasti punya tantangan. Ada yang tertinggal omsetnya, ada yang timnya belum sinkron. Tapi semua perubahan dimulai dari fokus. Sekarang, mari tentukan satu area yang paling penting untuk Anda perbaiki dulu. Kita tidak perlu sempurna di semua hal, cukup jadi luar biasa di satu hal.",
-    mascotState: "welcome",
+
   },
   {
     id: 2,
     title: "Undang Tim",
     description: "Siapa saja yang akan berkolaborasi dengan Anda?",
     icon: UserPlus,
-    mascotMessage:
-      "Tidak ada tim hebat yang dibangun oleh satu orang. Saat Anda mengundang tim, Anda sedang menanamkan rasa tanggung jawab bersama. Bayangkan jika semua anggota tahu tujuan tim, tahu perannya — komunikasi lebih jernih, hasil lebih cepat terlihat.",
-    mascotState: "encouraging",
+
   },
   {
     id: 3,
     title: "Tentukan Siklus Goal",
     description: "Berapa lama Anda ingin goal ini tercapai?",
     icon: Calendar,
-    mascotMessage:
-      "Bayangkan Anda sedang membangun jembatan. Tanpa batas waktu, pekerjaan bisa meluas tak tentu arah. Dengan siklus Goal, Anda tahu kapan harus mulai, mengevaluasi, dan menyesuaikan. Kita tidak sedang maraton tanpa garis akhir — kita sedang sprint kecil yang terarah.",
-    mascotState: "thinking",
+
   },
   {
     id: 4,
@@ -87,18 +81,14 @@ const ONBOARDING_STEPS = [
     description:
       "Pilih satu tujuan yang penting dan bermakna. Anda dapat menambahkan / merubahnya setelah onboarding selesai",
     icon: Target,
-    mascotMessage:
-      "Banyak pemilik usaha terseret ke rutinitas harian dan kehilangan arah. Goal adalah titik utara — kompas yang menjaga Anda tetap di jalur. Mari tuliskan tujuan yang benar-benar Anda pedulikan. Bukan sekadar target, tapi alasan kenapa Anda bangun tiap pagi dan tetap berjuang.",
-    mascotState: "encouraging",
+
   },
   {
     id: 5,
     title: "Angka Target",
     description: "Tentukan cara mengukur keberhasilan",
     icon: TrendingUp,
-    mascotMessage:
-      "Pernah merasa sudah sibuk setiap hari tapi tak yakin ada hasilnya? Di sinilah pentingnya angka target. Kita ubah tujuan jadi angka, agar Anda tahu persis kapan Anda berhasil, dan kapan perlu ganti cara. Ukuran ini bukan soal angka — tapi bukti bahwa kerja Anda bermakna.",
-    mascotState: "pointing",
+
   },
   {
     id: 6,
@@ -106,44 +96,35 @@ const ONBOARDING_STEPS = [
     description:
       "Tentukan langkah-langkah strategis untuk mencapai angka target",
     icon: CheckCircle,
-    mascotMessage:
-      "Kebanyakan strategi gagal bukan karena kurang ide, tapi karena terlalu banyak dan tak tahu mana yang penting. Inisiatif adalah langkah nyata. Kita pilih yang sederhana, bisa langsung dikerjakan, dan berdampak besar. Fokus pada satu tembakan yang paling kena sasaran.",
-    mascotState: "pointing",
+
   },
   {
     id: 7,
     title: "Tugas untuk Inisiatif",
     description: "Tentukan tugas-tugas yang harus dikerjakan",
     icon: BarChart,
-    mascotMessage:
-      "Banyak tim punya strategi bagus tapi mandek di eksekusi. Kenapa? Karena rencana besar sering terasa abstrak. Di sinilah pentingnya tugas / task — langkah-langkah kecil yang bisa Anda jalankan hari ini juga.",
-    mascotState: "celebrating",
+
   },
   {
     id: 8,
     title: "Pilih Ritme",
     description: "Seberapa sering Anda ingin update progress?",
     icon: Clock,
-    mascotMessage:
-      "Ritme adalah kunci konsistensi. Seperti olahraga, lebih baik dilakukan rutin meski ringan. Dengan cadence yang pas, Anda tidak akan kehilangan momentum. Bayangkan sistem ini seperti partner yang selalu mengingatkan, bukan menghakimi.",
-    mascotState: "thinking",
+
   },
   {
     id: 9,
     title: "Reminder & Review",
     description: "Atur reminder dan review berkala",
     icon: Zap,
-    mascotMessage:
-      "Di akhir periode, kita akan review hasilnya bareng. Kalau butuh penyesuaian, saya bantu reset tujuannya.",
-    mascotState: "celebrating",
+
   },
   {
     id: 10,
     title: "Dashboard Ringkas",
     description: "Lihat semua progress secara ringkas",
     icon: MessageSquare,
-    mascotMessage: "Ini tempat Anda bisa lihat semua progres secara ringkas.",
-    mascotState: "encouraging",
+
   },
 ];
 
@@ -165,63 +146,7 @@ interface OnboardingData {
   isCompleted: boolean;
 }
 
-type MascotState =
-  | "welcome"
-  | "encouraging"
-  | "celebrating"
-  | "thinking"
-  | "pointing"
-  | "waving"
-  | "excited"
-  | "sleeping";
 
-const MascotCharacter = ({
-  state,
-  message,
-}: {
-  state: MascotState;
-  message: string;
-}) => {
-  const getMascotColor = (state: MascotState) => {
-    switch (state) {
-      case "welcome":
-        return "from-blue-500 to-purple-500";
-      case "encouraging":
-        return "from-green-500 to-blue-500";
-      case "celebrating":
-        return "from-yellow-500 to-orange-500";
-      case "thinking":
-        return "from-purple-500 to-pink-500";
-      case "pointing":
-        return "from-orange-500 to-red-500";
-      case "excited":
-        return "from-green-400 to-blue-400";
-      default:
-        return "from-blue-500 to-purple-500";
-    }
-  };
-
-  return (
-    <div className="flex items-start gap-4 p-4 bg-gradient-to-br from-orange-50 to-yellow-50 rounded-lg border border-orange-200">
-      <div className="flex-shrink-0">
-        <div
-          className={`w-12 h-12 rounded-full bg-gradient-to-br ${getMascotColor(state)} flex items-center justify-center animate-pulse`}
-        >
-          <Sparkles className="w-6 h-6 text-white animate-spin" />
-        </div>
-      </div>
-      <div className="flex-1">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="font-medium text-orange-800">Orby</span>
-          <Badge variant="outline" className="text-xs">
-            Asisten Virtual
-          </Badge>
-        </div>
-        <p className="text-sm text-gray-700 leading-relaxed">{message}</p>
-      </div>
-    </div>
-  );
-};
 
 export default function CompanyOnboarding() {
   const { user } = useAuth();
@@ -311,9 +236,6 @@ export default function CompanyOnboarding() {
     title: "Selamat Datang di Platform Refokus",
     description:
       "Tim hebat bukan hanya tentang kerja keras, tapi tentang kerja yang selaras dan terarah. Refokus hadir untuk menyelaraskan tujuan, waktu, dan tindakan tim agar benar-benar bergerak menuju tujuan.",
-    mascotMessage:
-      "Halo! Saya Orby, asisten virtual yang akan membantu Anda menyususun tujuan dan aksi nyata yang terukur. Proses onboarding ini dirancang khusus untuk memastikan Anda mendapatkan hasil maksimal dari platform Refokus.",
-    mascotState: "welcome",
     icon: Sparkles,
   };
 
@@ -1997,23 +1919,6 @@ export default function CompanyOnboarding() {
           )}
 
           <div className="space-y-8">
-            {/* Mascot Assistant */}
-            <div className="space-y-4">
-              {onboardingData.currentStep === 0 ? (
-                <MascotCharacter
-                  state={welcomeScreenData.mascotState as MascotState}
-                  message={welcomeScreenData.mascotMessage}
-                />
-              ) : (
-                currentStepData && (
-                  <MascotCharacter
-                    state={currentStepData.mascotState as MascotState}
-                    message={currentStepData.mascotMessage}
-                  />
-                )
-              )}
-            </div>
-
             {/* Step Content */}
             <div className="space-y-6">
               {onboardingData.currentStep === 0 ? (
