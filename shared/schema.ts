@@ -1240,6 +1240,27 @@ export const updateOnboardingProgressSchema = z.object({
 
 export type UpdateOnboardingProgress = z.infer<typeof updateOnboardingProgressSchema>;
 
+// Company onboarding data schema
+export const companyOnboardingDataSchema = z.object({
+  currentStep: z.number().min(1).max(10).default(1),
+  completedSteps: z.array(z.number()).default([]),
+  teamFocus: z.string().optional(),
+  cycleDuration: z.string().optional(),
+  cycleStartDate: z.string().optional(),
+  cycleEndDate: z.string().optional(),
+  objective: z.string().optional(),
+  keyResults: z.array(z.string()).default([]),
+  cadence: z.string().optional(),
+  reminderTime: z.string().optional(),
+  invitedMembers: z.array(z.string()).default([]),
+  initiatives: z.array(z.string()).default([]),
+  tasks: z.array(z.string()).default([]),
+  firstCheckIn: z.string().optional(),
+  isCompleted: z.boolean().default(false),
+});
+
+export type CompanyOnboardingData = z.infer<typeof companyOnboardingDataSchema>;
+
 // Referral Code schemas
 export const insertReferralCodeSchema = createInsertSchema(referralCodes).omit({
   id: true,

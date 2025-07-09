@@ -170,6 +170,7 @@ export interface IStorage {
   // Organization Onboarding Status
   getOrganizationOnboardingStatus(organizationId: string): Promise<{ isCompleted: boolean; completedAt?: Date; data?: any }>;
   completeOrganizationOnboarding(organizationId: string): Promise<{ isCompleted: boolean; completedAt: Date }>;
+  saveCompanyOnboardingProgress(organizationId: string, onboardingData: any): Promise<any>;
   
   // Create first objective from onboarding data
   createFirstObjectiveFromOnboarding(userId: string, onboardingData: any): Promise<Objective | undefined>;
@@ -1616,6 +1617,35 @@ export class DatabaseStorage implements IStorage {
       };
     } catch (error) {
       console.error("Error completing organization onboarding:", error);
+      throw error;
+    }
+  }
+
+  async saveCompanyOnboardingProgress(organizationId: string, onboardingData: any): Promise<any> {
+    try {
+      if (!organizationId) {
+        throw new Error("Organization ID is required");
+      }
+      
+      const [updatedOrganization] = await db
+        .update(organizations)
+        .set({
+          onboardingData: onboardingData,
+          updatedAt: new Date()
+        })
+        .where(eq(organizations.id, organizationId))
+        .returning();
+      
+      if (!updatedOrganization) {
+        throw new Error("Organization not found");
+      }
+      
+      return {
+        success: true,
+        data: onboardingData
+      };
+    } catch (error) {
+      console.error("Error saving company onboarding progress:", error);
       throw error;
     }
   }

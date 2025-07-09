@@ -6,8 +6,8 @@ import {
   insertCheckInSchema, insertInitiativeSchema, insertInitiativeMemberSchema, insertInitiativeDocumentSchema, 
   insertTaskSchema, insertTaskCommentSchema, insertInitiativeNoteSchema, updateKeyResultProgressSchema, createOKRFromTemplateSchema,
   insertSuccessMetricSchema, insertSuccessMetricUpdateSchema, insertDailyReflectionSchema, updateOnboardingProgressSchema,
-  subscriptionPlans, organizations, organizationSubscriptions, users, dailyReflections,
-  type User, type SubscriptionPlan, type Organization, type OrganizationSubscription, type UserOnboardingProgress, type UpdateOnboardingProgress
+  subscriptionPlans, organizations, organizationSubscriptions, users, dailyReflections, companyOnboardingDataSchema,
+  type User, type SubscriptionPlan, type Organization, type OrganizationSubscription, type UserOnboardingProgress, type UpdateOnboardingProgress, type CompanyOnboardingData
 } from "@shared/schema";
 import { z } from "zod";
 import { createInsertSchema } from "drizzle-zod";
@@ -6754,6 +6754,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/onboarding/progress", requireAuth, async (req, res) => {
     try {
       const currentUser = req.user as User;
+      
+      // First try to get company onboarding data
+      if (currentUser.organizationId) {
+        const organizationStatus = await storage.getOrganizationOnboardingStatus(currentUser.organizationId);
+        if (organizationStatus.data) {
+          return res.json(organizationStatus.data);
+        }
+      }
+      
+      // Fallback to user onboarding progress
       const progress = await storage.getUserOnboardingProgress(currentUser.id);
       res.json(progress);
     } catch (error: any) {
@@ -6765,10 +6775,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/onboarding/progress", requireAuth, async (req, res) => {
     try {
       const currentUser = req.user as User;
-      const updateData = updateOnboardingProgressSchema.parse(req.body);
+      console.log("Received onboarding progress update:", req.body);
       
-      const updatedProgress = await storage.updateUserOnboardingProgress(currentUser.id, updateData);
-      res.json(updatedProgress);
+      // Try to parse as company onboarding data first
+      let onboardingData;
+      try {
+        onboardingData = companyOnboardingDataSchema.parse(req.body);
+        console.log("Parsed as company onboarding data:", onboardingData);
+        
+        // Save to organization's onboarding data
+        const result = await storage.saveCompanyOnboardingProgress(currentUser.organizationId, onboardingData);
+        return res.json(result);
+        
+      } catch (parseError) {
+        console.log("Failed to parse as company onboarding data, trying user onboarding data");
+        
+        // Fallback to user onboarding progress
+        const updateData = updateOnboardingProgressSchema.parse(req.body);
+        const updatedProgress = await storage.updateUserOnboardingProgress(currentUser.id, updateData);
+        return res.json(updatedProgress);
+      }
+      
     } catch (error: any) {
       console.error("Error updating onboarding progress:", error);
       res.status(500).json({ message: "Failed to update onboarding progress" });
