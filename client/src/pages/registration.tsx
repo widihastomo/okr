@@ -238,17 +238,17 @@ export default function Registration() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full">
+          <div className="text-center mb-8">
+            <img 
+              src={refokusLogo} 
+              alt="Refokus Logo" 
+              className="w-24 h-24 mx-auto"
+            />
+          </div>
           <Card className="border-0 shadow-2xl">
             <CardHeader className="text-center pb-8">
-              <div className="flex flex-col items-center mb-4">
-                <img 
-                  src={refokusLogo} 
-                  alt="Refokus Logo" 
-                  className="w-16 h-16 mb-4"
-                />
-                <div className="mx-auto w-16 h-16 bg-gradient-to-r from-orange-600 to-orange-500 rounded-full flex items-center justify-center">
-                  <CheckCircle className="h-8 w-8 text-white" />
-                </div>
+              <div className="mx-auto w-16 h-16 bg-gradient-to-r from-orange-600 to-orange-500 rounded-full flex items-center justify-center mb-4">
+                <CheckCircle className="h-8 w-8 text-white" />
               </div>
               <CardTitle className="text-2xl font-bold text-gray-900">
                 Verifikasi Email
@@ -339,17 +339,17 @@ export default function Registration() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex items-center justify-center p-4">
       <div className="max-w-lg w-full">
+        <div className="text-center mb-8">
+          <img 
+            src={refokusLogo} 
+            alt="Refokus Logo" 
+            className="w-24 h-24 mx-auto"
+          />
+        </div>
         <Card className="border-0 shadow-2xl">
           <CardHeader className="text-center pb-8">
-            <div className="flex flex-col items-center mb-4">
-              <img 
-                src={refokusLogo} 
-                alt="Refokus Logo" 
-                className="w-16 h-16 mb-4"
-              />
-              <div className="mx-auto w-16 h-16 bg-gradient-to-r from-orange-600 to-orange-500 rounded-full flex items-center justify-center">
-                <Sparkles className="h-8 w-8 text-white" />
-              </div>
+            <div className="mx-auto w-16 h-16 bg-gradient-to-r from-orange-600 to-orange-500 rounded-full flex items-center justify-center mb-4">
+              <Sparkles className="h-8 w-8 text-white" />
             </div>
             <CardTitle className="text-3xl font-bold text-gray-900">
               Daftar Akun Baru

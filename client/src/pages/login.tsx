@@ -61,15 +61,15 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <img 
+            src={refokusLogo} 
+            alt="Refokus Logo" 
+            className="w-24 h-24 mx-auto"
+          />
+        </div>
         <Card className="border-0 shadow-xl bg-white/80 backdrop-blur">
           <CardHeader className="text-center pb-8 pt-8">
-            <div className="flex flex-col items-center mb-4">
-              <img 
-                src={refokusLogo} 
-                alt="Refokus Logo" 
-                className="w-16 h-16 mb-4"
-              />
-            </div>
             <CardTitle className="text-2xl font-bold text-gray-900">
               Masuk ke Akun Anda
             </CardTitle>
