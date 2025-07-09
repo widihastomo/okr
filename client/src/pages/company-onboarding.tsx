@@ -890,79 +890,8 @@ export default function CompanyOnboarding() {
           (init) => init && init.trim() !== "",
         );
 
-        // Create mapping from key results to initiatives
-        const initiativeKeyResultMapping: { [key: string]: string[] } = {
-          // Sales key results
-          "Mencapai target penjualan Rp 500 juta per bulan": [
-            "Mengembangkan lead scoring system untuk prioritas",
-            "Mempersonalisasi approach berdasarkan lead profile",
-            "Menjalankan A/B testing untuk sales pitch",
-          ],
-          "Meningkatkan rata-rata nilai transaksi menjadi Rp 2 juta": [
-            "Mengotomatisasi lead notification system",
-            "Menugaskan dedicated lead response team",
-            "Mengembangkan mobile app untuk quick response",
-          ],
-          "Mencapai conversion rate 25% dari total lead": [
-            "Mengembangkan lead scoring system untuk prioritas",
-            "Mempersonalisasi approach berdasarkan lead profile",
-            "Menjalankan A/B testing untuk sales pitch",
-          ],
-          "Mengurangi waktu follow-up lead menjadi maksimal 24 jam": [
-            "Mengotomatisasi lead notification system",
-            "Menugaskan dedicated lead response team",
-            "Mengembangkan mobile app untuk quick response",
-          ],
-          "Meningkatkan kualitas lead scoring menjadi 80% akurat": [
-            "Menerapkan machine learning untuk lead analysis",
-            "Membangun feedback loop dari sales ke marketing",
-            "Melakukan regular review dan update criteria",
-          ],
-
-          // Operational key results
-          "Mengurangi waktu proses produksi menjadi 4 jam per unit": [
-            "Mengimplementasikan lean manufacturing principles",
-            "Mengotomatisasi production line setup",
-            "Melakukan time and motion study untuk bottleneck",
-          ],
-          "Mencapai cycle time 3 jam per produk": [
-            "Mengimplementasikan lean manufacturing principles",
-            "Mengotomatisasi production line setup",
-            "Melakukan time and motion study untuk bottleneck",
-          ],
-          "Meningkatkan throughput menjadi 50 unit per hari": [
-            "Mengimplementasikan lean manufacturing principles",
-            "Mengotomatisasi production line setup",
-            "Melakukan time and motion study untuk bottleneck",
-          ],
-          "Meningkatkan utilitas mesin menjadi 85%": [
-            "Menjadwalkan preventive maintenance",
-            "Melatih operator untuk efisiensi maksimal",
-            "Mengimplementasikan real-time monitoring system",
-          ],
-          "Mengurangi waste produksi menjadi maksimal 5%": [
-            "Menerapkan quality control di setiap stage produksi",
-            "Membuat recycling program untuk material waste",
-            "Mengevaluasi supplier untuk kualitas raw material",
-          ],
-
-          // Customer service key results
-          "Mencapai CSAT score 4.8/5 dalam survey bulanan": [
-            "Melatih customer service excellence",
-            "Mengimplementasikan feedback system yang real-time",
-            "Membuat reward program untuk high performing agent",
-          ],
-          "Meningkatkan customer retention rate menjadi 95%": [
-            "Menjalankan proactive customer outreach program",
-            "Mempersonalisasi customer journey mapping",
-            "Mengembangkan churn prediction dan prevention strategy",
-          ],
-          "Mengurangi complaint rate menjadi di bawah 1%": [
-            "Melakukan root cause analysis untuk recurring issues",
-            "Mengimplementasikan preventive quality assurance program",
-            "Membuat customer education dan self-service portal",
-          ],
-        };
+        // Use the same mapping as the one defined above
+        const initiativeKeyResultMapping = initiativeMapping;
 
         // Group initiatives by their corresponding key results
         const getInitiativesByKeyResult = (keyResults: string[]) => {
