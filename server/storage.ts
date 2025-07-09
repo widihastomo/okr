@@ -12,7 +12,8 @@ import {
   type SuccessMetric, type InsertSuccessMetric, type SuccessMetricUpdate, type InsertSuccessMetricUpdate,
   type Notification, type InsertNotification, type NotificationPreferences, type InsertNotificationPreferences,
   type UserOnboardingProgress, type InsertUserOnboardingProgress, type UpdateOnboardingProgress,
-  type MemberInvitation, type InsertMemberInvitation, type ApplicationSetting, type InsertApplicationSetting, type UpdateApplicationSetting
+  type MemberInvitation, type InsertMemberInvitation, type ApplicationSetting, type InsertApplicationSetting, type UpdateApplicationSetting,
+  type Organization
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, inArray, count } from "drizzle-orm";
@@ -67,6 +68,9 @@ export interface IStorage {
   updateUser(id: string, user: Partial<UpsertUser>): Promise<User | undefined>;
   updateUserReminderConfig(userId: string, config: any): Promise<void>;
   deleteUser(id: string): Promise<boolean>;
+  
+  // Organizations
+  getOrganization(id: string): Promise<Organization | undefined>;
   
   // Teams
   getTeam(id: string): Promise<Team | undefined>;
@@ -252,6 +256,11 @@ export class DatabaseStorage implements IStorage {
   async getUserByEmail(email: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.email, email));
     return user;
+  }
+
+  async getOrganization(id: string): Promise<Organization | undefined> {
+    const [organization] = await db.select().from(organizations).where(eq(organizations.id, id));
+    return organization;
   }
 
   async getUsers(): Promise<User[]> {

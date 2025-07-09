@@ -5479,6 +5479,105 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Member invitation verification endpoint
+  app.get("/api/member-invitations/verify/:token", async (req, res) => {
+    try {
+      const { token } = req.params;
+      const invitation = await storage.getMemberInvitationByToken(token);
+      
+      if (!invitation) {
+        return res.status(404).json({ message: "Undangan tidak ditemukan" });
+      }
+      
+      if (invitation.status !== "pending") {
+        return res.status(400).json({ message: "Undangan sudah tidak valid" });
+      }
+      
+      if (invitation.expiresAt && new Date() > invitation.expiresAt) {
+        return res.status(400).json({ message: "Undangan sudah kedaluwarsa" });
+      }
+      
+      // Get organization and inviter details
+      const organization = await storage.getOrganization(invitation.organizationId);
+      const inviter = await storage.getUser(invitation.invitedBy);
+      
+      res.json({
+        invitation,
+        organization,
+        inviter
+      });
+    } catch (error) {
+      console.error("Error verifying invitation:", error);
+      res.status(500).json({ message: "Failed to verify invitation" });
+    }
+  });
+
+  // Member invitation acceptance endpoint
+  app.post("/api/member-invitations/accept/:token", async (req, res) => {
+    try {
+      const { token } = req.params;
+      const { firstName, lastName, password } = req.body;
+      
+      // Validate required fields
+      if (!firstName || !lastName || !password) {
+        return res.status(400).json({ message: "Semua field harus diisi" });
+      }
+      
+      const invitation = await storage.getMemberInvitationByToken(token);
+      
+      if (!invitation) {
+        return res.status(404).json({ message: "Undangan tidak ditemukan" });
+      }
+      
+      if (invitation.status !== "pending") {
+        return res.status(400).json({ message: "Undangan sudah tidak valid" });
+      }
+      
+      if (invitation.expiresAt && new Date() > invitation.expiresAt) {
+        return res.status(400).json({ message: "Undangan sudah kedaluwarsa" });
+      }
+      
+      // Check if user with this email already exists
+      const existingUser = await storage.getUserByEmail(invitation.email);
+      if (existingUser) {
+        return res.status(400).json({ message: "Email sudah terdaftar" });
+      }
+      
+      // Create new user
+      const { hashPassword } = await import("./emailAuth");
+      const hashedPassword = await hashPassword(password);
+      
+      const newUser = await storage.createUser({
+        email: invitation.email,
+        firstName,
+        lastName,
+        password: hashedPassword,
+        organizationId: invitation.organizationId,
+        role: invitation.role || "member",
+        isEmailVerified: true, // Email already verified through invitation
+      });
+      
+      // Update invitation status
+      await storage.updateMemberInvitation(invitation.id, {
+        status: "accepted",
+        acceptedAt: new Date(),
+      });
+      
+      res.json({ 
+        message: "Berhasil bergabung dengan tim",
+        user: {
+          id: newUser.id,
+          email: newUser.email,
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
+        }
+      });
+    } catch (error) {
+      console.error("Error accepting invitation:", error);
+      res.status(500).json({ message: "Failed to accept invitation" });
+    }
+  });
+
   // Get current user's organization and subscription
   app.get("/api/my-organization", requireAuth, async (req, res) => {
     try {
@@ -7668,18 +7767,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Send invitations to team members if provided
+      console.log("📧 Checking member invitations:", {
+        hasOnboardingData: !!onboardingData,
+        hasInvitedMembers: !!(onboardingData && onboardingData.invitedMembers),
+        invitedMembersLength: onboardingData?.invitedMembers?.length || 0,
+        invitedMembers: onboardingData?.invitedMembers || []
+      });
+      
       if (onboardingData && onboardingData.invitedMembers && onboardingData.invitedMembers.length > 0) {
+        console.log("📧 Processing member invitations...");
         try {
           const { emailService } = await import("./email-service");
           
           for (const memberEmail of onboardingData.invitedMembers) {
             if (memberEmail && memberEmail.trim()) {
+              console.log(`📧 Processing invitation for: ${memberEmail.trim()}`);
               try {
                 // Create invitation token
                 const invitationToken = crypto.randomUUID();
                 const expiresAt = new Date();
                 expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiration
                 
+                console.log(`📧 Creating invitation in database for ${memberEmail.trim()}`);
                 // Save invitation to database
                 await storage.createMemberInvitation({
                   organizationId: currentUser.organizationId,
@@ -7690,24 +7799,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   status: "pending"
                 });
                 
+                console.log(`📧 Sending invitation email to ${memberEmail.trim()}`);
                 // Send invitation email
-                await emailService.sendInvitationEmail(
+                const emailResult = await emailService.sendInvitationEmail(
                   memberEmail.trim(),
                   invitationToken,
                   currentUser.organizationId!
                 );
                 
-                console.log(`✅ Invitation sent to ${memberEmail} during onboarding completion`);
+                console.log(`✅ Invitation sent to ${memberEmail} during onboarding completion. Email result:`, emailResult);
               } catch (inviteError) {
-                console.error(`Error sending invitation to ${memberEmail}:`, inviteError);
+                console.error(`❌ Error sending invitation to ${memberEmail}:`, inviteError);
                 // Continue with other invitations even if one fails
               }
+            } else {
+              console.log(`⚠️ Skipping empty email: "${memberEmail}"`);
             }
           }
         } catch (error) {
-          console.error("Error sending team member invitations:", error);
+          console.error("❌ Error sending team member invitations:", error);
           // Continue with completion even if invitations fail
         }
+      } else {
+        console.log("📧 No member invitations to process");
       }
 
       // Save reminder configuration if provided

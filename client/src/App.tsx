@@ -64,6 +64,7 @@ import MemberInvitations from "@/pages/member-invitations";
 import EmailSettings from "@/pages/system-admin/email-settings";
 import ClientStatusMapping from "@/pages/client-status-mapping";
 import ApplicationSettings from "@/pages/system-admin/application-settings";
+import AcceptInvitation from "@/pages/accept-invitation";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -146,6 +147,7 @@ function Router() {
         <Route path="/client-registration" component={ClientRegistration} />
         <Route path="/forgot-password" component={ForgotPassword} />
         <Route path="/reset-password" component={ResetPassword} />
+        <Route path="/accept-invitation" component={AcceptInvitation} />
         <Route component={Login} />
       </Switch>
     );
