@@ -133,6 +133,12 @@ Changelog:
   * Replaced DOM manipulation with proper React state management
   * Applied consistent auto-close behavior to both start date and end date pickers
   * Enhanced user experience with immediate visual feedback and smoother interaction flow
+- July 09, 2025. Enhanced time picker with intuitive preset buttons and custom input option:
+  * Added 6 preset time buttons with contextual labels (08:00-Pagi, 12:00-Siang, 17:00-Sore, 09:00-Pagi, 15:00-Siang, 19:00-Malam)
+  * Implemented responsive grid layout (2 columns mobile, 3 columns desktop) for preset buttons
+  * Added custom time input field for users who need specific times
+  * Visual feedback shows selected time with orange styling consistent with app theme
+  * Improved UX with instant selection and confirmation display
 Changelog:
 - July 08, 2025. Successfully created separate trial status header container with responsive mobile design:
   * Created dedicated TrialStatusHeader component positioned above global header as separate container

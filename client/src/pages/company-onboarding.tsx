@@ -781,19 +781,67 @@ export default function CompanyOnboarding() {
               </div>
             </RadioGroup>
             {onboardingData.cadence && (
-              <div>
+              <div className="space-y-3">
                 <Label htmlFor="reminder-time">Waktu reminder:</Label>
-                <Input
-                  id="reminder-time"
-                  type="time"
-                  value={onboardingData.reminderTime}
-                  onChange={(e) =>
-                    setOnboardingData({
-                      ...onboardingData,
-                      reminderTime: e.target.value,
-                    })
-                  }
-                />
+                <div className="space-y-3">
+                  {/* Common time options */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {[
+                      { value: "08:00", label: "08:00 - Pagi" },
+                      { value: "12:00", label: "12:00 - Siang" },
+                      { value: "17:00", label: "17:00 - Sore" },
+                      { value: "09:00", label: "09:00 - Pagi" },
+                      { value: "15:00", label: "15:00 - Siang" },
+                      { value: "19:00", label: "19:00 - Malam" },
+                    ].map((timeOption) => (
+                      <Button
+                        key={timeOption.value}
+                        variant={onboardingData.reminderTime === timeOption.value ? "default" : "outline"}
+                        size="sm"
+                        onClick={() =>
+                          setOnboardingData({
+                            ...onboardingData,
+                            reminderTime: timeOption.value,
+                          })
+                        }
+                        className={onboardingData.reminderTime === timeOption.value ? 
+                          "bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600" : 
+                          "hover:bg-orange-50 hover:border-orange-300"
+                        }
+                      >
+                        {timeOption.label}
+                      </Button>
+                    ))}
+                  </div>
+                  
+                  {/* Custom time input */}
+                  <div className="flex items-center space-x-2">
+                    <Label htmlFor="custom-time" className="text-sm text-gray-600">
+                      Atau pilih waktu custom:
+                    </Label>
+                    <Input
+                      id="custom-time"
+                      type="time"
+                      value={onboardingData.reminderTime}
+                      onChange={(e) =>
+                        setOnboardingData({
+                          ...onboardingData,
+                          reminderTime: e.target.value,
+                        })
+                      }
+                      className="w-32"
+                    />
+                  </div>
+                  
+                  {/* Selected time display */}
+                  {onboardingData.reminderTime && (
+                    <div className="p-2 bg-orange-50 rounded-lg border border-orange-200">
+                      <p className="text-sm text-orange-800">
+                        <strong>Waktu reminder terpilih:</strong> {onboardingData.reminderTime}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
