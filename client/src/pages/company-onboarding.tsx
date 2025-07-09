@@ -307,7 +307,7 @@ export default function CompanyOnboarding() {
   
   // Welcome screen data
   const welcomeScreenData = {
-    title: "Selamat Datang di Refokus",
+    title: "Selamat Datang di Platform Refokus",
     description: "Mari kita mulai perjalanan menuju tim yang lebih terarah dan produktif",
     mascotMessage: "Halo! Saya Orby, asisten virtual yang akan membantu Anda menyiapkan sistem OKR yang tepat untuk tim Anda. Proses onboarding ini dirancang khusus untuk memastikan Anda mendapatkan hasil maksimal dari platform Refokus.",
     mascotState: "welcome",
@@ -1991,13 +1991,26 @@ export default function CompanyOnboarding() {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              {onboardingData.currentStep === 0 ? "Selamat Datang di Refokus" : "Onboarding Perusahaan"}
-            </h1>
-            {onboardingData.currentStep > 0 && (
-              <p className="text-gray-600">
-                Mari kita siapkan sistem OKR yang tepat untuk tim Anda
-              </p>
+            <div className="flex justify-center mb-4">
+              <img 
+                src="/attached_assets/refokus_1751810711179.png" 
+                alt="Refokus Logo" 
+                className="h-12 w-auto"
+              />
+            </div>
+            {onboardingData.currentStep === 0 ? (
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                Selamat Datang di Platform Refokus
+              </h1>
+            ) : (
+              <>
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                  Onboarding Perusahaan
+                </h1>
+                <p className="text-gray-600">
+                  Mari kita siapkan sistem OKR yang tepat untuk tim Anda
+                </p>
+              </>
             )}
           </div>
 
