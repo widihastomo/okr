@@ -138,6 +138,7 @@ function Router() {
         <Route path="/landing" component={Landing} />
         <Route path="/register" component={Registration} />
         <Route path="/verify-email" component={EmailVerification} />
+        <Route path="/email-verification" component={EmailVerification} />
         <Route path="/client-registration" component={ClientRegistration} />
         <Route component={Login} />
       </Switch>

@@ -64,7 +64,7 @@ export default function Login() {
         });
         // Redirect to email verification page with email parameter
         setTimeout(() => {
-          window.location.href = `/verify-email?email=${encodeURIComponent(email)}`;
+          window.location.href = `/email-verification?email=${encodeURIComponent(email)}`;
         }, 1500);
         return;
       }
@@ -82,16 +82,16 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-4">
+        <div className="text-center mb-8">
           <img
             src={refokusLogo}
             alt="Refokus Logo"
-            className="w-50 h-32 mx-auto"
+            className="w-32 h-32 mx-auto"
           />
         </div>
-        <Card className="border-0 shadow-xl bg-white/80 backdrop-blur">
+        <Card className="border-0 shadow-2xl">
           <CardHeader className="text-center pb-8 pt-8">
             <CardTitle className="text-2xl font-bold text-gray-900">
               Masuk ke Akun Anda
