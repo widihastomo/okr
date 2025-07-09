@@ -12,6 +12,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Eye, EyeOff, Mail, Lock, Sparkles } from "lucide-react";
 import { z } from "zod";
 import { useAuth } from "@/hooks/useAuth";
+import refokusLogo from "@assets/refokus_1751810404513.png";
 
 const loginSchema = z.object({
   email: z.string().email("Email tidak valid"),
@@ -62,8 +63,15 @@ export default function Login() {
       <div className="w-full max-w-md">
         <Card className="border-0 shadow-xl bg-white/80 backdrop-blur">
           <CardHeader className="text-center pb-8 pt-8">
-            <div className="w-12 h-12 bg-gradient-to-r from-orange-600 to-orange-500 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <Sparkles className="w-6 h-6 text-white" />
+            <div className="flex flex-col items-center mb-4">
+              <img 
+                src={refokusLogo} 
+                alt="Refokus Logo" 
+                className="w-16 h-16 mb-4"
+              />
+              <div className="w-12 h-12 bg-gradient-to-r from-orange-600 to-orange-500 rounded-lg flex items-center justify-center">
+                <Sparkles className="w-6 h-6 text-white" />
+              </div>
             </div>
             <CardTitle className="text-2xl font-bold text-gray-900">
               Masuk ke Akun Anda

@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { apiRequest } from "@/lib/queryClient";
+import refokusLogo from "@assets/refokus_1751810404513.png";
 
 type RegistrationData = {
   name: string;
@@ -239,8 +240,15 @@ export default function Registration() {
         <div className="max-w-md w-full">
           <Card className="border-0 shadow-2xl">
             <CardHeader className="text-center pb-8">
-              <div className="mx-auto w-16 h-16 bg-gradient-to-r from-orange-600 to-orange-500 rounded-full flex items-center justify-center mb-4">
-                <CheckCircle className="h-8 w-8 text-white" />
+              <div className="flex flex-col items-center mb-4">
+                <img 
+                  src={refokusLogo} 
+                  alt="Refokus Logo" 
+                  className="w-16 h-16 mb-4"
+                />
+                <div className="mx-auto w-16 h-16 bg-gradient-to-r from-orange-600 to-orange-500 rounded-full flex items-center justify-center">
+                  <CheckCircle className="h-8 w-8 text-white" />
+                </div>
               </div>
               <CardTitle className="text-2xl font-bold text-gray-900">
                 Verifikasi Email
@@ -333,8 +341,15 @@ export default function Registration() {
       <div className="max-w-lg w-full">
         <Card className="border-0 shadow-2xl">
           <CardHeader className="text-center pb-8">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-r from-orange-600 to-orange-500 rounded-full flex items-center justify-center mb-4">
-              <Sparkles className="h-8 w-8 text-white" />
+            <div className="flex flex-col items-center mb-4">
+              <img 
+                src={refokusLogo} 
+                alt="Refokus Logo" 
+                className="w-16 h-16 mb-4"
+              />
+              <div className="mx-auto w-16 h-16 bg-gradient-to-r from-orange-600 to-orange-500 rounded-full flex items-center justify-center">
+                <Sparkles className="h-8 w-8 text-white" />
+              </div>
             </div>
             <CardTitle className="text-3xl font-bold text-gray-900">
               Daftar Akun Baru
