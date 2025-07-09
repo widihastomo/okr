@@ -83,7 +83,8 @@ const ONBOARDING_STEPS = [
   {
     id: 4,
     title: "Buat Goal",
-    description: "Pilih satu tujuan yang penting dan bermakna. Anda dapat menambahkan / merubahnya setelah onboarding selesai",
+    description:
+      "Pilih satu tujuan yang penting dan bermakna. Anda dapat menambahkan / merubahnya setelah onboarding selesai",
     icon: Target,
     mascotMessage:
       "Banyak pemilik usaha terseret ke rutinitas harian dan kehilangan arah. Goal adalah titik utara — kompas yang menjaga Anda tetap di jalur. Mari tuliskan tujuan yang benar-benar Anda pedulikan. Bukan sekadar target, tapi alasan kenapa Anda bangun tiap pagi dan tetap berjuang.",
@@ -101,7 +102,8 @@ const ONBOARDING_STEPS = [
   {
     id: 6,
     title: "Pilih Inisiatif Prioritas",
-    description: "Tentukan langkah-langkah strategis untuk mencapai angka target",
+    description:
+      "Tentukan langkah-langkah strategis untuk mencapai angka target",
     icon: CheckCircle,
     mascotMessage:
       "Kebanyakan strategi gagal bukan karena kurang ide, tapi karena terlalu banyak dan tak tahu mana yang penting. Inisiatif adalah langkah nyata. Kita pilih yang sederhana, bisa langsung dikerjakan, dan berdampak besar. Fokus pada satu tembakan yang paling kena sasaran.",
@@ -426,12 +428,16 @@ export default function CompanyOnboarding() {
                         variant={"outline"}
                         className={cn(
                           "w-full justify-start text-left font-normal",
-                          !onboardingData.cycleStartDate && "text-muted-foreground"
+                          !onboardingData.cycleStartDate &&
+                            "text-muted-foreground",
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {onboardingData.cycleStartDate ? (
-                          format(new Date(onboardingData.cycleStartDate), "dd MMMM yyyy")
+                          format(
+                            new Date(onboardingData.cycleStartDate),
+                            "dd MMMM yyyy",
+                          )
                         ) : (
                           <span>Pilih tanggal mulai</span>
                         )}
@@ -440,10 +446,14 @@ export default function CompanyOnboarding() {
                     <PopoverContent className="w-auto p-0">
                       <CalendarComponent
                         mode="single"
-                        selected={onboardingData.cycleStartDate ? new Date(onboardingData.cycleStartDate) : undefined}
+                        selected={
+                          onboardingData.cycleStartDate
+                            ? new Date(onboardingData.cycleStartDate)
+                            : undefined
+                        }
                         onSelect={(date) => {
                           if (date) {
-                            const formattedDate = format(date, 'yyyy-MM-dd');
+                            const formattedDate = format(date, "yyyy-MM-dd");
                             setOnboardingData({
                               ...onboardingData,
                               cycleStartDate: formattedDate,
@@ -463,12 +473,16 @@ export default function CompanyOnboarding() {
                         variant={"outline"}
                         className={cn(
                           "w-full justify-start text-left font-normal",
-                          !onboardingData.cycleEndDate && "text-muted-foreground"
+                          !onboardingData.cycleEndDate &&
+                            "text-muted-foreground",
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {onboardingData.cycleEndDate ? (
-                          format(new Date(onboardingData.cycleEndDate), "dd MMMM yyyy")
+                          format(
+                            new Date(onboardingData.cycleEndDate),
+                            "dd MMMM yyyy",
+                          )
                         ) : (
                           <span>Pilih tanggal selesai</span>
                         )}
@@ -477,10 +491,14 @@ export default function CompanyOnboarding() {
                     <PopoverContent className="w-auto p-0">
                       <CalendarComponent
                         mode="single"
-                        selected={onboardingData.cycleEndDate ? new Date(onboardingData.cycleEndDate) : undefined}
+                        selected={
+                          onboardingData.cycleEndDate
+                            ? new Date(onboardingData.cycleEndDate)
+                            : undefined
+                        }
                         onSelect={(date) => {
                           if (date) {
-                            const formattedDate = format(date, 'yyyy-MM-dd');
+                            const formattedDate = format(date, "yyyy-MM-dd");
                             setOnboardingData({
                               ...onboardingData,
                               cycleEndDate: formattedDate,
@@ -489,7 +507,7 @@ export default function CompanyOnboarding() {
                         }}
                         initialFocus
                         disabled={(date) =>
-                          onboardingData.cycleStartDate 
+                          onboardingData.cycleStartDate
                             ? date < new Date(onboardingData.cycleStartDate)
                             : false
                         }
@@ -1902,11 +1920,13 @@ export default function CompanyOnboarding() {
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Selamat Datang di Platform OKR
+              Selamat Datang di Refokus
             </h1>
-            <p className="text-gray-600">
-              Mari setup sistem manajemen tujuan untuk perusahaan Anda
-            </p>
+            <blockquote className="text-gray-600 italic border-l-4 border-orange-500 pl-4 bg-orange-50 p-4 rounded-r-lg">
+              "Tim hebat bukan hanya tentang kerja keras, tapi tentang kerja yang
+              selaras dan terarah. Refokus hadir untuk menyelaraskan tujuan,
+              waktu, dan tindakan tim agar benar-benar bergerak menuju tujuan."
+            </blockquote>
           </div>
 
           {/* Progress Bar */}
