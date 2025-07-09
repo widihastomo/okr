@@ -271,6 +271,46 @@ export default function EmailSettings() {
 
         <Separator className="my-8" />
 
+        {/* Email Provider Setup Instructions */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <AlertCircle className="h-5 w-5 text-orange-600" />
+              <span>Panduan Konfigurasi Email Provider</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-medium text-gray-900 mb-2">Gmail SMTP (Recommended)</h4>
+                <div className="text-sm text-gray-600 space-y-1">
+                  <p>• Email: akun.gmail.anda@gmail.com</p>
+                  <p>• Password: App Password (bukan password Gmail)</p>
+                  <p>• Cara buat App Password: Google Account → Security → App passwords</p>
+                  <p>• Host: smtp.gmail.com (sudah otomatis terisi)</p>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-medium text-gray-900 mb-2">SendGrid (Production)</h4>
+                <div className="text-sm text-gray-600 space-y-1">
+                  <p>• Daftar di sendgrid.com</p>
+                  <p>• API Key: SG.xxxxx (dari SendGrid dashboard)</p>
+                  <p>• From: email@domain.anda</p>
+                  <p>• Verifikasi domain sender di SendGrid</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <p className="text-sm text-blue-700">
+                <strong>Catatan:</strong> Mailtrap sandbox hanya untuk testing internal (email tidak benar-benar terkirim). 
+                Untuk mengirim email sesungguhnya, isi kredensial Gmail atau SendGrid di atas.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Test Email Section */}
         <Card>
           <CardHeader>
@@ -282,7 +322,8 @@ export default function EmailSettings() {
               Kirim test email untuk memastikan konfigurasi email bekerja dengan baik. 
               <br />
               <span className="text-amber-600 font-medium">
-                Catatan: Pastikan kredensial email provider telah diisi dengan benar untuk dapat mengirim email.
+                Catatan: Mailtrap sandbox hanya untuk testing (tidak mengirim email nyata). 
+                Untuk mengirim email sesungguhnya, gunakan Gmail atau SMTP dengan kredensial yang valid.
               </span>
             </CardDescription>
           </CardHeader>
