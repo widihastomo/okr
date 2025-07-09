@@ -7,7 +7,7 @@ import {
   insertTaskSchema, insertTaskCommentSchema, insertInitiativeNoteSchema, updateKeyResultProgressSchema, createOKRFromTemplateSchema,
   insertSuccessMetricSchema, insertSuccessMetricUpdateSchema, insertDailyReflectionSchema, updateOnboardingProgressSchema,
   subscriptionPlans, organizations, organizationSubscriptions, users, dailyReflections, companyOnboardingDataSchema,
-  insertMemberInvitationSchema, trialAchievements, userTrialAchievements,
+  insertMemberInvitationSchema, trialAchievements, userTrialAchievements, billingPeriods,
   type User, type SubscriptionPlan, type Organization, type OrganizationSubscription, type UserOnboardingProgress, type UpdateOnboardingProgress, type CompanyOnboardingData,
   type MemberInvitation, type InsertUser
 } from "@shared/schema";
