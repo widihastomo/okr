@@ -23,6 +23,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -40,6 +48,7 @@ import {
   BarChart,
   MessageSquare,
   Zap,
+  CalendarIcon,
 } from "lucide-react";
 
 // Onboarding steps following the reference structure
@@ -74,7 +83,7 @@ const ONBOARDING_STEPS = [
   {
     id: 4,
     title: "Buat Goal",
-    description: "Pilih satu tujuan yang penting dan bermakna",
+    description: "Pilih satu tujuan yang penting dan bermakna. Anda dapat menambahkan / merubahnya setelah onboarding selesai",
     icon: Target,
     mascotMessage:
       "Banyak pemilik usaha terseret ke rutinitas harian dan kehilangan arah. Goal adalah titik utara — kompas yang menjaga Anda tetap di jalur. Mari tuliskan tujuan yang benar-benar Anda pedulikan. Bukan sekadar target, tapi alasan kenapa Anda bangun tiap pagi dan tetap berjuang.",
@@ -411,31 +420,82 @@ export default function CompanyOnboarding() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="start-date">Tanggal Mulai</Label>
-                  <Input
-                    id="start-date"
-                    type="date"
-                    value={onboardingData.cycleStartDate}
-                    onChange={(e) =>
-                      setOnboardingData({
-                        ...onboardingData,
-                        cycleStartDate: e.target.value,
-                      })
-                    }
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !onboardingData.cycleStartDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {onboardingData.cycleStartDate ? (
+                          format(new Date(onboardingData.cycleStartDate), "dd MMMM yyyy")
+                        ) : (
+                          <span>Pilih tanggal mulai</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <CalendarComponent
+                        mode="single"
+                        selected={onboardingData.cycleStartDate ? new Date(onboardingData.cycleStartDate) : undefined}
+                        onSelect={(date) => {
+                          if (date) {
+                            const formattedDate = format(date, 'yyyy-MM-dd');
+                            setOnboardingData({
+                              ...onboardingData,
+                              cycleStartDate: formattedDate,
+                            });
+                          }
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 <div>
                   <Label htmlFor="end-date">Tanggal Selesai</Label>
-                  <Input
-                    id="end-date"
-                    type="date"
-                    value={onboardingData.cycleEndDate}
-                    onChange={(e) =>
-                      setOnboardingData({
-                        ...onboardingData,
-                        cycleEndDate: e.target.value,
-                      })
-                    }
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !onboardingData.cycleEndDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {onboardingData.cycleEndDate ? (
+                          format(new Date(onboardingData.cycleEndDate), "dd MMMM yyyy")
+                        ) : (
+                          <span>Pilih tanggal selesai</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <CalendarComponent
+                        mode="single"
+                        selected={onboardingData.cycleEndDate ? new Date(onboardingData.cycleEndDate) : undefined}
+                        onSelect={(date) => {
+                          if (date) {
+                            const formattedDate = format(date, 'yyyy-MM-dd');
+                            setOnboardingData({
+                              ...onboardingData,
+                              cycleEndDate: formattedDate,
+                            });
+                          }
+                        }}
+                        initialFocus
+                        disabled={(date) =>
+                          onboardingData.cycleStartDate 
+                            ? date < new Date(onboardingData.cycleStartDate)
+                            : false
+                        }
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
             )}
