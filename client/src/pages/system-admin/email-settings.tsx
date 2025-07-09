@@ -279,7 +279,11 @@ export default function EmailSettings() {
               <span>Test Email</span>
             </CardTitle>
             <CardDescription>
-              Kirim test email untuk memastikan konfigurasi email bekerja dengan baik
+              Kirim test email untuk memastikan konfigurasi email bekerja dengan baik. 
+              <br />
+              <span className="text-amber-600 font-medium">
+                Catatan: Pastikan kredensial email provider telah diisi dengan benar untuk dapat mengirim email.
+              </span>
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

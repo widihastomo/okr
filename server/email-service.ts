@@ -47,7 +47,7 @@ class MailtrapProvider implements EmailProvider {
         throw new Error('Mailtrap credentials not configured');
       }
       
-      const transporter = nodemailer.createTransporter({
+      const transporter = nodemailer.createTransport({
         host: settings.mailtrap_host,
         port: parseInt(settings.mailtrap_port),
         auth: {
@@ -66,7 +66,7 @@ class MailtrapProvider implements EmailProvider {
       return true;
     } catch (error) {
       console.error('Mailtrap error:', error);
-      return false;
+      throw error;
     }
   }
 }
@@ -95,7 +95,7 @@ class SendGridProvider implements EmailProvider {
       return true;
     } catch (error) {
       console.error('SendGrid error:', error);
-      return false;
+      throw error;
     }
   }
 }
@@ -112,7 +112,7 @@ class GmailProvider implements EmailProvider {
         throw new Error('Gmail credentials not configured');
       }
       
-      const transporter = nodemailer.createTransporter({
+      const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
           user: settings.gmail_email,
@@ -130,7 +130,7 @@ class GmailProvider implements EmailProvider {
       return true;
     } catch (error) {
       console.error('Gmail error:', error);
-      return false;
+      throw error;
     }
   }
 }
@@ -147,7 +147,7 @@ class SMTPProvider implements EmailProvider {
         throw new Error('SMTP_HOST is not configured');
       }
       
-      const transporter = nodemailer.createTransporter({
+      const transporter = nodemailer.createTransport({
         host: settings.smtp_host,
         port: parseInt(settings.smtp_port || '587'),
         secure: settings.smtp_secure === 'true',
@@ -167,7 +167,7 @@ class SMTPProvider implements EmailProvider {
       return true;
     } catch (error) {
       console.error('SMTP error:', error);
-      return false;
+      throw error;
     }
   }
 }
@@ -182,6 +182,8 @@ class EmailService {
   ];
   
   async sendEmail(config: EmailConfig): Promise<{ success: boolean; provider?: string; error?: string }> {
+    let lastError = '';
+    
     for (const provider of this.providers) {
       try {
         const success = await provider.sendEmail(config);
@@ -190,14 +192,16 @@ class EmailService {
           return { success: true, provider: provider.name };
         }
       } catch (error) {
-        console.log(`${provider.name} failed, trying next provider...`);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.log(`${provider.name} failed: ${errorMessage}`);
+        lastError = errorMessage;
         continue;
       }
     }
     
     return { 
       success: false, 
-      error: 'All email providers failed. Please check your email configuration.' 
+      error: `All email providers failed. Last error: ${lastError}. Please check your email configuration.` 
     };
   }
   
