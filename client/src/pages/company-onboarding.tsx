@@ -1925,30 +1925,30 @@ export default function CompanyOnboarding() {
                 </div>
                 
                 {/* Connecting lines with icons */}
-                <div className="mt-6 flex justify-center items-center space-x-8">
-                  <div className="flex flex-col items-center">
+                <div className="mt-6 flex justify-center items-center space-x-4 sm:space-x-8">
+                  <div className="flex flex-col items-center min-w-0">
                     <div className="p-2 bg-blue-100 rounded-full mb-2">
                       <Target className="w-4 h-4 text-blue-600" />
                     </div>
-                    <span className="text-xs text-gray-600">Tujuan</span>
+                    <span className="text-xs text-gray-600 text-center whitespace-nowrap">Tujuan</span>
                   </div>
                   
-                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-orange-200 to-transparent"></div>
+                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-orange-200 to-transparent min-w-[20px]"></div>
                   
-                  <div className="flex flex-col items-center">
+                  <div className="flex flex-col items-center min-w-0">
                     <div className="p-2 bg-green-100 rounded-full mb-2">
                       <Zap className="w-4 h-4 text-green-600" />
                     </div>
-                    <span className="text-xs text-gray-600">Eksekusi</span>
+                    <span className="text-xs text-gray-600 text-center whitespace-nowrap">Eksekusi</span>
                   </div>
                   
-                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-orange-200 to-transparent"></div>
+                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-orange-200 to-transparent min-w-[20px]"></div>
                   
-                  <div className="flex flex-col items-center">
+                  <div className="flex flex-col items-center min-w-0">
                     <div className="p-2 bg-purple-100 rounded-full mb-2">
                       <CheckCircle className="w-4 h-4 text-purple-600" />
                     </div>
-                    <span className="text-xs text-gray-600">Hasil</span>
+                    <span className="text-xs text-gray-600 text-center whitespace-nowrap">Hasil</span>
                   </div>
                 </div>
               </div>
