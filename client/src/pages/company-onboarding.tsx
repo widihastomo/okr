@@ -1887,6 +1887,28 @@ export default function CompanyOnboarding() {
     }
   };
 
+  // Get virtual assistant message based on current step
+  const getVirtualAssistantMessage = () => {
+    if (onboardingData.currentStep === 0) {
+      return "Halo! Saya akan membantu Anda melakukan onboarding platform. Mari kita mulai perjalanan untuk mencapai tujuan bisnis Anda! 🚀";
+    }
+    
+    const stepMessages = {
+      1: "Mari tentukan fokus utama yang ingin Anda tingkatkan. Pilih area yang paling penting untuk kemajuan bisnis Anda saat ini.",
+      2: "Kolaborasi adalah kunci kesuksesan! Undang anggota tim yang akan berpartisipasi dalam mencapai tujuan bersama.",
+      3: "Waktu adalah aset berharga. Tentukan periode yang realistis untuk mencapai tujuan Anda - bisa bulanan, kuartalan, atau tahunan.",
+      4: "Sekarang saatnya menetapkan tujuan yang jelas dan spesifik. Pilih goal yang menantang namun dapat dicapai.",
+      5: "Bagaimana mengukur kesuksesan? Tentukan angka target yang konkret dan terukur untuk melacak kemajuan.",
+      6: "Inisiatif adalah langkah strategis untuk mencapai target. Pilih yang paling berdampak dan prioritas utama.",
+      7: "Bagi inisiatif menjadi tugas-tugas yang dapat dikerjakan. Ini membantu tim fokus pada eksekusi yang efektif.",
+      8: "Konsistensi adalah kunci! Tentukan seberapa sering Anda akan memantau dan memperbarui progress.",
+      9: "Hampir selesai! Atur reminder agar selalu terjaga momentum dan review berkala untuk evaluasi.",
+      10: "Terakhir, lihat ringkasan semua yang telah Anda setting. Dashboard ini akan membantu memantau perjalanan menuju tujuan!"
+    };
+    
+    return stepMessages[onboardingData.currentStep] || "Terus semangat! Kita hampir selesai dengan pengaturan onboarding.";
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       <div className="container mx-auto px-4 py-8">
@@ -1953,6 +1975,25 @@ export default function CompanyOnboarding() {
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Virtual Assistant - Show on all steps */}
+          <div className="mb-6">
+            <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-lg p-4 shadow-sm">
+              <div className="flex items-start space-x-3">
+                <div className="flex-shrink-0">
+                  <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-white" />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-medium text-gray-900 mb-1">Asisten Virtual</h4>
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    {getVirtualAssistantMessage()}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Progress Bar */}
