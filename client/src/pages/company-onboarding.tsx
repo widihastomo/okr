@@ -1113,6 +1113,16 @@ export default function CompanyOnboarding() {
               "Import database lead ke CRM",
               "Training tim untuk menggunakan CRM",
             ],
+            "Mempersonalisasi approach berdasarkan lead profile": [
+              "Buat database profil lengkap untuk setiap lead",
+              "Develop template komunikasi untuk setiap persona",
+              "Training sales team untuk personalisasi approach",
+            ],
+            "Mengotomatisasi lead notification system": [
+              "Setup real-time notification untuk lead baru",
+              "Konfigurasi assignment rule untuk sales team",
+              "Implementasi lead routing berdasarkan criteria",
+            ],
             "Membuat program bundling produk dengan harga spesial": [
               "Analisis produk yang cocok untuk bundling",
               "Tentukan harga bundling yang kompetitif",
@@ -1140,20 +1150,35 @@ export default function CompanyOnboarding() {
               "Training karyawan tentang lean principles",
               "Implementasi 5S di area produksi",
             ],
-            "Automated production line setup": [
+            "Mengotomatisasi production line setup": [
               "Evaluasi kebutuhan automation equipment",
               "Install dan setup automated system",
               "Training operator untuk automated system",
             ],
-            "Preventive maintenance schedule": [
+            "Melakukan time and motion study untuk bottleneck": [
+              "Identifikasi bottleneck di production line",
+              "Lakukan time and motion study detail",
+              "Buat action plan untuk eliminate bottleneck",
+            ],
+            "Menjadwalkan preventive maintenance": [
               "Buat schedule maintenance untuk semua mesin",
               "Siapkan checklist maintenance routine",
               "Training teknisi untuk preventive maintenance",
             ],
-            "Quality control di setiap stage produksi": [
+            "Menerapkan quality control di setiap stage produksi": [
               "Buat SOP quality control untuk setiap stage",
               "Setup quality checkpoint di production line",
               "Training quality control inspector",
+            ],
+            "Melatih operator untuk efisiensi maksimal": [
+              "Buat program training untuk operator",
+              "Lakukan assessment skill operator",
+              "Implementasi best practices untuk efisiensi",
+            ],
+            "Mengimplementasikan real-time monitoring system": [
+              "Setup monitoring equipment di production line",
+              "Buat dashboard untuk real-time monitoring",
+              "Training tim untuk menggunakan monitoring system",
             ],
 
             // Customer Service Tasks
@@ -1226,7 +1251,7 @@ export default function CompanyOnboarding() {
               "Training sales team untuk interpretasi score",
               "Monitor dan adjust scoring algorithm",
             ],
-            "Personalisasi approach berdasarkan lead profile": [
+            "Mempersonalisasi approach berdasarkan lead profile": [
               "Buat database profil lengkap untuk setiap lead",
               "Develop template komunikasi untuk setiap persona",
               "Training sales team untuk personalisasi approach",
@@ -1238,7 +1263,7 @@ export default function CompanyOnboarding() {
               "Eksekusi A/B test dengan sample lead",
               "Analisis hasil dan implementasi pitch terbaik",
             ],
-            "Automated lead notification system": [
+            "Mengotomatisasi lead notification system": [
               "Setup real-time notification untuk lead baru",
               "Konfigurasi assignment rule untuk sales team",
               "Implementasi lead routing berdasarkan criteria",
@@ -1569,7 +1594,7 @@ export default function CompanyOnboarding() {
                                     "Training sales team untuk interpretasi score",
                                     "Monitor dan adjust scoring algorithm",
                                   ],
-                                  "Personalisasi approach berdasarkan lead profile":
+                                  "Mempersonalisasi approach berdasarkan lead profile":
                                     [
                                       "Buat database profil lengkap untuk setiap lead",
                                       "Develop template komunikasi untuk setiap persona",
@@ -1582,7 +1607,7 @@ export default function CompanyOnboarding() {
                                     "Eksekusi A/B test dengan sample lead",
                                     "Analisis hasil dan implementasi pitch terbaik",
                                   ],
-                                  "Automated lead notification system": [
+                                  "Mengotomatisasi lead notification system": [
                                     "Setup real-time notification untuk lead baru",
                                     "Konfigurasi assignment rule untuk sales team",
                                     "Implementasi lead routing berdasarkan criteria",
