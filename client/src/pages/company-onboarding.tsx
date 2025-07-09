@@ -925,6 +925,16 @@ export default function CompanyOnboarding() {
             "Mengotomatisasi production line setup",
             "Melakukan time and motion study untuk bottleneck",
           ],
+          "Mencapai cycle time 3 jam per produk": [
+            "Mengimplementasikan lean manufacturing principles",
+            "Mengotomatisasi production line setup",
+            "Melakukan time and motion study untuk bottleneck",
+          ],
+          "Meningkatkan throughput menjadi 50 unit per hari": [
+            "Mengimplementasikan lean manufacturing principles",
+            "Mengotomatisasi production line setup",
+            "Melakukan time and motion study untuk bottleneck",
+          ],
           "Meningkatkan utilitas mesin menjadi 85%": [
             "Menjadwalkan preventive maintenance",
             "Melatih operator untuk efisiensi maksimal",
