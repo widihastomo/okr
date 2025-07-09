@@ -244,6 +244,7 @@ export const users = pgTable("users", {
   phone: varchar("phone", { length: 20 }), // WhatsApp number
   verificationCode: varchar("verification_code", { length: 10 }), // Email verification code
   verificationCodeExpiry: timestamp("verification_code_expiry"), // Expiry time for verification code
+  isEmailVerified: boolean("is_email_verified").default(false).notNull(), // Track email verification status
   reminderConfig: jsonb("reminder_config"), // Store reminder settings for check-in notifications
   lastLoginAt: timestamp("last_login_at"),
   invitedBy: uuid("invited_by").references(() => users.id),

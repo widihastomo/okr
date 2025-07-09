@@ -8130,6 +8130,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ownerPhone: users.phone,
         ownerCreatedAt: users.createdAt,
         ownerLastLoginAt: users.lastLoginAt,
+        ownerIsEmailVerified: users.isEmailVerified,
         // Subscription details
         subscriptionStatus: organizationSubscriptions.status,
         subscriptionPlanId: organizationSubscriptions.planId,
@@ -8175,33 +8176,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const completedMissions = orgAchievements.length;
         const missionCompletionPercentage = Math.round((completedMissions / totalMissions) * 100);
 
-        // Determine client status based on progression
-        let clientStatus = "registered_incomplete_onboarding";
-        let statusLabel = "Terdaftar - Onboarding Belum Selesai";
-        let statusColor = "red";
-        let nextAction = "Menyelesaikan proses onboarding perusahaan";
+        // Determine client status based on progression - now with 5 stages
+        let clientStatus = "registered_email_not_verified";
+        let statusLabel = "Sudah Daftar - Email Belum Diverifikasi";
+        let statusColor = "gray";
+        let nextAction = "Verifikasi alamat email untuk mengaktifkan akun";
 
-        // Stage 1: Registered but incomplete onboarding
-        if (org.onboardingCompleted) {
-          // Stage 2: Onboarding complete but incomplete adaptation missions
-          clientStatus = "onboarding_complete_missions_incomplete";
-          statusLabel = "Onboarding Selesai - Misi Adaptasi Belum Selesai";
-          statusColor = "orange";
-          nextAction = "Menyelesaikan misi-misi adaptasi platform";
+        // Stage 1: Registered but email not verified
+        if (org.ownerIsEmailVerified) {
+          // Stage 2: Email verified but incomplete onboarding
+          clientStatus = "registered_incomplete_onboarding";
+          statusLabel = "Terdaftar - Onboarding Belum Selesai";
+          statusColor = "red";
+          nextAction = "Menyelesaikan proses onboarding perusahaan";
 
-          // Stage 3: Missions complete but no subscription upgrade
-          if (missionCompletionPercentage >= 80) { // 80% mission completion threshold
-            clientStatus = "missions_complete_no_upgrade";
-            statusLabel = "Misi Selesai - Belum Upgrade Paket";
-            statusColor = "yellow";
-            nextAction = "Melakukan upgrade ke paket berbayar";
+          if (org.onboardingCompleted) {
+            // Stage 3: Onboarding complete but incomplete adaptation missions
+            clientStatus = "onboarding_complete_missions_incomplete";
+            statusLabel = "Onboarding Selesai - Misi Adaptasi Belum Selesai";
+            statusColor = "orange";
+            nextAction = "Menyelesaikan misi-misi adaptasi platform";
 
-            // Stage 4: Upgraded with active subscription
-            if (org.subscriptionStatus && org.subscriptionStatus !== "trialing") {
-              clientStatus = "upgraded_active_subscription";
-              statusLabel = "Upgrade Selesai - Langganan Aktif";
-              statusColor = "green";
-              nextAction = "Mengoptimalkan penggunaan fitur premium";
+            // Stage 4: Missions complete but no subscription upgrade
+            if (missionCompletionPercentage >= 80) { // 80% mission completion threshold
+              clientStatus = "missions_complete_no_upgrade";
+              statusLabel = "Misi Selesai - Belum Upgrade Paket";
+              statusColor = "yellow";
+              nextAction = "Melakukan upgrade ke paket berbayar";
+
+              // Stage 5: Upgraded with active subscription
+              if (org.subscriptionStatus && org.subscriptionStatus !== "trialing") {
+                clientStatus = "upgraded_active_subscription";
+                statusLabel = "Upgrade Selesai - Langganan Aktif";
+                statusColor = "green";
+                nextAction = "Mengoptimalkan penggunaan fitur premium";
+              }
             }
           }
         }
@@ -8270,9 +8279,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
           // Progress indicators
           progressPercentage: (() => {
-            if (clientStatus === "registered_incomplete_onboarding") return 25;
-            if (clientStatus === "onboarding_complete_missions_incomplete") return 50;
-            if (clientStatus === "missions_complete_no_upgrade") return 75;
+            if (clientStatus === "registered_email_not_verified") return 0;
+            if (clientStatus === "registered_incomplete_onboarding") return 20;
+            if (clientStatus === "onboarding_complete_missions_incomplete") return 40;
+            if (clientStatus === "missions_complete_no_upgrade") return 60;
             if (clientStatus === "upgraded_active_subscription") return 100;
             return 0;
           })(),
@@ -8282,6 +8292,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Calculate summary statistics
       const totalClients = clientStatusMapping.length;
       const statusCounts = {
+        registered_email_not_verified: clientStatusMapping.filter(c => c.clientStatus === "registered_email_not_verified").length,
         registered_incomplete_onboarding: clientStatusMapping.filter(c => c.clientStatus === "registered_incomplete_onboarding").length,
         onboarding_complete_missions_incomplete: clientStatusMapping.filter(c => c.clientStatus === "onboarding_complete_missions_incomplete").length,
         missions_complete_no_upgrade: clientStatusMapping.filter(c => c.clientStatus === "missions_complete_no_upgrade").length,

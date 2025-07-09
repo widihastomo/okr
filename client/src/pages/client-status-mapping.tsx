@@ -74,6 +74,7 @@ interface ClientStatusResponse {
     summary: {
       totalClients: number;
       statusCounts: {
+        registered_email_not_verified: number;
         registered_incomplete_onboarding: number;
         onboarding_complete_missions_incomplete: number;
         missions_complete_no_upgrade: number;
@@ -86,6 +87,14 @@ interface ClientStatusResponse {
 }
 
 const statusConfig = {
+  registered_email_not_verified: {
+    label: "Sudah Daftar - Email Belum Diverifikasi",
+    color: "gray",
+    bgColor: "bg-gray-50",
+    textColor: "text-gray-700",
+    borderColor: "border-gray-200",
+    icon: Mail,
+  },
   registered_incomplete_onboarding: {
     label: "Terdaftar - Onboarding Belum Selesai",
     color: "red",
@@ -233,7 +242,7 @@ export default function ClientStatusMapping() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Pemetaan Status Client</h1>
               <p className="text-gray-600 mt-1">
-                Pantau progres client melalui 4 tahap: registrasi, onboarding, misi adaptasi, dan upgrade paket
+                Pantau progres client melalui 5 tahap: registrasi, verifikasi email, onboarding, misi adaptasi, dan upgrade paket
               </p>
             </div>
             <Button onClick={() => refetch()} variant="outline">
@@ -245,7 +254,7 @@ export default function ClientStatusMapping() {
 
         {/* Summary Cards */}
         {summary && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Client</CardTitle>
@@ -255,6 +264,19 @@ export default function ClientStatusMapping() {
                 <div className="text-2xl font-bold">{summary.totalClients}</div>
                 <p className="text-xs text-muted-foreground">
                   Organisasi terdaftar
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Email Belum Verified</CardTitle>
+                <Mail className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{summary.statusCounts.registered_email_not_verified}</div>
+                <p className="text-xs text-muted-foreground">
+                  Perlu verifikasi email
                 </p>
               </CardContent>
             </Card>
@@ -329,6 +351,7 @@ export default function ClientStatusMapping() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Semua Status</SelectItem>
+                  <SelectItem value="registered_email_not_verified">Email Belum Diverifikasi</SelectItem>
                   <SelectItem value="registered_incomplete_onboarding">Onboarding Belum Selesai</SelectItem>
                   <SelectItem value="onboarding_complete_missions_incomplete">Misi Belum Selesai</SelectItem>
                   <SelectItem value="missions_complete_no_upgrade">Belum Upgrade</SelectItem>
