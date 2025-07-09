@@ -121,6 +121,15 @@ Trial user untuk testing achievement system:
 ## Changelog
 ```
 Changelog:
+- July 09, 2025. Successfully implemented email verification redirect for unverified users during login:
+  * Updated authenticateUser function in emailAuth.ts to check isEmailVerified status
+  * Modified login endpoint to return specific error code EMAIL_NOT_VERIFIED with HTTP 403 status
+  * Enhanced login page to detect email verification errors and redirect to verification page
+  * Added automatic redirect to /verify-email with email parameter for unverified users
+  * Users attempting to login with unverified email now receive clear feedback and guided to verification process
+  * Email verification page enhanced to show personalized message with user's email address
+  * Complete login flow now properly handles email verification requirement as security measure
+Changelog:
 - July 09, 2025. Successfully updated LoadingButton component with standardized styling system:
   * Added comprehensive variant system: primary (orange gradient), secondary (gray), outline (orange border), ghost (transparent)
   * Added size variants: sm (small), md (medium), lg (large) with proper padding and text sizing

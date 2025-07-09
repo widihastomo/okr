@@ -56,6 +56,16 @@ export function setupEmailAuth(app: Express) {
       res.json(userWithoutPassword);
     } catch (error: any) {
       console.error('Login error:', error);
+      
+      // Handle email not verified error
+      if (error.message === 'EMAIL_NOT_VERIFIED') {
+        return res.status(403).json({ 
+          message: "Email belum diverifikasi",
+          errorCode: "EMAIL_NOT_VERIFIED",
+          email: req.body?.email
+        });
+      }
+      
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: error.errors[0].message });
       }

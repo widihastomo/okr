@@ -110,7 +110,7 @@ export default function EmailVerification() {
             Verifikasi Email
           </CardTitle>
           <CardDescription className="text-gray-600">
-            Masukkan kode verifikasi yang dikirim ke email Anda
+            {email ? `Masukkan kode verifikasi yang dikirim ke ${email}` : 'Masukkan kode verifikasi yang dikirim ke email Anda'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

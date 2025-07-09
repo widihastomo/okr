@@ -92,9 +92,18 @@ export async function authenticateUser(loginData: LoginData): Promise<User | nul
       return null;
     }
 
+    // Check if email is verified
+    if (!user.isEmailVerified) {
+      console.log('Email not verified for user:', user.email);
+      throw new Error('EMAIL_NOT_VERIFIED');
+    }
+
     return user;
   } catch (error) {
     console.error("Authentication error:", error);
+    if (error instanceof Error && error.message === 'EMAIL_NOT_VERIFIED') {
+      throw error;
+    }
     throw new Error("Database connection failed during authentication");
   }
 }
