@@ -192,6 +192,12 @@ export default function Sidebar({
       path: "/analytics",
       active: location === "/analytics",
     },
+    {
+      label: "Pengaturan Organisasi",
+      icon: Settings,
+      path: "/client-users",
+      active: location === "/organization-settings",
+    },
 
     {
       label: "Harga",

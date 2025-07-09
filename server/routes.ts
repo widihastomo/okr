@@ -164,10 +164,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("Organization values:", orgValues);
       
-      const newOrganization = await db.insert(organizations).values(orgValues).returning();
+      // Create user first
+      const userId = crypto.randomUUID();
+      
+      // Create organization with user as owner
+      const orgValuesWithOwner = {
+        ...orgValues,
+        ownerId: userId
+      };
+      
+      const newOrganization = await db.insert(organizations).values(orgValuesWithOwner).returning();
       
       // Create user
-      const userId = crypto.randomUUID();
       const newUser = await storage.createUser({
         id: userId,
         firstName: name.split(' ')[0],
@@ -183,6 +191,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdAt: new Date(),
         updatedAt: new Date(),
       });
+      
+      console.log("Created organization with owner:", { organizationId, userId });
       
       // Send verification email
       try {

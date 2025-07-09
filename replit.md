@@ -121,6 +121,15 @@ Trial user untuk testing achievement system:
 ## Changelog
 ```
 Changelog:
+- July 09, 2025. Successfully fixed registration organization owner assignment and improved registration endpoint:
+  * Fixed critical bug where organization owner_id was not being set correctly during registration
+  * Rewrote registration endpoint to set organization owner from the beginning during organization creation
+  * Removed separate update query that was causing race conditions and unreliable owner assignment
+  * Registration now creates organization with ownerId field set to newly created user ID
+  * Added proper debug logging to track organization owner assignment process
+  * Verified fix with multiple test registrations showing correct owner assignment
+  * All newly registered users now properly become organization owners with "organization_admin" role
+  * Database consistency maintained with proper user-organization ownership relationships
 - July 09, 2025. Successfully completed email settings management system with comprehensive provider configuration:
   * Fixed email settings API to return proper array data structure instead of database metadata
   * Updated all email provider classes to use correct nodemailer.createTransport() method (was using createTransporter)
