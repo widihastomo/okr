@@ -57,15 +57,8 @@ export default function Login() {
       // Check if error is due to email not verified
       if (error.message.includes("EMAIL_NOT_VERIFIED") || error.message.includes("Email belum diverifikasi")) {
         const email = loginForm.getValues("email");
-        toast({
-          title: "Email belum diverifikasi",
-          description: "Silakan verifikasi email Anda terlebih dahulu.",
-          variant: "destructive",
-        });
-        // Redirect to email verification page with email parameter
-        setTimeout(() => {
-          window.location.href = `/email-verification?email=${encodeURIComponent(email)}`;
-        }, 1500);
+        // Redirect to email verification page with email parameter immediately
+        window.location.href = `/email-verification?email=${encodeURIComponent(email)}`;
         return;
       }
       
