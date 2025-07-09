@@ -7458,6 +7458,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      // Send invitations to team members if provided
+      if (onboardingData && onboardingData.invitedMembers && onboardingData.invitedMembers.length > 0) {
+        try {
+          const { emailService } = await import("./email-service");
+          
+          for (const memberEmail of onboardingData.invitedMembers) {
+            if (memberEmail && memberEmail.trim()) {
+              try {
+                // Create invitation token
+                const invitationToken = crypto.randomUUID();
+                const expiresAt = new Date();
+                expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiration
+                
+                // Save invitation to database
+                await storage.createMemberInvitation({
+                  organizationId: currentUser.organizationId,
+                  email: memberEmail.trim(),
+                  invitedBy: currentUser.id,
+                  invitationToken,
+                  expiresAt,
+                  status: "pending"
+                });
+                
+                // Send invitation email
+                await emailService.sendInvitationEmail(
+                  memberEmail.trim(),
+                  invitationToken,
+                  currentUser.organizationId!
+                );
+                
+                console.log(`✅ Invitation sent to ${memberEmail} during onboarding completion`);
+              } catch (inviteError) {
+                console.error(`Error sending invitation to ${memberEmail}:`, inviteError);
+                // Continue with other invitations even if one fails
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error sending team member invitations:", error);
+          // Continue with completion even if invitations fail
+        }
+      }
+
       // Save reminder configuration if provided
       if (onboardingData && onboardingData.cadence && onboardingData.reminderTime) {
         try {
