@@ -2126,7 +2126,11 @@ export default function CompanyOnboarding() {
                       Check-in: {onboardingData.cadence || "Belum dipilih"}
                     </span>
                     <span className="inline-block bg-purple-100 text-purple-800 px-2 py-1 rounded ml-2">
-                      Periode: {onboardingData.cycleDuration || "Belum dipilih"}
+                      Periode: {onboardingData.cycleDuration === "1_bulan" ? "1 bulan" : 
+                               onboardingData.cycleDuration === "3_bulan" ? "3 bulan" : 
+                               onboardingData.cycleDuration === "6_bulan" ? "6 bulan" : 
+                               onboardingData.cycleDuration === "1_tahun" ? "1 tahun" : 
+                               onboardingData.cycleDuration || "Belum dipilih"}
                     </span>
                   </div>
                 </div>
