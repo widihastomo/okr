@@ -107,6 +107,11 @@ export default function GlobalHeader({
     queryKey: ["/api/users"],
   });
 
+  // Check if trial status is active to determine header positioning
+  const { data: trialStatus } = useQuery({
+    queryKey: ["/api/trial-status"],
+  });
+
 
 
   // Handle menu button click - mobile sidebar toggle or desktop collapse
@@ -194,8 +199,12 @@ export default function GlobalHeader({
     };
   }, []);
 
+  // Calculate header position based on trial status
+  const hasTrialStatus = trialStatus?.isTrialActive;
+  const headerTop = hasTrialStatus ? '44px' : '0px';
+
   return (
-    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between fixed left-0 right-0 z-40" style={{ top: '44px' }}>
+    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between fixed left-0 right-0 z-40" style={{ top: headerTop }}>
       {/* Left side - Menu toggle and Logo */}
       <div className="flex items-center space-x-3">
         {/* Sidebar toggle button */}

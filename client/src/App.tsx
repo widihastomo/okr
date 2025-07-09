@@ -67,6 +67,12 @@ function Router() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [location] = useLocation();
   
+  // Check trial status for dynamic content positioning
+  const { data: trialStatus } = useQuery({
+    queryKey: ["/api/trial-status"],
+    enabled: isAuthenticated && !isLoading,
+  });
+  
   // Check onboarding status with faster initial redirect and caching
   const { data: onboardingStatus, isLoading: isOnboardingLoading } = useQuery({
     queryKey: ["/api/onboarding/status"],
@@ -190,8 +196,12 @@ function Router() {
           {/* Main Content */}
           <div className={cn(
             "flex-1 min-h-[calc(100vh-6rem)] py-3 overflow-x-hidden",
-            // Different padding for onboarding page
-            isOnboardingPage ? "pt-0" : "pt-[108px] sm:pt-[108px]"
+            // Different padding for onboarding page and trial status
+            isOnboardingPage 
+              ? "pt-0" 
+              : trialStatus?.isTrialActive 
+                ? "pt-[108px] sm:pt-[108px]" 
+                : "pt-[64px] sm:pt-[64px]"
           )}>
             <Switch>
               <Route path="/onboarding" component={CompanyOnboarding} />

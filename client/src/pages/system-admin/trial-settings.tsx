@@ -37,13 +37,10 @@ export default function TrialSettingsPage() {
 
   // Update formData when trialConfig changes
   useEffect(() => {
-    console.log("Trial config data:", trialConfig);
-    console.log("Is loading:", isLoading);
-    console.log("Error:", error);
     if (trialConfig) {
       setFormData(trialConfig);
     }
-  }, [trialConfig, isLoading, error]);
+  }, [trialConfig]);
 
   // Update trial configuration mutation
   const updateTrialMutation = useMutation({
