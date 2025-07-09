@@ -3438,14 +3438,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/admin/email-settings", requireAuth, isSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
+      const { systemSettings } = await import("@shared/schema");
       const { eq } = await import("drizzle-orm");
       
-      const settings = await db.execute(
-        `SELECT setting_key, setting_value, description, category, is_active 
-         FROM system_settings 
-         WHERE category = 'email' AND is_active = true 
-         ORDER BY setting_key`
-      );
+      const settings = await db.select({
+        setting_key: systemSettings.settingKey,
+        setting_value: systemSettings.settingValue,
+        description: systemSettings.description,
+        category: systemSettings.category,
+        is_active: systemSettings.isActive,
+      }).from(systemSettings).where(eq(systemSettings.category, 'email'));
       
       res.json(settings);
     } catch (error) {
@@ -3457,7 +3459,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/admin/email-settings", requireAuth, isSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
-      const { eq } = await import("drizzle-orm");
+      const { systemSettings } = await import("@shared/schema");
+      const { eq, and } = await import("drizzle-orm");
       const { settings } = req.body;
       
       if (!settings || typeof settings !== 'object') {
@@ -3466,12 +3469,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Update each setting
       for (const [key, value] of Object.entries(settings)) {
-        await db.execute(
-          `UPDATE system_settings 
-           SET setting_value = $1, updated_at = NOW() 
-           WHERE setting_key = $2 AND category = 'email'`,
-          [value, key]
-        );
+        await db.update(systemSettings)
+          .set({ 
+            settingValue: value as string,
+            updatedAt: new Date()
+          })
+          .where(and(
+            eq(systemSettings.settingKey, key),
+            eq(systemSettings.category, 'email')
+          ));
       }
       
       res.json({ message: "Email settings updated successfully" });
