@@ -7274,30 +7274,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.updateOrganization(organization.id, { ownerId: user.id });
       
       // Automatically assign free trial subscription
-      const { subscriptionPlans, organizationSubscriptions } = await import("@shared/schema");
-      const { eq } = await import("drizzle-orm");
-      const { db } = await import("./db");
-      
-      const freeTrialPlan = await db.select()
-        .from(subscriptionPlans)
-        .where(eq(subscriptionPlans.slug, 'free-trial'))
-        .limit(1);
-      
-      if (freeTrialPlan.length > 0) {
-        const trialPlan = freeTrialPlan[0];
-        const trialStartDate = new Date();
-        const trialEndDate = new Date(trialStartDate.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days from now
+      try {
+        const { subscriptionPlans, organizationSubscriptions } = await import("@shared/schema");
+        const { eq } = await import("drizzle-orm");
+        const { db } = await import("./db");
         
-        // Create organization subscription for free trial
-        await db.insert(organizationSubscriptions).values({
-          organizationId: organization.id,
-          planId: trialPlan.id,
-          status: "trialing",
-          currentPeriodStart: trialStartDate,
-          currentPeriodEnd: trialEndDate,
-          trialStart: trialStartDate,
-          trialEnd: trialEndDate,
-        });
+        console.log("🔍 Looking for Free Trial subscription plan...");
+        
+        const freeTrialPlan = await db.select()
+          .from(subscriptionPlans)
+          .where(eq(subscriptionPlans.slug, 'free-trial'))
+          .limit(1);
+        
+        if (freeTrialPlan.length > 0) {
+          const trialPlan = freeTrialPlan[0];
+          console.log("✅ Found Free Trial plan:", trialPlan.name, "with ID:", trialPlan.id);
+          
+          const trialStartDate = new Date();
+          const trialEndDate = new Date(trialStartDate.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days from now
+          
+          console.log("📅 Trial period:", trialStartDate.toISOString(), "to", trialEndDate.toISOString());
+          
+          // Create organization subscription for free trial
+          const [newSubscription] = await db.insert(organizationSubscriptions).values({
+            organizationId: organization.id,
+            planId: trialPlan.id,
+            status: "trialing",
+            currentPeriodStart: trialStartDate,
+            currentPeriodEnd: trialEndDate,
+            trialStart: trialStartDate,
+            trialEnd: trialEndDate,
+          }).returning();
+          
+          console.log("🎉 Trial subscription created successfully:", newSubscription.id);
+        } else {
+          console.error("❌ Free Trial plan not found!");
+        }
+      } catch (subscriptionError) {
+        console.error("❌ Error creating trial subscription:", subscriptionError);
+        // Don't fail registration if subscription creation fails
       }
       
       res.json({ 
