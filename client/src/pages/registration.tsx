@@ -46,6 +46,7 @@ export default function Registration() {
   const [verificationSent, setVerificationSent] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
+  const [verificationSuccess, setVerificationSuccess] = useState(false);
   const { toast } = useToast();
 
   const handleInputChange = (field: keyof RegistrationData, value: string) => {
@@ -196,8 +197,8 @@ export default function Registration() {
         description: "Akun Anda telah diaktifkan. Silakan login.",
       });
       
-      // Redirect to login page
-      window.location.href = '/login';
+      // Show success screen
+      setVerificationSuccess(true);
     } catch (error: any) {
       console.error('Verification error:', error);
       toast({
@@ -233,6 +234,64 @@ export default function Registration() {
       setIsLoading(false);
     }
   };
+
+  // Success screen after verification
+  if (verificationSuccess) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          <div className="text-center mb-8">
+            <img 
+              src={refokusLogo} 
+              alt="Refokus Logo" 
+              className="w-32 h-32 mx-auto"
+            />
+          </div>
+          <Card className="border-0 shadow-2xl">
+            <CardHeader className="text-center pb-8">
+              <div className="mx-auto w-20 h-20 bg-gradient-to-r from-green-600 to-green-500 rounded-full flex items-center justify-center mb-6">
+                <CheckCircle className="h-10 w-10 text-white" />
+              </div>
+              <CardTitle className="text-2xl font-bold text-gray-900">
+                Selamat!
+              </CardTitle>
+              <CardDescription className="text-gray-600 mt-2">
+                Akun Anda berhasil diverifikasi dan telah aktif
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center pb-8">
+              <div className="bg-green-50 rounded-lg p-6 mb-6">
+                <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-4" />
+                <h3 className="font-semibold text-green-800 mb-2">
+                  Verifikasi Email Berhasil
+                </h3>
+                <p className="text-sm text-green-700">
+                  Akun untuk <span className="font-medium">{formData.email}</span> telah aktif dan siap digunakan.
+                </p>
+              </div>
+              
+              <div className="space-y-4">
+                <Link href="/login">
+                  <Button 
+                    className="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-medium h-11"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <ArrowRight className="h-5 w-5" />
+                      <span>Masuk ke Akun</span>
+                    </div>
+                  </Button>
+                </Link>
+                
+                <p className="text-sm text-gray-600">
+                  Anda dapat langsung masuk menggunakan email dan password yang telah dibuat
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   if (verificationSent) {
     return (
