@@ -765,8 +765,7 @@ export default function CompanyOnboarding() {
         );
 
       case 6: // Pilih Inisiatif Prioritas
-        const getInitiativeOptions = (keyResults: string[]) => {
-          const initiativeMapping = {
+        const initiativeMapping = {
             // Penjualan - Omzet
             "Mencapai target penjualan Rp 500 juta per bulan": [
               "Menjalankan kampanye promosi bulanan dengan diskon 20%",
@@ -870,6 +869,7 @@ export default function CompanyOnboarding() {
             ],
           };
 
+        const getInitiativeOptions = (keyResults: string[]) => {
           let allInitiatives = [];
           keyResults.forEach((kr) => {
             if (initiativeMapping[kr]) {
