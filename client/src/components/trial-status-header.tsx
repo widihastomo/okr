@@ -79,18 +79,7 @@ export default function TrialStatusHeader() {
           </Link>
         </div>
 
-        {/* Second row - User info */}
-        {userLimit && (
-          <div className="flex items-center justify-end text-xs text-gray-600">
-            <div className="flex items-center space-x-1">
-              <Users className="h-3 w-3" />
-              <span>{userLimit.currentUsers}/{userLimit.maxUsers}</span>
-              {isNearUserLimit && (
-                <AlertTriangle className="h-3 w-3 text-yellow-600" />
-              )}
-            </div>
-          </div>
-        )}
+        
 
         {/* Expiring warning for mobile */}
         {isExpiring && (
