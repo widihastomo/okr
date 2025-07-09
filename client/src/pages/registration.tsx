@@ -21,6 +21,8 @@ import {
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { apiRequest } from "@/lib/queryClient";
 import refokusLogo from "@assets/refokus_1751810404513.png";
+import { LoadingButton, PlayfulLoading } from "@/components/ui/playful-loading";
+import { usePlayfulLoading, LOADING_CONFIGS } from "@/hooks/usePlayfulLoading";
 
 type RegistrationData = {
   name: string;
@@ -348,23 +350,18 @@ export default function Registration() {
                   </div>
                 </div>
 
-                <Button 
+                <LoadingButton 
                   type="submit" 
+                  isLoading={isVerifying}
+                  loadingType="processing"
                   className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
-                  disabled={isVerifying || verificationCode.length !== 6}
+                  disabled={verificationCode.length !== 6}
                 >
-                  {isVerifying ? (
-                    <div className="flex items-center space-x-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Memverifikasi...</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center space-x-2">
-                      <ShieldCheck className="h-5 w-5" />
-                      <span>Verifikasi Akun</span>
-                    </div>
-                  )}
-                </Button>
+                  <div className="flex items-center space-x-2">
+                    <ShieldCheck className="h-5 w-5" />
+                    <span>Verifikasi Akun</span>
+                  </div>
+                </LoadingButton>
               </form>
 
               <div className="mt-6 text-center space-y-3">
@@ -549,23 +546,17 @@ export default function Registration() {
               </div>
 
               {/* Submit Button */}
-              <Button 
+              <LoadingButton 
                 type="submit" 
+                isLoading={isLoading}
+                loadingType="creating"
                 className="w-full h-12 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-semibold transition-all duration-300"
-                disabled={isLoading}
               >
-                {isLoading ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Mendaftar...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center space-x-2">
-                    <span>Daftar Sekarang</span>
-                    <ArrowRight className="h-5 w-5" />
-                  </div>
-                )}
-              </Button>
+                <div className="flex items-center space-x-2">
+                  <span>Daftar Sekarang</span>
+                  <ArrowRight className="h-5 w-5" />
+                </div>
+              </LoadingButton>
             </form>
 
             {/* Login Link */}

@@ -19,6 +19,8 @@ import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { z } from "zod";
 import { useAuth } from "@/hooks/useAuth";
 import refokusLogo from "@assets/refokus_1751810404513.png";
+import { LoadingButton } from "@/components/ui/playful-loading";
+import { usePlayfulLoading, LOADING_CONFIGS } from "@/hooks/usePlayfulLoading";
 
 const loginSchema = z.object({
   email: z.string().email("Email tidak valid"),
@@ -138,13 +140,14 @@ export default function Login() {
               </div>
 
               <div className="pt-2">
-                <Button
+                <LoadingButton
                   type="submit"
-                  disabled={loginMutation.isPending}
+                  isLoading={loginMutation.isPending}
+                  loadingType="processing"
                   className="w-full h-11 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium"
                 >
-                  {loginMutation.isPending ? "Masuk..." : "Masuk"}
-                </Button>
+                  Masuk
+                </LoadingButton>
               </div>
             </form>
 

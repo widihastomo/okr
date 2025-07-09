@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { SkeletonLoading, LoadingButton } from "@/components/ui/playful-loading";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
@@ -287,12 +288,7 @@ export default function DailyFocusPage() {
   if (!userId) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4">
-            <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-          </div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
+        <SkeletonLoading shape="card" />
       </div>
     );
   }
@@ -351,7 +347,7 @@ export default function DailyFocusPage() {
   };
 
   // Fetch data with status calculation
-  const { data: objectives = [] } = useQuery({
+  const { data: objectives = [], isLoading: isLoadingObjectives } = useQuery({
     queryKey: ["/api/okrs"],
   });
 
@@ -360,25 +356,25 @@ export default function DailyFocusPage() {
     return objectives.flatMap((obj: any) => obj.keyResults || []);
   }, [objectives]);
 
-  const { data: initiatives = [] } = useQuery({
+  const { data: initiatives = [], isLoading: isLoadingInitiatives } = useQuery({
     queryKey: ["/api/initiatives"],
   });
 
-  const { data: myTasks = [] } = useQuery({
+  const { data: myTasks = [], isLoading: isLoadingMyTasks } = useQuery({
     queryKey: [`/api/users/${userId}/tasks`],
     enabled: !!userId,
   });
 
-  const { data: allTasks = [] } = useQuery({
+  const { data: allTasks = [], isLoading: isLoadingAllTasks } = useQuery({
     queryKey: ["/api/tasks"],
   });
 
-  const { data: users = [] } = useQuery({
+  const { data: users = [], isLoading: isLoadingUsers } = useQuery({
     queryKey: ["/api/users"],
   });
 
   // Trial achievements query for missions
-  const { data: achievements = [] } = useQuery({
+  const { data: achievements = [], isLoading: isLoadingAchievements } = useQuery({
     queryKey: ["/api/trial-achievements"],
     enabled: !!userId,
   });
@@ -1040,62 +1036,74 @@ export default function DailyFocusPage() {
       )}
       {/* Overview Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Task Hari Ini</CardTitle>
-            <CheckCircle className="h-4 w-4 text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <div className="text-2xl font-bold">{todayTasks.length}</div>
-              {todayTasks.filter((t) => t.status === "completed").length >
-                0 && (
-                <div className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                  +
-                  {todayTasks.filter((t) => t.status === "completed").length *
-                    10}{" "}
-                  poin
-                </div>
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {todayTasks.filter((t) => t.status === "completed").length}{" "}
-              selesai
-            </p>
-          </CardContent>
-        </Card>
+        {isLoadingAllTasks ? (
+          <SkeletonLoading shape="card" className="h-24" />
+        ) : (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Task Hari Ini</CardTitle>
+              <CheckCircle className="h-4 w-4 text-blue-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2">
+                <div className="text-2xl font-bold">{todayTasks.length}</div>
+                {todayTasks.filter((t) => t.status === "completed").length >
+                  0 && (
+                  <div className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                    +
+                    {todayTasks.filter((t) => t.status === "completed").length *
+                      10}{" "}
+                    poin
+                  </div>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {todayTasks.filter((t) => t.status === "completed").length}{" "}
+                selesai
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Task Terlambat
-            </CardTitle>
-            <AlertTriangle className="h-4 w-4 text-red-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              {overdueTasks.length}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Perlu perhatian segera
-            </p>
-          </CardContent>
-        </Card>
+        {isLoadingAllTasks ? (
+          <SkeletonLoading shape="card" className="h-24" />
+        ) : (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Task Terlambat
+              </CardTitle>
+              <AlertTriangle className="h-4 w-4 text-red-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-red-600">
+                {overdueTasks.length}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Perlu perhatian segera
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Angka Target Aktif
-            </CardTitle>
-            <Target className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{activeKeyResults.length}</div>
-            <p className="text-xs text-muted-foreground">
-              Belum mencapai target
-            </p>
-          </CardContent>
-        </Card>
+        {isLoadingObjectives ? (
+          <SkeletonLoading shape="card" className="h-24" />
+        ) : (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Angka Target Aktif
+              </CardTitle>
+              <Target className="h-4 w-4 text-green-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{activeKeyResults.length}</div>
+              <p className="text-xs text-muted-foreground">
+                Belum mencapai target
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -1533,13 +1541,14 @@ export default function DailyFocusPage() {
                         <Button type="button" variant="outline" onClick={() => setIsTaskModalOpen(false)}>
                           Batal
                         </Button>
-                        <Button 
+                        <LoadingButton 
                           type="submit" 
-                          disabled={createTaskMutation.isPending}
+                          isLoading={createTaskMutation.isPending}
+                          loadingType="creating"
                           className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
                         >
-                          {createTaskMutation.isPending ? "Membuat..." : "Buat Task"}
-                        </Button>
+                          Buat Task
+                        </LoadingButton>
                       </DialogFooter>
                     </form>
                   </DialogContent>
@@ -3243,13 +3252,14 @@ export default function DailyFocusPage() {
             <Button variant="outline" onClick={() => setIsEditTaskModalOpen(false)}>
               Batal
             </Button>
-            <Button 
+            <LoadingButton 
               onClick={handleEditTaskSubmit}
+              isLoading={editTaskMutation.isPending}
+              loadingType="saving"
               className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
-              disabled={editTaskMutation.isPending}
             >
-              {editTaskMutation.isPending ? "Menyimpan..." : "Simpan"}
-            </Button>
+              Simpan
+            </LoadingButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -3267,13 +3277,14 @@ export default function DailyFocusPage() {
             <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>
               Batal
             </AlertDialogCancel>
-            <AlertDialogAction
+            <LoadingButton
               onClick={handleConfirmDelete}
+              isLoading={deleteTaskMutation.isPending}
+              loadingType="deleting"
               className="bg-red-600 hover:bg-red-700 text-white"
-              disabled={deleteTaskMutation.isPending}
             >
-              {deleteTaskMutation.isPending ? "Menghapus..." : "Hapus"}
-            </AlertDialogAction>
+              Hapus
+            </LoadingButton>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
