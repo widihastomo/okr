@@ -158,12 +158,24 @@ function Router() {
         
         {/* Sidebar - Hide on onboarding */}
         {!isOnboardingPage && (
-          <ClientSidebar
-            isOpen={sidebarOpen}
-            onClose={() => setSidebarOpen(false)}
-            isCollapsed={sidebarCollapsed}
-            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-          />
+          <>
+            {/* System Owner uses SystemAdminSidebar */}
+            {(user as any)?.isSystemOwner ? (
+              <SystemAdminSidebar
+                isOpen={sidebarOpen}
+                onClose={() => setSidebarOpen(false)}
+                isCollapsed={sidebarCollapsed}
+                onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+              />
+            ) : (
+              <ClientSidebar
+                isOpen={sidebarOpen}
+                onClose={() => setSidebarOpen(false)}
+                isCollapsed={sidebarCollapsed}
+                onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+              />
+            )}
+          </>
         )}
 
         {/* Main layout with responsive margin to avoid overlap */}
