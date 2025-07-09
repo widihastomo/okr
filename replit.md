@@ -134,6 +134,8 @@ Changelog:
   * Removed toast notification - users now directly redirected to email verification when login with unverified email
   * Added route /email-verification in App.tsx to handle the new verification page
   * Updated login page design to consistent orange theme matching other pages
+  * Standardized logo usage across all pages: refokus_1751810711179.png with h-12 w-auto sizing
+  * Added back button to email verification page for better navigation UX
 - July 09, 2025. Successfully implemented email verification redirect for unverified users during login:
   * Updated authenticateUser function in emailAuth.ts to check isEmailVerified status
   * Modified login endpoint to return specific error code EMAIL_NOT_VERIFIED with HTTP 403 status

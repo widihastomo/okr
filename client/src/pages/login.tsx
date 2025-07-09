@@ -18,7 +18,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { z } from "zod";
 import { useAuth } from "@/hooks/useAuth";
-import refokusLogo from "@assets/refokus_1751810404513.png";
+import refokusLogo from "@assets/refokus_1751810711179.png";
 import { LoadingButton } from "@/components/ui/playful-loading";
 import { usePlayfulLoading, LOADING_CONFIGS } from "@/hooks/usePlayfulLoading";
 
@@ -81,7 +81,7 @@ export default function Login() {
           <img
             src={refokusLogo}
             alt="Refokus Logo"
-            className="w-32 h-32 mx-auto"
+            className="h-12 w-auto mx-auto"
           />
         </div>
         <Card className="border-0 shadow-2xl">
