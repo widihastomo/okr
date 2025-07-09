@@ -242,7 +242,7 @@ export default function Registration() {
             <img 
               src={refokusLogo} 
               alt="Refokus Logo" 
-              className="w-24 h-24 mx-auto"
+              className="w-32 h-32 mx-auto"
             />
           </div>
           <Card className="border-0 shadow-2xl">
@@ -343,7 +343,7 @@ export default function Registration() {
           <img 
             src={refokusLogo} 
             alt="Refokus Logo" 
-            className="w-24 h-24 mx-auto"
+            className="w-32 h-32 mx-auto"
           />
         </div>
         <Card className="border-0 shadow-2xl">
