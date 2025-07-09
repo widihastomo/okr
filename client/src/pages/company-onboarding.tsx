@@ -140,6 +140,8 @@ export default function CompanyOnboarding() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [startDateOpen, setStartDateOpen] = useState(false);
+  const [endDateOpen, setEndDateOpen] = useState(false);
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
     currentStep: 0, // Start at welcome screen
     completedSteps: [],
@@ -377,7 +379,7 @@ export default function CompanyOnboarding() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="start-date">Tanggal Mulai</Label>
-                  <Popover>
+                  <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
                     <PopoverTrigger asChild>
                       <Button
                         variant={"outline"}
@@ -413,6 +415,7 @@ export default function CompanyOnboarding() {
                               ...onboardingData,
                               cycleStartDate: formattedDate,
                             });
+                            setStartDateOpen(false); // Close the popover after selection
                           }
                         }}
                         initialFocus
@@ -422,7 +425,7 @@ export default function CompanyOnboarding() {
                 </div>
                 <div>
                   <Label htmlFor="end-date">Tanggal Selesai</Label>
-                  <Popover>
+                  <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
                     <PopoverTrigger asChild>
                       <Button
                         variant={"outline"}
@@ -458,6 +461,7 @@ export default function CompanyOnboarding() {
                               ...onboardingData,
                               cycleEndDate: formattedDate,
                             });
+                            setEndDateOpen(false); // Close the popover after selection
                           }
                         }}
                         initialFocus

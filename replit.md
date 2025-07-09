@@ -127,6 +127,12 @@ Changelog:
   * Created visual feedback system that motivates users to complete onboarding steps
   * Enhanced user experience with color-coded progress indication in virtual assistant avatar
   * Maintained professional gradient design while adding engaging gamification elements
+- July 09, 2025. Implemented auto-close functionality for date pickers in onboarding process:
+  * Added controlled state management for popover visibility (startDateOpen, endDateOpen)
+  * Date pickers now automatically close when a date is selected for improved UX
+  * Replaced DOM manipulation with proper React state management
+  * Applied consistent auto-close behavior to both start date and end date pickers
+  * Enhanced user experience with immediate visual feedback and smoother interaction flow
 Changelog:
 - July 08, 2025. Successfully created separate trial status header container with responsive mobile design:
   * Created dedicated TrialStatusHeader component positioned above global header as separate container
