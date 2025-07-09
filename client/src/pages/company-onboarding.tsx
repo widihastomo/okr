@@ -1900,6 +1900,59 @@ export default function CompanyOnboarding() {
                 className="h-12 w-auto"
               />
             </div>
+            
+            {/* Welcome Screen Visual - Only show on step 0 */}
+            {onboardingData.currentStep === 0 && (
+              <div className="mt-8 mb-6">
+                <div className="relative mx-auto max-w-md">
+                  {/* Animated gradient circles */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-32 h-32 bg-gradient-to-br from-orange-200 to-orange-300 rounded-full animate-pulse opacity-20"></div>
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-24 h-24 bg-gradient-to-br from-orange-300 to-orange-400 rounded-full animate-pulse opacity-30" style={{animationDelay: '0.5s'}}></div>
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full animate-pulse opacity-40" style={{animationDelay: '1s'}}></div>
+                  </div>
+                  
+                  {/* Central icon */}
+                  <div className="relative flex items-center justify-center h-32">
+                    <div className="p-4 bg-white rounded-full shadow-lg border border-orange-100">
+                      <Target className="w-8 h-8 text-orange-600" />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Connecting lines with icons */}
+                <div className="mt-6 flex justify-center items-center space-x-8">
+                  <div className="flex flex-col items-center">
+                    <div className="p-2 bg-blue-100 rounded-full mb-2">
+                      <Users className="w-4 h-4 text-blue-600" />
+                    </div>
+                    <span className="text-xs text-gray-600">Tim</span>
+                  </div>
+                  
+                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-orange-200 to-transparent"></div>
+                  
+                  <div className="flex flex-col items-center">
+                    <div className="p-2 bg-green-100 rounded-full mb-2">
+                      <TrendingUp className="w-4 h-4 text-green-600" />
+                    </div>
+                    <span className="text-xs text-gray-600">Target</span>
+                  </div>
+                  
+                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-orange-200 to-transparent"></div>
+                  
+                  <div className="flex flex-col items-center">
+                    <div className="p-2 bg-purple-100 rounded-full mb-2">
+                      <CheckCircle className="w-4 h-4 text-purple-600" />
+                    </div>
+                    <span className="text-xs text-gray-600">Hasil</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Progress Bar */}
