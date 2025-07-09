@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
 import { 
   Card, 
   CardContent
@@ -192,6 +193,12 @@ export default function FloatingMascot({ className }: FloatingMascotProps) {
   
   const dragRef = useRef<HTMLDivElement>(null);
   const [location] = useLocation();
+  const { user } = useAuth();
+
+  // Hide mascot for system owners
+  if ((user as any)?.isSystemOwner) {
+    return null;
+  }
 
   // Fetch trial data
   const { data: trialStatus } = useQuery({
