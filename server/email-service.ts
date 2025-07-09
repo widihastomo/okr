@@ -140,6 +140,32 @@ class EmailService {
     };
   }
   
+  async sendInvitationEmail(email: string, invitationToken: string, organizationId: string): Promise<boolean> {
+    try {
+      // For now, we'll use a simple invitation link format
+      // In production, this would be your actual domain
+      const invitationLink = `${process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000'}/accept-invitation?token=${invitationToken}`;
+      
+      const emailHtml = this.generateInvitationEmail(
+        "Tim Administrator", // In production, get actual inviter name
+        "Platform OKR", // In production, get actual organization name
+        invitationLink
+      );
+      
+      const result = await this.sendEmail({
+        from: "no-reply@platform-okr.com",
+        to: email,
+        subject: "Undangan Bergabung dengan Tim",
+        html: emailHtml,
+      });
+      
+      return result.success;
+    } catch (error) {
+      console.error("Error sending invitation email:", error);
+      return false;
+    }
+  }
+
   generateInvitationEmail(inviterName: string, organizationName: string, invitationLink: string): string {
     return `
       <!DOCTYPE html>
