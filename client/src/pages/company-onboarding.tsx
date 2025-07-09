@@ -59,21 +59,18 @@ const ONBOARDING_STEPS = [
     title: "Fokus Tim",
     description: "Bagian mana di bisnis Anda yang ingin ditingkatkan?",
     icon: Building,
-
   },
   {
     id: 2,
     title: "Undang Tim",
     description: "Siapa saja yang akan berkolaborasi dengan Anda?",
     icon: UserPlus,
-
   },
   {
     id: 3,
     title: "Tentukan Siklus Goal",
     description: "Berapa lama Anda ingin goal ini tercapai?",
     icon: Calendar,
-
   },
   {
     id: 4,
@@ -81,14 +78,12 @@ const ONBOARDING_STEPS = [
     description:
       "Pilih satu tujuan yang penting dan bermakna. Anda dapat menambahkan / merubahnya setelah onboarding selesai",
     icon: Target,
-
   },
   {
     id: 5,
     title: "Angka Target",
     description: "Tentukan cara mengukur keberhasilan",
     icon: TrendingUp,
-
   },
   {
     id: 6,
@@ -96,35 +91,30 @@ const ONBOARDING_STEPS = [
     description:
       "Tentukan langkah-langkah strategis untuk mencapai angka target",
     icon: CheckCircle,
-
   },
   {
     id: 7,
     title: "Tugas untuk Inisiatif",
     description: "Tentukan tugas-tugas yang harus dikerjakan",
     icon: BarChart,
-
   },
   {
     id: 8,
     title: "Pilih Ritme",
     description: "Seberapa sering Anda ingin update progress?",
     icon: Clock,
-
   },
   {
     id: 9,
     title: "Reminder & Review",
     description: "Atur reminder dan review berkala",
     icon: Zap,
-
   },
   {
     id: 10,
     title: "Dashboard Ringkas",
     description: "Lihat semua progress secara ringkas",
     icon: MessageSquare,
-
   },
 ];
 
@@ -145,8 +135,6 @@ interface OnboardingData {
   firstCheckIn: string;
   isCompleted: boolean;
 }
-
-
 
 export default function CompanyOnboarding() {
   const { user } = useAuth();
@@ -214,7 +202,7 @@ export default function CompanyOnboarding() {
       toast({
         title: "Selamat!",
         description:
-          "Onboarding berhasil diselesaikan. Objective pertama telah dibuat!",
+          "Onboarding berhasil diselesaikan. Goal pertama telah dibuat!",
       });
       // Redirect to main dashboard
       window.location.href = "/";
@@ -234,7 +222,7 @@ export default function CompanyOnboarding() {
 
   // Welcome screen data
   const welcomeScreenData = {
-    title: "Selamat Datang di Platform Refokus",
+    title: "",
     description:
       "Tim hebat bukan hanya tentang kerja keras, tapi tentang kerja yang selaras dan terarah. Refokus hadir untuk menyelaraskan tujuan, waktu, dan tindakan tim agar benar-benar bergerak menuju tujuan.",
     icon: Sparkles,
@@ -244,6 +232,16 @@ export default function CompanyOnboarding() {
     onboardingData.currentStep === 0
       ? 0
       : (onboardingData.completedSteps.length / ONBOARDING_STEPS.length) * 100;
+
+  // Dynamic color system based on progress
+  const getProgressColor = () => {
+    if (progressPercentage === 0) return "from-gray-400 to-gray-500"; // Start - Gray
+    if (progressPercentage <= 25) return "from-red-400 to-red-500"; // 0-25% - Red
+    if (progressPercentage <= 50) return "from-orange-400 to-orange-500"; // 25-50% - Orange
+    if (progressPercentage <= 75) return "from-yellow-400 to-yellow-500"; // 50-75% - Yellow
+    if (progressPercentage < 100) return "from-blue-400 to-blue-500"; // 75-99% - Blue
+    return "from-green-400 to-green-500"; // 100% - Green
+  };
 
   const handleNext = () => {
     if (onboardingData.currentStep < ONBOARDING_STEPS.length) {
@@ -294,10 +292,7 @@ export default function CompanyOnboarding() {
   const renderStepContent = () => {
     switch (onboardingData.currentStep) {
       case 0: // Welcome Screen
-        return (
-          <div className="space-y-6">
-          </div>
-        );
+        return <div className="space-y-6"></div>;
       case 1: // Fokus Tim
         return (
           <div className="space-y-4">
@@ -746,7 +741,7 @@ export default function CompanyOnboarding() {
             {selectedKeyResults.length > 0 && (
               <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
                 <p className="text-sm text-blue-800 mb-2">
-                  <strong>Key Results terpilih:</strong>
+                  <strong>Angka target terpilih:</strong>
                 </p>
                 <ul className="text-sm text-blue-700 space-y-1">
                   {selectedKeyResults.map((kr, index) => (
@@ -953,7 +948,8 @@ export default function CompanyOnboarding() {
             {Object.keys(initiativesByKeyResult).length > 0 && (
               <div className="space-y-4">
                 <Label className="text-lg font-semibold">
-                  Pilih inisiatif untuk setiap Key Result yang sudah dipilih:
+                  Pilih inisiatif untuk setiap Angka Target yang sudah
+                  ditentukan:
                 </Label>
 
                 {Object.entries(initiativesByKeyResult).map(
@@ -1519,13 +1515,13 @@ export default function CompanyOnboarding() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
                   <div className="text-2xl font-bold text-blue-600">1</div>
-                  <div className="text-sm text-gray-600">Objective</div>
+                  <div className="text-sm text-gray-600">Goal</div>
                 </div>
                 <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
                   <div className="text-2xl font-bold text-green-600">
                     {onboardingData.keyResults.length}
                   </div>
-                  <div className="text-sm text-gray-600">Key Results</div>
+                  <div className="text-sm text-gray-600">Angka Target</div>
                 </div>
                 <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
                   <div className="text-2xl font-bold text-purple-600">
@@ -1730,19 +1726,32 @@ export default function CompanyOnboarding() {
 
                                 // Get all tasks for this initiative from the mapping
                                 const relatedTasks = taskGroups[init] || [];
-                                
+
                                 // Get tasks that match the predefined mapping
-                                let selectedTasksForThisInit = relatedTasks.filter((task) =>
-                                  onboardingData.tasks?.includes(task),
-                                );
-                                
-                                // If no tasks are mapped to this initiative, 
+                                let selectedTasksForThisInit =
+                                  relatedTasks.filter((task) =>
+                                    onboardingData.tasks?.includes(task),
+                                  );
+
+                                // If no tasks are mapped to this initiative,
                                 // distribute remaining tasks evenly among initiatives
-                                if (selectedTasksForThisInit.length === 0 && onboardingData.tasks?.length > 0) {
-                                  const tasksPerInitiative = Math.ceil(onboardingData.tasks.length / relatedInitiatives.length);
-                                  const startIndex = initIndex * tasksPerInitiative;
-                                  const endIndex = startIndex + tasksPerInitiative;
-                                  selectedTasksForThisInit = onboardingData.tasks.slice(startIndex, endIndex);
+                                if (
+                                  selectedTasksForThisInit.length === 0 &&
+                                  onboardingData.tasks?.length > 0
+                                ) {
+                                  const tasksPerInitiative = Math.ceil(
+                                    onboardingData.tasks.length /
+                                      relatedInitiatives.length,
+                                  );
+                                  const startIndex =
+                                    initIndex * tasksPerInitiative;
+                                  const endIndex =
+                                    startIndex + tasksPerInitiative;
+                                  selectedTasksForThisInit =
+                                    onboardingData.tasks.slice(
+                                      startIndex,
+                                      endIndex,
+                                    );
                                 }
 
                                 return (
@@ -1894,7 +1903,7 @@ export default function CompanyOnboarding() {
     if (onboardingData.currentStep === 0) {
       return "Halo! Saya akan membantu Anda melakukan onboarding platform. Mari kita mulai perjalanan untuk mencapai tujuan bisnis Anda! 🚀";
     }
-    
+
     const stepMessages = {
       1: "Mari tentukan fokus utama yang ingin Anda tingkatkan. Pilih area yang paling penting untuk kemajuan bisnis Anda saat ini.",
       2: "Kolaborasi adalah kunci kesuksesan! Undang anggota tim yang akan berpartisipasi dalam mencapai tujuan bersama.",
@@ -1905,10 +1914,13 @@ export default function CompanyOnboarding() {
       7: "Bagi inisiatif menjadi tugas-tugas yang dapat dikerjakan. Ini membantu tim fokus pada eksekusi yang efektif.",
       8: "Konsistensi adalah kunci! Tentukan seberapa sering Anda akan memantau dan memperbarui progress.",
       9: "Hampir selesai! Atur reminder agar selalu terjaga momentum dan review berkala untuk evaluasi.",
-      10: "Terakhir, lihat ringkasan semua yang telah Anda setting. Dashboard ini akan membantu memantau perjalanan menuju tujuan!"
+      10: "Terakhir, lihat ringkasan semua yang telah Anda setting. Dashboard ini akan membantu memantau perjalanan menuju tujuan!",
     };
-    
-    return stepMessages[onboardingData.currentStep] || "Terus semangat! Kita hampir selesai dengan pengaturan onboarding.";
+
+    return (
+      stepMessages[onboardingData.currentStep] ||
+      "Terus semangat! Kita hampir selesai dengan pengaturan onboarding."
+    );
   };
 
   return (
@@ -1924,7 +1936,7 @@ export default function CompanyOnboarding() {
                 className="h-12 w-auto"
               />
             </div>
-            
+
             {/* Welcome Screen Visual - Only show on step 0 */}
             {onboardingData.currentStep === 0 && (
               <div className="mt-8 mb-6">
@@ -1934,12 +1946,18 @@ export default function CompanyOnboarding() {
                     <div className="w-32 h-32 bg-gradient-to-br from-orange-200 to-orange-300 rounded-full animate-pulse opacity-20"></div>
                   </div>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-24 h-24 bg-gradient-to-br from-orange-300 to-orange-400 rounded-full animate-pulse opacity-30" style={{animationDelay: '0.5s'}}></div>
+                    <div
+                      className="w-24 h-24 bg-gradient-to-br from-orange-300 to-orange-400 rounded-full animate-pulse opacity-30"
+                      style={{ animationDelay: "0.5s" }}
+                    ></div>
                   </div>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full animate-pulse opacity-40" style={{animationDelay: '1s'}}></div>
+                    <div
+                      className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full animate-pulse opacity-40"
+                      style={{ animationDelay: "1s" }}
+                    ></div>
                   </div>
-                  
+
                   {/* Central icon */}
                   <div className="relative flex items-center justify-center h-32">
                     <div className="p-4 bg-white rounded-full shadow-lg border border-orange-100">
@@ -1947,32 +1965,38 @@ export default function CompanyOnboarding() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Connecting lines with icons */}
                 <div className="mt-6 flex justify-center items-center space-x-4 sm:space-x-8">
                   <div className="flex flex-col items-center min-w-0">
                     <div className="p-2 bg-blue-100 rounded-full mb-2">
                       <Target className="w-4 h-4 text-blue-600" />
                     </div>
-                    <span className="text-xs text-gray-600 text-center whitespace-nowrap">Tujuan</span>
+                    <span className="text-xs text-gray-600 text-center whitespace-nowrap">
+                      Tujuan
+                    </span>
                   </div>
-                  
+
                   <div className="flex-1 h-px bg-gradient-to-r from-transparent via-orange-200 to-transparent min-w-[20px]"></div>
-                  
+
                   <div className="flex flex-col items-center min-w-0">
                     <div className="p-2 bg-green-100 rounded-full mb-2">
                       <Zap className="w-4 h-4 text-green-600" />
                     </div>
-                    <span className="text-xs text-gray-600 text-center whitespace-nowrap">Eksekusi</span>
+                    <span className="text-xs text-gray-600 text-center whitespace-nowrap">
+                      Eksekusi
+                    </span>
                   </div>
-                  
+
                   <div className="flex-1 h-px bg-gradient-to-r from-transparent via-orange-200 to-transparent min-w-[20px]"></div>
-                  
+
                   <div className="flex flex-col items-center min-w-0">
                     <div className="p-2 bg-purple-100 rounded-full mb-2">
                       <CheckCircle className="w-4 h-4 text-purple-600" />
                     </div>
-                    <span className="text-xs text-gray-600 text-center whitespace-nowrap">Hasil</span>
+                    <span className="text-xs text-gray-600 text-center whitespace-nowrap">
+                      Hasil
+                    </span>
                   </div>
                 </div>
               </div>
@@ -1984,12 +2008,14 @@ export default function CompanyOnboarding() {
             <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-lg p-4 shadow-sm">
               <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0">
-                  <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full flex items-center justify-center">
+                  <div className={`w-10 h-10 bg-gradient-to-br ${getProgressColor()} rounded-full flex items-center justify-center transition-all duration-500`}>
                     <Sparkles className="w-5 h-5 text-white" />
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-medium text-gray-900 mb-1">Asisten Virtual</h4>
+                  <h4 className="font-medium text-gray-900 mb-1">
+                    Asisten Virtual
+                  </h4>
                   <p className="text-sm text-gray-700 leading-relaxed">
                     {getVirtualAssistantMessage()}
                   </p>
@@ -2060,12 +2086,15 @@ export default function CompanyOnboarding() {
               )}
 
               {/* Navigation */}
-              <div className={onboardingData.currentStep === 0 ? "flex justify-center" : "flex justify-between"}>
+              <div
+                className={
+                  onboardingData.currentStep === 0
+                    ? "flex justify-center"
+                    : "flex justify-between"
+                }
+              >
                 {onboardingData.currentStep > 0 && (
-                  <Button
-                    variant="outline"
-                    onClick={handlePrevious}
-                  >
+                  <Button variant="outline" onClick={handlePrevious}>
                     Sebelumnya
                   </Button>
                 )}
