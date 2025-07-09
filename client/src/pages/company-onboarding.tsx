@@ -1964,14 +1964,15 @@ export default function CompanyOnboarding() {
               )}
 
               {/* Navigation */}
-              <div className="flex justify-between">
-                <Button
-                  variant="outline"
-                  onClick={handlePrevious}
-                  disabled={onboardingData.currentStep === 0}
-                >
-                  Sebelumnya
-                </Button>
+              <div className={onboardingData.currentStep === 0 ? "flex justify-center" : "flex justify-between"}>
+                {onboardingData.currentStep > 0 && (
+                  <Button
+                    variant="outline"
+                    onClick={handlePrevious}
+                  >
+                    Sebelumnya
+                  </Button>
+                )}
 
                 {onboardingData.currentStep === ONBOARDING_STEPS.length ? (
                   <Button
@@ -1986,7 +1987,9 @@ export default function CompanyOnboarding() {
                 ) : (
                   <Button
                     onClick={handleNext}
-                    className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                    className={`bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 ${
+                      onboardingData.currentStep === 0 ? "w-full sm:w-auto" : ""
+                    }`}
                   >
                     {onboardingData.currentStep === 0
                       ? "Mulai Onboarding"
