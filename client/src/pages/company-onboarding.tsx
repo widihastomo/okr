@@ -1999,20 +1999,7 @@ export default function CompanyOnboarding() {
                 className="h-12 w-auto"
               />
             </div>
-            {onboardingData.currentStep === 0 ? (
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                Selamat Datang di Platform Refokus
-              </h1>
-            ) : (
-              <>
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                  Onboarding Perusahaan
-                </h1>
-                <p className="text-gray-600">
-                  Mari kita siapkan sistem OKR yang tepat untuk tim Anda
-                </p>
-              </>
-            )}
+            
           </div>
 
           {/* Progress Bar */}
