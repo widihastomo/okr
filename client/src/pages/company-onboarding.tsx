@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import refokusLogo from "@assets/refokus_1751810711179.png";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -1993,7 +1994,7 @@ export default function CompanyOnboarding() {
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
               <img 
-                src="/attached_assets/refokus_1751810711179.png" 
+                src={refokusLogo} 
                 alt="Refokus Logo" 
                 className="h-12 w-auto"
               />
