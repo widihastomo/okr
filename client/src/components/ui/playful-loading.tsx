@@ -337,6 +337,8 @@ export const LoadingButton: React.FC<{
   onClick?: () => void;
   disabled?: boolean;
   type?: 'button' | 'submit' | 'reset';
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
 }> = ({
   isLoading,
   loadingType = 'default',
@@ -344,16 +346,34 @@ export const LoadingButton: React.FC<{
   className = '',
   onClick,
   disabled = false,
-  type = 'button'
+  type = 'button',
+  variant = 'primary',
+  size = 'md'
 }) => {
+  // Define standard button styles
+  const baseStyles = "relative flex items-center justify-center space-x-2 font-medium rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2";
+  
+  const variantStyles = {
+    primary: "bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white border-transparent focus:ring-orange-500",
+    secondary: "bg-gray-100 hover:bg-gray-200 text-gray-900 border-gray-300 focus:ring-gray-500",
+    outline: "bg-transparent hover:bg-orange-50 text-orange-600 border-orange-300 hover:border-orange-400 focus:ring-orange-500",
+    ghost: "bg-transparent hover:bg-gray-100 text-gray-600 border-transparent focus:ring-gray-500"
+  };
+
+  const sizeStyles = {
+    sm: "px-3 py-1.5 text-sm",
+    md: "px-4 py-2 text-sm",
+    lg: "px-6 py-3 text-base"
+  };
+
+  const disabledStyles = (disabled || isLoading) ? "opacity-50 cursor-not-allowed" : "";
+
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled || isLoading}
-      className={`relative flex items-center justify-center space-x-2 ${className} ${
-        (disabled || isLoading) ? 'opacity-50 cursor-not-allowed' : ''
-      }`}
+      className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${disabledStyles} ${className}`}
     >
       <AnimatePresence mode="wait">
         {isLoading ? (
