@@ -489,8 +489,6 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
       case "register":
         return (
           <div className="space-y-6">
-            {renderBackButton()}
-            
             <form onSubmit={registerForm.handleSubmit(handleRegister)} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Nama Lengkap</Label>
@@ -592,14 +590,14 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                 </LoadingButton>
               </div>
             </form>
+            
+            {renderBackButton()}
           </div>
         );
 
       case "email-verification":
         return (
           <div className="space-y-6">
-            {renderBackButton()}
-            
             <div className="bg-orange-50 rounded-lg p-6">
               <Mail className="h-12 w-12 text-orange-600 mx-auto mb-4" />
               <p className="text-sm text-gray-700 mb-2 text-center">
@@ -651,6 +649,8 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                 Kirim Ulang Kode
               </Button>
             </div>
+            
+            {renderBackButton()}
           </div>
         );
 
@@ -681,8 +681,6 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
       case "forgot-password":
         return (
           <div className="space-y-6">
-            {renderBackButton()}
-            
             <div className="bg-blue-50 rounded-lg p-6 text-center">
               <Mail className="h-12 w-12 text-blue-600 mx-auto mb-4" />
               <p className="text-sm text-gray-700">
@@ -717,14 +715,14 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                 Kirim Kode Reset
               </LoadingButton>
             </form>
+            
+            {renderBackButton()}
           </div>
         );
 
       case "reset-password":
         return (
           <div className="space-y-6">
-            {renderBackButton()}
-            
             <div className="bg-blue-50 rounded-lg p-6">
               <Mail className="h-12 w-12 text-blue-600 mx-auto mb-4" />
               <p className="text-sm text-gray-700 mb-2 text-center">
@@ -797,6 +795,8 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                 Reset Password
               </LoadingButton>
             </form>
+            
+            {renderBackButton()}
           </div>
         );
 

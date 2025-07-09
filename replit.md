@@ -121,6 +121,12 @@ Trial user untuk testing achievement system:
 ## Changelog
 ```
 Changelog:
+- July 09, 2025. Successfully improved unified authentication system UX by repositioning back buttons:
+  * Moved "Kembali" button from top to bottom of forms on all authentication steps (register, email verification, forgot password, reset password)
+  * Button now appears after form submission button for better user flow and reduced visual clutter
+  * Enhanced user experience with cleaner form layout and logical button positioning
+  * Maintains consistent navigation while improving overall form aesthetics
+  * Applied changes to all authentication flows: register, email verification, forgot password, and reset password steps
 - July 09, 2025. Successfully unified email verification page design with modern OTP input and consistent styling:
   * Redesigned email verification page to match registration page styling with same orange theme and professional layout
   * Replaced standard input fields with InputOTP component for better 6-digit code entry experience
