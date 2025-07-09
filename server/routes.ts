@@ -164,18 +164,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("Organization values:", orgValues);
       
-      // Create user first
-      const userId = crypto.randomUUID();
-      
-      // Create organization with user as owner
-      const orgValuesWithOwner = {
-        ...orgValues,
-        ownerId: userId
-      };
-      
-      const newOrganization = await db.insert(organizations).values(orgValuesWithOwner).returning();
+      // Create organization first without owner
+      const newOrganization = await db.insert(organizations).values(orgValues).returning();
       
       // Create user
+      const userId = crypto.randomUUID();
       const newUser = await storage.createUser({
         id: userId,
         firstName: name.split(' ')[0],
@@ -192,7 +185,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
         updatedAt: new Date(),
       });
       
+      // Update organization to set user as owner
+      await db.update(organizations)
+        .set({ ownerId: userId })
+        .where(eq(organizations.id, organizationId));
+      
       console.log("Created organization with owner:", { organizationId, userId });
+      
+      // Create trial subscription for new organization
+      try {
+        const { subscriptionPlans, organizationSubscriptions } = await import("@shared/schema");
+        
+        // Get free trial plan
+        const [freeTrialPlan] = await db.select()
+          .from(subscriptionPlans)
+          .where(eq(subscriptionPlans.name, "Free Trial"))
+          .limit(1);
+        
+        if (freeTrialPlan && freeTrialPlan.isActive) {
+          const trialStartDate = new Date();
+          const trialEndDate = new Date(trialStartDate.getTime() + (14 * 24 * 60 * 60 * 1000)); // 14 days trial
+          
+          // Create organization subscription for free trial
+          await db.insert(organizationSubscriptions).values({
+            organizationId: organizationId,
+            planId: freeTrialPlan.id,
+            status: "trialing",
+            currentPeriodStart: trialStartDate,
+            currentPeriodEnd: trialEndDate,
+            trialStart: trialStartDate,
+            trialEnd: trialEndDate,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+          
+          console.log("Created trial subscription for organization:", organizationId);
+        }
+      } catch (subscriptionError) {
+        console.error("Error creating trial subscription:", subscriptionError);
+        // Don't fail registration if trial creation fails
+      }
       
       // Send verification email
       try {
