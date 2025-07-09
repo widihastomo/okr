@@ -815,22 +815,37 @@ export default function CompanyOnboarding() {
                   </div>
                   
                   {/* Custom time input */}
-                  <div className="flex items-center space-x-2">
-                    <Label htmlFor="custom-time" className="text-sm text-gray-600">
+                  <div className="space-y-2">
+                    <Label className="text-sm text-gray-600">
                       Atau pilih waktu custom:
                     </Label>
-                    <Input
-                      id="custom-time"
-                      type="time"
-                      value={onboardingData.reminderTime}
-                      onChange={(e) =>
-                        setOnboardingData({
-                          ...onboardingData,
-                          reminderTime: e.target.value,
-                        })
-                      }
-                      className="w-32"
-                    />
+                    <div className="flex items-center space-x-2">
+                      <Input
+                        id="custom-time"
+                        type="time"
+                        value={onboardingData.reminderTime}
+                        onChange={(e) =>
+                          setOnboardingData({
+                            ...onboardingData,
+                            reminderTime: e.target.value,
+                          })
+                        }
+                        className="w-32 cursor-pointer focus:ring-2 focus:ring-orange-500"
+                        placeholder="HH:MM"
+                        step="60"
+                        min="00:00"
+                        max="23:59"
+                      />
+                      <div className="text-sm text-gray-500">
+                        Format: HH:MM
+                      </div>
+                    </div>
+                    
+                    {/* Alternative manual input for better compatibility */}
+                    <div className="text-xs text-gray-500 mt-1 p-2 bg-gray-50 rounded border">
+                      💡 <strong>Tips:</strong> Klik pada input field untuk membuka time picker. 
+                      Jika tidak muncul, ketik langsung format waktu (contoh: 08:00, 14:30, 20:00)
+                    </div>
                   </div>
                   
                   {/* Selected time display */}
