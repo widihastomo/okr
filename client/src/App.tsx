@@ -40,6 +40,8 @@ import SystemAdmin from "@/pages/system-admin";
 import ClientUserManagement from "@/pages/client-user-management";
 import NotificationSettings from "@/pages/notification-settings";
 import ClientRegistration from "@/pages/client-registration";
+import Registration from "@/pages/registration";
+import EmailVerification from "@/pages/email-verification";
 import SubscriptionPackageManagement from "@/pages/subscription-package-management";
 import PackageDetail from "@/pages/package-detail";
 import SystemOrganizationManagement from "@/pages/system-organization-management";
@@ -118,7 +120,9 @@ function Router() {
     return (
       <Switch>
         <Route path="/landing" component={Landing} />
-        <Route path="/register" component={ClientRegistration} />
+        <Route path="/register" component={Registration} />
+        <Route path="/verify-email" component={EmailVerification} />
+        <Route path="/client-registration" component={ClientRegistration} />
         <Route component={Login} />
       </Switch>
     );

@@ -241,6 +241,9 @@ export const users = pgTable("users", {
   isActive: boolean("is_active").default(true).notNull(),
   department: text("department"), // e.g., "Engineering", "Marketing", "Sales"
   jobTitle: text("job_title"), // e.g., "Software Engineer", "Product Manager"
+  phone: varchar("phone", { length: 20 }), // WhatsApp number
+  verificationCode: varchar("verification_code", { length: 10 }), // Email verification code
+  verificationCodeExpiry: timestamp("verification_code_expiry"), // Expiry time for verification code
   reminderConfig: jsonb("reminder_config"), // Store reminder settings for check-in notifications
   lastLoginAt: timestamp("last_login_at"),
   invitedBy: uuid("invited_by").references(() => users.id),

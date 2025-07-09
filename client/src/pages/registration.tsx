@@ -1,0 +1,390 @@
+import { useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { Link } from "wouter";
+import { 
+  User, 
+  Building, 
+  Phone, 
+  Mail, 
+  Lock, 
+  Eye, 
+  EyeOff, 
+  CheckCircle, 
+  ArrowRight,
+  Sparkles
+} from "lucide-react";
+
+type RegistrationData = {
+  name: string;
+  businessName: string;
+  whatsappNumber: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
+
+export default function Registration() {
+  const [formData, setFormData] = useState<RegistrationData>({
+    name: "",
+    businessName: "",
+    whatsappNumber: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [verificationSent, setVerificationSent] = useState(false);
+  const { toast } = useToast();
+
+  const handleInputChange = (field: keyof RegistrationData, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const validateForm = () => {
+    if (!formData.name.trim()) {
+      toast({
+        title: "Nama diperlukan",
+        description: "Silakan masukkan nama lengkap Anda",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    if (!formData.businessName.trim()) {
+      toast({
+        title: "Nama usaha diperlukan",
+        description: "Silakan masukkan nama usaha atau perusahaan Anda",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    if (!formData.whatsappNumber.trim()) {
+      toast({
+        title: "Nomor WhatsApp diperlukan",
+        description: "Silakan masukkan nomor WhatsApp Anda",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    if (!formData.email.trim()) {
+      toast({
+        title: "Email diperlukan",
+        description: "Silakan masukkan alamat email Anda",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    if (!formData.email.includes('@')) {
+      toast({
+        title: "Format email tidak valid",
+        description: "Silakan masukkan alamat email yang valid",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    if (formData.password.length < 6) {
+      toast({
+        title: "Password terlalu pendek",
+        description: "Password minimal 6 karakter",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: "Konfirmasi password tidak cocok",
+        description: "Password dan konfirmasi password harus sama",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          businessName: formData.businessName,
+          whatsappNumber: formData.whatsappNumber,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Gagal mendaftarkan akun');
+      }
+
+      const result = await response.json();
+      
+      setVerificationSent(true);
+      toast({
+        title: "Registrasi berhasil!",
+        description: "Kode verifikasi telah dikirim ke email Anda. Silakan cek inbox email.",
+      });
+      
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      toast({
+        title: "Gagal mendaftarkan akun",
+        description: error.message || "Terjadi kesalahan saat mendaftarkan akun",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (verificationSent) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          <Card className="border-0 shadow-2xl">
+            <CardHeader className="text-center pb-8">
+              <div className="mx-auto w-16 h-16 bg-gradient-to-r from-orange-600 to-orange-500 rounded-full flex items-center justify-center mb-4">
+                <CheckCircle className="h-8 w-8 text-white" />
+              </div>
+              <CardTitle className="text-2xl font-bold text-gray-900">
+                Verifikasi Email
+              </CardTitle>
+              <CardDescription className="text-gray-600">
+                Kode verifikasi telah dikirim ke email Anda
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center">
+              <div className="bg-orange-50 rounded-lg p-6 mb-6">
+                <Mail className="h-12 w-12 text-orange-600 mx-auto mb-4" />
+                <p className="text-sm text-gray-700 mb-2">
+                  Kami telah mengirim kode verifikasi ke:
+                </p>
+                <p className="font-semibold text-orange-600">{formData.email}</p>
+              </div>
+              
+              <div className="text-sm text-gray-600 mb-6">
+                <p>Silakan cek inbox email Anda dan ikuti instruksi untuk mengaktifkan akun.</p>
+                <p className="mt-2">Jika tidak menerima email, cek folder spam atau junk.</p>
+              </div>
+
+              <Link href="/login">
+                <Button className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
+                  Kembali ke Login
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex items-center justify-center p-4">
+      <div className="max-w-lg w-full">
+        <Card className="border-0 shadow-2xl">
+          <CardHeader className="text-center pb-8">
+            <div className="mx-auto w-16 h-16 bg-gradient-to-r from-orange-600 to-orange-500 rounded-full flex items-center justify-center mb-4">
+              <Sparkles className="h-8 w-8 text-white" />
+            </div>
+            <CardTitle className="text-3xl font-bold text-gray-900">
+              Daftar Akun Baru
+            </CardTitle>
+            <CardDescription className="text-gray-600">
+              Mulai kelola goals dan target bisnis Anda dengan mudah
+            </CardDescription>
+          </CardHeader>
+          
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Nama Lengkap */}
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-sm font-medium text-gray-700">
+                  Nama Lengkap
+                </Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Masukkan nama lengkap Anda"
+                    value={formData.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    className="pl-10 h-12 border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Nama Usaha */}
+              <div className="space-y-2">
+                <Label htmlFor="businessName" className="text-sm font-medium text-gray-700">
+                  Nama Usaha/Perusahaan
+                </Label>
+                <div className="relative">
+                  <Building className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <Input
+                    id="businessName"
+                    type="text"
+                    placeholder="Masukkan nama usaha atau perusahaan"
+                    value={formData.businessName}
+                    onChange={(e) => handleInputChange('businessName', e.target.value)}
+                    className="pl-10 h-12 border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Nomor WhatsApp */}
+              <div className="space-y-2">
+                <Label htmlFor="whatsappNumber" className="text-sm font-medium text-gray-700">
+                  Nomor WhatsApp
+                </Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <Input
+                    id="whatsappNumber"
+                    type="tel"
+                    placeholder="Contoh: 081234567890"
+                    value={formData.whatsappNumber}
+                    onChange={(e) => handleInputChange('whatsappNumber', e.target.value)}
+                    className="pl-10 h-12 border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Email */}
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                  Email
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Masukkan alamat email Anda"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    className="pl-10 h-12 border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+                  Password
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Masukkan password (minimal 6 karakter)"
+                    value={formData.password}
+                    onChange={(e) => handleInputChange('password', e.target.value)}
+                    className="pl-10 pr-10 h-12 border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Confirm Password */}
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
+                  Konfirmasi Password
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Masukkan ulang password Anda"
+                    value={formData.confirmPassword}
+                    onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                    className="pl-10 pr-10 h-12 border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <Button 
+                type="submit" 
+                className="w-full h-12 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-semibold transition-all duration-300"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Mendaftar...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-2">
+                    <span>Daftar Sekarang</span>
+                    <ArrowRight className="h-5 w-5" />
+                  </div>
+                )}
+              </Button>
+            </form>
+
+            {/* Login Link */}
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-600">
+                Sudah memiliki akun?{' '}
+                <Link href="/login" className="text-orange-600 hover:text-orange-700 font-medium">
+                  Masuk di sini
+                </Link>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

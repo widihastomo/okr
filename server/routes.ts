@@ -33,6 +33,7 @@ import { eq, and, desc, inArray } from "drizzle-orm";
 import { createSnapTransaction } from "./midtrans";
 import { reminderSystem } from "./reminder-system";
 import { emailService } from "./email-service";
+import crypto from "crypto";
 
 // System Owner middleware to protect admin endpoints
 const isSystemOwner = (req: any, res: any, next: any) => {
@@ -69,6 +70,198 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Note: Auth routes are handled in authRoutes.ts
+  
+  // Registration API with email verification
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const { name, businessName, whatsappNumber, email, password } = req.body;
+      
+      // Validate required fields
+      if (!name || !businessName || !whatsappNumber || !email || !password) {
+        return res.status(400).json({ 
+          message: "Semua field harus diisi" 
+        });
+      }
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(409).json({ 
+          message: "Email sudah terdaftar" 
+        });
+      }
+      
+      // Hash password
+      const hashedPassword = await hashPassword(password);
+      
+      // Generate verification code
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // Create organization first
+      const organizationId = crypto.randomUUID();
+      const newOrganization = await db.insert(organizations).values({
+        id: organizationId,
+        name: businessName,
+        industry: "other",
+        size: "1-10",
+        registrationStatus: "pending",
+        subscriptionStatus: "trial",
+        trialStartDate: new Date(),
+        trialEndDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }).returning();
+      
+      // Create user
+      const userId = crypto.randomUUID();
+      const newUser = await storage.createUser({
+        id: userId,
+        firstName: name.split(' ')[0],
+        lastName: name.split(' ').slice(1).join(' ') || '',
+        email: email,
+        password: hashedPassword,
+        role: "organization_admin",
+        isActive: false, // Will be activated after email verification
+        organizationId: organizationId,
+        phone: whatsappNumber,
+        verificationCode: verificationCode,
+        verificationCodeExpiry: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      
+      // Send verification email
+      try {
+        const verificationLink = `${process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000'}/verify-email?code=${verificationCode}&email=${encodeURIComponent(email)}`;
+        
+        const emailHtml = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <title>Verifikasi Email - Platform OKR</title>
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+              .header { background: linear-gradient(135deg, #ea580c 0%, #fb923c 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+              .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px; }
+              .code { background: #fff; border: 2px solid #ea580c; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; color: #ea580c; border-radius: 5px; margin: 20px 0; }
+              .button { display: inline-block; background: linear-gradient(135deg, #ea580c 0%, #fb923c 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 20px 0; }
+              .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 14px; color: #666; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1>Verifikasi Email Anda</h1>
+              </div>
+              <div class="content">
+                <p>Halo <strong>${name}</strong>!</p>
+                <p>Terima kasih telah mendaftar di Platform OKR untuk <strong>${businessName}</strong>.</p>
+                
+                <p>Untuk mengaktifkan akun Anda, silakan gunakan kode verifikasi berikut:</p>
+                
+                <div class="code">${verificationCode}</div>
+                
+                <p>Atau klik tombol di bawah untuk verifikasi otomatis:</p>
+                
+                <div style="text-align: center;">
+                  <a href="${verificationLink}" class="button">Verifikasi Email</a>
+                </div>
+                
+                <p>Jika tombol di atas tidak berfungsi, Anda dapat menyalin dan menempel link berikut di browser:</p>
+                <p style="background: #e9ecef; padding: 10px; border-radius: 5px; word-break: break-all;">${verificationLink}</p>
+                
+                <p>Kode verifikasi ini akan kedaluwarsa dalam 24 jam.</p>
+                
+                <p>Jika Anda tidak mendaftar untuk akun ini, silakan abaikan email ini.</p>
+              </div>
+              <div class="footer">
+                <p>Email ini dikirim secara otomatis oleh sistem. Jangan balas email ini.</p>
+                <p>© 2025 Platform OKR. Semua hak dilindungi.</p>
+              </div>
+            </div>
+          </body>
+          </html>
+        `;
+        
+        await emailService.sendEmail({
+          from: "no-reply@platform-okr.com",
+          to: email,
+          subject: `Verifikasi Email - ${businessName}`,
+          html: emailHtml,
+        });
+        
+      } catch (emailError) {
+        console.error("Error sending verification email:", emailError);
+        // Don't fail registration if email fails
+      }
+      
+      res.status(201).json({
+        message: "Registrasi berhasil! Kode verifikasi telah dikirim ke email Anda.",
+        userId: newUser.id,
+        organizationId: organizationId,
+      });
+      
+    } catch (error) {
+      console.error("Registration error:", error);
+      res.status(500).json({ 
+        message: "Gagal mendaftarkan akun. Silakan coba lagi." 
+      });
+    }
+  });
+  
+  // Email verification endpoint
+  app.post("/api/auth/verify-email", async (req, res) => {
+    try {
+      const { code, email } = req.body;
+      
+      if (!code || !email) {
+        return res.status(400).json({ 
+          message: "Kode verifikasi dan email harus diisi" 
+        });
+      }
+      
+      // Find user by email and verification code
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(404).json({ 
+          message: "User tidak ditemukan" 
+        });
+      }
+      
+      if (user.verificationCode !== code) {
+        return res.status(400).json({ 
+          message: "Kode verifikasi tidak valid" 
+        });
+      }
+      
+      if (user.verificationCodeExpiry && new Date() > user.verificationCodeExpiry) {
+        return res.status(400).json({ 
+          message: "Kode verifikasi sudah kedaluwarsa" 
+        });
+      }
+      
+      // Activate user account
+      await storage.updateUser(user.id, {
+        isActive: true,
+        verificationCode: null,
+        verificationCodeExpiry: null,
+        updatedAt: new Date(),
+      });
+      
+      res.json({
+        message: "Email berhasil diverifikasi! Akun Anda sudah aktif.",
+        success: true,
+      });
+      
+    } catch (error) {
+      console.error("Email verification error:", error);
+      res.status(500).json({ 
+        message: "Gagal memverifikasi email. Silakan coba lagi." 
+      });
+    }
+  });
   
   // Reminder System API Routes
   app.get("/api/reminders/config", requireAuth, async (req, res) => {
