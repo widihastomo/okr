@@ -26,6 +26,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Package,
+  MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -92,6 +93,12 @@ export default function SystemAdminSidebar({
       icon: Package,
       path: "/system-admin/add-ons",
       active: location === "/system-admin/add-ons"
+    },
+    {
+      label: "Pemetaan Status Client",
+      icon: MapPin,
+      path: "/system-admin/client-status-mapping",
+      active: location === "/system-admin/client-status-mapping"
     },
     {
       label: "Pengaturan Free Trial",

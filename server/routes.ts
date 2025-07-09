@@ -8096,6 +8096,218 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Client Status Mapping API - Track user progression through 4 stages
+  app.get("/api/admin/client-status-mapping", requireAuth, async (req, res) => {
+    try {
+      // Only allow system owners to access this endpoint
+      const { user } = req as any;
+      if (!user?.claims?.sub) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const currentUser = await storage.getUser(user.claims.sub);
+      if (!currentUser?.isSystemOwner) {
+        return res.status(403).json({ message: "Access denied. System owner required." });
+      }
+
+      // Get all organizations with their owners and subscription data
+      const orgsWithData = await db.select({
+        id: organizations.id,
+        name: organizations.name,
+        slug: organizations.slug,
+        ownerId: organizations.ownerId,
+        onboardingCompleted: organizations.onboardingCompleted,
+        onboardingCompletedAt: organizations.onboardingCompletedAt,
+        createdAt: organizations.createdAt,
+        // Owner details
+        ownerEmail: users.email,
+        ownerFirstName: users.firstName,
+        ownerLastName: users.lastName,
+        ownerPhone: users.phone,
+        ownerCreatedAt: users.createdAt,
+        ownerLastLoginAt: users.lastLoginAt,
+        // Subscription details
+        subscriptionStatus: organizationSubscriptions.status,
+        subscriptionPlanId: organizationSubscriptions.planId,
+        subscriptionCurrentPeriodStart: organizationSubscriptions.currentPeriodStart,
+        subscriptionCurrentPeriodEnd: organizationSubscriptions.currentPeriodEnd,
+        subscriptionTrialStart: organizationSubscriptions.trialStart,
+        subscriptionTrialEnd: organizationSubscriptions.trialEnd,
+        subscriptionCreatedAt: organizationSubscriptions.createdAt,
+        // Plan details
+        planName: subscriptionPlans.name,
+        planSlug: subscriptionPlans.slug,
+        planPrice: subscriptionPlans.price,
+        planMaxUsers: subscriptionPlans.maxUsers,
+      })
+      .from(organizations)
+      .leftJoin(users, eq(organizations.ownerId, users.id))
+      .leftJoin(organizationSubscriptions, eq(organizations.id, organizationSubscriptions.organizationId))
+      .leftJoin(subscriptionPlans, eq(organizationSubscriptions.planId, subscriptionPlans.id))
+      .where(isNotNull(organizations.ownerId))
+      .orderBy(organizations.createdAt);
+
+      // Get trial achievements completion data for each organization
+      const achievementsData = await db.select({
+        userId: userTrialAchievements.userId,
+        achievementId: userTrialAchievements.achievementId,
+        unlockedAt: userTrialAchievements.unlockedAt,
+        achievementName: trialAchievements.name,
+        achievementCategory: trialAchievements.category,
+        userOrganizationId: users.organizationId,
+      })
+      .from(userTrialAchievements)
+      .leftJoin(trialAchievements, eq(userTrialAchievements.achievementId, trialAchievements.id))
+      .leftJoin(users, eq(userTrialAchievements.userId, users.id))
+      .where(isNotNull(users.organizationId));
+
+      // Process client status for each organization
+      const clientStatusMapping = orgsWithData.map(org => {
+        // Get achievements for this organization's owner
+        const orgAchievements = achievementsData.filter(a => a.userOrganizationId === org.id);
+        
+        // Calculate mission completion percentage
+        const totalMissions = 10; // Based on the 10-step onboarding sequence
+        const completedMissions = orgAchievements.length;
+        const missionCompletionPercentage = Math.round((completedMissions / totalMissions) * 100);
+
+        // Determine client status based on progression
+        let clientStatus = "registered_incomplete_onboarding";
+        let statusLabel = "Terdaftar - Onboarding Belum Selesai";
+        let statusColor = "red";
+        let nextAction = "Menyelesaikan proses onboarding perusahaan";
+
+        // Stage 1: Registered but incomplete onboarding
+        if (org.onboardingCompleted) {
+          // Stage 2: Onboarding complete but incomplete adaptation missions
+          clientStatus = "onboarding_complete_missions_incomplete";
+          statusLabel = "Onboarding Selesai - Misi Adaptasi Belum Selesai";
+          statusColor = "orange";
+          nextAction = "Menyelesaikan misi-misi adaptasi platform";
+
+          // Stage 3: Missions complete but no subscription upgrade
+          if (missionCompletionPercentage >= 80) { // 80% mission completion threshold
+            clientStatus = "missions_complete_no_upgrade";
+            statusLabel = "Misi Selesai - Belum Upgrade Paket";
+            statusColor = "yellow";
+            nextAction = "Melakukan upgrade ke paket berbayar";
+
+            // Stage 4: Upgraded with active subscription
+            if (org.subscriptionStatus && org.subscriptionStatus !== "trialing") {
+              clientStatus = "upgraded_active_subscription";
+              statusLabel = "Upgrade Selesai - Langganan Aktif";
+              statusColor = "green";
+              nextAction = "Mengoptimalkan penggunaan fitur premium";
+            }
+          }
+        }
+
+        // Calculate days since registration
+        const daysSinceRegistration = Math.floor(
+          (Date.now() - new Date(org.createdAt || "").getTime()) / (1000 * 60 * 60 * 24)
+        );
+
+        // Calculate subscription days remaining (for trial users)
+        let subscriptionDaysRemaining = null;
+        if (org.subscriptionTrialEnd) {
+          const trialEndDate = new Date(org.subscriptionTrialEnd);
+          subscriptionDaysRemaining = Math.ceil(
+            (trialEndDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+          );
+        }
+
+        return {
+          // Organization info
+          organizationId: org.id,
+          organizationName: org.name,
+          organizationSlug: org.slug,
+          registrationDate: org.createdAt,
+          daysSinceRegistration,
+
+          // Owner info
+          ownerEmail: org.ownerEmail,
+          ownerName: org.ownerFirstName && org.ownerLastName 
+            ? `${org.ownerFirstName} ${org.ownerLastName}` 
+            : org.ownerEmail,
+          ownerPhone: org.ownerPhone,
+          ownerLastLogin: org.ownerLastLoginAt,
+
+          // Onboarding status
+          onboardingCompleted: org.onboardingCompleted,
+          onboardingCompletedAt: org.onboardingCompletedAt,
+
+          // Mission progress
+          completedMissions,
+          totalMissions,
+          missionCompletionPercentage,
+          achievementsUnlocked: orgAchievements.map(a => ({
+            name: a.achievementName,
+            category: a.achievementCategory,
+            unlockedAt: a.unlockedAt,
+          })),
+
+          // Subscription info
+          subscriptionStatus: org.subscriptionStatus,
+          subscriptionPlan: org.planName,
+          subscriptionPlanSlug: org.planSlug,
+          subscriptionPrice: org.planPrice,
+          subscriptionMaxUsers: org.planMaxUsers,
+          subscriptionTrialStart: org.subscriptionTrialStart,
+          subscriptionTrialEnd: org.subscriptionTrialEnd,
+          subscriptionDaysRemaining,
+          subscriptionCurrentPeriodStart: org.subscriptionCurrentPeriodStart,
+          subscriptionCurrentPeriodEnd: org.subscriptionCurrentPeriodEnd,
+
+          // Client status classification
+          clientStatus,
+          statusLabel,
+          statusColor,
+          nextAction,
+
+          // Progress indicators
+          progressPercentage: (() => {
+            if (clientStatus === "registered_incomplete_onboarding") return 25;
+            if (clientStatus === "onboarding_complete_missions_incomplete") return 50;
+            if (clientStatus === "missions_complete_no_upgrade") return 75;
+            if (clientStatus === "upgraded_active_subscription") return 100;
+            return 0;
+          })(),
+        };
+      });
+
+      // Calculate summary statistics
+      const totalClients = clientStatusMapping.length;
+      const statusCounts = {
+        registered_incomplete_onboarding: clientStatusMapping.filter(c => c.clientStatus === "registered_incomplete_onboarding").length,
+        onboarding_complete_missions_incomplete: clientStatusMapping.filter(c => c.clientStatus === "onboarding_complete_missions_incomplete").length,
+        missions_complete_no_upgrade: clientStatusMapping.filter(c => c.clientStatus === "missions_complete_no_upgrade").length,
+        upgraded_active_subscription: clientStatusMapping.filter(c => c.clientStatus === "upgraded_active_subscription").length,
+      };
+
+      const conversionRate = totalClients > 0 ? Math.round((statusCounts.upgraded_active_subscription / totalClients) * 100) : 0;
+
+      res.json({
+        success: true,
+        data: {
+          clients: clientStatusMapping,
+          summary: {
+            totalClients,
+            statusCounts,
+            conversionRate,
+            lastUpdated: new Date().toISOString(),
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching client status mapping:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to fetch client status mapping",
+        error: error.message 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

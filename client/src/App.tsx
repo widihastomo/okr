@@ -59,6 +59,7 @@ import TrialAchievements from "@/pages/trial-achievements";
 import CompanyOnboarding from "@/pages/company-onboarding";
 import MemberInvitations from "@/pages/member-invitations";
 import EmailSettings from "@/pages/system-admin/email-settings";
+import ClientStatusMapping from "@/pages/client-status-mapping";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -238,6 +239,10 @@ function Router() {
               <Route
                 path="/system-admin/email-settings"
                 component={EmailSettings}
+              />
+              <Route
+                path="/system-admin/client-status-mapping"
+                component={ClientStatusMapping}
               />
               <Route
                 path="/system-admin/subscriptions"
