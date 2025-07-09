@@ -1591,10 +1591,18 @@ export class DatabaseStorage implements IStorage {
     }
   }
   
-  // Organization Onboarding Status
+  // Organization Onboarding Status - Optimized for performance
   async getOrganizationOnboardingStatus(organizationId: string): Promise<{ isCompleted: boolean; completedAt?: Date; data?: any }> {
     try {
-      const [organization] = await db.select().from(organizations).where(eq(organizations.id, organizationId));
+      // Only select the fields we need for better performance
+      const [organization] = await db
+        .select({
+          onboardingCompleted: organizations.onboardingCompleted,
+          onboardingCompletedAt: organizations.onboardingCompletedAt,
+          onboardingData: organizations.onboardingData
+        })
+        .from(organizations)
+        .where(eq(organizations.id, organizationId));
       
       if (!organization) {
         return { isCompleted: false };

@@ -1,5 +1,5 @@
 import { Switch, Route, useLocation } from "wouter";
-import { useState, useEffect, lazy } from "react";
+import { useState, useEffect, useMemo, lazy } from "react";
 import { cn } from "@/lib/utils";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
@@ -66,11 +66,13 @@ function Router() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [location] = useLocation();
   
-  // Check onboarding status
+  // Check onboarding status with faster initial redirect and caching
   const { data: onboardingStatus, isLoading: isOnboardingLoading } = useQuery({
     queryKey: ["/api/onboarding/status"],
     enabled: isAuthenticated && !isLoading,
     retry: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    cacheTime: 10 * 60 * 1000, // 10 minutes cache
   });
 
   // Clear logout flag on app start if user is authenticated
@@ -84,25 +86,30 @@ function Router() {
     setSidebarOpen(!sidebarOpen);
   };
 
-  // Redirect system owner to system admin dashboard by default
-  useEffect(() => {
-    if (isAuthenticated && user && (user as any)?.isSystemOwner) {
-      // Only redirect if on root path
+  // Memoized redirect logic for better performance
+  const shouldRedirect = useMemo(() => {
+    if (!isAuthenticated || !user || isLoading) return null;
+    
+    // Redirect system owner to system admin dashboard by default
+    if ((user as any)?.isSystemOwner) {
       if (location === "/" || location === "/daily-focus") {
-        window.location.href = "/system-admin";
+        return "/system-admin";
+      }
+    } else {
+      // Non-system owner users - check onboarding immediately
+      if (!isOnboardingLoading && onboardingStatus && !onboardingStatus.isCompleted && location !== "/onboarding") {
+        return "/onboarding";
       }
     }
-  }, [isAuthenticated, user, location]);
-  
-  // Redirect non-system owner users to onboarding if they haven't completed it
+    return null;
+  }, [isAuthenticated, user, isLoading, onboardingStatus, isOnboardingLoading, location]);
+
+  // Handle redirect
   useEffect(() => {
-    if (isAuthenticated && user && !(user as any)?.isSystemOwner && !isOnboardingLoading) {
-      // Check if user's organization has completed onboarding
-      if (onboardingStatus && !onboardingStatus.isCompleted && location !== "/onboarding") {
-        window.location.href = "/onboarding";
-      }
+    if (shouldRedirect) {
+      window.location.href = shouldRedirect;
     }
-  }, [isAuthenticated, user, onboardingStatus, isOnboardingLoading, location]);
+  }, [shouldRedirect]);
 
   if (isLoading) {
     return (
