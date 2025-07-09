@@ -894,63 +894,63 @@ export default function CompanyOnboarding() {
         const initiativeKeyResultMapping: { [key: string]: string[] } = {
           // Sales key results
           "Mencapai target penjualan Rp 500 juta per bulan": [
-            "Lead scoring system untuk prioritas",
-            "Personalisasi approach berdasarkan lead profile",
-            "A/B testing untuk sales pitch",
+            "Mengembangkan lead scoring system untuk prioritas",
+            "Mempersonalisasi approach berdasarkan lead profile",
+            "Menjalankan A/B testing untuk sales pitch",
           ],
           "Meningkatkan rata-rata nilai transaksi menjadi Rp 2 juta": [
-            "Automated lead notification system",
-            "Dedicated lead response team",
-            "Mobile app untuk quick response",
+            "Mengotomatisasi lead notification system",
+            "Menugaskan dedicated lead response team",
+            "Mengembangkan mobile app untuk quick response",
           ],
           "Mencapai conversion rate 25% dari total lead": [
-            "Lead scoring system untuk prioritas",
-            "Personalisasi approach berdasarkan lead profile",
-            "A/B testing untuk sales pitch",
+            "Mengembangkan lead scoring system untuk prioritas",
+            "Mempersonalisasi approach berdasarkan lead profile",
+            "Menjalankan A/B testing untuk sales pitch",
           ],
           "Mengurangi waktu follow-up lead menjadi maksimal 24 jam": [
-            "Automated lead notification system",
-            "Dedicated lead response team",
-            "Mobile app untuk quick response",
+            "Mengotomatisasi lead notification system",
+            "Menugaskan dedicated lead response team",
+            "Mengembangkan mobile app untuk quick response",
           ],
           "Meningkatkan kualitas lead scoring menjadi 80% akurat": [
-            "Machine learning untuk lead analysis",
-            "Feedback loop dari sales ke marketing",
-            "Regular review dan update criteria",
+            "Menerapkan machine learning untuk lead analysis",
+            "Membangun feedback loop dari sales ke marketing",
+            "Melakukan regular review dan update criteria",
           ],
 
           // Operational key results
           "Mengurangi waktu proses produksi menjadi 4 jam per unit": [
-            "Implementasi lean manufacturing principles",
-            "Automated production line setup",
-            "Time and motion study untuk bottleneck",
+            "Mengimplementasikan lean manufacturing principles",
+            "Mengotomatisasi production line setup",
+            "Melakukan time and motion study untuk bottleneck",
           ],
           "Meningkatkan utilitas mesin menjadi 85%": [
-            "Preventive maintenance schedule",
-            "Operator training untuk efisiensi maksimal",
-            "Real-time monitoring system",
+            "Menjadwalkan preventive maintenance",
+            "Melatih operator untuk efisiensi maksimal",
+            "Mengimplementasikan real-time monitoring system",
           ],
           "Mengurangi waste produksi menjadi maksimal 5%": [
-            "Quality control di setiap stage produksi",
-            "Recycling program untuk material waste",
-            "Supplier evaluation untuk kualitas raw material",
+            "Menerapkan quality control di setiap stage produksi",
+            "Membuat recycling program untuk material waste",
+            "Mengevaluasi supplier untuk kualitas raw material",
           ],
 
           // Customer service key results
           "Mencapai CSAT score 4.8/5 dalam survey bulanan": [
-            "Training customer service excellence",
-            "Implementasi feedback system yang real-time",
-            "Reward program untuk high performing agent",
+            "Melatih customer service excellence",
+            "Mengimplementasikan feedback system yang real-time",
+            "Membuat reward program untuk high performing agent",
           ],
           "Meningkatkan customer retention rate menjadi 95%": [
-            "Proactive customer outreach program",
-            "Personalized customer journey mapping",
-            "Churn prediction dan prevention strategy",
+            "Menjalankan proactive customer outreach program",
+            "Mempersonalisasi customer journey mapping",
+            "Mengembangkan churn prediction dan prevention strategy",
           ],
           "Mengurangi complaint rate menjadi di bawah 1%": [
-            "Root cause analysis untuk recurring issues",
-            "Preventive quality assurance program",
-            "Customer education dan self-service portal",
+            "Melakukan root cause analysis untuk recurring issues",
+            "Mengimplementasikan preventive quality assurance program",
+            "Membuat customer education dan self-service portal",
           ],
         };
 
