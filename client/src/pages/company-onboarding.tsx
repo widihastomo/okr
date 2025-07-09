@@ -178,11 +178,17 @@ export default function CompanyOnboarding() {
   }, [progress]);
 
   // Validation function for each step
-  const validateStep = (step: number, data: OnboardingData): { isValid: boolean; message?: string } => {
+  const validateStep = (
+    step: number,
+    data: OnboardingData,
+  ): { isValid: boolean; message?: string } => {
     switch (step) {
       case 1:
         if (!data.teamFocus) {
-          return { isValid: false, message: "Silakan pilih fokus tim terlebih dahulu" };
+          return {
+            isValid: false,
+            message: "Silakan pilih fokus tim terlebih dahulu",
+          };
         }
         break;
       case 2:
@@ -191,39 +197,63 @@ export default function CompanyOnboarding() {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         for (const email of data.invitedMembers) {
           if (email && email.trim() && !emailRegex.test(email.trim())) {
-            return { isValid: false, message: `Format email tidak valid: ${email}` };
+            return {
+              isValid: false,
+              message: `Format email tidak valid: ${email}`,
+            };
           }
         }
         break;
       case 3:
         if (!data.cycleDuration) {
-          return { isValid: false, message: "Silakan pilih durasi siklus goal" };
+          return {
+            isValid: false,
+            message: "Silakan pilih durasi siklus goal",
+          };
         }
         if (!data.cycleStartDate) {
-          return { isValid: false, message: "Silakan pilih tanggal mulai siklus" };
+          return {
+            isValid: false,
+            message: "Silakan pilih tanggal mulai siklus",
+          };
         }
         if (!data.cycleEndDate) {
-          return { isValid: false, message: "Silakan pilih tanggal berakhir siklus" };
+          return {
+            isValid: false,
+            message: "Silakan pilih tanggal berakhir siklus",
+          };
         }
         break;
       case 4:
         if (!data.objective.trim()) {
-          return { isValid: false, message: "Silakan pilih atau tulis goal yang ingin dicapai" };
+          return {
+            isValid: false,
+            message: "Silakan pilih atau tulis goal yang ingin dicapai",
+          };
         }
         break;
       case 5:
         if (data.keyResults.length === 0) {
-          return { isValid: false, message: "Silakan pilih minimal 1 angka target" };
+          return {
+            isValid: false,
+            message: "Silakan pilih minimal 1 angka target",
+          };
         }
         break;
       case 6:
         if (data.initiatives.length === 0) {
-          return { isValid: false, message: "Silakan pilih minimal 1 inisiatif prioritas" };
+          return {
+            isValid: false,
+            message: "Silakan pilih minimal 1 inisiatif prioritas",
+          };
         }
         break;
       case 7:
         if (data.tasks.length === 0) {
-          return { isValid: false, message: "Silakan pilih minimal 1 tugas untuk inisiatif" };
+          return {
+            isValid: false,
+            message: "Silakan pilih minimal 1 tugas untuk inisiatif",
+          };
         }
         break;
       case 8:
@@ -314,7 +344,10 @@ export default function CompanyOnboarding() {
   const handleNext = () => {
     // Validate current step before proceeding (skip validation for welcome screen)
     if (onboardingData.currentStep > 0) {
-      const validation = validateStep(onboardingData.currentStep, onboardingData);
+      const validation = validateStep(
+        onboardingData.currentStep,
+        onboardingData,
+      );
       if (!validation.isValid) {
         toast({
           title: "Input tidak lengkap",
@@ -410,13 +443,14 @@ export default function CompanyOnboarding() {
       case 2: // Undang Tim
         return (
           <div className="space-y-4">
-            <Label>
-              Undang anggota tim (opsional):
-            </Label>
+            <Label>Undang anggota tim (opsional):</Label>
             <div className="space-y-3">
               {[0, 1, 2].map((index) => (
                 <div key={index} className="space-y-1">
-                  <Label htmlFor={`email-${index}`} className="text-sm text-gray-600">
+                  <Label
+                    htmlFor={`email-${index}`}
+                    className="text-sm text-gray-600"
+                  >
                     Email anggota tim {index + 1}:
                   </Label>
                   <Input
@@ -442,7 +476,8 @@ export default function CompanyOnboarding() {
               ))}
             </div>
             <div className="text-sm text-gray-500">
-              Semua field email bersifat opsional. Anda dapat mengisi sebagian atau mengosongkan semua field.
+              Semua field email bersifat opsional. Anda dapat mengisi sebagian
+              atau mengosongkan semua field.
             </div>
           </div>
         );
@@ -450,7 +485,7 @@ export default function CompanyOnboarding() {
       case 3: // Tentukan OKR Cycle
         return (
           <div className="space-y-4">
-            <Label htmlFor="cycle-duration">Pilih durasi cycle:</Label>
+            <Label htmlFor="cycle-duration">Pilih durasi Siklus:</Label>
             <Select
               value={onboardingData.cycleDuration}
               onValueChange={(value) =>
@@ -647,8 +682,7 @@ export default function CompanyOnboarding() {
               objectiveOptions.includes(onboardingData.objective) && (
                 <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
                   <p className="text-sm text-blue-800">
-                    <strong>Objective terpilih:</strong>{" "}
-                    {onboardingData.objective}
+                    <strong>Goal terpilih:</strong> {onboardingData.objective}
                   </p>
                 </div>
               )}
@@ -852,7 +886,7 @@ export default function CompanyOnboarding() {
       case 8: // Pilih Cadence
         return (
           <div className="space-y-4">
-            <Label>Pilih ritme check-in:</Label>
+            <Label>Pilih ritme update progres:</Label>
             <RadioGroup
               value={onboardingData.cadence}
               onValueChange={(value) =>
@@ -877,7 +911,7 @@ export default function CompanyOnboarding() {
                 <Label htmlFor="reminder-time">Waktu reminder:</Label>
                 <div className="space-y-3">
                   {/* Common time options */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
                     {[
                       { value: "08:00", label: "08:00 - Pagi" },
                       { value: "12:00", label: "12:00 - Siang" },
@@ -888,7 +922,11 @@ export default function CompanyOnboarding() {
                     ].map((timeOption) => (
                       <Button
                         key={timeOption.value}
-                        variant={onboardingData.reminderTime === timeOption.value ? "default" : "outline"}
+                        variant={
+                          onboardingData.reminderTime === timeOption.value
+                            ? "default"
+                            : "outline"
+                        }
                         size="sm"
                         onClick={() =>
                           setOnboardingData({
@@ -896,56 +934,68 @@ export default function CompanyOnboarding() {
                             reminderTime: timeOption.value,
                           })
                         }
-                        className={onboardingData.reminderTime === timeOption.value ? 
-                          "bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600" : 
-                          "hover:bg-orange-50 hover:border-orange-300"
+                        className={
+                          onboardingData.reminderTime === timeOption.value
+                            ? "bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                            : "hover:bg-orange-50 hover:border-orange-300 text-gray-700"
                         }
                       >
                         {timeOption.label}
                       </Button>
                     ))}
                   </div>
-                  
+
                   {/* Custom time input */}
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <Label className="text-sm text-gray-600">
                       Atau pilih waktu custom:
                     </Label>
-                    <div className="flex items-center space-x-2">
-                      <Input
-                        id="custom-time"
-                        type="time"
-                        value={onboardingData.reminderTime}
-                        onChange={(e) =>
-                          setOnboardingData({
-                            ...onboardingData,
-                            reminderTime: e.target.value,
-                          })
-                        }
-                        className="w-32 cursor-pointer focus:ring-2 focus:ring-orange-500"
-                        placeholder="HH:MM"
-                        step="60"
-                        min="00:00"
-                        max="23:59"
-                      />
-                      <div className="text-sm text-gray-500">
-                        Format: HH:MM
+                    <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+                      <div className="flex items-center space-x-2">
+                        <Input
+                          id="custom-time"
+                          type="time"
+                          value={onboardingData.reminderTime}
+                          onChange={(e) =>
+                            setOnboardingData({
+                              ...onboardingData,
+                              reminderTime: e.target.value,
+                            })
+                          }
+                          className="w-32 cursor-pointer focus:ring-2 focus:ring-orange-500"
+                          placeholder="HH:MM"
+                          step="60"
+                          min="00:00"
+                          max="23:59"
+                        />
+                        <span className="text-sm text-gray-500">Format: HH:MM</span>
                       </div>
                     </div>
-                    
+
                     {/* Alternative manual input for better compatibility */}
-                    <div className="text-xs text-gray-500 mt-1 p-2 bg-gray-50 rounded border">
-                      💡 <strong>Tips:</strong> Klik pada input field untuk membuka time picker. 
-                      Jika tidak muncul, ketik langsung format waktu (contoh: 08:00, 14:30, 20:00)
+                    <div className="text-xs text-gray-500 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="flex items-start space-x-2">
+                        <span className="text-orange-500">💡</span>
+                        <div>
+                          <strong>Tips:</strong> Klik pada input field untuk membuka time picker. 
+                          Jika tidak muncul, ketik langsung format waktu (contoh: 08:00, 14:30, 20:00)
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  
+
                   {/* Selected time display */}
                   {onboardingData.reminderTime && (
-                    <div className="p-2 bg-orange-50 rounded-lg border border-orange-200">
-                      <p className="text-sm text-orange-800">
-                        <strong>Waktu reminder terpilih:</strong> {onboardingData.reminderTime}
-                      </p>
+                    <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                        <p className="text-sm text-orange-800">
+                          <strong>Waktu reminder terpilih:</strong>{" "}
+                          <span className="font-mono bg-orange-100 px-2 py-1 rounded">
+                            {onboardingData.reminderTime}
+                          </span>
+                        </p>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -2049,8 +2099,6 @@ export default function CompanyOnboarding() {
                 <li>• Rekomendasi penyesuaian jika diperlukan</li>
               </ul>
             </div>
-
-
           </div>
         );
 
@@ -2169,7 +2217,9 @@ export default function CompanyOnboarding() {
             <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-lg p-4 shadow-sm">
               <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0">
-                  <div className={`w-10 h-10 bg-gradient-to-br ${getProgressColor()} rounded-full flex items-center justify-center transition-all duration-500`}>
+                  <div
+                    className={`w-10 h-10 bg-gradient-to-br ${getProgressColor()} rounded-full flex items-center justify-center transition-all duration-500`}
+                  >
                     <Sparkles className="w-5 h-5 text-white" />
                   </div>
                 </div>
