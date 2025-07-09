@@ -342,6 +342,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Activate user account
       await storage.updateUser(user.id, {
         isActive: true,
+        isEmailVerified: true,
         verificationCode: null,
         verificationCodeExpiry: null,
         updatedAt: new Date(),
