@@ -121,6 +121,21 @@ Trial user untuk testing achievement system:
 ## Changelog
 ```
 Changelog:
+- July 09, 2025. Removed input field for first check-in planning from step 9 and cleaned up validation:
+  * Removed Textarea input field for rencana check-in pertama from step 9
+  * Removed validation requirement for firstCheckIn field in step 9 
+  * Step 9 now serves as a simple summary/congratulations page without input requirements
+  * Cleaned up validation system to only validate required fields for steps 1-8
+  * Simplified onboarding completion flow for better user experience
+- July 09, 2025. Implemented comprehensive input validation system for onboarding steps 1-8:
+  * Added validateStep function with specific validation rules for each step
+  * Step 1: Requires teamFocus selection, Step 3: Requires cycleDuration, cycleStartDate, cycleEndDate
+  * Step 4: Requires objective text, Step 5: Requires at least 1 keyResult
+  * Step 6: Requires at least 1 initiative, Step 7: Requires at least 1 task
+  * Step 8: Requires cadence and reminderTime selection
+  * Step 2 and 9 are optional/summary steps with no validation
+  * Added toast notifications with clear Indonesian error messages for incomplete fields
+  * Prevents users from proceeding to next step without completing required inputs
 - July 09, 2025. Enhanced virtual assistant avatar with dynamic color progression system for onboarding:
   * Implemented progressive color changes based on completion percentage: Gray (0%) → Red (1-25%) → Orange (26-50%) → Yellow (51-75%) → Blue (76-99%) → Green (100%)
   * Added smooth CSS transitions (duration-500) for seamless color changes during onboarding progress

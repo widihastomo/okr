@@ -229,9 +229,7 @@ export default function CompanyOnboarding() {
         }
         break;
       case 9:
-        if (!data.firstCheckIn.trim()) {
-          return { isValid: false, message: "Silakan tulis rencana check-in pertama Anda" };
-        }
+        // Step 9 is now just a summary page - no validation needed
         break;
       default:
         break;
@@ -2033,37 +2031,7 @@ export default function CompanyOnboarding() {
               </ul>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="first-checkin">
-                Tulis rencana check-in pertama Anda:
-              </Label>
-              <Textarea
-                id="first-checkin"
-                placeholder="Contoh: Minggu pertama fokus setup sistem CRM, evaluasi performa tim sales, dan mulai training closing technique..."
-                value={onboardingData.firstCheckIn}
-                onChange={(e) =>
-                  setOnboardingData({
-                    ...onboardingData,
-                    firstCheckIn: e.target.value,
-                  })
-                }
-                className="min-h-[120px] resize-none"
-              />
-              <p className="text-xs text-gray-500">
-                Tuliskan rencana aktivitas yang akan Anda lakukan dalam periode check-in pertama sesuai dengan ritme yang sudah dipilih.
-              </p>
-            </div>
 
-            {onboardingData.firstCheckIn && (
-              <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-sm text-blue-800">
-                  <strong>Rencana check-in pertama:</strong>
-                </p>
-                <p className="text-sm text-blue-700 mt-1">
-                  {onboardingData.firstCheckIn}
-                </p>
-              </div>
-            )}
           </div>
         );
 
