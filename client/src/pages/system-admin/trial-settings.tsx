@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,12 +31,19 @@ export default function TrialSettingsPage() {
   const [formData, setFormData] = useState<TrialConfiguration | null>(null);
 
   // Fetch current trial configuration
-  const { data: trialConfig, isLoading } = useQuery({
+  const { data: trialConfig, isLoading, error } = useQuery({
     queryKey: ["/api/admin/trial-configuration"],
-    onSuccess: (data) => {
-      setFormData(data);
-    },
   });
+
+  // Update formData when trialConfig changes
+  useEffect(() => {
+    console.log("Trial config data:", trialConfig);
+    console.log("Is loading:", isLoading);
+    console.log("Error:", error);
+    if (trialConfig) {
+      setFormData(trialConfig);
+    }
+  }, [trialConfig, isLoading, error]);
 
   // Update trial configuration mutation
   const updateTrialMutation = useMutation({
