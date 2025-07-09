@@ -270,6 +270,24 @@ export default function EmailSettings() {
               <Save className="h-4 w-4 mr-2" />
               {updateSettingsMutation.isPending ? "Menyimpan..." : "Simpan Pengaturan"}
             </Button>
+            
+            <Button
+              type="button"
+              onClick={() => {
+                // Reset to sandbox settings
+                const form = document.getElementById('email-settings-form') as HTMLFormElement;
+                (form.querySelector('input[name="mailtrap_host"]') as HTMLInputElement).value = 'smtp.mailtrap.io';
+                (form.querySelector('input[name="mailtrap_port"]') as HTMLInputElement).value = '2525';
+                (form.querySelector('input[name="mailtrap_user"]') as HTMLInputElement).value = 'a87eb1dd7f07e4';
+                (form.querySelector('input[name="mailtrap_pass"]') as HTMLInputElement).value = '6835b4a5b90cd7';
+                handleSaveSettings();
+              }}
+              disabled={updateSettingsMutation.isPending}
+              variant="outline"
+              className="border-amber-600 text-amber-600 hover:bg-amber-50"
+            >
+              Reset ke Sandbox
+            </Button>
           </div>
         </form>
 
@@ -317,13 +335,15 @@ export default function EmailSettings() {
               </div>
             </div>
             
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <p className="text-sm text-blue-700">
-                <strong>Status saat ini:</strong> Menggunakan Mailtrap Sandbox (smtp.mailtrap.io:2525) - hanya untuk testing internal. 
-                Email berhasil "dikirim" ke log server tapi tidak sampai ke inbox nyata.
+            <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+              <p className="text-sm text-amber-700">
+                <strong>⚠️ Error Authentication:</strong> Host sudah diubah ke "live.smtp.mailtrap.io" tapi kredensial masih menggunakan sandbox lama.
               </p>
-              <p className="text-sm text-blue-700 mt-2">
-                <strong>Untuk mengirim email sesungguhnya:</strong> Ubah host menjadi "live.smtp.mailtrap.io" dengan port 587 dan kredensial Mailtrap Send yang valid.
+              <p className="text-sm text-amber-700 mt-2">
+                <strong>Solusi:</strong> Masuk ke akun Mailtrap → Email Sending → SMTP → ambil username/password yang baru untuk live server.
+              </p>
+              <p className="text-sm text-amber-700 mt-1">
+                <strong>Atau:</strong> Ubah kembali host ke "smtp.mailtrap.io" dan port ke "2525" untuk menggunakan sandbox testing.
               </p>
             </div>
           </CardContent>
