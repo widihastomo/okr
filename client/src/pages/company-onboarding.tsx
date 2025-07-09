@@ -51,6 +51,8 @@ import {
   Zap,
   CalendarIcon,
 } from "lucide-react";
+import { ReminderSettings } from "@/components/ReminderSettings";
+import { type CompanyOnboardingData } from "@shared/schema";
 
 // Onboarding steps following the reference structure
 const ONBOARDING_STEPS = [
@@ -118,24 +120,8 @@ const ONBOARDING_STEPS = [
   },
 ];
 
-interface OnboardingData {
-  currentStep: number;
-  completedSteps: number[];
-  teamFocus: string;
-  cycleDuration: string;
-  cycleStartDate: string;
-  cycleEndDate: string;
-  objective: string;
-  keyResults: string[];
-  cadence: string;
-  reminderTime: string;
-  reminderDay?: string; // For weekly reminders
-  reminderDate?: string; // For monthly reminders
-  invitedMembers: string[];
-  initiatives: string[];
-  tasks: string[];
-  firstCheckIn: string;
-  isCompleted: boolean;
+interface OnboardingData extends CompanyOnboardingData {
+  // All fields are already defined in CompanyOnboardingData schema
 }
 
 export default function CompanyOnboarding() {
@@ -155,6 +141,8 @@ export default function CompanyOnboarding() {
     keyResults: [],
     cadence: "",
     reminderTime: "",
+    reminderDay: "",
+    reminderDate: "",
     invitedMembers: [],
     initiatives: [],
     tasks: [],

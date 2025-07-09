@@ -63,6 +63,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
   updateUser(id: string, user: Partial<UpsertUser>): Promise<User | undefined>;
+  updateUserReminderConfig(userId: string, config: any): Promise<void>;
   deleteUser(id: string): Promise<boolean>;
   
   // Teams
@@ -276,6 +277,13 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, id))
       .returning();
     return user;
+  }
+
+  async updateUserReminderConfig(userId: string, config: any): Promise<void> {
+    await db
+      .update(users)
+      .set({ reminderConfig: config, updatedAt: new Date() })
+      .where(eq(users.id, userId));
   }
 
   async deleteUser(id: string): Promise<boolean> {

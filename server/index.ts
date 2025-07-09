@@ -14,6 +14,7 @@ import { validateEnvironment, getConfig } from "./config";
 import { setupRLS } from "./setup-rls";
 import { rlsMiddleware, rlsCleanupMiddleware } from "./rls-middleware";
 import { scheduleInitiativeDeadlineChecks } from "./initiative-deadline-checker";
+import { reminderSystem } from "./reminder-system";
 
 const app = express();
 
@@ -120,6 +121,10 @@ const config = getConfig();
   
   // Start initiative deadline checking
   scheduleInitiativeDeadlineChecks();
+  
+  // Initialize reminder system scheduler
+  console.log("🔔 Initializing reminder system...");
+  reminderSystem.startReminderScheduler();
 
   app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

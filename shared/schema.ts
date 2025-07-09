@@ -241,6 +241,7 @@ export const users = pgTable("users", {
   isActive: boolean("is_active").default(true).notNull(),
   department: text("department"), // e.g., "Engineering", "Marketing", "Sales"
   jobTitle: text("job_title"), // e.g., "Software Engineer", "Product Manager"
+  reminderConfig: jsonb("reminder_config"), // Store reminder settings for check-in notifications
   lastLoginAt: timestamp("last_login_at"),
   invitedBy: uuid("invited_by").references(() => users.id),
   invitedAt: timestamp("invited_at"),
@@ -1242,7 +1243,7 @@ export type UpdateOnboardingProgress = z.infer<typeof updateOnboardingProgressSc
 
 // Company onboarding data schema
 export const companyOnboardingDataSchema = z.object({
-  currentStep: z.number().min(1).max(10).default(1),
+  currentStep: z.number().min(0).max(10).default(0), // Allow 0 for welcome screen
   completedSteps: z.array(z.number()).default([]),
   teamFocus: z.string().optional(),
   cycleDuration: z.string().optional(),
@@ -1252,6 +1253,8 @@ export const companyOnboardingDataSchema = z.object({
   keyResults: z.array(z.string()).default([]),
   cadence: z.string().optional(),
   reminderTime: z.string().optional(),
+  reminderDay: z.string().optional(), // For weekly reminders
+  reminderDate: z.string().optional(), // For monthly reminders
   invitedMembers: z.array(z.string()).default([]),
   initiatives: z.array(z.string()).default([]),
   tasks: z.array(z.string()).default([]),

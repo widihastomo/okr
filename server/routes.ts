@@ -29,6 +29,7 @@ import {
 import { db } from "./db";
 import { eq, and, desc, inArray } from "drizzle-orm";
 import { createSnapTransaction } from "./midtrans";
+import { reminderSystem } from "./reminder-system";
 
 // System Owner middleware to protect admin endpoints
 const isSystemOwner = (req: any, res: any, next: any) => {
@@ -65,6 +66,109 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Note: Auth routes are handled in authRoutes.ts
+  
+  // Reminder System API Routes
+  app.get("/api/reminders/config", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const user = await storage.getUser(currentUser.id);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json(user.reminderConfig || null);
+    } catch (error) {
+      console.error("Error fetching reminder config:", error);
+      res.status(500).json({ message: "Failed to fetch reminder config" });
+    }
+  });
+
+  app.post("/api/reminders/config", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const config = req.body;
+      
+      await storage.updateUserReminderConfig(currentUser.id, config);
+      res.json({ message: "Reminder config saved successfully" });
+    } catch (error) {
+      console.error("Error saving reminder config:", error);
+      res.status(500).json({ message: "Failed to save reminder config" });
+    }
+  });
+
+  app.put("/api/reminders/config", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const config = req.body;
+      
+      await storage.updateUserReminderConfig(currentUser.id, config);
+      res.json({ message: "Reminder config updated successfully" });
+    } catch (error) {
+      console.error("Error updating reminder config:", error);
+      res.status(500).json({ message: "Failed to update reminder config" });
+    }
+  });
+
+  app.post("/api/reminders/schedule", requireAuth, async (req, res) => {
+    try {
+      reminderSystem.startReminderScheduler();
+      res.json({ message: "Reminder scheduler started successfully" });
+    } catch (error) {
+      console.error("Error starting reminder scheduler:", error);
+      res.status(500).json({ message: "Failed to start reminder scheduler" });
+    }
+  });
+
+  app.post("/api/reminders/enable", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const user = await storage.getUser(currentUser.id);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const config = { ...user.reminderConfig, isActive: true };
+      await storage.updateUserReminderConfig(currentUser.id, config);
+      
+      res.json({ message: "Reminders enabled successfully" });
+    } catch (error) {
+      console.error("Error enabling reminders:", error);
+      res.status(500).json({ message: "Failed to enable reminders" });
+    }
+  });
+
+  app.post("/api/reminders/disable", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const user = await storage.getUser(currentUser.id);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const config = { ...user.reminderConfig, isActive: false };
+      await storage.updateUserReminderConfig(currentUser.id, config);
+      
+      res.json({ message: "Reminders disabled successfully" });
+    } catch (error) {
+      console.error("Error disabling reminders:", error);
+      res.status(500).json({ message: "Failed to disable reminders" });
+    }
+  });
+
+  app.get("/api/reminders/logs", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const logs = await reminderSystem.getReminderLogs(currentUser.id);
+      res.json(logs);
+    } catch (error) {
+      console.error("Error fetching reminder logs:", error);
+      res.status(500).json({ message: "Failed to fetch reminder logs" });
+    }
+  });
+
   // Cycles endpoints
   app.get("/api/cycles", requireAuth, async (req, res) => {
     try {
@@ -6860,12 +6964,122 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Continue with completion even if objective creation fails
         }
       }
+
+      // Save reminder configuration if provided
+      if (onboardingData && onboardingData.cadence && onboardingData.reminderTime) {
+        try {
+          const reminderConfig = {
+            userId: currentUser.id,
+            cadence: onboardingData.cadence,
+            reminderTime: onboardingData.reminderTime,
+            reminderDay: onboardingData.reminderDay,
+            reminderDate: onboardingData.reminderDate,
+            isActive: true,
+            teamFocus: onboardingData.teamFocus
+          };
+          
+          await reminderSystem.saveReminderConfig(reminderConfig);
+          console.log("✅ Reminder config saved during onboarding completion");
+        } catch (error) {
+          console.error("Error saving reminder config:", error);
+          // Continue with completion even if reminder config fails
+        }
+      }
       
       const result = await storage.completeOrganizationOnboarding(currentUser.organizationId);
       res.json(result);
     } catch (error: any) {
       console.error("Error completing onboarding:", error);
       res.status(500).json({ message: "Failed to complete onboarding" });
+    }
+  });
+
+  // Reminder System API Endpoints
+  app.get("/api/reminders/config", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const config = await reminderSystem.getReminderConfig(currentUser.id);
+      res.json(config);
+    } catch (error: any) {
+      console.error("Error fetching reminder config:", error);
+      res.status(500).json({ message: "Failed to fetch reminder config" });
+    }
+  });
+
+  app.post("/api/reminders/config", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const reminderConfig = {
+        userId: currentUser.id,
+        ...req.body
+      };
+      
+      await reminderSystem.saveReminderConfig(reminderConfig);
+      res.json({ message: "Reminder config saved successfully" });
+    } catch (error: any) {
+      console.error("Error saving reminder config:", error);
+      res.status(500).json({ message: "Failed to save reminder config" });
+    }
+  });
+
+  app.put("/api/reminders/config", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      await reminderSystem.updateReminderConfig(currentUser.id, req.body);
+      res.json({ message: "Reminder config updated successfully" });
+    } catch (error: any) {
+      console.error("Error updating reminder config:", error);
+      res.status(500).json({ message: "Failed to update reminder config" });
+    }
+  });
+
+  app.post("/api/reminders/schedule", requireAuth, async (req, res) => {
+    try {
+      console.log("🔔 Starting reminder scheduler...");
+      reminderSystem.startReminderScheduler();
+      res.json({ message: "Reminder scheduler started successfully" });
+    } catch (error: any) {
+      console.error("Error starting reminder scheduler:", error);
+      res.status(500).json({ message: "Failed to start reminder scheduler" });
+    }
+  });
+
+  app.get("/api/reminders/logs", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      // For now, return basic status - could be enhanced with database logging
+      const config = await reminderSystem.getReminderConfig(currentUser.id);
+      res.json({
+        userId: currentUser.id,
+        hasReminderConfig: !!config,
+        config: config || null,
+        message: "Reminder logs endpoint - ready for enhancement"
+      });
+    } catch (error: any) {
+      console.error("Error fetching reminder logs:", error);
+      res.status(500).json({ message: "Failed to fetch reminder logs" });
+    }
+  });
+
+  app.post("/api/reminders/enable", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      await reminderSystem.enableReminders(currentUser.id);
+      res.json({ message: "Reminders enabled successfully" });
+    } catch (error: any) {
+      console.error("Error enabling reminders:", error);
+      res.status(500).json({ message: "Failed to enable reminders" });
+    }
+  });
+
+  app.post("/api/reminders/disable", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      await reminderSystem.disableReminders(currentUser.id);
+      res.json({ message: "Reminders disabled successfully" });
+    } catch (error: any) {
+      console.error("Error disabling reminders:", error);
+      res.status(500).json({ message: "Failed to disable reminders" });
     }
   });
 
