@@ -1928,18 +1928,18 @@ export default function CompanyOnboarding() {
                 <div className="mt-6 flex justify-center items-center space-x-8">
                   <div className="flex flex-col items-center">
                     <div className="p-2 bg-blue-100 rounded-full mb-2">
-                      <Users className="w-4 h-4 text-blue-600" />
+                      <Target className="w-4 h-4 text-blue-600" />
                     </div>
-                    <span className="text-xs text-gray-600">Tim</span>
+                    <span className="text-xs text-gray-600">Tujuan</span>
                   </div>
                   
                   <div className="flex-1 h-px bg-gradient-to-r from-transparent via-orange-200 to-transparent"></div>
                   
                   <div className="flex flex-col items-center">
                     <div className="p-2 bg-green-100 rounded-full mb-2">
-                      <TrendingUp className="w-4 h-4 text-green-600" />
+                      <Zap className="w-4 h-4 text-green-600" />
                     </div>
-                    <span className="text-xs text-gray-600">Target</span>
+                    <span className="text-xs text-gray-600">Eksekusi</span>
                   </div>
                   
                   <div className="flex-1 h-px bg-gradient-to-r from-transparent via-orange-200 to-transparent"></div>
