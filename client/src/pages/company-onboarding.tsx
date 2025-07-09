@@ -162,6 +162,31 @@ export default function CompanyOnboarding() {
     isCompleted: false,
   });
 
+  // Error handling for ResizeObserver
+  useEffect(() => {
+    const handleResizeObserverError = (e: ErrorEvent) => {
+      if (e.message.includes('ResizeObserver loop completed with undelivered notifications')) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+    };
+
+    const originalConsoleError = console.error;
+    console.error = (...args) => {
+      if (args[0]?.includes && args[0].includes('ResizeObserver loop completed with undelivered notifications')) {
+        return;
+      }
+      originalConsoleError(...args);
+    };
+
+    window.addEventListener('error', handleResizeObserverError);
+    return () => {
+      window.removeEventListener('error', handleResizeObserverError);
+      console.error = originalConsoleError;
+    };
+  }, []);
+
   // Fetch onboarding progress
   const { data: progress } = useQuery({
     queryKey: ["/api/onboarding/progress"],
