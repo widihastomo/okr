@@ -1602,6 +1602,8 @@ export class DatabaseStorage implements IStorage {
   // Organization Onboarding Status - Optimized for performance
   async getOrganizationOnboardingStatus(organizationId: string): Promise<{ isCompleted: boolean; completedAt?: Date; data?: any }> {
     try {
+      console.log("📋 Fetching onboarding status for organization:", organizationId);
+      
       // Only select the fields we need for better performance
       const [organization] = await db
         .select({
@@ -1613,14 +1615,18 @@ export class DatabaseStorage implements IStorage {
         .where(eq(organizations.id, organizationId));
       
       if (!organization) {
+        console.log("❌ Organization not found for ID:", organizationId);
         return { isCompleted: false };
       }
       
-      return {
+      const result = {
         isCompleted: organization.onboardingCompleted || false,
         completedAt: organization.onboardingCompletedAt || undefined,
         data: organization.onboardingData || undefined
       };
+      
+      console.log("✅ Organization onboarding status:", result);
+      return result;
     } catch (error) {
       console.error("Error fetching organization onboarding status:", error);
       throw error;

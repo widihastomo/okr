@@ -7636,7 +7636,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/onboarding/status", requireAuth, async (req, res) => {
     try {
       const currentUser = req.user as User;
+      console.log("🔍 Checking onboarding status for user:", currentUser.id, "organizationId:", currentUser.organizationId);
+      
+      if (!currentUser.organizationId) {
+        console.log("❌ User has no organization ID");
+        return res.status(400).json({ message: "User not associated with an organization" });
+      }
+      
       const status = await storage.getOrganizationOnboardingStatus(currentUser.organizationId);
+      console.log("📊 Onboarding status result:", status);
       res.json(status);
     } catch (error: any) {
       console.error("Error fetching onboarding status:", error);
