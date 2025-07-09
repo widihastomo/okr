@@ -375,40 +375,7 @@ export default function CompanyOnboarding() {
                 waktu, dan tindakan tim agar benar-benar bergerak menuju tujuan."
               </blockquote>
             </div>
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Proses Onboarding yang Akan Anda Lalui:
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {ONBOARDING_STEPS.map((step) => (
-                  <div
-                    key={step.id}
-                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
-                  >
-                    <div className="p-2 bg-orange-100 rounded-lg">
-                      <step.icon className="w-4 h-4 text-orange-600" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900">{step.title}</h4>
-                      <p className="text-sm text-gray-600">{step.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-5 h-5 text-blue-600" />
-                  <span className="font-medium text-blue-900">
-                    Dampingi oleh Orby, Asisten Virtual Anda
-                  </span>
-                </div>
-                <p className="text-sm text-blue-700">
-                  Selama proses onboarding, Orby akan membantu menjelaskan setiap
-                  langkah dan memberikan panduan yang dipersonalisasi untuk tim
-                  Anda.
-                </p>
-              </div>
-            </div>
+
           </div>
         );
       case 1: // Fokus Tim
