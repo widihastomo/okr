@@ -5,7 +5,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Menu,
   Bell,
-  Plus,
   Settings,
   User,
   LogOut,
@@ -77,9 +76,7 @@ export default function GlobalHeader({
   sidebarCollapsed,
   onToggleCollapse,
 }: GlobalHeaderProps) {
-  const [notificationCount] = useState(1);
   const [isOKRModalOpen, setIsOKRModalOpen] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
@@ -154,19 +151,7 @@ export default function GlobalHeader({
     },
   });
 
-  const handleCreateOKR = () => {
-    setIsOKRModalOpen(true);
-    setIsExpanded(false);
-  };
 
-  const handleCreateTask = () => {
-    setShowTaskModal(true);
-    setIsExpanded(false);
-  };
-
-  const toggleExpanded = () => {
-    setIsExpanded(!isExpanded);
-  };
 
   const handleTaskSubmit = (data: z.infer<typeof taskFormSchema>) => {
     createTaskMutation.mutate(data);
@@ -225,44 +210,7 @@ export default function GlobalHeader({
 
       {/* Right side - Action buttons and notifications */}
       <div className="flex items-center space-x-3">
-        {/* Quick Action FAB */}
-        <div className="relative">
-          {/* Expanded Action Buttons */}
-          <div
-            className={`absolute right-0 top-full mt-2 transition-all duration-300 ${
-              isExpanded
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 -translate-y-2 pointer-events-none"
-            }`}
-          >
-            <div className="flex flex-col space-y-2">
-              <Button
-                onClick={handleCreateOKR}
-                className="h-8 px-3 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white text-sm whitespace-nowrap"
-              >
-                <Target className="h-4 w-4 mr-1" />
-                <span className="font-medium">Buat OKR</span>
-              </Button>
-              <Button
-                onClick={handleCreateTask}
-                className="h-8 px-3 bg-purple-600 hover:bg-purple-700 text-white text-sm whitespace-nowrap"
-              >
-                <FileText className="h-4 w-4 mr-1" />
-                <span className="font-medium">Buat Tugas</span>
-              </Button>
-            </div>
-          </div>
 
-          {/* Main FAB Button */}
-          <Button
-            onClick={toggleExpanded}
-            className={`h-8 w-8 rounded-full bg-orange-600 hover:bg-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 ${
-              isExpanded ? "rotate-45" : "rotate-0"
-            }`}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
 
         {/* Notification Bell */}
         <NotificationBell />
