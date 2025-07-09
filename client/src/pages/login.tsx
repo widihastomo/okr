@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Eye, EyeOff, Mail, Lock, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { z } from "zod";
 import { useAuth } from "@/hooks/useAuth";
 import refokusLogo from "@assets/refokus_1751810404513.png";
@@ -69,9 +69,6 @@ export default function Login() {
                 alt="Refokus Logo" 
                 className="w-16 h-16 mb-4"
               />
-              <div className="w-12 h-12 bg-gradient-to-r from-orange-600 to-orange-500 rounded-lg flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
             </div>
             <CardTitle className="text-2xl font-bold text-gray-900">
               Masuk ke Akun Anda
