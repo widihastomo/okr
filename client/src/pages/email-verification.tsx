@@ -164,7 +164,7 @@ export default function EmailVerification() {
           <img 
             src={refokusLogo} 
             alt="Refokus Logo" 
-            className="w-32 h-32 mx-auto"
+            className="h-12 w-auto mx-auto"
           />
         </div>
         <Card className="border-0 shadow-2xl">
