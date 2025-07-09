@@ -148,6 +148,10 @@ export default function EmailSettings() {
                 </CardTitle>
                 <CardDescription>
                   Konfigurasi utama untuk email development dan testing
+                  <br />
+                  <span className="text-sm text-amber-600">
+                    Current: Sandbox (testing only). Untuk email nyata, gunakan Mailtrap Send dengan host: live.smtp.mailtrap.io
+                  </span>
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -280,9 +284,20 @@ export default function EmailSettings() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <h4 className="font-medium text-gray-900 mb-2">Gmail SMTP (Recommended)</h4>
+                <h4 className="font-medium text-gray-900 mb-2">Mailtrap Send (Production)</h4>
+                <div className="text-sm text-gray-600 space-y-1">
+                  <p>• Host: live.smtp.mailtrap.io</p>
+                  <p>• Port: 587</p>
+                  <p>• User: Username dari Mailtrap Send</p>
+                  <p>• Password: Password dari Mailtrap Send</p>
+                  <p>• Untuk email produksi sesungguhnya</p>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-medium text-gray-900 mb-2">Gmail SMTP</h4>
                 <div className="text-sm text-gray-600 space-y-1">
                   <p>• Email: akun.gmail.anda@gmail.com</p>
                   <p>• Password: App Password (bukan password Gmail)</p>
@@ -292,7 +307,7 @@ export default function EmailSettings() {
               </div>
               
               <div>
-                <h4 className="font-medium text-gray-900 mb-2">SendGrid (Production)</h4>
+                <h4 className="font-medium text-gray-900 mb-2">SendGrid</h4>
                 <div className="text-sm text-gray-600 space-y-1">
                   <p>• Daftar di sendgrid.com</p>
                   <p>• API Key: SG.xxxxx (dari SendGrid dashboard)</p>
@@ -304,8 +319,11 @@ export default function EmailSettings() {
             
             <div className="bg-blue-50 p-4 rounded-lg">
               <p className="text-sm text-blue-700">
-                <strong>Catatan:</strong> Mailtrap sandbox hanya untuk testing internal (email tidak benar-benar terkirim). 
-                Untuk mengirim email sesungguhnya, isi kredensial Gmail atau SendGrid di atas.
+                <strong>Status saat ini:</strong> Menggunakan Mailtrap Sandbox (smtp.mailtrap.io:2525) - hanya untuk testing internal. 
+                Email berhasil "dikirim" ke log server tapi tidak sampai ke inbox nyata.
+              </p>
+              <p className="text-sm text-blue-700 mt-2">
+                <strong>Untuk mengirim email sesungguhnya:</strong> Ubah host menjadi "live.smtp.mailtrap.io" dengan port 587 dan kredensial Mailtrap Send yang valid.
               </p>
             </div>
           </CardContent>
