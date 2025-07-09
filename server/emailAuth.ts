@@ -139,5 +139,15 @@ declare module "express-session" {
   interface SessionData {
     userId: string;
     loggedOut?: boolean;
+    pendingRegistration?: {
+      userName: string;
+      businessName: string;
+      whatsappNumber: string;
+      email: string;
+      password: string;
+      verificationCode: string;
+      expiresAt: number;
+      isVerified?: boolean;
+    };
   }
 }
