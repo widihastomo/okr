@@ -492,14 +492,14 @@ export default function CompanyOnboarding() {
                 setOnboardingData({ ...onboardingData, cycleDuration: value })
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className="transition-all duration-300 hover:shadow-md focus:shadow-lg focus:scale-[1.02]">
                 <SelectValue placeholder="Pilih durasi" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1_bulan">1 Bulan</SelectItem>
-                <SelectItem value="3_bulan">3 Bulan (Quarterly)</SelectItem>
-                <SelectItem value="6_bulan">6 Bulan</SelectItem>
-                <SelectItem value="1_tahun">1 Tahun</SelectItem>
+                <SelectItem value="1_bulan" className="transition-all duration-200 hover:bg-orange-50">1 Bulan</SelectItem>
+                <SelectItem value="3_bulan" className="transition-all duration-200 hover:bg-orange-50">3 Bulan (Quarterly)</SelectItem>
+                <SelectItem value="6_bulan" className="transition-all duration-200 hover:bg-orange-50">6 Bulan</SelectItem>
+                <SelectItem value="1_tahun" className="transition-all duration-200 hover:bg-orange-50">1 Tahun</SelectItem>
               </SelectContent>
             </Select>
             {onboardingData.cycleDuration && (
@@ -511,7 +511,7 @@ export default function CompanyOnboarding() {
                       <Button
                         variant={"outline"}
                         className={cn(
-                          "w-full justify-start text-left font-normal",
+                          "w-full justify-start text-left font-normal transition-all duration-300 hover:shadow-md focus:shadow-lg focus:scale-[1.02]",
                           !onboardingData.cycleStartDate &&
                             "text-muted-foreground",
                         )}
@@ -557,7 +557,7 @@ export default function CompanyOnboarding() {
                       <Button
                         variant={"outline"}
                         className={cn(
-                          "w-full justify-start text-left font-normal",
+                          "w-full justify-start text-left font-normal transition-all duration-300 hover:shadow-md focus:shadow-lg focus:scale-[1.02]",
                           !onboardingData.cycleEndDate &&
                             "text-muted-foreground",
                         )}
@@ -898,29 +898,29 @@ export default function CompanyOnboarding() {
                 setOnboardingData({ ...onboardingData, cadence: value })
               }
             >
-              <div className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50">
-                <RadioGroupItem value="harian" id="harian" className="mt-1" />
+              <div className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50 transition-all duration-300 hover:shadow-md hover:scale-[1.02]">
+                <RadioGroupItem value="harian" id="harian" className="mt-1 transition-all duration-200" />
                 <div className="flex-1">
-                  <Label htmlFor="harian" className="font-medium cursor-pointer">Setiap Hari</Label>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <Label htmlFor="harian" className="font-medium cursor-pointer transition-all duration-200 hover:text-orange-600">Setiap Hari</Label>
+                  <p className="text-sm text-gray-500 mt-1 transition-all duration-200">
                     Cocok untuk goal yang memerlukan perhatian harian dan monitoring ketat
                   </p>
                 </div>
               </div>
-              <div className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50">
-                <RadioGroupItem value="mingguan" id="mingguan" className="mt-1" />
+              <div className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50 transition-all duration-300 hover:shadow-md hover:scale-[1.02]">
+                <RadioGroupItem value="mingguan" id="mingguan" className="mt-1 transition-all duration-200" />
                 <div className="flex-1">
-                  <Label htmlFor="mingguan" className="font-medium cursor-pointer">Setiap Minggu</Label>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <Label htmlFor="mingguan" className="font-medium cursor-pointer transition-all duration-200 hover:text-orange-600">Setiap Minggu</Label>
+                  <p className="text-sm text-gray-500 mt-1 transition-all duration-200">
                     Ideal untuk goal jangka menengah dengan review progress mingguan
                   </p>
                 </div>
               </div>
-              <div className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50">
-                <RadioGroupItem value="bulanan" id="bulanan" className="mt-1" />
+              <div className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50 transition-all duration-300 hover:shadow-md hover:scale-[1.02]">
+                <RadioGroupItem value="bulanan" id="bulanan" className="mt-1 transition-all duration-200" />
                 <div className="flex-1">
-                  <Label htmlFor="bulanan" className="font-medium cursor-pointer">Setiap Bulan</Label>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <Label htmlFor="bulanan" className="font-medium cursor-pointer transition-all duration-200 hover:text-orange-600">Setiap Bulan</Label>
+                  <p className="text-sm text-gray-500 mt-1 transition-all duration-200">
                     Tepat untuk goal strategis dengan evaluasi bulanan yang komprehensif
                   </p>
                 </div>
@@ -956,8 +956,8 @@ export default function CompanyOnboarding() {
                         }
                         className={
                           onboardingData.reminderTime === timeOption.value
-                            ? "bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
-                            : "hover:bg-orange-50 hover:border-orange-300 text-gray-700"
+                            ? "bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white transition-all duration-300 transform hover:scale-105 shadow-md"
+                            : "hover:bg-orange-50 hover:border-orange-300 text-gray-700 transition-all duration-300 transform hover:scale-105 hover:shadow-md"
                         }
                       >
                         {timeOption.label}
@@ -982,7 +982,7 @@ export default function CompanyOnboarding() {
                               reminderTime: e.target.value,
                             })
                           }
-                          className="w-32 cursor-pointer focus:ring-2 focus:ring-orange-500"
+                          className="w-32 cursor-pointer focus:ring-2 focus:ring-orange-500 transition-all duration-300 hover:shadow-md focus:shadow-lg focus:scale-[1.02]"
                           placeholder="HH:MM"
                           step="60"
                           min="00:00"
@@ -2257,21 +2257,21 @@ export default function CompanyOnboarding() {
           </div>
 
           {/* Virtual Assistant - Show on all steps */}
-          <div className="mb-6">
-            <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-lg p-4 shadow-sm">
+          <div className="mb-6 animate-in fade-in slide-in-from-left-4 duration-500">
+            <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-lg p-4 shadow-sm transition-all duration-300 hover:shadow-md">
               <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0">
                   <div
-                    className={`w-10 h-10 bg-gradient-to-br ${getProgressColor()} rounded-full flex items-center justify-center transition-all duration-500`}
+                    className={`w-10 h-10 bg-gradient-to-br ${getProgressColor()} rounded-full flex items-center justify-center transition-all duration-500 hover:scale-110`}
                   >
-                    <Sparkles className="w-5 h-5 text-white" />
+                    <Sparkles className="w-5 h-5 text-white transition-all duration-300 hover:rotate-12" />
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-medium text-gray-900 mb-1">
+                  <h4 className="font-medium text-gray-900 mb-1 transition-all duration-300">
                     Asisten Virtual
                   </h4>
-                  <p className="text-sm text-gray-700 leading-relaxed">
+                  <p className="text-sm text-gray-700 leading-relaxed transition-all duration-300">
                     {getVirtualAssistantMessage()}
                   </p>
                 </div>
@@ -2281,17 +2281,17 @@ export default function CompanyOnboarding() {
 
           {/* Progress Bar */}
           {onboardingData.currentStep > 0 && (
-            <div className="mb-8">
+            <div className="mb-8 animate-in fade-in slide-in-from-top-2 duration-500">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 transition-all duration-300">
                   Langkah {onboardingData.currentStep} dari{" "}
                   {ONBOARDING_STEPS.length}
                 </span>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 transition-all duration-300">
                   {Math.round(progressPercentage)}% selesai
                 </span>
               </div>
-              <Progress value={progressPercentage} className="h-2" />
+              <Progress value={progressPercentage} className="h-2 transition-all duration-700 ease-out" />
             </div>
           )}
 
@@ -2299,43 +2299,43 @@ export default function CompanyOnboarding() {
             {/* Step Content */}
             <div className="space-y-6">
               {onboardingData.currentStep === 0 ? (
-                <Card>
-                  <CardHeader>
+                <Card key="welcome" className="shadow-lg transition-all duration-500 ease-in-out transform hover:shadow-xl animate-in fade-in slide-in-from-bottom-4">
+                  <CardHeader className="transition-all duration-300">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-orange-100 rounded-lg">
-                        <welcomeScreenData.icon className="w-5 h-5 text-orange-600" />
+                      <div className="p-2 bg-orange-100 rounded-lg transition-all duration-300 hover:bg-orange-200">
+                        <welcomeScreenData.icon className="w-5 h-5 text-orange-600 transition-all duration-300" />
                       </div>
                       <div>
-                        <CardTitle className="text-lg">
+                        <CardTitle className="text-lg transition-all duration-300">
                           {welcomeScreenData.title}
                         </CardTitle>
-                        <CardDescription>
+                        <CardDescription className="transition-all duration-300">
                           {welcomeScreenData.description}
                         </CardDescription>
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent>{renderStepContent()}</CardContent>
+                  <CardContent className="transition-all duration-300">{renderStepContent()}</CardContent>
                 </Card>
               ) : (
                 currentStepData && (
-                  <Card>
-                    <CardHeader>
+                  <Card key={`step-${onboardingData.currentStep}`} className="shadow-lg transition-all duration-500 ease-in-out transform hover:shadow-xl animate-in fade-in slide-in-from-bottom-4">
+                    <CardHeader className="transition-all duration-300">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-orange-100 rounded-lg">
-                          <currentStepData.icon className="w-5 h-5 text-orange-600" />
+                        <div className="p-2 bg-orange-100 rounded-lg transition-all duration-300 hover:bg-orange-200 hover:scale-105">
+                          <currentStepData.icon className="w-5 h-5 text-orange-600 transition-all duration-300" />
                         </div>
                         <div>
-                          <CardTitle className="text-lg">
+                          <CardTitle className="text-lg transition-all duration-300">
                             {currentStepData.title}
                           </CardTitle>
-                          <CardDescription>
+                          <CardDescription className="transition-all duration-300">
                             {currentStepData.description}
                           </CardDescription>
                         </div>
                       </div>
                     </CardHeader>
-                    <CardContent>{renderStepContent()}</CardContent>
+                    <CardContent className="transition-all duration-300">{renderStepContent()}</CardContent>
                   </Card>
                 )
               )}
@@ -2349,7 +2349,11 @@ export default function CompanyOnboarding() {
                 }
               >
                 {onboardingData.currentStep > 0 && (
-                  <Button variant="outline" onClick={handlePrevious}>
+                  <Button 
+                    variant="outline" 
+                    onClick={handlePrevious}
+                    className="transition-all duration-300 transform hover:scale-105 hover:shadow-md"
+                  >
                     Sebelumnya
                   </Button>
                 )}
@@ -2357,7 +2361,7 @@ export default function CompanyOnboarding() {
                 {onboardingData.currentStep === ONBOARDING_STEPS.length ? (
                   <Button
                     onClick={handleComplete}
-                    className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                    className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:hover:scale-100 disabled:hover:shadow-none"
                     disabled={completeOnboardingMutation.isPending}
                   >
                     {completeOnboardingMutation.isPending
@@ -2367,14 +2371,14 @@ export default function CompanyOnboarding() {
                 ) : (
                   <Button
                     onClick={handleNext}
-                    className={`bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 ${
+                    className={`bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg ${
                       onboardingData.currentStep === 0 ? "w-full sm:w-auto" : ""
                     }`}
                   >
                     {onboardingData.currentStep === 0
                       ? "Mulai Onboarding"
                       : "Selanjutnya"}
-                    <ArrowRight className="w-4 h-4 ml-2" />
+                    <ArrowRight className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
                   </Button>
                 )}
               </div>
