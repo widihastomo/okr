@@ -196,6 +196,7 @@ export default function CompanyOnboarding() {
       queryClient.invalidateQueries({ queryKey: ["/api/onboarding/progress"] });
     },
     onError: (error) => {
+      console.error("Frontend mutation error:", error);
       toast({
         title: "Error",
         description: "Gagal menyimpan progress onboarding",
@@ -258,6 +259,7 @@ export default function CompanyOnboarding() {
       setOnboardingData(newData);
       // Only save progress if we're past the welcome screen
       if (onboardingData.currentStep > 0) {
+        console.log("Saving progress data:", newData);
         saveProgressMutation.mutate(newData);
       }
     }
