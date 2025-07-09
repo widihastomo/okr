@@ -1033,62 +1033,130 @@ export default function CompanyOnboarding() {
         
         // Create task groups by initiative
         const getTaskGroupsByInitiative = (initiatives: string[]) => {
-          const taskGroups: { [key: string]: string[] } = {};
+          const taskGroups: { [key: string]: string[] } = {
+            // Sales initiatives
+            "Lead scoring system untuk prioritas": [
+              "Setup lead scoring criteria berdasarkan behavior",
+              "Konfigurasi automated scoring dalam CRM",
+              "Training sales team untuk interpretasi score",
+              "Monitor dan adjust scoring algorithm"
+            ],
+            "Personalisasi approach berdasarkan lead profile": [
+              "Buat database profil lengkap untuk setiap lead",
+              "Develop template komunikasi untuk setiap persona",
+              "Training sales team untuk personalisasi approach",
+              "Track conversion rate per persona"
+            ],
+            "A/B testing untuk sales pitch": [
+              "Buat 2 versi sales pitch yang berbeda",
+              "Setup sistem tracking untuk setiap pitch",
+              "Eksekusi A/B test dengan sample lead",
+              "Analisis hasil dan implementasi pitch terbaik"
+            ],
+            "Automated lead notification system": [
+              "Setup real-time notification untuk lead baru",
+              "Konfigurasi assignment rule untuk sales team",
+              "Implementasi lead routing berdasarkan criteria",
+              "Monitor response time dan follow-up rate"
+            ],
+            "Dedicated lead response team": [
+              "Rekrut dan training specialized lead response team",
+              "Setup SOP untuk response time maksimal 1 jam",
+              "Buat dashboard monitoring untuk response metrics",
+              "Implementasi escalation protocol untuk urgent leads"
+            ],
+            "Mobile app untuk quick response": [
+              "Develop mobile app untuk notifikasi lead",
+              "Integrasikan dengan CRM untuk data sync",
+              "Training team untuk menggunakan mobile app",
+              "Monitor response time improvement"
+            ],
+            "Machine learning untuk lead analysis": [
+              "Collect historical data untuk training ML model",
+              "Develop predictive model untuk lead quality",
+              "Integrasikan ML model dengan existing system",
+              "Monitor akurasi dan continuous improvement"
+            ],
+            
+            // Operational initiatives
+            "Implementasi lean manufacturing principles": [
+              "Analisis current process dan identifikasi waste",
+              "Training karyawan tentang lean principles",
+              "Implementasi 5S di area produksi",
+              "Monitor improvement metrics"
+            ],
+            "Automated production line setup": [
+              "Evaluasi kebutuhan automation equipment",
+              "Install dan setup automated system",
+              "Training operator untuk automated system",
+              "Monitor produktivitas improvement"
+            ],
+            "Time and motion study untuk bottleneck": [
+              "Lakukan time study untuk setiap production step",
+              "Identifikasi bottleneck dalam production line",
+              "Buat action plan untuk eliminate bottleneck",
+              "Implementasi solution dan monitor hasil"
+            ],
+            "Preventive maintenance schedule": [
+              "Buat schedule maintenance untuk semua mesin",
+              "Siapkan checklist maintenance routine",
+              "Training teknisi untuk preventive maintenance",
+              "Monitor downtime reduction"
+            ],
+            "Real-time monitoring system": [
+              "Install sensor untuk real-time monitoring",
+              "Setup dashboard untuk production metrics",
+              "Training team untuk respond alert",
+              "Monitor overall equipment effectiveness"
+            ],
+            "Quality control di setiap stage produksi": [
+              "Buat SOP quality control untuk setiap stage",
+              "Setup quality checkpoint di production line",
+              "Training quality control inspector",
+              "Monitor quality metrics dan defect rate"
+            ],
+            
+            // Customer service initiatives
+            "Training customer service excellence": [
+              "Buat modul training customer service",
+              "Conduct training session untuk CS team",
+              "Evaluasi performance setelah training",
+              "Monitor customer satisfaction improvement"
+            ],
+            "Implementasi feedback system yang real-time": [
+              "Setup feedback system di website",
+              "Buat dashboard untuk monitoring feedback",
+              "Training tim untuk respond feedback",
+              "Monitor response time dan resolution rate"
+            ],
+            "Reward program untuk high performing agent": [
+              "Buat criteria untuk high performing agent",
+              "Design reward system yang motivating",
+              "Implementasi recognition program",
+              "Monitor agent performance improvement"
+            ],
+            "Proactive customer outreach program": [
+              "Buat database customer untuk outreach",
+              "Buat script untuk customer outreach",
+              "Schedule regular customer check-in",
+              "Monitor customer retention rate"
+            ],
+            "Root cause analysis untuk recurring issues": [
+              "Analisis data complaint untuk pattern",
+              "Buat action plan untuk fix root cause",
+              "Implementasi solution dan monitoring",
+              "Monitor complaint reduction rate"
+            ]
+          };
           
+          const selectedTaskGroups: { [key: string]: string[] } = {};
           initiatives.forEach(initiative => {
-            if (initiative.toLowerCase().includes('social media') || initiative.toLowerCase().includes('media sosial')) {
-              taskGroups[initiative] = [
-                'Buat konten untuk Instagram',
-                'Posting regular di Facebook',
-                'Engagement dengan audience',
-                'Analisis performa konten'
-              ];
-            } else if (initiative.toLowerCase().includes('website') || initiative.toLowerCase().includes('landing page')) {
-              taskGroups[initiative] = [
-                'Desain wireframe halaman',
-                'Develop halaman utama',
-                'Optimasi SEO',
-                'Testing responsivitas'
-              ];
-            } else if (initiative.toLowerCase().includes('email') || initiative.toLowerCase().includes('newsletter')) {
-              taskGroups[initiative] = [
-                'Setup email campaign',
-                'Buat template email',
-                'Segmentasi target audience',
-                'Analisis open rate'
-              ];
-            } else if (initiative.toLowerCase().includes('product') || initiative.toLowerCase().includes('produk')) {
-              taskGroups[initiative] = [
-                'Riset kebutuhan pasar',
-                'Develop prototype',
-                'User testing',
-                'Iterasi berdasarkan feedback'
-              ];
-            } else if (initiative.toLowerCase().includes('sales') || initiative.toLowerCase().includes('penjualan')) {
-              taskGroups[initiative] = [
-                'Identifikasi prospek',
-                'Buat sales pitch',
-                'Follow up leads',
-                'Closing deals'
-              ];
-            } else if (initiative.toLowerCase().includes('team') || initiative.toLowerCase().includes('tim')) {
-              taskGroups[initiative] = [
-                'Rekrut anggota tim',
-                'Training onboarding',
-                'Setup workflow',
-                'Evaluasi performa'
-              ];
-            } else {
-              taskGroups[initiative] = [
-                'Perencanaan strategi',
-                'Eksekusi tahap pertama',
-                'Monitoring progress',
-                'Evaluasi dan optimasi'
-              ];
+            if (taskGroups[initiative]) {
+              selectedTaskGroups[initiative] = taskGroups[initiative];
             }
           });
           
-          return taskGroups;
+          return selectedTaskGroups;
         };
         
         const taskGroups = getTaskGroupsByInitiative(selectedInitiativesForTasks);
@@ -1243,9 +1311,127 @@ export default function CompanyOnboarding() {
                             
                             {/* Initiatives for this Key Result */}
                             {relatedInitiatives.map((init, initIndex) => {
-                              // Get tasks related to this initiative (simplified: divide tasks equally)
-                              const tasksPerInit = Math.ceil((onboardingData.tasks?.filter(task => task && task !== "custom")?.length || 0) / relatedInitiatives.length);
-                              const relatedTasks = onboardingData.tasks?.filter(task => task && task !== "custom")?.slice(initIndex * tasksPerInit, (initIndex + 1) * tasksPerInit) || [];
+                              // Get tasks related to this specific initiative using the mapping
+                              const taskGroups = {
+                                // Sales initiatives
+                                "Lead scoring system untuk prioritas": [
+                                  "Setup lead scoring criteria berdasarkan behavior",
+                                  "Konfigurasi automated scoring dalam CRM",
+                                  "Training sales team untuk interpretasi score",
+                                  "Monitor dan adjust scoring algorithm"
+                                ],
+                                "Personalisasi approach berdasarkan lead profile": [
+                                  "Buat database profil lengkap untuk setiap lead",
+                                  "Develop template komunikasi untuk setiap persona",
+                                  "Training sales team untuk personalisasi approach",
+                                  "Track conversion rate per persona"
+                                ],
+                                "A/B testing untuk sales pitch": [
+                                  "Buat 2 versi sales pitch yang berbeda",
+                                  "Setup sistem tracking untuk setiap pitch",
+                                  "Eksekusi A/B test dengan sample lead",
+                                  "Analisis hasil dan implementasi pitch terbaik"
+                                ],
+                                "Automated lead notification system": [
+                                  "Setup real-time notification untuk lead baru",
+                                  "Konfigurasi assignment rule untuk sales team",
+                                  "Implementasi lead routing berdasarkan criteria",
+                                  "Monitor response time dan follow-up rate"
+                                ],
+                                "Dedicated lead response team": [
+                                  "Rekrut dan training specialized lead response team",
+                                  "Setup SOP untuk response time maksimal 1 jam",
+                                  "Buat dashboard monitoring untuk response metrics",
+                                  "Implementasi escalation protocol untuk urgent leads"
+                                ],
+                                "Mobile app untuk quick response": [
+                                  "Develop mobile app untuk notifikasi lead",
+                                  "Integrasikan dengan CRM untuk data sync",
+                                  "Training team untuk menggunakan mobile app",
+                                  "Monitor response time improvement"
+                                ],
+                                "Machine learning untuk lead analysis": [
+                                  "Collect historical data untuk training ML model",
+                                  "Develop predictive model untuk lead quality",
+                                  "Integrasikan ML model dengan existing system",
+                                  "Monitor akurasi dan continuous improvement"
+                                ],
+                                
+                                // Operational initiatives
+                                "Implementasi lean manufacturing principles": [
+                                  "Analisis current process dan identifikasi waste",
+                                  "Training karyawan tentang lean principles",
+                                  "Implementasi 5S di area produksi",
+                                  "Monitor improvement metrics"
+                                ],
+                                "Automated production line setup": [
+                                  "Evaluasi kebutuhan automation equipment",
+                                  "Install dan setup automated system",
+                                  "Training operator untuk automated system",
+                                  "Monitor produktivitas improvement"
+                                ],
+                                "Time and motion study untuk bottleneck": [
+                                  "Lakukan time study untuk setiap production step",
+                                  "Identifikasi bottleneck dalam production line",
+                                  "Buat action plan untuk eliminate bottleneck",
+                                  "Implementasi solution dan monitor hasil"
+                                ],
+                                "Preventive maintenance schedule": [
+                                  "Buat schedule maintenance untuk semua mesin",
+                                  "Siapkan checklist maintenance routine",
+                                  "Training teknisi untuk preventive maintenance",
+                                  "Monitor downtime reduction"
+                                ],
+                                "Real-time monitoring system": [
+                                  "Install sensor untuk real-time monitoring",
+                                  "Setup dashboard untuk production metrics",
+                                  "Training team untuk respond alert",
+                                  "Monitor overall equipment effectiveness"
+                                ],
+                                "Quality control di setiap stage produksi": [
+                                  "Buat SOP quality control untuk setiap stage",
+                                  "Setup quality checkpoint di production line",
+                                  "Training quality control inspector",
+                                  "Monitor quality metrics dan defect rate"
+                                ],
+                                
+                                // Customer service initiatives
+                                "Training customer service excellence": [
+                                  "Buat modul training customer service",
+                                  "Conduct training session untuk CS team",
+                                  "Evaluasi performance setelah training",
+                                  "Monitor customer satisfaction improvement"
+                                ],
+                                "Implementasi feedback system yang real-time": [
+                                  "Setup feedback system di website",
+                                  "Buat dashboard untuk monitoring feedback",
+                                  "Training tim untuk respond feedback",
+                                  "Monitor response time dan resolution rate"
+                                ],
+                                "Reward program untuk high performing agent": [
+                                  "Buat criteria untuk high performing agent",
+                                  "Design reward system yang motivating",
+                                  "Implementasi recognition program",
+                                  "Monitor agent performance improvement"
+                                ],
+                                "Proactive customer outreach program": [
+                                  "Buat database customer untuk outreach",
+                                  "Buat script untuk customer outreach",
+                                  "Schedule regular customer check-in",
+                                  "Monitor customer retention rate"
+                                ],
+                                "Root cause analysis untuk recurring issues": [
+                                  "Analisis data complaint untuk pattern",
+                                  "Buat action plan untuk fix root cause",
+                                  "Implementasi solution dan monitoring",
+                                  "Monitor complaint reduction rate"
+                                ]
+                              };
+
+                              const relatedTasks = taskGroups[init] || [];
+                              const selectedTasksForThisInit = relatedTasks.filter(task => 
+                                onboardingData.tasks?.includes(task)
+                              );
                               
                               return (
                                 <div key={initIndex} className="ml-4 border-l-2 border-purple-200 pl-4 space-y-2">
@@ -1258,7 +1444,7 @@ export default function CompanyOnboarding() {
                                   </div>
                                   
                                   {/* Tasks for this Initiative */}
-                                  {relatedTasks.map((task, taskIndex) => (
+                                  {selectedTasksForThisInit.map((task, taskIndex) => (
                                     <div key={taskIndex} className="ml-4 flex items-start space-x-2">
                                       <div className="w-1 h-1 bg-orange-500 rounded-full mt-2"></div>
                                       <div>
