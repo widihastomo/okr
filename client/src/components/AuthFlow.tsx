@@ -396,7 +396,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
       <Button
         variant="outline"
         onClick={() => navigateToStep(backStep)}
-        className="text-gray-600 hover:text-gray-800 border-gray-300 hover:border-gray-400 mb-4"
+        className="w-full text-gray-600 hover:text-gray-800 border-gray-300 hover:border-gray-400 mb-4 h-11"
       >
         <ArrowLeft className="h-4 w-4 mr-2" />
         Kembali
