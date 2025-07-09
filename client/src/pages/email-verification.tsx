@@ -9,7 +9,7 @@ import { CheckCircle, Mail, AlertCircle, ArrowRight, RefreshCw } from "lucide-re
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { apiRequest } from "@/lib/queryClient";
 import { LoadingButton } from "@/components/ui/playful-loading";
-import refokusLogo from "@assets/refokus_1751810404513.png";
+import refokusLogo from "@assets/refokus_1751810711179.png";
 
 export default function EmailVerification() {
   const [code, setCode] = useState("");
