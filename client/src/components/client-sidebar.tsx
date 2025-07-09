@@ -87,6 +87,12 @@ export default function Sidebar({
       active: location === "/system-admin/trial-settings",
     },
     {
+      label: "Pengaturan Email",
+      icon: Mail,
+      path: "/system-admin/email-settings",
+      active: location === "/system-admin/email-settings",
+    },
+    {
       label: "Kelola Langganan",
       icon: CreditCard,
       path: "/system-admin/subscriptions",

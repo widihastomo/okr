@@ -1,4 +1,8 @@
 import nodemailer from 'nodemailer';
+import sgMail from '@sendgrid/mail';
+import { db } from './db';
+import { systemSettings } from '@shared/schema';
+import { eq } from 'drizzle-orm';
 
 interface EmailConfig {
   from: string;
@@ -12,23 +16,78 @@ interface EmailProvider {
   sendEmail(config: EmailConfig): Promise<boolean>;
 }
 
+// Get email settings from system settings
+async function getEmailSettings(): Promise<Record<string, string>> {
+  try {
+    const settings = await db.select().from(systemSettings).where(eq(systemSettings.category, 'email'));
+    const settingsMap: Record<string, string> = {};
+    
+    for (const setting of settings) {
+      if (setting.settingKey && setting.settingValue) {
+        settingsMap[setting.settingKey] = setting.settingValue;
+      }
+    }
+    
+    return settingsMap;
+  } catch (error) {
+    console.error('Error fetching email settings:', error);
+    return {};
+  }
+}
+
+// Mailtrap Provider
+class MailtrapProvider implements EmailProvider {
+  name = 'Mailtrap';
+  
+  async sendEmail(config: EmailConfig): Promise<boolean> {
+    try {
+      const settings = await getEmailSettings();
+      
+      if (!settings.mailtrap_host || !settings.mailtrap_port || !settings.mailtrap_user || !settings.mailtrap_pass) {
+        throw new Error('Mailtrap credentials not configured');
+      }
+      
+      const transporter = nodemailer.createTransporter({
+        host: settings.mailtrap_host,
+        port: parseInt(settings.mailtrap_port),
+        auth: {
+          user: settings.mailtrap_user,
+          pass: settings.mailtrap_pass,
+        },
+      });
+      
+      await transporter.sendMail({
+        from: settings.mailtrap_from || config.from,
+        to: config.to,
+        subject: config.subject,
+        html: config.html,
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Mailtrap error:', error);
+      return false;
+    }
+  }
+}
+
 // SendGrid Provider
 class SendGridProvider implements EmailProvider {
   name = 'SendGrid';
   
   async sendEmail(config: EmailConfig): Promise<boolean> {
     try {
-      const sgMail = require('@sendgrid/mail');
+      const settings = await getEmailSettings();
       
-      if (!process.env.SENDGRID_API_KEY) {
-        throw new Error('SENDGRID_API_KEY is not configured');
+      if (!settings.sendgrid_api_key) {
+        throw new Error('SendGrid API key not configured');
       }
       
-      sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+      sgMail.setApiKey(settings.sendgrid_api_key);
       
       await sgMail.send({
         to: config.to,
-        from: config.from,
+        from: settings.sendgrid_from || config.from,
         subject: config.subject,
         html: config.html,
       });
@@ -47,20 +106,22 @@ class GmailProvider implements EmailProvider {
   
   async sendEmail(config: EmailConfig): Promise<boolean> {
     try {
-      if (!process.env.GMAIL_EMAIL || !process.env.GMAIL_PASSWORD) {
+      const settings = await getEmailSettings();
+      
+      if (!settings.gmail_email || !settings.gmail_password) {
         throw new Error('Gmail credentials not configured');
       }
       
       const transporter = nodemailer.createTransporter({
         service: 'gmail',
         auth: {
-          user: process.env.GMAIL_EMAIL,
-          pass: process.env.GMAIL_PASSWORD, // App password
+          user: settings.gmail_email,
+          pass: settings.gmail_password, // App password
         },
       });
       
       await transporter.sendMail({
-        from: config.from,
+        from: settings.gmail_from || config.from,
         to: config.to,
         subject: config.subject,
         html: config.html,
@@ -80,25 +141,24 @@ class SMTPProvider implements EmailProvider {
   
   async sendEmail(config: EmailConfig): Promise<boolean> {
     try {
-      const requiredEnvs = ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS'];
-      for (const env of requiredEnvs) {
-        if (!process.env[env]) {
-          throw new Error(`${env} is not configured`);
-        }
+      const settings = await getEmailSettings();
+      
+      if (!settings.smtp_host) {
+        throw new Error('SMTP_HOST is not configured');
       }
       
       const transporter = nodemailer.createTransporter({
-        host: process.env.SMTP_HOST,
-        port: parseInt(process.env.SMTP_PORT || '587'),
-        secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+        host: settings.smtp_host,
+        port: parseInt(settings.smtp_port || '587'),
+        secure: settings.smtp_secure === 'true',
         auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
+          user: settings.smtp_user,
+          pass: settings.smtp_pass,
         },
       });
       
       await transporter.sendMail({
-        from: config.from,
+        from: settings.smtp_from || config.from,
         to: config.to,
         subject: config.subject,
         html: config.html,
@@ -115,6 +175,7 @@ class SMTPProvider implements EmailProvider {
 // Email Service with fallback providers
 class EmailService {
   private providers: EmailProvider[] = [
+    new MailtrapProvider(), // Mailtrap as primary
     new SendGridProvider(),
     new GmailProvider(),
     new SMTPProvider(),

@@ -708,8 +708,27 @@ export const dailyReflections = pgTable("daily_reflections", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// System Settings table for email configuration
+export const systemSettings = pgTable("system_settings", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  settingKey: text("setting_key").notNull().unique(),
+  settingValue: text("setting_value"),
+  description: text("description"),
+  category: text("category").notNull().default("email"), // "email", "general", "security"
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Daily Reflections Insert Schema
 export const insertDailyReflectionSchema = createInsertSchema(dailyReflections).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// System Settings Insert Schema
+export const insertSystemSettingSchema = createInsertSchema(systemSettings).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
@@ -748,6 +767,10 @@ export type InitiativeDocument = typeof initiativeDocuments.$inferSelect;
 export type InitiativeNote = typeof initiativeNotes.$inferSelect;
 export type Task = typeof tasks.$inferSelect;
 export type TaskComment = typeof taskComments.$inferSelect;
+export type SystemSetting = typeof systemSettings.$inferSelect;
+export type DailyReflection = typeof dailyReflections.$inferSelect;
+export type InsertSystemSetting = z.infer<typeof insertSystemSettingSchema>;
+export type InsertDailyReflection = z.infer<typeof insertDailyReflectionSchema>;
 export type User = typeof users.$inferSelect;
 export type Team = typeof teams.$inferSelect;
 export type TeamMember = typeof teamMembers.$inferSelect;

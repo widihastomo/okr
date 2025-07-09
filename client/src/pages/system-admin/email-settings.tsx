@@ -1,0 +1,330 @@
+import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { useToast } from "@/hooks/use-toast";
+import { ArrowLeft, Mail, Send, AlertCircle, CheckCircle, Save, TestTube } from "lucide-react";
+import { Link } from "wouter";
+import { Separator } from "@/components/ui/separator";
+
+interface EmailSetting {
+  setting_key: string;
+  setting_value: string;
+  description: string;
+  category: string;
+  is_active: boolean;
+}
+
+export default function EmailSettings() {
+  const { toast } = useToast();
+  const [testEmail, setTestEmail] = useState("");
+  const [testSubject, setTestSubject] = useState("Test Email dari Platform OKR");
+  const [testMessage, setTestMessage] = useState("Ini adalah test email untuk memastikan konfigurasi email bekerja dengan baik.");
+
+  const { data: settings, isLoading } = useQuery<EmailSetting[]>({
+    queryKey: ['/api/admin/email-settings'],
+  });
+
+  const updateSettingsMutation = useMutation({
+    mutationFn: async (settingsData: Record<string, string>) => {
+      return apiRequest("PUT", "/api/admin/email-settings", { settings: settingsData });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Berhasil",
+        description: "Pengaturan email telah diperbarui",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/email-settings'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal memperbarui pengaturan email",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const testEmailMutation = useMutation({
+    mutationFn: async (testData: { to: string; subject: string; message: string }) => {
+      return apiRequest("POST", "/api/admin/email-settings/test", testData);
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "Test Email Berhasil",
+        description: `Email terkirim menggunakan ${data.provider || 'email provider'}`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Test Email Gagal",
+        description: error.message || "Gagal mengirim test email",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSaveSettings = () => {
+    if (!settings) return;
+
+    const formData = new FormData(document.getElementById('email-settings-form') as HTMLFormElement);
+    const settingsData: Record<string, string> = {};
+    
+    settings.forEach(setting => {
+      const value = formData.get(setting.setting_key) as string;
+      if (value !== null) {
+        settingsData[setting.setting_key] = value;
+      }
+    });
+
+    updateSettingsMutation.mutate(settingsData);
+  };
+
+  const handleTestEmail = () => {
+    if (!testEmail || !testSubject || !testMessage) {
+      toast({
+        title: "Error",
+        description: "Harap isi semua field untuk test email",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    testEmailMutation.mutate({
+      to: testEmail,
+      subject: testSubject,
+      message: testMessage,
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  const mailtrapSettings = settings?.filter(s => s.setting_key.startsWith('mailtrap_')) || [];
+  const sendgridSettings = settings?.filter(s => s.setting_key.startsWith('sendgrid_')) || [];
+  const gmailSettings = settings?.filter(s => s.setting_key.startsWith('gmail_')) || [];
+  const smtpSettings = settings?.filter(s => s.setting_key.startsWith('smtp_')) || [];
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-white border-b">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-4">
+              <Link href="/system-admin">
+                <Button variant="ghost" size="sm">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Kembali
+                </Button>
+              </Link>
+              <div className="flex items-center space-x-2">
+                <Mail className="h-5 w-5 text-blue-600" />
+                <h1 className="text-xl font-semibold text-gray-900">Pengaturan Email</h1>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <form id="email-settings-form">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Mailtrap Settings */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span>Mailtrap (Primary)</span>
+                </CardTitle>
+                <CardDescription>
+                  Konfigurasi utama untuk email development dan testing
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {mailtrapSettings.map((setting) => (
+                  <div key={setting.setting_key}>
+                    <Label htmlFor={setting.setting_key}>
+                      {setting.setting_key.replace('mailtrap_', '').replace('_', ' ').toUpperCase()}
+                    </Label>
+                    <Input
+                      id={setting.setting_key}
+                      name={setting.setting_key}
+                      type={setting.setting_key.includes('pass') ? 'password' : 'text'}
+                      defaultValue={setting.setting_value}
+                      placeholder={setting.description}
+                    />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* SendGrid Settings */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <span>SendGrid (Fallback)</span>
+                </CardTitle>
+                <CardDescription>
+                  Konfigurasi SendGrid untuk email production
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {sendgridSettings.map((setting) => (
+                  <div key={setting.setting_key}>
+                    <Label htmlFor={setting.setting_key}>
+                      {setting.setting_key.replace('sendgrid_', '').replace('_', ' ').toUpperCase()}
+                    </Label>
+                    <Input
+                      id={setting.setting_key}
+                      name={setting.setting_key}
+                      type={setting.setting_key.includes('api') ? 'password' : 'text'}
+                      defaultValue={setting.setting_value}
+                      placeholder={setting.description}
+                    />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Gmail Settings */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                  <span>Gmail (Fallback)</span>
+                </CardTitle>
+                <CardDescription>
+                  Konfigurasi Gmail untuk email fallback
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {gmailSettings.map((setting) => (
+                  <div key={setting.setting_key}>
+                    <Label htmlFor={setting.setting_key}>
+                      {setting.setting_key.replace('gmail_', '').replace('_', ' ').toUpperCase()}
+                    </Label>
+                    <Input
+                      id={setting.setting_key}
+                      name={setting.setting_key}
+                      type={setting.setting_key.includes('pass') ? 'password' : 'text'}
+                      defaultValue={setting.setting_value}
+                      placeholder={setting.description}
+                    />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* SMTP Settings */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                  <span>SMTP Generic (Fallback)</span>
+                </CardTitle>
+                <CardDescription>
+                  Konfigurasi SMTP generic untuk email fallback
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {smtpSettings.map((setting) => (
+                  <div key={setting.setting_key}>
+                    <Label htmlFor={setting.setting_key}>
+                      {setting.setting_key.replace('smtp_', '').replace('_', ' ').toUpperCase()}
+                    </Label>
+                    <Input
+                      id={setting.setting_key}
+                      name={setting.setting_key}
+                      type={setting.setting_key.includes('pass') ? 'password' : 'text'}
+                      defaultValue={setting.setting_value}
+                      placeholder={setting.description}
+                    />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="mt-6 flex justify-between items-center">
+            <Button
+              type="button"
+              onClick={handleSaveSettings}
+              disabled={updateSettingsMutation.isPending}
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              {updateSettingsMutation.isPending ? "Menyimpan..." : "Simpan Pengaturan"}
+            </Button>
+          </div>
+        </form>
+
+        <Separator className="my-8" />
+
+        {/* Test Email Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <TestTube className="h-5 w-5 text-blue-600" />
+              <span>Test Email</span>
+            </CardTitle>
+            <CardDescription>
+              Kirim test email untuk memastikan konfigurasi email bekerja dengan baik
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="test-email">Email Tujuan</Label>
+                <Input
+                  id="test-email"
+                  type="email"
+                  value={testEmail}
+                  onChange={(e) => setTestEmail(e.target.value)}
+                  placeholder="test@example.com"
+                />
+              </div>
+              <div>
+                <Label htmlFor="test-subject">Subject</Label>
+                <Input
+                  id="test-subject"
+                  value={testSubject}
+                  onChange={(e) => setTestSubject(e.target.value)}
+                  placeholder="Test Email Subject"
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="test-message">Pesan</Label>
+              <Textarea
+                id="test-message"
+                value={testMessage}
+                onChange={(e) => setTestMessage(e.target.value)}
+                placeholder="Masukkan pesan test email"
+                rows={4}
+              />
+            </div>
+            <Button
+              onClick={handleTestEmail}
+              disabled={testEmailMutation.isPending}
+              variant="outline"
+            >
+              <Send className="h-4 w-4 mr-2" />
+              {testEmailMutation.isPending ? "Mengirim..." : "Kirim Test Email"}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

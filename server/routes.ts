@@ -3434,6 +3434,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Email Settings API Routes (System Admin Only)
+  app.get("/api/admin/email-settings", requireAuth, isSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      
+      const settings = await db.execute(
+        `SELECT setting_key, setting_value, description, category, is_active 
+         FROM system_settings 
+         WHERE category = 'email' AND is_active = true 
+         ORDER BY setting_key`
+      );
+      
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching email settings:", error);
+      res.status(500).json({ message: "Failed to fetch email settings" });
+    }
+  });
+
+  app.put("/api/admin/email-settings", requireAuth, isSystemOwner, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      const { settings } = req.body;
+      
+      if (!settings || typeof settings !== 'object') {
+        return res.status(400).json({ message: "Invalid settings data" });
+      }
+      
+      // Update each setting
+      for (const [key, value] of Object.entries(settings)) {
+        await db.execute(
+          `UPDATE system_settings 
+           SET setting_value = $1, updated_at = NOW() 
+           WHERE setting_key = $2 AND category = 'email'`,
+          [value, key]
+        );
+      }
+      
+      res.json({ message: "Email settings updated successfully" });
+    } catch (error) {
+      console.error("Error updating email settings:", error);
+      res.status(500).json({ message: "Failed to update email settings" });
+    }
+  });
+
+  app.post("/api/admin/email-settings/test", requireAuth, isSystemOwner, async (req, res) => {
+    try {
+      const { to, subject, message } = req.body;
+      
+      if (!to || !subject || !message) {
+        return res.status(400).json({ message: "Email address, subject, and message are required" });
+      }
+      
+      const result = await emailService.sendEmail({
+        to,
+        from: 'test@platformokr.com',
+        subject,
+        html: `<p>${message}</p>`
+      });
+      
+      if (result.success) {
+        res.json({ 
+          message: "Test email sent successfully",
+          provider: result.provider
+        });
+      } else {
+        res.status(500).json({ 
+          message: "Failed to send test email",
+          error: result.error 
+        });
+      }
+    } catch (error) {
+      console.error("Error sending test email:", error);
+      res.status(500).json({ message: "Failed to send test email" });
+    }
+  });
+
   // Admin API - Get all subscription plans (including inactive)
   app.get("/api/admin/subscription-plans", requireAuth, isSystemOwner, async (req, res) => {
     try {
