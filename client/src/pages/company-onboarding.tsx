@@ -2070,13 +2070,13 @@ export default function CompanyOnboarding() {
             ],
 
             // Operational initiatives
-            "Implementasi lean manufacturing principles": [
+            "Mengimplementasikan lean manufacturing principles": [
               "Analisis current process dan identifikasi waste",
               "Training karyawan tentang lean principles",
               "Implementasi 5S di area produksi",
               "Monitor improvement metrics",
             ],
-            "Automated production line setup": [
+            "Mengotomatisasi production line setup": [
               "Evaluasi kebutuhan automation equipment",
               "Install dan setup automated system",
               "Training operator untuk automated system",
