@@ -541,7 +541,7 @@ export default function OrganizationSettings() {
                     </div>
                   </div>
                   <div className="flex justify-between">
-                    <Button variant="outline" onClick={() => window.location.href = "/pricing"}>
+                    <Button variant="outline" onClick={() => setLocation("/pricing")}>
                       Ubah Paket
                     </Button>
                     <Button variant="outline" className="text-red-600 hover:text-red-700">
