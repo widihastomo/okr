@@ -285,14 +285,7 @@ export default function DailyFocusPage() {
   const userId =
     user && typeof user === "object" && "id" in user ? (user as any).id : null;
 
-  if (!userId) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <SkeletonLoading shape="card" />
-      </div>
-    );
-  }
-
+  // Move all hooks before any early returns
   const [selectedKeyResult, setSelectedKeyResult] = useState<any>(null);
   const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
   const [isSuccessMetricsModalOpen, setIsSuccessMetricsModalOpen] =
@@ -800,6 +793,15 @@ export default function DailyFocusPage() {
   const getInitiativeCount = (keyResultId: string): number => {
     return initiatives.filter((init: any) => init.keyResultId === keyResultId).length;
   };
+
+  // Early return check - must be AFTER all hooks are called
+  if (!userId) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <SkeletonLoading shape="card" />
+      </div>
+    );
+  }
 
   // Apply user filter to tasks and key results
   const filteredTasks = selectedUserId === "all" 
