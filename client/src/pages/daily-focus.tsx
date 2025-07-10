@@ -368,7 +368,7 @@ export default function DailyFocusPage() {
 
   // Trial achievements query for missions
   const { data: achievements = [], isLoading: isLoadingAchievements } = useQuery({
-    queryKey: ["/api/trial-achievements"],
+    queryKey: ["/api/trial/achievements"],
     enabled: !!userId,
   });
 

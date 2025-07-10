@@ -141,12 +141,7 @@ export default function Sidebar({
       path: "/achievements",
       active: location === "/achievements",
     },
-    {
-      label: "Achievement Trial",
-      icon: Trophy,
-      path: "/trial-achievements",
-      active: location === "/trial-achievements",
-    },
+
     {
       label: "Analitik",
       icon: BarChart3,

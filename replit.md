@@ -233,6 +233,15 @@ All email configuration now uses environment variables:
 ## Changelog
 ```
 Changelog:
+- July 10, 2025. Successfully removed trial-achievements page completely from the application:
+  * Removed /trial-achievements route from App.tsx routing configuration
+  * Deleted client/src/pages/trial-achievements.tsx file completely
+  * Removed TrialAchievements import statement from App.tsx
+  * Removed "Achievement Trial" menu item from sidebar navigation (sidebar.tsx and client-sidebar.tsx)
+  * Updated floating mascot and trial mascot components to use correct API endpoint (/api/trial/achievements)
+  * Fixed floating mascot navigation to redirect to /achievements instead of /trial-achievements
+  * Cleaned up all remaining references to trial-achievements across the codebase
+  * Updated changelog documentation to reflect file removal and system cleanup
 - July 10, 2025. Successfully integrated build seeder with npm run dev for automatic development seeding:
   * Integrated server/build-seeder.ts with development server startup in server/index.ts
   * Build seeder now runs automatically during npm run dev command
@@ -598,7 +607,7 @@ Changelog:
   * Disabled auto-slide functionality for mascot messages to give users full control over message cycling and interface interaction
   * Resolved React JSX styling warnings and state management issues for cleaner console output
 - July 08, 2025. Successfully migrated onboarding mission system to Daily Focus page (root "/" route) with sequential numbered steps:
-  * Completed migration from trial-achievements.tsx to daily-focus.tsx as main application homepage
+  * Completed migration from trial achievements page to daily-focus.tsx as main application homepage
   * Removed points system and gamification elements for cleaner, more focused interface
   * Consolidated all missions into single expandable card titled "Panduan Onboarding Platform"
   * Implemented numbered sequence (1-10) for clear progression: 1. Menambahkan Member, 2. Membuat Tim, 3. Membuat Objective, 4. Menambahkan Key Result, 5. Menambahkan Inisiatif, 6. Menambahkan Task, 7. Update Capaian Key Result, 8. Update Capaian Metrik Inisiatif, 9. Update Status Task, 10. Update Harian Instan

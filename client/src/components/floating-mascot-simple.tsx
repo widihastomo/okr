@@ -69,7 +69,7 @@ export default function FloatingMascot({ className }: FloatingMascotProps) {
   });
 
   const { data: achievements = [] } = useQuery({
-    queryKey: ["/api/trial-achievements"],
+    queryKey: ["/api/trial/achievements"],
   });
 
   // Simple tips array

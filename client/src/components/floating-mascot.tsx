@@ -201,7 +201,7 @@ export default function FloatingMascot({ className }: FloatingMascotProps) {
   });
 
   const { data: achievements = [] } = useQuery({
-    queryKey: ["/api/trial-achievements"],
+    queryKey: ["/api/trial/achievements"],
   });
 
   // Get contextual tips based on current page
@@ -429,7 +429,7 @@ export default function FloatingMascot({ className }: FloatingMascotProps) {
                     } else if (action.includes("Member") || action.includes("Undang Member")) {
                       window.location.href = "/client-users";
                     } else if (action.includes("Pencapaian") || action.includes("Lihat Pencapaian")) {
-                      window.location.href = "/trial-achievements";
+                      window.location.href = "/achievements";
                     } else {
                       // Default action - go to dashboard
                       window.location.href = "/dashboard";

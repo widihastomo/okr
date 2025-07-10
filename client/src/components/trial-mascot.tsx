@@ -170,7 +170,7 @@ export default function TrialMascot({ className, missions = [], onMissionAction 
   });
 
   const { data: achievements = [] } = useQuery({
-    queryKey: ["/api/trial-achievements"],
+    queryKey: ["/api/trial/achievements"],
   });
 
   // Calculate progress from missions data first, fallback to achievements

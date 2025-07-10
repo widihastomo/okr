@@ -145,12 +145,7 @@ export default function Sidebar({
   ];
 
   const regularUserMenuItems = [
-    {
-      label: "Achievement Trial",
-      icon: Trophy,
-      path: "/trial-achievements",
-      active: location === "/trial-achievements",
-    },
+
     {
       label: "Daily Focus",
       icon: Sun,
