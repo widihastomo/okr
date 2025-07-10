@@ -1,8 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
-import { useState } from "react";
-import { useLocation } from "wouter";
-import { useQueryClient } from "@tanstack/react-query";
+import { useLogout } from "@/hooks/useLogout";
 
 interface LogoutButtonProps {
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
@@ -19,31 +17,11 @@ export function LogoutButton({
   showIcon = true,
   children = "Keluar"
 }: LogoutButtonProps) {
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [, setLocation] = useLocation();
-  const queryClient = useQueryClient();
-
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    
-    // Immediately clear client state and navigate for fastest UX
-    queryClient.clear();
-    localStorage.clear();
-    sessionStorage.clear();
-    setLocation("/");
-    
-    // Call logout API in background - don't wait for response
-    fetch('/api/auth/logout', {
-      method: 'POST',
-      credentials: 'include'
-    }).catch(() => {
-      // Ignore errors - user is already logged out on client side
-    });
-  };
+  const { logout, isLoggingOut } = useLogout();
 
   return (
     <Button
-      onClick={handleLogout}
+      onClick={logout}
       variant={variant}
       size={size}
       className={className}

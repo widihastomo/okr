@@ -52,6 +52,7 @@ import { useToast } from "@/hooks/use-toast";
 import OKRFormModal from "./okr-form-modal";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
+import { useLogout } from "@/hooks/useLogout";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 
 interface GlobalHeaderProps {
@@ -78,6 +79,7 @@ export default function GlobalHeader({
 }: GlobalHeaderProps) {
   const [isOKRModalOpen, setIsOKRModalOpen] = useState(false);
   const [showTaskModal, setShowTaskModal] = useState(false);
+  const { logout } = useLogout();
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -248,21 +250,7 @@ export default function GlobalHeader({
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="flex items-center space-x-2 cursor-pointer text-red-600 hover:text-red-700"
-              onClick={() => {
-                // Immediately clear client state and navigate for instant logout
-                queryClient.clear();
-                localStorage.clear();
-                sessionStorage.clear();
-                navigate("/");
-                
-                // Call logout API in background - don't wait
-                fetch("/api/auth/logout", {
-                  method: "POST",
-                  credentials: "include",
-                }).catch(() => {
-                  // Ignore errors - user is already logged out on client
-                });
-              }}
+              onClick={logout}
             >
               <LogOut className="h-4 w-4" />
               <span>Keluar</span>
