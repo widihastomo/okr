@@ -1,0 +1,57 @@
+{
+  "name": "refokus-okr-platform",
+  "version": "1.0.0",
+  "description": "Advanced multi-tenant SaaS platform for organizational goal management",
+  "deployment": {
+    "build": {
+      "command": "./deploy-production.sh",
+      "outputDirectory": "dist",
+      "environment": "production"
+    },
+    "start": {
+      "command": "./start-production.sh",
+      "port": 5000,
+      "healthCheck": "/health"
+    },
+    "database": {
+      "seeder": "npx tsx server/create-production-seeder.ts",
+      "adminCreator": "npx tsx server/create-production-admin.ts",
+      "required": true
+    }
+  },
+  "environment": {
+    "required": [
+      "DATABASE_URL",
+      "NODE_ENV"
+    ],
+    "optional": [
+      "PORT",
+      "MIDTRANS_CLIENT_KEY",
+      "MIDTRANS_SERVER_KEY",
+      "SENDGRID_API_KEY",
+      "OPENAI_API_KEY"
+    ]
+  },
+  "features": {
+    "database": "PostgreSQL with Drizzle ORM",
+    "authentication": "Email/password with system owner support",
+    "subscriptions": "SaaS billing with Midtrans payment gateway",
+    "multiTenant": "Organization-based isolation",
+    "gamification": "Achievement system with progress tracking",
+    "ai": "OpenAI integration for insights and recommendations"
+  },
+  "admin": {
+    "email": "admin@refokus.com",
+    "password": "RefokusAdmin2025!",
+    "role": "system_owner",
+    "changePasswordRequired": true
+  },
+  "scripts": {
+    "build": "./build-production.sh",
+    "deploy": "./deploy-production.sh",
+    "start": "./start-production.sh",
+    "seed": "npx tsx server/create-production-seeder.ts",
+    "createAdmin": "npx tsx server/create-production-admin.ts",
+    "testAdmin": "npx tsx server/create-test-admin.ts"
+  }
+}
