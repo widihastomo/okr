@@ -156,32 +156,44 @@ System menyediakan seeder scripts untuk production deployment:
 
 ## Production Deployment Automation
 
-### Automated Production Seeding
-The system now includes automated production seeding during build process:
+### Build-Time Database Seeder System
+The system now includes comprehensive build-time database seeding that runs automatically during production builds:
 
-#### Build Scripts
-- **`deploy-production.sh`** - Complete deployment with automatic seeding
-- **`build-production.sh`** - Build with seeding integration
-- **`build-production-with-seeder.js`** - Node.js deployment script
+#### Build Seeder Scripts
+- **`server/build-seeder.ts`** - Main build seeder with essential data creation
+- **`build-with-seeder.js`** - Production build script with integrated seeder
+- **`BUILD_SEEDER_GUIDE.md`** - Complete documentation and usage guide
 
-#### Production Seeder Integration
-- Automatically runs during production build when NODE_ENV=production
-- Creates system owner account: admin@refokus.com / RefokusAdmin2025!
-- Populates subscription plans (Free Trial, Starter, Growth, Enterprise)
-- Sets up system organization (Refokus System)
-- Includes fallback to admin-only creation if full seeding fails
+#### Build Seeder Features
+- **System Owner Account**: admin@refokus.com / RefokusAdmin2025! with full platform access
+- **Application Settings**: 22 essential settings (general, appearance, features, security, business, integration)
+- **Subscription Plans**: 4 plans (Free Trial, Starter, Growth, Enterprise) with 10 billing periods
+- **Smart Duplicate Prevention**: Uses onConflictDoNothing() to avoid overwriting existing data
+- **Environment-Aware**: Different behavior for development vs production environments
 
-#### Deployment Configuration
-- **`deployment-config.json`** - Comprehensive deployment configuration
-- **`PRODUCTION-DEPLOYMENT.md`** - Complete deployment guide
-- Environment-aware seeding (production vs development)
-- Health checks and verification steps included
+#### Build Process Integration
+- **Automatic Execution**: Seeder runs before build process to ensure data availability
+- **Error Handling**: Production builds continue even if seeder fails (with warnings)
+- **Standalone Seeder**: Included in dist/ folder for manual execution post-deployment
+- **SSL Support**: Automatic SSL configuration for production database connections
 
-#### Available Scripts
-- `./deploy-production.sh` - Full deployment with seeding
-- `npx tsx server/create-production-seeder.ts` - Manual full seeding
-- `npx tsx server/create-production-admin.ts` - Admin creation only
-- `npx tsx server/create-test-admin.ts` - Test admin for development
+#### Database Connection Support
+- **DATABASE_URL**: Direct PostgreSQL connection string (recommended)
+- **PG Variables**: Automatic URL construction from PGUSER, PGPASSWORD, PGHOST, PGDATABASE, PGPORT
+- **SSL Security**: Automatic sslmode=require for production connections
+
+#### Available Build Commands
+- `npx tsx server/build-seeder.ts` - Run seeder standalone (development testing)
+- `node build-with-seeder.js` - Full production build with integrated seeder
+- `npx tsx server/create-production-seeder.ts` - Legacy full seeding script
+- `npx tsx server/create-production-admin.ts` - Admin-only creation script
+
+#### Production Deployment Workflow
+1. Configure environment variables (DATABASE_URL, SESSION_SECRET)
+2. Run `node build-with-seeder.js` to build with seeder
+3. Deploy `dist/` folder to production server
+4. Run `npm install` and `npm start`
+5. System ready with admin account and essential data
 
 ## Email Configuration
 
