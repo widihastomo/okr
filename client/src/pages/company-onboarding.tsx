@@ -1856,8 +1856,8 @@ export default function CompanyOnboarding() {
         );
 
       case 7: // Task untuk Inisiatif
-        const getTaskOptions = (initiatives: string[]) => {
-          const taskMapping = {
+        // Define taskMapping outside functions so it can be reused
+        const taskMapping = {
             // Penjualan & Marketing Tasks
             "Menjalankan kampanye promosi bulanan dengan diskon 20%": [
               "Buat creative design untuk promosi diskon",
@@ -2079,6 +2079,7 @@ export default function CompanyOnboarding() {
             ],
           };
 
+        const getTaskOptions = (initiatives: string[]) => {
           let allTasks = [];
           initiatives.forEach((init) => {
             if (taskMapping[init]) {
