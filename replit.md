@@ -124,6 +124,7 @@ Changelog:
 - July 10, 2025. Successfully fixed missing task mappings in onboarding system step 7:
   * Added task mappings for operational initiatives: Performance monitoring system, Employee productivity training, Resource allocation optimization, Energy efficiency program, Process optimization initiative  
   * Added task mappings for marketing initiatives: cross-selling strategy, upselling training, referral program, marketplace partnerships
+  * Added task mappings for cost management initiatives: Supplier negotiation program, Material waste reduction program, Cost analysis dan reduction program, Administrative process automation
   * Fixed taskMapping variable scope issue by moving it outside function scope for proper reusability
   * All selected initiatives now properly display corresponding tasks in step 7 of onboarding process
   * Completed comprehensive task mapping coverage for all initiative categories (marketing, operational, customer service)

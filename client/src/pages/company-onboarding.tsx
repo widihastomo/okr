@@ -2031,6 +2031,26 @@ export default function CompanyOnboarding() {
               "Siapkan checklist maintenance routine",
               "Training teknisi untuk preventive maintenance",
             ],
+            "Supplier negotiation program": [
+              "Analisis supplier performance dan pricing",
+              "Negosiasi contract terms dengan supplier",
+              "Monitor supplier performance dan relationship",
+            ],
+            "Material waste reduction program": [
+              "Analisis waste material di production process",
+              "Implementasi waste reduction techniques",
+              "Monitor dan tracking waste reduction progress",
+            ],
+            "Cost analysis dan reduction program": [
+              "Analisis detail structure cost operasional",
+              "Identifikasi area untuk cost reduction",
+              "Implementasi cost reduction measures dan monitoring",
+            ],
+            "Administrative process automation": [
+              "Analisis administrative process yang manual",
+              "Design automation system untuk admin tasks",
+              "Implementasi automation dan training staff",
+            ],
 
             // Customer Service Tasks
             "Melatih customer service excellence": [
