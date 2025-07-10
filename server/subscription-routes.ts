@@ -16,7 +16,7 @@ import { eq, and } from "drizzle-orm";
 export function setupSubscriptionRoutes(app: Express) {
 
   // Get subscription plans with billing periods for wizard
-  app.get("/api/subscription-plans-with-billing", async (req, res) => {
+  app.get("/api/subscription-plans-with-billing", requireAuth, async (req, res) => {
     try {
       const plansWithBilling = await db.select()
         .from(subscriptionPlans)

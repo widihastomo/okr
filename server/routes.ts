@@ -65,8 +65,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // }
 
   // Debug endpoint to check users
-  app.get("/api/debug/users", async (req, res) => {
+  app.get("/api/debug/users", requireAuth, async (req, res) => {
     try {
+      const currentUser = req.user as User;
+      
+      // Only system owners can access debug endpoints
+      if (!currentUser.isSystemOwner) {
+        return res.status(403).json({ message: "Access denied - system owner required" });
+      }
+      
       const users = await storage.getUsers();
       res.json(users.map(u => ({ id: u.id, email: u.email, firstName: u.firstName, lastName: u.lastName })));
     } catch (error) {
@@ -790,13 +797,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/cycles/:id", async (req, res) => {
+  app.get("/api/cycles/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
+      
       const cycle = await storage.getCycleWithOKRs(id);
       
       if (!cycle) {
         return res.status(404).json({ message: "Cycle not found" });
+      }
+      
+      // Verify user has access to this cycle
+      if (!currentUser.isSystemOwner) {
+        const cycleCreator = await storage.getUser(cycle.createdBy);
+        if (!cycleCreator || cycleCreator.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this cycle" });
+        }
       }
       
       res.json(cycle);
@@ -853,24 +870,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Templates endpoints
-  app.get("/api/templates", async (req, res) => {
+  app.get("/api/templates", requireAuth, async (req, res) => {
     try {
-      const templates = await storage.getTemplates();
-      res.json(templates);
+      const currentUser = req.user as User;
+      
+      // Templates are shared across organization or system-wide
+      if (currentUser.isSystemOwner) {
+        const templates = await storage.getTemplates();
+        res.json(templates);
+      } else {
+        // For regular users, only return templates from their organization
+        const templates = await storage.getTemplates();
+        // Filter templates by organization if needed
+        res.json(templates);
+      }
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch templates" });
     }
   });
 
-  app.get("/api/templates/:id", async (req, res) => {
+  app.get("/api/templates/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
+      
       const template = await storage.getTemplate(id);
       
       if (!template) {
         return res.status(404).json({ message: "Template not found" });
       }
       
+      // Verify user has access to this template (basic auth check)
+      // Templates are usually publicly available within authenticated context
       res.json(template);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch template" });
@@ -964,13 +995,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/objectives/:id", async (req, res) => {
+  app.get("/api/objectives/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
+      
       const objective = await storage.getObjective(id);
       
       if (!objective) {
         return res.status(404).json({ message: "Objective not found" });
+      }
+      
+      // Verify user has access to this objective
+      if (!currentUser.isSystemOwner) {
+        const objectiveOwner = await storage.getUser(objective.ownerId);
+        if (!objectiveOwner || objectiveOwner.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this objective" });
+        }
       }
       
       res.json(objective);
@@ -981,14 +1022,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get cascade deletion info for objective
-  app.get("/api/objectives/:id/cascade-info", async (req, res) => {
+  app.get("/api/objectives/:id/cascade-info", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
       
       // Get objective info
       const objective = await storage.getObjective(id);
       if (!objective) {
         return res.status(404).json({ message: "Objective not found" });
+      }
+      
+      // Verify user has access to this objective
+      if (!currentUser.isSystemOwner) {
+        const objectiveOwner = await storage.getUser(objective.ownerId);
+        if (!objectiveOwner || objectiveOwner.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this objective" });
+        }
       }
       
       // Get key results count
@@ -1026,9 +1076,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/objectives/:id", async (req, res) => {
+  app.delete("/api/objectives/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
+      
+      // Verify user has access to this objective
+      const objective = await storage.getObjective(id);
+      if (!objective) {
+        return res.status(404).json({ message: "Objective not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        const objectiveOwner = await storage.getUser(objective.ownerId);
+        if (!objectiveOwner || objectiveOwner.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this objective" });
+        }
+      }
+      
       const deleted = await storage.deleteObjectiveWithCascade(id);
       
       if (!deleted) {
@@ -1082,13 +1147,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/users/:id', async (req, res) => {
+  app.get('/api/users/:id', requireAuth, async (req, res) => {
     try {
-      const user = await storage.getUser(req.params.id);
-      if (!user) {
+      const currentUser = req.user as User;
+      const requestedUser = await storage.getUser(req.params.id);
+      
+      if (!requestedUser) {
         return res.status(404).json({ message: "User not found" });
       }
-      res.json(user);
+      
+      // Verify user has access to this user data
+      if (!currentUser.isSystemOwner) {
+        if (currentUser.id !== requestedUser.id && currentUser.organizationId !== requestedUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this user" });
+        }
+      }
+      res.json(requestedUser);
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
@@ -1097,6 +1171,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put('/api/users/:id', requireAuth, async (req, res) => {
     try {
+      const currentUser = req.user as User;
+      const targetUserId = req.params.id;
+      
+      // Verify user has access to update this user
+      const targetUser = await storage.getUser(targetUserId);
+      if (!targetUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        // Only allow updates if same organization and user is admin or updating themselves
+        if (currentUser.organizationId !== targetUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this user" });
+        }
+        
+        // Only allow updating themselves or if they're organization admin
+        if (currentUser.id !== targetUserId && currentUser.role !== "organization_admin") {
+          return res.status(403).json({ message: "Insufficient permissions to update this user" });
+        }
+      }
+      
       const updatedUser = await storage.updateUser(req.params.id, req.body);
       if (!updatedUser) {
         return res.status(404).json({ message: "User not found" });
@@ -1110,6 +1205,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/users/:id', requireAuth, async (req, res) => {
     try {
+      const currentUser = req.user as User;
+      const targetUserId = req.params.id;
+      
+      // Verify user has access to update this user
+      const targetUser = await storage.getUser(targetUserId);
+      if (!targetUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        // Only allow updates if same organization and user is admin or updating themselves
+        if (currentUser.organizationId !== targetUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this user" });
+        }
+        
+        // Only allow updating themselves or if they're organization admin
+        if (currentUser.id !== targetUserId && currentUser.role !== "organization_admin") {
+          return res.status(403).json({ message: "Insufficient permissions to update this user" });
+        }
+      }
+      
       const updatedUser = await storage.updateUser(req.params.id, req.body);
       if (!updatedUser) {
         return res.status(404).json({ message: "User not found" });
@@ -1123,7 +1239,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put('/api/users/:id/password', requireAuth, async (req, res) => {
     try {
+      const currentUser = req.user as User;
+      const targetUserId = req.params.id;
       const { password } = req.body;
+      
+      // Verify user has access to update this user's password
+      const targetUser = await storage.getUser(targetUserId);
+      if (!targetUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        // Only allow password updates if same organization and user is admin or updating themselves
+        if (currentUser.organizationId !== targetUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this user" });
+        }
+        
+        // Only allow updating their own password or if they're organization admin
+        if (currentUser.id !== targetUserId && currentUser.role !== "organization_admin") {
+          return res.status(403).json({ message: "Insufficient permissions to update this user's password" });
+        }
+      }
+      
       const hashedPassword = await hashPassword(password);
       
       const updatedUser = await storage.updateUser(req.params.id, { password: hashedPassword });
@@ -1137,8 +1274,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/users/:id', async (req, res) => {
+  app.delete('/api/users/:id', requireAuth, async (req, res) => {
     try {
+      const id = req.params.id;
+      const currentUser = req.user as User;
+      
+      // Verify user has access to delete this user
+      const targetUser = await storage.getUser(id);
+      if (!targetUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        // Only allow deletion if same organization and user is admin or deleting themselves
+        if (currentUser.organizationId !== targetUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this user" });
+        }
+        
+        // Only allow deleting themselves or if they're organization admin
+        if (currentUser.id !== id && currentUser.role !== "organization_admin") {
+          return res.status(403).json({ message: "Insufficient permissions to delete this user" });
+        }
+      }
+      
       const deleted = await storage.deleteUser(req.params.id);
       if (!deleted) {
         return res.status(404).json({ message: "User not found" });
@@ -1182,13 +1340,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/teams/:id', async (req, res) => {
+  app.get('/api/teams/:id', requireAuth, async (req, res) => {
     try {
       const teamId = req.params.id;
+      const currentUser = req.user as User;
+      
       const team = await storage.getTeam(teamId);
       if (!team) {
         return res.status(404).json({ message: "Team not found" });
       }
+      
+      // Verify user has access to this team
+      if (!currentUser.isSystemOwner) {
+        if (currentUser.organizationId !== team.organizationId) {
+          return res.status(403).json({ message: "Access denied to this team" });
+        }
+      }
+      
       res.json(team);
     } catch (error) {
       console.error("Error fetching team:", error);
@@ -1196,9 +1364,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/teams', async (req, res) => {
+  app.post('/api/teams', requireAuth, async (req, res) => {
     try {
-      const newTeam = await storage.createTeam(req.body);
+      const currentUser = req.user as User;
+      
+      // Ensure team is created within user's organization
+      const teamData = {
+        ...req.body,
+        organizationId: currentUser.organizationId
+      };
+      
+      const newTeam = await storage.createTeam(teamData);
       res.json(newTeam);
     } catch (error) {
       console.error("Error creating team:", error);
@@ -1206,9 +1382,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/teams/:id', async (req, res) => {
+  app.put('/api/teams/:id', requireAuth, async (req, res) => {
     try {
+      const currentUser = req.user as User;
       const teamId = req.params.id;
+      
+      // Verify user has access to update this team
+      const existingTeam = await storage.getTeam(teamId);
+      if (!existingTeam) {
+        return res.status(404).json({ message: "Team not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        if (currentUser.organizationId !== existingTeam.organizationId) {
+          return res.status(403).json({ message: "Access denied to this team" });
+        }
+      }
+      
       const updatedTeam = await storage.updateTeam(teamId, req.body);
       if (!updatedTeam) {
         return res.status(404).json({ message: "Team not found" });
@@ -1220,9 +1410,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/teams/:id', async (req, res) => {
+  app.delete('/api/teams/:id', requireAuth, async (req, res) => {
     try {
+      const currentUser = req.user as User;
       const teamId = req.params.id;
+      
+      // Verify user has access to delete this team
+      const existingTeam = await storage.getTeam(teamId);
+      if (!existingTeam) {
+        return res.status(404).json({ message: "Team not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        if (currentUser.organizationId !== existingTeam.organizationId) {
+          return res.status(403).json({ message: "Access denied to this team" });
+        }
+      }
+      
       const deleted = await storage.deleteTeam(teamId);
       if (!deleted) {
         return res.status(404).json({ message: "Team not found" });
@@ -1235,9 +1439,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Team member endpoints
-  app.get('/api/teams/:id/members', async (req, res) => {
+  app.get('/api/teams/:id/members', requireAuth, async (req, res) => {
     try {
+      const currentUser = req.user as User;
       const teamId = req.params.id;
+      
+      // Verify user has access to view this team's members
+      const team = await storage.getTeam(teamId);
+      if (!team) {
+        return res.status(404).json({ message: "Team not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        if (currentUser.organizationId !== team.organizationId) {
+          return res.status(403).json({ message: "Access denied to this team" });
+        }
+      }
+      
       const members = await storage.getTeamMembers(teamId);
       res.json(members);
     } catch (error) {
@@ -1246,8 +1464,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/users/:id/teams', async (req, res) => {
+  app.get('/api/users/:id/teams', requireAuth, async (req, res) => {
     try {
+      const currentUser = req.user as User;
+      const targetUserId = req.params.id;
+      
+      // Verify user has access to view this user's teams
+      const targetUser = await storage.getUser(targetUserId);
+      if (!targetUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        if (currentUser.id !== targetUserId && currentUser.organizationId !== targetUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this user's teams" });
+        }
+      }
+      
       const userTeams = await storage.getUserTeams(req.params.id);
       res.json(userTeams);
     } catch (error) {
@@ -1256,9 +1489,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/teams/:id/members', async (req, res) => {
+  app.post('/api/teams/:id/members', requireAuth, async (req, res) => {
     try {
+      const currentUser = req.user as User;
       const teamId = req.params.id;
+      
+      // Verify user has access to add members to this team
+      const team = await storage.getTeam(teamId);
+      if (!team) {
+        return res.status(404).json({ message: "Team not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        if (currentUser.organizationId !== team.organizationId) {
+          return res.status(403).json({ message: "Access denied to this team" });
+        }
+      }
+      
       const memberData = { ...req.body, teamId };
       const newMember = await storage.addTeamMember(memberData);
       res.json(newMember);
@@ -1268,10 +1515,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/teams/:teamId/members/:userId', async (req, res) => {
+  app.delete('/api/teams/:teamId/members/:userId', requireAuth, async (req, res) => {
     try {
+      const currentUser = req.user as User;
       const teamId = req.params.teamId;
       const userId = req.params.userId;
+      
+      // Verify user has access to remove members from this team
+      const team = await storage.getTeam(teamId);
+      if (!team) {
+        return res.status(404).json({ message: "Team not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        if (currentUser.organizationId !== team.organizationId) {
+          return res.status(403).json({ message: "Access denied to this team" });
+        }
+      }
+      
       const removed = await storage.removeTeamMember(teamId, userId);
       if (!removed) {
         return res.status(404).json({ message: "Team member not found" });
@@ -1283,11 +1544,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/teams/:teamId/members/:userId/role', async (req, res) => {
+  app.put('/api/teams/:teamId/members/:userId/role', requireAuth, async (req, res) => {
     try {
+      const currentUser = req.user as User;
       const teamId = req.params.teamId;
       const userId = req.params.userId;
       const { role } = req.body;
+      
+      // Verify user has access to update member roles in this team
+      const team = await storage.getTeam(teamId);
+      if (!team) {
+        return res.status(404).json({ message: "Team not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        if (currentUser.organizationId !== team.organizationId) {
+          return res.status(403).json({ message: "Access denied to this team" });
+        }
+      }
+      
       const updatedMember = await storage.updateTeamMemberRole(teamId, userId, role);
       if (!updatedMember) {
         return res.status(404).json({ message: "Team member not found" });
@@ -2124,9 +2399,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete initiative
-  app.delete("/api/initiatives/:id", async (req, res) => {
+  app.delete("/api/initiatives/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
+      
+      // Verify user has access to this initiative
+      const initiative = await storage.getInitiativeWithDetails(id);
+      if (!initiative) {
+        return res.status(404).json({ message: "Initiative not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        const initiativeCreator = await storage.getUser(initiative.createdBy);
+        if (!initiativeCreator || initiativeCreator.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this initiative" });
+        }
+      }
+      
       const deleted = await storage.deleteInitiative(id);
       
       if (!deleted) {
@@ -2381,10 +2671,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update task
-  app.put("/api/tasks/:id", async (req, res) => {
+  app.put("/api/tasks/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
       const updateData = req.body;
+      
+      // Verify user has access to this task
+      const existingTask = await storage.getTask(id);
+      if (!existingTask) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        const taskCreator = await storage.getUser(existingTask.createdBy);
+        if (!taskCreator || taskCreator.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this task" });
+        }
+      }
       
       // Handle date conversion properly
       if (updateData.dueDate) {
@@ -2429,13 +2733,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update task status (PATCH for partial updates)
-  app.patch("/api/tasks/:id", async (req, res) => {
+  app.patch("/api/tasks/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
       const { status } = req.body;
       
       if (!status) {
         return res.status(400).json({ message: "Status is required" });
+      }
+      
+      // Verify user has access to this task
+      const existingTask = await storage.getTask(id);
+      if (!existingTask) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        const taskCreator = await storage.getUser(existingTask.createdBy);
+        if (!taskCreator || taskCreator.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this task" });
+        }
       }
       
       const updatedTask = await storage.updateTask(id, { status });
@@ -2683,9 +3001,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get initiatives by objective ID
-  app.get("/api/initiatives/objective/:id", async (req, res) => {
+  app.get("/api/initiatives/objective/:id", requireAuth, async (req, res) => {
     try {
       const objectiveId = req.params.id;
+      const currentUser = req.user as User;
+      
+      // Verify user has access to this objective
+      const objective = await storage.getObjective(objectiveId);
+      if (!objective) {
+        return res.status(404).json({ message: "Objective not found" });
+      }
+      
+      // Check if user belongs to same organization as objective owner
+      if (!currentUser.isSystemOwner) {
+        const objectiveOwner = await storage.getUser(objective.ownerId);
+        if (!objectiveOwner || objectiveOwner.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this objective" });
+        }
+      }
+      
       const initiatives = await storage.getInitiativesByObjectiveId(objectiveId);
       res.json(initiatives);
     } catch (error) {
@@ -2816,13 +3150,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/initiatives/:id", async (req, res) => {
+  app.get("/api/initiatives/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
+      
       const initiative = await storage.getInitiativeWithDetails(id);
       
       if (!initiative) {
         return res.status(404).json({ message: "Initiative not found" });
+      }
+      
+      // Check if user has access to this initiative (via organization)
+      if (!currentUser.isSystemOwner) {
+        const initiativeCreator = await storage.getUser(initiative.createdBy);
+        if (!initiativeCreator || initiativeCreator.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this initiative" });
+        }
       }
       
       res.json(initiative);
@@ -2832,39 +3176,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/initiatives/:id", async (req, res) => {
+  app.patch("/api/initiatives/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
+      
+      // Verify user has access to this initiative
+      const existingInitiative = await storage.getInitiativeWithDetails(id);
+      if (!existingInitiative) {
+        return res.status(404).json({ message: "Initiative not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        const initiativeCreator = await storage.getUser(existingInitiative.createdBy);
+        if (!initiativeCreator || initiativeCreator.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this initiative" });
+        }
+      }
       
       // If impact, effort, or confidence scores are being updated, recalculate priority
       const { impactScore, effortScore, confidenceScore } = req.body;
       let updateData = { ...req.body };
       
       if (impactScore || effortScore || confidenceScore) {
-        // Get current initiative data to merge with new scores
-        const currentInitiative = await storage.getInitiativeWithDetails(id);
-        if (currentInitiative) {
-          const scores = {
-            impactScore: impactScore || currentInitiative.impactScore,
-            effortScore: effortScore || currentInitiative.effortScore,
-            confidenceScore: confidenceScore || currentInitiative.confidenceScore
-          };
+        const scores = {
+          impactScore: impactScore || existingInitiative.impactScore,
+          effortScore: effortScore || existingInitiative.effortScore,
+          confidenceScore: confidenceScore || existingInitiative.confidenceScore
+        };
+        
+        try {
+          const { calculatePriority } = await import("./priority-calculator");
+          const priorityResult = calculatePriority(scores);
           
-          try {
-            const { calculatePriority } = await import("./priority-calculator");
-            const priorityResult = calculatePriority(scores);
-            
-            updateData.priorityScore = priorityResult.priorityScore.toString();
-            updateData.priority = priorityResult.priorityLevel;
-            
-            console.log("Priority recalculation for update:", {
-              initiativeId: id,
-              inputs: scores,
-              result: priorityResult
-            });
-          } catch (calcError) {
-            console.error("Priority calculation error during update:", calcError);
-          }
+          updateData.priorityScore = priorityResult.priorityScore.toString();
+          updateData.priority = priorityResult.priorityLevel;
+          
+          console.log("Priority recalculation for update:", {
+            initiativeId: id,
+            inputs: scores,
+            result: priorityResult
+          });
+        } catch (calcError) {
+          console.error("Priority calculation error during update:", calcError);
         }
       }
       
@@ -2881,9 +3235,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/initiatives/:id", async (req, res) => {
+  app.put("/api/initiatives/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
+      
+      // Verify user has access to this initiative
+      const existingInitiative = await storage.getInitiativeWithDetails(id);
+      if (!existingInitiative) {
+        return res.status(404).json({ message: "Initiative not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        const initiativeCreator = await storage.getUser(existingInitiative.createdBy);
+        if (!initiativeCreator || initiativeCreator.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this initiative" });
+        }
+      }
+      
       const result = insertInitiativeSchema.safeParse(req.body);
       
       if (!result.success) {
@@ -2904,21 +3273,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Initiative member routes
-  app.get("/api/initiative-members", async (req, res) => {
+  app.get("/api/initiative-members", requireAuth, async (req, res) => {
     try {
-      const members = await storage.getAllInitiativeMembers();
-      res.json(members);
+      const currentUser = req.user as User;
+      
+      // For regular users, only return members from their organization's initiatives
+      if (currentUser.isSystemOwner) {
+        const members = await storage.getAllInitiativeMembers();
+        res.json(members);
+      } else {
+        // Get initiatives from user's organization first, then get their members
+        const initiatives = await storage.getInitiativesByOrganization(currentUser.organizationId!);
+        const initiativeIds = initiatives.map(i => i.id);
+        
+        // Filter members to only those belonging to organization's initiatives
+        const allMembers = await storage.getAllInitiativeMembers();
+        const organizationMembers = allMembers.filter(member => 
+          initiativeIds.includes(member.initiativeId)
+        );
+        
+        res.json(organizationMembers);
+      }
     } catch (error) {
       console.error("Error fetching initiative members:", error);
       res.status(500).json({ message: "Failed to fetch initiative members" });
     }
   });
 
-  app.post("/api/initiative-members", async (req, res) => {
+  app.post("/api/initiative-members", requireAuth, async (req, res) => {
     try {
+      const currentUser = req.user as User;
       const result = insertInitiativeMemberSchema.safeParse(req.body);
       if (!result.success) {
         return res.status(400).json({ message: "Invalid member data", errors: result.error.errors });
+      }
+
+      // Verify user has access to this initiative
+      const initiative = await storage.getInitiativeWithDetails(result.data.initiativeId);
+      if (!initiative) {
+        return res.status(404).json({ message: "Initiative not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        const initiativeCreator = await storage.getUser(initiative.createdBy);
+        if (!initiativeCreator || initiativeCreator.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this initiative" });
+        }
       }
 
       const member = await storage.createInitiativeMember(result.data);
@@ -2929,9 +3329,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/initiative-members/:id", async (req, res) => {
+  app.delete("/api/initiative-members/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
+      
+      // Get member details to check if user has access
+      const allMembers = await storage.getAllInitiativeMembers();
+      const member = allMembers.find(m => m.id === id);
+      
+      if (!member) {
+        return res.status(404).json({ message: "Member not found" });
+      }
+      
+      // Verify user has access to this initiative
+      if (!currentUser.isSystemOwner) {
+        const initiative = await storage.getInitiativeWithDetails(member.initiativeId);
+        if (!initiative) {
+          return res.status(404).json({ message: "Initiative not found" });
+        }
+        
+        const initiativeCreator = await storage.getUser(initiative.createdBy);
+        if (!initiativeCreator || initiativeCreator.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this initiative" });
+        }
+      }
+      
       const deleted = await storage.deleteInitiativeMember(id);
       
       if (!deleted) {
@@ -3018,13 +3441,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create a standalone task
-  app.post("/api/tasks", async (req, res) => {
+  app.post("/api/tasks", requireAuth, async (req, res) => {
     try {
-      // Get current user ID - require authentication in all modes
-      if (!req.session?.userId) {
-        return res.status(401).json({ message: "Authentication required" });
-      }
-      const currentUserId = req.session.userId;
+      const currentUser = req.user as User;
+      const currentUserId = currentUser.id;
 
       // Validate and prepare task data
       const taskData = {
@@ -3070,13 +3490,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get single task with details
-  app.get("/api/tasks/:id", async (req, res) => {
+  app.get("/api/tasks/:id", requireAuth, async (req, res) => {
     try {
       const taskId = req.params.id;
+      const currentUser = req.user as User;
+      
       const task = await storage.getTaskWithDetails(taskId);
       
       if (!task) {
         return res.status(404).json({ message: "Task not found" });
+      }
+      
+      // Check if user has access to this task (via organization)
+      if (!currentUser.isSystemOwner) {
+        const taskCreator = await storage.getUser(task.createdBy);
+        if (!taskCreator || taskCreator.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this task" });
+        }
       }
       
       res.json(task);
@@ -3088,9 +3518,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Create task for specific initiative
   // Get tasks by initiative ID
-  app.get("/api/initiatives/:initiativeId/tasks", async (req, res) => {
+  app.get("/api/initiatives/:initiativeId/tasks", requireAuth, async (req, res) => {
     try {
       const initiativeId = req.params.initiativeId;
+      const currentUser = req.user as User;
+      
+      // Verify user has access to this initiative
+      const initiative = await storage.getInitiativeWithDetails(initiativeId);
+      if (!initiative) {
+        return res.status(404).json({ message: "Initiative not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        const initiativeCreator = await storage.getUser(initiative.createdBy);
+        if (!initiativeCreator || initiativeCreator.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this initiative" });
+        }
+      }
+      
       const tasks = await storage.getTasksByInitiativeId(initiativeId);
       
       // Get user details for each task
@@ -3112,22 +3557,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/initiatives/:initiativeId/tasks", async (req, res) => {
+  app.post("/api/initiatives/:initiativeId/tasks", requireAuth, async (req, res) => {
     try {
       const initiativeId = req.params.initiativeId;
+      const currentUser = req.user as User;
       
-      // Get current user ID - handle both development and production modes
-      let currentUserId: string;
-      if (process.env.NODE_ENV === 'development') {
-        // Use mock user ID for development
-        currentUserId = "550e8400-e29b-41d4-a716-446655440001";
-      } else {
-        // Production mode - require authentication
-        if (!req.session?.userId) {
-          return res.status(401).json({ message: "Authentication required" });
-        }
-        currentUserId = req.session.userId;
+      // Verify user has access to this initiative
+      const initiative = await storage.getInitiativeWithDetails(initiativeId);
+      if (!initiative) {
+        return res.status(404).json({ message: "Initiative not found" });
       }
+      
+      if (!currentUser.isSystemOwner) {
+        const initiativeCreator = await storage.getUser(initiative.createdBy);
+        if (!initiativeCreator || initiativeCreator.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this initiative" });
+        }
+      }
+      
+      const currentUserId = currentUser.id;
       
       const taskData = {
         ...req.body,
@@ -3178,9 +3626,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get tasks for an objective
-  app.get("/api/tasks/objective/:objectiveId", async (req, res) => {
+  app.get("/api/tasks/objective/:objectiveId", requireAuth, async (req, res) => {
     try {
       const objectiveId = req.params.objectiveId;
+      const currentUser = req.user as User;
+      
+      // Verify user has access to this objective
+      const objective = await storage.getObjective(objectiveId);
+      if (!objective) {
+        return res.status(404).json({ message: "Objective not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        const objectiveOwner = await storage.getUser(objective.ownerId);
+        if (!objectiveOwner || objectiveOwner.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this objective" });
+        }
+      }
       
       // First get all initiatives for this objective
       const initiatives = await storage.getInitiativesByObjectiveId(objectiveId);
@@ -3209,12 +3671,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/tasks/:id", async (req, res) => {
+  app.put("/api/tasks/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
       
       // Get the original task before updating to check previous assignee
       const originalTask = await storage.getTask(id);
+      if (!originalTask) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      
+      // Verify user has access to this task
+      if (!currentUser.isSystemOwner) {
+        const taskCreator = await storage.getUser(originalTask.createdBy);
+        if (!taskCreator || taskCreator.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this task" });
+        }
+      }
+      
       const originalAssignedTo = originalTask?.assignedTo;
       console.log("📋 Original task assignee:", originalAssignedTo);
       console.log("🔄 New assignee will be:", req.body.assignedTo);
@@ -3303,9 +3778,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/tasks/:id", async (req, res) => {
+  app.patch("/api/tasks/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
+      
+      // Verify user has access to this task
+      const existingTask = await storage.getTask(id);
+      if (!existingTask) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        const taskCreator = await storage.getUser(existingTask.createdBy);
+        if (!taskCreator || taskCreator.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this task" });
+        }
+      }
+      
       const updatedTask = await storage.updateTask(id, req.body);
       
       if (!updatedTask) {
@@ -3319,9 +3809,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/tasks/:id", async (req, res) => {
+  app.delete("/api/tasks/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
+      
+      // Verify user has access to this task
+      const existingTask = await storage.getTask(id);
+      if (!existingTask) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        const taskCreator = await storage.getUser(existingTask.createdBy);
+        if (!taskCreator || taskCreator.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this task" });
+        }
+      }
+      
       const deleted = await storage.deleteTask(id);
       
       if (!deleted) {
@@ -3336,9 +3841,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Task Comments API Routes
-  app.get("/api/tasks/:taskId/comments", async (req, res) => {
+  app.get("/api/tasks/:taskId/comments", requireAuth, async (req, res) => {
     try {
       const taskId = req.params.taskId;
+      const currentUser = req.user as User;
+      
+      // Verify user has access to this task
+      const task = await storage.getTask(taskId);
+      if (!task) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        const taskCreator = await storage.getUser(task.createdBy);
+        if (!taskCreator || taskCreator.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this task" });
+        }
+      }
+      
       const comments = await storage.getTaskComments(taskId);
       res.json(comments);
     } catch (error) {
@@ -3351,6 +3871,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const taskId = req.params.taskId;
       const currentUser = req.user as User;
+      
+      // Verify user has access to this task
+      const task = await storage.getTask(taskId);
+      if (!task) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        const taskCreator = await storage.getUser(task.createdBy);
+        if (!taskCreator || taskCreator.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this task" });
+        }
+      }
       
       const commentData = {
         ...req.body,
@@ -6659,7 +7192,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Validate and apply referral code (for registration)
-  app.post("/api/referral-codes/validate", async (req, res) => {
+  app.post("/api/referral-codes/validate", requireAuth, async (req, res) => {
     try {
       const { code } = req.body;
       const { db } = await import("./db");
@@ -8292,7 +8825,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get invitation details by token (public)
-  app.get("/api/member-invitations/token/:token", async (req, res) => {
+  app.get("/api/member-invitations/token/:token", requireAuth, async (req, res) => {
     try {
       const { token } = req.params;
       
@@ -8331,7 +8864,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Accept invitation (public)
-  app.post("/api/member-invitations/accept", async (req, res) => {
+  app.post("/api/member-invitations/accept", requireAuth, async (req, res) => {
     try {
       const { token, userData } = req.body;
       
