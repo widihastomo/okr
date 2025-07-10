@@ -892,29 +892,21 @@ export default function CompanyOnboarding() {
               "Menciptakan pertumbuhan penjualan yang berkelanjutan dan signifikan",
               "Membangun basis pelanggan yang kuat dan loyal",
               "Mengoptimalkan konversi prospek menjadi pelanggan",
-              "Memperluas jangkauan pasar ke wilayah baru",
-              "Meningkatkan nilai transaksi rata-rata pelanggan",
             ],
             operasional: [
               "Mencapai efisiensi operasional yang optimal dan berkelanjutan",
               "Mempercepat proses produksi dengan kualitas terjaga",
-              "Menciptakan lingkungan kerja yang produktif dan memuaskan",
-              "Mengimplementasi transformasi digital untuk otomasi proses",
               "Mengoptimalkan biaya operasional tanpa mengurangi kualitas",
             ],
             customer_service: [
               "Mencapai kepuasan pelanggan yang luar biasa dan berkelanjutan",
               "Memberikan respon pelanggan yang cepat dan efektif",
-              "Meningkatkan kemampuan penyelesaian masalah dengan sekali kontak",
-              "Mengurangi keluhan pelanggan secara signifikan",
               "Membangun loyalitas pelanggan dan advokasi yang tinggi",
             ],
             marketing: [
               "Meningkatkan kesadaran merek di pasar target",
               "Membangun komunitas yang aktif dan engaged di media sosial",
-              "Meningkatkan engagement yang berkualitas dengan audiens",
               "Menghasilkan lead berkualitas tinggi secara konsisten",
-              "Meningkatkan konversi website yang efektif",
             ],
           };
           return options[teamFocus] || [];
@@ -988,16 +980,6 @@ export default function CompanyOnboarding() {
               "Mengurangi waktu follow-up lead menjadi maksimal 24 jam",
               "Meningkatkan kualitas lead scoring menjadi 80% akurat",
             ],
-            "Memperluas jangkauan pasar ke wilayah baru": [
-              "Membuka kantor cabang di 3 kota baru",
-              "Mencapai 500 customer baru dari wilayah ekspansi",
-              "Meraih market share 10% di setiap wilayah baru",
-            ],
-            "Meningkatkan nilai transaksi rata-rata pelanggan": [
-              "Mencapai average order value Rp 1.5 juta",
-              "Meningkatkan cross-selling success rate menjadi 30%",
-              "Mencapai upselling rate 25% dari existing customer",
-            ],
           };
 
           // Key Results untuk objective operasional
@@ -1011,16 +993,6 @@ export default function CompanyOnboarding() {
               "Mencapai cycle time 3 jam per produk",
               "Meningkatkan throughput menjadi 50 unit per hari",
               "Mengurangi downtime mesin menjadi maksimal 2%",
-            ],
-            "Menciptakan lingkungan kerja yang produktif dan memuaskan": [
-              "Mencapai employee satisfaction score 4.5/5",
-              "Mengurangi turnover rate menjadi di bawah 10%",
-              "Meningkatkan employee engagement score menjadi 80%",
-            ],
-            "Mengimplementasi transformasi digital untuk otomasi proses": [
-              "Mendigitalisasi 5 proses manual utama",
-              "Mencapai automation rate 70% untuk proses rutin",
-              "Mengurangi human error menjadi di bawah 2%",
             ],
             "Mengoptimalkan biaya operasional tanpa mengurangi kualitas": [
               "Menurunkan cost per unit menjadi Rp 50,000",
@@ -1041,17 +1013,6 @@ export default function CompanyOnboarding() {
               "Meningkatkan first response rate menjadi 95%",
               "Mencapai resolution time maksimal 24 jam",
             ],
-            "Meningkatkan kemampuan penyelesaian masalah dengan sekali kontak":
-              [
-                "Mencapai FCR rate 80% untuk semua inquiry",
-                "Mengurangi escalation rate menjadi di bawah 10%",
-                "Meningkatkan agent knowledge score menjadi 90%",
-              ],
-            "Mengurangi keluhan pelanggan secara signifikan": [
-              "Mengurangi complaint volume menjadi maksimal 20 per bulan",
-              "Meningkatkan complaint resolution rate menjadi 98%",
-              "Mencapai zero repeat complaint rate",
-            ],
             "Membangun loyalitas pelanggan dan advokasi yang tinggi": [
               "Mencapai NPS score 70+ dalam quarterly survey",
               "Meningkatkan customer advocacy rate menjadi 40%",
@@ -1071,20 +1032,10 @@ export default function CompanyOnboarding() {
               "Meningkatkan follower growth rate 15% per bulan",
               "Mencapai engagement rate 8% di semua platform",
             ],
-            "Meningkatkan engagement yang berkualitas dengan audiens": [
-              "Mencapai engagement rate 10% di Instagram",
-              "Meningkatkan comment rate menjadi 3% per post",
-              "Mencapai share rate 5% untuk konten video",
-            ],
             "Menghasilkan lead berkualitas tinggi secara konsisten": [
-              "Generate 500 MQL (Marketing Qualified Leads) per bulan",
-              "Mencapai lead quality score 80% dari total leads",
-              "Meningkatkan lead-to-customer conversion rate 20%",
-            ],
-            "Meningkatkan konversi website yang efektif": [
-              "Mencapai website conversion rate 5%",
-              "Meningkatkan landing page conversion rate menjadi 8%",
-              "Mengurangi bounce rate website menjadi di bawah 40%",
+              "Mencapai 500 qualified leads per bulan",
+              "Meningkatkan lead quality score menjadi 85%",
+              "Mencapai cost per lead di bawah Rp 100,000",
             ],
           };
 
@@ -1657,10 +1608,95 @@ export default function CompanyOnboarding() {
             "Paid social media advertising campaign",
             "Community building dan engagement program",
           ],
-          "Mencapai top-of-mind awareness 25% di kategori produk": [
-            "Consistent brand messaging across all touchpoint",
-            "Thought leadership content strategy",
-            "Strategic partnership dengan industry leader",
+          "Mencapai 500 qualified leads per bulan": [
+            "Optimisasi SEO untuk organic traffic",
+            "Lead magnet dan landing page optimization",
+            "Content marketing dan thought leadership",
+          ],
+
+          // Marketing - Social Media
+          "Mencapai 10,000 new followers di Instagram": [
+            "Paid social media advertising campaign",
+            "Community building dan engagement program",
+            "Influencer partnership program",
+          ],
+          "Meningkatkan follower growth rate 15% per bulan": [
+            "Content calendar dengan viral potential",
+            "User-generated content campaign",
+            "Social media contest dan giveaway",
+          ],
+          "Mencapai engagement rate 8% di semua platform": [
+            "Interactive content strategy",
+            "Community management program",
+            "Social listening dan response optimization",
+          ],
+
+          // Customer Service - Response Time
+          "Mencapai average response time 1 jam": [
+            "Implementasi chatbot untuk instant response",
+            "Dedicated customer support team",
+            "Automated ticket routing system",
+          ],
+          "Meningkatkan first response rate menjadi 95%": [
+            "24/7 customer support system",
+            "Live chat integration di website",
+            "Mobile app untuk customer service",
+          ],
+          "Mencapai resolution time maksimal 24 jam": [
+            "Streamlined escalation process",
+            "Knowledge base optimization",
+            "Advanced CRM integration",
+          ],
+
+          // Customer Service - Loyalty
+          "Mencapai NPS score 70+ dalam quarterly survey": [
+            "Customer feedback loop system",
+            "Personalized customer experience program",
+            "Loyalty rewards program",
+          ],
+          "Meningkatkan customer advocacy rate menjadi 40%": [
+            "Referral program dengan incentive",
+            "Customer success story campaign",
+            "Community building program",
+          ],
+          "Mencapai customer recommendation rate 80%": [
+            "Word-of-mouth marketing strategy",
+            "Customer testimonial program",
+            "Brand ambassador program",
+          ],
+
+          // Operational - Production Speed
+          "Mencapai cycle time 3 jam per produk": [
+            "Workflow optimization dan automation",
+            "Team training untuk efficiency",
+            "Quality control streamlining",
+          ],
+          "Meningkatkan throughput menjadi 50 unit per hari": [
+            "Production capacity scaling",
+            "Equipment upgrade program",
+            "Staff scheduling optimization",
+          ],
+          "Mengurangi downtime mesin menjadi maksimal 2%": [
+            "Preventive maintenance program",
+            "Equipment monitoring system",
+            "Backup system implementation",
+          ],
+
+          // Operational - Cost Efficiency
+          "Menurunkan cost per unit menjadi Rp 50,000": [
+            "Supplier negotiation program",
+            "Process optimization initiative",
+            "Material waste reduction program",
+          ],
+          "Meningkatkan efficiency ratio menjadi 90%": [
+            "Performance monitoring system",
+            "Employee productivity training",
+            "Resource allocation optimization",
+          ],
+          "Mengurangi overhead cost sebesar 20%": [
+            "Cost analysis dan reduction program",
+            "Administrative process automation",
+            "Energy efficiency program",
           ],
         };
 
@@ -1943,7 +1979,6 @@ export default function CompanyOnboarding() {
               "Setup Facebook Ads dan Instagram Ads campaign",
               "Buat creative ads dengan A/B testing",
               "Monitor dan optimize campaign performance",
-              "Analisis ROI dan cost per acquisition",
             ],
             "Membangun influencer partnership program": [
               "Identifikasi influencer yang sesuai dengan brand",
@@ -1954,6 +1989,93 @@ export default function CompanyOnboarding() {
               "Plan concept dan venue untuk brand activation",
               "Execute brand activation event",
               "Follow up dengan participant setelah event",
+            ],
+            
+            // Additional initiatives that need task mappings
+            "Mengembangkan strategi cross-selling kepada existing customer": [
+              "Analisis customer behavior dan purchase pattern",
+              "Buat recommendation system untuk cross-selling",
+              "Training sales team untuk cross-selling approach",
+            ],
+            "Melatih tim sales untuk upselling": [
+              "Buat materi training upselling technique",
+              "Identifikasi opportunity upselling per customer",
+              "Setup reward system untuk upselling success",
+            ],
+            "Membuat referral program dengan reward menarik": [
+              "Design struktur reward untuk referral program",
+              "Buat sistem tracking untuk referral",
+              "Launch campaign dan monitor adoption rate",
+            ],
+            "Membangun partnership dengan marketplace online": [
+              "Identifikasi marketplace yang sesuai target",
+              "Nego terms partnership dengan marketplace",
+              "Setup product listing dan optimize visibility",
+            ],
+            "Menyediakan program trial gratis untuk prospek": [
+              "Buat struktur program trial dengan time limit",
+              "Setup sistem aktivasi dan monitoring trial",
+              "Follow up trial user untuk conversion",
+            ],
+            "Membuat follow-up sequence email marketing": [
+              "Buat email sequence untuk nurturing lead",
+              "Setup automated email campaign",
+              "Monitor open rate dan click-through rate",
+            ],
+            "Menjalankan telemarketing campaign yang lebih personal": [
+              "Buat script telemarketing yang personal",
+              "Training tim telemarketing untuk approach",
+              "Monitor conversion rate dari telemarketing",
+            ],
+            "Membuat program loyalty dengan point reward": [
+              "Design struktur point reward system",
+              "Develop sistem tracking untuk point",
+              "Launch program dan monitor customer engagement",
+            ],
+            "Menugaskan customer success manager untuk onboarding": [
+              "Rekrut dan training customer success manager",
+              "Buat SOP untuk customer onboarding process",
+              "Monitor customer retention dan satisfaction",
+            ],
+            "Melakukan survey kepuasan dan improvement action": [
+              "Buat questionnaire untuk customer satisfaction",
+              "Distribute survey dan collect feedback",
+              "Analisis hasil dan implementasi improvement",
+            ],
+            "Mengembangkan lead scoring system untuk prioritas": [
+              "Setup lead scoring criteria berdasarkan behavior",
+              "Konfigurasi automated scoring dalam CRM",
+              "Training sales team untuk interpretasi score",
+            ],
+            "Menjalankan A/B testing untuk sales pitch": [
+              "Buat 2 versi sales pitch yang berbeda",
+              "Setup sistem tracking untuk setiap pitch",
+              "Analisis hasil dan implementasi pitch terbaik",
+            ],
+            "Menugaskan dedicated lead response team": [
+              "Rekrut dan training specialized lead response team",
+              "Setup SOP untuk response time maksimal 1 jam",
+              "Implementasi escalation protocol untuk urgent leads",
+            ],
+            "Mengembangkan mobile app untuk quick response": [
+              "Develop mobile app untuk notifikasi lead",
+              "Integrasikan dengan CRM untuk data sync",
+              "Training team untuk menggunakan mobile app",
+            ],
+            "Menerapkan machine learning untuk lead analysis": [
+              "Collect historical data untuk training ML model",
+              "Develop predictive model untuk lead quality",
+              "Integrasikan ML model dengan existing system",
+            ],
+            "Membangun feedback loop dari sales ke marketing": [
+              "Setup sistem feedback dari sales ke marketing",
+              "Buat regular meeting untuk sharing insights",
+              "Monitor lead quality improvement",
+            ],
+            "Melakukan regular review dan update criteria": [
+              "Schedule regular review untuk criteria evaluation",
+              "Collect performance data untuk analysis",
+              "Update criteria berdasarkan performance data",
             ],
           };
 
@@ -1972,223 +2094,20 @@ export default function CompanyOnboarding() {
           (init) => init && init.trim() !== "",
         );
 
-        // Create task groups by initiative
+        // Create task groups by initiative using the same mapping as above
         const getTaskGroupsByInitiative = (initiatives: string[]) => {
-          const taskGroups: { [key: string]: string[] } = {
-            // Sales & Marketing initiatives
-            "Mengoptimalkan landing page untuk konversi": [
-              "Analisis current landing page performance",
-              "Buat wireframe design untuk landing page baru",
-              "Implementasi A/B testing untuk conversion rate",
-              "Optimasi loading speed dan mobile responsiveness",
-              "Setup tracking dan analytics untuk monitoring",
-            ],
-            "Membuat program loyalty dengan point reward": [
-              "Design struktur point reward system",
-              "Develop backend system untuk point tracking",
-              "Buat UI/UX untuk loyalty program dashboard",
-              "Integrasikan dengan payment system",
-              "Launch campaign dan monitor adoption rate",
-            ],
-            "Menjalankan kampanye promosi bulanan dengan diskon 20%": [
-              "Buat creative design untuk promosi diskon",
-              "Setup campaign di Facebook Ads dan Google Ads",
-              "Siapkan landing page untuk campaign",
-              "Monitor dan optimize campaign performance",
-              "Analisis ROI dan customer acquisition cost",
-            ],
-            "Melatih sales team untuk closing technique": [
-              "Buat materi training closing technique",
-              "Jadwalkan session training dengan sales team",
-              "Evaluasi dan feedback setelah training",
-              "Setup roleplay session untuk practice",
-              "Monitor improvement dalam conversion rate",
-            ],
-            "Mengimplementasikan CRM untuk follow-up lead": [
-              "Pilih dan setup CRM software",
-              "Import database lead ke CRM",
-              "Training tim untuk menggunakan CRM",
-              "Setup automated follow-up sequence",
-              "Monitor lead conversion improvement",
-            ],
-            "Membuat program bundling produk dengan harga spesial": [
-              "Analisis produk yang cocok untuk bundling",
-              "Tentukan harga bundling yang kompetitif",
-              "Buat marketing material untuk bundling",
-              "Launch bundling campaign",
-              "Monitor sales performance bundling",
-            ],
-            "Melatih tim sales untuk upselling": [
-              "Buat materi training upselling technique",
-              "Identifikasi opportunity upselling per customer",
-              "Setup reward system untuk upselling success",
-              "Monitor average transaction value improvement",
-              "Analisis customer satisfaction dari upselling",
-            ],
-            "Mengembangkan strategi cross-selling kepada existing customer": [
-              "Analisis customer behavior dan purchase pattern",
-              "Buat recommendation system untuk cross-selling",
-              "Training sales team untuk cross-selling approach",
-              "Setup automated cross-selling email campaign",
-              "Monitor cross-selling conversion rate",
-            ],
-            "Lead scoring system untuk prioritas": [
-              "Setup lead scoring criteria berdasarkan behavior",
-              "Konfigurasi automated scoring dalam CRM",
-              "Training sales team untuk interpretasi score",
-              "Monitor dan adjust scoring algorithm",
-            ],
-            "Mempersonalisasi approach berdasarkan lead profile": [
-              "Buat database profil lengkap untuk setiap lead",
-              "Develop template komunikasi untuk setiap persona",
-              "Training sales team untuk personalisasi approach",
-              "Track conversion rate per persona",
-            ],
-            "A/B testing untuk sales pitch": [
-              "Buat 2 versi sales pitch yang berbeda",
-              "Setup sistem tracking untuk setiap pitch",
-              "Eksekusi A/B test dengan sample lead",
-              "Analisis hasil dan implementasi pitch terbaik",
-            ],
-            "Mengotomatisasi lead notification system": [
-              "Setup real-time notification untuk lead baru",
-              "Konfigurasi assignment rule untuk sales team",
-              "Implementasi lead routing berdasarkan criteria",
-              "Monitor response time dan follow-up rate",
-            ],
-            "Dedicated lead response team": [
-              "Rekrut dan training specialized lead response team",
-              "Setup SOP untuk response time maksimal 1 jam",
-              "Buat dashboard monitoring untuk response metrics",
-              "Implementasi escalation protocol untuk urgent leads",
-            ],
-            "Mobile app untuk quick response": [
-              "Develop mobile app untuk notifikasi lead",
-              "Integrasikan dengan CRM untuk data sync",
-              "Training team untuk menggunakan mobile app",
-              "Monitor response time improvement",
-            ],
-            "Machine learning untuk lead analysis": [
-              "Collect historical data untuk training ML model",
-              "Develop predictive model untuk lead quality",
-              "Integrasikan ML model dengan existing system",
-              "Monitor akurasi dan continuous improvement",
-            ],
-
-            // Operational initiatives
-            "Mengimplementasikan lean manufacturing principles": [
-              "Analisis current process dan identifikasi waste",
-              "Training karyawan tentang lean principles",
-              "Implementasi 5S di area produksi",
-              "Monitor improvement metrics",
-            ],
-            "Mengotomatisasi production line setup": [
-              "Evaluasi kebutuhan automation equipment",
-              "Install dan setup automated system",
-              "Training operator untuk automated system",
-              "Monitor produktivitas improvement",
-            ],
-            "Time and motion study untuk bottleneck": [
-              "Lakukan time study untuk setiap production step",
-              "Identifikasi bottleneck dalam production line",
-              "Buat action plan untuk eliminate bottleneck",
-              "Implementasi solution dan monitor hasil",
-            ],
-            "Preventive maintenance schedule": [
-              "Buat schedule maintenance untuk semua mesin",
-              "Siapkan checklist maintenance routine",
-              "Training teknisi untuk preventive maintenance",
-              "Monitor downtime reduction",
-            ],
-            "Real-time monitoring system": [
-              "Install sensor untuk real-time monitoring",
-              "Setup dashboard untuk production metrics",
-              "Training team untuk respond alert",
-              "Monitor overall equipment effectiveness",
-            ],
-            "Quality control di setiap stage produksi": [
-              "Buat SOP quality control untuk setiap stage",
-              "Setup quality checkpoint di production line",
-              "Training quality control inspector",
-              "Monitor quality metrics dan defect rate",
-            ],
-
-            // Customer service initiatives
-            "Melatih customer service excellence": [
-              "Buat modul training customer service",
-              "Conduct training session untuk CS team",
-              "Evaluasi performance setelah training",
-              "Monitor customer satisfaction improvement",
-            ],
-            "Implementasi feedback system yang real-time": [
-              "Setup feedback system di website",
-              "Buat dashboard untuk monitoring feedback",
-              "Training tim untuk respond feedback",
-              "Monitor response time dan resolution rate",
-            ],
-            "Reward program untuk high performing agent": [
-              "Buat criteria untuk high performing agent",
-              "Design reward system yang motivating",
-              "Implementasi recognition program",
-              "Monitor agent performance improvement",
-            ],
-            "Proactive customer outreach program": [
-              "Buat database customer untuk outreach",
-              "Buat script untuk customer outreach",
-              "Schedule regular customer check-in",
-              "Monitor customer retention rate",
-            ],
-            "Root cause analysis untuk recurring issues": [
-              "Analisis data complaint untuk pattern",
-              "Buat action plan untuk fix root cause",
-              "Implementasi solution dan monitoring",
-              "Monitor complaint reduction rate",
-            ],
-
-            // Marketing & Branding initiatives
-            "Menjalankan integrated marketing campaign di multiple channel": [
-              "Buat campaign strategy untuk multiple channel",
-              "Coordinate campaign launch across channel",
-              "Monitor dan optimize campaign performance",
-              "Analisis cross-channel performance",
-              "Optimize budget allocation antar channel",
-            ],
-            "Membangun influencer partnership program": [
-              "Identifikasi influencer yang sesuai dengan brand",
-              "Nego collaboration terms dengan influencer",
-              "Monitor campaign performance dari influencer",
-              "Buat long-term partnership strategy",
-              "Evaluasi ROI dari setiap influencer",
-            ],
-            "Content calendar dengan viral potential": [
-              "Riset trending topic untuk content inspiration",
-              "Buat content calendar dengan viral angle",
-              "Analyze performance dan optimize content",
-              "Setup content distribution strategy",
-              "Monitor engagement dan viral metrics",
-            ],
-            "Paid social media advertising campaign": [
-              "Setup Facebook Ads dan Instagram Ads campaign",
-              "Buat creative ads dengan A/B testing",
-              "Monitor dan optimize campaign performance",
-              "Analisis ROI dan cost per acquisition",
-              "Scale winning campaigns untuk maximum reach",
-            ],
-          };
-
-          const selectedTaskGroups: { [key: string]: string[] } = {};
-          initiatives.forEach((initiative) => {
-            if (taskGroups[initiative]) {
-              selectedTaskGroups[initiative] = taskGroups[initiative];
+          const tasksByInitiative: { [key: string]: string[] } = {};
+          
+          initiatives.forEach(initiative => {
+            if (taskMapping[initiative]) {
+              tasksByInitiative[initiative] = taskMapping[initiative];
             }
           });
-
-          return selectedTaskGroups;
+          
+          return tasksByInitiative;
         };
-
-        const taskGroups = getTaskGroupsByInitiative(
-          selectedInitiativesForTasks,
-        );
+        
+        const tasksByInitiative = getTaskGroupsByInitiative(selectedInitiativesForTasks);
 
         if (!onboardingData.tasks) {
           onboardingData.tasks = [];
@@ -2206,7 +2125,7 @@ export default function CompanyOnboarding() {
                   Pilih task untuk setiap inisiatif yang sudah dipilih:
                 </Label>
 
-                {Object.entries(taskGroups).map(
+                {Object.entries(tasksByInitiative).map(
                   ([initiative, tasks], groupIndex) => (
                     <div
                       key={groupIndex}
