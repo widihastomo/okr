@@ -990,14 +990,14 @@ export default function CompanyOnboarding() {
               "Mengurangi waste produksi menjadi maksimal 5%",
             ],
             "Mempercepat proses produksi dengan kualitas terjaga": [
-              "Mencapai cycle time 3 jam per produk",
+              "Mencapai waktu siklus 3 jam per produk",
               "Meningkatkan throughput menjadi 50 unit per hari",
               "Mengurangi downtime mesin menjadi maksimal 2%",
             ],
             "Mengoptimalkan biaya operasional tanpa mengurangi kualitas": [
-              "Menurunkan cost per unit menjadi Rp 50,000",
-              "Meningkatkan efficiency ratio menjadi 90%",
-              "Mengurangi overhead cost sebesar 20%",
+              "Menurunkan biaya per unit menjadi Rp 50,000",
+              "Meningkatkan rasio efisiensi menjadi 90%",
+              "Mengurangi biaya overhead sebesar 20%",
             ],
           };
 
@@ -1009,14 +1009,14 @@ export default function CompanyOnboarding() {
               "Mengurangi complaint rate menjadi di bawah 1%",
             ],
             "Memberikan respon pelanggan yang cepat dan efektif": [
-              "Mencapai average response time 1 jam",
-              "Meningkatkan first response rate menjadi 95%",
-              "Mencapai resolution time maksimal 24 jam",
+              "Mencapai rata-rata waktu respons 1 jam",
+              "Meningkatkan tingkat respons pertama menjadi 95%",
+              "Mencapai waktu penyelesaian maksimal 24 jam",
             ],
             "Membangun loyalitas pelanggan dan advokasi yang tinggi": [
-              "Mencapai NPS score 70+ dalam quarterly survey",
-              "Meningkatkan customer advocacy rate menjadi 40%",
-              "Mencapai customer recommendation rate 80%",
+              "Mencapai skor NPS 70+ dalam survei triwulanan",
+              "Meningkatkan tingkat advokasi pelanggan menjadi 40%",
+              "Mencapai tingkat rekomendasi pelanggan 80%",
             ],
           };
 
@@ -1028,9 +1028,9 @@ export default function CompanyOnboarding() {
               "Mencapai top-of-mind awareness 25% di kategori produk",
             ],
             "Membangun komunitas yang aktif dan engaged di media sosial": [
-              "Mencapai 10,000 new followers di Instagram",
-              "Meningkatkan follower growth rate 15% per bulan",
-              "Mencapai engagement rate 8% di semua platform",
+              "Mencapai 10,000 pengikut baru di Instagram",
+              "Meningkatkan tingkat pertumbuhan pengikut 15% per bulan",
+              "Mencapai tingkat engagement 8% di semua platform",
             ],
             "Menghasilkan lead berkualitas tinggi secara konsisten": [
               "Mencapai 500 qualified leads per bulan",
@@ -1604,9 +1604,9 @@ export default function CompanyOnboarding() {
             "Mengadakan brand activation event di target market",
           ],
           "Meningkatkan social media reach menjadi 100,000 per post": [
-            "Content calendar dengan viral potential",
-            "Paid social media advertising campaign",
-            "Community building dan engagement program",
+            "Kalender konten dengan potensi viral",
+            "Kampanye iklan berbayar di media sosial",
+            "Program membangun komunitas dan engagement",
           ],
           "Mencapai 500 qualified leads per bulan": [
             "Optimisasi SEO untuk organic traffic",
@@ -1615,71 +1615,71 @@ export default function CompanyOnboarding() {
           ],
 
           // Marketing - Social Media
-          "Mencapai 10,000 new followers di Instagram": [
-            "Paid social media advertising campaign",
-            "Community building dan engagement program",
-            "Influencer partnership program",
+          "Mencapai 10,000 pengikut baru di Instagram": [
+            "Kampanye iklan berbayar di media sosial",
+            "Program membangun komunitas dan engagement",
+            "Program kemitraan dengan influencer",
           ],
-          "Meningkatkan follower growth rate 15% per bulan": [
-            "Content calendar dengan viral potential",
-            "User-generated content campaign",
-            "Social media contest dan giveaway",
+          "Meningkatkan tingkat pertumbuhan pengikut 15% per bulan": [
+            "Kalender konten dengan potensi viral",
+            "Kampanye konten buatan pengguna",
+            "Kontes dan hadiah di media sosial",
           ],
-          "Mencapai engagement rate 8% di semua platform": [
-            "Interactive content strategy",
-            "Community management program",
-            "Social listening dan response optimization",
+          "Mencapai tingkat engagement 8% di semua platform": [
+            "Strategi konten interaktif",
+            "Program manajemen komunitas",
+            "Optimisasi social listening dan respon",
           ],
 
           // Customer Service - Response Time
-          "Mencapai average response time 1 jam": [
-            "Implementasi chatbot untuk instant response",
-            "Dedicated customer support team",
-            "Automated ticket routing system",
+          "Mencapai rata-rata waktu respons 1 jam": [
+            "Implementasi chatbot untuk respons instan",
+            "Tim dukungan pelanggan khusus",
+            "Sistem routing tiket otomatis",
           ],
-          "Meningkatkan first response rate menjadi 95%": [
-            "24/7 customer support system",
-            "Live chat integration di website",
-            "Mobile app untuk customer service",
+          "Meningkatkan tingkat respons pertama menjadi 95%": [
+            "Sistem dukungan pelanggan 24/7",
+            "Integrasi live chat di website",
+            "Aplikasi mobile untuk layanan pelanggan",
           ],
-          "Mencapai resolution time maksimal 24 jam": [
-            "Streamlined escalation process",
-            "Knowledge base optimization",
-            "Advanced CRM integration",
+          "Mencapai waktu penyelesaian maksimal 24 jam": [
+            "Proses eskalasi yang efisien",
+            "Optimisasi basis pengetahuan",
+            "Integrasi CRM lanjutan",
           ],
 
           // Customer Service - Loyalty
-          "Mencapai NPS score 70+ dalam quarterly survey": [
-            "Customer feedback loop system",
-            "Personalized customer experience program",
-            "Loyalty rewards program",
+          "Mencapai skor NPS 70+ dalam survei triwulanan": [
+            "Sistem feedback loop pelanggan",
+            "Program pengalaman pelanggan yang dipersonalisasi",
+            "Program rewards loyalitas",
           ],
-          "Meningkatkan customer advocacy rate menjadi 40%": [
-            "Referral program dengan incentive",
-            "Customer success story campaign",
-            "Community building program",
+          "Meningkatkan tingkat advokasi pelanggan menjadi 40%": [
+            "Program referral dengan insentif",
+            "Kampanye kisah sukses pelanggan",
+            "Program membangun komunitas",
           ],
-          "Mencapai customer recommendation rate 80%": [
-            "Word-of-mouth marketing strategy",
-            "Customer testimonial program",
-            "Brand ambassador program",
+          "Mencapai tingkat rekomendasi pelanggan 80%": [
+            "Strategi pemasaran dari mulut ke mulut",
+            "Program testimoni pelanggan",
+            "Program duta merek",
           ],
 
           // Operational - Production Speed
-          "Mencapai cycle time 3 jam per produk": [
-            "Workflow optimization dan automation",
-            "Team training untuk efficiency",
-            "Quality control streamlining",
+          "Mencapai waktu siklus 3 jam per produk": [
+            "Optimisasi dan otomasi alur kerja",
+            "Pelatihan tim untuk efisiensi",
+            "Penyederhanaan kontrol kualitas",
           ],
           "Meningkatkan throughput menjadi 50 unit per hari": [
-            "Production capacity scaling",
-            "Equipment upgrade program",
-            "Staff scheduling optimization",
+            "Peningkatan kapasitas produksi",
+            "Program upgrade peralatan",
+            "Optimisasi penjadwalan staff",
           ],
           "Mengurangi downtime mesin menjadi maksimal 2%": [
-            "Preventive maintenance program",
-            "Equipment monitoring system",
-            "Backup system implementation",
+            "Program maintenance preventif",
+            "Sistem monitoring peralatan",
+            "Implementasi sistem backup",
           ],
 
           // Operational - Cost Efficiency
@@ -2098,10 +2098,10 @@ export default function CompanyOnboarding() {
               "Design self-service portal untuk customer",
               "Launch portal dan monitor usage analytics",
             ],
-            "Community building dan engagement program": [
-              "Buat community platform untuk customer engagement",
-              "Design engagement activities dan content",
-              "Monitor community growth dan activity",
+            "Program membangun komunitas dan engagement": [
+              "Buat platform komunitas untuk customer engagement",
+              "Desain aktivitas engagement dan konten",
+              "Monitor pertumbuhan komunitas dan aktivitas",
             ],
             "Optimisasi SEO untuk organic traffic": [
               "Audit SEO current website dan competitor",
@@ -2118,30 +2118,30 @@ export default function CompanyOnboarding() {
               "Develop high-quality content secara konsisten",
               "Monitor content performance dan engagement",
             ],
-            "User-generated content campaign": [
-              "Design campaign untuk encourage UGC",
-              "Setup tracking dan incentive system",
-              "Monitor campaign performance dan engagement",
+            "Kampanye konten buatan pengguna": [
+              "Desain kampanye untuk mendorong UGC",
+              "Setup sistem tracking dan insentif",
+              "Monitor performa kampanye dan engagement",
             ],
-            "Social media contest dan giveaway": [
-              "Plan contest theme dan prize yang menarik",
-              "Setup contest mechanics dan rules",
-              "Execute contest dan monitor participation",
+            "Kontes dan hadiah di media sosial": [
+              "Rencanakan tema kontes dan hadiah menarik",
+              "Setup mekanisme kontes dan aturan",
+              "Jalankan kontes dan monitor partisipasi",
             ],
-            "Interactive content strategy": [
-              "Develop interactive content format (quiz, poll, etc)",
-              "Create engaging interactive content",
-              "Monitor engagement dan conversion metrics",
+            "Strategi konten interaktif": [
+              "Kembangkan format konten interaktif (quiz, poll, dll)",
+              "Buat konten interaktif yang menarik",
+              "Monitor engagement dan metrics konversi",
             ],
-            "Community management program": [
-              "Setup community guidelines dan moderation",
-              "Develop community engagement strategy",
-              "Monitor community health dan activity",
+            "Program manajemen komunitas": [
+              "Setup guidelines komunitas dan moderasi",
+              "Kembangkan strategi engagement komunitas",
+              "Monitor kesehatan dan aktivitas komunitas",
             ],
-            "Social listening dan response optimization": [
-              "Setup social listening tools untuk monitoring",
-              "Develop response strategy untuk berbagai skenario",
-              "Monitor brand sentiment dan response effectiveness",
+            "Optimisasi social listening dan respon": [
+              "Setup tools social listening untuk monitoring",
+              "Kembangkan strategi respon untuk berbagai skenario",
+              "Monitor brand sentiment dan efektivitas respon",
             ],
             "Implementasi chatbot untuk instant response": [
               "Design chatbot flow untuk common queries",
@@ -2262,15 +2262,15 @@ export default function CompanyOnboarding() {
               "Coordinate campaign launch across channel",
               "Monitor dan optimize campaign performance",
             ],
-            "Content calendar dengan viral potential": [
-              "Riset trending topic untuk content inspiration",
-              "Buat content calendar dengan viral angle",
-              "Analyze performance dan optimize content",
+            "Kalender konten dengan potensi viral": [
+              "Riset trending topic untuk inspirasi konten",
+              "Buat kalender konten dengan sudut viral",
+              "Analisis performa dan optimasi konten",
             ],
-            "Paid social media advertising campaign": [
-              "Setup Facebook Ads dan Instagram Ads campaign",
-              "Buat creative ads dengan A/B testing",
-              "Monitor dan optimize campaign performance",
+            "Kampanye iklan berbayar di media sosial": [
+              "Setup kampanye Facebook Ads dan Instagram Ads",
+              "Buat iklan kreatif dengan A/B testing",
+              "Monitor dan optimasi performa kampanye",
             ],
             "Membangun influencer partnership program": [
               "Identifikasi influencer yang sesuai dengan brand",
@@ -2456,7 +2456,7 @@ export default function CompanyOnboarding() {
                   📋 Task yang Dipilih ({selectedTasks.length})
                 </h4>
                 <div className="space-y-2">
-                  {Object.entries(taskGroups).map(([initiative, tasks]) => {
+                  {Object.entries(tasksByInitiative).map(([initiative, tasks]) => {
                     const initiativeTasks = tasks.filter((task) =>
                       selectedTasks.includes(task),
                     );
