@@ -118,11 +118,11 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
     enabled: open && !!userId,
   });
 
-  // Fetch success metrics for active initiatives
+  // Fetch success metrics for active initiatives (organization-specific)
   const { data: allSuccessMetrics } = useQuery({
-    queryKey: ['/api/success-metrics'],
+    queryKey: ['/api/success-metrics', userId],
     queryFn: async () => {
-      if (!initiatives) return [];
+      if (!initiatives || !userId) return [];
       
       const metricsPromises = (initiatives as any[])
         .filter(init => init.status === 'sedang_berjalan' || init.status === 'draft')
@@ -138,9 +138,16 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
         });
       
       const results = await Promise.all(metricsPromises);
-      return results.flat();
+      const allMetrics = results.flat();
+      
+      // Deduplicate by metric ID to prevent duplicates
+      const uniqueMetrics = allMetrics.filter((metric: any, index: number, self: any[]) => 
+        index === self.findIndex(m => m.id === metric.id)
+      );
+      
+      return uniqueMetrics;
     },
-    enabled: open && !!initiatives,
+    enabled: open && !!initiatives && !!userId,
   });
 
   // Filter tasks for today and tomorrow
@@ -204,11 +211,31 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
     });
   }, [keyResults, calculateKeyResultProgress]);
 
-  // Initialize update data when modal opens
+  // Initialize update data when modal opens (with deduplication)
   React.useEffect(() => {
     if (open && (activeKeyResults?.length > 0 || allSuccessMetrics?.length > 0 || todayTasks.length > 0)) {
+      // Deduplicate key results by ID
+      const uniqueKeyResults = activeKeyResults?.filter((kr: any, index: number, self: any[]) => 
+        index === self.findIndex(k => k.id === kr.id)
+      ) || [];
+
+      // Deduplicate success metrics by ID
+      const uniqueSuccessMetrics = allSuccessMetrics?.filter((metric: any, index: number, self: any[]) => 
+        index === self.findIndex(m => m.id === metric.id)
+      ) || [];
+
+      // Deduplicate today tasks by ID
+      const uniqueTodayTasks = todayTasks.filter((task: any, index: number, self: any[]) => 
+        index === self.findIndex(t => t.id === task.id)
+      );
+
+      // Deduplicate tomorrow tasks by ID
+      const uniqueTomorrowTasks = tomorrowTasks.filter((task: any, index: number, self: any[]) => 
+        index === self.findIndex(t => t.id === task.id)
+      );
+
       setUpdateData({
-        keyResults: activeKeyResults?.map((kr: any) => ({
+        keyResults: uniqueKeyResults.map((kr: any) => ({
           id: kr.id,
           title: kr.title,
           currentValue: kr.currentValue,
@@ -217,8 +244,8 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
           keyResultType: kr.keyResultType,
           newValue: kr.currentValue,
           notes: ''
-        })) || [],
-        successMetrics: allSuccessMetrics?.map((metric: any) => ({
+        })),
+        successMetrics: uniqueSuccessMetrics.map((metric: any) => ({
           id: metric.id,
           name: metric.name,
           target: metric.target,
@@ -226,15 +253,15 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
           initiativeTitle: metric.initiativeTitle,
           newValue: metric.achievement,
           notes: ''
-        })) || [],
-        todayTasks: todayTasks.map((task: any) => ({
+        })),
+        todayTasks: uniqueTodayTasks.map((task: any) => ({
           id: task.id,
           title: task.title,
           status: task.status,
           newStatus: task.status,
           completed: task.status === 'completed'
         })),
-        tomorrowTasks: tomorrowTasks.map((task: any) => ({
+        tomorrowTasks: uniqueTomorrowTasks.map((task: any) => ({
           id: task.id,
           title: task.title,
           dueDate: task.dueDate,
@@ -300,8 +327,9 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
         description: "Semua progress dan refleksi telah disimpan"
       });
       
-      // Invalidate queries to refresh data
+      // Invalidate queries to refresh data (specific to user)
       queryClient.invalidateQueries({ queryKey: ['/api/key-results'] });
+      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
       queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
       queryClient.invalidateQueries({ queryKey: ['/api/daily-reflections'] });
       queryClient.invalidateQueries({ queryKey: ['/api/success-metrics'] });
