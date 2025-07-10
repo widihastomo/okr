@@ -19,6 +19,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Settings, Users, CreditCard, Building2, Loader2, Plus, Edit, Trash2, UserPlus, Shield, User as UserIcon, Search, UserCheck, UserX, MoreHorizontal, MoreVertical, Eye, EyeOff, Key } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import PlanChangeWizard from "@/components/plan-change-wizard";
 
 type UserWithTeams = User & {
   teams?: (TeamMember & { team: Team })[];
@@ -541,9 +542,12 @@ export default function OrganizationSettings() {
                     </div>
                   </div>
                   <div className="flex justify-between">
-                    <Button variant="outline" onClick={() => setLocation("/pricing")}>
-                      Ubah Paket
-                    </Button>
+                    <PlanChangeWizard 
+                      currentPlan={subscription.plan}
+                      onPlanChanged={() => {
+                        queryClient.invalidateQueries({ queryKey: ["/api/my-organization-with-role"] });
+                      }}
+                    />
                     <Button variant="outline" className="text-red-600 hover:text-red-700">
                       Batalkan Langganan
                     </Button>

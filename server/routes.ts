@@ -34,6 +34,7 @@ import { eq, and, desc, inArray, isNotNull } from "drizzle-orm";
 import { createSnapTransaction } from "./midtrans";
 import { reminderSystem } from "./reminder-system";
 import { emailService } from "./email-service";
+import { setupSubscriptionRoutes } from "./subscription-routes";
 import crypto from "crypto";
 
 // System Owner middleware to protect admin endpoints
@@ -48,6 +49,9 @@ const isSystemOwner = (req: any, res: any, next: any) => {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
   setupEmailAuth(app);
+  
+  // Setup subscription routes
+  setupSubscriptionRoutes(app);
   
   // Auto-login middleware for development (before auth routes) - DISABLED for registration testing
   // if (process.env.NODE_ENV === 'development') {
