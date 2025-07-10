@@ -25,32 +25,20 @@ export function LogoutButton({
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
-    try {
-      // Call logout API endpoint
-      const response = await fetch('/api/auth/logout', {
-        method: 'POST',
-        credentials: 'include'
-      });
-
-      // Clear React Query cache to reset authentication state
-      queryClient.clear();
-      
-      // Clear any client-side state
-      localStorage.clear();
-      sessionStorage.clear();
-      
-      // Use client-side navigation for fastest redirect
-      setLocation("/");
-    } catch (error) {
-      console.error('Logout error:', error);
-      // Clear cache and navigate anyway
-      queryClient.clear();
-      localStorage.clear();
-      sessionStorage.clear();
-      setLocation("/");
-    } finally {
-      setIsLoggingOut(false);
-    }
+    
+    // Immediately clear client state and navigate for fastest UX
+    queryClient.clear();
+    localStorage.clear();
+    sessionStorage.clear();
+    setLocation("/");
+    
+    // Call logout API in background - don't wait for response
+    fetch('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include'
+    }).catch(() => {
+      // Ignore errors - user is already logged out on client side
+    });
   };
 
   return (

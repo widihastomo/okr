@@ -248,30 +248,20 @@ export default function GlobalHeader({
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="flex items-center space-x-2 cursor-pointer text-red-600 hover:text-red-700"
-              onClick={async () => {
-                try {
-                  const response = await fetch("/api/auth/logout", {
-                    method: "POST",
-                    credentials: "include",
-                  });
-                  
-                  // Clear React Query cache first
-                  queryClient.clear();
-                  
-                  // Clear any local storage or session data
-                  localStorage.clear();
-                  sessionStorage.clear();
-                  
-                  // Use client-side navigation for fastest redirect
-                  navigate("/");
-                } catch (error) {
-                  console.error("Logout error:", error);
-                  // Clear cache and navigate anyway
-                  queryClient.clear();
-                  localStorage.clear();
-                  sessionStorage.clear();
-                  navigate("/");
-                }
+              onClick={() => {
+                // Immediately clear client state and navigate for instant logout
+                queryClient.clear();
+                localStorage.clear();
+                sessionStorage.clear();
+                navigate("/");
+                
+                // Call logout API in background - don't wait
+                fetch("/api/auth/logout", {
+                  method: "POST",
+                  credentials: "include",
+                }).catch(() => {
+                  // Ignore errors - user is already logged out on client
+                });
               }}
             >
               <LogOut className="h-4 w-4" />

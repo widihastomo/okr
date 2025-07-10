@@ -128,6 +128,13 @@ Trial user untuk testing achievement system:
 ## Changelog
 ```
 Changelog:
+- January 10, 2025. Further optimized authentication flow for instant login and logout:
+  * OPTIMIZED: Logout process now instant - client state cleared immediately before API call
+  * ENHANCED: Login/logout both use non-blocking pattern - clear state → navigate → API call in background
+  * IMPROVED: Auth cache set to 10 seconds for faster navigation between pages
+  * ADDED: Pre-fetch strategy for commonly needed data (trial status, onboarding status) after login
+  * FIXED: Loading screen only shows on initial app load, not during navigation
+  * RESULT: Both login and logout are now instantaneous with zero perceived delay
 - July 10, 2025. Successfully optimized ALL authentication redirects for maximum performance:
   * OPTIMIZED: Login redirect now immediate - removed onboarding API call during login for instant redirect to "/"
   * OPTIMIZED: Logout redirect now uses wouter's navigate() instead of window.location.reload() for instant client-side redirect
