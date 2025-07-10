@@ -732,20 +732,33 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap">
                             <div>
-                              <div className="text-xs text-gray-500 mb-1">
-                                Current: {task.status}, New: {task.newStatus || 'none'}
+                              <div className="text-xs text-red-600 mb-1 font-bold">
+                                DESKTOP - Current: {task.status}, New: {task.newStatus || 'none'}, Index: {index}
                               </div>
                               <select
-                                className="w-40 h-10 px-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:border-blue-600 focus:outline-none"
+                                className="w-40 h-10 px-3 py-2 text-sm border border-red-500 rounded-md bg-yellow-50 focus:border-blue-600 focus:outline-none"
                                 value={task.newStatus || task.status}
+                                onClick={() => console.log('Dropdown clicked!')}
+                                onFocus={() => console.log('Dropdown focused!')}
                                 onChange={(e) => {
                                   const value = e.target.value;
-                                  console.log('Desktop native dropdown changed:', { taskId: task.id, taskTitle: task.title, oldValue: task.newStatus, newValue: value });
-                                  const newData = { ...updateData };
-                                  newData.todayTasks[index].newStatus = value;
-                                  newData.todayTasks[index].completed = value === 'completed';
-                                  setUpdateData(newData);
-                                  console.log('Desktop native update data set:', newData.todayTasks[index]);
+                                  console.log('🔥 DESKTOP DROPDOWN CHANGED!', { 
+                                    taskId: task.id, 
+                                    taskTitle: task.title, 
+                                    index, 
+                                    oldValue: task.newStatus || task.status, 
+                                    newValue: value,
+                                    eventTarget: e.target
+                                  });
+                                  
+                                  // Force update using functional state update
+                                  setUpdateData(prevData => {
+                                    const newData = { ...prevData };
+                                    newData.todayTasks[index].newStatus = value;
+                                    newData.todayTasks[index].completed = value === 'completed';
+                                    console.log('🚀 Desktop state updated:', newData.todayTasks[index]);
+                                    return newData;
+                                  });
                                 }}
                               >
                                 <option value="not_started">Belum Dimulai</option>
@@ -776,20 +789,33 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
 
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-700">Status Baru:</label>
-                        <div className="text-xs text-gray-500 mb-1">
-                          Current: {task.status}, New: {task.newStatus || 'none'}
+                        <div className="text-xs text-red-600 mb-1 font-bold">
+                          MOBILE - Current: {task.status}, New: {task.newStatus || 'none'}, Index: {index}
                         </div>
                         <select
-                          className="w-full h-10 px-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:border-blue-600 focus:outline-none"
+                          className="w-full h-10 px-3 py-2 text-sm border border-red-500 rounded-md bg-yellow-50 focus:border-blue-600 focus:outline-none"
                           value={task.newStatus || task.status}
+                          onClick={() => console.log('Mobile dropdown clicked!')}
+                          onFocus={() => console.log('Mobile dropdown focused!')}
                           onChange={(e) => {
                             const value = e.target.value;
-                            console.log('Mobile native dropdown changed:', { taskId: task.id, taskTitle: task.title, oldValue: task.newStatus, newValue: value });
-                            const newData = { ...updateData };
-                            newData.todayTasks[index].newStatus = value;
-                            newData.todayTasks[index].completed = value === 'completed';
-                            setUpdateData(newData);
-                            console.log('Mobile native update data set:', newData.todayTasks[index]);
+                            console.log('🔥 MOBILE DROPDOWN CHANGED!', { 
+                              taskId: task.id, 
+                              taskTitle: task.title, 
+                              index,
+                              oldValue: task.newStatus || task.status, 
+                              newValue: value,
+                              eventTarget: e.target
+                            });
+                            
+                            // Force update using functional state update
+                            setUpdateData(prevData => {
+                              const newData = { ...prevData };
+                              newData.todayTasks[index].newStatus = value;
+                              newData.todayTasks[index].completed = value === 'completed';
+                              console.log('🚀 Mobile state updated:', newData.todayTasks[index]);
+                              return newData;
+                            });
                           }}
                         >
                           <option value="not_started">Belum Dimulai</option>
