@@ -735,27 +735,24 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                               <div className="text-xs text-gray-500 mb-1">
                                 Current: {task.status}, New: {task.newStatus || 'none'}
                               </div>
-                              <Select
+                              <select
+                                className="w-40 h-10 px-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:border-blue-600 focus:outline-none"
                                 value={task.newStatus || task.status}
-                                onValueChange={(value) => {
-                                  console.log('Dropdown changed:', { taskId: task.id, taskTitle: task.title, oldValue: task.newStatus, newValue: value });
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  console.log('Desktop native dropdown changed:', { taskId: task.id, taskTitle: task.title, oldValue: task.newStatus, newValue: value });
                                   const newData = { ...updateData };
                                   newData.todayTasks[index].newStatus = value;
                                   newData.todayTasks[index].completed = value === 'completed';
                                   setUpdateData(newData);
-                                  console.log('Update data set:', newData.todayTasks[index]);
+                                  console.log('Desktop native update data set:', newData.todayTasks[index]);
                                 }}
                               >
-                              <SelectTrigger className="w-40">
-                                <SelectValue placeholder={`Status: ${getTaskStatusLabel(task.status)}`} />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="not_started">Belum Dimulai</SelectItem>
-                                <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
-                                <SelectItem value="completed">Selesai</SelectItem>
-                                <SelectItem value="cancelled">Dibatalkan</SelectItem>
-                              </SelectContent>
-                            </Select>
+                                <option value="not_started">Belum Dimulai</option>
+                                <option value="in_progress">Sedang Berjalan</option>
+                                <option value="completed">Selesai</option>
+                                <option value="cancelled">Dibatalkan</option>
+                              </select>
                             </div>
                           </td>
                         </tr>
@@ -779,26 +776,27 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
 
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-700">Status Baru:</label>
-                        <Select
+                        <div className="text-xs text-gray-500 mb-1">
+                          Current: {task.status}, New: {task.newStatus || 'none'}
+                        </div>
+                        <select
+                          className="w-full h-10 px-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:border-blue-600 focus:outline-none"
                           value={task.newStatus || task.status}
-                          onValueChange={(value) => {
-                            console.log('Mobile dropdown changed:', { taskId: task.id, oldValue: task.newStatus, newValue: value });
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            console.log('Mobile native dropdown changed:', { taskId: task.id, taskTitle: task.title, oldValue: task.newStatus, newValue: value });
                             const newData = { ...updateData };
                             newData.todayTasks[index].newStatus = value;
                             newData.todayTasks[index].completed = value === 'completed';
                             setUpdateData(newData);
+                            console.log('Mobile native update data set:', newData.todayTasks[index]);
                           }}
                         >
-                          <SelectTrigger>
-                            <SelectValue placeholder={`Status: ${getTaskStatusLabel(task.status)}`} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="not_started">Belum Dimulai</SelectItem>
-                            <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
-                            <SelectItem value="completed">Selesai</SelectItem>
-                            <SelectItem value="cancelled">Dibatalkan</SelectItem>
-                          </SelectContent>
-                        </Select>
+                          <option value="not_started">Belum Dimulai</option>
+                          <option value="in_progress">Sedang Berjalan</option>
+                          <option value="completed">Selesai</option>
+                          <option value="cancelled">Dibatalkan</option>
+                        </select>
                       </div>
                     </div>
                   ))}
