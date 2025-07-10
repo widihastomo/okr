@@ -121,6 +121,14 @@ Trial user untuk testing achievement system:
 ## Changelog
 ```
 Changelog:
+- July 10, 2025. Successfully implemented random deadline assignment for initiatives and tasks during onboarding completion:
+  * Added generateRandomDeadline helper function to create random dates within cycle range
+  * Initiatives now receive random deadline between cycleStartDate and cycleEndDate from onboarding data
+  * Tasks now receive random dueDate between cycleStartDate and cycleEndDate from onboarding data
+  * Added logging to track creation of initiatives and tasks with their random deadlines
+  * Used onboarding cycle dates (e.g., 2025-07-31 to 2025-08-02) to generate realistic deadlines
+  * Fallback to default 30-day range if cycle dates not provided in onboarding data
+  * Enhanced createFirstObjectiveFromOnboarding function in storage.ts with deadline logic
 - July 10, 2025. Successfully fixed onboarding system by reducing from 10 to 9 steps and resolving critical errors:
   * Combined onboarding steps 9 and 10 into single "Ringkasan & Reminder" step with comprehensive dashboard
   * Fixed "MessageSquare is not defined" error by adding missing import in trial-mascot.tsx

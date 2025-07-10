@@ -1771,6 +1771,18 @@ export class DatabaseStorage implements IStorage {
         const objectiveKeyResults = await db.select().from(keyResults).where(eq(keyResults.objectiveId, newObjective.id));
         
         if (objectiveKeyResults.length > 0) {
+          // Helper function to generate random deadline within cycle range
+          const generateRandomDeadline = (startDate: string, endDate: string) => {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const randomTime = start.getTime() + Math.random() * (end.getTime() - start.getTime());
+            return new Date(randomTime);
+          };
+
+          // Use cycle dates from onboarding data or create default range
+          const cycleStartDate = onboardingData.cycleStartDate || new Date().toISOString().split('T')[0];
+          const cycleEndDate = onboardingData.cycleEndDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+          
           const initiativesData = onboardingData.initiatives
             .filter((init: string) => init && init.trim() !== '' && init !== 'custom')
             .map((init: string) => ({
@@ -1784,7 +1796,8 @@ export class DatabaseStorage implements IStorage {
               effortScore: 3,
               confidenceScore: 3,
               priorityScore: "3.00",
-              createdBy: userId
+              createdBy: userId,
+              dueDate: generateRandomDeadline(cycleStartDate, cycleEndDate)
             }));
           
           if (initiativesData.length > 0) {
@@ -1801,13 +1814,17 @@ export class DatabaseStorage implements IStorage {
                   status: 'not_started',
                   priority: 'medium',
                   assignedTo: userId,
-                  createdBy: userId
+                  createdBy: userId,
+                  dueDate: generateRandomDeadline(cycleStartDate, cycleEndDate)
                 }));
               
               if (tasksData.length > 0) {
                 await db.insert(tasks).values(tasksData);
+                console.log(`📅 Created ${tasksData.length} tasks with random deadlines between ${cycleStartDate} and ${cycleEndDate}`);
               }
             }
+            
+            console.log(`📅 Created ${initiativesData.length} initiatives with random deadlines between ${cycleStartDate} and ${cycleEndDate}`);
           }
         }
       }
