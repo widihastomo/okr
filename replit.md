@@ -121,6 +121,15 @@ Trial user untuk testing achievement system:
 ## Changelog
 ```
 Changelog:
+- July 10, 2025. Successfully implemented loading state during redirect from onboarding to home page:
+  * Added isRedirecting state to track redirect loading status
+  * Modified completeOnboardingMutation to set loading state after successful API response
+  * Added 1.5-second delay before redirect to show loading state
+  * Enhanced LoadingButton to display different states: "processing" during API call, "creating" during redirect
+  * Button text changes to "Menuju Dashboard..." during redirect phase
+  * Added full-screen loading overlay with animated icon and descriptive text
+  * Improved user experience with clear visual feedback during onboarding completion process
+  * Loading overlay features blurred background, centered message, and animated ArrowRight icon
 - July 10, 2025. Successfully implemented random deadline assignment for initiatives and tasks during onboarding completion:
   * Added generateRandomDeadline helper function to create random dates within cycle range
   * Initiatives now receive random deadline between cycleStartDate and cycleEndDate from onboarding data

@@ -165,6 +165,7 @@ export default function CompanyOnboarding() {
   const queryClient = useQueryClient();
   const [startDateOpen, setStartDateOpen] = useState(false);
   const [endDateOpen, setEndDateOpen] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
     currentStep: 0, // Start at welcome screen
     completedSteps: [],
@@ -399,8 +400,14 @@ export default function CompanyOnboarding() {
         description:
           "Onboarding berhasil diselesaikan. Goal pertama telah dibuat!",
       });
-      // Redirect to main dashboard
-      window.location.href = "/";
+      
+      // Set redirecting state to show loading
+      setIsRedirecting(true);
+      
+      // Add a brief delay to show the loading state before redirect
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1500);
     },
     onError: (error) => {
       toast({
@@ -3252,6 +3259,22 @@ export default function CompanyOnboarding() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+      {/* Loading overlay for redirect */}
+      {isRedirecting && (
+        <div className="fixed inset-0 bg-white/90 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 mx-auto mb-4 relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-orange-500 rounded-full animate-pulse"></div>
+              <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center">
+                <ArrowRight className="w-6 h-6 text-orange-600 animate-bounce" />
+              </div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Menuju Dashboard...</h3>
+            <p className="text-gray-600">Onboarding selesai! Mempersiapkan dashboard untuk Anda.</p>
+          </div>
+        </div>
+      )}
+      
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
@@ -3456,11 +3479,11 @@ export default function CompanyOnboarding() {
                 {onboardingData.currentStep === ONBOARDING_STEPS.length ? (
                   <LoadingButton
                     onClick={handleComplete}
-                    isLoading={completeOnboardingMutation.isPending}
-                    loadingType="processing"
+                    isLoading={completeOnboardingMutation.isPending || isRedirecting}
+                    loadingType={isRedirecting ? "creating" : "processing"}
                     className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:hover:scale-100 disabled:hover:shadow-none"
                   >
-                    Selesai
+                    {isRedirecting ? "Menuju Dashboard..." : "Selesai"}
                   </LoadingButton>
                 ) : (
                   <Button
