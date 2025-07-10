@@ -1986,6 +1986,51 @@ export default function CompanyOnboarding() {
               "Design optimized process workflow",
               "Implementasi process improvement dan monitoring",
             ],
+            "Workflow optimization dan automation": [
+              "Analisis current workflow dan identifikasi bottleneck",
+              "Design automated workflow system",
+              "Implementasi automation dan monitoring efficiency",
+            ],
+            "Team training untuk efficiency": [
+              "Buat program training untuk meningkatkan skill tim",
+              "Lakukan assessment competency dan gap analysis",
+              "Implementasi training program dan evaluasi hasil",
+            ],
+            "Quality control streamlining": [
+              "Analisis current quality control process",
+              "Design streamlined quality control system",
+              "Implementasi quality control baru dan monitoring",
+            ],
+            "Equipment upgrade program": [
+              "Evaluasi equipment lama dan kebutuhan upgrade",
+              "Procurement dan instalasi equipment baru",
+              "Training operator dan maintenance equipment",
+            ],
+            "Production capacity scaling": [
+              "Analisis current production capacity dan demand",
+              "Design scaling strategy untuk production",
+              "Implementasi capacity expansion dan monitoring",
+            ],
+            "Staff scheduling optimization": [
+              "Analisis current staff scheduling pattern",
+              "Design optimal scheduling system",
+              "Implementasi scheduling optimization dan monitoring",
+            ],
+            "Backup system implementation": [
+              "Design backup system untuk critical process",
+              "Implementasi backup system dan testing",
+              "Monitor backup system performance dan reliability",
+            ],
+            "Equipment monitoring system": [
+              "Setup monitoring equipment untuk production line",
+              "Buat dashboard untuk real-time monitoring",
+              "Training tim untuk menggunakan monitoring system",
+            ],
+            "Preventive maintenance program": [
+              "Buat schedule maintenance untuk semua equipment",
+              "Siapkan checklist maintenance routine",
+              "Training teknisi untuk preventive maintenance",
+            ],
 
             // Customer Service Tasks
             "Melatih customer service excellence": [
