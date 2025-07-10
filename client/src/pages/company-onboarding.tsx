@@ -56,8 +56,6 @@ import {
 import { ReminderSettings } from "@/components/ReminderSettings";
 import { type CompanyOnboardingData } from "@shared/schema";
 
-
-
 // Onboarding steps following the reference structure
 const ONBOARDING_STEPS = [
   {
@@ -112,8 +110,9 @@ const ONBOARDING_STEPS = [
   },
   {
     id: 9,
-    title: "Ringkasan & Reminder",
-    description: "Lihat ringkasan lengkap dan atur reminder",
+    title: "Ringkasan",
+    description:
+      "Lihat ringkasan dari goal dan strategi eksekusi yang sudah anda buat",
     icon: MessageSquare,
   },
 ];
@@ -1852,498 +1851,497 @@ export default function CompanyOnboarding() {
       case 7: // Task untuk Inisiatif
         // Define taskMapping outside functions so it can be reused
         const taskMapping = {
-            // Penjualan & Marketing Tasks
-            "Menjalankan kampanye promosi bulanan dengan diskon 20%": [
-              "Buat creative design untuk promosi diskon",
-              "Setup campaign di Facebook Ads dan Google Ads",
-              "Siapkan landing page untuk campaign",
-            ],
-            "Melatih sales team untuk closing technique": [
-              "Buat materi training closing technique",
-              "Jadwalkan session training dengan sales team",
-              "Evaluasi dan feedback setelah training",
-            ],
-            "Mengimplementasikan CRM untuk follow-up lead": [
-              "Pilih dan setup CRM software",
-              "Import database lead ke CRM",
-              "Training tim untuk menggunakan CRM",
-            ],
-            "Mempersonalisasi approach berdasarkan lead profile": [
-              "Buat database profil lengkap untuk setiap lead",
-              "Develop template komunikasi untuk setiap persona",
-              "Training sales team untuk personalisasi approach",
-            ],
-            "Mengotomatisasi lead notification system": [
-              "Setup real-time notification untuk lead baru",
-              "Konfigurasi assignment rule untuk sales team",
-              "Implementasi lead routing berdasarkan criteria",
-            ],
-            "Membuat program bundling produk dengan harga spesial": [
-              "Analisis produk yang cocok untuk bundling",
-              "Tentukan harga bundling yang kompetitif",
-              "Buat marketing material untuk bundling",
-            ],
-            "Menjalankan digital marketing campaign di social media": [
-              "Buat content calendar untuk social media",
-              "Design konten visual untuk campaign",
-              "Schedule posting di multiple platform",
-            ],
-            "Mengembangkan content marketing strategy di blog dan sosmed": [
-              "Riset keyword untuk content strategy",
-              "Buat content calendar bulanan",
-              "Tulis dan publish artikel blog",
-            ],
-            "Mengadakan event networking dan product demo": [
-              "Cari dan daftar event networking yang relevan",
-              "Siapkan booth material dan product demo",
-              "Follow up dengan kontak dari event",
-            ],
-            "Mengembangkan strategi cross-selling kepada existing customer": [
-              "Analisis purchase history existing customer",
-              "Buat cross-selling recommendation engine",
-              "Training sales team untuk cross-selling technique",
-            ],
-            "Melatih tim sales untuk upselling": [
-              "Buat materi training upselling technique",
-              "Lakukan roleplay session untuk upselling",
-              "Monitor dan evaluasi upselling performance",
-            ],
-            "Membuat referral program dengan reward menarik": [
-              "Design struktur referral program dan reward",
-              "Buat sistem tracking untuk referral",
-              "Launch program dan monitor customer engagement",
-            ],
-            "Membangun partnership dengan marketplace online": [
-              "Riset marketplace yang sesuai dengan produk",
-              "Negosiasi partnership terms dengan marketplace",
-              "Setup produk di marketplace dan monitor performance",
-            ],
+          // Penjualan & Marketing Tasks
+          "Menjalankan kampanye promosi bulanan dengan diskon 20%": [
+            "Buat creative design untuk promosi diskon",
+            "Setup campaign di Facebook Ads dan Google Ads",
+            "Siapkan landing page untuk campaign",
+          ],
+          "Melatih sales team untuk closing technique": [
+            "Buat materi training closing technique",
+            "Jadwalkan session training dengan sales team",
+            "Evaluasi dan feedback setelah training",
+          ],
+          "Mengimplementasikan CRM untuk follow-up lead": [
+            "Pilih dan setup CRM software",
+            "Import database lead ke CRM",
+            "Training tim untuk menggunakan CRM",
+          ],
+          "Mempersonalisasi approach berdasarkan lead profile": [
+            "Buat database profil lengkap untuk setiap lead",
+            "Develop template komunikasi untuk setiap persona",
+            "Training sales team untuk personalisasi approach",
+          ],
+          "Mengotomatisasi lead notification system": [
+            "Setup real-time notification untuk lead baru",
+            "Konfigurasi assignment rule untuk sales team",
+            "Implementasi lead routing berdasarkan criteria",
+          ],
+          "Membuat program bundling produk dengan harga spesial": [
+            "Analisis produk yang cocok untuk bundling",
+            "Tentukan harga bundling yang kompetitif",
+            "Buat marketing material untuk bundling",
+          ],
+          "Menjalankan digital marketing campaign di social media": [
+            "Buat content calendar untuk social media",
+            "Design konten visual untuk campaign",
+            "Schedule posting di multiple platform",
+          ],
+          "Mengembangkan content marketing strategy di blog dan sosmed": [
+            "Riset keyword untuk content strategy",
+            "Buat content calendar bulanan",
+            "Tulis dan publish artikel blog",
+          ],
+          "Mengadakan event networking dan product demo": [
+            "Cari dan daftar event networking yang relevan",
+            "Siapkan booth material dan product demo",
+            "Follow up dengan kontak dari event",
+          ],
+          "Mengembangkan strategi cross-selling kepada existing customer": [
+            "Analisis purchase history existing customer",
+            "Buat cross-selling recommendation engine",
+            "Training sales team untuk cross-selling technique",
+          ],
+          "Melatih tim sales untuk upselling": [
+            "Buat materi training upselling technique",
+            "Lakukan roleplay session untuk upselling",
+            "Monitor dan evaluasi upselling performance",
+          ],
+          "Membuat referral program dengan reward menarik": [
+            "Design struktur referral program dan reward",
+            "Buat sistem tracking untuk referral",
+            "Launch program dan monitor customer engagement",
+          ],
+          "Membangun partnership dengan marketplace online": [
+            "Riset marketplace yang sesuai dengan produk",
+            "Negosiasi partnership terms dengan marketplace",
+            "Setup produk di marketplace dan monitor performance",
+          ],
 
-            // Operasional Tasks
-            "Mengimplementasikan lean manufacturing principles": [
-              "Analisis current process dan identifikasi waste",
-              "Training karyawan tentang lean principles",
-              "Implementasi 5S di area produksi",
-            ],
-            "Mengotomatisasi production line setup": [
-              "Evaluasi kebutuhan automation equipment",
-              "Install dan setup automated system",
-              "Training operator untuk automated system",
-            ],
-            "Melakukan time and motion study untuk bottleneck": [
-              "Identifikasi bottleneck di production line",
-              "Lakukan time and motion study detail",
-              "Buat action plan untuk eliminate bottleneck",
-            ],
-            "Menjadwalkan preventive maintenance": [
-              "Buat schedule maintenance untuk semua mesin",
-              "Siapkan checklist maintenance routine",
-              "Training teknisi untuk preventive maintenance",
-            ],
-            "Menerapkan quality control di setiap stage produksi": [
-              "Buat SOP quality control untuk setiap stage",
-              "Setup quality checkpoint di production line",
-              "Training quality control inspector",
-            ],
-            "Melatih operator untuk efisiensi maksimal": [
-              "Buat program training untuk operator",
-              "Lakukan assessment skill operator",
-              "Implementasi best practices untuk efisiensi",
-            ],
-            "Mengimplementasikan real-time monitoring system": [
-              "Setup monitoring equipment di production line",
-              "Buat dashboard untuk real-time monitoring",
-              "Training tim untuk menggunakan monitoring system",
-            ],
-            "Sistem monitoring kinerja": [
-              "Setup performance monitoring tools",
-              "Buat dashboard untuk tracking performance",
-              "Training tim untuk menggunakan monitoring system",
-            ],
-            "Pelatihan produktivitas karyawan": [
-              "Buat program training untuk karyawan",
-              "Lakukan assessment skill karyawan",
-              "Implementasi best practices untuk produktivitas",
-            ],
-            "Optimisasi alokasi sumber daya": [
-              "Analisis current resource allocation",
-              "Buat model optimization untuk resource",
-              "Implementasi resource allocation yang optimal",
-            ],
-            "Program efisiensi energi": [
-              "Audit energy consumption di semua area",
-              "Implementasi energy saving measures",
-              "Monitor energy efficiency improvement",
-            ],
-            "Inisiatif optimisasi proses": [
-              "Analisis current process dan identifikasi waste",
-              "Design optimized process workflow",
-              "Implementasi process improvement dan monitoring",
-            ],
-            "Optimisasi dan otomasi alur kerja": [
-              "Analisis current workflow dan identifikasi bottleneck",
-              "Design automated workflow system",
-              "Implementasi automation dan monitoring efficiency",
-            ],
-            "Pelatihan tim untuk efisiensi": [
-              "Buat program training untuk meningkatkan skill tim",
-              "Lakukan assessment competency dan gap analysis",
-              "Implementasi training program dan evaluasi hasil",
-            ],
-            "Penyederhanaan kontrol kualitas": [
-              "Analisis current quality control process",
-              "Design streamlined quality control system",
-              "Implementasi quality control baru dan monitoring",
-            ],
-            "Program upgrade peralatan": [
-              "Evaluasi equipment lama dan kebutuhan upgrade",
-              "Procurement dan instalasi equipment baru",
-              "Training operator dan maintenance equipment",
-            ],
-            "Peningkatan kapasitas produksi": [
-              "Analisis current production capacity dan demand",
-              "Design scaling strategy untuk production",
-              "Implementasi capacity expansion dan monitoring",
-            ],
-            "Optimisasi penjadwalan staff": [
-              "Analisis current staff scheduling pattern",
-              "Design optimal scheduling system",
-              "Implementasi scheduling optimization dan monitoring",
-            ],
-            "Implementasi sistem backup": [
-              "Design backup system untuk critical process",
-              "Implementasi backup system dan testing",
-              "Monitor backup system performance dan reliability",
-            ],
-            "Sistem monitoring peralatan": [
-              "Setup monitoring equipment untuk production line",
-              "Buat dashboard untuk real-time monitoring",
-              "Training tim untuk menggunakan monitoring system",
-            ],
-            "Program maintenance preventif": [
-              "Buat schedule maintenance untuk semua equipment",
-              "Siapkan checklist maintenance routine",
-              "Training teknisi untuk preventive maintenance",
-            ],
-            "Program negosiasi supplier": [
-              "Analisis supplier performance dan pricing",
-              "Negosiasi contract terms dengan supplier",
-              "Monitor supplier performance dan relationship",
-            ],
-            "Program pengurangan limbah material": [
-              "Analisis waste material di production process",
-              "Implementasi waste reduction techniques",
-              "Monitor dan tracking waste reduction progress",
-            ],
-            "Program analisis dan pengurangan biaya": [
-              "Analisis detail structure cost operasional",
-              "Identifikasi area untuk cost reduction",
-              "Implementasi cost reduction measures dan monitoring",
-            ],
-            "Otomatisasi proses administratif": [
-              "Analisis administrative process yang manual",
-              "Design automation system untuk admin tasks",
-              "Implementasi automation dan training staff",
-            ],
+          // Operasional Tasks
+          "Mengimplementasikan lean manufacturing principles": [
+            "Analisis current process dan identifikasi waste",
+            "Training karyawan tentang lean principles",
+            "Implementasi 5S di area produksi",
+          ],
+          "Mengotomatisasi production line setup": [
+            "Evaluasi kebutuhan automation equipment",
+            "Install dan setup automated system",
+            "Training operator untuk automated system",
+          ],
+          "Melakukan time and motion study untuk bottleneck": [
+            "Identifikasi bottleneck di production line",
+            "Lakukan time and motion study detail",
+            "Buat action plan untuk eliminate bottleneck",
+          ],
+          "Menjadwalkan preventive maintenance": [
+            "Buat schedule maintenance untuk semua mesin",
+            "Siapkan checklist maintenance routine",
+            "Training teknisi untuk preventive maintenance",
+          ],
+          "Menerapkan quality control di setiap stage produksi": [
+            "Buat SOP quality control untuk setiap stage",
+            "Setup quality checkpoint di production line",
+            "Training quality control inspector",
+          ],
+          "Melatih operator untuk efisiensi maksimal": [
+            "Buat program training untuk operator",
+            "Lakukan assessment skill operator",
+            "Implementasi best practices untuk efisiensi",
+          ],
+          "Mengimplementasikan real-time monitoring system": [
+            "Setup monitoring equipment di production line",
+            "Buat dashboard untuk real-time monitoring",
+            "Training tim untuk menggunakan monitoring system",
+          ],
+          "Sistem monitoring kinerja": [
+            "Setup performance monitoring tools",
+            "Buat dashboard untuk tracking performance",
+            "Training tim untuk menggunakan monitoring system",
+          ],
+          "Pelatihan produktivitas karyawan": [
+            "Buat program training untuk karyawan",
+            "Lakukan assessment skill karyawan",
+            "Implementasi best practices untuk produktivitas",
+          ],
+          "Optimisasi alokasi sumber daya": [
+            "Analisis current resource allocation",
+            "Buat model optimization untuk resource",
+            "Implementasi resource allocation yang optimal",
+          ],
+          "Program efisiensi energi": [
+            "Audit energy consumption di semua area",
+            "Implementasi energy saving measures",
+            "Monitor energy efficiency improvement",
+          ],
+          "Inisiatif optimisasi proses": [
+            "Analisis current process dan identifikasi waste",
+            "Design optimized process workflow",
+            "Implementasi process improvement dan monitoring",
+          ],
+          "Optimisasi dan otomasi alur kerja": [
+            "Analisis current workflow dan identifikasi bottleneck",
+            "Design automated workflow system",
+            "Implementasi automation dan monitoring efficiency",
+          ],
+          "Pelatihan tim untuk efisiensi": [
+            "Buat program training untuk meningkatkan skill tim",
+            "Lakukan assessment competency dan gap analysis",
+            "Implementasi training program dan evaluasi hasil",
+          ],
+          "Penyederhanaan kontrol kualitas": [
+            "Analisis current quality control process",
+            "Design streamlined quality control system",
+            "Implementasi quality control baru dan monitoring",
+          ],
+          "Program upgrade peralatan": [
+            "Evaluasi equipment lama dan kebutuhan upgrade",
+            "Procurement dan instalasi equipment baru",
+            "Training operator dan maintenance equipment",
+          ],
+          "Peningkatan kapasitas produksi": [
+            "Analisis current production capacity dan demand",
+            "Design scaling strategy untuk production",
+            "Implementasi capacity expansion dan monitoring",
+          ],
+          "Optimisasi penjadwalan staff": [
+            "Analisis current staff scheduling pattern",
+            "Design optimal scheduling system",
+            "Implementasi scheduling optimization dan monitoring",
+          ],
+          "Implementasi sistem backup": [
+            "Design backup system untuk critical process",
+            "Implementasi backup system dan testing",
+            "Monitor backup system performance dan reliability",
+          ],
+          "Sistem monitoring peralatan": [
+            "Setup monitoring equipment untuk production line",
+            "Buat dashboard untuk real-time monitoring",
+            "Training tim untuk menggunakan monitoring system",
+          ],
+          "Program maintenance preventif": [
+            "Buat schedule maintenance untuk semua equipment",
+            "Siapkan checklist maintenance routine",
+            "Training teknisi untuk preventive maintenance",
+          ],
+          "Program negosiasi supplier": [
+            "Analisis supplier performance dan pricing",
+            "Negosiasi contract terms dengan supplier",
+            "Monitor supplier performance dan relationship",
+          ],
+          "Program pengurangan limbah material": [
+            "Analisis waste material di production process",
+            "Implementasi waste reduction techniques",
+            "Monitor dan tracking waste reduction progress",
+          ],
+          "Program analisis dan pengurangan biaya": [
+            "Analisis detail structure cost operasional",
+            "Identifikasi area untuk cost reduction",
+            "Implementasi cost reduction measures dan monitoring",
+          ],
+          "Otomatisasi proses administratif": [
+            "Analisis administrative process yang manual",
+            "Design automation system untuk admin tasks",
+            "Implementasi automation dan training staff",
+          ],
 
-            // Landing Page & Conversion Optimization Tasks
-            "Mengoptimalkan landing page untuk konversi": [
-              "Analisis current landing page performance",
-              "A/B testing untuk element optimization",
-              "Implementasi conversion rate optimization",
-            ],
-            "Membuat recycling program untuk material waste": [
-              "Analisis jenis dan volume material waste",
-              "Setup recycling system dan partnership",
-              "Monitor recycling program effectiveness",
-            ],
-            "Mengevaluasi supplier untuk kualitas raw material": [
-              "Audit supplier quality dan delivery performance",
-              "Buat supplier scorecard dan evaluation criteria",
-              "Implementasi supplier improvement program",
-            ],
-            "Membuat reward program untuk high performing agent": [
-              "Design reward structure berdasarkan KPI",
-              "Setup tracking system untuk performance metrics",
-              "Launch reward program dan monitor engagement",
-            ],
-            "Menjalankan proactive customer outreach program": [
-              "Buat database customer untuk segmentasi",
-              "Design outreach strategy dan messaging",
-              "Implementasi outreach campaign dan follow-up",
-            ],
-            "Mempersonalisasi customer journey mapping": [
-              "Analisis customer behavior dan touchpoints",
-              "Design personalized journey untuk setiap segment",
-              "Implementasi personalized experience program",
-            ],
-            "Mengembangkan churn prediction dan prevention strategy": [
-              "Analisis data customer untuk churn indicators",
-              "Develop predictive model untuk churn risk",
-              "Implementasi prevention strategy dan monitoring",
-            ],
-            "Mengimplementasikan preventive quality assurance program": [
-              "Design quality assurance checklist dan SOP",
-              "Training tim untuk preventive QA process",
-              "Monitor quality metrics dan improvement",
-            ],
-            "Membuat customer education dan self-service portal": [
-              "Buat knowledge base dan FAQ system",
-              "Design self-service portal untuk customer",
-              "Launch portal dan monitor usage analytics",
-            ],
-            "Program membangun komunitas dan engagement": [
-              "Buat platform komunitas untuk customer engagement",
-              "Desain aktivitas engagement dan konten",
-              "Monitor pertumbuhan komunitas dan aktivitas",
-            ],
-            "Optimisasi SEO untuk traffic organik": [
-              "Audit SEO current website dan competitor",
-              "Implementasi on-page dan off-page SEO",
-              "Monitor organic traffic growth dan ranking",
-            ],
-            "Lead magnet dan optimisasi landing page": [
-              "Buat lead magnet yang valuable untuk target audience",
-              "Design landing page untuk lead capture",
-              "A/B testing dan optimization untuk conversion",
-            ],
-            "Pemasaran konten dan thought leadership": [
-              "Buat content strategy untuk thought leadership",
-              "Develop high-quality content secara konsisten",
-              "Monitor content performance dan engagement",
-            ],
-            "Kampanye konten buatan pengguna": [
-              "Desain kampanye untuk mendorong UGC",
-              "Setup sistem tracking dan insentif",
-              "Monitor performa kampanye dan engagement",
-            ],
-            "Kontes dan hadiah di media sosial": [
-              "Rencanakan tema kontes dan hadiah menarik",
-              "Setup mekanisme kontes dan aturan",
-              "Jalankan kontes dan monitor partisipasi",
-            ],
-            "Strategi konten interaktif": [
-              "Kembangkan format konten interaktif (quiz, poll, dll)",
-              "Buat konten interaktif yang menarik",
-              "Monitor engagement dan metrics konversi",
-            ],
-            "Program manajemen komunitas": [
-              "Setup guidelines komunitas dan moderasi",
-              "Kembangkan strategi engagement komunitas",
-              "Monitor kesehatan dan aktivitas komunitas",
-            ],
-            "Optimisasi social listening dan respon": [
-              "Setup tools social listening untuk monitoring",
-              "Kembangkan strategi respon untuk berbagai skenario",
-              "Monitor brand sentiment dan efektivitas respon",
-            ],
-            "Implementasi chatbot untuk instant response": [
-              "Design chatbot flow untuk common queries",
-              "Setup chatbot platform dan integration",
-              "Monitor chatbot performance dan optimization",
-            ],
-            "Tim dukungan pelanggan khusus": [
-              "Recruit dan training dedicated support team",
-              "Setup support workflow dan escalation process",
-              "Monitor team performance dan customer satisfaction",
-            ],
-            "Sistem routing tiket otomatis": [
-              "Setup ticket routing berdasarkan category",
-              "Implement automation untuk ticket assignment",
-              "Monitor routing effectiveness dan response time",
-            ],
-            "Sistem dukungan pelanggan 24/7": [
-              "Setup 24/7 support coverage dengan shift system",
-              "Implement support tools untuk multi-channel",
-              "Monitor support availability dan response metrics",
-            ],
-            "Integrasi live chat di website": [
-              "Setup live chat platform di website",
-              "Training tim untuk live chat handling",
-              "Monitor chat performance dan customer satisfaction",
-            ],
-            "Aplikasi mobile untuk layanan pelanggan": [
-              "Develop mobile app untuk customer service",
-              "Integrate app dengan customer database",
-              "Monitor app usage dan customer feedback",
-            ],
-            "Proses eskalasi yang efisien": [
-              "Design escalation workflow untuk complex issues",
-              "Setup escalation criteria dan SLA",
-              "Monitor escalation effectiveness dan resolution time",
-            ],
-            "Optimisasi basis pengetahuan": [
-              "Audit current knowledge base content",
-              "Optimize knowledge base untuk searchability",
-              "Monitor knowledge base usage dan effectiveness",
-            ],
-            "Integrasi CRM lanjutan": [
-              "Setup advanced CRM dengan full integration",
-              "Training tim untuk CRM utilization",
-              "Monitor CRM effectiveness dan customer insights",
-            ],
-            "Sistem feedback loop pelanggan": [
-              "Setup feedback collection pada multiple touchpoints",
-              "Develop feedback analysis dan action plan",
-              "Monitor feedback trends dan improvement metrics",
-            ],
-            "Program pengalaman pelanggan yang dipersonalisasi": [
-              "Design personalization berdasarkan customer data",
-              "Implement personalized experience across touchpoints",
-              "Monitor personalization effectiveness dan engagement",
-            ],
-            "Loyalty rewards program": [
-              "Design loyalty program structure dan rewards",
-              "Setup tracking system untuk loyalty points",
-              "Monitor program adoption dan customer retention",
-            ],
-            "Referral program dengan incentive": [
-              "Design referral program dengan attractive incentive",
-              "Setup referral tracking dan reward system",
-              "Monitor referral program performance dan adoption",
-            ],
-            "Customer success story campaign": [
-              "Collect customer success stories dan testimonials",
-              "Create campaign materials dari success stories",
-              "Monitor campaign reach dan impact",
-            ],
-            "Community building program": [
-              "Build customer community platform",
-              "Develop community engagement activities",
-              "Monitor community growth dan engagement",
-            ],
-            "Word-of-mouth marketing strategy": [
-              "Develop strategy untuk encourage word-of-mouth",
-              "Create shareable content dan experiences",
-              "Monitor word-of-mouth impact dan reach",
-            ],
-            "Customer testimonial program": [
-              "Setup system untuk collect customer testimonials",
-              "Create testimonial content untuk marketing",
-              "Monitor testimonial effectiveness dan conversion",
-            ],
-            "Brand ambassador program": [
-              "Recruit dan training brand ambassadors",
-              "Setup ambassador program structure dan rewards",
-              "Monitor ambassador performance dan brand impact",
-            ],
+          // Landing Page & Conversion Optimization Tasks
+          "Mengoptimalkan landing page untuk konversi": [
+            "Analisis current landing page performance",
+            "A/B testing untuk element optimization",
+            "Implementasi conversion rate optimization",
+          ],
+          "Membuat recycling program untuk material waste": [
+            "Analisis jenis dan volume material waste",
+            "Setup recycling system dan partnership",
+            "Monitor recycling program effectiveness",
+          ],
+          "Mengevaluasi supplier untuk kualitas raw material": [
+            "Audit supplier quality dan delivery performance",
+            "Buat supplier scorecard dan evaluation criteria",
+            "Implementasi supplier improvement program",
+          ],
+          "Membuat reward program untuk high performing agent": [
+            "Design reward structure berdasarkan KPI",
+            "Setup tracking system untuk performance metrics",
+            "Launch reward program dan monitor engagement",
+          ],
+          "Menjalankan proactive customer outreach program": [
+            "Buat database customer untuk segmentasi",
+            "Design outreach strategy dan messaging",
+            "Implementasi outreach campaign dan follow-up",
+          ],
+          "Mempersonalisasi customer journey mapping": [
+            "Analisis customer behavior dan touchpoints",
+            "Design personalized journey untuk setiap segment",
+            "Implementasi personalized experience program",
+          ],
+          "Mengembangkan churn prediction dan prevention strategy": [
+            "Analisis data customer untuk churn indicators",
+            "Develop predictive model untuk churn risk",
+            "Implementasi prevention strategy dan monitoring",
+          ],
+          "Mengimplementasikan preventive quality assurance program": [
+            "Design quality assurance checklist dan SOP",
+            "Training tim untuk preventive QA process",
+            "Monitor quality metrics dan improvement",
+          ],
+          "Membuat customer education dan self-service portal": [
+            "Buat knowledge base dan FAQ system",
+            "Design self-service portal untuk customer",
+            "Launch portal dan monitor usage analytics",
+          ],
+          "Program membangun komunitas dan engagement": [
+            "Buat platform komunitas untuk customer engagement",
+            "Desain aktivitas engagement dan konten",
+            "Monitor pertumbuhan komunitas dan aktivitas",
+          ],
+          "Optimisasi SEO untuk traffic organik": [
+            "Audit SEO current website dan competitor",
+            "Implementasi on-page dan off-page SEO",
+            "Monitor organic traffic growth dan ranking",
+          ],
+          "Lead magnet dan optimisasi landing page": [
+            "Buat lead magnet yang valuable untuk target audience",
+            "Design landing page untuk lead capture",
+            "A/B testing dan optimization untuk conversion",
+          ],
+          "Pemasaran konten dan thought leadership": [
+            "Buat content strategy untuk thought leadership",
+            "Develop high-quality content secara konsisten",
+            "Monitor content performance dan engagement",
+          ],
+          "Kampanye konten buatan pengguna": [
+            "Desain kampanye untuk mendorong UGC",
+            "Setup sistem tracking dan insentif",
+            "Monitor performa kampanye dan engagement",
+          ],
+          "Kontes dan hadiah di media sosial": [
+            "Rencanakan tema kontes dan hadiah menarik",
+            "Setup mekanisme kontes dan aturan",
+            "Jalankan kontes dan monitor partisipasi",
+          ],
+          "Strategi konten interaktif": [
+            "Kembangkan format konten interaktif (quiz, poll, dll)",
+            "Buat konten interaktif yang menarik",
+            "Monitor engagement dan metrics konversi",
+          ],
+          "Program manajemen komunitas": [
+            "Setup guidelines komunitas dan moderasi",
+            "Kembangkan strategi engagement komunitas",
+            "Monitor kesehatan dan aktivitas komunitas",
+          ],
+          "Optimisasi social listening dan respon": [
+            "Setup tools social listening untuk monitoring",
+            "Kembangkan strategi respon untuk berbagai skenario",
+            "Monitor brand sentiment dan efektivitas respon",
+          ],
+          "Implementasi chatbot untuk instant response": [
+            "Design chatbot flow untuk common queries",
+            "Setup chatbot platform dan integration",
+            "Monitor chatbot performance dan optimization",
+          ],
+          "Tim dukungan pelanggan khusus": [
+            "Recruit dan training dedicated support team",
+            "Setup support workflow dan escalation process",
+            "Monitor team performance dan customer satisfaction",
+          ],
+          "Sistem routing tiket otomatis": [
+            "Setup ticket routing berdasarkan category",
+            "Implement automation untuk ticket assignment",
+            "Monitor routing effectiveness dan response time",
+          ],
+          "Sistem dukungan pelanggan 24/7": [
+            "Setup 24/7 support coverage dengan shift system",
+            "Implement support tools untuk multi-channel",
+            "Monitor support availability dan response metrics",
+          ],
+          "Integrasi live chat di website": [
+            "Setup live chat platform di website",
+            "Training tim untuk live chat handling",
+            "Monitor chat performance dan customer satisfaction",
+          ],
+          "Aplikasi mobile untuk layanan pelanggan": [
+            "Develop mobile app untuk customer service",
+            "Integrate app dengan customer database",
+            "Monitor app usage dan customer feedback",
+          ],
+          "Proses eskalasi yang efisien": [
+            "Design escalation workflow untuk complex issues",
+            "Setup escalation criteria dan SLA",
+            "Monitor escalation effectiveness dan resolution time",
+          ],
+          "Optimisasi basis pengetahuan": [
+            "Audit current knowledge base content",
+            "Optimize knowledge base untuk searchability",
+            "Monitor knowledge base usage dan effectiveness",
+          ],
+          "Integrasi CRM lanjutan": [
+            "Setup advanced CRM dengan full integration",
+            "Training tim untuk CRM utilization",
+            "Monitor CRM effectiveness dan customer insights",
+          ],
+          "Sistem feedback loop pelanggan": [
+            "Setup feedback collection pada multiple touchpoints",
+            "Develop feedback analysis dan action plan",
+            "Monitor feedback trends dan improvement metrics",
+          ],
+          "Program pengalaman pelanggan yang dipersonalisasi": [
+            "Design personalization berdasarkan customer data",
+            "Implement personalized experience across touchpoints",
+            "Monitor personalization effectiveness dan engagement",
+          ],
+          "Loyalty rewards program": [
+            "Design loyalty program structure dan rewards",
+            "Setup tracking system untuk loyalty points",
+            "Monitor program adoption dan customer retention",
+          ],
+          "Referral program dengan incentive": [
+            "Design referral program dengan attractive incentive",
+            "Setup referral tracking dan reward system",
+            "Monitor referral program performance dan adoption",
+          ],
+          "Customer success story campaign": [
+            "Collect customer success stories dan testimonials",
+            "Create campaign materials dari success stories",
+            "Monitor campaign reach dan impact",
+          ],
+          "Community building program": [
+            "Build customer community platform",
+            "Develop community engagement activities",
+            "Monitor community growth dan engagement",
+          ],
+          "Word-of-mouth marketing strategy": [
+            "Develop strategy untuk encourage word-of-mouth",
+            "Create shareable content dan experiences",
+            "Monitor word-of-mouth impact dan reach",
+          ],
+          "Customer testimonial program": [
+            "Setup system untuk collect customer testimonials",
+            "Create testimonial content untuk marketing",
+            "Monitor testimonial effectiveness dan conversion",
+          ],
+          "Brand ambassador program": [
+            "Recruit dan training brand ambassadors",
+            "Setup ambassador program structure dan rewards",
+            "Monitor ambassador performance dan brand impact",
+          ],
 
-            // Customer Service Tasks
-            "Melatih customer service excellence": [
-              "Buat modul training customer service",
-              "Conduct training session untuk CS team",
-              "Evaluasi performance setelah training",
-            ],
-            "Implementasi feedback system yang real-time": [
-              "Setup feedback system di website",
-              "Buat dashboard untuk monitoring feedback",
-              "Training tim untuk respond feedback",
-            ],
-            "Proactive customer outreach program": [
-              "Buat database customer untuk outreach",
-              "Buat script untuk customer outreach",
-              "Schedule regular customer check-in",
-            ],
-            "Root cause analysis untuk recurring issues": [
-              "Analisis data complaint untuk pattern",
-              "Buat action plan untuk fix root cause",
-              "Implementasi solution dan monitoring",
-            ],
+          // Customer Service Tasks
+          "Melatih customer service excellence": [
+            "Buat modul training customer service",
+            "Conduct training session untuk CS team",
+            "Evaluasi performance setelah training",
+          ],
+          "Implementasi feedback system yang real-time": [
+            "Setup feedback system di website",
+            "Buat dashboard untuk monitoring feedback",
+            "Training tim untuk respond feedback",
+          ],
+          "Proactive customer outreach program": [
+            "Buat database customer untuk outreach",
+            "Buat script untuk customer outreach",
+            "Schedule regular customer check-in",
+          ],
+          "Root cause analysis untuk recurring issues": [
+            "Analisis data complaint untuk pattern",
+            "Buat action plan untuk fix root cause",
+            "Implementasi solution dan monitoring",
+          ],
 
-            // Marketing & Branding Tasks
-            "Menjalankan integrated marketing campaign di multiple channel": [
-              "Buat campaign strategy untuk multiple channel",
-              "Coordinate campaign launch across channel",
-              "Monitor dan optimize campaign performance",
-            ],
-            "Kalender konten dengan potensi viral": [
-              "Riset trending topic untuk inspirasi konten",
-              "Buat kalender konten dengan sudut viral",
-              "Analisis performa dan optimasi konten",
-            ],
-            "Kampanye iklan berbayar di media sosial": [
-              "Setup kampanye Facebook Ads dan Instagram Ads",
-              "Buat iklan kreatif dengan A/B testing",
-              "Monitor dan optimasi performa kampanye",
-            ],
-            "Program kemitraan dengan influencer": [
-              "Identifikasi influencer yang sesuai dengan brand",
-              "Nego collaboration terms dengan influencer",
-              "Monitor campaign performance dari influencer",
-            ],
-            "Event aktivasi brand di target market": [
-              "Plan concept dan venue untuk brand activation",
-              "Execute brand activation event",
-              "Follow up dengan participant setelah event",
-            ],
-            
+          // Marketing & Branding Tasks
+          "Menjalankan integrated marketing campaign di multiple channel": [
+            "Buat campaign strategy untuk multiple channel",
+            "Coordinate campaign launch across channel",
+            "Monitor dan optimize campaign performance",
+          ],
+          "Kalender konten dengan potensi viral": [
+            "Riset trending topic untuk inspirasi konten",
+            "Buat kalender konten dengan sudut viral",
+            "Analisis performa dan optimasi konten",
+          ],
+          "Kampanye iklan berbayar di media sosial": [
+            "Setup kampanye Facebook Ads dan Instagram Ads",
+            "Buat iklan kreatif dengan A/B testing",
+            "Monitor dan optimasi performa kampanye",
+          ],
+          "Program kemitraan dengan influencer": [
+            "Identifikasi influencer yang sesuai dengan brand",
+            "Nego collaboration terms dengan influencer",
+            "Monitor campaign performance dari influencer",
+          ],
+          "Event aktivasi brand di target market": [
+            "Plan concept dan venue untuk brand activation",
+            "Execute brand activation event",
+            "Follow up dengan participant setelah event",
+          ],
 
-            "Menyediakan program trial gratis untuk prospek": [
-              "Buat struktur program trial dengan time limit",
-              "Setup sistem aktivasi dan monitoring trial",
-              "Follow up trial user untuk conversion",
-            ],
-            "Membuat follow-up sequence email marketing": [
-              "Buat email sequence untuk nurturing lead",
-              "Setup automated email campaign",
-              "Monitor open rate dan click-through rate",
-            ],
-            "Menjalankan telemarketing campaign yang lebih personal": [
-              "Buat script telemarketing yang personal",
-              "Training tim telemarketing untuk approach",
-              "Monitor conversion rate dari telemarketing",
-            ],
-            "Membuat program loyalty dengan point reward": [
-              "Design struktur point reward system",
-              "Develop sistem tracking untuk point",
-              "Launch program dan monitor customer engagement",
-            ],
-            "Menugaskan customer success manager untuk onboarding": [
-              "Rekrut dan training customer success manager",
-              "Buat SOP untuk customer onboarding process",
-              "Monitor customer retention dan satisfaction",
-            ],
-            "Melakukan survey kepuasan dan improvement action": [
-              "Buat questionnaire untuk customer satisfaction",
-              "Distribute survey dan collect feedback",
-              "Analisis hasil dan implementasi improvement",
-            ],
-            "Mengembangkan lead scoring system untuk prioritas": [
-              "Setup lead scoring criteria berdasarkan behavior",
-              "Konfigurasi automated scoring dalam CRM",
-              "Training sales team untuk interpretasi score",
-            ],
-            "Menjalankan A/B testing untuk sales pitch": [
-              "Buat 2 versi sales pitch yang berbeda",
-              "Setup sistem tracking untuk setiap pitch",
-              "Analisis hasil dan implementasi pitch terbaik",
-            ],
-            "Menugaskan dedicated lead response team": [
-              "Rekrut dan training specialized lead response team",
-              "Setup SOP untuk response time maksimal 1 jam",
-              "Implementasi escalation protocol untuk urgent leads",
-            ],
-            "Mengembangkan mobile app untuk quick response": [
-              "Develop mobile app untuk notifikasi lead",
-              "Integrasikan dengan CRM untuk data sync",
-              "Training team untuk menggunakan mobile app",
-            ],
-            "Menerapkan machine learning untuk lead analysis": [
-              "Collect historical data untuk training ML model",
-              "Develop predictive model untuk lead quality",
-              "Integrasikan ML model dengan existing system",
-            ],
-            "Membangun feedback loop dari sales ke marketing": [
-              "Setup sistem feedback dari sales ke marketing",
-              "Buat regular meeting untuk sharing insights",
-              "Monitor lead quality improvement",
-            ],
-            "Melakukan regular review dan update criteria": [
-              "Schedule regular review untuk criteria evaluation",
-              "Collect performance data untuk analysis",
-              "Update criteria berdasarkan performance data",
-            ],
-          };
+          "Menyediakan program trial gratis untuk prospek": [
+            "Buat struktur program trial dengan time limit",
+            "Setup sistem aktivasi dan monitoring trial",
+            "Follow up trial user untuk conversion",
+          ],
+          "Membuat follow-up sequence email marketing": [
+            "Buat email sequence untuk nurturing lead",
+            "Setup automated email campaign",
+            "Monitor open rate dan click-through rate",
+          ],
+          "Menjalankan telemarketing campaign yang lebih personal": [
+            "Buat script telemarketing yang personal",
+            "Training tim telemarketing untuk approach",
+            "Monitor conversion rate dari telemarketing",
+          ],
+          "Membuat program loyalty dengan point reward": [
+            "Design struktur point reward system",
+            "Develop sistem tracking untuk point",
+            "Launch program dan monitor customer engagement",
+          ],
+          "Menugaskan customer success manager untuk onboarding": [
+            "Rekrut dan training customer success manager",
+            "Buat SOP untuk customer onboarding process",
+            "Monitor customer retention dan satisfaction",
+          ],
+          "Melakukan survey kepuasan dan improvement action": [
+            "Buat questionnaire untuk customer satisfaction",
+            "Distribute survey dan collect feedback",
+            "Analisis hasil dan implementasi improvement",
+          ],
+          "Mengembangkan lead scoring system untuk prioritas": [
+            "Setup lead scoring criteria berdasarkan behavior",
+            "Konfigurasi automated scoring dalam CRM",
+            "Training sales team untuk interpretasi score",
+          ],
+          "Menjalankan A/B testing untuk sales pitch": [
+            "Buat 2 versi sales pitch yang berbeda",
+            "Setup sistem tracking untuk setiap pitch",
+            "Analisis hasil dan implementasi pitch terbaik",
+          ],
+          "Menugaskan dedicated lead response team": [
+            "Rekrut dan training specialized lead response team",
+            "Setup SOP untuk response time maksimal 1 jam",
+            "Implementasi escalation protocol untuk urgent leads",
+          ],
+          "Mengembangkan mobile app untuk quick response": [
+            "Develop mobile app untuk notifikasi lead",
+            "Integrasikan dengan CRM untuk data sync",
+            "Training team untuk menggunakan mobile app",
+          ],
+          "Menerapkan machine learning untuk lead analysis": [
+            "Collect historical data untuk training ML model",
+            "Develop predictive model untuk lead quality",
+            "Integrasikan ML model dengan existing system",
+          ],
+          "Membangun feedback loop dari sales ke marketing": [
+            "Setup sistem feedback dari sales ke marketing",
+            "Buat regular meeting untuk sharing insights",
+            "Monitor lead quality improvement",
+          ],
+          "Melakukan regular review dan update criteria": [
+            "Schedule regular review untuk criteria evaluation",
+            "Collect performance data untuk analysis",
+            "Update criteria berdasarkan performance data",
+          ],
+        };
 
         const getTaskOptions = (initiatives: string[]) => {
           let allTasks = [];
@@ -2364,17 +2362,19 @@ export default function CompanyOnboarding() {
         // Create task groups by initiative using the same mapping as above
         const getTaskGroupsByInitiative = (initiatives: string[]) => {
           const tasksByInitiative: { [key: string]: string[] } = {};
-          
-          initiatives.forEach(initiative => {
+
+          initiatives.forEach((initiative) => {
             if (taskMapping[initiative]) {
               tasksByInitiative[initiative] = taskMapping[initiative];
             }
           });
-          
+
           return tasksByInitiative;
         };
-        
-        const tasksByInitiative = getTaskGroupsByInitiative(selectedInitiativesForTasks);
+
+        const tasksByInitiative = getTaskGroupsByInitiative(
+          selectedInitiativesForTasks,
+        );
 
         if (!onboardingData.tasks) {
           onboardingData.tasks = [];
@@ -2450,36 +2450,38 @@ export default function CompanyOnboarding() {
                   📋 Task yang Dipilih ({selectedTasks.length})
                 </h4>
                 <div className="space-y-2">
-                  {Object.entries(tasksByInitiative).map(([initiative, tasks]) => {
-                    const initiativeTasks = tasks.filter((task) =>
-                      selectedTasks.includes(task),
-                    );
-                    if (initiativeTasks.length === 0) return null;
+                  {Object.entries(tasksByInitiative).map(
+                    ([initiative, tasks]) => {
+                      const initiativeTasks = tasks.filter((task) =>
+                        selectedTasks.includes(task),
+                      );
+                      if (initiativeTasks.length === 0) return null;
 
-                    return (
-                      <div key={initiative} className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
-                          <span className="text-sm font-medium text-purple-700">
-                            {initiative}
-                          </span>
+                      return (
+                        <div key={initiative} className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                            <span className="text-sm font-medium text-purple-700">
+                              {initiative}
+                            </span>
+                          </div>
+                          <div className="ml-4 space-y-1">
+                            {initiativeTasks.map((task, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center gap-2"
+                              >
+                                <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
+                                <span className="text-sm text-gray-700">
+                                  {task}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                        <div className="ml-4 space-y-1">
-                          {initiativeTasks.map((task, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center gap-2"
-                            >
-                              <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
-                              <span className="text-sm text-gray-700">
-                                {task}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    },
+                  )}
                 </div>
                 <p className="text-sm text-green-700 mt-3">
                   <strong>Total: {selectedTasks.length} task terpilih</strong>
@@ -2905,6 +2907,13 @@ export default function CompanyOnboarding() {
       case 9: // Ringkasan & Reminder
         return (
           <div className="space-y-6">
+            {/* Success Message */}
+            <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+              <h3 className="font-semibold text-green-800 mb-2">🎉 Selamat!</h3>
+              <p className="text-sm text-green-700 mb-3">
+                Anda telah menyelesaikan semua langkah onboarding.
+              </p>
+            </div>
             <div className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
               <h3 className="font-semibold text-lg mb-4 text-blue-900">
                 📊 Rekap Data Onboarding Anda
@@ -3012,17 +3021,18 @@ export default function CompanyOnboarding() {
                               {relatedInitiatives.map((init, initIndex) => {
                                 // Get tasks related to this initiative
                                 const tasksPerInit = Math.ceil(
-                                  (onboardingData.tasks || []).length / 
-                                  onboardingData.initiatives.filter(
-                                    (init) => init && init !== "custom"
-                                  ).length
+                                  (onboardingData.tasks || []).length /
+                                    onboardingData.initiatives.filter(
+                                      (init) => init && init !== "custom",
+                                    ).length,
                                 );
-                                const startIndex = (krIndex * initiativesPerKR + initIndex) * tasksPerInit;
+                                const startIndex =
+                                  (krIndex * initiativesPerKR + initIndex) *
+                                  tasksPerInit;
                                 const endIndex = startIndex + tasksPerInit;
-                                const selectedTasksForThisInit = (onboardingData.tasks || []).slice(
-                                  startIndex,
-                                  endIndex
-                                );
+                                const selectedTasksForThisInit = (
+                                  onboardingData.tasks || []
+                                ).slice(startIndex, endIndex);
 
                                 return (
                                   <div
@@ -3152,21 +3162,6 @@ export default function CompanyOnboarding() {
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Success Message */}
-            <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-              <h3 className="font-semibold text-green-800 mb-2">🎉 Selamat!</h3>
-              <p className="text-sm text-green-700 mb-3">
-                Anda telah menyelesaikan semua langkah onboarding. Sistem akan
-                membantu Anda dengan:
-              </p>
-              <ul className="text-sm text-green-700 space-y-1">
-                <li>• Reminder otomatis sesuai cadence yang dipilih</li>
-                <li>• Dashboard ringkas untuk tracking progress</li>
-                <li>• Review berkala di akhir periode</li>
-                <li>• Rekomendasi penyesuaian jika diperlukan</li>
-              </ul>
             </div>
 
             <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
