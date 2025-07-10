@@ -1,11 +1,21 @@
 # Database Backup Information
 
-## Backup Details
+## Complete Backup Files Created
+
+### 1. Structure + Data Backup (RECOMMENDED)
+- **File Name**: `database-with-data-2025-07-10T08-31-49.sql`
+- **Created**: July 10, 2025 at 08:31:49 UTC
+- **File Size**: 96,795 bytes (0.09 MB)
+- **Total Lines**: 338 lines
+- **Format**: PostgreSQL INSERT statements
+- **Contains**: Complete data (186 records across 43 tables)
+
+### 2. Full Schema Backup (Structure Only)
 - **File Name**: `database-backup-2025-07-10T08-23-22.sql`
 - **Created**: July 10, 2025 at 08:23:22 UTC
 - **File Size**: 144,680 bytes (0.14 MB)
 - **Total Lines**: 3,105 lines
-- **Format**: PostgreSQL SQL dump (plain text)
+- **Format**: PostgreSQL SQL dump (complete schema)
 
 ## Database Information
 - **Database**: neondb
@@ -63,14 +73,43 @@
 - **Indexes** for performance optimization
 - **Triggers** for automated data management
 
-### Data Included
-- Complete schema structure (tables, columns, constraints)
-- All user data and content
-- System configuration and settings
-- Subscription and billing information
-- OKR data (objectives, key results, initiatives, tasks)
-- User achievements and gamification data
-- Notification and activity logs
+### Data Included (186 Total Records)
+
+#### System Configuration (48 records)
+- **application_settings**: 31 records - App configuration (name, colors, contact info)
+- **system_settings**: 17 records - System-wide settings
+
+#### User & Organization Data (31 records)
+- **users**: 16 records - User accounts and profiles
+- **organizations**: 13 records - Client organizations
+- **teams**: 1 record - Team structure
+- **team_members**: 2 records - Team membership
+
+#### Subscription & Billing (16 records)
+- **subscription_plans**: 4 records - Available plans (Free Trial, Starter, Growth, Enterprise)
+- **billing_periods**: 9 records - Billing cycle definitions
+- **organization_subscriptions**: 3 records - Active subscriptions
+
+#### OKR Data (70 records)
+- **objectives**: 11 records - Main objectives
+- **key_results**: 15 records - Measurable results
+- **initiatives**: 19 records - Strategic initiatives
+- **tasks**: 23 records - Action items
+- **cycles**: 2 records - Time-based cycles
+
+#### User Activity (21 records)
+- **user_stats**: 7 records - User statistics
+- **member_invitations**: 5 records - Pending invitations
+- **sessions**: 7 records - Active user sessions
+- **check_ins**: 1 record - Progress check-ins
+- **user_trial_achievements**: 1 record - Trial achievements
+
+#### Empty Tables (0 records each)
+Tables with structure but no data:
+- achievements, activity_logs, daily_reflections, emoji_reactions
+- initiative_documents, initiative_members, initiative_notes
+- invoice_line_items, invoices, notifications, trial_progress
+- user_achievements, user_activity_log, templates, etc.
 
 ## Backup Features
 - **Clean backup**: Includes DROP statements for clean restoration
