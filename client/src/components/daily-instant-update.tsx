@@ -732,28 +732,33 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                             </span>
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap">
-                            <select
-                              className="w-40 h-10 px-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:border-blue-600 focus:outline-none"
-                              value={updateData.todayTasks[index]?.newStatus || task.status}
-                              onChange={(e) => {
-                                const value = e.target.value;
-                                const newTasks = [...updateData.todayTasks];
-                                newTasks[index] = {
-                                  ...newTasks[index],
-                                  newStatus: value,
-                                  completed: value === 'completed'
-                                };
-                                setUpdateData({
-                                  ...updateData,
-                                  todayTasks: newTasks
-                                });
-                              }}
-                            >
-                              <option value="not_started">Belum Dimulai</option>
-                              <option value="in_progress">Sedang Berjalan</option>
-                              <option value="completed">Selesai</option>
-                              <option value="cancelled">Dibatalkan</option>
-                            </select>
+                            <div className="relative">
+                              <button
+                                type="button"
+                                className="w-40 h-10 px-3 py-2 text-sm border border-gray-300 rounded-md bg-white text-left flex items-center justify-between hover:border-blue-600"
+                                onClick={() => {
+                                  const currentStatus = updateData.todayTasks[index]?.newStatus || task.status;
+                                  const statusOptions = ['not_started', 'in_progress', 'completed', 'cancelled'];
+                                  const currentIndex = statusOptions.indexOf(currentStatus);
+                                  const nextIndex = (currentIndex + 1) % statusOptions.length;
+                                  const nextStatus = statusOptions[nextIndex];
+                                  
+                                  const newTasks = [...updateData.todayTasks];
+                                  newTasks[index] = {
+                                    ...newTasks[index],
+                                    newStatus: nextStatus,
+                                    completed: nextStatus === 'completed'
+                                  };
+                                  setUpdateData({
+                                    ...updateData,
+                                    todayTasks: newTasks
+                                  });
+                                }}
+                              >
+                                <span>{getTaskStatusLabel(updateData.todayTasks[index]?.newStatus || task.status)}</span>
+                                <span className="text-gray-400">↻</span>
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -776,16 +781,21 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
 
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-700">Status Baru:</label>
-                        <select
-                          className="w-full h-10 px-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:border-blue-600 focus:outline-none"
-                          value={updateData.todayTasks[index]?.newStatus || task.status}
-                          onChange={(e) => {
-                            const value = e.target.value;
+                        <button
+                          type="button"
+                          className="w-full h-10 px-3 py-2 text-sm border border-gray-300 rounded-md bg-white text-left flex items-center justify-between hover:border-blue-600"
+                          onClick={() => {
+                            const currentStatus = updateData.todayTasks[index]?.newStatus || task.status;
+                            const statusOptions = ['not_started', 'in_progress', 'completed', 'cancelled'];
+                            const currentIndex = statusOptions.indexOf(currentStatus);
+                            const nextIndex = (currentIndex + 1) % statusOptions.length;
+                            const nextStatus = statusOptions[nextIndex];
+                            
                             const newTasks = [...updateData.todayTasks];
                             newTasks[index] = {
                               ...newTasks[index],
-                              newStatus: value,
-                              completed: value === 'completed'
+                              newStatus: nextStatus,
+                              completed: nextStatus === 'completed'
                             };
                             setUpdateData({
                               ...updateData,
@@ -793,11 +803,9 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                             });
                           }}
                         >
-                          <option value="not_started">Belum Dimulai</option>
-                          <option value="in_progress">Sedang Berjalan</option>
-                          <option value="completed">Selesai</option>
-                          <option value="cancelled">Dibatalkan</option>
-                        </select>
+                          <span>{getTaskStatusLabel(updateData.todayTasks[index]?.newStatus || task.status)}</span>
+                          <span className="text-gray-400">↻</span>
+                        </button>
                       </div>
                     </div>
                   ))}
