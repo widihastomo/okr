@@ -112,14 +112,8 @@ const ONBOARDING_STEPS = [
   },
   {
     id: 9,
-    title: "Reminder & Review",
-    description: "Atur reminder dan review berkala",
-    icon: Zap,
-  },
-  {
-    id: 10,
-    title: "Dashboard Ringkas",
-    description: "Lihat semua progress secara ringkas",
+    title: "Ringkasan & Reminder",
+    description: "Lihat ringkasan lengkap dan atur reminder",
     icon: MessageSquare,
   },
 ];
@@ -2908,9 +2902,259 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 9: // Reminder & Review
+      case 9: // Ringkasan & Reminder
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
+            <div className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+              <h3 className="font-semibold text-lg mb-4 text-blue-900">
+                📊 Rekap Data Onboarding Anda
+              </h3>
+
+              {/* Summary Cards */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
+                  <div className="text-2xl font-bold text-blue-600">1</div>
+                  <div className="text-sm text-gray-600">Goal</div>
+                </div>
+                <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
+                  <div className="text-2xl font-bold text-green-600">
+                    {onboardingData.keyResults.length}
+                  </div>
+                  <div className="text-sm text-gray-600">Angka Target</div>
+                </div>
+                <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
+                  <div className="text-2xl font-bold text-purple-600">
+                    {onboardingData.initiatives.length}
+                  </div>
+                  <div className="text-sm text-gray-600">Inisiatif</div>
+                </div>
+                <div className="bg-white p-3 rounded-lg border border-gray-200 text-center">
+                  <div className="text-2xl font-bold text-orange-600">
+                    {onboardingData.tasks ? onboardingData.tasks.length : 0}
+                  </div>
+                  <div className="text-sm text-gray-600">Task</div>
+                </div>
+              </div>
+
+              {/* Detailed Information */}
+              <div className="space-y-4">
+                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <h4 className="font-semibold text-blue-800 mb-2">
+                    🎯 Goal Utama
+                  </h4>
+                  <p className="text-gray-700">
+                    {onboardingData.objective || "Belum diisi"}
+                  </p>
+                  <div className="mt-2 text-sm text-gray-500">
+                    <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                      Fokus: {onboardingData.teamFocus || "General"}
+                    </span>
+                    <span className="inline-block bg-green-100 text-green-800 px-2 py-1 rounded ml-2">
+                      Check-in: {onboardingData.cadence || "Belum dipilih"}
+                    </span>
+                    <span className="inline-block bg-purple-100 text-purple-800 px-2 py-1 rounded ml-2">
+                      Periode:{" "}
+                      {onboardingData.cycleDuration === "1_bulan"
+                        ? "1 bulan"
+                        : onboardingData.cycleDuration === "3_bulan"
+                          ? "3 bulan"
+                          : onboardingData.cycleDuration === "6_bulan"
+                            ? "6 bulan"
+                            : onboardingData.cycleDuration === "1_tahun"
+                              ? "1 tahun"
+                              : onboardingData.cycleDuration || "Belum dipilih"}
+                    </span>
+                  </div>
+                </div>
+
+                {onboardingData.keyResults.length > 0 && (
+                  <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <h4 className="font-semibold text-green-800 mb-3">
+                      📏 Angka Target & Hierarki Pelaksanaan
+                    </h4>
+                    <div className="space-y-4">
+                      {onboardingData.keyResults
+                        .filter((kr) => kr && kr !== "custom")
+                        .map((kr, krIndex) => {
+                          // Get initiatives related to this key result (simplified: divide initiatives equally)
+                          const initiativesPerKR = Math.ceil(
+                            onboardingData.initiatives.filter(
+                              (init) => init && init !== "custom",
+                            ).length /
+                              onboardingData.keyResults.filter(
+                                (kr) => kr && kr !== "custom",
+                              ).length,
+                          );
+                          const relatedInitiatives = onboardingData.initiatives
+                            .filter((init) => init && init !== "custom")
+                            .slice(
+                              krIndex * initiativesPerKR,
+                              (krIndex + 1) * initiativesPerKR,
+                            );
+
+                          return (
+                            <div
+                              key={krIndex}
+                              className="border-l-2 border-green-200 pl-4 space-y-3"
+                            >
+                              {/* Key Result */}
+                              <div className="flex items-start space-x-2">
+                                <div className="w-2 h-2 bg-green-500 rounded-full mt-1.5"></div>
+                                <div>
+                                  <span className="text-sm font-semibold text-green-800">
+                                    Angka Target {krIndex + 1}
+                                  </span>
+                                  <p className="text-sm text-gray-700">{kr}</p>
+                                </div>
+                              </div>
+
+                              {/* Initiatives for this Key Result */}
+                              {relatedInitiatives.map((init, initIndex) => {
+                                // Get tasks related to this initiative
+                                const tasksPerInit = Math.ceil(
+                                  (onboardingData.tasks || []).length / 
+                                  onboardingData.initiatives.filter(
+                                    (init) => init && init !== "custom"
+                                  ).length
+                                );
+                                const startIndex = (krIndex * initiativesPerKR + initIndex) * tasksPerInit;
+                                const endIndex = startIndex + tasksPerInit;
+                                const selectedTasksForThisInit = (onboardingData.tasks || []).slice(
+                                  startIndex,
+                                  endIndex
+                                );
+
+                                return (
+                                  <div
+                                    key={initIndex}
+                                    className="ml-4 border-l-2 border-purple-200 pl-4 space-y-2"
+                                  >
+                                    <div className="flex items-start space-x-2">
+                                      <div className="w-1.5 h-1.5 bg-purple-500 rounded-full mt-1.5"></div>
+                                      <div>
+                                        <span className="text-xs font-medium text-purple-600">
+                                          Inisiatif {initIndex + 1}
+                                        </span>
+                                        <p className="text-sm text-purple-700">
+                                          {init}
+                                        </p>
+                                      </div>
+                                    </div>
+
+                                    {/* Tasks for this Initiative */}
+                                    {selectedTasksForThisInit.map(
+                                      (task, taskIndex) => (
+                                        <div
+                                          key={taskIndex}
+                                          className="ml-4 flex items-start space-x-2"
+                                        >
+                                          <div className="w-1 h-1 bg-orange-500 rounded-full mt-2"></div>
+                                          <div>
+                                            <span className="text-xs font-medium text-orange-600">
+                                              Task {taskIndex + 1}
+                                            </span>
+                                            <p className="text-xs text-orange-700">
+                                              {task}
+                                            </p>
+                                          </div>
+                                        </div>
+                                      ),
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          );
+                        })}
+                    </div>
+                  </div>
+                )}
+
+                {onboardingData.invitedMembers.length > 0 && (
+                  <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <h4 className="font-semibold text-blue-800 mb-2">
+                      👥 Anggota Tim yang Diundang
+                    </h4>
+                    <div className="space-y-2">
+                      {onboardingData.invitedMembers.map((member, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center space-x-2"
+                        >
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          <span className="text-sm text-gray-700">
+                            {member}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <h4 className="font-semibold text-gray-800 mb-3">
+                    📅 Pengaturan Siklus & Monitoring
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700">
+                    <div className="space-y-2">
+                      <p>
+                        <strong>Periode Goal:</strong>{" "}
+                        <span className="inline-block bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-xs">
+                          {onboardingData.cycleDuration === "1_bulan"
+                            ? "1 Bulan"
+                            : onboardingData.cycleDuration === "3_bulan"
+                              ? "3 Bulan"
+                              : onboardingData.cycleDuration === "6_bulan"
+                                ? "6 Bulan"
+                                : onboardingData.cycleDuration === "1_tahun"
+                                  ? "1 Tahun"
+                                  : "Belum dipilih"}
+                        </span>
+                      </p>
+                      <p>
+                        <strong>Tanggal Mulai:</strong>{" "}
+                        <span className="text-gray-900">
+                          {onboardingData.cycleStartDate || "Belum diatur"}
+                        </span>
+                      </p>
+                      <p>
+                        <strong>Tanggal Selesai:</strong>{" "}
+                        <span className="text-gray-900">
+                          {onboardingData.cycleEndDate || "Belum diatur"}
+                        </span>
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <p>
+                        <strong>Frekuensi Check-in:</strong>{" "}
+                        <span className="inline-block bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs">
+                          {onboardingData.cadence === "harian"
+                            ? "Setiap Hari"
+                            : onboardingData.cadence === "mingguan"
+                              ? "Setiap Minggu"
+                              : onboardingData.cadence === "bulanan"
+                                ? "Setiap Bulan"
+                                : "Belum dipilih"}
+                        </span>
+                      </p>
+                      <p>
+                        <strong>Waktu Reminder:</strong>{" "}
+                        <span className="text-gray-900 font-mono">
+                          {onboardingData.reminderTime || "Belum diatur"}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-3 p-2 bg-gray-50 rounded text-xs text-gray-600">
+                    💡 <strong>Info:</strong> Sistem akan mengirim reminder
+                    sesuai jadwal yang dipilih untuk membantu Anda melacak
+                    progress goal secara konsisten.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Success Message */}
             <div className="p-4 bg-green-50 rounded-lg border border-green-200">
               <h3 className="font-semibold text-green-800 mb-2">🎉 Selamat!</h3>
               <p className="text-sm text-green-700 mb-3">
@@ -2922,6 +3166,27 @@ export default function CompanyOnboarding() {
                 <li>• Dashboard ringkas untuk tracking progress</li>
                 <li>• Review berkala di akhir periode</li>
                 <li>• Rekomendasi penyesuaian jika diperlukan</li>
+              </ul>
+            </div>
+
+            <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+              <h4 className="font-semibold text-yellow-800 mb-2">
+                💡 Yang Akan Terjadi Selanjutnya
+              </h4>
+              <ul className="text-sm text-yellow-700 space-y-1">
+                <li>
+                  • Goal pertama akan dibuat otomatis di sistem berdasarkan
+                  pilihan anda
+                </li>
+                <li>• Anggota tim akan diundang untuk berkolaborasi</li>
+                <li>
+                  • Reminder otomatis akan dimulai sesuai ketentuan yang sudah
+                  dimasukkan
+                </li>
+                <li>
+                  • Anda dapat menambah / merubah konfigurasi setelah onboarding
+                  selesai
+                </li>
               </ul>
             </div>
           </div>
@@ -2947,8 +3212,7 @@ export default function CompanyOnboarding() {
       6: "Kebanyakan strategi gagal bukan karena kurang ide, tapi karena terlalu banyak dan tak tahu mana yang penting. Inisiatif adalah langkah nyata. Kita pilih yang sederhana, bisa langsung dikerjakan, dan berdampak besar. Fokus pada satu tembakan yang paling kena sasaran.",
       7: "Inisiatif ibarat jalan menuju tujuan — tapi kita tetap butuh langkah konkret agar sampai ke sana. Di sini, Anda bisa memecah inisiatif menjadi tugas-tugas kecil yang bisa segera dikerjakan.",
       8: "Ritme adalah kunci konsistensi. Seperti olahraga, lebih baik dilakukan rutin meski ringan. Dengan ritme update yang pas, Anda tidak akan kehilangan momentum. Bayangkan sistem ini seperti partner yang selalu mengingatkan, bukan menghakimi.",
-      9: "Hampir selesai! Atur reminder agar selalu terjaga momentum dan review berkala untuk evaluasi.",
-      10: "Terakhir, lihat ringkasan semua yang telah Anda setting. Dashboard ini akan membantu memantau perjalanan menuju tujuan!",
+      9: "Selamat! Anda sudah siap untuk memulai perjalanan goal management yang terstruktur. Lihat ringkasan lengkap setup Anda dan sistem akan membantu melacak progress dengan reminder otomatis serta insight yang berguna untuk perbaikan berkelanjutan.",
     };
 
     return (

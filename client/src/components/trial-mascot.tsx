@@ -266,23 +266,16 @@ export default function TrialMascot({ className, missions = [], onMissionAction 
       {
         state: "encouraging" as MascotState,
         title: "8. Update Capaian Key Result",
-        message: "Langkah 8 dari 10: Update progress Key Result Anda. Pantau apakah target angka sudah tercapai atau masih perlu diperbaiki.",
+        message: "Langkah 8 dari 9: Update progress Key Result Anda. Pantau apakah target angka sudah tercapai atau masih perlu diperbaiki.",
         action: "Mulai",
         icon: Target,
       },
       {
-        state: "pointing" as MascotState,
-        title: "9. Update Capaian Metrik Inisiatif",
-        message: "Langkah 9 dari 10: Update metrik inisiatif untuk evaluasi kemajuan pelaksanaan rencana aksi yang telah dibuat.",
-        action: "Mulai",
-        icon: LineChart,
-      },
-      {
         state: "celebrating" as MascotState,
-        title: "10. Update Status Task & Harian Instan",
-        message: "Langkah 10 dari 10: Update status task harian dan lakukan review harian untuk memastikan kemajuan yang konsisten setiap hari. Selamat, Anda telah menyelesaikan onboarding!",
+        title: "9. Ringkasan & Reminder",
+        message: "Langkah 9 dari 9: Lihat ringkasan lengkap onboarding Anda dan atur reminder otomatis untuk membantu melacak progress. Selamat, Anda telah menyelesaikan onboarding!",
         action: "Selesai",
-        icon: Zap,
+        icon: MessageSquare,
       },
     ];
 
