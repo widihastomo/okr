@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -83,6 +84,17 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
   });
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  // Get user ID for organization-specific data filtering
+  const getUserId = () => {
+    if (user && typeof user === 'object' && 'id' in user) {
+      return (user as any).id;
+    }
+    return null;
+  };
+
+  const userId = getUserId();
 
   // Get today and tomorrow dates
   const today = new Date();
@@ -90,20 +102,20 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
   const todayStr = today.toISOString().split('T')[0];
   const tomorrowStr = tomorrow.toISOString().split('T')[0];
 
-  // Fetch data for instant update
+  // Fetch data for instant update (organization-specific)
   const { data: keyResults } = useQuery({
     queryKey: ['/api/key-results'],
-    enabled: open,
+    enabled: open && !!userId,
   });
 
   const { data: allTasks } = useQuery({
-    queryKey: ['/api/tasks'],
-    enabled: open,
+    queryKey: [`/api/users/${userId}/tasks`],
+    enabled: open && !!userId,
   });
 
   const { data: initiatives } = useQuery({
     queryKey: ['/api/initiatives'],
-    enabled: open,
+    enabled: open && !!userId,
   });
 
   // Fetch success metrics for active initiatives
