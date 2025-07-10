@@ -13,6 +13,7 @@ type ToasterToast = ToastProps & {
   title?: React.ReactNode
   description?: React.ReactNode
   action?: ToastActionElement
+  variant?: "default" | "destructive" | "success"
 }
 
 const actionTypes = {
@@ -141,6 +142,9 @@ type Toast = Omit<ToasterToast, "id">
 
 function toast({ ...props }: Toast) {
   const id = genId()
+  
+  // Debug logging to see what props are being passed
+  console.log('Toast function called with props:', props);
 
   const update = (props: ToasterToast) =>
     dispatch({

@@ -85,31 +85,35 @@
   }
 }
 
-/* Toast Success Override - More specific selectors */
+/* Toast Success Override - Ultra specific selectors */
 [data-radix-toast-root].success,
-.success[data-radix-toast-root] {
+.success[data-radix-toast-root],
+.group.success,
+.success {
   background-color: rgb(220, 252, 231) !important;
   border-color: rgb(22, 163, 74) !important;
   color: rgb(20, 83, 45) !important;
 }
 
 .dark [data-radix-toast-root].success,
-.dark .success[data-radix-toast-root] {
+.dark .success[data-radix-toast-root],
+.dark .group.success,
+.dark .success {
   background-color: rgb(20, 83, 45) !important;
   border-color: rgb(34, 197, 94) !important;
   color: rgb(220, 252, 231) !important;
 }
 
-/* Additional override for group classes */
-.group.success {
-  background-color: rgb(220, 252, 231) !important;
-  border-color: rgb(22, 163, 74) !important;
+/* Toast Success Title and Description Override */
+.success .text-sm,
+.success [data-radix-toast-title],
+.success [data-radix-toast-description] {
   color: rgb(20, 83, 45) !important;
 }
 
-.dark .group.success {
-  background-color: rgb(20, 83, 45) !important;
-  border-color: rgb(34, 197, 94) !important;
+.dark .success .text-sm,
+.dark .success [data-radix-toast-title],
+.dark .success [data-radix-toast-description] {
   color: rgb(220, 252, 231) !important;
 }
 

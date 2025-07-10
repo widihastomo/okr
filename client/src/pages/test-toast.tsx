@@ -5,26 +5,33 @@ export default function TestToast() {
   const { toast } = useToast();
 
   const showSuccessToast = () => {
-    toast({
-      title: "Test Success Toast",
-      description: "Ini adalah toast success dengan warna hijau",
-      variant: "success",
-    });
+    console.log('Triggering success toast with variant: success');
+    const toastData = {
+      title: "✅ SUCCESS - Berhasil!",
+      description: "Toast ini harus berwarna hijau dengan border hijau gelap",
+      variant: "success" as const,
+    };
+    console.log('Toast data being passed:', toastData);
+    toast(toastData);
   };
 
   const showDefaultToast = () => {
-    toast({
-      title: "Test Default Toast",
-      description: "Ini adalah toast default dengan warna putih",
-    });
+    const toastData = {
+      title: "📋 DEFAULT - Informasi",
+      description: "Toast ini harus berwarna putih (default)",
+    };
+    console.log('Default toast data:', toastData);
+    toast(toastData);
   };
 
   const showDestructiveToast = () => {
-    toast({
-      title: "Test Destructive Toast",  
-      description: "Ini adalah toast destructive dengan warna merah",
-      variant: "destructive",
-    });
+    const toastData = {
+      title: "❌ ERROR - Gagal!",
+      description: "Toast ini harus berwarna merah (destructive)",
+      variant: "destructive" as const,
+    };
+    console.log('Destructive toast data:', toastData);
+    toast(toastData);
   };
 
   return (
@@ -57,6 +64,9 @@ export default function TestToast() {
       <div className="mt-8 text-center text-gray-600">
         <p>Klik tombol di atas untuk test warna toast yang berbeda</p>
         <p>Toast success harus berwarna hijau dengan border hijau gelap</p>
+        <p className="mt-2 text-sm text-gray-500">
+          Buka Developer Console (F12) untuk melihat debug logs
+        </p>
       </div>
     </div>
   );
