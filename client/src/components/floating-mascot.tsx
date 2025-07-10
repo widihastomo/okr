@@ -208,11 +208,6 @@ export default function FloatingMascot({ className }: FloatingMascotProps) {
   const tips = getPageContextualTips(location, achievements, trialStatus);
   const currentTip = tips[currentTipIndex] || tips[0];
 
-  // Hide mascot for system owners or onboarding page - check after all hooks
-  if ((user as any)?.isSystemOwner || location === "/onboarding") {
-    return null;
-  }
-
   // Auto-cycle through tips
   useEffect(() => {
     if (tips.length > 1) {
@@ -294,7 +289,12 @@ export default function FloatingMascot({ className }: FloatingMascotProps) {
     }
   };
 
-  if (!isVisible || !currentTip) return null;
+  // Check if component should render
+  const shouldHide = (user as any)?.isSystemOwner || location === "/onboarding" || !isVisible || !currentTip;
+  
+  if (shouldHide) {
+    return null;
+  }
 
   return (
     <div
