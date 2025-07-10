@@ -1907,7 +1907,7 @@ export default function CompanyOnboarding() {
             ],
 
             // Customer Service Tasks
-            "Training customer service excellence": [
+            "Melatih customer service excellence": [
               "Buat modul training customer service",
               "Conduct training session untuk CS team",
               "Evaluasi performance setelah training",
@@ -2114,7 +2114,7 @@ export default function CompanyOnboarding() {
             ],
 
             // Customer service initiatives
-            "Training customer service excellence": [
+            "Melatih customer service excellence": [
               "Buat modul training customer service",
               "Conduct training session untuk CS team",
               "Evaluasi performance setelah training",
