@@ -65,6 +65,7 @@ import EmailSettings from "@/pages/system-admin/email-settings";
 import ClientStatusMapping from "@/pages/client-status-mapping";
 import ApplicationSettings from "@/pages/system-admin/application-settings";
 import AcceptInvitation from "@/pages/accept-invitation";
+import TestToast from "@/pages/test-toast";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -297,6 +298,7 @@ function Router() {
                 path="/invoice-payment-finish"
                 component={InvoicePaymentFinish}
               />
+              <Route path="/test-toast" component={TestToast} />
               <Route component={NotFound} />
             </Switch>
           </div>
