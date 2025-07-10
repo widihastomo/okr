@@ -2607,20 +2607,23 @@ export default function CompanyOnboarding() {
 
           {/* Virtual Assistant - Show on all steps */}
           <div className="mb-6 animate-in fade-in slide-in-from-left-4 duration-500">
-            <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-lg p-4 shadow-sm transition-all duration-300 hover:shadow-md">
+            <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-lg p-4 shadow-sm transition-all duration-500 hover:shadow-md hover:scale-[1.02] animate-pulse-gentle">
               <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0">
                   <div
-                    className={`w-10 h-10 bg-gradient-to-br ${getProgressColor()} rounded-full flex items-center justify-center transition-all duration-500 hover:scale-110`}
+                    className={`w-10 h-10 bg-gradient-to-br ${getProgressColor()} rounded-full flex items-center justify-center transition-all duration-500 hover:scale-110 animate-bounce-gentle`}
                   >
-                    <Sparkles className="w-5 h-5 text-white transition-all duration-300 hover:rotate-12" />
+                    <Sparkles className="w-5 h-5 text-white transition-all duration-300 hover:rotate-12 animate-sparkle" />
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-medium text-gray-900 mb-1 transition-all duration-300">
+                  <h4 className="font-medium text-gray-900 mb-1 transition-all duration-300 animate-slide-in">
                     Asisten Virtual
                   </h4>
-                  <p className="text-sm text-gray-700 leading-relaxed transition-all duration-300">
+                  <p 
+                    key={`assistant-message-${onboardingData.currentStep}`}
+                    className="text-sm text-gray-700 leading-relaxed transition-all duration-500 animate-fade-in-up"
+                  >
                     {getVirtualAssistantMessage()}
                   </p>
                 </div>
