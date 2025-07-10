@@ -153,10 +153,12 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
   // Filter tasks for today and tomorrow
   const todayTasks = React.useMemo(() => {
     if (!allTasks) return [];
-    return (allTasks as any[]).filter((task: any) => {
+    const filtered = (allTasks as any[]).filter((task: any) => {
       const dueDate = task.dueDate ? task.dueDate.split('T')[0] : null;
       return dueDate === todayStr || task.status === 'in_progress';
     });
+    console.log('Today tasks filtered:', filtered.map(t => ({ id: t.id, title: t.title, status: t.status, dueDate: t.dueDate })));
+    return filtered;
   }, [allTasks, todayStr]);
 
   const tomorrowTasks = React.useMemo(() => {
@@ -238,6 +240,8 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
         index === self.findIndex(t => t.id === task.id)
       );
 
+      console.log('Setting update data with tasks:', uniqueTodayTasks.map(t => ({ id: t.id, title: t.title, status: t.status, newStatus: t.newStatus })));
+      
       setUpdateData({
         keyResults: uniqueKeyResults.map((kr: any) => ({
           id: kr.id,
@@ -723,8 +727,9 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap">
                             <Select
-                              value={task.newStatus}
+                              value={task.newStatus || task.status}
                               onValueChange={(value) => {
+                                console.log('Dropdown changed:', { taskId: task.id, oldValue: task.newStatus, newValue: value });
                                 const newData = { ...updateData };
                                 newData.todayTasks[index].newStatus = value;
                                 newData.todayTasks[index].completed = value === 'completed';
@@ -764,8 +769,9 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-700">Status Baru:</label>
                         <Select
-                          value={task.newStatus}
+                          value={task.newStatus || task.status}
                           onValueChange={(value) => {
+                            console.log('Mobile dropdown changed:', { taskId: task.id, oldValue: task.newStatus, newValue: value });
                             const newData = { ...updateData };
                             newData.todayTasks[index].newStatus = value;
                             newData.todayTasks[index].completed = value === 'completed';
