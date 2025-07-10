@@ -125,9 +125,48 @@ Trial user untuk testing achievement system:
 - **User ID**: f47ac10b-58cc-4372-a567-0e02b2c3d480
 - **Achievement Status**: 2 achievements sudah terbuka (Welcome achievement)
 
+## Production Seeder Scripts
+
+System menyediakan seeder scripts untuk production deployment:
+
+### Scripts Available
+- `./seed-production.sh` - Complete production seeding (system owner + subscription plans)
+- `./create-production-admin.sh` - System owner account only
+- `npx tsx server/create-production-seeder.ts` - Direct TypeScript execution
+- `npx tsx server/create-production-admin.ts` - Direct admin creation
+
+### Production Admin Credentials
+- **Email:** admin@refokus.com
+- **Password:** RefokusAdmin2025!
+- **Role:** System Owner with full platform privileges
+- **Organization:** Refokus System (system organization)
+
+### What Gets Created
+- System owner user account with proper authentication
+- System organization (Refokus System)
+- Complete subscription plans (Free Trial, Starter, Growth, Enterprise)
+- Proper role assignments and permissions
+- Multi-tenant security setup
+
+### Security Notes
+- Default password must be changed immediately after first login
+- Scripts check for existing data to prevent duplicates
+- All passwords are properly hashed using bcrypt
+- Environment-specific configuration supported
+
 ## Changelog
 ```
 Changelog:
+- July 10, 2025. Successfully created comprehensive production seeder scripts for system owner account setup:
+  * Created create-production-admin.ts for system owner account creation only
+  * Created create-production-seeder.ts for complete production setup (admin + subscription plans)
+  * Added shell scripts (seed-production.sh, create-production-admin.sh) for easy execution
+  * Production admin credentials: admin@refokus.com / RefokusAdmin2025! with system owner privileges
+  * Scripts include proper security measures: bcrypt password hashing, duplicate prevention, data verification
+  * Complete subscription plans created: Free Trial (7 days), Starter (199k IDR), Growth (499k IDR), Enterprise (999k IDR)
+  * System organization (Refokus System) created for platform administration
+  * Comprehensive documentation provided in PRODUCTION-SETUP.md with security guidelines
+  * Scripts check for existing data to prevent duplicates and ensure clean production deployment
 - January 10, 2025. Further optimized authentication flow for instant login and logout:
   * OPTIMIZED: Logout process now instant - client state cleared immediately before API call
   * ENHANCED: Login/logout both use non-blocking pattern - clear state → navigate → API call in background
