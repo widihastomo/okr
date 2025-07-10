@@ -22,10 +22,11 @@ import {
 } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { LoadingButton } from "@/components/ui/playful-loading";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import refokusLogo from "@assets/refokus_1751810711179.png";
+import { prefetchAuthData } from "@/lib/auth-prefetch";
 
 // Validation schemas
 const loginSchema = z.object({
@@ -114,7 +115,13 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
       }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
+      // Invalidate auth cache to force refresh with new user data
+      await queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      
+      // Start prefetching data in background for faster page loads
+      prefetchAuthData();
+      
       toast({
         title: "Login berhasil",
         description: "Selamat datang!",

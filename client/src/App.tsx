@@ -77,6 +77,7 @@ function Router() {
   const { data: trialStatus } = useQuery({
     queryKey: ["/api/trial-status"],
     enabled: isAuthenticated && !isLoading,
+    staleTime: 60 * 1000, // 1 minute cache
   });
   
   // Check onboarding status for redirect (efficient version)
@@ -86,6 +87,7 @@ function Router() {
     staleTime: 5 * 60 * 1000, // 5 minutes cache
     cacheTime: 10 * 60 * 1000, // 10 minutes cache
     refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
   // Clear logout flag on app start if user is authenticated
@@ -115,7 +117,8 @@ function Router() {
     }
   }, [isAuthenticated, user, isLoading, location, navigate]);
 
-  if (isLoading) {
+  // Show loading only on initial load, not on navigation
+  if (isLoading && !user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">

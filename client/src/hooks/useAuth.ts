@@ -4,9 +4,10 @@ export function useAuth() {
   const { data: user, isLoading, error } = useQuery({
     queryKey: ["/api/auth/me"],
     retry: false,
-    staleTime: 0, // No cache for auth state to ensure logout works immediately
-    cacheTime: 0, // No cache
+    staleTime: 10 * 1000, // 10 seconds cache for faster navigation
+    cacheTime: 30 * 1000, // 30 seconds cache
     refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnMount: false, // Don't refetch on mount if cached
   });
 
   // If we get a 401 error, user is not authenticated
