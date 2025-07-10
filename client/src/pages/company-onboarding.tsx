@@ -1961,92 +1961,92 @@ export default function CompanyOnboarding() {
               "Buat dashboard untuk real-time monitoring",
               "Training tim untuk menggunakan monitoring system",
             ],
-            "Performance monitoring system": [
+            "Sistem monitoring kinerja": [
               "Setup performance monitoring tools",
               "Buat dashboard untuk tracking performance",
               "Training tim untuk menggunakan monitoring system",
             ],
-            "Employee productivity training": [
+            "Pelatihan produktivitas karyawan": [
               "Buat program training untuk karyawan",
               "Lakukan assessment skill karyawan",
               "Implementasi best practices untuk produktivitas",
             ],
-            "Resource allocation optimization": [
+            "Optimisasi alokasi sumber daya": [
               "Analisis current resource allocation",
               "Buat model optimization untuk resource",
               "Implementasi resource allocation yang optimal",
             ],
-            "Energy efficiency program": [
+            "Program efisiensi energi": [
               "Audit energy consumption di semua area",
               "Implementasi energy saving measures",
               "Monitor energy efficiency improvement",
             ],
-            "Process optimization initiative": [
+            "Inisiatif optimisasi proses": [
               "Analisis current process dan identifikasi waste",
               "Design optimized process workflow",
               "Implementasi process improvement dan monitoring",
             ],
-            "Workflow optimization dan automation": [
+            "Optimisasi dan otomasi alur kerja": [
               "Analisis current workflow dan identifikasi bottleneck",
               "Design automated workflow system",
               "Implementasi automation dan monitoring efficiency",
             ],
-            "Team training untuk efficiency": [
+            "Pelatihan tim untuk efisiensi": [
               "Buat program training untuk meningkatkan skill tim",
               "Lakukan assessment competency dan gap analysis",
               "Implementasi training program dan evaluasi hasil",
             ],
-            "Quality control streamlining": [
+            "Penyederhanaan kontrol kualitas": [
               "Analisis current quality control process",
               "Design streamlined quality control system",
               "Implementasi quality control baru dan monitoring",
             ],
-            "Equipment upgrade program": [
+            "Program upgrade peralatan": [
               "Evaluasi equipment lama dan kebutuhan upgrade",
               "Procurement dan instalasi equipment baru",
               "Training operator dan maintenance equipment",
             ],
-            "Production capacity scaling": [
+            "Peningkatan kapasitas produksi": [
               "Analisis current production capacity dan demand",
               "Design scaling strategy untuk production",
               "Implementasi capacity expansion dan monitoring",
             ],
-            "Staff scheduling optimization": [
+            "Optimisasi penjadwalan staff": [
               "Analisis current staff scheduling pattern",
               "Design optimal scheduling system",
               "Implementasi scheduling optimization dan monitoring",
             ],
-            "Backup system implementation": [
+            "Implementasi sistem backup": [
               "Design backup system untuk critical process",
               "Implementasi backup system dan testing",
               "Monitor backup system performance dan reliability",
             ],
-            "Equipment monitoring system": [
+            "Sistem monitoring peralatan": [
               "Setup monitoring equipment untuk production line",
               "Buat dashboard untuk real-time monitoring",
               "Training tim untuk menggunakan monitoring system",
             ],
-            "Preventive maintenance program": [
+            "Program maintenance preventif": [
               "Buat schedule maintenance untuk semua equipment",
               "Siapkan checklist maintenance routine",
               "Training teknisi untuk preventive maintenance",
             ],
-            "Supplier negotiation program": [
+            "Program negosiasi supplier": [
               "Analisis supplier performance dan pricing",
               "Negosiasi contract terms dengan supplier",
               "Monitor supplier performance dan relationship",
             ],
-            "Material waste reduction program": [
+            "Program pengurangan limbah material": [
               "Analisis waste material di production process",
               "Implementasi waste reduction techniques",
               "Monitor dan tracking waste reduction progress",
             ],
-            "Cost analysis dan reduction program": [
+            "Program analisis dan pengurangan biaya": [
               "Analisis detail structure cost operasional",
               "Identifikasi area untuk cost reduction",
               "Implementasi cost reduction measures dan monitoring",
             ],
-            "Administrative process automation": [
+            "Otomatisasi proses administratif": [
               "Analisis administrative process yang manual",
               "Design automation system untuk admin tasks",
               "Implementasi automation dan training staff",
@@ -2103,17 +2103,17 @@ export default function CompanyOnboarding() {
               "Desain aktivitas engagement dan konten",
               "Monitor pertumbuhan komunitas dan aktivitas",
             ],
-            "Optimisasi SEO untuk organic traffic": [
+            "Optimisasi SEO untuk traffic organik": [
               "Audit SEO current website dan competitor",
               "Implementasi on-page dan off-page SEO",
               "Monitor organic traffic growth dan ranking",
             ],
-            "Lead magnet dan landing page optimization": [
+            "Lead magnet dan optimisasi landing page": [
               "Buat lead magnet yang valuable untuk target audience",
               "Design landing page untuk lead capture",
               "A/B testing dan optimization untuk conversion",
             ],
-            "Content marketing dan thought leadership": [
+            "Pemasaran konten dan thought leadership": [
               "Buat content strategy untuk thought leadership",
               "Develop high-quality content secara konsisten",
               "Monitor content performance dan engagement",
@@ -2148,52 +2148,52 @@ export default function CompanyOnboarding() {
               "Setup chatbot platform dan integration",
               "Monitor chatbot performance dan optimization",
             ],
-            "Dedicated customer support team": [
+            "Tim dukungan pelanggan khusus": [
               "Recruit dan training dedicated support team",
               "Setup support workflow dan escalation process",
               "Monitor team performance dan customer satisfaction",
             ],
-            "Automated ticket routing system": [
+            "Sistem routing tiket otomatis": [
               "Setup ticket routing berdasarkan category",
               "Implement automation untuk ticket assignment",
               "Monitor routing effectiveness dan response time",
             ],
-            "24/7 customer support system": [
+            "Sistem dukungan pelanggan 24/7": [
               "Setup 24/7 support coverage dengan shift system",
               "Implement support tools untuk multi-channel",
               "Monitor support availability dan response metrics",
             ],
-            "Live chat integration di website": [
+            "Integrasi live chat di website": [
               "Setup live chat platform di website",
               "Training tim untuk live chat handling",
               "Monitor chat performance dan customer satisfaction",
             ],
-            "Mobile app untuk customer service": [
+            "Aplikasi mobile untuk layanan pelanggan": [
               "Develop mobile app untuk customer service",
               "Integrate app dengan customer database",
               "Monitor app usage dan customer feedback",
             ],
-            "Streamlined escalation process": [
+            "Proses eskalasi yang efisien": [
               "Design escalation workflow untuk complex issues",
               "Setup escalation criteria dan SLA",
               "Monitor escalation effectiveness dan resolution time",
             ],
-            "Knowledge base optimization": [
+            "Optimisasi basis pengetahuan": [
               "Audit current knowledge base content",
               "Optimize knowledge base untuk searchability",
               "Monitor knowledge base usage dan effectiveness",
             ],
-            "Advanced CRM integration": [
+            "Integrasi CRM lanjutan": [
               "Setup advanced CRM dengan full integration",
               "Training tim untuk CRM utilization",
               "Monitor CRM effectiveness dan customer insights",
             ],
-            "Customer feedback loop system": [
+            "Sistem feedback loop pelanggan": [
               "Setup feedback collection pada multiple touchpoints",
               "Develop feedback analysis dan action plan",
               "Monitor feedback trends dan improvement metrics",
             ],
-            "Personalized customer experience program": [
+            "Program pengalaman pelanggan yang dipersonalisasi": [
               "Design personalization berdasarkan customer data",
               "Implement personalized experience across touchpoints",
               "Monitor personalization effectiveness dan engagement",
@@ -2272,12 +2272,12 @@ export default function CompanyOnboarding() {
               "Buat iklan kreatif dengan A/B testing",
               "Monitor dan optimasi performa kampanye",
             ],
-            "Membangun influencer partnership program": [
+            "Program kemitraan dengan influencer": [
               "Identifikasi influencer yang sesuai dengan brand",
               "Nego collaboration terms dengan influencer",
               "Monitor campaign performance dari influencer",
             ],
-            "Brand activation event di target market": [
+            "Event aktivasi brand di target market": [
               "Plan concept dan venue untuk brand activation",
               "Execute brand activation event",
               "Follow up dengan participant setelah event",
