@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   X,
   MessageCircle,
+  MessageSquare,
   Sparkles,
   Heart,
   Star,
