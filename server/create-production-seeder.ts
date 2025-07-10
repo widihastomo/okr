@@ -10,22 +10,45 @@ import { eq } from "drizzle-orm";
 
 // Check if DATABASE_URL is available and construct if needed
 function checkDatabaseConnection() {
+  console.log("🔍 Checking database connection setup...");
+  
   if (!process.env.DATABASE_URL) {
+    console.log("⚠️  DATABASE_URL not found, attempting to construct from PG variables...");
+    
     // Try to construct DATABASE_URL from PG variables
     const { PGUSER, PGPASSWORD, PGHOST, PGPORT = '5432', PGDATABASE } = process.env;
     
+    console.log("Available PG variables:");
+    console.log(`- PGUSER: ${PGUSER || 'not set'}`);
+    console.log(`- PGPASSWORD: ${PGPASSWORD ? 'set' : 'not set'}`);
+    console.log(`- PGHOST: ${PGHOST || 'not set'}`);
+    console.log(`- PGDATABASE: ${PGDATABASE || 'not set'}`);
+    console.log(`- PGPORT: ${PGPORT}`);
+    
     if (PGUSER && PGPASSWORD && PGHOST && PGDATABASE) {
-      process.env.DATABASE_URL = `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}`;
+      const constructedUrl = `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}`;
+      process.env.DATABASE_URL = constructedUrl;
       console.log("✅ DATABASE_URL constructed from PG environment variables");
+      console.log(`🔗 Database URL: postgresql://${PGUSER}:****@${PGHOST}:${PGPORT}/${PGDATABASE}`);
       return true;
     }
     
     console.error("❌ DATABASE_URL not found and cannot be constructed from PG variables");
-    console.error("Please set DATABASE_URL or ensure PG variables are available:");
+    console.error("Missing PG variables:");
+    if (!PGUSER) console.error("  - PGUSER is required");
+    if (!PGPASSWORD) console.error("  - PGPASSWORD is required");
+    if (!PGHOST) console.error("  - PGHOST is required");
+    if (!PGDATABASE) console.error("  - PGDATABASE is required");
+    console.error("\nPlease set DATABASE_URL or ensure all PG variables are available:");
     console.error("- DATABASE_URL=postgresql://user:password@host:port/database");
     console.error("- Or: PGUSER, PGPASSWORD, PGHOST, PGDATABASE (and optionally PGPORT)");
     return false;
   }
+  
+  console.log("✅ DATABASE_URL found in environment");
+  // Hide password in log
+  const maskedUrl = process.env.DATABASE_URL.replace(/:([^:@]+)@/, ':****@');
+  console.log(`🔗 Database URL: ${maskedUrl}`);
   return true;
 }
 
