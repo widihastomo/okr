@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
+
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -704,9 +704,6 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Status Baru
                         </th>
-                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Selesai
-                        </th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -740,17 +737,6 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                                 <SelectItem value="cancelled">Dibatalkan</SelectItem>
                               </SelectContent>
                             </Select>
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap text-center">
-                            <Checkbox
-                              checked={task.completed}
-                              onCheckedChange={(checked) => {
-                                const newData = { ...updateData };
-                                newData.todayTasks[index].completed = !!checked;
-                                newData.todayTasks[index].newStatus = checked ? 'completed' : 'in_progress';
-                                setUpdateData(newData);
-                              }}
-                            />
                           </td>
                         </tr>
                       ))}
@@ -792,19 +778,6 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                             <SelectItem value="cancelled">Dibatalkan</SelectItem>
                           </SelectContent>
                         </Select>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <Checkbox
-                          checked={task.completed}
-                          onCheckedChange={(checked) => {
-                            const newData = { ...updateData };
-                            newData.todayTasks[index].completed = !!checked;
-                            newData.todayTasks[index].newStatus = checked ? 'completed' : 'in_progress';
-                            setUpdateData(newData);
-                          }}
-                        />
-                        <label className="text-sm font-medium text-gray-700">Tandai sebagai selesai</label>
                       </div>
                     </div>
                   ))}
