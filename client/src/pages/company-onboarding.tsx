@@ -426,6 +426,8 @@ export default function CompanyOnboarding() {
   const progressPercentage =
     onboardingData.currentStep === 0
       ? 0
+      : onboardingData.currentStep === ONBOARDING_STEPS.length
+      ? 100 // Show 100% when at the final step (step 9)
       : (onboardingData.completedSteps.length / ONBOARDING_STEPS.length) * 100;
 
   // Dynamic color system based on progress
