@@ -39,16 +39,17 @@ export function LogoutButton({
       localStorage.clear();
       sessionStorage.clear();
       
-      // Force page reload to show login page
-      window.location.reload();
+      // Use client-side navigation for fastest redirect
+      setLocation("/");
     } catch (error) {
       console.error('Logout error:', error);
-      // Clear cache and reload anyway
+      // Clear cache and navigate anyway
       queryClient.clear();
       localStorage.clear();
       sessionStorage.clear();
-      window.location.reload();
+      setLocation("/");
     }
+    setIsLoggingOut(false);
   };
 
   return (

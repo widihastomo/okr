@@ -50,7 +50,7 @@ import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import OKRFormModal from "./okr-form-modal";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 
@@ -81,6 +81,7 @@ export default function GlobalHeader({
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, navigate] = useLocation();
 
   // Check if user is system owner
   const isSystemOwner = (user as any)?.isSystemOwner || false;
@@ -256,13 +257,18 @@ export default function GlobalHeader({
                     // Clear any local storage or session data
                     localStorage.clear();
                     sessionStorage.clear();
-                    // Force page reload to clear auth state
-                    window.location.replace("/");
+                    // Clear React Query cache
+                    queryClient.clear();
+                    // Use client-side navigation for fastest redirect
+                    navigate("/");
                   }
                 } catch (error) {
                   console.error("Logout error:", error);
-                  // Force redirect even if logout fails
-                  window.location.replace("/");
+                  // Clear cache and navigate anyway
+                  localStorage.clear();
+                  sessionStorage.clear();
+                  queryClient.clear();
+                  navigate("/");
                 }
               }}
             >
