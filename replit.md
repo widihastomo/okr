@@ -128,6 +128,12 @@ Changelog:
   * IMPROVED: Removed redirect delays (50ms → 0ms for login, 1500ms → 800ms for onboarding completion)
   * ADDED: Cache invalidation on onboarding completion to ensure fresh dashboard data
   * RESULT: Smooth, fast transitions without full page reloads for complete user journey
+- July 10, 2025. Successfully fixed React hooks violation in FloatingMascot component:
+  * RESOLVED: "Rendered fewer hooks than expected" error caused by early return after hooks
+  * FIXED: Moved conditional returns (system owner/onboarding page check) after all hooks are called
+  * MAINTAINED: All hooks (useState, useQuery, useEffect) now called consistently regardless of render conditions
+  * IMPROVED: Component stability and prevented React warnings in console
+  * ENHANCED: FloatingMascot component now renders properly without breaking React hooks rules
 - July 10, 2025. Successfully completed comprehensive Toast success variant implementation with green color scheme:
   * RESOLVED: Root cause was variant property not being properly passed through in Toaster component
   * Fixed explicit variant destructuring in toaster.tsx to ensure "success" variant reaches Toast component

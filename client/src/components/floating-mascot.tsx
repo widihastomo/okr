@@ -195,12 +195,7 @@ export default function FloatingMascot({ className }: FloatingMascotProps) {
   const [location] = useLocation();
   const { user } = useAuth();
 
-  // Hide mascot for system owners
-  if ((user as any)?.isSystemOwner) {
-    return null;
-  }
-
-  // Fetch trial data
+  // Fetch trial data - always call hooks first
   const { data: trialStatus } = useQuery({
     queryKey: ["/api/trial-status"],
   });
@@ -213,8 +208,8 @@ export default function FloatingMascot({ className }: FloatingMascotProps) {
   const tips = getPageContextualTips(location, achievements, trialStatus);
   const currentTip = tips[currentTipIndex] || tips[0];
 
-  // Don't show mascot on onboarding page
-  if (location === "/onboarding") {
+  // Hide mascot for system owners or onboarding page - check after all hooks
+  if ((user as any)?.isSystemOwner || location === "/onboarding") {
     return null;
   }
 
