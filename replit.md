@@ -230,6 +230,9 @@ All email configuration now uses environment variables:
 - Production-ready deployment configuration
 - Automatic fallback between providers
 
+## Current Issues
+- **PERSISTENT DROPDOWN ISSUE**: Daily instant update task status dropdowns consistently fail to register clicks or onChange events despite multiple debugging approaches including native HTML select, custom buttons, visual debugging, and state management fixes. Root cause appears to be a deeper React/DOM interaction issue that requires alternative UI pattern.
+
 ## Changelog
 ```
 Changelog:

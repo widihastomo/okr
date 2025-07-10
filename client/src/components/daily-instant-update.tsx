@@ -732,32 +732,36 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                             </span>
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap">
-                            <div className="relative">
-                              <button
-                                type="button"
-                                className="w-40 h-10 px-3 py-2 text-sm border border-gray-300 rounded-md bg-white text-left flex items-center justify-between hover:border-blue-600"
-                                onClick={() => {
-                                  const currentStatus = updateData.todayTasks[index]?.newStatus || task.status;
-                                  const statusOptions = ['not_started', 'in_progress', 'completed', 'cancelled'];
-                                  const currentIndex = statusOptions.indexOf(currentStatus);
-                                  const nextIndex = (currentIndex + 1) % statusOptions.length;
-                                  const nextStatus = statusOptions[nextIndex];
-                                  
-                                  const newTasks = [...updateData.todayTasks];
-                                  newTasks[index] = {
-                                    ...newTasks[index],
-                                    newStatus: nextStatus,
-                                    completed: nextStatus === 'completed'
-                                  };
-                                  setUpdateData({
-                                    ...updateData,
-                                    todayTasks: newTasks
-                                  });
-                                }}
-                              >
-                                <span>{getTaskStatusLabel(updateData.todayTasks[index]?.newStatus || task.status)}</span>
-                                <span className="text-gray-400">↻</span>
-                              </button>
+                            <div className="flex gap-1">
+                              {['not_started', 'in_progress', 'completed', 'cancelled'].map((status) => (
+                                <button
+                                  key={status}
+                                  type="button"
+                                  className={`px-2 py-1 text-xs rounded border ${
+                                    (updateData.todayTasks[index]?.newStatus || task.status) === status
+                                      ? 'bg-blue-600 text-white border-blue-600'
+                                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                                  }`}
+                                  onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    const newTasks = [...updateData.todayTasks];
+                                    newTasks[index] = {
+                                      ...newTasks[index],
+                                      newStatus: status,
+                                      completed: status === 'completed'
+                                    };
+                                    setUpdateData({
+                                      ...updateData,
+                                      todayTasks: newTasks
+                                    });
+                                  }}
+                                >
+                                  {status === 'not_started' && 'Belum'}
+                                  {status === 'in_progress' && 'Jalan'}
+                                  {status === 'completed' && 'Selesai'}
+                                  {status === 'cancelled' && 'Batal'}
+                                </button>
+                              ))}
                             </div>
                           </td>
                         </tr>
@@ -781,31 +785,34 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
 
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-700">Status Baru:</label>
-                        <button
-                          type="button"
-                          className="w-full h-10 px-3 py-2 text-sm border border-gray-300 rounded-md bg-white text-left flex items-center justify-between hover:border-blue-600"
-                          onClick={() => {
-                            const currentStatus = updateData.todayTasks[index]?.newStatus || task.status;
-                            const statusOptions = ['not_started', 'in_progress', 'completed', 'cancelled'];
-                            const currentIndex = statusOptions.indexOf(currentStatus);
-                            const nextIndex = (currentIndex + 1) % statusOptions.length;
-                            const nextStatus = statusOptions[nextIndex];
-                            
-                            const newTasks = [...updateData.todayTasks];
-                            newTasks[index] = {
-                              ...newTasks[index],
-                              newStatus: nextStatus,
-                              completed: nextStatus === 'completed'
-                            };
-                            setUpdateData({
-                              ...updateData,
-                              todayTasks: newTasks
-                            });
-                          }}
-                        >
-                          <span>{getTaskStatusLabel(updateData.todayTasks[index]?.newStatus || task.status)}</span>
-                          <span className="text-gray-400">↻</span>
-                        </button>
+                        <div className="grid grid-cols-2 gap-2">
+                          {['not_started', 'in_progress', 'completed', 'cancelled'].map((status) => (
+                            <button
+                              key={status}
+                              type="button"
+                              className={`px-3 py-2 text-sm rounded border ${
+                                (updateData.todayTasks[index]?.newStatus || task.status) === status
+                                  ? 'bg-blue-600 text-white border-blue-600'
+                                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                              }`}
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                const newTasks = [...updateData.todayTasks];
+                                newTasks[index] = {
+                                  ...newTasks[index],
+                                  newStatus: status,
+                                  completed: status === 'completed'
+                                };
+                                setUpdateData({
+                                  ...updateData,
+                                  todayTasks: newTasks
+                                });
+                              }}
+                            >
+                              {getTaskStatusLabel(status)}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   ))}
