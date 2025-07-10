@@ -8,6 +8,27 @@ import {
 import { hashPassword } from "./emailAuth";
 import { eq } from "drizzle-orm";
 
+// Check if DATABASE_URL is available and construct if needed
+function checkDatabaseConnection() {
+  if (!process.env.DATABASE_URL) {
+    // Try to construct DATABASE_URL from PG variables
+    const { PGUSER, PGPASSWORD, PGHOST, PGPORT = '5432', PGDATABASE } = process.env;
+    
+    if (PGUSER && PGPASSWORD && PGHOST && PGDATABASE) {
+      process.env.DATABASE_URL = `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}`;
+      console.log("✅ DATABASE_URL constructed from PG environment variables");
+      return true;
+    }
+    
+    console.error("❌ DATABASE_URL not found and cannot be constructed from PG variables");
+    console.error("Please set DATABASE_URL or ensure PG variables are available:");
+    console.error("- DATABASE_URL=postgresql://user:password@host:port/database");
+    console.error("- Or: PGUSER, PGPASSWORD, PGHOST, PGDATABASE (and optionally PGPORT)");
+    return false;
+  }
+  return true;
+}
+
 /**
  * Complete production seeder script
  * Creates essential data for production environment including:
@@ -18,6 +39,12 @@ import { eq } from "drizzle-orm";
  */
 async function seedProductionData() {
   console.log("🚀 Starting production data seeding...");
+
+  // Check database connection first
+  if (!checkDatabaseConnection()) {
+    console.error("❌ Cannot proceed without valid database connection");
+    process.exit(1);
+  }
 
   try {
     // 1. Create system owner account
