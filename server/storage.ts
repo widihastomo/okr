@@ -1781,7 +1781,17 @@ export class DatabaseStorage implements IStorage {
         
         if (objectiveKeyResults.length > 0) {
           // Helper function to generate random deadline within cycle range
-          const generateRandomDeadline = (startDate: string, endDate: string) => {
+          // Some tasks will have today's deadline to immediately show up in daily focus
+          const generateRandomDeadline = (startDate: string, endDate: string, index: number = 0) => {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Set to beginning of day
+            
+            // For the first 2 tasks, set deadline to today so they appear immediately
+            if (index < 2) {
+              return today;
+            }
+            
+            // For remaining tasks, generate random dates within cycle range
             const start = new Date(startDate);
             const end = new Date(endDate);
             const randomTime = start.getTime() + Math.random() * (end.getTime() - start.getTime());
@@ -1816,7 +1826,7 @@ export class DatabaseStorage implements IStorage {
             if (onboardingData.tasks && onboardingData.tasks.length > 0 && createdInitiatives.length > 0) {
               const tasksData = onboardingData.tasks
                 .filter((task: string) => task && task.trim() !== '' && task !== 'custom')
-                .map((task: string) => ({
+                .map((task: string, index: number) => ({
                   initiativeId: createdInitiatives[0].id, // Link to first initiative
                   title: task,
                   description: `Task dari hasil onboarding`,
@@ -1824,12 +1834,14 @@ export class DatabaseStorage implements IStorage {
                   priority: 'medium',
                   assignedTo: userId,
                   createdBy: userId,
-                  dueDate: generateRandomDeadline(cycleStartDate, cycleEndDate)
+                  dueDate: generateRandomDeadline(cycleStartDate, cycleEndDate, index)
                 }));
               
               if (tasksData.length > 0) {
                 await db.insert(tasks).values(tasksData);
-                console.log(`📅 Created ${tasksData.length} tasks with random deadlines between ${cycleStartDate} and ${cycleEndDate}`);
+                const todayTasksCount = Math.min(2, tasksData.length);
+                const futureTasksCount = tasksData.length - todayTasksCount;
+                console.log(`📅 Created ${tasksData.length} tasks: ${todayTasksCount} with today's deadline, ${futureTasksCount} with random deadlines between ${cycleStartDate} and ${cycleEndDate}`);
               }
             }
             

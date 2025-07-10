@@ -233,6 +233,19 @@ All email configuration now uses environment variables:
 ## Changelog
 ```
 Changelog:
+- July 10, 2025. Successfully updated task deadline generation logic during onboarding for immediate user engagement:
+  * Enhanced generateRandomDeadline function to prioritize today's deadline for first 2 tasks
+  * Modified task creation logic to ensure some tasks appear immediately in daily focus
+  * Added intelligent deadline distribution: first 2 tasks get today's deadline, remaining tasks get random deadlines within cycle range
+  * Improved user experience by providing actionable tasks from day one of platform usage
+  * Enhanced console logging to track today vs future task distribution during onboarding completion
+- July 10, 2025. Successfully fixed task filtering issue that prevented newly created tasks from appearing:
+  * Resolved duplicate /api/tasks route conflict that caused inconsistent data filtering
+  * Fixed POST /api/tasks endpoint authentication to use proper session data instead of hardcoded development user ID
+  * Confirmed multi-tenant organization-based filtering works correctly for data isolation
+  * Implemented comprehensive debugging and cache invalidation for real-time task updates
+  * Enhanced task creation workflow to support both manual task creation and onboarding task generation
+  * Verified task filtering logic correctly handles date-based filtering for today's tasks display
 - July 10, 2025. Successfully removed virtual assistant floating mascot component completely from the application:
   * Removed FloatingMascot import and usage from App.tsx
   * Deleted floating-mascot-simple.tsx and floating-mascot.tsx files
