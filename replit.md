@@ -198,6 +198,13 @@ Changelog:
   * Complete production seeder automation working: 2 system owners, 4 subscription plans, 1 system organization
   * All production scripts tested and verified with both connection types: build-production-with-seeder.js, run-production-seeder.sh, test-seeder.js
   * Added connection choice system: users can select between 'neon' (default) or 'node-postgres' for database connections
+- July 10, 2025. Successfully extended seeder system to support development environment with enhanced logging:
+  * Modified server/create-production-seeder.ts to detect NODE_ENV and provide environment-specific messaging
+  * Enhanced run-seeder-with-connection-choice.js to support both production and development modes
+  * Created run-dev-seeder.js for simple development-only seeding with clear credentials display
+  * Added development-specific features: detailed login credentials, environment-aware messaging, debug information
+  * Complete development workflow: node run-dev-seeder.js for quick setup, node run-seeder-with-connection-choice.js neon development for advanced options
+  * Updated documentation to include all development seeder options and usage examples
 - July 10, 2025. Successfully implemented automated production seeder execution during build process:
   * Created comprehensive deployment scripts: deploy-production.sh, build-production.sh, build-production-with-seeder.js
   * Integrated automatic production seeding during NODE_ENV=production builds

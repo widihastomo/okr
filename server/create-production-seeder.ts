@@ -53,15 +53,16 @@ function checkDatabaseConnection() {
 }
 
 /**
- * Complete production seeder script
- * Creates essential data for production environment including:
+ * Complete seeder script for production and development environments
+ * Creates essential data including:
  * - System owner account
  * - Basic subscription plans
  * - System organization
  * - Minimal required data
  */
 async function seedProductionData() {
-  console.log("🚀 Starting production data seeding...");
+  const environment = process.env.NODE_ENV || 'development';
+  console.log(`🚀 Starting ${environment} data seeding...`);
 
   // Check database connection first
   if (!checkDatabaseConnection()) {
@@ -79,10 +80,10 @@ async function seedProductionData() {
     // 3. Verify setup
     await verifySetup();
     
-    console.log("✅ Production seeding completed successfully!");
+    console.log(`✅ ${environment} seeding completed successfully!`);
     
   } catch (error) {
-    console.error("❌ Production seeding failed:", error);
+    console.error(`❌ ${environment} seeding failed:`, error);
     throw error;
   }
 }
@@ -138,6 +139,16 @@ async function createSystemOwner() {
   console.log(`   Email: ${adminEmail}`);
   console.log(`   Password: ${adminPassword}`);
   console.log(`   User ID: ${systemOwner.id}`);
+  
+  // Show development-specific information
+  const environment = process.env.NODE_ENV || 'development';
+  if (environment === 'development') {
+    console.log("\n📋 Development Login Credentials:");
+    console.log("  📧 Email: admin@refokus.com");
+    console.log("  🔒 Password: RefokusAdmin2025!");
+    console.log("  👤 Role: System Owner (Full Access)");
+    console.log("  🌐 Access: All admin features available");
+  }
 }
 
 async function createSubscriptionPlans() {
