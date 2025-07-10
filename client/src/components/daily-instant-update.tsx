@@ -224,10 +224,14 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
         index === self.findIndex(m => m.id === metric.id)
       ) || [];
 
-      // Deduplicate today tasks by ID
+      // Deduplicate today tasks by ID and initialize newStatus
       const uniqueTodayTasks = todayTasks.filter((task: any, index: number, self: any[]) => 
         index === self.findIndex(t => t.id === task.id)
-      );
+      ).map((task: any) => ({
+        ...task,
+        newStatus: task.newStatus || task.status, // Initialize with current status if not set
+        completed: task.completed || task.status === 'completed'
+      }));
 
       // Deduplicate tomorrow tasks by ID
       const uniqueTomorrowTasks = tomorrowTasks.filter((task: any, index: number, self: any[]) => 
@@ -258,8 +262,8 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
           id: task.id,
           title: task.title,
           status: task.status,
-          newStatus: task.status,
-          completed: task.status === 'completed'
+          newStatus: task.newStatus,
+          completed: task.completed
         })),
         tomorrowTasks: uniqueTomorrowTasks.map((task: any) => ({
           id: task.id,
@@ -728,7 +732,7 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                               }}
                             >
                               <SelectTrigger className="w-40">
-                                <SelectValue />
+                                <SelectValue placeholder="Pilih Status" />
                               </SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="not_started">Belum Dimulai</SelectItem>
@@ -769,7 +773,7 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                           }}
                         >
                           <SelectTrigger>
-                            <SelectValue />
+                            <SelectValue placeholder="Pilih Status" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="not_started">Belum Dimulai</SelectItem>
