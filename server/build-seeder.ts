@@ -286,6 +286,10 @@ async function runBuildSeeder() {
   // Check database connection first
   if (!checkDatabaseConnection()) {
     console.error("❌ Cannot proceed without valid database connection");
+    if (environment === 'development') {
+      console.log("⚠️  Skipping seeder in development due to database connection issue");
+      return;
+    }
     process.exit(1);
   }
 
@@ -307,17 +311,20 @@ async function runBuildSeeder() {
     console.error("❌ Build seeder failed:", error);
     
     // In production, we don't want to fail the build if seeder fails
-    // Instead, we'll log the error and continue
+    // In development, we also don't want to crash the server
     if (environment === 'production') {
       console.log("⚠️  Build seeder failed in production - continuing build process");
       console.log("📋 Manual seeder execution may be required after deployment");
     } else {
-      throw error;
+      console.log("⚠️  Build seeder failed in development - continuing server startup");
+      console.log("📋 You can run seeder manually with: npx tsx server/build-seeder.ts");
     }
   } finally {
-    // Close database connection
+    // Close database connection safely
     try {
-      await db.$client.end();
+      if (db && db.$client) {
+        await db.$client.end();
+      }
     } catch (error) {
       console.log("ℹ️  Database connection cleanup completed");
     }

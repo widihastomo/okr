@@ -15,9 +15,18 @@ npx tsx server/build-seeder.ts
 - Membuat subscription plans
 - Ideal untuk development testing
 
-### 2. Build dengan Seeder (Production)
+### 2. Development Server dengan Auto-Seeder
 ```bash
-node build-with-seeder.js
+npm run dev
+```
+- ✅ **SEEDER OTOMATIS BERJALAN**: Seeder terintegrasi dengan development server
+- Server startup otomatis menjalankan build seeder
+- Tidak perlu manual seeder untuk development
+- Data essential tersedia segera setelah server start
+
+### 3. Build dengan Seeder (Production)
+```bash
+node build-with-seeder.cjs
 ```
 - Menjalankan seeder terlebih dahulu
 - Kemudian melakukan build production

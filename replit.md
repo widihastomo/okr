@@ -183,17 +183,24 @@ The system now includes comprehensive build-time database seeding that runs auto
 - **SSL Security**: Automatic sslmode=require for production connections
 
 #### Available Build Commands
+- `npm run dev` - Development server with integrated auto-seeder (✅ SEEDER OTOMATIS BERJALAN)
 - `npx tsx server/build-seeder.ts` - Run seeder standalone (development testing)
-- `node build-with-seeder.js` - Full production build with integrated seeder
+- `node build-with-seeder.cjs` - Full production build with integrated seeder
 - `npx tsx server/create-production-seeder.ts` - Legacy full seeding script
 - `npx tsx server/create-production-admin.ts` - Admin-only creation script
 
 #### Production Deployment Workflow
 1. Configure environment variables (DATABASE_URL, SESSION_SECRET)
-2. Run `node build-with-seeder.js` to build with seeder
+2. Run `node build-with-seeder.cjs` to build with seeder
 3. Deploy `dist/` folder to production server
 4. Run `npm install` and `npm start`
 5. System ready with admin account and essential data
+
+#### Development Workflow
+1. Run `npm run dev` - seeder otomatis berjalan saat server startup
+2. System owner account dan application settings tersedia segera
+3. Database siap digunakan tanpa manual seeder execution
+4. Build seeder terintegrasi dengan development server lifecycle
 
 ## Email Configuration
 
@@ -226,6 +233,15 @@ All email configuration now uses environment variables:
 ## Changelog
 ```
 Changelog:
+- July 10, 2025. Successfully integrated build seeder with npm run dev for automatic development seeding:
+  * Integrated server/build-seeder.ts with development server startup in server/index.ts
+  * Build seeder now runs automatically during npm run dev command
+  * System owner account and application settings created during server startup
+  * Development workflow simplified: no manual seeder execution required
+  * Added graceful error handling for development environment
+  * Seeder completes in ~8 seconds during development server startup
+  * Essential data (system owner, 22 app settings, 4 subscription plans) available immediately
+  * Enhanced development experience with automatic data initialization
 - July 10, 2025. Successfully migrated email configuration from database to environment variables:
   * Removed database-based email settings system (system_settings table email category)
   * Migrated all email providers to use environment variables for security

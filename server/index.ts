@@ -298,6 +298,11 @@ const config = getConfig();
       const dbConnected = await testDatabaseConnection();
       
       if (dbConnected) {
+        // Run build seeder first (essential data)
+        console.log("🌱 Running build seeder for development...");
+        const { runBuildSeeder } = await import("./build-seeder");
+        await runBuildSeeder();
+        
         console.log("Setting up Row Level Security (RLS)...");
         await setupRLS();
         console.log("Populating PostgreSQL database with sample data...");
