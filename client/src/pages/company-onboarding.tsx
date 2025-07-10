@@ -2052,6 +2052,188 @@ export default function CompanyOnboarding() {
               "Implementasi automation dan training staff",
             ],
 
+            // Landing Page & Conversion Optimization Tasks
+            "Mengoptimalkan landing page untuk konversi": [
+              "Analisis current landing page performance",
+              "A/B testing untuk element optimization",
+              "Implementasi conversion rate optimization",
+            ],
+            "Membuat recycling program untuk material waste": [
+              "Analisis jenis dan volume material waste",
+              "Setup recycling system dan partnership",
+              "Monitor recycling program effectiveness",
+            ],
+            "Mengevaluasi supplier untuk kualitas raw material": [
+              "Audit supplier quality dan delivery performance",
+              "Buat supplier scorecard dan evaluation criteria",
+              "Implementasi supplier improvement program",
+            ],
+            "Membuat reward program untuk high performing agent": [
+              "Design reward structure berdasarkan KPI",
+              "Setup tracking system untuk performance metrics",
+              "Launch reward program dan monitor engagement",
+            ],
+            "Menjalankan proactive customer outreach program": [
+              "Buat database customer untuk segmentasi",
+              "Design outreach strategy dan messaging",
+              "Implementasi outreach campaign dan follow-up",
+            ],
+            "Mempersonalisasi customer journey mapping": [
+              "Analisis customer behavior dan touchpoints",
+              "Design personalized journey untuk setiap segment",
+              "Implementasi personalized experience program",
+            ],
+            "Mengembangkan churn prediction dan prevention strategy": [
+              "Analisis data customer untuk churn indicators",
+              "Develop predictive model untuk churn risk",
+              "Implementasi prevention strategy dan monitoring",
+            ],
+            "Mengimplementasikan preventive quality assurance program": [
+              "Design quality assurance checklist dan SOP",
+              "Training tim untuk preventive QA process",
+              "Monitor quality metrics dan improvement",
+            ],
+            "Membuat customer education dan self-service portal": [
+              "Buat knowledge base dan FAQ system",
+              "Design self-service portal untuk customer",
+              "Launch portal dan monitor usage analytics",
+            ],
+            "Community building dan engagement program": [
+              "Buat community platform untuk customer engagement",
+              "Design engagement activities dan content",
+              "Monitor community growth dan activity",
+            ],
+            "Optimisasi SEO untuk organic traffic": [
+              "Audit SEO current website dan competitor",
+              "Implementasi on-page dan off-page SEO",
+              "Monitor organic traffic growth dan ranking",
+            ],
+            "Lead magnet dan landing page optimization": [
+              "Buat lead magnet yang valuable untuk target audience",
+              "Design landing page untuk lead capture",
+              "A/B testing dan optimization untuk conversion",
+            ],
+            "Content marketing dan thought leadership": [
+              "Buat content strategy untuk thought leadership",
+              "Develop high-quality content secara konsisten",
+              "Monitor content performance dan engagement",
+            ],
+            "User-generated content campaign": [
+              "Design campaign untuk encourage UGC",
+              "Setup tracking dan incentive system",
+              "Monitor campaign performance dan engagement",
+            ],
+            "Social media contest dan giveaway": [
+              "Plan contest theme dan prize yang menarik",
+              "Setup contest mechanics dan rules",
+              "Execute contest dan monitor participation",
+            ],
+            "Interactive content strategy": [
+              "Develop interactive content format (quiz, poll, etc)",
+              "Create engaging interactive content",
+              "Monitor engagement dan conversion metrics",
+            ],
+            "Community management program": [
+              "Setup community guidelines dan moderation",
+              "Develop community engagement strategy",
+              "Monitor community health dan activity",
+            ],
+            "Social listening dan response optimization": [
+              "Setup social listening tools untuk monitoring",
+              "Develop response strategy untuk berbagai skenario",
+              "Monitor brand sentiment dan response effectiveness",
+            ],
+            "Implementasi chatbot untuk instant response": [
+              "Design chatbot flow untuk common queries",
+              "Setup chatbot platform dan integration",
+              "Monitor chatbot performance dan optimization",
+            ],
+            "Dedicated customer support team": [
+              "Recruit dan training dedicated support team",
+              "Setup support workflow dan escalation process",
+              "Monitor team performance dan customer satisfaction",
+            ],
+            "Automated ticket routing system": [
+              "Setup ticket routing berdasarkan category",
+              "Implement automation untuk ticket assignment",
+              "Monitor routing effectiveness dan response time",
+            ],
+            "24/7 customer support system": [
+              "Setup 24/7 support coverage dengan shift system",
+              "Implement support tools untuk multi-channel",
+              "Monitor support availability dan response metrics",
+            ],
+            "Live chat integration di website": [
+              "Setup live chat platform di website",
+              "Training tim untuk live chat handling",
+              "Monitor chat performance dan customer satisfaction",
+            ],
+            "Mobile app untuk customer service": [
+              "Develop mobile app untuk customer service",
+              "Integrate app dengan customer database",
+              "Monitor app usage dan customer feedback",
+            ],
+            "Streamlined escalation process": [
+              "Design escalation workflow untuk complex issues",
+              "Setup escalation criteria dan SLA",
+              "Monitor escalation effectiveness dan resolution time",
+            ],
+            "Knowledge base optimization": [
+              "Audit current knowledge base content",
+              "Optimize knowledge base untuk searchability",
+              "Monitor knowledge base usage dan effectiveness",
+            ],
+            "Advanced CRM integration": [
+              "Setup advanced CRM dengan full integration",
+              "Training tim untuk CRM utilization",
+              "Monitor CRM effectiveness dan customer insights",
+            ],
+            "Customer feedback loop system": [
+              "Setup feedback collection pada multiple touchpoints",
+              "Develop feedback analysis dan action plan",
+              "Monitor feedback trends dan improvement metrics",
+            ],
+            "Personalized customer experience program": [
+              "Design personalization berdasarkan customer data",
+              "Implement personalized experience across touchpoints",
+              "Monitor personalization effectiveness dan engagement",
+            ],
+            "Loyalty rewards program": [
+              "Design loyalty program structure dan rewards",
+              "Setup tracking system untuk loyalty points",
+              "Monitor program adoption dan customer retention",
+            ],
+            "Referral program dengan incentive": [
+              "Design referral program dengan attractive incentive",
+              "Setup referral tracking dan reward system",
+              "Monitor referral program performance dan adoption",
+            ],
+            "Customer success story campaign": [
+              "Collect customer success stories dan testimonials",
+              "Create campaign materials dari success stories",
+              "Monitor campaign reach dan impact",
+            ],
+            "Community building program": [
+              "Build customer community platform",
+              "Develop community engagement activities",
+              "Monitor community growth dan engagement",
+            ],
+            "Word-of-mouth marketing strategy": [
+              "Develop strategy untuk encourage word-of-mouth",
+              "Create shareable content dan experiences",
+              "Monitor word-of-mouth impact dan reach",
+            ],
+            "Customer testimonial program": [
+              "Setup system untuk collect customer testimonials",
+              "Create testimonial content untuk marketing",
+              "Monitor testimonial effectiveness dan conversion",
+            ],
+            "Brand ambassador program": [
+              "Recruit dan training brand ambassadors",
+              "Setup ambassador program structure dan rewards",
+              "Monitor ambassador performance dan brand impact",
+            ],
+
             // Customer Service Tasks
             "Melatih customer service excellence": [
               "Buat modul training customer service",
