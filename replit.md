@@ -47,6 +47,13 @@ The system uses multiple interconnected entities:
   - `decrease_to`: Reverse progress calculation ((Baseline - Current) / (Baseline - Target)) * 100%
   - `achieve_or_not`: Binary achievement (100% if achieved, 0% if not)
 
+### Database Connection Options
+The system supports two database connection types:
+- **Neon Serverless** (default): Uses `@neondatabase/serverless` for HTTP connections, optimized for serverless environments
+- **Node-Postgres**: Uses traditional PostgreSQL connections with connection pooling via `pg` library
+- Connection type is controlled by `DB_CONNECTION_TYPE` environment variable (`neon` or `node-postgres`)
+- Node-Postgres includes connection pooling (max 20 connections), SSL support, and graceful shutdown handling
+
 ## Data Flow
 
 1. **Client Requests**: React components use TanStack Query to fetch data from the API

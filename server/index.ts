@@ -9,7 +9,7 @@ import { scheduleCycleStatusUpdates } from "./cycle-status-updater";
 import { populateDatabase } from "./populate-postgres";
 import { populateGamificationData } from "./gamification-data";
 import { populateSaaSData } from "./populate-saas-data";
-import { testDatabaseConnection } from "./db";
+import { testDatabaseConnection, closeDatabaseConnection } from "./db";
 import { validateEnvironment, getConfig } from "./config";
 import { setupRLS } from "./setup-rls";
 import { rlsMiddleware, rlsCleanupMiddleware } from "./rls-middleware";
@@ -250,15 +250,17 @@ const config = getConfig();
     }
   }
 
-  process.on('SIGTERM', () => {
+  process.on('SIGTERM', async () => {
     console.log('SIGTERM received, shutting down gracefully');
+    await closeDatabaseConnection();
     server.close(() => {
       console.log('Process terminated');
     });
   });
 
-  process.on('SIGINT', () => {
+  process.on('SIGINT', async () => {
     console.log('SIGINT received, shutting down gracefully');
+    await closeDatabaseConnection();
     server.close(() => {
       console.log('Process terminated');
     });
