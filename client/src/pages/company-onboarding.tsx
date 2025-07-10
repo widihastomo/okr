@@ -1929,7 +1929,7 @@ export default function CompanyOnboarding() {
             ],
 
             // Marketing & Branding Tasks
-            "Integrated marketing campaign di multiple channel": [
+            "Menjalankan integrated marketing campaign di multiple channel": [
               "Buat campaign strategy untuk multiple channel",
               "Coordinate campaign launch across channel",
               "Monitor dan optimize campaign performance",
@@ -1945,7 +1945,7 @@ export default function CompanyOnboarding() {
               "Monitor dan optimize campaign performance",
               "Analisis ROI dan cost per acquisition",
             ],
-            "Influencer partnership program": [
+            "Membangun influencer partnership program": [
               "Identifikasi influencer yang sesuai dengan brand",
               "Nego collaboration terms dengan influencer",
               "Monitor campaign performance dari influencer",
@@ -2146,6 +2146,20 @@ export default function CompanyOnboarding() {
             ],
 
             // Marketing & Branding initiatives
+            "Menjalankan integrated marketing campaign di multiple channel": [
+              "Buat campaign strategy untuk multiple channel",
+              "Coordinate campaign launch across channel",
+              "Monitor dan optimize campaign performance",
+              "Analisis cross-channel performance",
+              "Optimize budget allocation antar channel",
+            ],
+            "Membangun influencer partnership program": [
+              "Identifikasi influencer yang sesuai dengan brand",
+              "Nego collaboration terms dengan influencer",
+              "Monitor campaign performance dari influencer",
+              "Buat long-term partnership strategy",
+              "Evaluasi ROI dari setiap influencer",
+            ],
             "Content calendar dengan viral potential": [
               "Riset trending topic untuk content inspiration",
               "Buat content calendar dengan viral angle",
