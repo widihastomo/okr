@@ -26,21 +26,32 @@ app.use(helmet({
   contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false
 }));
 
-// Rate limiting
+// Rate limiting - More permissive for production SaaS usage
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: "Too many requests from this IP, please try again later."
+  max: process.env.NODE_ENV === 'production' ? 500 : 100, // Higher limit for production
+  message: {
+    error: "Too many requests from this IP, please try again later.",
+    retryAfter: "15 minutes"
+  },
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  // Skip rate limiting for successful requests in production
+  skipSuccessfulRequests: process.env.NODE_ENV === 'production'
 });
 
 // Apply rate limiting to API routes
 app.use('/api', limiter);
 
-// Stricter rate limit for auth endpoints
+// Stricter rate limit for auth endpoints only (to prevent brute force)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // limit each IP to 5 requests per windowMs
-  skipSuccessfulRequests: true
+  max: 10, // Increased from 5 to 10 for better UX
+  skipSuccessfulRequests: true,
+  message: {
+    error: "Too many login attempts from this IP, please try again later.",
+    retryAfter: "15 minutes"
+  }
 });
 
 app.use('/api/auth/login', authLimiter);

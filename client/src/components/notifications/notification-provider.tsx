@@ -29,12 +29,16 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
 
   const { data: notifications = [], isLoading: notificationsLoading, refetch: refetchNotifications } = useQuery<(Notification & { actor?: User })[]>({
     queryKey: ["/api/notifications"],
-    refetchInterval: 30000, // Refetch every 30 seconds for real-time updates
+    refetchInterval: 120000, // Refetch every 2 minutes (reduced from 30 seconds)
+    staleTime: 60000, // Consider data fresh for 1 minute
+    refetchOnWindowFocus: false, // Prevent excessive refetching on focus
   });
 
   const { data: unreadCountData, isLoading: countLoading, refetch: refetchUnreadCount } = useQuery<{ count: number }>({
     queryKey: ["/api/notifications/unread-count"],
-    refetchInterval: 15000, // Refetch every 15 seconds for real-time count
+    refetchInterval: 60000, // Refetch every 1 minute (reduced from 15 seconds)
+    staleTime: 30000, // Consider data fresh for 30 seconds
+    refetchOnWindowFocus: false, // Prevent excessive refetching on focus
   });
 
   const unreadCount = unreadCountData?.count || 0;

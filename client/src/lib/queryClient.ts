@@ -49,9 +49,31 @@ export const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
       staleTime: Infinity,
       retry: false,
+      // Reduce request frequency for production
+      gcTime: 5 * 60 * 1000, // 5 minutes (formerly cacheTime)
     },
     mutations: {
       retry: false,
     },
   },
 });
+
+// Throttled invalidation to prevent excessive requests
+const invalidationThrottleMap = new Map<string, NodeJS.Timeout>();
+
+export const throttledInvalidateQueries = (queryKey: string[], delay: number = 1000) => {
+  const keyString = queryKey.join('|');
+  
+  // Clear existing timeout
+  if (invalidationThrottleMap.has(keyString)) {
+    clearTimeout(invalidationThrottleMap.get(keyString)!);
+  }
+  
+  // Set new timeout
+  const timeoutId = setTimeout(() => {
+    queryClient.invalidateQueries({ queryKey });
+    invalidationThrottleMap.delete(keyString);
+  }, delay);
+  
+  invalidationThrottleMap.set(keyString, timeoutId);
+};

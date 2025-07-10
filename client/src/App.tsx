@@ -77,7 +77,8 @@ function Router() {
   const { data: trialStatus } = useQuery({
     queryKey: ["/api/trial-status"],
     enabled: isAuthenticated && !isLoading,
-    staleTime: 60 * 1000, // 1 minute cache
+    staleTime: 5 * 60 * 1000, // 5 minutes cache (increased from 1 minute)
+    refetchOnWindowFocus: false, // Prevent unnecessary refetch on focus
   });
   
   // Check onboarding status for redirect (efficient version)
