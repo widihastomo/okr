@@ -27,7 +27,7 @@ export function LogoutButton({
     setIsLoggingOut(true);
     try {
       // Call logout API endpoint
-      await fetch('/api/auth/logout', {
+      const response = await fetch('/api/auth/logout', {
         method: 'POST',
         credentials: 'include'
       });
@@ -48,8 +48,9 @@ export function LogoutButton({
       localStorage.clear();
       sessionStorage.clear();
       setLocation("/");
+    } finally {
+      setIsLoggingOut(false);
     }
-    setIsLoggingOut(false);
   };
 
   return (

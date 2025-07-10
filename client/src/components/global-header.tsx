@@ -252,22 +252,24 @@ export default function GlobalHeader({
                 try {
                   const response = await fetch("/api/auth/logout", {
                     method: "POST",
+                    credentials: "include",
                   });
-                  if (response.ok) {
-                    // Clear any local storage or session data
-                    localStorage.clear();
-                    sessionStorage.clear();
-                    // Clear React Query cache
-                    queryClient.clear();
-                    // Use client-side navigation for fastest redirect
-                    navigate("/");
-                  }
+                  
+                  // Clear React Query cache first
+                  queryClient.clear();
+                  
+                  // Clear any local storage or session data
+                  localStorage.clear();
+                  sessionStorage.clear();
+                  
+                  // Use client-side navigation for fastest redirect
+                  navigate("/");
                 } catch (error) {
                   console.error("Logout error:", error);
                   // Clear cache and navigate anyway
+                  queryClient.clear();
                   localStorage.clear();
                   sessionStorage.clear();
-                  queryClient.clear();
                   navigate("/");
                 }
               }}
