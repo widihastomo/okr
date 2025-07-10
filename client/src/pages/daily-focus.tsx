@@ -115,7 +115,7 @@ import MetricsUpdateModal from "@/components/metrics-update-modal";
 import { SimpleProgressStatus } from "@/components/progress-status";
 import { UserStatsCard } from "@/components/gamification/user-stats-card";
 import { DailyAchievements } from "@/components/daily-achievements";
-import { DailyInstantUpdate } from "@/components/daily-instant-update";
+import { DailyUpdateSimple } from "@/components/daily-update-simple";
 import { useAuth } from "@/hooks/useAuth";
 
 // Icon mapping for mission cards
@@ -1014,7 +1014,7 @@ export default function DailyFocusPage() {
           
           {/* Action buttons */}
           <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-            <DailyInstantUpdate />
+            <DailyUpdateSimple />
           </div>
         </div>
       </div>
