@@ -365,6 +365,15 @@ export default function CompanyOnboarding() {
     return "from-green-400 to-green-500"; // 100% - Green
   };
 
+  const getContainerBackgroundColor = () => {
+    if (progressPercentage === 0) return "from-gray-50 to-gray-100 border-gray-200"; // Start - Gray
+    if (progressPercentage <= 25) return "from-red-50 to-pink-50 border-red-200"; // 0-25% - Red
+    if (progressPercentage <= 50) return "from-orange-50 to-yellow-50 border-orange-200"; // 25-50% - Orange
+    if (progressPercentage <= 75) return "from-yellow-50 to-amber-50 border-yellow-200"; // 50-75% - Yellow
+    if (progressPercentage < 100) return "from-blue-50 to-indigo-50 border-blue-200"; // 75-99% - Blue
+    return "from-green-50 to-emerald-50 border-green-200"; // 100% - Green
+  };
+
   const handleNext = () => {
     // Validate current step before proceeding (skip validation for welcome screen)
     if (onboardingData.currentStep > 0) {
@@ -2607,7 +2616,7 @@ export default function CompanyOnboarding() {
 
           {/* Virtual Assistant - Show on all steps */}
           <div className="mb-6 animate-in fade-in slide-in-from-left-4 duration-500">
-            <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-lg p-4 shadow-sm transition-all duration-500 hover:shadow-md hover:scale-[1.02] animate-pulse-gentle">
+            <div className={`bg-gradient-to-r ${getContainerBackgroundColor()} rounded-lg p-4 shadow-sm transition-all duration-500 hover:shadow-md hover:scale-[1.02] animate-pulse-gentle`}>
               <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0">
                   <div

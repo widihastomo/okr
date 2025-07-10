@@ -121,6 +121,14 @@ Trial user untuk testing achievement system:
 ## Changelog
 ```
 Changelog:
+- July 10, 2025. Successfully enhanced virtual assistant with dynamic container colors and engaging animations for better user attention:
+  * Added dynamic background color system for virtual assistant container that changes based on onboarding progress
+  * Container colors progress through: Gray (0%) → Red (1-25%) → Orange (26-50%) → Yellow (51-75%) → Blue (76-99%) → Green (100%)
+  * Implemented comprehensive animation system: pulse-gentle for container, bounce-gentle for avatar, sparkle for icon rotation
+  * Added fade-in-up animation for message text that re-triggers when content changes between steps
+  * Enhanced user experience with smooth color transitions and engaging visual feedback
+  * Virtual assistant now provides clear visual indication of progress through color-coded container backgrounds
+  * All animations are subtle and professional while effectively drawing user attention to important guidance
 - July 09, 2025. Successfully improved unified authentication system UX by repositioning back buttons:
   * Moved "Kembali" button from top to bottom of forms on all authentication steps (register, email verification, forgot password, reset password)
   * Button now appears after form submission button for better user flow and reduced visual clutter
