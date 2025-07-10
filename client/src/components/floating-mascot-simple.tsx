@@ -196,14 +196,7 @@ export default function FloatingMascot({ className }: FloatingMascotProps) {
                   </div>
                   
                   <div className="flex items-center gap-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 w-6 p-0 text-blue-600 hover:bg-blue-100"
-                      onClick={() => setShowSettings(!showSettings)}
-                    >
-                      <Settings className="h-3 w-3" />
-                    </Button>
+                    
                     <Button
                       variant="ghost"
                       size="sm"
