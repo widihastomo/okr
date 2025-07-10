@@ -58,27 +58,51 @@ chmod +x test-seeder.js
 
 ## 🚀 Available Scripts
 
-### 1. `run-production-seeder.sh`
+### 1. `run-seeder-with-connection-choice.js` (RECOMMENDED)
+Complete production seeder with database connection choice
+```bash
+# Use Neon serverless (default, recommended)
+node run-seeder-with-connection-choice.js neon
+
+# Use node-postgres connection
+node run-seeder-with-connection-choice.js node-postgres
+
+# Use default connection (Neon)
+node run-seeder-with-connection-choice.js
+```
+
+### 2. `run-production-seeder.sh`
 Complete production seeder with environment setup
 ```bash
 ./run-production-seeder.sh
 ```
 
-### 2. `test-seeder.js`
+### 3. `test-seeder.js`
 Test environment setup and run seeder
 ```bash
 node test-seeder.js
 ```
 
-### 3. `build-production-with-seeder.js`
+### 4. `test-node-postgres.js`
+Test node-postgres connection specifically
+```bash
+node test-node-postgres.js
+```
+
+### 5. `build-production-with-seeder.js`
 Full production build with automatic seeding
 ```bash
 node build-production-with-seeder.js
 ```
 
-### 4. Direct execution
-Run seeder directly (requires proper environment)
+### 6. Direct execution with connection choice
+Run seeder directly with specific connection type
 ```bash
+# Neon serverless
+npx tsx server/create-production-seeder.ts
+
+# node-postgres
+export DB_CONNECTION_TYPE=node-postgres
 npx tsx server/create-production-seeder.ts
 ```
 

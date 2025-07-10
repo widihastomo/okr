@@ -4,11 +4,28 @@ import { drizzle as drizzleNode } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from "@shared/schema";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
+// Check and construct DATABASE_URL if needed
+function ensureDatabaseUrl() {
+  if (!process.env.DATABASE_URL) {
+    console.log("⚠️  DATABASE_URL not found, attempting to construct from PG variables...");
+    
+    const { PGUSER, PGPASSWORD, PGHOST, PGPORT = '5432', PGDATABASE } = process.env;
+    
+    if (PGUSER && PGPASSWORD && PGHOST && PGDATABASE) {
+      const constructedUrl = `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}`;
+      process.env.DATABASE_URL = constructedUrl;
+      console.log("✅ DATABASE_URL constructed from PG environment variables");
+      return constructedUrl;
+    }
+    
+    throw new Error(
+      "DATABASE_URL must be set or PG variables (PGUSER, PGPASSWORD, PGHOST, PGDATABASE) must be available. Did you forget to provision a database?",
+    );
+  }
+  return process.env.DATABASE_URL;
 }
+
+const DATABASE_URL = ensureDatabaseUrl();
 
 // Database connection configuration
 const DB_CONNECTION_TYPE = process.env.DB_CONNECTION_TYPE || 'neon'; // 'neon' or 'node-postgres'
@@ -21,7 +38,7 @@ if (DB_CONNECTION_TYPE === 'node-postgres') {
   console.log("🔌 Using node-postgres connection");
   
   connectionPool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: DATABASE_URL,
     max: 20, // Maximum number of connections in the pool
     idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
     connectionTimeoutMillis: 2000, // Return error after 2 seconds if connection cannot be established
@@ -33,7 +50,7 @@ if (DB_CONNECTION_TYPE === 'node-postgres') {
   // Default: Neon serverless connection
   console.log("🔌 Using Neon serverless connection");
   
-  const sql = neon(process.env.DATABASE_URL);
+  const sql = neon(DATABASE_URL);
   db = drizzleNeon(sql, { schema });
 }
 
