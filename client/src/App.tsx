@@ -59,7 +59,7 @@ import TrialSettingsPage from "@/pages/system-admin/trial-settings";
 import DummyClientExamples from "@/pages/dummy-client-examples";
 import ReferralCodes from "@/pages/referral-codes";
 import TrialAchievements from "@/pages/trial-achievements";
-
+import CompanyOnboarding from "@/pages/company-onboarding";
 import MemberInvitations from "@/pages/member-invitations";
 import EmailSettings from "@/pages/system-admin/email-settings";
 import ClientStatusMapping from "@/pages/client-status-mapping";
@@ -153,58 +153,68 @@ function Router() {
     );
   }
 
+  // Check if current route is onboarding
+  const isOnboardingPage = location === "/onboarding";
+
   return (
     <NotificationProvider>
       <div className="min-h-screen bg-gray-50">
-        {/* Trial Status Header - Shows above main header */}
-        <TrialStatusHeader />
+        {/* Trial Status Header - Shows above main header - Hide on onboarding */}
+        {!isOnboardingPage && <TrialStatusHeader />}
         
-        {/* Global Header */}
-        <GlobalHeader
-          onMenuToggle={handleMenuToggle}
-          sidebarOpen={sidebarOpen}
-          sidebarCollapsed={sidebarCollapsed}
-          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-        />
+        {/* Global Header - Hide on onboarding */}
+        {!isOnboardingPage && (
+          <GlobalHeader
+            onMenuToggle={handleMenuToggle}
+            sidebarOpen={sidebarOpen}
+            sidebarCollapsed={sidebarCollapsed}
+            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          />
+        )}
         
-        {/* Sidebar */}
-        <>
-          {/* System Owner uses SystemAdminSidebar */}
-          {(user as any)?.isSystemOwner ? (
-            <SystemAdminSidebar
-              isOpen={sidebarOpen}
-              onClose={() => setSidebarOpen(false)}
-              isCollapsed={sidebarCollapsed}
-              onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-            />
-          ) : (
-            <ClientSidebar
-              isOpen={sidebarOpen}
-              onClose={() => setSidebarOpen(false)}
-              isCollapsed={sidebarCollapsed}
-              onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-            />
-          )}
-        </>
+        {/* Sidebar - Hide on onboarding */}
+        {!isOnboardingPage && (
+          <>
+            {/* System Owner uses SystemAdminSidebar */}
+            {(user as any)?.isSystemOwner ? (
+              <SystemAdminSidebar
+                isOpen={sidebarOpen}
+                onClose={() => setSidebarOpen(false)}
+                isCollapsed={sidebarCollapsed}
+                onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+              />
+            ) : (
+              <ClientSidebar
+                isOpen={sidebarOpen}
+                onClose={() => setSidebarOpen(false)}
+                isCollapsed={sidebarCollapsed}
+                onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+              />
+            )}
+          </>
+        )}
 
         {/* Main layout with responsive margin to avoid overlap */}
         <div
           className={cn(
             "flex-1 flex flex-col",
             // Desktop: Dynamic margin based on sidebar collapsed state, Mobile: full width (sidebar is overlay)
-            sidebarCollapsed ? "lg:ml-16" : "lg:ml-64", // 16 = 64px for collapsed, 64 = 256px for expanded
+            // No margin on onboarding page
+            !isOnboardingPage && (sidebarCollapsed ? "lg:ml-16" : "lg:ml-64"), // 16 = 64px for collapsed, 64 = 256px for expanded
           )}
         >
           {/* Main Content */}
           <div className={cn(
             "flex-1 min-h-[calc(100vh-6rem)] py-3 overflow-x-hidden",
-            // Different padding for trial status
-            trialStatus?.isTrialActive 
-              ? "pt-[108px] sm:pt-[108px]" 
-              : "pt-[64px] sm:pt-[64px]"
+            // Different padding for onboarding page and trial status
+            isOnboardingPage 
+              ? "pt-0" 
+              : trialStatus?.isTrialActive 
+                ? "pt-[108px] sm:pt-[108px]" 
+                : "pt-[64px] sm:pt-[64px]"
           )}>
             <Switch>
-
+              <Route path="/onboarding" component={CompanyOnboarding} />
               <Route path="/" component={DailyFocusPage} />
               <Route path="/daily-focus" component={DailyFocusPage} />
               <Route path="/dashboard" component={Dashboard} />
