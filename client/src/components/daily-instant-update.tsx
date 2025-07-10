@@ -313,14 +313,12 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
         }
       }
 
-      // Update task statuses
+      // Update task statuses - auto-mark all tasks as completed during daily update
       for (const task of data.todayTasks) {
-        if (task.newStatus && task.newStatus !== task.status) {
-          await apiRequest('PATCH', `/api/tasks/${task.id}`, {
-            status: task.newStatus,
-            completed: task.newStatus === 'completed'
-          });
-        }
+        await apiRequest('PATCH', `/api/tasks/${task.id}`, {
+          status: 'completed',
+          completed: true
+        });
       }
 
       // Create daily reflection entry
@@ -735,10 +733,10 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                             <div className="text-sm">
                               <div className="text-gray-600 mb-1">Status Saat Ini:</div>
                               <div className="font-medium text-gray-800">
-                                {getTaskStatusLabel(updateData.todayTasks[index]?.newStatus || task.status)}
+                                {getTaskStatusLabel(task.status)}
                               </div>
-                              <div className="text-xs text-gray-500 mt-1">
-                                (Ubah di form di bawah)
+                              <div className="text-xs text-green-600 mt-1">
+                                ✓ Akan dimark selesai saat submit
                               </div>
                             </div>
                           </td>
