@@ -1,4 +1,4 @@
-import { Switch, Route, useLocation } from "wouter";
+import { Switch, Route, useLocation, useRouter } from "wouter";
 import { useState, useEffect, useMemo, lazy } from "react";
 import { cn } from "@/lib/utils";
 import { queryClient } from "./lib/queryClient";
@@ -71,7 +71,7 @@ function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   
   // Check trial status for dynamic content positioning
   const { data: trialStatus } = useQuery({
@@ -79,13 +79,15 @@ function Router() {
     enabled: isAuthenticated && !isLoading,
   });
   
-  // Check onboarding status with faster initial redirect and caching
+  // Check onboarding status with aggressive caching for fastest transitions
   const { data: onboardingStatus, isLoading: isOnboardingLoading } = useQuery({
     queryKey: ["/api/onboarding/status"],
     enabled: isAuthenticated && !isLoading,
     retry: false,
-    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    staleTime: 5 * 60 * 1000, // 5 minutes cache - reduce API calls
     cacheTime: 10 * 60 * 1000, // 10 minutes cache
+    refetchOnWindowFocus: false, // Prevent unnecessary refetch on focus
+    refetchOnMount: false, // Don't refetch on component mount if cached
   });
 
   // Clear logout flag on app start if user is authenticated
@@ -117,12 +119,13 @@ function Router() {
     return null;
   }, [isAuthenticated, user, isLoading, onboardingStatus, isOnboardingLoading, location]);
 
-  // Handle redirect
+  // Handle redirect with instant client-side navigation
   useEffect(() => {
     if (shouldRedirect) {
-      window.location.href = shouldRedirect;
+      // Immediate navigation without delay for fastest transition
+      navigate(shouldRedirect);
     }
-  }, [shouldRedirect]);
+  }, [shouldRedirect, navigate]);
 
   if (isLoading) {
     return (

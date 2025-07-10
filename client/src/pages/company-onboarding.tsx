@@ -245,10 +245,14 @@ export default function CompanyOnboarding() {
     };
   }, []);
 
-  // Fetch onboarding progress
+  // Fetch onboarding progress with optimized caching
   const { data: progress } = useQuery({
     queryKey: ["/api/onboarding/progress"],
     retry: false,
+    staleTime: 30 * 1000, // 30 seconds cache
+    cacheTime: 2 * 60 * 1000, // 2 minutes cache
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchInterval: false, // Don't auto-refetch
   });
 
   // Update local state when progress data is loaded
