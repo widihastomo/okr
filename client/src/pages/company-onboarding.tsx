@@ -1939,6 +1939,12 @@ export default function CompanyOnboarding() {
               "Buat content calendar dengan viral angle",
               "Analyze performance dan optimize content",
             ],
+            "Paid social media advertising campaign": [
+              "Setup Facebook Ads dan Instagram Ads campaign",
+              "Buat creative ads dengan A/B testing",
+              "Monitor dan optimize campaign performance",
+              "Analisis ROI dan cost per acquisition",
+            ],
             "Influencer partnership program": [
               "Identifikasi influencer yang sesuai dengan brand",
               "Nego collaboration terms dengan influencer",
@@ -2137,6 +2143,22 @@ export default function CompanyOnboarding() {
               "Buat action plan untuk fix root cause",
               "Implementasi solution dan monitoring",
               "Monitor complaint reduction rate",
+            ],
+
+            // Marketing & Branding initiatives
+            "Content calendar dengan viral potential": [
+              "Riset trending topic untuk content inspiration",
+              "Buat content calendar dengan viral angle",
+              "Analyze performance dan optimize content",
+              "Setup content distribution strategy",
+              "Monitor engagement dan viral metrics",
+            ],
+            "Paid social media advertising campaign": [
+              "Setup Facebook Ads dan Instagram Ads campaign",
+              "Buat creative ads dengan A/B testing",
+              "Monitor dan optimize campaign performance",
+              "Analisis ROI dan cost per acquisition",
+              "Scale winning campaigns untuk maximum reach",
             ],
           };
 
