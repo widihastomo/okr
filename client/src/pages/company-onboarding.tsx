@@ -56,6 +56,8 @@ import {
 import { ReminderSettings } from "@/components/ReminderSettings";
 import { type CompanyOnboardingData } from "@shared/schema";
 
+
+
 // Onboarding steps following the reference structure
 const ONBOARDING_STEPS = [
   {
@@ -193,7 +195,11 @@ export default function CompanyOnboarding() {
   // Error handling for ResizeObserver
   useEffect(() => {
     const handleResizeObserverError = (e: ErrorEvent) => {
-      if (e.message.includes('ResizeObserver loop completed with undelivered notifications')) {
+      if (
+        e.message.includes(
+          "ResizeObserver loop completed with undelivered notifications",
+        )
+      ) {
         e.preventDefault();
         e.stopPropagation();
         return false;
@@ -202,15 +208,20 @@ export default function CompanyOnboarding() {
 
     const originalConsoleError = console.error;
     console.error = (...args) => {
-      if (args[0]?.includes && args[0].includes('ResizeObserver loop completed with undelivered notifications')) {
+      if (
+        args[0]?.includes &&
+        args[0].includes(
+          "ResizeObserver loop completed with undelivered notifications",
+        )
+      ) {
         return;
       }
       originalConsoleError(...args);
     };
 
-    window.addEventListener('error', handleResizeObserverError);
+    window.addEventListener("error", handleResizeObserverError);
     return () => {
-      window.removeEventListener('error', handleResizeObserverError);
+      window.removeEventListener("error", handleResizeObserverError);
       console.error = originalConsoleError;
     };
   }, []);
@@ -320,10 +331,16 @@ export default function CompanyOnboarding() {
         }
         // Additional validation based on cadence type
         if (data.cadence === "mingguan" && !data.reminderDay) {
-          return { isValid: false, message: "Silakan pilih hari reminder untuk check-in mingguan" };
+          return {
+            isValid: false,
+            message: "Silakan pilih hari reminder untuk check-in mingguan",
+          };
         }
         if (data.cadence === "bulanan" && !data.reminderDate) {
-          return { isValid: false, message: "Silakan pilih tanggal reminder untuk check-in bulanan" };
+          return {
+            isValid: false,
+            message: "Silakan pilih tanggal reminder untuk check-in bulanan",
+          };
         }
         break;
       case 9:
@@ -404,15 +421,18 @@ export default function CompanyOnboarding() {
   };
 
   const getContainerBackgroundColor = () => {
-    if (progressPercentage === 0) return "from-gray-50 to-gray-100 border-gray-200"; // Start - Gray
-    if (progressPercentage <= 25) return "from-red-50 to-pink-50 border-red-200"; // 0-25% - Red
-    if (progressPercentage <= 50) return "from-orange-50 to-yellow-50 border-orange-200"; // 25-50% - Orange
-    if (progressPercentage <= 75) return "from-yellow-50 to-amber-50 border-yellow-200"; // 50-75% - Yellow
-    if (progressPercentage < 100) return "from-blue-50 to-indigo-50 border-blue-200"; // 75-99% - Blue
+    if (progressPercentage === 0)
+      return "from-gray-50 to-gray-100 border-gray-200"; // Start - Gray
+    if (progressPercentage <= 25)
+      return "from-red-50 to-pink-50 border-red-200"; // 0-25% - Red
+    if (progressPercentage <= 50)
+      return "from-orange-50 to-yellow-50 border-orange-200"; // 25-50% - Orange
+    if (progressPercentage <= 75)
+      return "from-yellow-50 to-amber-50 border-yellow-200"; // 50-75% - Yellow
+    if (progressPercentage < 100)
+      return "from-blue-50 to-indigo-50 border-blue-200"; // 75-99% - Blue
     return "from-green-50 to-emerald-50 border-green-200"; // 100% - Green
   };
-
-
 
   const handleNext = () => {
     // Validate current step before proceeding (skip validation for welcome screen)
@@ -447,11 +467,11 @@ export default function CompanyOnboarding() {
         console.log("Saving progress data:", newData);
         saveProgressMutation.mutate(newData);
       }
-      
+
       // Scroll to top to show virtual assistant
       window.scrollTo({
         top: 0,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
   };
@@ -466,11 +486,11 @@ export default function CompanyOnboarding() {
       if (onboardingData.currentStep > 1) {
         saveProgressMutation.mutate(newData);
       }
-      
+
       // Scroll to top to show virtual assistant
       window.scrollTo({
         top: 0,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
   };
@@ -496,7 +516,9 @@ export default function CompanyOnboarding() {
         return (
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label className="text-lg font-semibold">Pilih fokus bisnis Anda:</Label>
+              <Label className="text-lg font-semibold">
+                Pilih fokus bisnis Anda:
+              </Label>
               <p className="text-sm text-gray-600">
                 Pilih area yang paling ingin Anda tingkatkan dalam organisasi
               </p>
@@ -508,68 +530,106 @@ export default function CompanyOnboarding() {
               }
               className="grid grid-cols-1 sm:grid-cols-2 gap-4"
             >
-              <div 
+              <div
                 className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
-                  onboardingData.teamFocus === "penjualan" 
-                    ? "border-orange-500 bg-orange-50 shadow-md" 
+                  onboardingData.teamFocus === "penjualan"
+                    ? "border-orange-500 bg-orange-50 shadow-md"
                     : "border-gray-200 bg-white hover:border-orange-300"
                 }`}
-                onClick={() => setOnboardingData({ ...onboardingData, teamFocus: "penjualan" })}
+                onClick={() =>
+                  setOnboardingData({
+                    ...onboardingData,
+                    teamFocus: "penjualan",
+                  })
+                }
               >
                 <div className="flex items-start space-x-3">
-                  <RadioGroupItem value="penjualan" id="penjualan" className="mt-1" />
+                  <RadioGroupItem
+                    value="penjualan"
+                    id="penjualan"
+                    className="mt-1"
+                  />
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <TrendingUp className="w-5 h-5 text-orange-600" />
-                      <Label htmlFor="penjualan" className="font-medium cursor-pointer">
+                      <Label
+                        htmlFor="penjualan"
+                        className="font-medium cursor-pointer"
+                      >
                         Penjualan
                       </Label>
                     </div>
                     <p className="text-sm text-gray-600">
-                      Tingkatkan performa penjualan, konversi, dan pertumbuhan revenue
+                      Tingkatkan performa penjualan, konversi, dan pertumbuhan
+                      revenue
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div 
+              <div
                 className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
-                  onboardingData.teamFocus === "operasional" 
-                    ? "border-orange-500 bg-orange-50 shadow-md" 
+                  onboardingData.teamFocus === "operasional"
+                    ? "border-orange-500 bg-orange-50 shadow-md"
                     : "border-gray-200 bg-white hover:border-orange-300"
                 }`}
-                onClick={() => setOnboardingData({ ...onboardingData, teamFocus: "operasional" })}
+                onClick={() =>
+                  setOnboardingData({
+                    ...onboardingData,
+                    teamFocus: "operasional",
+                  })
+                }
               >
                 <div className="flex items-start space-x-3">
-                  <RadioGroupItem value="operasional" id="operasional" className="mt-1" />
+                  <RadioGroupItem
+                    value="operasional"
+                    id="operasional"
+                    className="mt-1"
+                  />
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <BarChart className="w-5 h-5 text-orange-600" />
-                      <Label htmlFor="operasional" className="font-medium cursor-pointer">
+                      <Label
+                        htmlFor="operasional"
+                        className="font-medium cursor-pointer"
+                      >
                         Operasional
                       </Label>
                     </div>
                     <p className="text-sm text-gray-600">
-                      Optimalisasi proses, efisiensi, dan produktivitas operasional
+                      Optimalisasi proses, efisiensi, dan produktivitas
+                      operasional
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div 
+              <div
                 className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
-                  onboardingData.teamFocus === "customer_service" 
-                    ? "border-orange-500 bg-orange-50 shadow-md" 
+                  onboardingData.teamFocus === "customer_service"
+                    ? "border-orange-500 bg-orange-50 shadow-md"
                     : "border-gray-200 bg-white hover:border-orange-300"
                 }`}
-                onClick={() => setOnboardingData({ ...onboardingData, teamFocus: "customer_service" })}
+                onClick={() =>
+                  setOnboardingData({
+                    ...onboardingData,
+                    teamFocus: "customer_service",
+                  })
+                }
               >
                 <div className="flex items-start space-x-3">
-                  <RadioGroupItem value="customer_service" id="customer_service" className="mt-1" />
+                  <RadioGroupItem
+                    value="customer_service"
+                    id="customer_service"
+                    className="mt-1"
+                  />
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <Users className="w-5 h-5 text-orange-600" />
-                      <Label htmlFor="customer_service" className="font-medium cursor-pointer">
+                      <Label
+                        htmlFor="customer_service"
+                        className="font-medium cursor-pointer"
+                      >
                         Customer Service
                       </Label>
                     </div>
@@ -580,20 +640,32 @@ export default function CompanyOnboarding() {
                 </div>
               </div>
 
-              <div 
+              <div
                 className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
-                  onboardingData.teamFocus === "marketing" 
-                    ? "border-orange-500 bg-orange-50 shadow-md" 
+                  onboardingData.teamFocus === "marketing"
+                    ? "border-orange-500 bg-orange-50 shadow-md"
                     : "border-gray-200 bg-white hover:border-orange-300"
                 }`}
-                onClick={() => setOnboardingData({ ...onboardingData, teamFocus: "marketing" })}
+                onClick={() =>
+                  setOnboardingData({
+                    ...onboardingData,
+                    teamFocus: "marketing",
+                  })
+                }
               >
                 <div className="flex items-start space-x-3">
-                  <RadioGroupItem value="marketing" id="marketing" className="mt-1" />
+                  <RadioGroupItem
+                    value="marketing"
+                    id="marketing"
+                    className="mt-1"
+                  />
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <Target className="w-5 h-5 text-orange-600" />
-                      <Label htmlFor="marketing" className="font-medium cursor-pointer">
+                      <Label
+                        htmlFor="marketing"
+                        className="font-medium cursor-pointer"
+                      >
                         Marketing
                       </Label>
                     </div>
@@ -610,12 +682,16 @@ export default function CompanyOnboarding() {
                 <div className="flex items-center space-x-2">
                   <CheckCircle className="w-5 h-5 text-orange-600" />
                   <p className="text-sm text-orange-800">
-                    <strong>Fokus terpilih:</strong> {
-                      onboardingData.teamFocus === "penjualan" ? "Penjualan" :
-                      onboardingData.teamFocus === "operasional" ? "Operasional" :
-                      onboardingData.teamFocus === "customer_service" ? "Customer Service" :
-                      onboardingData.teamFocus === "marketing" ? "Marketing" : ""
-                    }
+                    <strong>Fokus terpilih:</strong>{" "}
+                    {onboardingData.teamFocus === "penjualan"
+                      ? "Penjualan"
+                      : onboardingData.teamFocus === "operasional"
+                        ? "Operasional"
+                        : onboardingData.teamFocus === "customer_service"
+                          ? "Customer Service"
+                          : onboardingData.teamFocus === "marketing"
+                            ? "Marketing"
+                            : ""}
                   </p>
                 </div>
               </div>
@@ -679,10 +755,30 @@ export default function CompanyOnboarding() {
                 <SelectValue placeholder="Pilih durasi" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1_bulan" className="transition-all duration-200 hover:bg-orange-50">1 Bulan</SelectItem>
-                <SelectItem value="3_bulan" className="transition-all duration-200 hover:bg-orange-50">3 Bulan (Quarterly)</SelectItem>
-                <SelectItem value="6_bulan" className="transition-all duration-200 hover:bg-orange-50">6 Bulan</SelectItem>
-                <SelectItem value="1_tahun" className="transition-all duration-200 hover:bg-orange-50">1 Tahun</SelectItem>
+                <SelectItem
+                  value="1_bulan"
+                  className="transition-all duration-200 hover:bg-orange-50"
+                >
+                  1 Bulan
+                </SelectItem>
+                <SelectItem
+                  value="3_bulan"
+                  className="transition-all duration-200 hover:bg-orange-50"
+                >
+                  3 Bulan (Quarterly)
+                </SelectItem>
+                <SelectItem
+                  value="6_bulan"
+                  className="transition-all duration-200 hover:bg-orange-50"
+                >
+                  6 Bulan
+                </SelectItem>
+                <SelectItem
+                  value="1_tahun"
+                  className="transition-all duration-200 hover:bg-orange-50"
+                >
+                  1 Tahun
+                </SelectItem>
               </SelectContent>
             </Select>
             {onboardingData.cycleDuration && (
@@ -1070,9 +1166,12 @@ export default function CompanyOnboarding() {
         return (
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label className="text-lg font-semibold">Pilih frekuensi check-in progress:</Label>
+              <Label className="text-lg font-semibold">
+                Pilih frekuensi check-in progress:
+              </Label>
               <p className="text-sm text-gray-600">
-                Seberapa sering Anda ingin menerima reminder dan melakukan update progress goal?
+                Seberapa sering Anda ingin menerima reminder dan melakukan
+                update progress goal?
               </p>
             </div>
             <RadioGroup
@@ -1082,73 +1181,99 @@ export default function CompanyOnboarding() {
               }
               className="space-y-4"
             >
-              <div 
+              <div
                 className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
-                  onboardingData.cadence === "harian" 
-                    ? "border-orange-500 bg-orange-50 shadow-md" 
+                  onboardingData.cadence === "harian"
+                    ? "border-orange-500 bg-orange-50 shadow-md"
                     : "border-gray-200 bg-white hover:border-orange-300"
                 }`}
-                onClick={() => setOnboardingData({ ...onboardingData, cadence: "harian" })}
+                onClick={() =>
+                  setOnboardingData({ ...onboardingData, cadence: "harian" })
+                }
               >
                 <div className="flex items-start space-x-3">
                   <RadioGroupItem value="harian" id="harian" className="mt-1" />
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <Clock className="w-5 h-5 text-orange-600" />
-                      <Label htmlFor="harian" className="font-medium cursor-pointer">
+                      <Label
+                        htmlFor="harian"
+                        className="font-medium cursor-pointer"
+                      >
                         Setiap Hari
                       </Label>
                     </div>
                     <p className="text-sm text-gray-600">
-                      Cocok untuk goal yang memerlukan perhatian harian dan monitoring ketat
+                      Cocok untuk goal yang memerlukan perhatian harian dan
+                      monitoring ketat
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div 
+              <div
                 className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
-                  onboardingData.cadence === "mingguan" 
-                    ? "border-orange-500 bg-orange-50 shadow-md" 
+                  onboardingData.cadence === "mingguan"
+                    ? "border-orange-500 bg-orange-50 shadow-md"
                     : "border-gray-200 bg-white hover:border-orange-300"
                 }`}
-                onClick={() => setOnboardingData({ ...onboardingData, cadence: "mingguan" })}
+                onClick={() =>
+                  setOnboardingData({ ...onboardingData, cadence: "mingguan" })
+                }
               >
                 <div className="flex items-start space-x-3">
-                  <RadioGroupItem value="mingguan" id="mingguan" className="mt-1" />
+                  <RadioGroupItem
+                    value="mingguan"
+                    id="mingguan"
+                    className="mt-1"
+                  />
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <Calendar className="w-5 h-5 text-orange-600" />
-                      <Label htmlFor="mingguan" className="font-medium cursor-pointer">
+                      <Label
+                        htmlFor="mingguan"
+                        className="font-medium cursor-pointer"
+                      >
                         Setiap Minggu
                       </Label>
                     </div>
                     <p className="text-sm text-gray-600">
-                      Ideal untuk goal jangka menengah dengan review progress mingguan
+                      Ideal untuk goal jangka menengah dengan review progress
+                      mingguan
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div 
+              <div
                 className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
-                  onboardingData.cadence === "bulanan" 
-                    ? "border-orange-500 bg-orange-50 shadow-md" 
+                  onboardingData.cadence === "bulanan"
+                    ? "border-orange-500 bg-orange-50 shadow-md"
                     : "border-gray-200 bg-white hover:border-orange-300"
                 }`}
-                onClick={() => setOnboardingData({ ...onboardingData, cadence: "bulanan" })}
+                onClick={() =>
+                  setOnboardingData({ ...onboardingData, cadence: "bulanan" })
+                }
               >
                 <div className="flex items-start space-x-3">
-                  <RadioGroupItem value="bulanan" id="bulanan" className="mt-1" />
+                  <RadioGroupItem
+                    value="bulanan"
+                    id="bulanan"
+                    className="mt-1"
+                  />
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <CalendarIcon className="w-5 h-5 text-orange-600" />
-                      <Label htmlFor="bulanan" className="font-medium cursor-pointer">
+                      <Label
+                        htmlFor="bulanan"
+                        className="font-medium cursor-pointer"
+                      >
                         Setiap Bulan
                       </Label>
                     </div>
                     <p className="text-sm text-gray-600">
-                      Tepat untuk goal strategis dengan evaluasi bulanan yang komprehensif
+                      Tepat untuk goal strategis dengan evaluasi bulanan yang
+                      komprehensif
                     </p>
                   </div>
                 </div>
@@ -1159,7 +1284,9 @@ export default function CompanyOnboarding() {
                 {/* Harian - Waktu reminder */}
                 {onboardingData.cadence === "harian" && (
                   <div className="space-y-3">
-                    <Label htmlFor="reminder-time">Waktu reminder harian:</Label>
+                    <Label htmlFor="reminder-time">
+                      Waktu reminder harian:
+                    </Label>
                     <div className="space-y-3">
                       {/* Common time options */}
                       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
@@ -1219,7 +1346,9 @@ export default function CompanyOnboarding() {
                               min="00:00"
                               max="23:59"
                             />
-                            <span className="text-sm text-gray-500">Format: HH:MM</span>
+                            <span className="text-sm text-gray-500">
+                              Format: HH:MM
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -1231,10 +1360,12 @@ export default function CompanyOnboarding() {
                 {onboardingData.cadence === "mingguan" && (
                   <div className="space-y-4">
                     <Label>Pengaturan reminder mingguan:</Label>
-                    
+
                     {/* Pilih hari */}
                     <div className="space-y-3">
-                      <Label className="text-sm text-gray-600">Pilih hari reminder:</Label>
+                      <Label className="text-sm text-gray-600">
+                        Pilih hari reminder:
+                      </Label>
                       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
                         {[
                           { value: "senin", label: "Senin" },
@@ -1273,7 +1404,9 @@ export default function CompanyOnboarding() {
 
                     {/* Pilih waktu */}
                     <div className="space-y-3">
-                      <Label className="text-sm text-gray-600">Pilih waktu reminder:</Label>
+                      <Label className="text-sm text-gray-600">
+                        Pilih waktu reminder:
+                      </Label>
                       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
                         {[
                           { value: "08:00", label: "08:00 - Pagi" },
@@ -1315,41 +1448,47 @@ export default function CompanyOnboarding() {
                 {onboardingData.cadence === "bulanan" && (
                   <div className="space-y-4">
                     <Label>Pengaturan reminder bulanan:</Label>
-                    
+
                     {/* Pilih tanggal */}
                     <div className="space-y-3">
-                      <Label className="text-sm text-gray-600">Pilih tanggal reminder setiap bulan:</Label>
+                      <Label className="text-sm text-gray-600">
+                        Pilih tanggal reminder setiap bulan:
+                      </Label>
                       <div className="grid grid-cols-5 sm:grid-cols-8 lg:grid-cols-10 gap-2">
-                        {Array.from({ length: 31 }, (_, i) => i + 1).map((date) => (
-                          <Button
-                            key={date}
-                            variant={
-                              onboardingData.reminderDate === date.toString()
-                                ? "default"
-                                : "outline"
-                            }
-                            size="sm"
-                            onClick={() =>
-                              setOnboardingData({
-                                ...onboardingData,
-                                reminderDate: date.toString(),
-                              })
-                            }
-                            className={
-                              onboardingData.reminderDate === date.toString()
-                                ? "bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white transition-all duration-300 transform hover:scale-105 shadow-md"
-                                : "hover:bg-purple-50 hover:border-purple-300 text-gray-700 transition-all duration-300 transform hover:scale-105 hover:shadow-md"
-                            }
-                          >
-                            {date}
-                          </Button>
-                        ))}
+                        {Array.from({ length: 31 }, (_, i) => i + 1).map(
+                          (date) => (
+                            <Button
+                              key={date}
+                              variant={
+                                onboardingData.reminderDate === date.toString()
+                                  ? "default"
+                                  : "outline"
+                              }
+                              size="sm"
+                              onClick={() =>
+                                setOnboardingData({
+                                  ...onboardingData,
+                                  reminderDate: date.toString(),
+                                })
+                              }
+                              className={
+                                onboardingData.reminderDate === date.toString()
+                                  ? "bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white transition-all duration-300 transform hover:scale-105 shadow-md"
+                                  : "hover:bg-purple-50 hover:border-purple-300 text-gray-700 transition-all duration-300 transform hover:scale-105 hover:shadow-md"
+                              }
+                            >
+                              {date}
+                            </Button>
+                          ),
+                        )}
                       </div>
                     </div>
 
                     {/* Pilih waktu */}
                     <div className="space-y-3">
-                      <Label className="text-sm text-gray-600">Pilih waktu reminder:</Label>
+                      <Label className="text-sm text-gray-600">
+                        Pilih waktu reminder:
+                      </Label>
                       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
                         {[
                           { value: "08:00", label: "08:00 - Pagi" },
@@ -1401,12 +1540,14 @@ export default function CompanyOnboarding() {
                         )}
                         {onboardingData.cadence === "mingguan" && (
                           <span className="font-mono bg-orange-100 px-2 py-1 rounded">
-                            Setiap {onboardingData.reminderDay} jam {onboardingData.reminderTime}
+                            Setiap {onboardingData.reminderDay} jam{" "}
+                            {onboardingData.reminderTime}
                           </span>
                         )}
                         {onboardingData.cadence === "bulanan" && (
                           <span className="font-mono bg-orange-100 px-2 py-1 rounded">
-                            Setiap tanggal {onboardingData.reminderDate} jam {onboardingData.reminderTime}
+                            Setiap tanggal {onboardingData.reminderDate} jam{" "}
+                            {onboardingData.reminderTime}
                           </span>
                         )}
                       </p>
@@ -2177,11 +2318,16 @@ export default function CompanyOnboarding() {
                       Check-in: {onboardingData.cadence || "Belum dipilih"}
                     </span>
                     <span className="inline-block bg-purple-100 text-purple-800 px-2 py-1 rounded ml-2">
-                      Periode: {onboardingData.cycleDuration === "1_bulan" ? "1 bulan" : 
-                               onboardingData.cycleDuration === "3_bulan" ? "3 bulan" : 
-                               onboardingData.cycleDuration === "6_bulan" ? "6 bulan" : 
-                               onboardingData.cycleDuration === "1_tahun" ? "1 tahun" : 
-                               onboardingData.cycleDuration || "Belum dipilih"}
+                      Periode:{" "}
+                      {onboardingData.cycleDuration === "1_bulan"
+                        ? "1 bulan"
+                        : onboardingData.cycleDuration === "3_bulan"
+                          ? "3 bulan"
+                          : onboardingData.cycleDuration === "6_bulan"
+                            ? "6 bulan"
+                            : onboardingData.cycleDuration === "1_tahun"
+                              ? "1 tahun"
+                              : onboardingData.cycleDuration || "Belum dipilih"}
                     </span>
                   </div>
                 </div>
@@ -2457,11 +2603,15 @@ export default function CompanyOnboarding() {
                       <p>
                         <strong>Periode Goal:</strong>{" "}
                         <span className="inline-block bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-xs">
-                          {onboardingData.cycleDuration === "1_bulan" ? "1 Bulan" : 
-                           onboardingData.cycleDuration === "3_bulan" ? "3 Bulan" : 
-                           onboardingData.cycleDuration === "6_bulan" ? "6 Bulan" : 
-                           onboardingData.cycleDuration === "1_tahun" ? "1 Tahun" : 
-                           "Belum dipilih"}
+                          {onboardingData.cycleDuration === "1_bulan"
+                            ? "1 Bulan"
+                            : onboardingData.cycleDuration === "3_bulan"
+                              ? "3 Bulan"
+                              : onboardingData.cycleDuration === "6_bulan"
+                                ? "6 Bulan"
+                                : onboardingData.cycleDuration === "1_tahun"
+                                  ? "1 Tahun"
+                                  : "Belum dipilih"}
                         </span>
                       </p>
                       <p>
@@ -2481,10 +2631,13 @@ export default function CompanyOnboarding() {
                       <p>
                         <strong>Frekuensi Check-in:</strong>{" "}
                         <span className="inline-block bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs">
-                          {onboardingData.cadence === "harian" ? "Setiap Hari" : 
-                           onboardingData.cadence === "mingguan" ? "Setiap Minggu" : 
-                           onboardingData.cadence === "bulanan" ? "Setiap Bulan" : 
-                           "Belum dipilih"}
+                          {onboardingData.cadence === "harian"
+                            ? "Setiap Hari"
+                            : onboardingData.cadence === "mingguan"
+                              ? "Setiap Minggu"
+                              : onboardingData.cadence === "bulanan"
+                                ? "Setiap Bulan"
+                                : "Belum dipilih"}
                         </span>
                       </p>
                       <p>
@@ -2496,7 +2649,9 @@ export default function CompanyOnboarding() {
                     </div>
                   </div>
                   <div className="mt-3 p-2 bg-gray-50 rounded text-xs text-gray-600">
-                    💡 <strong>Info:</strong> Sistem akan mengirim reminder sesuai jadwal yang dipilih untuk membantu Anda melacak progress goal secara konsisten.
+                    💡 <strong>Info:</strong> Sistem akan mengirim reminder
+                    sesuai jadwal yang dipilih untuk membantu Anda melacak
+                    progress goal secara konsisten.
                   </div>
                 </div>
               </div>
@@ -2552,18 +2707,18 @@ export default function CompanyOnboarding() {
   // Get virtual assistant message based on current step
   const getVirtualAssistantMessage = () => {
     if (onboardingData.currentStep === 0) {
-      return "Halo! Saya akan membantu Anda melakukan onboarding platform. Mari kita mulai perjalanan untuk mencapai tujuan bisnis Anda! 🚀";
+      return "Halo! Saya Orby, asisten virtual yang akan membantu Anda menyusun goal yang tepat dan terukur. Proses onboarding ini dirancang khusus agar Anda dan tim dapat bekerja lebih fokus, selaras, dan berdampak nyata bersama Refokus. 🚀";
     }
 
     const stepMessages = {
-      1: "Mari tentukan fokus utama yang ingin Anda tingkatkan. Pilih area yang paling penting untuk kemajuan bisnis Anda saat ini.",
-      2: "Kolaborasi adalah kunci kesuksesan! Undang anggota tim yang akan berpartisipasi dalam mencapai tujuan bersama.",
-      3: "Waktu adalah aset berharga. Tentukan periode yang realistis untuk mencapai tujuan Anda - bisa bulanan, kuartalan, atau tahunan.",
-      4: "Sekarang saatnya menetapkan tujuan yang jelas dan spesifik. Pilih goal yang menantang namun dapat dicapai.",
-      5: "Bagaimana mengukur kesuksesan? Tentukan angka target yang konkret dan terukur untuk melacak kemajuan.",
-      6: "Inisiatif adalah langkah strategis untuk mencapai target. Pilih yang paling berdampak dan prioritas utama.",
-      7: "Bagi inisiatif menjadi tugas-tugas yang dapat dikerjakan. Ini membantu tim fokus pada eksekusi yang efektif.",
-      8: "Konsistensi adalah kunci! Tentukan seberapa sering Anda akan memantau dan memperbarui progress.",
+      1: "Setiap bisnis pasti punya tantangan. Ada yang tertinggal omzetnya, ada yang timnya belum sinkron. Tapi semua perubahan dimulai dari fokus. Sekarang, mari tentukan satu area yang paling penting untuk Anda perbaiki dulu. Kita tidak perlu sempurna di semua hal, cukup jadi luar biasa di satu hal.",
+      2: "Tidak ada tim hebat yang dibangun oleh satu orang. Saat Anda mengundang tim, Anda sedang menanamkan rasa tanggung jawab bersama. Bayangkan jika semua anggota tahu tujuan tim, tahu perannya — komunikasi lebih jernih, hasil lebih cepat terlihat",
+      3: "Bayangkan Anda sedang membangun jembatan. Tanpa batas waktu, pekerjaan bisa meluas tak tentu arah. Dengan siklus goal, Anda tahu kapan harus mulai, mengevaluasi, dan menyesuaikan. Kita tidak sedang maraton tanpa garis akhir — kita sedang sprint kecil yang terarah.",
+      4: "Banyak pemilik usaha terseret ke rutinitas harian dan kehilangan arah. Goal adalah titik utara — kompas yang menjaga Anda tetap di jalur. Mari tuliskan tujuan yang benar-benar Anda pedulikan. Bukan sekadar target, tapi alasan kenapa Anda bangun tiap pagi dan tetap berjuang.",
+      5: "Pernah merasa sudah sibuk setiap hari tapi tak yakin ada hasilnya? Di sinilah pentingnya ukuran keberhasilan. Kita ubah tujuan jadi angka, agar Anda tahu persis kapan Anda berhasil, dan kapan perlu ganti cara. Ukuran ini bukan soal angka — tapi bukti bahwa kerja Anda bermakna.",
+      6: "Kebanyakan strategi gagal bukan karena kurang ide, tapi karena terlalu banyak dan tak tahu mana yang penting. Inisiatif adalah langkah nyata. Kita pilih yang sederhana, bisa langsung dikerjakan, dan berdampak besar. Fokus pada satu tembakan yang paling kena sasaran.",
+      7: "Inisiatif ibarat jalan menuju tujuan — tapi kita tetap butuh langkah konkret agar sampai ke sana. Di sini, Anda bisa memecah inisiatif menjadi tugas-tugas kecil yang bisa segera dikerjakan.",
+      8: "Ritme adalah kunci konsistensi. Seperti olahraga, lebih baik dilakukan rutin meski ringan. Dengan ritme update yang pas, Anda tidak akan kehilangan momentum. Bayangkan sistem ini seperti partner yang selalu mengingatkan, bukan menghakimi.",
       9: "Hampir selesai! Atur reminder agar selalu terjaga momentum dan review berkala untuk evaluasi.",
       10: "Terakhir, lihat ringkasan semua yang telah Anda setting. Dashboard ini akan membantu memantau perjalanan menuju tujuan!",
     };
@@ -2576,7 +2731,10 @@ export default function CompanyOnboarding() {
 
   // Use typing effect for virtual assistant message
   const assistantMessage = getVirtualAssistantMessage();
-  const { displayText: typedMessage, isTyping } = useTypingEffect(assistantMessage, 35);
+  const { displayText: typedMessage, isTyping } = useTypingEffect(
+    assistantMessage,
+    35,
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
@@ -2660,7 +2818,9 @@ export default function CompanyOnboarding() {
 
           {/* Virtual Assistant - Show on all steps */}
           <div className="mb-6 animate-in fade-in slide-in-from-left-4 duration-500">
-            <div className={`bg-gradient-to-r ${getContainerBackgroundColor()} rounded-lg p-4 shadow-sm transition-all duration-500 hover:shadow-md hover:scale-[1.02] animate-pulse-gentle`}>
+            <div
+              className={`bg-gradient-to-r ${getContainerBackgroundColor()} rounded-lg p-4 shadow-sm transition-all duration-500 hover:shadow-md hover:scale-[1.02] animate-pulse-gentle`}
+            >
               <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0">
                   <div
@@ -2673,7 +2833,7 @@ export default function CompanyOnboarding() {
                   <h4 className="font-medium text-gray-900 mb-1 transition-all duration-300 animate-slide-in">
                     Asisten Virtual
                   </h4>
-                  <p 
+                  <p
                     key={`assistant-message-${onboardingData.currentStep}`}
                     className="text-sm text-gray-700 leading-relaxed transition-all duration-500 animate-fade-in-up"
                   >
@@ -2699,7 +2859,10 @@ export default function CompanyOnboarding() {
                   {Math.round(progressPercentage)}% selesai
                 </span>
               </div>
-              <Progress value={progressPercentage} className="h-2 transition-all duration-700 ease-out" />
+              <Progress
+                value={progressPercentage}
+                className="h-2 transition-all duration-700 ease-out"
+              />
             </div>
           )}
 
@@ -2707,7 +2870,10 @@ export default function CompanyOnboarding() {
             {/* Step Content */}
             <div className="space-y-6">
               {onboardingData.currentStep === 0 ? (
-                <Card key="welcome" className="shadow-lg transition-all duration-500 ease-in-out transform hover:shadow-xl animate-in fade-in slide-in-from-bottom-4">
+                <Card
+                  key="welcome"
+                  className="shadow-lg transition-all duration-500 ease-in-out transform hover:shadow-xl animate-in fade-in slide-in-from-bottom-4"
+                >
                   <CardHeader className="transition-all duration-300">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-orange-100 rounded-lg transition-all duration-300 hover:bg-orange-200">
@@ -2723,11 +2889,16 @@ export default function CompanyOnboarding() {
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="transition-all duration-300">{renderStepContent()}</CardContent>
+                  <CardContent className="transition-all duration-300">
+                    {renderStepContent()}
+                  </CardContent>
                 </Card>
               ) : (
                 currentStepData && (
-                  <Card key={`step-${onboardingData.currentStep}`} className="shadow-lg transition-all duration-500 ease-in-out transform hover:shadow-xl animate-in fade-in slide-in-from-bottom-4">
+                  <Card
+                    key={`step-${onboardingData.currentStep}`}
+                    className="shadow-lg transition-all duration-500 ease-in-out transform hover:shadow-xl animate-in fade-in slide-in-from-bottom-4"
+                  >
                     <CardHeader className="transition-all duration-300">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-orange-100 rounded-lg transition-all duration-300 hover:bg-orange-200 hover:scale-105">
@@ -2743,7 +2914,9 @@ export default function CompanyOnboarding() {
                         </div>
                       </div>
                     </CardHeader>
-                    <CardContent className="transition-all duration-300">{renderStepContent()}</CardContent>
+                    <CardContent className="transition-all duration-300">
+                      {renderStepContent()}
+                    </CardContent>
                   </Card>
                 )
               )}
@@ -2757,8 +2930,8 @@ export default function CompanyOnboarding() {
                 }
               >
                 {onboardingData.currentStep > 0 && (
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={handlePrevious}
                     className="transition-all duration-300 transform hover:scale-105 hover:shadow-md"
                   >

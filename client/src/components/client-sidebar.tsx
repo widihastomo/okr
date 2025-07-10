@@ -194,9 +194,9 @@ export default function Sidebar({
       active: location === "/analytics",
     },
     {
-      label: "Pengaturan Organisasi",
+      label: "Pengaturan Organisasi", 
       icon: Settings,
-      path: "/client-users",
+      path: "/organization-settings",
       active: location === "/organization-settings",
     },
 
