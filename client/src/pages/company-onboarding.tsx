@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import refokusLogo from "@assets/refokus_1751810711179.png";
 import { Button } from "@/components/ui/button";
@@ -125,6 +125,44 @@ const ONBOARDING_STEPS = [
 interface OnboardingData extends CompanyOnboardingData {
   // All fields are already defined in CompanyOnboardingData schema
 }
+
+// Custom hook for typing effect
+const useTypingEffect = (text: string, speed: number = 30) => {
+  const [displayText, setDisplayText] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const typewriterRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (typewriterRef.current) {
+      clearTimeout(typewriterRef.current);
+    }
+
+    setDisplayText("");
+    setIsTyping(true);
+
+    let currentIndex = 0;
+    const typeNextChar = () => {
+      if (currentIndex < text.length) {
+        setDisplayText(text.slice(0, currentIndex + 1));
+        currentIndex++;
+        typewriterRef.current = setTimeout(typeNextChar, speed);
+      } else {
+        setIsTyping(false);
+      }
+    };
+
+    // Start typing after a brief delay
+    typewriterRef.current = setTimeout(typeNextChar, 200);
+
+    return () => {
+      if (typewriterRef.current) {
+        clearTimeout(typewriterRef.current);
+      }
+    };
+  }, [text, speed]);
+
+  return { displayText, isTyping };
+};
 
 export default function CompanyOnboarding() {
   const { user } = useAuth();
@@ -373,6 +411,8 @@ export default function CompanyOnboarding() {
     if (progressPercentage < 100) return "from-blue-50 to-indigo-50 border-blue-200"; // 75-99% - Blue
     return "from-green-50 to-emerald-50 border-green-200"; // 100% - Green
   };
+
+
 
   const handleNext = () => {
     // Validate current step before proceeding (skip validation for welcome screen)
@@ -2534,6 +2574,10 @@ export default function CompanyOnboarding() {
     );
   };
 
+  // Use typing effect for virtual assistant message
+  const assistantMessage = getVirtualAssistantMessage();
+  const { displayText: typedMessage, isTyping } = useTypingEffect(assistantMessage, 35);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       <div className="container mx-auto px-4 py-8">
@@ -2633,7 +2677,10 @@ export default function CompanyOnboarding() {
                     key={`assistant-message-${onboardingData.currentStep}`}
                     className="text-sm text-gray-700 leading-relaxed transition-all duration-500 animate-fade-in-up"
                   >
-                    {getVirtualAssistantMessage()}
+                    {typedMessage}
+                    {isTyping && (
+                      <span className="inline-block w-2 h-4 bg-orange-500 ml-1 animate-typing-cursor"></span>
+                    )}
                   </p>
                 </div>
               </div>
