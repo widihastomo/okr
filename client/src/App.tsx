@@ -149,6 +149,7 @@ function Router() {
         <Route path="/forgot-password" component={ForgotPassword} />
         <Route path="/reset-password" component={ResetPassword} />
         <Route path="/accept-invitation" component={AcceptInvitation} />
+        <Route path="/test-toast" component={TestToast} />
         <Route component={Login} />
       </Switch>
     );
