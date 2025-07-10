@@ -34,8 +34,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Import the mascot character from trial-mascot
-import { MascotFloatingAnimation, MascotSparkleEffect, MascotTooltip } from "./mascot-animations";
+// Import the mascot character components
+// Note: Mascot animation components will be defined inline
 
 type MascotState = "welcome" | "encouraging" | "celebrating" | "thinking" | "waving" | "pointing" | "sleeping" | "excited";
 
@@ -166,7 +166,11 @@ const SimpleMascot: React.FC<{ state: MascotState; size?: number }> = ({ state, 
       </svg>
       
       {state === "celebrating" && (
-        <MascotSparkleEffect className="absolute inset-0" />
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-0 text-yellow-400 animate-pulse">✨</div>
+          <div className="absolute top-0 right-0 text-yellow-400 animate-bounce">⭐</div>
+          <div className="absolute bottom-0 left-0 text-yellow-400 animate-ping">💫</div>
+        </div>
       )}
       
       {state === "sleeping" && (
@@ -312,7 +316,7 @@ export default function FloatingMascot({ className }: FloatingMascotProps) {
       {/* Minimized state - just the mascot */}
       {isMinimized && (
         <div className="relative">
-          <MascotFloatingAnimation>
+          <div className="animate-pulse">
             <button
               onClick={() => {
                 setIsMinimized(false);
@@ -323,14 +327,13 @@ export default function FloatingMascot({ className }: FloatingMascotProps) {
             >
               <SimpleMascot state={mascotState} size={32} />
             </button>
-          </MascotFloatingAnimation>
+          </div>
           
           {showTooltip && (
-            <MascotTooltip
-              message={tooltipMessage}
-              position="left"
-              className="whitespace-nowrap max-w-xs"
-            />
+            <div className="absolute right-full mr-2 top-1/2 transform -translate-y-1/2 bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap max-w-xs z-10">
+              {tooltipMessage}
+              <div className="absolute left-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-l-black"></div>
+            </div>
           )}
         </div>
       )}
