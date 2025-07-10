@@ -734,13 +734,19 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                           <td className="px-4 py-4 whitespace-nowrap">
                             <select
                               className="w-40 h-10 px-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:border-blue-600 focus:outline-none"
-                              value={task.newStatus || task.status}
+                              value={updateData.todayTasks[index]?.newStatus || task.status}
                               onChange={(e) => {
                                 const value = e.target.value;
-                                const newData = { ...updateData };
-                                newData.todayTasks[index].newStatus = value;
-                                newData.todayTasks[index].completed = value === 'completed';
-                                setUpdateData(newData);
+                                const newTasks = [...updateData.todayTasks];
+                                newTasks[index] = {
+                                  ...newTasks[index],
+                                  newStatus: value,
+                                  completed: value === 'completed'
+                                };
+                                setUpdateData({
+                                  ...updateData,
+                                  todayTasks: newTasks
+                                });
                               }}
                             >
                               <option value="not_started">Belum Dimulai</option>
@@ -772,13 +778,19 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                         <label className="text-sm font-medium text-gray-700">Status Baru:</label>
                         <select
                           className="w-full h-10 px-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:border-blue-600 focus:outline-none"
-                          value={task.newStatus || task.status}
+                          value={updateData.todayTasks[index]?.newStatus || task.status}
                           onChange={(e) => {
                             const value = e.target.value;
-                            const newData = { ...updateData };
-                            newData.todayTasks[index].newStatus = value;
-                            newData.todayTasks[index].completed = value === 'completed';
-                            setUpdateData(newData);
+                            const newTasks = [...updateData.todayTasks];
+                            newTasks[index] = {
+                              ...newTasks[index],
+                              newStatus: value,
+                              completed: value === 'completed'
+                            };
+                            setUpdateData({
+                              ...updateData,
+                              todayTasks: newTasks
+                            });
                           }}
                         >
                           <option value="not_started">Belum Dimulai</option>
