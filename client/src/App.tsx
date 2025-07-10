@@ -79,16 +79,7 @@ function Router() {
     enabled: isAuthenticated && !isLoading,
   });
   
-  // Check onboarding status with aggressive caching for fastest transitions
-  const { data: onboardingStatus, isLoading: isOnboardingLoading } = useQuery({
-    queryKey: ["/api/onboarding/status"],
-    enabled: isAuthenticated && !isLoading,
-    retry: false,
-    staleTime: 5 * 60 * 1000, // 5 minutes cache - reduce API calls
-    cacheTime: 10 * 60 * 1000, // 10 minutes cache
-    refetchOnWindowFocus: false, // Prevent unnecessary refetch on focus
-    refetchOnMount: false, // Don't refetch on component mount if cached
-  });
+  // No need for onboarding check here - handled in login flow
 
   // Clear logout flag on app start if user is authenticated
   useEffect(() => {
@@ -101,31 +92,14 @@ function Router() {
     setSidebarOpen(!sidebarOpen);
   };
 
-  // Memoized redirect logic for better performance
-  const shouldRedirect = useMemo(() => {
-    if (!isAuthenticated || !user || isLoading) return null;
-    
-    // Redirect system owner to system admin dashboard by default
-    if ((user as any)?.isSystemOwner) {
-      if (location === "/" || location === "/daily-focus") {
-        return "/system-admin";
-      }
-    } else {
-      // Non-system owner users - check onboarding immediately
-      if (!isOnboardingLoading && onboardingStatus && !onboardingStatus.isCompleted && location !== "/onboarding") {
-        return "/onboarding";
-      }
-    }
-    return null;
-  }, [isAuthenticated, user, isLoading, onboardingStatus, isOnboardingLoading, location]);
-
-  // Handle redirect with instant client-side navigation
+  // Only redirect system owner to system admin dashboard
   useEffect(() => {
-    if (shouldRedirect) {
-      // Immediate navigation without delay for fastest transition
-      navigate(shouldRedirect);
+    if (isAuthenticated && user && !isLoading && (user as any)?.isSystemOwner) {
+      if (location === "/" || location === "/daily-focus") {
+        navigate("/system-admin");
+      }
     }
-  }, [shouldRedirect, navigate]);
+  }, [isAuthenticated, user, isLoading, location, navigate]);
 
   if (isLoading) {
     return (

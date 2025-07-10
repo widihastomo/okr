@@ -24,6 +24,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { LoadingButton } from "@/components/ui/playful-loading";
 import { apiRequest } from "@/lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import refokusLogo from "@assets/refokus_1751810711179.png";
 
 // Validation schemas
@@ -80,6 +81,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
   const [isVerifying, setIsVerifying] = useState(false);
   const [resetCode, setResetCode] = useState("");
   const { toast } = useToast();
+  const [, navigate] = useLocation();
 
   // Form instances
   const loginForm = useForm<LoginData>({
@@ -112,14 +114,36 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
       }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast({
         title: "Login berhasil",
         description: "Selamat datang!",
         variant: "success",
       });
+      
+      // Check onboarding status immediately after login
+      try {
+        const onboardingResponse = await apiRequest("GET", "/api/onboarding/status");
+        if (onboardingResponse.ok) {
+          const onboardingStatus = await onboardingResponse.json();
+          
+          // Use client-side navigation for fastest redirect
+          if (onboardingStatus.isCompleted) {
+            navigate("/");
+          } else {
+            navigate("/onboarding");
+          }
+        } else {
+          // If onboarding status check fails, default to home
+          navigate("/");
+        }
+      } catch (error) {
+        console.error("Error checking onboarding status:", error);
+        navigate("/");
+      }
+      
+      // Call onSuccess callback if provided
       if (onSuccess) onSuccess();
-      else window.location.href = "/";
     },
     onError: (error: Error) => {
       if (error.message.includes("EMAIL_NOT_VERIFIED") || error.message.includes("Email belum diverifikasi")) {
