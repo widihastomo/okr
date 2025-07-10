@@ -1682,9 +1682,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all key results
-  app.get("/api/key-results", async (req, res) => {
+  app.get("/api/key-results", requireAuth, async (req, res) => {
     try {
-      const keyResults = await storage.getKeyResults();
+      const user = req.user as User;
+      const organizationId = user.organizationId;
+      
+      if (!organizationId) {
+        return res.status(400).json({ message: "User not associated with any organization" });
+      }
+      
+      const keyResults = await storage.getKeyResultsByOrganization(organizationId);
       res.json(keyResults);
     } catch (error) {
       console.error("Error fetching key results:", error);

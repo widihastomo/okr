@@ -50,6 +50,7 @@ export interface IStorage {
   
   // Key Results
   getKeyResults(): Promise<KeyResult[]>;
+  getKeyResultsByOrganization(organizationId: string): Promise<KeyResult[]>;
   getKeyResultsByObjectiveId(objectiveId: string): Promise<KeyResult[]>;
   getKeyResult(id: string): Promise<KeyResult | undefined>;
   createKeyResult(keyResult: InsertKeyResult): Promise<KeyResult>;
@@ -711,6 +712,18 @@ export class DatabaseStorage implements IStorage {
   // Key Results
   async getKeyResults(): Promise<KeyResult[]> {
     return await db.select().from(keyResults);
+  }
+
+  async getKeyResultsByOrganization(organizationId: string): Promise<KeyResult[]> {
+    // Join with objectives and users to filter by organization
+    const result = await db
+      .select({ keyResult: keyResults })
+      .from(keyResults)
+      .innerJoin(objectives, eq(objectives.id, keyResults.objectiveId))
+      .innerJoin(users, eq(users.id, objectives.ownerId))
+      .where(eq(users.organizationId, organizationId));
+    
+    return result.map(r => r.keyResult);
   }
 
   async getKeyResultsByObjectiveId(objectiveId: string): Promise<KeyResult[]> {

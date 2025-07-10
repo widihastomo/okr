@@ -104,7 +104,7 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
 
   // Fetch data for instant update (organization-specific)
   const { data: keyResults } = useQuery({
-    queryKey: ['/api/key-results'],
+    queryKey: ['/api/key-results', userId],
     enabled: open && !!userId,
   });
 
