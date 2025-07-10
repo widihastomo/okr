@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useLocation } from "wouter";
 import refokusLogo from "@assets/refokus_1751810711179.png";
 import { Button } from "@/components/ui/button";
 import { LoadingButton, PlayfulLoading } from "@/components/ui/playful-loading";
@@ -163,6 +164,7 @@ export default function CompanyOnboarding() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, navigate] = useLocation();
   const [startDateOpen, setStartDateOpen] = useState(false);
   const [endDateOpen, setEndDateOpen] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
@@ -409,10 +411,15 @@ export default function CompanyOnboarding() {
       // Set redirecting state to show loading
       setIsRedirecting(true);
       
-      // Add a brief delay to show the loading state before redirect
+      // Use instant client-side navigation instead of window.location.href
+      // Invalidate cache to ensure fresh data on dashboard
+      queryClient.invalidateQueries({ queryKey: ["/api/onboarding/status"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/onboarding/progress"] });
+      
+      // Minimal delay to show success message then navigate
       setTimeout(() => {
-        window.location.href = "/";
-      }, 1500);
+        navigate("/");
+      }, 800); // Reduced from 1500ms to 800ms
     },
     onError: (error) => {
       toast({

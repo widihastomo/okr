@@ -121,12 +121,13 @@ Trial user untuk testing achievement system:
 ## Changelog
 ```
 Changelog:
-- July 10, 2025. Successfully optimized login-to-onboarding transition performance for faster user experience:
-  * FIXED: Replaced window.location.href with wouter's navigate() for instant client-side navigation
-  * OPTIMIZED: Aggressive caching strategies - 5 minutes for onboarding status, 2 minutes for auth state
+- July 10, 2025. Successfully optimized both login-to-onboarding AND onboarding-to-dashboard transitions for faster user experience:
+  * FIXED: Replaced window.location.href with wouter's navigate() for instant client-side navigation on BOTH transitions
+  * OPTIMIZED: Aggressive caching strategies - 5 minutes for onboarding status, 2 minutes for auth state, 30 seconds for onboarding progress
   * ENHANCED: Disabled refetchOnWindowFocus and refetchOnMount to prevent unnecessary API calls
-  * IMPROVED: Removed redirect delays (50ms → 0ms) for immediate navigation
-  * RESULT: Smooth, fast transition from login to onboarding without full page reloads
+  * IMPROVED: Removed redirect delays (50ms → 0ms for login, 1500ms → 800ms for onboarding completion)
+  * ADDED: Cache invalidation on onboarding completion to ensure fresh dashboard data
+  * RESULT: Smooth, fast transitions without full page reloads for complete user journey
 - July 10, 2025. Successfully completed comprehensive Toast success variant implementation with green color scheme:
   * RESOLVED: Root cause was variant property not being properly passed through in Toaster component
   * Fixed explicit variant destructuring in toaster.tsx to ensure "success" variant reaches Toast component
