@@ -732,62 +732,13 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                             </span>
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap">
-                            <div className="space-y-1">
-                              <div className="text-xs text-gray-500">Klik untuk ubah:</div>
-                              <div className="flex gap-1">
-                                {['not_started', 'in_progress', 'completed', 'cancelled'].map((status, statusIndex) => {
-                                  const isSelected = (updateData.todayTasks[index]?.newStatus || task.status) === status;
-                                  return (
-                                    <div
-                                      key={status}
-                                      className={`px-2 py-1 text-xs rounded border cursor-pointer select-none ${
-                                        isSelected
-                                          ? 'bg-blue-600 text-white border-blue-600'
-                                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                                      }`}
-                                      onMouseDown={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        console.log(`Clicked status ${status} for task ${task.id} at index ${index}`);
-                                        
-                                        const newTasks = [...updateData.todayTasks];
-                                        if (!newTasks[index]) {
-                                          newTasks[index] = { ...task };
-                                        }
-                                        newTasks[index].newStatus = status;
-                                        newTasks[index].completed = status === 'completed';
-                                        
-                                        console.log('Setting new tasks:', newTasks.map(t => ({ id: t.id, newStatus: t.newStatus })));
-                                        
-                                        setUpdateData(prev => ({
-                                          ...prev,
-                                          todayTasks: newTasks
-                                        }));
-                                      }}
-                                      onTouchStart={(e) => {
-                                        e.preventDefault();
-                                        console.log(`Touch start ${status} for task ${task.id}`);
-                                        
-                                        const newTasks = [...updateData.todayTasks];
-                                        if (!newTasks[index]) {
-                                          newTasks[index] = { ...task };
-                                        }
-                                        newTasks[index].newStatus = status;
-                                        newTasks[index].completed = status === 'completed';
-                                        
-                                        setUpdateData(prev => ({
-                                          ...prev,
-                                          todayTasks: newTasks
-                                        }));
-                                      }}
-                                    >
-                                      {status === 'not_started' && 'Belum'}
-                                      {status === 'in_progress' && 'Jalan'}
-                                      {status === 'completed' && 'Selesai'}
-                                      {status === 'cancelled' && 'Batal'}
-                                    </div>
-                                  );
-                                })}
+                            <div className="text-sm">
+                              <div className="text-gray-600 mb-1">Status Saat Ini:</div>
+                              <div className="font-medium text-gray-800">
+                                {getTaskStatusLabel(updateData.todayTasks[index]?.newStatus || task.status)}
+                              </div>
+                              <div className="text-xs text-gray-500 mt-1">
+                                (Ubah di form di bawah)
                               </div>
                             </div>
                           </td>
@@ -811,56 +762,51 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700">Status Baru:</label>
-                        <div className="grid grid-cols-2 gap-2">
-                          {['not_started', 'in_progress', 'completed', 'cancelled'].map((status) => {
-                            const isSelected = (updateData.todayTasks[index]?.newStatus || task.status) === status;
-                            return (
-                              <div
-                                key={status}
-                                className={`px-3 py-2 text-sm rounded border cursor-pointer select-none text-center ${
-                                  isSelected
-                                    ? 'bg-blue-600 text-white border-blue-600'
-                                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                                }`}
-                                onMouseDown={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  console.log(`Mobile clicked status ${status} for task ${task.id} at index ${index}`);
-                                  
-                                  const newTasks = [...updateData.todayTasks];
-                                  if (!newTasks[index]) {
-                                    newTasks[index] = { ...task };
-                                  }
-                                  newTasks[index].newStatus = status;
-                                  newTasks[index].completed = status === 'completed';
-                                  
-                                  setUpdateData(prev => ({
-                                    ...prev,
-                                    todayTasks: newTasks
-                                  }));
-                                }}
-                                onTouchStart={(e) => {
-                                  e.preventDefault();
-                                  console.log(`Mobile touch ${status} for task ${task.id}`);
-                                  
-                                  const newTasks = [...updateData.todayTasks];
-                                  if (!newTasks[index]) {
-                                    newTasks[index] = { ...task };
-                                  }
-                                  newTasks[index].newStatus = status;
-                                  newTasks[index].completed = status === 'completed';
-                                  
-                                  setUpdateData(prev => ({
-                                    ...prev,
-                                    todayTasks: newTasks
-                                  }));
-                                }}
-                              >
-                                {getTaskStatusLabel(status)}
-                              </div>
-                            );
-                          })}
+                        <label className="text-sm font-medium text-gray-700">
+                          Status untuk: {task.title}
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Ketik: belum/jalan/selesai/batal"
+                          className="w-full h-10 px-3 py-2 text-sm border border-gray-300 rounded-md focus:border-blue-600 focus:outline-none"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              const value = e.currentTarget.value.toLowerCase().trim();
+                              let newStatus = '';
+                              
+                              if (value === 'belum' || value === 'belum dimulai') {
+                                newStatus = 'not_started';
+                              } else if (value === 'jalan' || value === 'sedang berjalan') {
+                                newStatus = 'in_progress';
+                              } else if (value === 'selesai' || value === 'completed') {
+                                newStatus = 'completed';
+                              } else if (value === 'batal' || value === 'dibatalkan') {
+                                newStatus = 'cancelled';
+                              }
+                              
+                              if (newStatus) {
+                                const newTasks = [...updateData.todayTasks];
+                                if (!newTasks[index]) {
+                                  newTasks[index] = { ...task };
+                                }
+                                newTasks[index].newStatus = newStatus;
+                                newTasks[index].completed = newStatus === 'completed';
+                                
+                                setUpdateData(prev => ({
+                                  ...prev,
+                                  todayTasks: newTasks
+                                }));
+                                
+                                e.currentTarget.value = '';
+                                e.currentTarget.placeholder = `Status diubah ke: ${getTaskStatusLabel(newStatus)}`;
+                              }
+                            }
+                          }}
+                        />
+                        <div className="text-xs text-gray-500">
+                          Status saat ini: <span className="font-medium">
+                            {getTaskStatusLabel(updateData.todayTasks[index]?.newStatus || task.status)}
+                          </span>
                         </div>
                       </div>
                     </div>
