@@ -61,7 +61,7 @@ import ReferralCodes from "@/pages/referral-codes";
 import TrialAchievements from "@/pages/trial-achievements";
 import CompanyOnboarding from "@/pages/company-onboarding";
 import MemberInvitations from "@/pages/member-invitations";
-import EmailSettings from "@/pages/system-admin/email-settings";
+
 import ClientStatusMapping from "@/pages/client-status-mapping";
 import ApplicationSettings from "@/pages/system-admin/application-settings";
 import AcceptInvitation from "@/pages/accept-invitation";
@@ -264,10 +264,7 @@ function Router() {
                 path="/system-admin/trial-settings"
                 component={TrialSettingsPage}
               />
-              <Route
-                path="/system-admin/email-settings"
-                component={EmailSettings}
-              />
+
               <Route
                 path="/system-admin/client-status-mapping"
                 component={ClientStatusMapping}

@@ -1,8 +1,5 @@
 import nodemailer from 'nodemailer';
 import sgMail from '@sendgrid/mail';
-import { db } from './db';
-import { systemSettings } from '@shared/schema';
-import { eq } from 'drizzle-orm';
 
 interface EmailConfig {
   from: string;
@@ -16,23 +13,33 @@ interface EmailProvider {
   sendEmail(config: EmailConfig): Promise<boolean>;
 }
 
-// Get email settings from system settings
-async function getEmailSettings(): Promise<Record<string, string>> {
-  try {
-    const settings = await db.select().from(systemSettings).where(eq(systemSettings.category, 'email'));
-    const settingsMap: Record<string, string> = {};
+// Get email settings from environment variables
+function getEmailSettings(): Record<string, string> {
+  return {
+    // Mailtrap settings
+    mailtrap_host: process.env.MAILTRAP_HOST || '',
+    mailtrap_port: process.env.MAILTRAP_PORT || '',
+    mailtrap_user: process.env.MAILTRAP_USER || '',
+    mailtrap_pass: process.env.MAILTRAP_PASS || '',
+    mailtrap_from: process.env.MAILTRAP_FROM || '',
     
-    for (const setting of settings) {
-      if (setting.settingKey && setting.settingValue) {
-        settingsMap[setting.settingKey] = setting.settingValue;
-      }
-    }
+    // SendGrid settings
+    sendgrid_api_key: process.env.SENDGRID_API_KEY || '',
+    sendgrid_from: process.env.SENDGRID_FROM || '',
     
-    return settingsMap;
-  } catch (error) {
-    console.error('Error fetching email settings:', error);
-    return {};
-  }
+    // Gmail settings
+    gmail_email: process.env.GMAIL_EMAIL || '',
+    gmail_password: process.env.GMAIL_PASSWORD || '',
+    gmail_from: process.env.GMAIL_FROM || '',
+    
+    // SMTP settings
+    smtp_host: process.env.SMTP_HOST || '',
+    smtp_port: process.env.SMTP_PORT || '587',
+    smtp_secure: process.env.SMTP_SECURE || 'false',
+    smtp_user: process.env.SMTP_USER || '',
+    smtp_pass: process.env.SMTP_PASS || '',
+    smtp_from: process.env.SMTP_FROM || '',
+  };
 }
 
 // Mailtrap Provider
@@ -41,7 +48,7 @@ class MailtrapProvider implements EmailProvider {
   
   async sendEmail(config: EmailConfig): Promise<boolean> {
     try {
-      const settings = await getEmailSettings();
+      const settings = getEmailSettings();
       
       if (!settings.mailtrap_host || !settings.mailtrap_port || !settings.mailtrap_user || !settings.mailtrap_pass) {
         throw new Error('Mailtrap credentials not configured');
@@ -77,7 +84,7 @@ class SendGridProvider implements EmailProvider {
   
   async sendEmail(config: EmailConfig): Promise<boolean> {
     try {
-      const settings = await getEmailSettings();
+      const settings = getEmailSettings();
       
       if (!settings.sendgrid_api_key) {
         throw new Error('SendGrid API key not configured');
@@ -106,7 +113,7 @@ class GmailProvider implements EmailProvider {
   
   async sendEmail(config: EmailConfig): Promise<boolean> {
     try {
-      const settings = await getEmailSettings();
+      const settings = getEmailSettings();
       
       if (!settings.gmail_email || !settings.gmail_password) {
         throw new Error('Gmail credentials not configured');
@@ -141,7 +148,7 @@ class SMTPProvider implements EmailProvider {
   
   async sendEmail(config: EmailConfig): Promise<boolean> {
     try {
-      const settings = await getEmailSettings();
+      const settings = getEmailSettings();
       
       if (!settings.smtp_host) {
         throw new Error('SMTP_HOST is not configured');

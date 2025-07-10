@@ -183,9 +183,46 @@ The system now includes automated production seeding during build process:
 - `npx tsx server/create-production-admin.ts` - Admin creation only
 - `npx tsx server/create-test-admin.ts` - Test admin for development
 
+## Email Configuration
+
+System email configuration has been migrated from database settings to environment variables for enhanced security and deployment flexibility.
+
+### Configuration Method
+- **Previous**: Database-based email settings managed via system admin UI
+- **Current**: Environment variables defined in `.env` file
+- **Documentation**: Complete setup guide available in `EMAIL_CONFIGURATION.md`
+
+### Supported Email Providers
+- **Mailtrap**: Development and testing (priority 1)
+- **SendGrid**: Production environment (priority 2) 
+- **Gmail SMTP**: Alternative provider (priority 3)
+- **Generic SMTP**: Fallback provider (priority 4)
+
+### Environment Variables
+All email configuration now uses environment variables:
+- `MAILTRAP_HOST`, `MAILTRAP_PORT`, `MAILTRAP_USER`, `MAILTRAP_PASS`, `MAILTRAP_FROM`
+- `SENDGRID_API_KEY`, `SENDGRID_FROM`
+- `GMAIL_EMAIL`, `GMAIL_PASSWORD`, `GMAIL_FROM`
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`
+
+### Security Benefits
+- Credentials stored in environment variables (not database)
+- No exposure in admin UI
+- Production-ready deployment configuration
+- Automatic fallback between providers
+
 ## Changelog
 ```
 Changelog:
+- July 10, 2025. Successfully migrated email configuration from database to environment variables:
+  * Removed database-based email settings system (system_settings table email category)
+  * Migrated all email providers to use environment variables for security
+  * Removed system admin email settings UI page and API routes
+  * Created EMAIL_CONFIGURATION.md with complete setup instructions
+  * Updated .env.example with all email provider configurations
+  * Maintained email test endpoint for system admin testing
+  * Enhanced security: credentials no longer stored in database or exposed in UI
+  * Improved deployment workflow: email configuration via environment variables
 - July 10, 2025. Successfully fixed SSL security issue in DATABASE_URL construction across all seeder scripts:
   * Added sslmode=require to constructed DATABASE_URLs in both server/db.ts and server/create-production-seeder.ts
   * Fixed "connection is insecure" error when DATABASE_URL is constructed from PG environment variables

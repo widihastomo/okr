@@ -3778,59 +3778,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Email Settings API Routes (System Admin Only)
-  app.get("/api/admin/email-settings", requireAuth, isSystemOwner, async (req, res) => {
-    try {
-      const { db } = await import("./db");
-      const { systemSettings } = await import("@shared/schema");
-      const { eq } = await import("drizzle-orm");
-      
-      const settings = await db.select({
-        setting_key: systemSettings.settingKey,
-        setting_value: systemSettings.settingValue,
-        description: systemSettings.description,
-        category: systemSettings.category,
-        is_active: systemSettings.isActive,
-      }).from(systemSettings).where(eq(systemSettings.category, 'email'));
-      
-      res.json(settings);
-    } catch (error) {
-      console.error("Error fetching email settings:", error);
-      res.status(500).json({ message: "Failed to fetch email settings" });
-    }
-  });
-
-  app.put("/api/admin/email-settings", requireAuth, isSystemOwner, async (req, res) => {
-    try {
-      const { db } = await import("./db");
-      const { systemSettings } = await import("@shared/schema");
-      const { eq, and } = await import("drizzle-orm");
-      const { settings } = req.body;
-      
-      if (!settings || typeof settings !== 'object') {
-        return res.status(400).json({ message: "Invalid settings data" });
-      }
-      
-      // Update each setting
-      for (const [key, value] of Object.entries(settings)) {
-        await db.update(systemSettings)
-          .set({ 
-            settingValue: value as string,
-            updatedAt: new Date()
-          })
-          .where(and(
-            eq(systemSettings.settingKey, key),
-            eq(systemSettings.category, 'email')
-          ));
-      }
-      
-      res.json({ message: "Email settings updated successfully" });
-    } catch (error) {
-      console.error("Error updating email settings:", error);
-      res.status(500).json({ message: "Failed to update email settings" });
-    }
-  });
-
+  // Email Test API Route (System Admin Only) - using env variables
   app.post("/api/admin/email-settings/test", requireAuth, isSystemOwner, async (req, res) => {
     try {
       const { to, subject, message } = req.body;

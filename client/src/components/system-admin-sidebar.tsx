@@ -84,12 +84,7 @@ export default function SystemAdminSidebar({
       path: "/system-admin/trial-settings",
       active: location === "/system-admin/trial-settings",
     },
-    {
-      label: "Pengaturan Email",
-      icon: Mail,
-      path: "/system-admin/email-settings",
-      active: location === "/system-admin/email-settings",
-    },
+
     {
       label: "Pengaturan Aplikasi",
       icon: Settings,
