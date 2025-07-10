@@ -69,16 +69,20 @@ export function DailyUpdateSimple() {
   });
 
   const { data: successMetrics = [] } = useQuery({
-    queryKey: ['/api/success-metrics'],
+    queryKey: ['/api/success-metrics', initiatives.map(i => i.id).join(',')],
     queryFn: async () => {
+      if (initiatives.length === 0) return [];
+      
       const allMetrics = [];
       for (const initiative of initiatives) {
         try {
           const metrics = await apiRequest('GET', `/api/initiatives/${initiative.id}/success-metrics`);
-          allMetrics.push(...metrics.map((metric: any) => ({
-            ...metric,
-            initiativeTitle: initiative.title
-          })));
+          if (Array.isArray(metrics)) {
+            allMetrics.push(...metrics.map((metric: any) => ({
+              ...metric,
+              initiativeTitle: initiative.title
+            })));
+          }
         } catch (error) {
           console.error(`Error fetching metrics for initiative ${initiative.id}:`, error);
         }
@@ -131,10 +135,14 @@ export function DailyUpdateSimple() {
 
       // Update success metrics
       for (const sm of data.successMetrics) {
-        if (sm.newValue !== sm.achievement) {
-          await apiRequest('PATCH', `/api/success-metrics/${sm.id}`, {
-            achievement: sm.newValue
-          });
+        if (sm.newValue !== sm.achievement && sm.id) {
+          try {
+            await apiRequest('PATCH', `/api/success-metrics/${sm.id}`, {
+              achievement: sm.newValue
+            });
+          } catch (error) {
+            console.error(`Error updating success metric ${sm.id}:`, error);
+          }
         }
       }
 
@@ -148,15 +156,22 @@ export function DailyUpdateSimple() {
         }
       }
 
-      // Create daily reflection
-      await apiRequest('POST', '/api/daily-reflections', {
-        date: new Date().toISOString().split('T')[0],
-        whatWorkedWell: data.reflection.whatWorkedWell,
-        challenges: data.reflection.challenges,
-        keyResultUpdates: data.keyResults.filter(kr => kr.notes),
-        successMetricUpdates: data.successMetrics.filter(sm => sm.notes),
-        tasksCompleted: todayTasks.length
-      });
+      // Create daily reflection (if reflection content exists)
+      if (data.reflection.whatWorkedWell || data.reflection.challenges) {
+        try {
+          await apiRequest('POST', '/api/daily-reflections', {
+            date: new Date().toISOString().split('T')[0],
+            whatWorkedWell: data.reflection.whatWorkedWell,
+            challenges: data.reflection.challenges,
+            keyResultUpdates: data.keyResults.filter(kr => kr.notes),
+            successMetricUpdates: data.successMetrics.filter(sm => sm.notes),
+            tasksCompleted: todayTasks.length
+          });
+        } catch (error) {
+          console.error('Error creating daily reflection:', error);
+          // Continue even if reflection fails
+        }
+      }
     },
     onSuccess: () => {
       toast({
