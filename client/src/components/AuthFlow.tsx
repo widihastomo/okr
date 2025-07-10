@@ -114,33 +114,16 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
       }
       return response.json();
     },
-    onSuccess: async () => {
+    onSuccess: () => {
       toast({
         title: "Login berhasil",
         description: "Selamat datang!",
         variant: "success",
       });
       
-      // Check onboarding status immediately after login
-      try {
-        const onboardingResponse = await apiRequest("GET", "/api/onboarding/status");
-        if (onboardingResponse.ok) {
-          const onboardingStatus = await onboardingResponse.json();
-          
-          // Use client-side navigation for fastest redirect
-          if (onboardingStatus.isCompleted) {
-            navigate("/");
-          } else {
-            navigate("/onboarding");
-          }
-        } else {
-          // If onboarding status check fails, default to home
-          navigate("/");
-        }
-      } catch (error) {
-        console.error("Error checking onboarding status:", error);
-        navigate("/");
-      }
+      // Immediate redirect to "/" for fastest user experience
+      // Onboarding check will happen in App.tsx after redirect
+      navigate("/");
       
       // Call onSuccess callback if provided
       if (onSuccess) onSuccess();

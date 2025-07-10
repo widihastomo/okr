@@ -121,6 +121,14 @@ Trial user untuk testing achievement system:
 ## Changelog
 ```
 Changelog:
+- July 10, 2025. Successfully optimized ALL authentication redirects for maximum performance:
+  * OPTIMIZED: Login redirect now immediate - removed onboarding API call during login for instant redirect to "/"
+  * OPTIMIZED: Logout redirect now uses wouter's navigate() instead of window.location.reload() for instant client-side redirect
+  * OPTIMIZED: Onboarding check moved to App.tsx with efficient caching (5 minutes cache, only on root path)
+  * ENHANCED: Login flow: immediate redirect → background onboarding check → redirect to /onboarding if needed
+  * ENHANCED: Logout flow: API call → cache clear → instant navigate("/") 
+  * PERFORMANCE: All authentication redirects now use client-side navigation for sub-second performance
+  * RESULT: Login and logout redirects are now instantaneous without page reloads
 - July 10, 2025. Successfully fixed onboarding cycle data inconsistency issue:
   * FIXED: Cycle creation now uses exact dates from user input during onboarding (cycleStartDate, cycleEndDate)
   * CORRECTED: Existing cycle data updated to match user's original input (end date corrected from 2025-07-31 to 2025-08-31)

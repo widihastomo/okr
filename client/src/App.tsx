@@ -79,7 +79,14 @@ function Router() {
     enabled: isAuthenticated && !isLoading,
   });
   
-  // No need for onboarding check here - handled in login flow
+  // Check onboarding status for redirect (efficient version)
+  const { data: onboardingStatus } = useQuery({
+    queryKey: ["/api/onboarding/status"],
+    enabled: isAuthenticated && !isLoading && location === "/",
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    cacheTime: 10 * 60 * 1000, // 10 minutes cache
+    refetchOnWindowFocus: false,
+  });
 
   // Clear logout flag on app start if user is authenticated
   useEffect(() => {
@@ -87,6 +94,13 @@ function Router() {
       localStorage.removeItem("isLoggedOut");
     }
   }, [isAuthenticated]);
+
+  // Handle onboarding redirect only on root path
+  useEffect(() => {
+    if (isAuthenticated && !isLoading && location === "/" && onboardingStatus && !onboardingStatus.isCompleted) {
+      navigate("/onboarding");
+    }
+  }, [isAuthenticated, isLoading, location, onboardingStatus, navigate]);
 
   const handleMenuToggle = () => {
     setSidebarOpen(!sidebarOpen);
