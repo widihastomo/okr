@@ -31,15 +31,17 @@ export default function PlanChangeWizard({ currentPlan, onPlanChanged }: PlanCha
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch available plans
-  const { data: plans = [], isLoading: plansLoading } = useQuery<(SubscriptionPlan & { billingPeriods: BillingPeriod[] })[]>({
-    queryKey: ["/api/subscription-plans"],
+  // Fetch available plans with billing periods
+  const { data: plansData, isLoading: plansLoading } = useQuery({
+    queryKey: ["/api/subscription-plans-with-billing"],
+    enabled: isOpen, // Only fetch when dialog is open
   });
 
-  // Filter out current plan and show upgrades only
-  const availablePlans = plans.filter(plan => 
-    plan.slug !== currentPlan?.slug && 
-    parseFloat(plan.price) > parseFloat(currentPlan?.price || "0")
+  // Safely handle plans data and filter upgrades
+  const plans = plansData || [];
+  const availablePlans = plans.filter((plan: any) => 
+    plan?.slug !== currentPlan?.slug && 
+    parseFloat(plan?.price || "0") > parseFloat(currentPlan?.price || "0")
   );
 
   const wizardSteps: WizardStep[] = [
@@ -117,7 +119,8 @@ export default function PlanChangeWizard({ currentPlan, onPlanChanged }: PlanCha
     }
   };
 
-  const handlePlanSelect = (plan: SubscriptionPlan & { billingPeriods: BillingPeriod[] }) => {
+  const handlePlanSelect = (plan: any) => {
+    console.log("Selected plan:", plan);
     setSelectedPlan(plan);
     setCurrentStep(2);
   };
@@ -241,9 +244,13 @@ export default function PlanChangeWizard({ currentPlan, onPlanChanged }: PlanCha
               <div className="flex justify-center py-8">
                 <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
               </div>
+            ) : availablePlans.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-500">Tidak ada paket upgrade yang tersedia</p>
+              </div>
             ) : (
               <div className="grid gap-4 md:grid-cols-2">
-                {availablePlans.map((plan) => (
+                {availablePlans.map((plan: any) => (
                   <Card 
                     key={plan.id} 
                     className={`cursor-pointer transition-all hover:shadow-lg border-2 ${
@@ -279,7 +286,7 @@ export default function PlanChangeWizard({ currentPlan, onPlanChanged }: PlanCha
                           <span className="text-sm">Hingga {plan.maxUsers} pengguna</span>
                         </div>
                         <div className="space-y-1">
-                          {plan.features.slice(0, 4).map((feature, index) => (
+                          {(plan.features || []).slice(0, 4).map((feature: string, index: number) => (
                             <div key={index} className="flex items-center gap-2">
                               <CheckCircle className="h-4 w-4 text-green-500" />
                               <span className="text-sm text-gray-700">{feature}</span>
@@ -304,7 +311,7 @@ export default function PlanChangeWizard({ currentPlan, onPlanChanged }: PlanCha
             </div>
 
             <div className="grid gap-4">
-              {selectedPlan.billingPeriods.map((billing) => {
+              {(selectedPlan?.billingPeriods || []).map((billing: any) => {
                 const { savings, savingsPercentage } = calculateSavings(billing, selectedPlan.price);
                 
                 return (
@@ -409,7 +416,7 @@ export default function PlanChangeWizard({ currentPlan, onPlanChanged }: PlanCha
                         Kapasitas meningkat dari {currentPlan?.maxUsers} ke {selectedPlan.maxUsers} pengguna
                       </span>
                     </div>
-                    {selectedPlan.features.slice(0, 3).map((feature, index) => (
+                    {(selectedPlan?.features || []).slice(0, 3).map((feature: string, index: number) => (
                       <div key={index} className="flex items-center gap-2">
                         <CheckCircle className="h-4 w-4 text-green-500" />
                         <span className="text-sm">{feature}</span>

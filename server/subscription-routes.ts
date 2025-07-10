@@ -14,6 +14,41 @@ import { eq, and } from "drizzle-orm";
  * Subscription management routes
  */
 export function setupSubscriptionRoutes(app: Express) {
+
+  // Get subscription plans with billing periods for wizard
+  app.get("/api/subscription-plans-with-billing", async (req, res) => {
+    try {
+      const plansWithBilling = await db.select()
+        .from(subscriptionPlans)
+        .leftJoin(billingPeriods, eq(subscriptionPlans.id, billingPeriods.planId))
+        .where(eq(subscriptionPlans.isActive, true));
+
+      // Group billing periods by plan
+      const groupedPlans = plansWithBilling.reduce((acc: any, row) => {
+        const plan = row.subscription_plans;
+        const billing = row.billing_periods;
+        
+        if (!acc[plan.id]) {
+          acc[plan.id] = {
+            ...plan,
+            billingPeriods: []
+          };
+        }
+        
+        if (billing) {
+          acc[plan.id].billingPeriods.push(billing);
+        }
+        
+        return acc;
+      }, {});
+
+      const result = Object.values(groupedPlans);
+      res.json(result);
+    } catch (error) {
+      console.error("Error fetching plans with billing:", error);
+      res.status(500).json({ message: "Failed to fetch subscription plans" });
+    }
+  });
   
   // Change subscription plan
   app.post("/api/subscription/change-plan", requireAuth, async (req, res) => {
