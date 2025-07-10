@@ -158,6 +158,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
       toast({
         title: "Registrasi berhasil",
         description: "Kode verifikasi telah dikirim ke email Anda",
+        variant: "success",
       });
     },
     onError: (error: Error) => {
@@ -250,6 +251,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
         toast({
           title: "Email berhasil diverifikasi",
           description: "Akun Anda sudah aktif!",
+          variant: "success",
         });
       } else {
         const error = await response.json();

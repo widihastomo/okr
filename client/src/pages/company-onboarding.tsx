@@ -399,6 +399,7 @@ export default function CompanyOnboarding() {
         title: "Selamat!",
         description:
           "Onboarding berhasil diselesaikan. Goal pertama telah dibuat!",
+        variant: "success",
       });
       
       // Set redirecting state to show loading

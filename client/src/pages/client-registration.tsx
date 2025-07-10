@@ -105,6 +105,7 @@ export default function ClientRegistration() {
       toast({
         title: "Invoice Generated",
         description: "Invoice berhasil dibuat, silakan lanjutkan ke pembayaran",
+        variant: "success",
       });
     } catch (error) {
       console.error('Error generating invoice:', error);
@@ -122,6 +123,7 @@ export default function ClientRegistration() {
     toast({
       title: "Registration Complete",
       description: "Pendaftaran berhasil! Silakan login dengan akun yang telah dibuat.",
+      variant: "success",
     });
     // Redirect to login page
     window.location.href = '/login';
