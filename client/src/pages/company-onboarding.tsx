@@ -72,7 +72,7 @@ const ONBOARDING_STEPS = [
   },
   {
     id: 3,
-    title: "Tentukan Siklus Goal",
+    title: "Tentukan Tenggat Waktu Goal",
     description: "Berapa lama Anda ingin goal ini tercapai?",
     icon: Calendar,
   },
@@ -185,37 +185,62 @@ export default function CompanyOnboarding() {
     isCompleted: false,
   });
 
-  // Error handling for ResizeObserver
+  // Error handling for ResizeObserver and other common errors
   useEffect(() => {
-    const handleResizeObserverError = (e: ErrorEvent) => {
-      if (
-        e.message.includes(
-          "ResizeObserver loop completed with undelivered notifications",
-        )
-      ) {
+    const handleGlobalError = (e: ErrorEvent) => {
+      if (e.message.includes("ResizeObserver loop completed with undelivered notifications")) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+      if (e.message.includes("Non-Error promise rejection captured")) {
         e.preventDefault();
         e.stopPropagation();
         return false;
       }
     };
 
+    const handleUnhandledRejection = (e: PromiseRejectionEvent) => {
+      if (String(e.reason).includes("ResizeObserver")) {
+        e.preventDefault();
+        return false;
+      }
+    };
+
     const originalConsoleError = console.error;
+    const originalConsoleWarn = console.warn;
+    
     console.error = (...args) => {
-      if (
-        args[0]?.includes &&
-        args[0].includes(
-          "ResizeObserver loop completed with undelivered notifications",
-        )
-      ) {
+      const message = String(args[0]);
+      if (message.includes("ResizeObserver loop completed with undelivered notifications") ||
+          message.includes("Non-Error promise rejection captured")) {
         return;
+      }
+      // Log important errors for debugging
+      if (message.includes("completeOnboardingMutation") || 
+          message.includes("TypeError") || 
+          message.includes("ReferenceError")) {
+        console.log("🔍 Important error caught:", args);
       }
       originalConsoleError(...args);
     };
 
-    window.addEventListener("error", handleResizeObserverError);
+    console.warn = (...args) => {
+      const message = String(args[0]);
+      if (message.includes("ResizeObserver loop completed with undelivered notifications")) {
+        return;
+      }
+      originalConsoleWarn(...args);
+    };
+
+    window.addEventListener("error", handleGlobalError);
+    window.addEventListener("unhandledrejection", handleUnhandledRejection);
+    
     return () => {
-      window.removeEventListener("error", handleResizeObserverError);
+      window.removeEventListener("error", handleGlobalError);
+      window.removeEventListener("unhandledrejection", handleUnhandledRejection);
       console.error = originalConsoleError;
+      console.warn = originalConsoleWarn;
     };
   }, []);
 
@@ -267,19 +292,19 @@ export default function CompanyOnboarding() {
         if (!data.cycleDuration) {
           return {
             isValid: false,
-            message: "Silakan pilih durasi siklus goal",
+            message: "Silakan pilih durasi tenggat waktu goal",
           };
         }
         if (!data.cycleStartDate) {
           return {
             isValid: false,
-            message: "Silakan pilih tanggal mulai siklus",
+            message: "Silakan pilih tanggal mulai",
           };
         }
         if (!data.cycleEndDate) {
           return {
             isValid: false,
-            message: "Silakan pilih tanggal berakhir siklus",
+            message: "Silakan pilih tanggal berakhir",
           };
         }
         break;
@@ -401,8 +426,6 @@ export default function CompanyOnboarding() {
   const progressPercentage =
     onboardingData.currentStep === 0
       ? 0
-      : onboardingData.currentStep === ONBOARDING_STEPS.length
-      ? 100 // Show 100% when at the final step (step 9)
       : (onboardingData.completedSteps.length / ONBOARDING_STEPS.length) * 100;
 
   // Dynamic color system based on progress
@@ -739,7 +762,7 @@ export default function CompanyOnboarding() {
       case 3: // Tentukan OKR Cycle
         return (
           <div className="space-y-4">
-            <Label htmlFor="cycle-duration">Pilih durasi Siklus:</Label>
+            <Label htmlFor="cycle-duration">Pilih durasi Goal:</Label>
             <Select
               value={onboardingData.cycleDuration}
               onValueChange={(value) =>
@@ -2822,7 +2845,7 @@ export default function CompanyOnboarding() {
 
                 <div className="bg-white p-4 rounded-lg border border-gray-200">
                   <h4 className="font-semibold text-gray-800 mb-3">
-                    📅 Pengaturan Siklus & Monitoring
+                    📅 Pengaturan Tenggat Waktu & Monitoring
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700">
                     <div className="space-y-2">
@@ -3105,7 +3128,7 @@ export default function CompanyOnboarding() {
 
                 <div className="bg-white p-4 rounded-lg border border-gray-200">
                   <h4 className="font-semibold text-gray-800 mb-3">
-                    📅 Pengaturan Siklus & Monitoring
+                    📅 Pengaturan Tenggat Waktu & Monitoring
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700">
                     <div className="space-y-2">
@@ -3203,7 +3226,7 @@ export default function CompanyOnboarding() {
     const stepMessages = {
       1: "Setiap bisnis pasti punya tantangan. Ada yang tertinggal omzetnya, ada yang timnya belum sinkron. Tapi semua perubahan dimulai dari fokus. Sekarang, mari tentukan satu area yang paling penting untuk Anda perbaiki dulu. Kita tidak perlu sempurna di semua hal, cukup jadi luar biasa di satu hal.",
       2: "Tidak ada tim hebat yang dibangun oleh satu orang. Saat Anda mengundang tim, Anda sedang menanamkan rasa tanggung jawab bersama. Bayangkan jika semua anggota tahu tujuan tim, tahu perannya — komunikasi lebih jernih, hasil lebih cepat terlihat",
-      3: "Bayangkan Anda sedang membangun jembatan. Tanpa batas waktu, pekerjaan bisa meluas tak tentu arah. Dengan siklus goal, Anda tahu kapan harus mulai, mengevaluasi, dan menyesuaikan. Kita tidak sedang maraton tanpa garis akhir — kita sedang sprint kecil yang terarah.",
+      3: "Bayangkan Anda sedang membangun jembatan. Tanpa batas waktu, pekerjaan bisa meluas tak tentu arah. Dengan tenggat waktu goal, Anda tahu kapan harus mulai, mengevaluasi, dan menyesuaikan. Kita tidak sedang maraton tanpa garis akhir — kita sedang sprint kecil yang terarah.",
       4: "Banyak pemilik usaha terseret ke rutinitas harian dan kehilangan arah. Goal adalah titik utara — kompas yang menjaga Anda tetap di jalur. Mari tuliskan tujuan yang benar-benar Anda pedulikan. Bukan sekadar target, tapi alasan kenapa Anda bangun tiap pagi dan tetap berjuang.",
       5: "Pernah merasa sudah sibuk setiap hari tapi tak yakin ada hasilnya? Di sinilah pentingnya ukuran keberhasilan. Kita ubah tujuan jadi angka, agar Anda tahu persis kapan Anda berhasil, dan kapan perlu ganti cara. Ukuran ini bukan soal angka — tapi bukti bahwa kerja Anda bermakna.",
       6: "Kebanyakan strategi gagal bukan karena kurang ide, tapi karena terlalu banyak dan tak tahu mana yang penting. Inisiatif adalah langkah nyata. Kita pilih yang sederhana, bisa langsung dikerjakan, dan berdampak besar. Fokus pada satu tembakan yang paling kena sasaran.",
