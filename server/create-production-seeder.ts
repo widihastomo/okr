@@ -26,10 +26,10 @@ function checkDatabaseConnection() {
     console.log(`- PGPORT: ${PGPORT}`);
     
     if (PGUSER && PGPASSWORD && PGHOST && PGDATABASE) {
-      const constructedUrl = `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}`;
+      const constructedUrl = `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}?sslmode=require`;
       process.env.DATABASE_URL = constructedUrl;
       console.log("✅ DATABASE_URL constructed from PG environment variables");
-      console.log(`🔗 Database URL: postgresql://${PGUSER}:****@${PGHOST}:${PGPORT}/${PGDATABASE}`);
+      console.log(`🔗 Database URL: postgresql://${PGUSER}:****@${PGHOST}:${PGPORT}/${PGDATABASE}?sslmode=require`);
       return true;
     }
     

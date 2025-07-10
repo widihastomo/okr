@@ -12,7 +12,7 @@ function ensureDatabaseUrl() {
     const { PGUSER, PGPASSWORD, PGHOST, PGPORT = '5432', PGDATABASE } = process.env;
     
     if (PGUSER && PGPASSWORD && PGHOST && PGDATABASE) {
-      const constructedUrl = `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}`;
+      const constructedUrl = `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}?sslmode=require`;
       process.env.DATABASE_URL = constructedUrl;
       console.log("✅ DATABASE_URL constructed from PG environment variables");
       return constructedUrl;
