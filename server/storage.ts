@@ -1710,19 +1710,28 @@ export class DatabaseStorage implements IStorage {
       // Find or create active cycle
       let activeCycle = await db.select().from(cycles).where(eq(cycles.status, "active")).limit(1);
       if (!activeCycle.length) {
-        // Create a new cycle if none exists
-        const currentYear = new Date().getFullYear();
-        const currentMonth = new Date().getMonth() + 1;
-        const currentDate = new Date();
+        // Create a new cycle from onboarding data
+        const startDate = onboardingData.cycleStartDate ? new Date(onboardingData.cycleStartDate) : new Date();
+        const endDate = onboardingData.cycleEndDate ? new Date(onboardingData.cycleEndDate) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+        
+        // Generate cycle name based on dates and duration
+        const cycleName = onboardingData.cycleDuration === '1_bulan' ? 
+          `Bulanan - ${startDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}` :
+          onboardingData.cycleDuration === '3_bulan' ? 
+          `Triwulanan - ${startDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}` :
+          `Tahunan - ${startDate.getFullYear()}`;
         
         const cycleData = {
-          name: `Onboarding - ${currentDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}`,
-          type: onboardingData.cadence === 'monthly' ? 'monthly' : 'quarterly',
-          startDate: new Date(currentYear, currentMonth - 1, 1).toISOString(),
-          endDate: new Date(currentYear, currentMonth, 0).toISOString(),
+          name: cycleName,
+          type: onboardingData.cycleDuration === '1_bulan' ? 'monthly' : 
+                onboardingData.cycleDuration === '3_bulan' ? 'quarterly' : 'annual',
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
           status: 'active',
-          description: `Siklus pertama dari hasil onboarding perusahaan`
+          description: `Siklus pertama dari hasil onboarding perusahaan - ${onboardingData.teamFocus || 'General'}`
         };
+        
+        console.log(`🔄 Creating cycle from onboarding: ${cycleName} (${cycleData.startDate} to ${cycleData.endDate})`);
         
         const [newCycle] = await db.insert(cycles).values(cycleData).returning();
         activeCycle = [newCycle];

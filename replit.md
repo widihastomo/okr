@@ -121,6 +121,12 @@ Trial user untuk testing achievement system:
 ## Changelog
 ```
 Changelog:
+- July 10, 2025. Successfully fixed onboarding cycle data inconsistency issue:
+  * FIXED: Cycle creation now uses exact dates from user input during onboarding (cycleStartDate, cycleEndDate)
+  * CORRECTED: Existing cycle data updated to match user's original input (end date corrected from 2025-07-31 to 2025-08-31)
+  * IMPROVED: Cycle name generation now reflects actual duration selected (Triwulanan instead of generic Onboarding)
+  * RESOLVED: createFirstObjectiveFromOnboarding function now properly respects user's cycle date preferences
+  * ENHANCED: Cycle type mapping improved to match selected duration (1_bulan→monthly, 3_bulan→quarterly, 1_tahun→annual)
 - July 10, 2025. Successfully optimized both login-to-onboarding AND onboarding-to-dashboard transitions for faster user experience:
   * FIXED: Replaced window.location.href with wouter's navigate() for instant client-side navigation on BOTH transitions
   * OPTIMIZED: Aggressive caching strategies - 5 minutes for onboarding status, 2 minutes for auth state, 30 seconds for onboarding progress
