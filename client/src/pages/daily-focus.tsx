@@ -321,6 +321,7 @@ export default function DailyFocusPage() {
       toast({
         title: "Status berhasil diupdate",
         description: "Status task telah diperbarui",
+        variant: "success",
       });
     },
     onError: (error: Error) => {
@@ -421,6 +422,7 @@ export default function DailyFocusPage() {
       toast({
         title: "Task berhasil dibuat",
         description: "Task baru telah ditambahkan",
+        variant: "success",
       });
       setIsTaskModalOpen(false);
       setTaskFormData({
@@ -453,6 +455,7 @@ export default function DailyFocusPage() {
       toast({
         title: "Task berhasil dihapus",
         description: "Task telah dihapus dari sistem",
+        variant: "success",
       });
     },
     onError: (error: Error) => {
@@ -476,6 +479,7 @@ export default function DailyFocusPage() {
       toast({
         title: "Task berhasil diperbarui",
         description: "Task telah diperbarui",
+        variant: "success",
       });
       setIsEditTaskModalOpen(false);
       setSelectedTask(null);

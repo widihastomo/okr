@@ -359,7 +359,7 @@ export default function TaskDetailPage() {
       toast({
         title: "Task dihapus",
         description: "Task berhasil dihapus",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       window.history.back();
     },
@@ -382,7 +382,7 @@ export default function TaskDetailPage() {
       toast({
         title: "Status diperbarui",
         description: "Status task berhasil diperbarui",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
     },
   });

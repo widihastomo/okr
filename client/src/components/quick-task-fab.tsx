@@ -105,7 +105,7 @@ export default function QuickTaskFAB() {
       toast({
         title: "Task berhasil dibuat",
         description: "Task baru telah ditambahkan",
-        className: "border-green-200 bg-green-50 text-green-800",
+        variant: "success",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
       queryClient.invalidateQueries({ queryKey: ["/api/initiatives"] });
