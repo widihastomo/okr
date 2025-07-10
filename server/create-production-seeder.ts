@@ -1,8 +1,7 @@
 import { db } from "./db";
 import { 
   users, 
-  organizations, 
-  organizationMembers, 
+  organizations,
   subscriptionPlans, 
   organizationSubscriptions 
 } from "../shared/schema";
@@ -62,11 +61,9 @@ async function createSystemOwner() {
   const [systemOrg] = await db.insert(organizations).values({
     name: "Refokus System",
     slug: "refokus-system",
-    description: "System administration organization",
+    website: "https://refokus.com",
     industry: "Technology",
     size: "1-10",
-    website: "https://refokus.com",
-    isSystemOrganization: true,
   }).returning();
 
   // Create system owner user
@@ -76,20 +73,16 @@ async function createSystemOwner() {
     firstName: "System",
     lastName: "Administrator",
     isSystemOwner: true,
-    emailVerified: true,
+    isEmailVerified: true,
     organizationId: systemOrg.id,
     role: "system_owner",
     isActive: true,
   }).returning();
 
-  // Add system owner to organization
-  await db.insert(organizationMembers).values({
-    userId: systemOwner.id,
-    organizationId: systemOrg.id,
-    role: "admin",
-    invitedBy: systemOwner.id,
-    joinedAt: new Date(),
-  });
+  // Update organization to set owner
+  await db.update(organizations)
+    .set({ ownerId: systemOwner.id })
+    .where(eq(organizations.id, systemOrg.id));
 
   console.log("✅ System owner created successfully");
   console.log(`   Email: ${adminEmail}`);
@@ -226,7 +219,14 @@ async function verifySetup() {
 }
 
 // Run the script if called directly
-if (require.main === module) {
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Check if this script is being run directly
+if (process.argv[1] === __filename || process.argv[1] === fileURLToPath(import.meta.url)) {
   seedProductionData()
     .then(() => {
       console.log("🎉 Production seeding completed successfully");

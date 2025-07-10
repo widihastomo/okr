@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, organizations, organizationMembers } from "../shared/schema";
+import { users, organizations } from "../shared/schema";
 import { hashPassword } from "./emailAuth";
 import { eq } from "drizzle-orm";
 
@@ -43,11 +43,9 @@ async function createProductionAdmin() {
     const [systemOrg] = await db.insert(organizations).values({
       name: "Refokus System",
       slug: "refokus-system",
-      description: "System administration organization",
+      website: "https://refokus.com",
       industry: "Technology",
       size: "1-10",
-      website: "https://refokus.com",
-      isSystemOrganization: true,
     }).returning();
 
     console.log("✅ System organization created:", systemOrg.id);
@@ -59,7 +57,7 @@ async function createProductionAdmin() {
       firstName: adminFirstName,
       lastName: adminLastName,
       isSystemOwner: true,
-      emailVerified: true,
+      isEmailVerified: true,
       organizationId: systemOrg.id,
       role: "system_owner",
       isActive: true,
@@ -67,16 +65,12 @@ async function createProductionAdmin() {
 
     console.log("✅ System owner created:", systemOwner.id);
 
-    // Add system owner to organization as admin
-    await db.insert(organizationMembers).values({
-      userId: systemOwner.id,
-      organizationId: systemOrg.id,
-      role: "admin",
-      invitedBy: systemOwner.id,
-      joinedAt: new Date(),
-    });
+    // Update organization to set owner
+    await db.update(organizations)
+      .set({ ownerId: systemOwner.id })
+      .where(eq(organizations.id, systemOrg.id));
 
-    console.log("✅ System owner added to organization");
+    console.log("✅ Organization owner updated");
 
     // Log production credentials
     console.log("\n🎯 PRODUCTION SYSTEM OWNER CREDENTIALS:");
@@ -102,7 +96,14 @@ async function createProductionAdmin() {
 }
 
 // Run the script if called directly
-if (require.main === module) {
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Check if this script is being run directly
+if (process.argv[1] === __filename || process.argv[1] === fileURLToPath(import.meta.url)) {
   createProductionAdmin()
     .then(() => {
       console.log("🎉 Production admin creation completed");
