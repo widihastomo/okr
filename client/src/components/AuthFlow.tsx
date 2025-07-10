@@ -116,6 +116,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
       toast({
         title: "Login berhasil",
         description: "Selamat datang!",
+        variant: "success",
       });
       if (onSuccess) onSuccess();
       else window.location.href = "/";
@@ -187,6 +188,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
       toast({
         title: "Kode reset dikirim",
         description: "Silakan cek email Anda untuk kode reset password",
+        variant: "success",
       });
     },
     onError: (error: Error) => {
@@ -217,6 +219,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
       toast({
         title: "Password berhasil direset",
         description: "Silakan login dengan password baru Anda",
+        variant: "success",
       });
     },
     onError: (error: Error) => {

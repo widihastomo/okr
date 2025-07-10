@@ -160,6 +160,7 @@ export default function Registration() {
       toast({
         title: "Registrasi berhasil!",
         description: "Kode verifikasi telah dikirim ke email Anda. Silakan cek inbox email.",
+        variant: "success",
       });
       
     } catch (error: any) {
@@ -197,6 +198,7 @@ export default function Registration() {
       toast({
         title: "Verifikasi berhasil!",
         description: "Akun Anda telah diaktifkan. Silakan login.",
+        variant: "success",
       });
       
       // Show success screen
