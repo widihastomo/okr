@@ -121,6 +121,13 @@ Trial user untuk testing achievement system:
 ## Changelog
 ```
 Changelog:
+- July 10, 2025. Successfully fixed missing task mappings in onboarding system step 7:
+  * Added task mappings for operational initiatives: Performance monitoring system, Employee productivity training, Resource allocation optimization, Energy efficiency program, Process optimization initiative  
+  * Added task mappings for marketing initiatives: cross-selling strategy, upselling training, referral program, marketplace partnerships
+  * Fixed taskMapping variable scope issue by moving it outside function scope for proper reusability
+  * All selected initiatives now properly display corresponding tasks in step 7 of onboarding process
+  * Completed comprehensive task mapping coverage for all initiative categories (marketing, operational, customer service)
+  * Each initiative now has exactly 3 relevant tasks for consistent user experience
 - July 10, 2025. Successfully enhanced virtual assistant with typing animation effect for immersive user experience:
   * Added comprehensive typing effect hook (useTypingEffect) with configurable typing speed and real-time message display
   * Virtual assistant messages now type out character by character with smooth animation (35ms per character)

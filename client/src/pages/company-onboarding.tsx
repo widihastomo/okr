@@ -1904,6 +1904,26 @@ export default function CompanyOnboarding() {
               "Siapkan booth material dan product demo",
               "Follow up dengan kontak dari event",
             ],
+            "Mengembangkan strategi cross-selling kepada existing customer": [
+              "Analisis purchase history existing customer",
+              "Buat cross-selling recommendation engine",
+              "Training sales team untuk cross-selling technique",
+            ],
+            "Melatih tim sales untuk upselling": [
+              "Buat materi training upselling technique",
+              "Lakukan roleplay session untuk upselling",
+              "Monitor dan evaluasi upselling performance",
+            ],
+            "Membuat referral program dengan reward menarik": [
+              "Design struktur referral program dan reward",
+              "Buat sistem tracking untuk referral",
+              "Launch program dan monitor customer engagement",
+            ],
+            "Membangun partnership dengan marketplace online": [
+              "Riset marketplace yang sesuai dengan produk",
+              "Negosiasi partnership terms dengan marketplace",
+              "Setup produk di marketplace dan monitor performance",
+            ],
 
             // Operasional Tasks
             "Mengimplementasikan lean manufacturing principles": [
@@ -1940,6 +1960,31 @@ export default function CompanyOnboarding() {
               "Setup monitoring equipment di production line",
               "Buat dashboard untuk real-time monitoring",
               "Training tim untuk menggunakan monitoring system",
+            ],
+            "Performance monitoring system": [
+              "Setup performance monitoring tools",
+              "Buat dashboard untuk tracking performance",
+              "Training tim untuk menggunakan monitoring system",
+            ],
+            "Employee productivity training": [
+              "Buat program training untuk karyawan",
+              "Lakukan assessment skill karyawan",
+              "Implementasi best practices untuk produktivitas",
+            ],
+            "Resource allocation optimization": [
+              "Analisis current resource allocation",
+              "Buat model optimization untuk resource",
+              "Implementasi resource allocation yang optimal",
+            ],
+            "Energy efficiency program": [
+              "Audit energy consumption di semua area",
+              "Implementasi energy saving measures",
+              "Monitor energy efficiency improvement",
+            ],
+            "Process optimization initiative": [
+              "Analisis current process dan identifikasi waste",
+              "Design optimized process workflow",
+              "Implementasi process improvement dan monitoring",
             ],
 
             // Customer Service Tasks
@@ -1991,27 +2036,7 @@ export default function CompanyOnboarding() {
               "Follow up dengan participant setelah event",
             ],
             
-            // Additional initiatives that need task mappings
-            "Mengembangkan strategi cross-selling kepada existing customer": [
-              "Analisis customer behavior dan purchase pattern",
-              "Buat recommendation system untuk cross-selling",
-              "Training sales team untuk cross-selling approach",
-            ],
-            "Melatih tim sales untuk upselling": [
-              "Buat materi training upselling technique",
-              "Identifikasi opportunity upselling per customer",
-              "Setup reward system untuk upselling success",
-            ],
-            "Membuat referral program dengan reward menarik": [
-              "Design struktur reward untuk referral program",
-              "Buat sistem tracking untuk referral",
-              "Launch campaign dan monitor adoption rate",
-            ],
-            "Membangun partnership dengan marketplace online": [
-              "Identifikasi marketplace yang sesuai target",
-              "Nego terms partnership dengan marketplace",
-              "Setup product listing dan optimize visibility",
-            ],
+
             "Menyediakan program trial gratis untuk prospek": [
               "Buat struktur program trial dengan time limit",
               "Setup sistem aktivasi dan monitoring trial",
