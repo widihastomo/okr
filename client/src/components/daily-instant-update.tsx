@@ -315,9 +315,10 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
 
       // Update task statuses
       for (const task of data.todayTasks) {
-        if (task.newStatus !== task.status) {
+        if (task.newStatus && task.newStatus !== task.status) {
           await apiRequest('PATCH', `/api/tasks/${task.id}`, {
-            status: task.newStatus
+            status: task.newStatus,
+            completed: task.newStatus === 'completed'
           });
         }
       }
@@ -731,51 +732,22 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                             </span>
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap">
-                            <div>
-                              <div className="text-xs text-red-600 mb-1 font-bold">
-                                DESKTOP - Current: {task.status}, New: {task.newStatus || 'none'}, Index: {index}
-                              </div>
-                              <div className="flex flex-col gap-1">
-                                <button
-                                  type="button"
-                                  className="w-40 h-10 px-3 py-2 text-sm border border-red-500 rounded-md bg-yellow-50 focus:border-blue-600 focus:outline-none text-left"
-                                  onClick={() => {
-                                    console.log('🔥 BUTTON CLICKED FOR TASK:', task.title);
-                                    const newStatus = task.newStatus === 'in_progress' ? 'completed' : 'in_progress';
-                                    
-                                    setUpdateData(prevData => {
-                                      const newData = { ...prevData };
-                                      newData.todayTasks[index].newStatus = newStatus;
-                                      newData.todayTasks[index].completed = newStatus === 'completed';
-                                      console.log('🚀 BUTTON state updated:', newData.todayTasks[index]);
-                                      return newData;
-                                    });
-                                  }}
-                                >
-                                  {getTaskStatusLabel(task.newStatus || task.status)} (Klik untuk ubah)
-                                </button>
-                                
-                                <select
-                                  className="w-40 h-8 px-2 py-1 text-xs border border-gray-300 rounded bg-white"
-                                  value={task.newStatus || task.status}
-                                  onChange={(e) => {
-                                    console.log('🔥 SELECT CHANGED:', e.target.value);
-                                    const value = e.target.value;
-                                    setUpdateData(prevData => {
-                                      const newData = { ...prevData };
-                                      newData.todayTasks[index].newStatus = value;
-                                      newData.todayTasks[index].completed = value === 'completed';
-                                      return newData;
-                                    });
-                                  }}
-                                >
-                                  <option value="not_started">Belum Dimulai</option>
-                                  <option value="in_progress">Sedang Berjalan</option>
-                                  <option value="completed">Selesai</option>
-                                  <option value="cancelled">Dibatalkan</option>
-                                </select>
-                              </div>
-                            </div>
+                            <select
+                              className="w-40 h-10 px-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:border-blue-600 focus:outline-none"
+                              value={task.newStatus || task.status}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                const newData = { ...updateData };
+                                newData.todayTasks[index].newStatus = value;
+                                newData.todayTasks[index].completed = value === 'completed';
+                                setUpdateData(newData);
+                              }}
+                            >
+                              <option value="not_started">Belum Dimulai</option>
+                              <option value="in_progress">Sedang Berjalan</option>
+                              <option value="completed">Selesai</option>
+                              <option value="cancelled">Dibatalkan</option>
+                            </select>
                           </td>
                         </tr>
                       ))}
@@ -798,49 +770,22 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
 
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-700">Status Baru:</label>
-                        <div className="text-xs text-red-600 mb-1 font-bold">
-                          MOBILE - Current: {task.status}, New: {task.newStatus || 'none'}, Index: {index}
-                        </div>
-                        <div className="flex flex-col gap-2">
-                          <button
-                            type="button"
-                            className="w-full h-10 px-3 py-2 text-sm border border-red-500 rounded-md bg-yellow-50 focus:border-blue-600 focus:outline-none text-left"
-                            onClick={() => {
-                              console.log('🔥 MOBILE BUTTON CLICKED FOR TASK:', task.title);
-                              const newStatus = task.newStatus === 'in_progress' ? 'completed' : 'in_progress';
-                              
-                              setUpdateData(prevData => {
-                                const newData = { ...prevData };
-                                newData.todayTasks[index].newStatus = newStatus;
-                                newData.todayTasks[index].completed = newStatus === 'completed';
-                                console.log('🚀 MOBILE BUTTON state updated:', newData.todayTasks[index]);
-                                return newData;
-                              });
-                            }}
-                          >
-                            {getTaskStatusLabel(task.newStatus || task.status)} (Tap untuk ubah)
-                          </button>
-                          
-                          <select
-                            className="w-full h-8 px-2 py-1 text-xs border border-gray-300 rounded bg-white"
-                            value={task.newStatus || task.status}
-                            onChange={(e) => {
-                              console.log('🔥 MOBILE SELECT CHANGED:', e.target.value);
-                              const value = e.target.value;
-                              setUpdateData(prevData => {
-                                const newData = { ...prevData };
-                                newData.todayTasks[index].newStatus = value;
-                                newData.todayTasks[index].completed = value === 'completed';
-                                return newData;
-                              });
-                            }}
-                          >
-                            <option value="not_started">Belum Dimulai</option>
-                            <option value="in_progress">Sedang Berjalan</option>
-                            <option value="completed">Selesai</option>
-                            <option value="cancelled">Dibatalkan</option>
-                          </select>
-                        </div>
+                        <select
+                          className="w-full h-10 px-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:border-blue-600 focus:outline-none"
+                          value={task.newStatus || task.status}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            const newData = { ...updateData };
+                            newData.todayTasks[index].newStatus = value;
+                            newData.todayTasks[index].completed = value === 'completed';
+                            setUpdateData(newData);
+                          }}
+                        >
+                          <option value="not_started">Belum Dimulai</option>
+                          <option value="in_progress">Sedang Berjalan</option>
+                          <option value="completed">Selesai</option>
+                          <option value="cancelled">Dibatalkan</option>
+                        </select>
                       </div>
                     </div>
                   ))}
