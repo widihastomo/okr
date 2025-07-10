@@ -199,11 +199,11 @@ async function verifySetup() {
   // Check subscription plans
   const plans = await db.select().from(subscriptionPlans);
 
-  // Check system organization
+  // Check system organization (by slug)
   const systemOrgs = await db
     .select()
     .from(organizations)
-    .where(eq(organizations.isSystemOrganization, true));
+    .where(eq(organizations.slug, "refokus-system"));
 
   console.log(`✅ System owners: ${systemOwners.length}`);
   console.log(`✅ Subscription plans: ${plans.length}`);

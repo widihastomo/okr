@@ -5,9 +5,9 @@
  * This script builds the application for production and runs the production seeder
  */
 
-const { execSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
 
 function log(message) {
   console.log(`[BUILD] ${message}`);
@@ -53,24 +53,21 @@ async function buildProduction() {
       fs.rmSync('dist', { recursive: true, force: true });
     }
 
-    // 2. Build frontend
-    runCommand('npm run build:client', 'Building frontend');
+    // 2. Build application using existing build process
+    runCommand('npm run build', 'Building application');
     
-    // 3. Build backend  
-    runCommand('npm run build:server', 'Building backend');
-    
-    // 4. Verify build outputs
+    // 3. Verify build outputs
     log('🔍 Verifying build outputs...');
     
-    const frontendBuilt = verifyFile('dist/client/index.html', 100);
-    const backendBuilt = verifyFile('dist/server/index.js', 1000);
+    const frontendBuilt = verifyFile('dist/public/index.html', 100);
+    const backendBuilt = verifyFile('dist/index.js', 1000);
     
     if (!frontendBuilt || !backendBuilt) {
       log('❌ Build verification failed');
       process.exit(1);
     }
     
-    // 5. Run production seeder (only in production environment)
+    // 4. Run production seeder (only in production environment)
     if (isProduction) {
       log('🌱 Running production seeder...');
       
@@ -100,18 +97,18 @@ async function buildProduction() {
       log('💡 To run production seeder manually: npm run seed:production');
     }
     
-    // 6. Copy static files if needed
+    // 5. Copy static files if needed
     log('📄 Copying static files...');
     if (fs.existsSync('public')) {
-      runCommand('cp -r public/* dist/client/ 2>/dev/null || true', 'Copying public files');
+      runCommand('cp -r public/* dist/public/ 2>/dev/null || true', 'Copying public files');
     }
     
-    // 7. Create startup script
+    // 6. Create startup script
     log('📝 Creating startup script...');
     const startupScript = `#!/bin/bash
 # Production startup script
 export NODE_ENV=production
-node dist/server/index.js
+node dist/index.js
 `;
     
     fs.writeFileSync('start-production.sh', startupScript);
@@ -123,8 +120,8 @@ node dist/server/index.js
     // Display summary
     log('\n📊 Build Summary:');
     log('===================');
-    log(`Frontend: ${fs.existsSync('dist/client/index.html') ? '✅ Built' : '❌ Failed'}`);
-    log(`Backend: ${fs.existsSync('dist/server/index.js') ? '✅ Built' : '❌ Failed'}`);
+    log(`Frontend: ${fs.existsSync('dist/public/index.html') ? '✅ Built' : '❌ Failed'}`);
+    log(`Backend: ${fs.existsSync('dist/index.js') ? '✅ Built' : '❌ Failed'}`);
     log(`Database: ${isProduction ? '✅ Seeded' : '⚠️  Skipped (dev mode)'}`);
     log(`Startup: ${fs.existsSync('start-production.sh') ? '✅ Ready' : '❌ Failed'}`);
     

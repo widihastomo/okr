@@ -78,7 +78,7 @@ fi
 
 # Verify build outputs
 log "🔍 Verifying build outputs..."
-if [ ! -f "dist/client/index.html" ]; then
+if [ ! -f "dist/public/index.html" ]; then
     log "❌ Frontend build failed - index.html not found"
     exit 1
 fi
@@ -89,7 +89,7 @@ if [ ! -f "dist/server/index.js" ]; then
 fi
 
 # Get build sizes
-FRONTEND_SIZE=$(du -sh dist/client 2>/dev/null | cut -f1)
+FRONTEND_SIZE=$(du -sh dist/public 2>/dev/null | cut -f1)
 BACKEND_SIZE=$(du -sh dist/server 2>/dev/null | cut -f1)
 
 log "✅ Build verification passed"
@@ -128,7 +128,7 @@ fi
 # Copy static files
 if [ -d "public" ]; then
     log "📄 Copying static files..."
-    cp -r public/* dist/client/ 2>/dev/null || true
+    cp -r public/* dist/public/ 2>/dev/null || true
 fi
 
 # Create production startup script

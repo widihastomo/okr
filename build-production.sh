@@ -13,27 +13,19 @@ if [ "$NODE_ENV" != "production" ]; then
     export NODE_ENV=production
 fi
 
-# Clean previous build
-echo "🧹 Cleaning previous build..."
-rm -rf dist
-
-# Build frontend
-echo "🔄 Building frontend..."
-npm run build:client
-
-# Build backend
-echo "🔄 Building backend..."
-npm run build:server
+# Use the existing build process
+echo "🔄 Building application..."
+npm run build
 
 # Verify build outputs
 echo "🔍 Verifying build outputs..."
-if [ ! -f "dist/client/index.html" ]; then
-    echo "❌ Frontend build failed - index.html not found"
+if [ ! -f "dist/index.js" ]; then
+    echo "❌ Server build failed - index.js not found"
     exit 1
 fi
 
-if [ ! -f "dist/server/index.js" ]; then
-    echo "❌ Backend build failed - index.js not found"
+if [ ! -f "dist/public/index.html" ]; then
+    echo "❌ Frontend build failed - index.html not found"
     exit 1
 fi
 
