@@ -155,11 +155,16 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
     if (!allTasks) return [];
     const filtered = (allTasks as any[]).filter((task: any) => {
       const dueDate = task.dueDate ? task.dueDate.split('T')[0] : null;
-      return dueDate === todayStr || task.status === 'in_progress';
+      // Include tasks for today, yesterday (overdue), or in progress
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.toISOString().split('T')[0];
+      
+      return dueDate === todayStr || dueDate === yesterdayStr || task.status === 'in_progress';
     });
     console.log('Today tasks filtered:', filtered.map(t => ({ id: t.id, title: t.title, status: t.status, dueDate: t.dueDate })));
     return filtered;
-  }, [allTasks, todayStr]);
+  }, [allTasks, todayStr, today]);
 
   const tomorrowTasks = React.useMemo(() => {
     if (!allTasks) return [];
@@ -726,18 +731,23 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                             </span>
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap">
-                            <Select
-                              value={task.newStatus || task.status}
-                              onValueChange={(value) => {
-                                console.log('Dropdown changed:', { taskId: task.id, oldValue: task.newStatus, newValue: value });
-                                const newData = { ...updateData };
-                                newData.todayTasks[index].newStatus = value;
-                                newData.todayTasks[index].completed = value === 'completed';
-                                setUpdateData(newData);
-                              }}
-                            >
+                            <div>
+                              <div className="text-xs text-gray-500 mb-1">
+                                Current: {task.status}, New: {task.newStatus || 'none'}
+                              </div>
+                              <Select
+                                value={task.newStatus || task.status}
+                                onValueChange={(value) => {
+                                  console.log('Dropdown changed:', { taskId: task.id, taskTitle: task.title, oldValue: task.newStatus, newValue: value });
+                                  const newData = { ...updateData };
+                                  newData.todayTasks[index].newStatus = value;
+                                  newData.todayTasks[index].completed = value === 'completed';
+                                  setUpdateData(newData);
+                                  console.log('Update data set:', newData.todayTasks[index]);
+                                }}
+                              >
                               <SelectTrigger className="w-40">
-                                <SelectValue placeholder="Pilih Status" />
+                                <SelectValue placeholder={`Status: ${getTaskStatusLabel(task.status)}`} />
                               </SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="not_started">Belum Dimulai</SelectItem>
@@ -746,6 +756,7 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                                 <SelectItem value="cancelled">Dibatalkan</SelectItem>
                               </SelectContent>
                             </Select>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -779,7 +790,7 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
                           }}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Pilih Status" />
+                            <SelectValue placeholder={`Status: ${getTaskStatusLabel(task.status)}`} />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="not_started">Belum Dimulai</SelectItem>
