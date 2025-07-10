@@ -358,6 +358,8 @@ export default function DailyFocusPage() {
 
   const { data: allTasks = [], isLoading: isLoadingAllTasks } = useQuery({
     queryKey: ["/api/tasks"],
+    staleTime: 0, // Always fetch fresh data
+    cacheTime: 0, // Don't cache
   });
 
   const { data: users = [], isLoading: isLoadingUsers } = useQuery({
@@ -406,9 +408,16 @@ export default function DailyFocusPage() {
       const response = await apiRequest("POST", "/api/tasks", taskData);
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("Task creation success, invalidating cache...", data);
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
       queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
+      
+      // Force refetch to ensure data is updated
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ["/api/tasks"] });
+      }, 100);
+      
       toast({
         title: "Task berhasil dibuat",
         description: "Task baru telah ditambahkan",
@@ -805,6 +814,14 @@ export default function DailyFocusPage() {
   const filteredTasks = selectedUserId === "all" 
     ? (allTasks as any[])
     : (allTasks as any[]).filter((task: any) => task.assignedTo === selectedUserId);
+  
+  console.log("User filter debug:", {
+    selectedUserId,
+    currentUserId: userId,
+    allTasksCount: allTasks.length,
+    filteredTasksCount: filteredTasks.length,
+    sampleTasks: allTasks.slice(0, 3).map(t => ({ title: t.title, assignedTo: t.assignedTo, dueDate: t.dueDate }))
+  });
 
   const filteredKeyResults = selectedUserId === "all"
     ? (keyResults as any[])
@@ -817,6 +834,14 @@ export default function DailyFocusPage() {
   // Filter data for today's focus
   const todayTasks = filteredTasks.filter((task: any) => {
     const dueDate = task.dueDate ? task.dueDate.split("T")[0] : null;
+    console.log("Task filtering debug:", { 
+      taskTitle: task.title, 
+      dueDate, 
+      todayStr, 
+      isToday: dueDate === todayStr, 
+      status: task.status,
+      isInProgress: task.status === "in_progress" 
+    });
     // Include tasks due today or in progress tasks
     return (
       dueDate === todayStr ||

@@ -2996,16 +2996,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all tasks
-  app.get("/api/tasks", async (req, res) => {
-    try {
-      const allTasks = await storage.getTasks();
-      res.json(allTasks);
-    } catch (error) {
-      console.error("Error fetching all tasks:", error);
-      res.status(500).json({ message: "Failed to fetch all tasks" });
-    }
-  });
+
 
   // Get tasks for a specific user
   app.get("/api/users/:userId/tasks", async (req, res) => {
@@ -3022,18 +3013,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create a standalone task
   app.post("/api/tasks", async (req, res) => {
     try {
-      // Get current user ID - handle both development and production modes
-      let currentUserId: string;
-      if (process.env.NODE_ENV !== 'production') {
-        // Use mock user ID for development
-        currentUserId = "550e8400-e29b-41d4-a716-446655440001";
-      } else {
-        // Production mode - require authentication
-        if (!req.session?.userId) {
-          return res.status(401).json({ message: "Authentication required" });
-        }
-        currentUserId = req.session.userId;
+      // Get current user ID - require authentication in all modes
+      if (!req.session?.userId) {
+        return res.status(401).json({ message: "Authentication required" });
       }
+      const currentUserId = req.session.userId;
 
       // Validate and prepare task data
       const taskData = {
