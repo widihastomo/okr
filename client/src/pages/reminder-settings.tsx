@@ -30,6 +30,7 @@ interface ReminderSettings {
   enableNotifications: boolean;
   autoUpdateTasks: boolean;
   reminderMessage?: string;
+  activeDays?: string[]; // Array of day names: ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu']
   notificationTypes?: {
     updateOverdue: boolean;
     taskOverdue: boolean;

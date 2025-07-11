@@ -12,6 +12,7 @@ export interface ReminderConfig {
   isActive: boolean;
   objectiveId?: string;
   teamFocus?: string;
+  activeDays?: string[]; // Array of day names: ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu']
   notificationTypes?: {
     updateOverdue: boolean;
     taskOverdue: boolean;
@@ -96,9 +97,20 @@ export class ReminderSystem {
 
     if (!timeMatch) return false;
 
+    // Check if today is in active days (if specified)
+    if (config.activeDays && config.activeDays.length > 0) {
+      const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+      const dayNames = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
+      const todayName = dayNames[dayOfWeek];
+      
+      if (!config.activeDays.includes(todayName)) {
+        return false; // Today is not in active days
+      }
+    }
+
     switch (config.cadence) {
       case 'harian':
-        return true; // Send daily at specified time
+        return true; // Send daily at specified time (if active days allows)
 
       case 'mingguan':
         const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
