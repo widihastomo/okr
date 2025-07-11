@@ -3528,23 +3528,60 @@ export default function DailyFocusPage() {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-gray-700">
-                Judul Task *
-              </label>
+              <Label htmlFor="edit-title" className="flex items-center gap-2 mb-2">
+                Title *
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button 
+                      type="button" 
+                      className="inline-flex items-center justify-center"
+                    >
+                      <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent side="right" className="max-w-xs">
+                    <p className="text-sm">
+                      <strong>Nama task yang jelas dan deskriptif</strong>
+                      <br /><br />
+                      Gunakan judul yang spesifik dan mudah dipahami sehingga anggota tim dapat dengan cepat memahami apa yang harus dikerjakan.
+                    </p>
+                  </PopoverContent>
+                </Popover>
+              </Label>
               <Input
+                id="edit-title"
                 value={taskFormData.title}
                 onChange={(e) =>
                   setTaskFormData({ ...taskFormData, title: e.target.value })
                 }
-                placeholder="Masukkan judul task"
-                className="mt-1"
+                placeholder="Masukkan title task"
+                required
               />
             </div>
+            
             <div>
-              <label className="text-sm font-medium text-gray-700">
+              <Label htmlFor="edit-description" className="flex items-center gap-2 mb-2">
                 Deskripsi
-              </label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button 
+                      type="button" 
+                      className="inline-flex items-center justify-center"
+                    >
+                      <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent side="right" className="max-w-xs">
+                    <p className="text-sm">
+                      <strong>Penjelasan detail tentang task</strong>
+                      <br /><br />
+                      Deskripsikan tujuan yang ingin dicapai, langkah-langkah yang perlu dilakukan, dan hasil yang diharapkan untuk memberikan konteks yang jelas.
+                    </p>
+                  </PopoverContent>
+                </Popover>
+              </Label>
               <Textarea
+                id="edit-description"
                 value={taskFormData.description}
                 onChange={(e) =>
                   setTaskFormData({
@@ -3553,20 +3590,38 @@ export default function DailyFocusPage() {
                   })
                 }
                 placeholder="Masukkan deskripsi task"
-                className="mt-1"
+                rows={3}
               />
             </div>
+            
             <div>
-              <label className="text-sm font-medium text-gray-700">
+              <Label htmlFor="edit-priority" className="flex items-center gap-2 mb-2">
                 Prioritas
-              </label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button 
+                      type="button" 
+                      className="inline-flex items-center justify-center"
+                    >
+                      <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent side="right" className="max-w-xs">
+                    <p className="text-sm">
+                      <strong>Tingkat kepentingan task</strong>
+                      <br /><br />
+                      Rendah: task yang bisa ditunda, Sedang: task penting namun tidak mendesak, Tinggi: task yang perlu segera dikerjakan, Kritis: task yang harus diselesaikan secepat mungkin.
+                    </p>
+                  </PopoverContent>
+                </Popover>
+              </Label>
               <Select
                 value={taskFormData.priority}
                 onValueChange={(value) =>
                   setTaskFormData({ ...taskFormData, priority: value })
                 }
               >
-                <SelectTrigger className="mt-1">
+                <SelectTrigger id="edit-priority">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -3577,36 +3632,113 @@ export default function DailyFocusPage() {
                 </SelectContent>
               </Select>
             </div>
+            
             <div>
-              <label className="text-sm font-medium text-gray-700">PIC</label>
+              <Label htmlFor="edit-status" className="flex items-center gap-2 mb-2">
+                Status
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button 
+                      type="button" 
+                      className="inline-flex items-center justify-center"
+                    >
+                      <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent side="right" className="max-w-xs">
+                    <p className="text-sm">
+                      <strong>Status perkembangan task</strong>
+                      <br /><br />
+                      Belum Mulai: task belum dikerjakan, Sedang Berjalan: task sedang dalam proses, Selesai: task telah completed, Dibatalkan: task tidak akan dikerjakan.
+                    </p>
+                  </PopoverContent>
+                </Popover>
+              </Label>
+              <Select
+                value={taskFormData.status}
+                onValueChange={(value) =>
+                  setTaskFormData({ ...taskFormData, status: value })
+                }
+              >
+                <SelectTrigger id="edit-status">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="not_started">Belum Mulai</SelectItem>
+                  <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
+                  <SelectItem value="completed">Selesai</SelectItem>
+                  <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label htmlFor="edit-assignedTo" className="flex items-center gap-2 mb-2">
+                PIC
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button 
+                      type="button" 
+                      className="inline-flex items-center justify-center"
+                    >
+                      <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent side="right" className="max-w-xs">
+                    <p className="text-sm">
+                      <strong>Person In Charge (PIC)</strong>
+                      <br /><br />
+                      Orang yang bertanggung jawab untuk menyelesaikan task ini. Pilih anggota tim yang tepat berdasarkan keahlian dan beban kerja mereka.
+                    </p>
+                  </PopoverContent>
+                </Popover>
+              </Label>
               <Select
                 value={taskFormData.assignedTo || "unassigned"}
                 onValueChange={(value) =>
                   setTaskFormData({ ...taskFormData, assignedTo: value })
                 }
               >
-                <SelectTrigger className="mt-1">
+                <SelectTrigger id="edit-assignedTo">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="unassigned">Belum ditentukan</SelectItem>
                   {users.map((user: any) => (
                     <SelectItem key={user.id} value={user.id}>
-                      {user.username || user.email}
+                      {user.firstName} {user.lastName}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
+            
             <div>
-              <label className="text-sm font-medium text-gray-700">
+              <Label htmlFor="edit-dueDate" className="flex items-center gap-2 mb-2">
                 Tenggat Waktu
-              </label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button 
+                      type="button" 
+                      className="inline-flex items-center justify-center"
+                    >
+                      <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent side="right" className="max-w-xs">
+                    <p className="text-sm">
+                      <strong>Batas waktu penyelesaian task</strong>
+                      <br /><br />
+                      Tentukan tanggal realistic yang memberikan cukup waktu untuk menyelesaikan task dengan kualitas yang baik. Pastikan tanggal tidak terlalu ketat atau terlalu longgar.
+                    </p>
+                  </PopoverContent>
+                </Popover>
+              </Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-full justify-start text-left font-normal mt-1"
+                    className="w-full justify-start text-left font-normal"
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {taskFormData.dueDate
