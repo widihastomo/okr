@@ -97,31 +97,48 @@ export class ReminderSystem {
 
     if (!timeMatch) return false;
 
-    // Check if today is in active days (if specified)
-    if (config.activeDays && config.activeDays.length > 0) {
-      const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-      const dayNames = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
-      const todayName = dayNames[dayOfWeek];
-      
-      if (!config.activeDays.includes(todayName)) {
-        return false; // Today is not in active days
-      }
-    }
+    const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    const dayNames = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
+    const todayName = dayNames[dayOfWeek];
 
     switch (config.cadence) {
       case 'harian':
-        return true; // Send daily at specified time (if active days allows)
+        // For daily reminders, check activeDays filter
+        if (config.activeDays && config.activeDays.length > 0) {
+          return config.activeDays.includes(todayName);
+        }
+        return true; // Send daily if no activeDays specified
 
       case 'mingguan':
-        const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
-        const targetDay = config.reminderDay ? parseInt(config.reminderDay) : 1; // Default to Monday
-        const adjustedDay = dayOfWeek === 0 ? 7 : dayOfWeek; // Convert Sunday to 7
-        return adjustedDay === targetDay;
+        // For weekly reminders, check specific day (reminderDay takes precedence over activeDays)
+        if (config.reminderDay) {
+          // Use specific day from reminderDay setting
+          const targetDay = parseInt(config.reminderDay);
+          const adjustedDay = dayOfWeek === 0 ? 7 : dayOfWeek; // Convert Sunday to 7
+          return adjustedDay === targetDay;
+        } else if (config.activeDays && config.activeDays.length > 0) {
+          // If no specific day set, use first day from activeDays
+          const firstActiveDay = config.activeDays[0];
+          return todayName === firstActiveDay;
+        }
+        return dayOfWeek === 1; // Default to Monday
 
       case 'bulanan':
+        // For monthly reminders, check specific date (reminderDate takes precedence)
         const dateOfMonth = now.getDate();
-        const targetDate = config.reminderDate ? parseInt(config.reminderDate) : 1; // Default to 1st
-        return dateOfMonth === targetDate;
+        if (config.reminderDate) {
+          const targetDate = parseInt(config.reminderDate);
+          return dateOfMonth === targetDate;
+        } else {
+          // If no specific date, use 1st of month but also check activeDays
+          if (dateOfMonth === 1) {
+            if (config.activeDays && config.activeDays.length > 0) {
+              return config.activeDays.includes(todayName);
+            }
+            return true;
+          }
+          return false;
+        }
 
       default:
         return false;

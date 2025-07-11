@@ -234,6 +234,7 @@ All email configuration now uses environment variables:
 - **FOCUSED REMINDER SYSTEM**: Streamlined notification types system with 4 specific categories based on user requirements (update overdue, task overdue, initiative overdue, chat mention)
 - **CUSTOM TIME IMPLEMENTATION**: Toggle functionality between preset times and custom time input with HTML5 time field and 24-hour format validation
 - **NOTIFICATION TYPES SYSTEM**: Individual toggle controls for each notification category with proper backend integration and JSON parsing error handling
+- **DAY-BASED REMINDER FILTERING**: Advanced activeDays system allowing users to specify which days of the week to receive reminders
 - **UI ENHANCEMENTS**: Added focused notification types interface with individual switch controls for precise user control
 
 ## Current Issues
@@ -244,6 +245,13 @@ All email configuration now uses environment variables:
 ## Changelog
 ```
 Changelog:
+- July 11, 2025. Successfully implemented day-based reminder filtering system with activeDays support:
+  * Added activeDays field to ReminderConfig interface supporting array of day names
+  * Created comprehensive logic for different cadence types: harian uses activeDays filter, mingguan uses reminderDay OR first activeDays, bulanan uses reminderDate OR check activeDays on 1st
+  * Enhanced UI with individual day selection buttons and preset options (all except Sunday, weekdays, all days)
+  * Fixed logical conflicts between cadence-specific settings and activeDays filtering
+  * Improved backend shouldSendReminder function to handle precedence: specific day/date settings take priority over activeDays
+  * Added backward compatibility for existing reminder configurations without activeDays
 - July 11, 2025. Successfully implemented focused notification types system based on user requirements:
   * Simplified notification types to 4 specific categories: updateOverdue, taskOverdue, initiativeOverdue, chatMention
   * Enhanced ReminderSettings interface to include focused notificationTypes object with user-requested categories
