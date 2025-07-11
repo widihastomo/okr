@@ -194,12 +194,6 @@ export default function Sidebar({
       path: "/organization-settings",
       active: location === "/organization-settings",
     },
-    {
-      label: "Pengaturan Reminder",
-      icon: Bell,
-      path: "/reminder-settings",
-      active: location === "/reminder-settings",
-    },
 
     {
       label: "Harga",

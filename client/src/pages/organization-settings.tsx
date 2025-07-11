@@ -5,6 +5,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useOrganization } from "@/hooks/useOrganization";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
+import { useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +18,10 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Settings, Users, CreditCard, Building2, Loader2, Plus, Edit, Trash2, UserPlus, Shield, User as UserIcon, Search, UserCheck, UserX, MoreHorizontal, MoreVertical, Eye, EyeOff, Key } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+import { Settings, Users, CreditCard, Building2, Loader2, Plus, Edit, Trash2, UserPlus, Shield, User as UserIcon, Search, UserCheck, UserX, MoreHorizontal, MoreVertical, Eye, EyeOff, Key, Bell, Clock, Calendar, AlertCircle, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import PlanChangeWizard from "@/components/plan-change-wizard";
 
@@ -56,6 +60,27 @@ export default function OrganizationSettings() {
   const [editingRole, setEditingRole] = useState<any>(null);
   const [roleSearchTerm, setRoleSearchTerm] = useState("");
 
+  // Notification/Reminder settings states
+  const [useCustomTime, setUseCustomTime] = useState(false);
+  const [customTime, setCustomTime] = useState('17:00');
+  const [reminderSettings, setReminderSettings] = useState({
+    isEnabled: true,
+    cadence: 'harian',
+    reminderTime: '17:00',
+    reminderDay: 'senin',
+    reminderDate: '1',
+    enableEmailReminders: true,
+    enableNotifications: true,
+    autoUpdateTasks: false,
+    reminderMessage: 'Saatnya update progress harian Anda!',
+    notificationTypes: {
+      updateOverdue: true,
+      taskOverdue: true,
+      initiativeOverdue: true,
+      chatMention: true,
+    }
+  });
+
   // Fetch users for organization
   const { data: users = [], isLoading: usersLoading } = useQuery<User[]>({
     queryKey: ["/api/users"],
@@ -84,6 +109,40 @@ export default function OrganizationSettings() {
     },
     enabled: teams.length > 0,
   });
+
+  // Fetch reminder settings
+  const { data: apiReminderSettings } = useQuery({
+    queryKey: ["/api/reminder-settings"],
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false,
+  });
+
+  // Initialize reminder settings from API
+  useEffect(() => {
+    if (apiReminderSettings) {
+      const updatedSettings = {
+        ...apiReminderSettings,
+        notificationTypes: {
+          updateOverdue: true,
+          taskOverdue: true,
+          initiativeOverdue: true,
+          chatMention: true,
+          ...apiReminderSettings.notificationTypes
+        }
+      };
+      
+      setReminderSettings(updatedSettings);
+      
+      // Check if custom time is being used
+      const timeOptions = ['08:00', '09:00', '12:00', '15:00', '17:00', '19:00'];
+      const isPresetTime = timeOptions.includes(apiReminderSettings.reminderTime);
+      if (!isPresetTime && apiReminderSettings.reminderTime) {
+        setUseCustomTime(true);
+        setCustomTime(apiReminderSettings.reminderTime);
+      }
+    }
+  }, [apiReminderSettings]);
 
   // Filtered users based on search and role filter
   const filteredUsers = users.filter(u => {
@@ -419,7 +478,7 @@ export default function OrganizationSettings() {
       </div>
 
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6 max-w-4xl">
+        <TabsList className="grid w-full grid-cols-7 max-w-5xl">
           <TabsTrigger value="general">
             <Building2 className="h-4 w-4 mr-2" />
             Umum
@@ -439,6 +498,10 @@ export default function OrganizationSettings() {
           <TabsTrigger value="roles">
             <Shield className="h-4 w-4 mr-2" />
             Roles
+          </TabsTrigger>
+          <TabsTrigger value="notifications">
+            <Bell className="h-4 w-4 mr-2" />
+            Notifikasi
           </TabsTrigger>
           <TabsTrigger value="settings">
             <Settings className="h-4 w-4 mr-2" />
@@ -1512,6 +1575,325 @@ export default function OrganizationSettings() {
                   </DialogContent>
                 </Dialog>
               )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Notifications Tab */}
+        <TabsContent value="notifications">
+          <Card>
+            <CardHeader>
+              <CardTitle>Pengaturan Notifikasi & Reminder</CardTitle>
+              <CardDescription>
+                Kelola notifikasi dan reminder untuk semua anggota organisasi
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Reminder Enable/Disable */}
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="space-y-1">
+                  <Label className="text-base font-medium">
+                    Aktifkan Reminder
+                  </Label>
+                  <p className="text-sm text-gray-600">
+                    Mengaktifkan sistem reminder untuk semua anggota
+                  </p>
+                </div>
+                <Switch
+                  checked={reminderSettings.isEnabled}
+                  onCheckedChange={(checked) =>
+                    setReminderSettings({ ...reminderSettings, isEnabled: checked })
+                  }
+                />
+              </div>
+
+              {/* Reminder Frequency */}
+              <div className="space-y-3">
+                <Label className="text-base font-medium">
+                  Frekuensi Reminder
+                </Label>
+                <div className="grid grid-cols-3 gap-3">
+                  <Button
+                    variant={reminderSettings.cadence === 'harian' ? 'default' : 'outline'}
+                    onClick={() => setReminderSettings({ ...reminderSettings, cadence: 'harian' })}
+                    className="justify-start"
+                  >
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Harian
+                  </Button>
+                  <Button
+                    variant={reminderSettings.cadence === 'mingguan' ? 'default' : 'outline'}
+                    onClick={() => setReminderSettings({ ...reminderSettings, cadence: 'mingguan' })}
+                    className="justify-start"
+                  >
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Mingguan
+                  </Button>
+                  <Button
+                    variant={reminderSettings.cadence === 'bulanan' ? 'default' : 'outline'}
+                    onClick={() => setReminderSettings({ ...reminderSettings, cadence: 'bulanan' })}
+                    className="justify-start"
+                  >
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Bulanan
+                  </Button>
+                </div>
+              </div>
+
+              {/* Reminder Time */}
+              <div className="space-y-3">
+                <Label className="text-base font-medium">
+                  Waktu Reminder
+                </Label>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      checked={!useCustomTime}
+                      onCheckedChange={(checked) => setUseCustomTime(!checked)}
+                    />
+                    <Label className="text-sm font-medium">
+                      Gunakan waktu preset
+                    </Label>
+                  </div>
+                  
+                  {!useCustomTime ? (
+                    <div className="grid grid-cols-3 gap-3">
+                      {['08:00', '12:00', '17:00', '09:00', '15:00', '19:00'].map((time) => (
+                        <Button
+                          key={time}
+                          variant={reminderSettings.reminderTime === time ? 'default' : 'outline'}
+                          onClick={() => setReminderSettings({ ...reminderSettings, reminderTime: time })}
+                          className="justify-center"
+                        >
+                          <Clock className="h-4 w-4 mr-2" />
+                          {time}
+                        </Button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <Label className="text-sm">
+                        Waktu Kustom (Format: HH:MM)
+                      </Label>
+                      <Input
+                        type="time"
+                        value={customTime}
+                        onChange={(e) => {
+                          setCustomTime(e.target.value);
+                          setReminderSettings({ ...reminderSettings, reminderTime: e.target.value });
+                        }}
+                        className="w-32"
+                      />
+                      <p className="text-xs text-gray-500">
+                        Gunakan format 24 jam (contoh: 17:00)
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Notification Types */}
+              <div className="space-y-4">
+                <Label className="text-base font-medium">
+                  Jenis Notifikasi
+                </Label>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="space-y-1">
+                      <Label className="text-sm font-medium">
+                        Update Overdue
+                      </Label>
+                      <p className="text-sm text-gray-600">
+                        Notifikasi ketika user belum melakukan daily update
+                      </p>
+                    </div>
+                    <Switch
+                      checked={reminderSettings.notificationTypes?.updateOverdue || false}
+                      onCheckedChange={(checked) =>
+                        setReminderSettings({
+                          ...reminderSettings,
+                          notificationTypes: {
+                            ...reminderSettings.notificationTypes,
+                            updateOverdue: checked
+                          }
+                        })
+                      }
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="space-y-1">
+                      <Label className="text-sm font-medium">
+                        Task Overdue
+                      </Label>
+                      <p className="text-sm text-gray-600">
+                        Notifikasi ketika deadline task terlewat
+                      </p>
+                    </div>
+                    <Switch
+                      checked={reminderSettings.notificationTypes?.taskOverdue || false}
+                      onCheckedChange={(checked) =>
+                        setReminderSettings({
+                          ...reminderSettings,
+                          notificationTypes: {
+                            ...reminderSettings.notificationTypes,
+                            taskOverdue: checked
+                          }
+                        })
+                      }
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="space-y-1">
+                      <Label className="text-sm font-medium">
+                        Initiative Overdue
+                      </Label>
+                      <p className="text-sm text-gray-600">
+                        Notifikasi ketika deadline inisiatif terlewat dan belum ditutup
+                      </p>
+                    </div>
+                    <Switch
+                      checked={reminderSettings.notificationTypes?.initiativeOverdue || false}
+                      onCheckedChange={(checked) =>
+                        setReminderSettings({
+                          ...reminderSettings,
+                          notificationTypes: {
+                            ...reminderSettings.notificationTypes,
+                            initiativeOverdue: checked
+                          }
+                        })
+                      }
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="space-y-1">
+                      <Label className="text-sm font-medium">
+                        Chat Mention
+                      </Label>
+                      <p className="text-sm text-gray-600">
+                        Notifikasi ketika di-mention oleh user lain dalam chat
+                      </p>
+                    </div>
+                    <Switch
+                      checked={reminderSettings.notificationTypes?.chatMention || false}
+                      onCheckedChange={(checked) =>
+                        setReminderSettings({
+                          ...reminderSettings,
+                          notificationTypes: {
+                            ...reminderSettings.notificationTypes,
+                            chatMention: checked
+                          }
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Email & In-App Notifications */}
+              <div className="space-y-4">
+                <Label className="text-base font-medium">
+                  Channel Notifikasi
+                </Label>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="space-y-1">
+                      <Label className="text-sm font-medium">
+                        Email Notifications
+                      </Label>
+                      <p className="text-sm text-gray-600">
+                        Kirim notifikasi melalui email
+                      </p>
+                    </div>
+                    <Switch
+                      checked={reminderSettings.enableEmailReminders}
+                      onCheckedChange={(checked) =>
+                        setReminderSettings({ ...reminderSettings, enableEmailReminders: checked })
+                      }
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="space-y-1">
+                      <Label className="text-sm font-medium">
+                        In-App Notifications
+                      </Label>
+                      <p className="text-sm text-gray-600">
+                        Tampilkan notifikasi dalam aplikasi
+                      </p>
+                    </div>
+                    <Switch
+                      checked={reminderSettings.enableNotifications}
+                      onCheckedChange={(checked) =>
+                        setReminderSettings({ ...reminderSettings, enableNotifications: checked })
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Reminder Message */}
+              <div className="space-y-3">
+                <Label className="text-base font-medium">
+                  Pesan Reminder
+                </Label>
+                <Textarea
+                  value={reminderSettings.reminderMessage}
+                  onChange={(e) =>
+                    setReminderSettings({ ...reminderSettings, reminderMessage: e.target.value })
+                  }
+                  placeholder="Masukkan pesan reminder yang akan dikirim..."
+                  className="min-h-[100px]"
+                />
+              </div>
+
+              {/* Save Button */}
+              <div className="flex justify-end space-x-3">
+                <Button
+                  variant="outline"
+                  onClick={async () => {
+                    try {
+                      await apiRequest('POST', '/api/reminder-settings/test');
+                      toast({
+                        title: "Test Reminder Berhasil!",
+                        description: "Cek email dan notifikasi Anda.",
+                        variant: "success"
+                      });
+                    } catch (error: any) {
+                      toast({
+                        title: "Test Gagal",
+                        description: error.message,
+                        variant: "destructive"
+                      });
+                    }
+                  }}
+                >
+                  Test Reminder
+                </Button>
+                <Button
+                  onClick={async () => {
+                    try {
+                      await apiRequest('POST', '/api/reminder-settings', reminderSettings);
+                      toast({
+                        title: "Pengaturan Tersimpan!",
+                        description: "Pengaturan reminder telah diperbarui.",
+                        variant: "success"
+                      });
+                      queryClient.invalidateQueries({ queryKey: ['/api/reminder-settings'] });
+                    } catch (error: any) {
+                      toast({
+                        title: "Gagal Menyimpan",
+                        description: error.message,
+                        variant: "destructive"
+                      });
+                    }
+                  }}
+                >
+                  Simpan Pengaturan
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

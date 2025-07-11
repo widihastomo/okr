@@ -41,7 +41,7 @@ import OrganizationSettings from "@/pages/organization-settings";
 import SystemAdmin from "@/pages/system-admin";
 import ClientUserManagement from "@/pages/client-user-management";
 import NotificationSettings from "@/pages/notification-settings";
-import ReminderSettings from "@/pages/reminder-settings";
+
 import ClientRegistration from "@/pages/client-registration";
 import Registration from "@/pages/registration";
 import EmailVerification from "@/pages/email-verification";
@@ -250,10 +250,7 @@ function Router() {
                 path="/notification-settings"
                 component={NotificationSettings}
               />
-              <Route
-                path="/reminder-settings"
-                component={ReminderSettings}
-              />
+
               <Route path="/register" component={ClientRegistration} />
               <Route
                 path="/subscription-packages"
