@@ -1685,75 +1685,147 @@ export default function OrganizationSettings() {
                 </div>
               </div>
 
-              {/* Active Days */}
-              <div className="space-y-3">
-                <Label className="text-base font-medium">
-                  Hari Aktif
-                </Label>
+              {/* Conditional inputs based on cadence */}
+              {reminderSettings.cadence === 'harian' && (
                 <div className="space-y-3">
-                  <p className="text-sm text-gray-600">
-                    Pilih hari-hari ketika reminder akan aktif
-                  </p>
-                  <div className="grid grid-cols-7 gap-2">
-                    {[
-                      { key: 'senin', label: 'Sen' },
-                      { key: 'selasa', label: 'Sel' },
-                      { key: 'rabu', label: 'Rab' },
-                      { key: 'kamis', label: 'Kam' },
-                      { key: 'jumat', label: 'Jum' },
-                      { key: 'sabtu', label: 'Sab' },
-                      { key: 'minggu', label: 'Min' }
-                    ].map((day) => (
+                  <Label className="text-base font-medium">
+                    Hari Aktif
+                  </Label>
+                  <div className="space-y-3">
+                    <p className="text-sm text-gray-600">
+                      Pilih hari-hari ketika reminder akan aktif
+                    </p>
+                    <div className="grid grid-cols-7 gap-2">
+                      {[
+                        { key: 'senin', label: 'Sen' },
+                        { key: 'selasa', label: 'Sel' },
+                        { key: 'rabu', label: 'Rab' },
+                        { key: 'kamis', label: 'Kam' },
+                        { key: 'jumat', label: 'Jum' },
+                        { key: 'sabtu', label: 'Sab' },
+                        { key: 'minggu', label: 'Min' }
+                      ].map((day) => (
+                        <Button
+                          key={day.key}
+                          variant={reminderSettings.activeDays?.includes(day.key) ? 'default' : 'outline'}
+                          onClick={() => {
+                            const currentDays = reminderSettings.activeDays || [];
+                            const updatedDays = currentDays.includes(day.key)
+                              ? currentDays.filter(d => d !== day.key)
+                              : [...currentDays, day.key];
+                            setReminderSettings({ ...reminderSettings, activeDays: updatedDays });
+                          }}
+                          className="justify-center text-xs p-2 h-8"
+                        >
+                          {day.label}
+                        </Button>
+                      ))}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
                       <Button
-                        key={day.key}
-                        variant={reminderSettings.activeDays?.includes(day.key) ? 'default' : 'outline'}
-                        onClick={() => {
-                          const currentDays = reminderSettings.activeDays || [];
-                          const updatedDays = currentDays.includes(day.key)
-                            ? currentDays.filter(d => d !== day.key)
-                            : [...currentDays, day.key];
-                          setReminderSettings({ ...reminderSettings, activeDays: updatedDays });
-                        }}
-                        className="justify-center text-xs p-2 h-8"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setReminderSettings({ 
+                          ...reminderSettings, 
+                          activeDays: ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'] 
+                        })}
                       >
-                        {day.label}
+                        Semua Kecuali Minggu
                       </Button>
-                    ))}
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setReminderSettings({ 
-                        ...reminderSettings, 
-                        activeDays: ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'] 
-                      })}
-                    >
-                      Semua Kecuali Minggu
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setReminderSettings({ 
-                        ...reminderSettings, 
-                        activeDays: ['senin', 'selasa', 'rabu', 'kamis', 'jumat'] 
-                      })}
-                    >
-                      Hari Kerja
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setReminderSettings({ 
-                        ...reminderSettings, 
-                        activeDays: ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'] 
-                      })}
-                    >
-                      Semua Hari
-                    </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setReminderSettings({ 
+                          ...reminderSettings, 
+                          activeDays: ['senin', 'selasa', 'rabu', 'kamis', 'jumat'] 
+                        })}
+                      >
+                        Hari Kerja
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setReminderSettings({ 
+                          ...reminderSettings, 
+                          activeDays: ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'] 
+                        })}
+                      >
+                        Semua Hari
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
+
+              {reminderSettings.cadence === 'mingguan' && (
+                <div className="space-y-3">
+                  <Label className="text-base font-medium">
+                    Pilih Hari
+                  </Label>
+                  <div className="space-y-3">
+                    <p className="text-sm text-gray-600">
+                      Pilih hari dalam seminggu untuk reminder mingguan
+                    </p>
+                    <div className="grid grid-cols-7 gap-2">
+                      {[
+                        { key: '1', label: 'Senin' },
+                        { key: '2', label: 'Selasa' },
+                        { key: '3', label: 'Rabu' },
+                        { key: '4', label: 'Kamis' },
+                        { key: '5', label: 'Jumat' },
+                        { key: '6', label: 'Sabtu' },
+                        { key: '7', label: 'Minggu' }
+                      ].map((day) => (
+                        <Button
+                          key={day.key}
+                          variant={reminderSettings.reminderDay === day.key ? 'default' : 'outline'}
+                          onClick={() => setReminderSettings({ ...reminderSettings, reminderDay: day.key })}
+                          className="justify-center text-xs p-2 h-auto"
+                        >
+                          {day.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {reminderSettings.cadence === 'bulanan' && (
+                <div className="space-y-3">
+                  <Label className="text-base font-medium">
+                    Pilih Tanggal
+                  </Label>
+                  <div className="space-y-3">
+                    <p className="text-sm text-gray-600">
+                      Pilih tanggal dalam bulan untuk reminder bulanan
+                    </p>
+                    <div className="grid grid-cols-5 gap-2">
+                      {[1, 2, 3, 4, 5, 10, 15, 20, 25, 28].map((date) => (
+                        <Button
+                          key={date}
+                          variant={reminderSettings.reminderDate === date.toString() ? 'default' : 'outline'}
+                          onClick={() => setReminderSettings({ ...reminderSettings, reminderDate: date.toString() })}
+                          className="justify-center"
+                        >
+                          {date}
+                        </Button>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Label className="text-sm font-medium">Tanggal Kustom:</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="31"
+                        value={reminderSettings.reminderDate || ''}
+                        onChange={(e) => setReminderSettings({ ...reminderSettings, reminderDate: e.target.value })}
+                        className="w-20"
+                        placeholder="1-31"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Reminder Time */}
               <div className="space-y-3">

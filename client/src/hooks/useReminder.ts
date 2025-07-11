@@ -10,6 +10,7 @@ export interface ReminderConfig {
   isActive: boolean;
   objectiveId?: string;
   teamFocus?: string;
+  activeDays?: string[]; // Array of day names: ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu']
 }
 
 export function useReminderConfig() {
