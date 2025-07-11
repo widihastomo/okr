@@ -251,8 +251,8 @@ Changelog:
   * Removed "Ubah role" and "Hapus role" options from role actions dropdown menu
   * Removed edit role dialog form with permissions checkboxes
   * Changed table header from "Aksi" to "Total Permissions" for better clarity
-  * Updated card description from "Kelola roles" to "Lihat daftar roles" to reflect view-only nature
-  * Updated card title from "Kelola Roles" to "Daftar Roles" for consistency
+  * Updated card title from "Kelola Roles" to "Sistem Roles & Permissions" for professional appearance
+  * Updated card description to "Tampilan informasi roles dan hak akses yang tersedia dalam organisasi"
   * Role management now displays role information without modification capabilities
 - July 11, 2025. Successfully completed comprehensive role system simplification across entire application:
   * Implemented 4-role system: Owner (full access), Administrator (all except advanced settings), Member (all except org settings), Viewer (objectives/analysis only)

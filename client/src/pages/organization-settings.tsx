@@ -1381,9 +1381,9 @@ export default function OrganizationSettings() {
         <TabsContent value="roles">
           <Card>
             <CardHeader>
-              <CardTitle>Daftar Roles</CardTitle>
+              <CardTitle>Sistem Roles & Permissions</CardTitle>
               <CardDescription>
-                Lihat daftar roles dan permissions dalam organisasi Anda ({filteredRoles.length} roles)
+                Tampilan informasi roles dan hak akses yang tersedia dalam organisasi ({filteredRoles.length} roles)
               </CardDescription>
             </CardHeader>
             <CardContent>
