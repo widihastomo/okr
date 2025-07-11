@@ -51,6 +51,7 @@ const Toast = React.forwardRef<
       className={cn(
         toastVariants({ variant }), 
         variant === "success" && "toast-success",
+        variant === "destructive" && "toast-destructive",
         className
       )}
       data-variant={variant}

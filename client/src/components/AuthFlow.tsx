@@ -146,7 +146,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
         toast({
           title: "Email belum diverifikasi",
           description: "Silakan masukkan kode verifikasi yang dikirim ke email Anda",
-          variant: "default",
+          variant: "destructive",
         });
         return;
       }

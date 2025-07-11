@@ -105,6 +105,36 @@
   [data-variant="success"] .toast-description {
     color: rgb(20, 83, 45) !important;
   }
+  
+  /* Destructive/Error variant */
+  .toast-destructive {
+    background-color: rgb(254, 226, 226) !important;
+    border-color: rgb(239, 68, 68) !important;
+    color: rgb(127, 29, 29) !important;
+  }
+  
+  .toast-destructive .toast-title {
+    color: rgb(127, 29, 29) !important;
+  }
+  
+  .toast-destructive .toast-description {
+    color: rgb(127, 29, 29) !important;
+  }
+  
+  /* Destructive variant with data attribute */
+  [data-variant="destructive"] {
+    background-color: rgb(254, 226, 226) !important;
+    border-color: rgb(239, 68, 68) !important;
+    color: rgb(127, 29, 29) !important;
+  }
+  
+  [data-variant="destructive"] .toast-title {
+    color: rgb(127, 29, 29) !important;
+  }
+  
+  [data-variant="destructive"] .toast-description {
+    color: rgb(127, 29, 29) !important;
+  }
 }
 
 @layer base {
