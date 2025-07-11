@@ -1661,7 +1661,10 @@ export default function OrganizationSettings() {
                   <Button
                     variant={reminderSettings.cadence === 'harian' ? 'default' : 'outline'}
                     onClick={() => setReminderSettings({ ...reminderSettings, cadence: 'harian' })}
-                    className="justify-start"
+                    className={reminderSettings.cadence === 'harian' 
+                      ? "justify-start bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                      : "justify-start border-orange-300 text-orange-700 hover:bg-orange-50"
+                    }
                   >
                     <Calendar className="h-4 w-4 mr-2" />
                     Harian
@@ -1669,7 +1672,10 @@ export default function OrganizationSettings() {
                   <Button
                     variant={reminderSettings.cadence === 'mingguan' ? 'default' : 'outline'}
                     onClick={() => setReminderSettings({ ...reminderSettings, cadence: 'mingguan' })}
-                    className="justify-start"
+                    className={reminderSettings.cadence === 'mingguan' 
+                      ? "justify-start bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                      : "justify-start border-orange-300 text-orange-700 hover:bg-orange-50"
+                    }
                   >
                     <Calendar className="h-4 w-4 mr-2" />
                     Mingguan
@@ -1677,7 +1683,10 @@ export default function OrganizationSettings() {
                   <Button
                     variant={reminderSettings.cadence === 'bulanan' ? 'default' : 'outline'}
                     onClick={() => setReminderSettings({ ...reminderSettings, cadence: 'bulanan' })}
-                    className="justify-start"
+                    className={reminderSettings.cadence === 'bulanan' 
+                      ? "justify-start bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                      : "justify-start border-orange-300 text-orange-700 hover:bg-orange-50"
+                    }
                   >
                     <Calendar className="h-4 w-4 mr-2" />
                     Bulanan
@@ -1715,7 +1724,10 @@ export default function OrganizationSettings() {
                               : [...currentDays, day.key];
                             setReminderSettings({ ...reminderSettings, activeDays: updatedDays });
                           }}
-                          className="justify-center text-xs p-2 h-8"
+                          className={reminderSettings.activeDays?.includes(day.key)
+                            ? "justify-center text-xs p-2 h-8 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                            : "justify-center text-xs p-2 h-8 border-orange-300 text-orange-700 hover:bg-orange-50"
+                          }
                         >
                           {day.label}
                         </Button>
@@ -1729,6 +1741,7 @@ export default function OrganizationSettings() {
                           ...reminderSettings, 
                           activeDays: ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'] 
                         })}
+                        className="border-orange-300 text-orange-700 hover:bg-orange-50"
                       >
                         Semua Kecuali Minggu
                       </Button>
@@ -1739,6 +1752,7 @@ export default function OrganizationSettings() {
                           ...reminderSettings, 
                           activeDays: ['senin', 'selasa', 'rabu', 'kamis', 'jumat'] 
                         })}
+                        className="border-orange-300 text-orange-700 hover:bg-orange-50"
                       >
                         Hari Kerja
                       </Button>
@@ -1749,6 +1763,7 @@ export default function OrganizationSettings() {
                           ...reminderSettings, 
                           activeDays: ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'] 
                         })}
+                        className="border-orange-300 text-orange-700 hover:bg-orange-50"
                       >
                         Semua Hari
                       </Button>
@@ -1780,7 +1795,10 @@ export default function OrganizationSettings() {
                           key={day.key}
                           variant={reminderSettings.reminderDay === day.key ? 'default' : 'outline'}
                           onClick={() => setReminderSettings({ ...reminderSettings, reminderDay: day.key })}
-                          className="justify-center text-xs p-2 h-auto"
+                          className={reminderSettings.reminderDay === day.key
+                            ? "justify-center text-xs p-2 h-auto bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                            : "justify-center text-xs p-2 h-auto border-orange-300 text-orange-700 hover:bg-orange-50"
+                          }
                         >
                           {day.label}
                         </Button>
@@ -1805,7 +1823,10 @@ export default function OrganizationSettings() {
                           key={date}
                           variant={reminderSettings.reminderDate === date.toString() ? 'default' : 'outline'}
                           onClick={() => setReminderSettings({ ...reminderSettings, reminderDate: date.toString() })}
-                          className="justify-center"
+                          className={reminderSettings.reminderDate === date.toString()
+                            ? "justify-center bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                            : "justify-center border-orange-300 text-orange-700 hover:bg-orange-50"
+                          }
                         >
                           {date}
                         </Button>
@@ -1850,7 +1871,10 @@ export default function OrganizationSettings() {
                           key={time}
                           variant={reminderSettings.reminderTime === time ? 'default' : 'outline'}
                           onClick={() => setReminderSettings({ ...reminderSettings, reminderTime: time })}
-                          className="justify-center"
+                          className={reminderSettings.reminderTime === time
+                            ? "justify-center bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                            : "justify-center border-orange-300 text-orange-700 hover:bg-orange-50"
+                          }
                         >
                           <Clock className="h-4 w-4 mr-2" />
                           {time}
@@ -2056,6 +2080,7 @@ export default function OrganizationSettings() {
                       });
                     }
                   }}
+                  className="border-orange-300 text-orange-700 hover:bg-orange-50"
                 >
                   Test Reminder
                 </Button>
@@ -2077,6 +2102,7 @@ export default function OrganizationSettings() {
                       });
                     }
                   }}
+                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
                 >
                   Simpan Pengaturan
                 </Button>
