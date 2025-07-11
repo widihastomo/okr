@@ -246,6 +246,14 @@ All email configuration now uses environment variables:
 ## Changelog
 ```
 Changelog:
+- July 11, 2025. Successfully removed add/edit role functionality from organization settings, making role management view-only:
+  * Removed "Tambah Role" button and entire add role dialog form
+  * Removed "Ubah role" and "Hapus role" options from role actions dropdown menu
+  * Removed edit role dialog form with permissions checkboxes
+  * Changed table header from "Aksi" to "Total Permissions" for better clarity
+  * Updated card description from "Kelola roles" to "Lihat daftar roles" to reflect view-only nature
+  * Updated card title from "Kelola Roles" to "Daftar Roles" for consistency
+  * Role management now displays role information without modification capabilities
 - July 11, 2025. Successfully completed comprehensive role system simplification across entire application:
   * Implemented 4-role system: Owner (full access), Administrator (all except advanced settings), Member (all except org settings), Viewer (objectives/analysis only)
   * Updated shared/schema.ts to define new simplified role enumeration (owner, administrator, member, viewer)

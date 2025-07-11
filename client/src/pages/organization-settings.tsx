@@ -1381,80 +1381,12 @@ export default function OrganizationSettings() {
         <TabsContent value="roles">
           <Card>
             <CardHeader>
-              <CardTitle>Kelola Roles</CardTitle>
+              <CardTitle>Daftar Roles</CardTitle>
               <CardDescription>
-                Kelola roles dan permissions dalam organisasi Anda ({filteredRoles.length} roles)
+                Lihat daftar roles dan permissions dalam organisasi Anda ({filteredRoles.length} roles)
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {/* Add Role and Search Controls */}
-              <div className="flex justify-between items-center mb-6">
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Tambah Role
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Tambah Role Baru</DialogTitle>
-                      <DialogDescription>
-                        Buat role baru dengan permissions khusus
-                      </DialogDescription>
-                    </DialogHeader>
-                    <form onSubmit={(e) => {
-                      e.preventDefault();
-                      const formData = new FormData(e.currentTarget);
-                      const permissions = Array.from(formData.getAll('permissions')) as string[];
-                      const roleData = {
-                        name: formData.get('name') as string,
-                        description: formData.get('description') as string,
-                        permissions,
-                      };
-                      createRoleMutation.mutate(roleData);
-                    }}>
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="name">Nama Role</Label>
-                          <Input name="name" placeholder="Contoh: Project Manager" required />
-                        </div>
-                        <div>
-                          <Label htmlFor="description">Deskripsi</Label>
-                          <Input name="description" placeholder="Deskripsi role dan tanggung jawab" required />
-                        </div>
-                        <div>
-                          <Label>Permissions</Label>
-                          <div className="space-y-2 max-h-40 overflow-y-auto">
-                            {['read', 'write', 'delete', 'admin', 'manage_team', 'manage_projects', 'view_analytics', 'manage_settings'].map((permission) => (
-                              <div key={permission} className="flex items-center space-x-2">
-                                <input
-                                  type="checkbox"
-                                  id={`permission-${permission}`}
-                                  name="permissions"
-                                  value={permission}
-                                  className="rounded border-gray-300"
-                                />
-                                <label htmlFor={`permission-${permission}`} className="text-sm capitalize">
-                                  {permission.replace('_', ' ')}
-                                </label>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        <Button 
-                          type="submit" 
-                          className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
-                          disabled={createRoleMutation.isPending}
-                        >
-                          {createRoleMutation.isPending ? "Membuat..." : "Buat Role"}
-                        </Button>
-                      </div>
-                    </form>
-                  </DialogContent>
-                </Dialog>
-              </div>
-
               {/* Search Controls */}
               <div className="flex gap-4 mb-6">
                 <div className="relative flex-1">
@@ -1476,7 +1408,7 @@ export default function OrganizationSettings() {
                       <TableHead>Nama Role</TableHead>
                       <TableHead>Deskripsi</TableHead>
                       <TableHead>Permissions</TableHead>
-                      <TableHead className="text-right">Aksi</TableHead>
+                      <TableHead className="text-right">Total Permissions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -1503,51 +1435,11 @@ export default function OrganizationSettings() {
                           </div>
                         </TableCell>
                         <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Buka menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                              <DropdownMenuItem onClick={() => setEditingRole(role)}>
-                                <Edit className="mr-2 h-4 w-4" />
-                                Ubah role
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <DropdownMenuItem 
-                                    className="text-red-600"
-                                    onSelect={(e) => e.preventDefault()}
-                                  >
-                                    <Trash2 className="mr-2 h-4 w-4" />
-                                    Hapus role
-                                  </DropdownMenuItem>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      Tindakan ini tidak dapat dibatalkan. Ini akan menghapus role 
-                                      "{role.name}" secara permanen.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Batal</AlertDialogCancel>
-                                    <AlertDialogAction
-                                      onClick={() => deleteRoleMutation.mutate(role.id)}
-                                      className="bg-red-600 hover:bg-red-700"
-                                    >
-                                      Hapus
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <div className="flex items-center justify-end space-x-2">
+                            <Badge variant="secondary" className="text-xs">
+                              {role.permissions.length} permission{role.permissions.length !== 1 ? 's' : ''}
+                            </Badge>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -1555,76 +1447,7 @@ export default function OrganizationSettings() {
                 </Table>
               </div>
 
-              {/* Edit Role Dialog */}
-              {editingRole && (
-                <Dialog open={!!editingRole} onOpenChange={() => setEditingRole(null)}>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Ubah Role</DialogTitle>
-                      <DialogDescription>
-                        Perbarui informasi role untuk {editingRole.name}
-                      </DialogDescription>
-                    </DialogHeader>
-                    <form onSubmit={(e) => {
-                      e.preventDefault();
-                      const formData = new FormData(e.currentTarget);
-                      const permissions = Array.from(formData.getAll('permissions')) as string[];
-                      updateRoleMutation.mutate({
-                        id: editingRole.id,
-                        name: formData.get('name') as string,
-                        description: formData.get('description') as string,
-                        permissions,
-                      });
-                    }}>
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="name">Nama Role</Label>
-                          <Input 
-                            name="name" 
-                            defaultValue={editingRole.name} 
-                            required 
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="description">Deskripsi</Label>
-                          <Input 
-                            name="description" 
-                            defaultValue={editingRole.description} 
-                            required 
-                          />
-                        </div>
-                        <div>
-                          <Label>Permissions</Label>
-                          <div className="space-y-2 max-h-40 overflow-y-auto">
-                            {['read', 'write', 'delete', 'admin', 'manage_team', 'manage_projects', 'view_analytics', 'manage_settings'].map((permission) => (
-                              <div key={permission} className="flex items-center space-x-2">
-                                <input
-                                  type="checkbox"
-                                  id={`edit-permission-${permission}`}
-                                  name="permissions"
-                                  value={permission}
-                                  defaultChecked={editingRole.permissions.includes(permission)}
-                                  className="rounded border-gray-300"
-                                />
-                                <label htmlFor={`edit-permission-${permission}`} className="text-sm capitalize">
-                                  {permission.replace('_', ' ')}
-                                </label>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        <Button 
-                          type="submit" 
-                          className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
-                          disabled={updateRoleMutation.isPending}
-                        >
-                          {updateRoleMutation.isPending ? "Memperbarui..." : "Perbarui Role"}
-                        </Button>
-                      </div>
-                    </form>
-                  </DialogContent>
-                </Dialog>
-              )}
+
             </CardContent>
           </Card>
         </TabsContent>
