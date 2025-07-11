@@ -485,7 +485,6 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                 </Button>
               </div>
             </form>
-
             <div className="text-center space-y-3">
               <Button
                 variant="ghost"
@@ -501,9 +500,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                   variant="outline"
                   onClick={() => navigateToStep("register")}
                   className="text-orange-600 hover:text-orange-700 border-orange-300 hover:border-orange-400"
-                >
-                  Daftar Organisasi Baru
-                </Button>
+                >Daftar Sekarang</Button>
               </div>
             </div>
           </div>
