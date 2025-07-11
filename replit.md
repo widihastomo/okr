@@ -246,6 +246,14 @@ All email configuration now uses environment variables:
 ## Changelog
 ```
 Changelog:
+- July 11, 2025. Successfully standardized role name capitalization across all components:
+  * Updated all role names from capitalized (Owner, Administrator, Member, Viewer) to lowercase (owner, administrator, member, viewer)
+  * Fixed role names in organization-settings.tsx hardcoded roles array
+  * Fixed role names in client-user-management.tsx roleConfig labels
+  * Fixed role names in system-role-management.tsx SelectItem values
+  * Fixed role names in users-page.tsx SelectItem values
+  * All role display names now consistently use lowercase formatting: owner, administrator, member, viewer
+  * Role management table now displays consistent lowercase role names throughout the application
 - July 11, 2025. Successfully removed add/edit role functionality from organization settings, making role management view-only:
   * Removed "Tambah Role" button and entire add role dialog form
   * Removed "Ubah role" and "Hapus role" options from role actions dropdown menu

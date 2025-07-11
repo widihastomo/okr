@@ -53,10 +53,10 @@ export default function OrganizationSettings() {
 
   // Role management states
   const [roles, setRoles] = useState([
-    { id: "1", name: "Admin", description: "Full access to all features", permissions: ["read", "write", "delete", "admin"] },
-    { id: "2", name: "Manager", description: "Can manage team and projects", permissions: ["read", "write", "manage_team"] },
-    { id: "3", name: "Member", description: "Basic access to projects", permissions: ["read", "write"] },
-    { id: "4", name: "Viewer", description: "Read-only access", permissions: ["read"] }
+    { id: "1", name: "owner", description: "Full access to all features", permissions: ["read", "write", "delete", "admin"] },
+    { id: "2", name: "administrator", description: "Can manage team and projects", permissions: ["read", "write", "manage_team"] },
+    { id: "3", name: "member", description: "Basic access to projects", permissions: ["read", "write"] },
+    { id: "4", name: "viewer", description: "Read-only access", permissions: ["read"] }
   ]);
   const [editingRole, setEditingRole] = useState<any>(null);
   const [roleSearchTerm, setRoleSearchTerm] = useState("");

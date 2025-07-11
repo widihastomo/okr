@@ -521,10 +521,10 @@ export default function UsersPage() {
                           <SelectValue placeholder="Select role" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="owner">Owner</SelectItem>
-                          <SelectItem value="administrator">Administrator</SelectItem>
-                          <SelectItem value="member">Member</SelectItem>
-                          <SelectItem value="viewer">Viewer</SelectItem>
+                          <SelectItem value="owner">owner</SelectItem>
+                          <SelectItem value="administrator">administrator</SelectItem>
+                          <SelectItem value="member">member</SelectItem>
+                          <SelectItem value="viewer">viewer</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

@@ -164,10 +164,10 @@ export default function ClientUserManagement() {
 
   const getRoleBadge = (role: string) => {
     const roleConfig = {
-      owner: { label: "Owner", color: "bg-red-100 text-red-800" },
-      administrator: { label: "Administrator", color: "bg-blue-100 text-blue-800" },
-      member: { label: "Member", color: "bg-green-100 text-green-800" },
-      viewer: { label: "Viewer", color: "bg-gray-100 text-gray-800" },
+      owner: { label: "owner", color: "bg-red-100 text-red-800" },
+      administrator: { label: "administrator", color: "bg-blue-100 text-blue-800" },
+      member: { label: "member", color: "bg-green-100 text-green-800" },
+      viewer: { label: "viewer", color: "bg-gray-100 text-gray-800" },
     };
     
     const config = roleConfig[role as keyof typeof roleConfig] || { label: role, color: "bg-gray-100 text-gray-800" };
