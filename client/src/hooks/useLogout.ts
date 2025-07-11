@@ -48,7 +48,9 @@ export function useLogout() {
       
       // 5. Navigate to login page
       console.log('🔓 Navigating to home page...');
-      setLocation("/");
+      
+      // Force a page refresh to ensure clean state
+      window.location.href = "/";
       
       setIsLoggingOut(false);
       console.log('🔓 Logout process completed');
