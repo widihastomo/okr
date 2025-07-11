@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, TrendingUp, Target, Clock } from 'lucide-react';
+import { Zap, TrendingUp, Target, Clock } from 'lucide-react';
 
 interface SimpleUpdateData {
   keyResults: Array<{
@@ -203,9 +203,9 @@ export function DailyUpdateSimple() {
     return (
       <Button
         onClick={() => setIsOpen(true)}
-        className="bg-orange-600 hover:bg-orange-700 text-white"
+        className="bg-orange-600 hover:bg-orange-700 text-white w-full sm:w-auto"
       >
-        <CheckCircle className="mr-2 h-4 w-4" />
+        <Zap className="mr-2 h-4 w-4" />
         Update Harian Instan
       </Button>
     );
