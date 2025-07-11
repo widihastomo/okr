@@ -97,7 +97,20 @@ export default function ReminderSettings() {
   // Initialize settings from API data or onboarding data
   React.useEffect(() => {
     if (reminderSettings) {
-      setSettings(reminderSettings);
+      // Ensure notificationTypes has default values if not present
+      const updatedSettings = {
+        ...reminderSettings,
+        notificationTypes: {
+          updateOverdue: true,
+          taskOverdue: true,
+          initiativeOverdue: true,
+          chatMention: true,
+          ...reminderSettings.notificationTypes // Override with existing values if any
+        }
+      };
+      
+      setSettings(updatedSettings);
+      
       // Check if the time is in preset options
       const isPresetTime = timeOptions.some(option => option.value === reminderSettings.reminderTime);
       if (!isPresetTime && reminderSettings.reminderTime) {
@@ -113,7 +126,13 @@ export default function ReminderSettings() {
         cadence: onboarding.cadence || 'harian',
         reminderTime: reminderTime,
         reminderDay: onboarding.reminderDay || 'senin',
-        reminderDate: onboarding.reminderDate || '1'
+        reminderDate: onboarding.reminderDate || '1',
+        notificationTypes: {
+          updateOverdue: true,
+          taskOverdue: true,
+          initiativeOverdue: true,
+          chatMention: true,
+        }
       }));
       
       // Check if the time is in preset options
@@ -458,6 +477,10 @@ export default function ReminderSettings() {
                       setSettings({ 
                         ...settings, 
                         notificationTypes: { 
+                          updateOverdue: true,
+                          taskOverdue: true,
+                          initiativeOverdue: true,
+                          chatMention: true,
                           ...settings.notificationTypes, 
                           updateOverdue: checked 
                         } 
@@ -484,6 +507,10 @@ export default function ReminderSettings() {
                       setSettings({ 
                         ...settings, 
                         notificationTypes: { 
+                          updateOverdue: true,
+                          taskOverdue: true,
+                          initiativeOverdue: true,
+                          chatMention: true,
                           ...settings.notificationTypes, 
                           taskOverdue: checked 
                         } 
@@ -510,6 +537,10 @@ export default function ReminderSettings() {
                       setSettings({ 
                         ...settings, 
                         notificationTypes: { 
+                          updateOverdue: true,
+                          taskOverdue: true,
+                          initiativeOverdue: true,
+                          chatMention: true,
                           ...settings.notificationTypes, 
                           initiativeOverdue: checked 
                         } 
@@ -536,6 +567,10 @@ export default function ReminderSettings() {
                       setSettings({ 
                         ...settings, 
                         notificationTypes: { 
+                          updateOverdue: true,
+                          taskOverdue: true,
+                          initiativeOverdue: true,
+                          chatMention: true,
                           ...settings.notificationTypes, 
                           chatMention: checked 
                         } 
