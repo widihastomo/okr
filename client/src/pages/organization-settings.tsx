@@ -2154,7 +2154,7 @@ export default function OrganizationSettings() {
                 <div className="p-4 border border-orange-200 rounded-lg bg-orange-50">
                   <h4 className="font-semibold text-orange-900 mb-2">Reset Data</h4>
                   <p className="text-sm text-orange-700 mb-4">
-                    Hapus semua objective, key result, initiative, task, dan siklus dari organisasi ini. 
+                    Hapus semua goal, angka target, initiative, task, dan siklus dari organisasi ini. 
                     Data anggota dan tim akan tetap tersimpan.
                   </p>
                   <AlertDialog>
@@ -2173,13 +2173,13 @@ export default function OrganizationSettings() {
                         <AlertDialogTitle>Konfirmasi Reset Data</AlertDialogTitle>
                         <AlertDialogDescription>
                           <div className="space-y-4">
-                            <p>Apakah Anda yakin ingin mereset semua data OKR (Objective, Key Result, Initiative, Task, dan Siklus)? 
+                            <p>Apakah Anda yakin ingin mereset semua data Goal (Goal, Angka Target, Initiative, Task, dan Siklus)? 
                             Tindakan ini tidak dapat dibatalkan.</p>
                             
                             <div>
                               <strong>Data yang akan dihapus:</strong>
                               <ul className="list-disc ml-6 mt-2">
-                                <li>Semua objective dan key result</li>
+                                <li>Semua goal dan angka target</li>
                                 <li>Semua initiative dan task</li>
                                 <li>Semua siklus</li>
                               </ul>
