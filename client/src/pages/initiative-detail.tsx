@@ -650,8 +650,12 @@ export default function InitiativeDetailPage() {
       {initiative && (
         <InitiativeFormModal
           initiative={initiative}
-          open={isEditInitiativeModalOpen}
-          onOpenChange={setIsEditInitiativeModalOpen}
+          isOpen={isEditInitiativeModalOpen}
+          onClose={() => setIsEditInitiativeModalOpen(false)}
+          onSuccess={() => {
+            setIsEditInitiativeModalOpen(false);
+            queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
+          }}
         />
       )}
 
