@@ -1345,14 +1345,36 @@ export class DatabaseStorage implements IStorage {
     // Get task before deletion to access initiativeId
     const [task] = await db.select().from(tasks).where(eq(tasks.id, id));
     
-    const result = await db.delete(tasks).where(eq(tasks.id, id));
-    
-    if (result.rowCount > 0 && task?.initiativeId) {
-      // Recalculate initiative progress after task deletion (only if task was linked to initiative)
-      await this.updateInitiativeProgress(task.initiativeId);
+    if (!task) {
+      return false;
     }
     
-    return result.rowCount > 0;
+    // Delete related data first to avoid foreign key constraint violations
+    try {
+      console.log(`🗑️ Deleting task ${id} and related data...`);
+      
+      // Delete task comments
+      const commentsResult = await db.delete(taskComments).where(eq(taskComments.taskId, id));
+      console.log(`🗑️ Deleted ${commentsResult.rowCount} comments for task ${id}`);
+      
+      // Delete task audit trail
+      const auditResult = await db.delete(taskAuditTrail).where(eq(taskAuditTrail.taskId, id));
+      console.log(`🗑️ Deleted ${auditResult.rowCount} audit trail entries for task ${id}`);
+      
+      // Delete the task itself
+      const result = await db.delete(tasks).where(eq(tasks.id, id));
+      console.log(`🗑️ Deleted task ${id}, result: ${result.rowCount} rows affected`);
+      
+      if (result.rowCount > 0 && task.initiativeId) {
+        // Recalculate initiative progress after task deletion (only if task was linked to initiative)
+        await this.updateInitiativeProgress(task.initiativeId);
+      }
+      
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error("Error deleting task and related data:", error);
+      throw error;
+    }
   }
 
   // Initiative Notes

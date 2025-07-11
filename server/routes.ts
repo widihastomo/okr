@@ -3117,9 +3117,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete task
-  app.delete("/api/tasks/:id", async (req, res) => {
+  app.delete("/api/tasks/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
+      
+      // Verify user has access to this task
+      const existingTask = await storage.getTask(id);
+      if (!existingTask) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        const taskCreator = await storage.getUser(existingTask.createdBy);
+        if (!taskCreator || taskCreator.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this task" });
+        }
+      }
+      
+      // Create audit trail for task deletion
+      try {
+        await storage.createTaskAuditTrail({
+          taskId: id,
+          userId: currentUser.id,
+          action: "task_deleted",
+          oldValue: existingTask.title,
+          newValue: null,
+          changeDescription: `Task "${existingTask.title}" dihapus oleh ${currentUser.firstName || currentUser.email}`
+        });
+      } catch (auditError) {
+        console.error("Error creating task deletion audit trail:", auditError);
+      }
+      
       const deleted = await storage.deleteTask(id);
       
       if (!deleted) {
