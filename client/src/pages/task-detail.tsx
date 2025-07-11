@@ -1,6 +1,7 @@
 import { useParams } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
+import React from "react";
 import {
   ArrowLeft,
   Calendar,
@@ -22,6 +23,7 @@ import {
   Users,
   Timer,
   CalendarDays,
+  MessageSquare,
 } from "lucide-react";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
@@ -251,37 +253,71 @@ function CommentsCard({ taskId }: { taskId: string }) {
 
 // Task History Card Component
 function TaskHistoryCard({ taskId }: { taskId: string }) {
-  // For now, create a placeholder history. In future this could be actual task activity logs
-  const historyItems = [
-    {
-      id: 1,
-      action: "Task dibuat",
-      user: "Widi Hastomo",
-      timestamp: "2025-01-07 10:30",
-      type: "created"
-    },
-    {
-      id: 2,
-      action: "Status diubah menjadi 'Sedang Berjalan'",
-      user: "Widi Hastomo", 
-      timestamp: "2025-01-07 11:15",
-      type: "status_change"
-    },
-    {
-      id: 3,
-      action: "Due date diperbarui",
-      user: "Admin User",
-      timestamp: "2025-01-07 14:20",
-      type: "due_date_change"
-    },
-    {
-      id: 4,
-      action: "PIC diubah",
-      user: "Admin User",
-      timestamp: "2025-01-07 16:45",
-      type: "assignee_change"
+  // Get task data for creation info
+  const { data: task, isLoading } = useQuery({
+    queryKey: [`/api/tasks/${taskId}`],
+    enabled: !!taskId,
+  });
+
+  const taskData = task as any;
+
+  // Build history items from task data
+  const historyItems = React.useMemo(() => {
+    const items: any[] = [];
+    
+    // Add task creation
+    if (taskData?.createdAt) {
+      const createdByUser = taskData.createdByUser || {};
+      const createdByName = createdByUser.firstName || createdByUser.email || "System";
+      
+      items.push({
+        id: 'created',
+        action: "Task dibuat",
+        user: createdByName,
+        timestamp: new Date(taskData.createdAt).toLocaleString('id-ID'),
+        type: "created"
+      });
     }
-  ];
+
+    // Add last update info if available
+    if (taskData?.updatedAt && taskData.updatedAt !== taskData.createdAt) {
+      const updatedByUser = taskData.lastUpdateByUser || {};
+      const updatedByName = updatedByUser.firstName || updatedByUser.email || "System";
+      
+      items.push({
+        id: 'updated',
+        action: "Task diperbarui",
+        user: updatedByName,
+        timestamp: new Date(taskData.updatedAt).toLocaleString('id-ID'),
+        type: "general"
+      });
+    }
+
+    // Sort by timestamp (newest first)
+    return items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  }, [taskData]);
+
+  if (isLoading) {
+    return (
+      <Card className="h-fit">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg">Riwayat Task</CardTitle>
+          <CardDescription className="text-sm">Timeline aktivitas dan perubahan</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="space-y-3">
+            <div className="flex gap-2 animate-pulse">
+              <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+              <div className="flex-1">
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const getHistoryIcon = (type: string) => {
     switch (type) {
@@ -293,6 +329,8 @@ function TaskHistoryCard({ taskId }: { taskId: string }) {
         return <Calendar className="w-4 h-4 text-orange-600" />;
       case "assignee_change":
         return <User className="w-4 h-4 text-purple-600" />;
+      case "comment":
+        return <MessageSquare className="w-4 h-4 text-indigo-600" />;
       default:
         return <Clock className="w-4 h-4 text-gray-600" />;
     }
@@ -306,28 +344,35 @@ function TaskHistoryCard({ taskId }: { taskId: string }) {
       </CardHeader>
       <CardContent className="pt-0">
         <div className="space-y-3">
-          {historyItems.map((item, index) => (
-            <div key={item.id} className="flex gap-2">
-              <div className="flex flex-col items-center">
-                <div className="p-1.5 rounded-full bg-gray-100">
-                  {getHistoryIcon(item.type)}
+          {historyItems.length > 0 ? (
+            historyItems.map((item, index) => (
+              <div key={item.id} className="flex gap-2">
+                <div className="flex flex-col items-center">
+                  <div className="p-1.5 rounded-full bg-gray-100">
+                    {getHistoryIcon(item.type)}
+                  </div>
+                  {index < historyItems.length - 1 && (
+                    <div className="w-px h-6 bg-gray-200 mt-1"></div>
+                  )}
                 </div>
-                {index < historyItems.length - 1 && (
-                  <div className="w-px h-6 bg-gray-200 mt-1"></div>
-                )}
-              </div>
-              <div className="flex-1 pb-2">
-                <p className="text-xs font-medium text-gray-900">
-                  {item.action}
-                </p>
-                <div className="flex items-center gap-1 mt-1">
-                  <span className="text-xs text-gray-500">{item.user}</span>
-                  <span className="text-xs text-gray-400">•</span>
-                  <span className="text-xs text-gray-500">{item.timestamp}</span>
+                <div className="flex-1 pb-2">
+                  <p className="text-xs font-medium text-gray-900">
+                    {item.action}
+                  </p>
+                  <div className="flex items-center gap-1 mt-1">
+                    <span className="text-xs text-gray-500">{item.user}</span>
+                    <span className="text-xs text-gray-400">•</span>
+                    <span className="text-xs text-gray-500">{item.timestamp}</span>
+                  </div>
                 </div>
               </div>
+            ))
+          ) : (
+            <div className="text-center py-8">
+              <Clock className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+              <p className="text-sm text-gray-500">Belum ada aktivitas pada task ini</p>
             </div>
-          ))}
+          )}
         </div>
       </CardContent>
     </Card>
