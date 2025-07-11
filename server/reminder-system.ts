@@ -12,6 +12,15 @@ export interface ReminderConfig {
   isActive: boolean;
   objectiveId?: string;
   teamFocus?: string;
+  notificationTypes?: {
+    updateOverdue: boolean;
+    taskOverdue: boolean;
+    initiativeOverdue: boolean;
+    keyResultOverdue: boolean;
+    checkInOverdue: boolean;
+    progressReminder: boolean;
+    deadlineWarning: boolean;
+  };
 }
 
 export class ReminderSystem {

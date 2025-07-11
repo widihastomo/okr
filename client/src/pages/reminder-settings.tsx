@@ -30,6 +30,15 @@ interface ReminderSettings {
   enableNotifications: boolean;
   autoUpdateTasks: boolean;
   reminderMessage?: string;
+  notificationTypes?: {
+    updateOverdue: boolean;
+    taskOverdue: boolean;
+    initiativeOverdue: boolean;
+    keyResultOverdue: boolean;
+    checkInOverdue: boolean;
+    progressReminder: boolean;
+    deadlineWarning: boolean;
+  };
 }
 
 const dayOptions = [
@@ -76,7 +85,16 @@ export default function ReminderSettings() {
     enableEmailReminders: true,
     enableNotifications: true,
     autoUpdateTasks: false,
-    reminderMessage: 'Saatnya update progress harian Anda!'
+    reminderMessage: 'Saatnya update progress harian Anda!',
+    notificationTypes: {
+      updateOverdue: true,
+      taskOverdue: true,
+      initiativeOverdue: true,
+      keyResultOverdue: true,
+      checkInOverdue: true,
+      progressReminder: true,
+      deadlineWarning: true,
+    }
   });
 
   const [useCustomTime, setUseCustomTime] = useState(false);
@@ -412,6 +430,200 @@ export default function ReminderSettings() {
                     checked={settings.autoUpdateTasks}
                     onCheckedChange={(checked) => 
                       setSettings({ ...settings, autoUpdateTasks: checked })
+                    }
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Notification Types */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Bell className="h-5 w-5 text-blue-600" />
+                  Jenis Notifikasi
+                </CardTitle>
+                <p className="text-sm text-gray-600">
+                  Pilih jenis notifikasi yang ingin Anda terima
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="update-overdue" className="text-base font-medium">
+                      Update Overdue
+                    </Label>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Notifikasi ketika update progress terlambat
+                    </p>
+                  </div>
+                  <Switch
+                    id="update-overdue"
+                    checked={settings.notificationTypes?.updateOverdue || false}
+                    onCheckedChange={(checked) => 
+                      setSettings({ 
+                        ...settings, 
+                        notificationTypes: { 
+                          ...settings.notificationTypes, 
+                          updateOverdue: checked 
+                        } 
+                      })
+                    }
+                  />
+                </div>
+
+                <Separator />
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="task-overdue" className="text-base font-medium">
+                      Task Overdue
+                    </Label>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Notifikasi ketika deadline task terlewat
+                    </p>
+                  </div>
+                  <Switch
+                    id="task-overdue"
+                    checked={settings.notificationTypes?.taskOverdue || false}
+                    onCheckedChange={(checked) => 
+                      setSettings({ 
+                        ...settings, 
+                        notificationTypes: { 
+                          ...settings.notificationTypes, 
+                          taskOverdue: checked 
+                        } 
+                      })
+                    }
+                  />
+                </div>
+
+                <Separator />
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="initiative-overdue" className="text-base font-medium">
+                      Inisiatif Overdue
+                    </Label>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Notifikasi ketika update inisiatif terlambat
+                    </p>
+                  </div>
+                  <Switch
+                    id="initiative-overdue"
+                    checked={settings.notificationTypes?.initiativeOverdue || false}
+                    onCheckedChange={(checked) => 
+                      setSettings({ 
+                        ...settings, 
+                        notificationTypes: { 
+                          ...settings.notificationTypes, 
+                          initiativeOverdue: checked 
+                        } 
+                      })
+                    }
+                  />
+                </div>
+
+                <Separator />
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="keyresult-overdue" className="text-base font-medium">
+                      Key Result Overdue
+                    </Label>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Notifikasi ketika update key result terlambat
+                    </p>
+                  </div>
+                  <Switch
+                    id="keyresult-overdue"
+                    checked={settings.notificationTypes?.keyResultOverdue || false}
+                    onCheckedChange={(checked) => 
+                      setSettings({ 
+                        ...settings, 
+                        notificationTypes: { 
+                          ...settings.notificationTypes, 
+                          keyResultOverdue: checked 
+                        } 
+                      })
+                    }
+                  />
+                </div>
+
+                <Separator />
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="checkin-overdue" className="text-base font-medium">
+                      Check-in Overdue
+                    </Label>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Notifikasi ketika check-in rutin terlambat
+                    </p>
+                  </div>
+                  <Switch
+                    id="checkin-overdue"
+                    checked={settings.notificationTypes?.checkInOverdue || false}
+                    onCheckedChange={(checked) => 
+                      setSettings({ 
+                        ...settings, 
+                        notificationTypes: { 
+                          ...settings.notificationTypes, 
+                          checkInOverdue: checked 
+                        } 
+                      })
+                    }
+                  />
+                </div>
+
+                <Separator />
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="progress-reminder" className="text-base font-medium">
+                      Progress Reminder
+                    </Label>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Reminder rutin untuk update progress
+                    </p>
+                  </div>
+                  <Switch
+                    id="progress-reminder"
+                    checked={settings.notificationTypes?.progressReminder || false}
+                    onCheckedChange={(checked) => 
+                      setSettings({ 
+                        ...settings, 
+                        notificationTypes: { 
+                          ...settings.notificationTypes, 
+                          progressReminder: checked 
+                        } 
+                      })
+                    }
+                  />
+                </div>
+
+                <Separator />
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="deadline-warning" className="text-base font-medium">
+                      Deadline Warning
+                    </Label>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Peringatan sebelum deadline mendekati
+                    </p>
+                  </div>
+                  <Switch
+                    id="deadline-warning"
+                    checked={settings.notificationTypes?.deadlineWarning || false}
+                    onCheckedChange={(checked) => 
+                      setSettings({ 
+                        ...settings, 
+                        notificationTypes: { 
+                          ...settings.notificationTypes, 
+                          deadlineWarning: checked 
+                        } 
+                      })
                     }
                   />
                 </div>

@@ -787,7 +787,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           enableEmailReminders: true,
           enableNotifications: true,
           autoUpdateTasks: false,
-          reminderMessage: 'Saatnya update progress harian Anda!'
+          reminderMessage: 'Saatnya update progress harian Anda!',
+          notificationTypes: {
+            updateOverdue: true,
+            taskOverdue: true,
+            initiativeOverdue: true,
+            keyResultOverdue: true,
+            checkInOverdue: true,
+            progressReminder: true,
+            deadlineWarning: true,
+          }
         };
         return res.json(defaultSettings);
       } catch (onboardingError) {
@@ -801,7 +810,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           enableEmailReminders: true,
           enableNotifications: true,
           autoUpdateTasks: false,
-          reminderMessage: 'Saatnya update progress harian Anda!'
+          reminderMessage: 'Saatnya update progress harian Anda!',
+          notificationTypes: {
+            updateOverdue: true,
+            taskOverdue: true,
+            initiativeOverdue: true,
+            keyResultOverdue: true,
+            checkInOverdue: true,
+            progressReminder: true,
+            deadlineWarning: true,
+          }
         };
         return res.json(defaultSettings);
       }
