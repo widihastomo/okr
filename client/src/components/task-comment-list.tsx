@@ -63,6 +63,7 @@ export function TaskCommentList({ taskId }: TaskCommentListProps) {
       toast({
         title: "Berhasil",
         description: "Komentar berhasil diperbarui",
+        variant: "success",
       });
     },
     onError: (error: any) => {
@@ -84,6 +85,7 @@ export function TaskCommentList({ taskId }: TaskCommentListProps) {
       toast({
         title: "Berhasil",
         description: "Komentar berhasil dihapus",
+        variant: "success",
       });
     },
     onError: (error: any) => {

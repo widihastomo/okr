@@ -82,6 +82,7 @@ export function TaskCommentEditor({
       toast({
         title: "Berhasil",
         description: "Komentar berhasil ditambahkan",
+        variant: "success",
       });
       onCommentAdded?.();
     },

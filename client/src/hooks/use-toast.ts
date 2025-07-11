@@ -142,9 +142,6 @@ type Toast = Omit<ToasterToast, "id">
 
 function toast({ ...props }: Toast) {
   const id = genId()
-  
-  // Debug logging to see what props are being passed
-  console.log('Toast function called with props:', props);
 
   const update = (props: ToasterToast) =>
     dispatch({
