@@ -194,11 +194,13 @@ function TaskOverviewCard({ task, assignedUser, initiative }: any) {
   return (
     <Card>
       <CardHeader className="pb-4">
-        <div className="flex items-start justify-between">
-          <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg mb-2 pr-4">{task?.title}</CardTitle>
+        <div className="space-y-3">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <CardTitle className="text-lg leading-tight">{task?.title}</CardTitle>
+            </div>
           </div>
-          <div className="flex items-center gap-2 flex-wrap flex-shrink-0">
+          <div className="flex items-center gap-2 flex-wrap">
             <Badge className={`${getTaskStatusColor(task?.status || '')} text-xs`}>
               {getTaskStatusLabel(task?.status || '')}
             </Badge>

@@ -246,6 +246,15 @@ All email configuration now uses environment variables:
 ## Changelog
 ```
 Changelog:
+- July 11, 2025. Successfully fixed task status update functionality and improved UI layout:
+  * FIXED: apiRequest parameter order issue causing task status updates to fail
+  * CORRECTED: Changed apiRequest('url', 'method', data) to apiRequest('method', 'url', data) 
+  * IMPROVED: Task detail page layout to prevent title overlap with badges
+  * ENHANCED: Separated title and badges into different rows for better readability
+  * RESOLVED: Task status dropdown now functions correctly with proper PATCH requests
+  * TESTED: Backend endpoint confirmed working via curl testing
+  * PRODUCTION-READY: All task status updates now work seamlessly
+Changelog:
 - July 11, 2025. Successfully implemented real audit trail integration for task history across task detail pages:
   * COMPLETED: Replaced all dummy task history data with real audit trail data from database
   * ENHANCED: Task history now displays actual creation and update information with user attribution
