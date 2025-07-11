@@ -309,64 +309,13 @@ function CommentsCard({ taskId }: { taskId: string }) {
 
 // Task History Card Component
 function TaskHistoryCard({ taskId }: { taskId: string }) {
-  // Get task data for creation info
-  const { data: task, isLoading } = useQuery({
-    queryKey: [`/api/tasks/${taskId}`],
+  // Get task audit trail from API
+  const { data: auditTrail, isLoading } = useQuery({
+    queryKey: [`/api/tasks/${taskId}/audit-trail`],
     enabled: !!taskId,
   });
 
-  const taskData = task as any;
-
-  // Build history items from task data
-  const historyItems = React.useMemo(() => {
-    const items: any[] = [];
-    
-    // Add task creation
-    if (taskData?.createdAt) {
-      // Check if createdBy ID matches assignedUser ID (same person)
-      let createdByName = "System";
-      
-      if (taskData.createdBy && taskData.assignedUser && taskData.createdBy === taskData.assignedUser.id) {
-        // Use assignedUser data if creator is the same person
-        createdByName = taskData.assignedUser.firstName || taskData.assignedUser.email || "System";
-      } else if (taskData.createdBy) {
-        // For different creator, we'd need to fetch user data separately
-        // For now, show the creator ID or "System" if not available
-        createdByName = taskData.createdBy.firstName || taskData.createdBy.email || "System";
-      }
-      
-      items.push({
-        id: 'created',
-        action: `Task dibuat oleh ${createdByName}`,
-        user: createdByName,
-        timestamp: new Date(taskData.createdAt).toLocaleString('id-ID'),
-        type: "created"
-      });
-    }
-
-    // Add last update info if available
-    if (taskData?.updatedAt && taskData.updatedAt !== taskData.createdAt) {
-      let updatedByName = "System";
-      
-      // Check if lastUpdateBy matches assignedUser or createdBy
-      if (taskData.lastUpdateBy && taskData.assignedUser && taskData.lastUpdateBy === taskData.assignedUser.id) {
-        updatedByName = taskData.assignedUser.firstName || taskData.assignedUser.email || "System";
-      } else if (taskData.lastUpdateBy) {
-        updatedByName = taskData.lastUpdateBy.firstName || taskData.lastUpdateBy.email || "System";
-      }
-      
-      items.push({
-        id: 'updated',
-        action: `Task diperbarui oleh ${updatedByName}`,
-        user: updatedByName,
-        timestamp: new Date(taskData.updatedAt).toLocaleString('id-ID'),
-        type: "general"
-      });
-    }
-
-    // Sort by timestamp (newest first)
-    return items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-  }, [taskData]);
+  const historyItems = auditTrail || [];
 
   if (isLoading) {
     return (
@@ -390,20 +339,19 @@ function TaskHistoryCard({ taskId }: { taskId: string }) {
     );
   }
 
-  const getHistoryIcon = (type: string) => {
-    switch (type) {
-      case "created":
-        return <Plus className="w-4 h-4 text-green-600" />;
-      case "status_change":
-        return <CheckCircle className="w-4 h-4 text-blue-600" />;
-      case "due_date_change":
-        return <Calendar className="w-4 h-4 text-orange-600" />;
-      case "assignee_change":
-        return <User className="w-4 h-4 text-purple-600" />;
-      case "comment":
-        return <MessageSquare className="w-4 h-4 text-indigo-600" />;
-      default:
-        return <Clock className="w-4 h-4 text-gray-600" />;
+  const getHistoryIcon = (action: string) => {
+    if (action === "created") {
+      return <Plus className="w-4 h-4 text-green-600" />;
+    } else if (action === "status_changed") {
+      return <CheckCircle className="w-4 h-4 text-blue-600" />;
+    } else if (action.includes("due_date")) {
+      return <Calendar className="w-4 h-4 text-orange-600" />;
+    } else if (action.includes("assignee")) {
+      return <User className="w-4 h-4 text-purple-600" />;
+    } else if (action.includes("comment")) {
+      return <MessageSquare className="w-4 h-4 text-indigo-600" />;
+    } else {
+      return <Clock className="w-4 h-4 text-gray-600" />;
     }
   };
 
@@ -420,7 +368,7 @@ function TaskHistoryCard({ taskId }: { taskId: string }) {
               <div key={item.id} className="flex gap-2">
                 <div className="flex flex-col items-center">
                   <div className="p-1.5 rounded-full bg-gray-100">
-                    {getHistoryIcon(item.type)}
+                    {getHistoryIcon(item.action)}
                   </div>
                   {index < historyItems.length - 1 && (
                     <div className="w-px h-6 bg-gray-200 mt-1"></div>
@@ -428,10 +376,21 @@ function TaskHistoryCard({ taskId }: { taskId: string }) {
                 </div>
                 <div className="flex-1 pb-2">
                   <p className="text-xs font-medium text-gray-900">
-                    {item.action}
+                    {item.changeDescription || item.action}
                   </p>
                   <div className="flex items-center gap-1 mt-1">
-                    <span className="text-xs text-gray-500">{item.timestamp}</span>
+                    <span className="text-xs text-gray-500">{item.user?.firstName || item.user?.email || "System"}</span>
+                    <span className="text-xs text-gray-400">•</span>
+                    <span className="text-xs text-gray-500">
+                      {new Date(item.createdAt).toLocaleString('id-ID', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        timeZone: 'Asia/Jakarta'
+                      })}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -495,6 +454,7 @@ export default function TaskDetailPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/tasks/${id}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/tasks/${id}/audit-trail`] });
       toast({
         title: "Status diperbarui",
         description: "Status task berhasil diperbarui",

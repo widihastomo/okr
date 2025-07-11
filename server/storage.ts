@@ -1,14 +1,14 @@
 import { 
-  cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives, tasks, taskComments,
+  cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives, tasks, taskComments, taskAuditTrail,
   initiativeMembers, initiativeDocuments, initiativeNotes, initiativeSuccessMetrics, successMetricUpdates,
   notifications, notificationPreferences, userOnboardingProgress, organizations, memberInvitations, applicationSettings,
   insertMemberInvitationSchema,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
-  type CheckIn, type Initiative, type Task, type TaskComment, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
+  type CheckIn, type Initiative, type Task, type TaskComment, type TaskAuditTrail, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
   type InitiativeNote, type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
   type InsertUser, type UpsertUser, type InsertTeam, type InsertTeamMember,
   type InsertCheckIn, type InsertInitiative, type InsertInitiativeMember, type InsertInitiativeDocument, type InsertTask,
-  type InsertTaskComment, type InsertInitiativeNote, type OKRWithKeyResults, type CycleWithOKRs, type UpdateKeyResultProgress, type CreateOKRFromTemplate,
+  type InsertTaskComment, type InsertTaskAuditTrail, type InsertInitiativeNote, type OKRWithKeyResults, type CycleWithOKRs, type UpdateKeyResultProgress, type CreateOKRFromTemplate,
   type SuccessMetric, type InsertSuccessMetric, type SuccessMetricUpdate, type InsertSuccessMetricUpdate,
   type Notification, type InsertNotification, type NotificationPreferences, type InsertNotificationPreferences,
   type UserOnboardingProgress, type InsertUserOnboardingProgress, type UpdateOnboardingProgress,
@@ -145,6 +145,10 @@ export interface IStorage {
   createTaskComment(comment: InsertTaskComment): Promise<TaskComment>;
   updateTaskComment(id: string, comment: Partial<InsertTaskComment>): Promise<TaskComment | undefined>;
   deleteTaskComment(id: string): Promise<boolean>;
+
+  // Task Audit Trail
+  getTaskAuditTrail(taskId: string): Promise<(TaskAuditTrail & { user: User })[]>;
+  createTaskAuditTrail(auditTrail: InsertTaskAuditTrail): Promise<TaskAuditTrail>;
   
   // Key Result with Details
   getKeyResultWithDetails(id: string): Promise<KeyResultWithDetails | undefined>;
@@ -1048,6 +1052,16 @@ export class DatabaseStorage implements IStorage {
   async createTask(taskData: InsertTask): Promise<Task> {
     const [task] = await db.insert(tasks).values(taskData).returning();
     
+    // Create audit trail for task creation
+    await this.createTaskAuditTrail({
+      taskId: task.id,
+      userId: task.createdBy,
+      action: "created",
+      oldValue: null,
+      newValue: task.title,
+      changeDescription: `Task dibuat dengan judul: "${task.title}"`
+    });
+    
     // Recalculate initiative progress after task creation (only if task is linked to initiative)
     if (taskData.initiativeId) {
       await this.updateInitiativeProgress(taskData.initiativeId);
@@ -1484,6 +1498,29 @@ export class DatabaseStorage implements IStorage {
   async deleteTaskComment(id: string): Promise<boolean> {
     const result = await db.delete(taskComments).where(eq(taskComments.id, id));
     return result.rowCount > 0;
+  }
+
+  // Task Audit Trail
+  async getTaskAuditTrail(taskId: string): Promise<(TaskAuditTrail & { user: User })[]> {
+    const auditTrail = await db
+      .select({
+        auditTrail: taskAuditTrail,
+        user: users,
+      })
+      .from(taskAuditTrail)
+      .innerJoin(users, eq(taskAuditTrail.userId, users.id))
+      .where(eq(taskAuditTrail.taskId, taskId))
+      .orderBy(desc(taskAuditTrail.createdAt));
+
+    return auditTrail.map(row => ({
+      ...row.auditTrail,
+      user: row.user,
+    }));
+  }
+
+  async createTaskAuditTrail(auditTrailData: InsertTaskAuditTrail): Promise<TaskAuditTrail> {
+    const [newAuditTrail] = await db.insert(taskAuditTrail).values(auditTrailData).returning();
+    return newAuditTrail;
   }
 
   // Notifications

@@ -4,13 +4,14 @@ import { storage } from "./storage";
 import { 
   insertCycleSchema, insertTemplateSchema, insertObjectiveSchema, insertKeyResultSchema, 
   insertCheckInSchema, insertInitiativeSchema, insertInitiativeMemberSchema, insertInitiativeDocumentSchema, 
-  insertTaskSchema, insertTaskCommentSchema, insertInitiativeNoteSchema, updateKeyResultProgressSchema, createOKRFromTemplateSchema,
+  insertTaskSchema, insertTaskCommentSchema, insertTaskAuditTrailSchema, insertInitiativeNoteSchema, updateKeyResultProgressSchema, createOKRFromTemplateSchema,
   insertSuccessMetricSchema, insertSuccessMetricUpdateSchema, insertDailyReflectionSchema, updateOnboardingProgressSchema,
   subscriptionPlans, organizations, organizationSubscriptions, users, dailyReflections, companyOnboardingDataSchema,
   insertMemberInvitationSchema, trialAchievements, userTrialAchievements, billingPeriods,
   applicationSettings, insertApplicationSettingSchema, updateApplicationSettingSchema,
   type User, type SubscriptionPlan, type Organization, type OrganizationSubscription, type UserOnboardingProgress, type UpdateOnboardingProgress, type CompanyOnboardingData,
-  type MemberInvitation, type InsertUser, type ApplicationSetting, type InsertApplicationSetting, type UpdateApplicationSetting
+  type MemberInvitation, type InsertUser, type ApplicationSetting, type InsertApplicationSetting, type UpdateApplicationSetting,
+  type TaskAuditTrail, type InsertTaskAuditTrail
 } from "@shared/schema";
 import { z } from "zod";
 import { createInsertSchema } from "drizzle-zod";
@@ -36,6 +37,17 @@ import { reminderSystem } from "./reminder-system";
 import { emailService } from "./email-service";
 import { setupSubscriptionRoutes } from "./subscription-routes";
 import crypto from "crypto";
+
+// Helper function to get task status label
+function getTaskStatusLabel(status: string): string {
+  switch (status) {
+    case 'not_started': return 'Belum Mulai';
+    case 'in_progress': return 'Sedang Berjalan';
+    case 'completed': return 'Selesai';
+    case 'cancelled': return 'Dibatalkan';
+    default: return status;
+  }
+}
 
 // System Owner middleware to protect admin endpoints
 const isSystemOwner = (req: any, res: any, next: any) => {
@@ -3018,10 +3030,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      const updatedTask = await storage.updateTask(id, { status });
+      // Get old status for audit trail
+      const oldStatus = existingTask.status;
+      
+      const updatedTask = await storage.updateTask(id, { 
+        status,
+        updatedAt: new Date(),
+        lastUpdateBy: currentUser.id
+      });
       
       if (!updatedTask) {
         return res.status(404).json({ message: "Task not found" });
+      }
+      
+      // Create audit trail entry for status change
+      if (oldStatus !== status) {
+        await storage.createTaskAuditTrail({
+          taskId: id,
+          userId: currentUser.id,
+          action: 'status_changed',
+          oldValue: oldStatus,
+          newValue: status,
+          changeDescription: `Status diubah dari ${getTaskStatusLabel(oldStatus)} ke ${getTaskStatusLabel(status)}`,
+          createdAt: new Date()
+        });
       }
       
       // Auto-update initiative progress when task status changes
@@ -4073,6 +4105,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Task not found" });
       }
       
+      // Create audit trail for status changes
+      if (req.body.status && existingTask.status !== req.body.status) {
+        const changeDescription = `Status berubah dari ${getTaskStatusLabel(existingTask.status)} ke ${getTaskStatusLabel(req.body.status)}`;
+        
+        await storage.createTaskAuditTrail({
+          taskId: id,
+          userId: currentUser.id,
+          action: "status_changed",
+          oldValue: existingTask.status,
+          newValue: req.body.status,
+          changeDescription
+        });
+      }
+      
       res.json(updatedTask);
     } catch (error) {
       console.error("Error updating task:", error);
@@ -4108,6 +4154,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting task:", error);
       res.status(500).json({ message: "Failed to delete task" });
+    }
+  });
+
+  // Get task audit trail
+  app.get("/api/tasks/:id/audit-trail", requireAuth, async (req, res) => {
+    try {
+      const id = req.params.id;
+      const currentUser = req.user as User;
+      
+      // Verify user has access to this task
+      const existingTask = await storage.getTask(id);
+      if (!existingTask) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      
+      if (!currentUser.isSystemOwner) {
+        const taskCreator = await storage.getUser(existingTask.createdBy);
+        if (!taskCreator || taskCreator.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this task" });
+        }
+      }
+      
+      const auditTrail = await storage.getTaskAuditTrail(id);
+      
+      res.json(auditTrail);
+    } catch (error) {
+      console.error("Error fetching task audit trail:", error);
+      res.status(500).json({ message: "Failed to fetch audit trail" });
     }
   });
 
@@ -4262,6 +4336,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting task comment:", error);
       res.status(500).json({ message: "Failed to delete task comment" });
+    }
+  });
+
+  // Task audit trail endpoints
+  app.get("/api/tasks/:taskId/audit-trail", requireAuth, async (req, res) => {
+    try {
+      const { taskId } = req.params;
+      const currentUser = req.user as User;
+      
+      // Check if user has access to this task's audit trail
+      const task = await storage.getTask(taskId);
+      if (!task) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      
+      const auditTrail = await storage.getTaskAuditTrail(taskId);
+      res.json(auditTrail);
+    } catch (error) {
+      console.error("Error fetching task audit trail:", error);
+      res.status(500).json({ message: "Failed to fetch task audit trail" });
     }
   });
 

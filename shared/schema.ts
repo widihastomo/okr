@@ -521,6 +521,18 @@ export const taskComments = pgTable("task_comments", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Task Audit Trail for tracking changes
+export const taskAuditTrail = pgTable("task_audit_trail", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  taskId: uuid("task_id").references(() => tasks.id).notNull(),
+  userId: uuid("user_id").references(() => users.id).notNull(),
+  action: text("action").notNull(), // "created", "status_changed", "priority_changed", "assigned", "deadline_changed", "updated"
+  oldValue: text("old_value"), // Previous value for comparison
+  newValue: text("new_value"), // New value after change
+  changeDescription: text("change_description"), // Human-readable description of the change
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const insertCycleSchema = createInsertSchema(cycles).omit({
   id: true,
   createdBy: true, // Will be set by backend
@@ -570,6 +582,11 @@ export const insertTaskCommentSchema = createInsertSchema(taskComments).omit({
   createdAt: true,
   updatedAt: true,
   editedAt: true,
+});
+
+export const insertTaskAuditTrailSchema = createInsertSchema(taskAuditTrail).omit({
+  id: true,
+  createdAt: true,
 });
 
 export const insertInitiativeDocumentSchema = createInsertSchema(initiativeDocuments).omit({
@@ -1055,6 +1072,14 @@ export type InsertTeam = z.infer<typeof insertTeamSchema>;
 export type InsertTeamMember = z.infer<typeof insertTeamMemberSchema>;
 export type LoginData = z.infer<typeof loginSchema>;
 export type RegisterData = z.infer<typeof registerSchema>;
+
+// Task Types
+export type Task = typeof tasks.$inferSelect;
+export type InsertTask = z.infer<typeof insertTaskSchema>;
+export type TaskComment = typeof taskComments.$inferSelect;
+export type InsertTaskComment = z.infer<typeof insertTaskCommentSchema>;
+export type TaskAuditTrail = typeof taskAuditTrail.$inferSelect;
+export type InsertTaskAuditTrail = z.infer<typeof insertTaskAuditTrailSchema>;
 
 export type KeyResultWithDetails = KeyResult & {
   checkIns: CheckIn[];
