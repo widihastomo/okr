@@ -285,50 +285,45 @@ export default function InitiativeDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="flex items-center gap-2 hover:bg-gray-100"
-              onClick={() => {
-                if (window.history.length > 1) {
-                  window.history.back();
-                } else {
-                  window.location.href = '/dashboard?tab=initiatives';
-                }
-              }}
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Kembali
-            </Button>
-            
-            <div className="text-sm text-gray-600">
-              Detail Inisiatif
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-3">
+    <div className="p-4 sm:p-6 max-w-full">
+      {/* Page Header with Back Button and Actions */}
+      <div className="mb-6">
+        {/* Back button and Actions in same row */}
+        <div className="flex items-center justify-between mb-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              if (window.history.length > 1) {
+                window.history.back();
+              } else {
+                window.location.href = '/dashboard?tab=initiatives';
+              }
+            }}
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Kembali
+          </Button>
+
+          <div className="flex items-center gap-2">
             {canEdit(initiativeData.status) && (
               <Button 
                 variant="outline" 
+                size="sm"
                 onClick={() => setIsEditInitiativeModalOpen(true)}
-                className="flex items-center gap-2 hover:bg-gray-50"
               >
-                <Edit className="h-4 w-4" />
+                <Edit className="w-4 h-4 mr-2" />
                 Edit
               </Button>
             )}
             
             {canClose(initiativeData.status) && (
               <Button 
+                size="sm"
                 onClick={() => setIsClosureModalOpen(true)}
-                className="flex items-center gap-2 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white"
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
               >
-                <CheckCircle className="h-4 w-4" />
+                <CheckCircle className="w-4 h-4 mr-2" />
                 Tutup Inisiatif
               </Button>
             )}
@@ -336,19 +331,19 @@ export default function InitiativeDetailPage() {
             {canCancel(initiativeData.status) && (
               <Button 
                 variant="outline" 
+                size="sm"
                 onClick={() => setIsCancelModalOpen(true)}
-                className="flex items-center gap-2 border-red-300 text-red-600 hover:bg-red-50"
+                className="border-red-300 text-red-600 hover:bg-red-50"
               >
-                <XCircle className="h-4 w-4" />
+                <XCircle className="w-4 h-4 mr-2" />
                 Batalkan
               </Button>
             )}
           </div>
         </div>
       </div>
-
-      <div className="p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Main Content Grid */}
+      <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6 mb-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Overview Card */}
@@ -638,9 +633,8 @@ export default function InitiativeDetailPage() {
             </CardContent>
           </Card>
 
-            {/* Initiative Notes */}
-            <InitiativeNotes initiativeId={id!} />
-          </div>
+          {/* Initiative Notes */}
+          <InitiativeNotes initiativeId={id!} />
         </div>
       </div>
 
