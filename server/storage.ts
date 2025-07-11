@@ -314,6 +314,11 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, userId));
   }
 
+  async getReminderSettings(userId: string): Promise<any> {
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    return user?.reminderConfig || null;
+  }
+
   async deleteUser(id: string): Promise<boolean> {
     const result = await db.delete(users).where(eq(users.id, id));
     return (result.rowCount ?? 0) > 0;

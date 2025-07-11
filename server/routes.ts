@@ -763,6 +763,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // New reminder settings API endpoints
+  app.get("/api/reminder-settings", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const config = await reminderSystem.getReminderConfig(currentUser.id);
+      
+      if (!config) {
+        // Return default settings based on onboarding data if no config exists
+        const onboardingStatus = await storage.getOnboardingStatus(currentUser.organizationId!);
+        const defaultSettings = {
+          isEnabled: false,
+          cadence: onboardingStatus?.data?.cadence || 'harian',
+          reminderTime: onboardingStatus?.data?.reminderTime || '17:00',
+          reminderDay: onboardingStatus?.data?.reminderDay || 'senin',
+          reminderDate: onboardingStatus?.data?.reminderDate || '1',
+          enableEmailReminders: true,
+          enableNotifications: true,
+          autoUpdateTasks: false,
+          reminderMessage: 'Saatnya update progress harian Anda!'
+        };
+        return res.json(defaultSettings);
+      }
+      
+      res.json(config);
+    } catch (error) {
+      console.error("Error fetching reminder settings:", error);
+      res.status(500).json({ message: "Failed to fetch reminder settings" });
+    }
+  });
+
+  app.post("/api/reminder-settings", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const settings = req.body;
+      
+      // Convert settings to ReminderConfig format
+      const reminderConfig = {
+        userId: currentUser.id,
+        cadence: settings.cadence,
+        reminderTime: settings.reminderTime,
+        reminderDay: settings.reminderDay,
+        reminderDate: settings.reminderDate,
+        isActive: settings.isEnabled
+      };
+      
+      // Save to reminder system
+      await reminderSystem.saveReminderConfig(reminderConfig);
+      
+      // Also save full settings to user table
+      await storage.updateUserReminderConfig(currentUser.id, settings);
+      
+      res.json({ message: "Reminder settings saved successfully" });
+    } catch (error) {
+      console.error("Error saving reminder settings:", error);
+      res.status(500).json({ message: "Failed to save reminder settings" });
+    }
+  });
+
+  app.post("/api/reminder-settings/test", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const config = await reminderSystem.getReminderConfig(currentUser.id);
+      
+      if (!config) {
+        return res.status(404).json({ message: "No reminder configuration found" });
+      }
+      
+      // Send test reminder
+      await reminderSystem.sendReminderNotification(currentUser.id, config);
+      
+      res.json({ message: "Test reminder sent successfully" });
+    } catch (error) {
+      console.error("Error sending test reminder:", error);
+      res.status(500).json({ message: "Failed to send test reminder" });
+    }
+  });
+
   app.get("/api/reminders/logs", requireAuth, async (req, res) => {
     try {
       const currentUser = req.user as User;

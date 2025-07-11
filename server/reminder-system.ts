@@ -1,6 +1,6 @@
 import { db } from './db';
 import { users, objectives, keyResults, tasks, notifications } from '@shared/schema';
-import { eq, and, lte, gte, isNull } from 'drizzle-orm';
+import { eq, and, lte, gte, isNull, isNotNull } from 'drizzle-orm';
 import { NotificationService } from './notification-service';
 
 export interface ReminderConfig {
@@ -176,10 +176,10 @@ export class ReminderSystem {
     try {
       console.log('🔄 Processing reminder checks...');
 
-      // Get all users with reminder configs
+      // Get all users with reminder configs (fix: should NOT be null)
       const usersWithReminders = await db.select()
         .from(users)
-        .where(isNull(users.reminderConfig));
+        .where(isNotNull(users.reminderConfig));
 
       const activeUsers = usersWithReminders.filter(user => 
         user.reminderConfig && user.reminderConfig !== null
