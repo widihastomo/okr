@@ -375,8 +375,6 @@ function TaskHistoryCard({ taskId }: { taskId: string }) {
                     {item.action}
                   </p>
                   <div className="flex items-center gap-1 mt-1">
-                    <span className="text-xs text-gray-500">{item.user}</span>
-                    <span className="text-xs text-gray-400">•</span>
                     <span className="text-xs text-gray-500">{item.timestamp}</span>
                   </div>
                 </div>
