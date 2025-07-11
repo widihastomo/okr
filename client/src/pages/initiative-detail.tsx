@@ -62,6 +62,21 @@ import SuccessMetricsModal from "@/components/success-metrics-modal-simple";
 import InitiativeClosureModal from "@/components/initiative-closure-modal";
 import type { SuccessMetricWithUpdates } from "@shared/schema";
 
+// Helper function to translate priority to Indonesian
+const translatePriority = (priority: string): string => {
+  const translations: { [key: string]: string } = {
+    'low': 'rendah',
+    'medium': 'sedang',
+    'high': 'tinggi',
+    'urgent': 'mendesak',
+    'rendah': 'rendah',
+    'sedang': 'sedang',
+    'tinggi': 'tinggi',
+    'mendesak': 'mendesak'
+  };
+  return translations[priority?.toLowerCase()] || priority;
+};
+
 export default function InitiativeDetailPage() {
   const { id } = useParams();
   const { toast } = useToast();
@@ -364,7 +379,7 @@ export default function InitiativeDetailPage() {
                       <div className="flex items-center gap-2 text-sm">
                         <Flag className="h-4 w-4 text-orange-500" />
                         <span className="text-gray-600">Prioritas:</span>
-                        <span className="font-medium capitalize">{initiativeData.priority}</span>
+                        <span className="font-medium capitalize">{translatePriority(initiativeData.priority)}</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <DollarSign className="h-4 w-4 text-green-500" />
