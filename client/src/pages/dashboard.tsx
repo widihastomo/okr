@@ -13,6 +13,7 @@ import { OKRGridSkeleton } from "@/components/skeletons/okr-card-skeleton";
 import { StatsOverviewSkeleton, FiltersSkeleton } from "@/components/skeletons/dashboard-skeleton";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import {
   AlertDialog,
@@ -25,15 +26,23 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
-import { Plus, Target, Trophy } from "lucide-react";
+import { Plus, Target, Trophy, List, GitBranch, ChevronDown, ChevronRight, Network } from "lucide-react";
 import TourLauncher from "@/components/onboarding/tour-launcher";
 import { useAuth } from "@/hooks/useAuth";
 import { DashboardHelpBubble } from "@/components/help-bubble";
 import AIHelpBubble from "@/components/ai-help-bubble";
+import { ObjectiveStatusBadge } from "@/components/objective-status-badge";
 
 
 import { useLocation } from "wouter";
 import type { OKRWithKeyResults, KeyResult, Cycle, User } from "@shared/schema";
+
+interface TreeNode {
+  okr: OKRWithKeyResults;
+  children: TreeNode[];
+  level: number;
+  isExpanded: boolean;
+}
 
 
 export default function Dashboard() {
@@ -45,6 +54,9 @@ export default function Dashboard() {
   const [cycleFilter, setCycleFilter] = useState<string>("all");
   const [userFilter, setUserFilter] = useState<string>("");
   const [hasAutoSelected, setHasAutoSelected] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<string>("list");
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+  const [hasAutoExpanded, setHasAutoExpanded] = useState(false);
 
 
   const [editProgressModal, setEditProgressModal] = useState<{ open: boolean; keyResult?: KeyResult }>({
@@ -165,6 +177,163 @@ export default function Dashboard() {
     updateURL({ user: userValue });
   };
 
+  // Build tree structure for hierarchy view
+  const buildTree = (okrs: OKRWithKeyResults[]): TreeNode[] => {
+    const nodeMap = new Map<string, TreeNode>();
+    const rootNodes: TreeNode[] = [];
+
+    // Create nodes for all OKRs
+    okrs.forEach(okr => {
+      nodeMap.set(okr.id, {
+        okr,
+        children: [],
+        level: 0,
+        isExpanded: expandedNodes.has(okr.id)
+      });
+    });
+
+    // Build parent-child relationships and assign levels
+    okrs.forEach(okr => {
+      const node = nodeMap.get(okr.id)!;
+      
+      if (okr.parentId && nodeMap.has(okr.parentId)) {
+        const parent = nodeMap.get(okr.parentId)!;
+        parent.children.push(node);
+        node.level = parent.level + 1;
+      } else {
+        rootNodes.push(node);
+      }
+    });
+
+    return rootNodes;
+  };
+
+  // Toggle expand/collapse for hierarchy nodes
+  const toggleExpand = (nodeId: string) => {
+    const newExpanded = new Set(expandedNodes);
+    if (newExpanded.has(nodeId)) {
+      newExpanded.delete(nodeId);
+    } else {
+      newExpanded.add(nodeId);
+    }
+    setExpandedNodes(newExpanded);
+  };
+
+  // Expand all nodes
+  const expandAll = () => {
+    const allIds = new Set(filteredOKRs.map((okr: OKRWithKeyResults) => okr.id));
+    setExpandedNodes(allIds);
+  };
+
+  // Collapse all nodes
+  const collapseAll = () => {
+    setExpandedNodes(new Set());
+  };
+
+
+
+  // Render hierarchy tree node
+  const renderTreeNode = (node: TreeNode): JSX.Element => {
+    const hasChildren = node.children.length > 0;
+    const isExpanded = expandedNodes.has(node.okr.id);
+    const indentLevel = node.level * 20; // 20px per level
+
+    return (
+      <div key={node.okr.id} className="relative">
+        {/* Node Content */}
+        <div 
+          className={`border rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow mb-2`}
+          style={{ marginLeft: `${indentLevel}px` }}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3 flex-1">
+              {/* Expand/Collapse Button */}
+              {hasChildren && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => toggleExpand(node.okr.id)}
+                  className="p-1 h-6 w-6"
+                >
+                  {isExpanded ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                </Button>
+              )}
+              
+              {/* Level indicator */}
+              <div className="flex items-center space-x-1">
+                <Target className="h-4 w-4 text-blue-600" />
+                <span className="text-xs text-gray-500">Level {node.level + 1}</span>
+              </div>
+
+              {/* Goal Title */}
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900 mb-1">{node.okr.title}</h3>
+                <p className="text-sm text-gray-600 mb-2">{node.okr.description}</p>
+                
+                {/* Status and Progress */}
+                <div className="flex items-center space-x-3">
+                  <ObjectiveStatusBadge status={node.okr.status} />
+                  <div className="flex items-center space-x-2">
+                    <div className="w-32 bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${node.okr.overallProgress}%` }}
+                      />
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">
+                      {node.okr.overallProgress}%
+                    </span>
+                  </div>
+                </div>
+
+                {/* Key Results Summary */}
+                {node.okr.keyResults && node.okr.keyResults.length > 0 && (
+                  <div className="mt-2 text-sm text-gray-600">
+                    <span className="font-medium">{node.okr.keyResults.length} Angka Target</span>
+                    <span className="ml-2">
+                      {node.okr.keyResults.filter(kr => kr.progress >= 100).length} selesai
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleEditObjective(node.okr)}
+                className="text-blue-600 hover:text-blue-800"
+              >
+                Edit
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleDuplicateOKR(node.okr)}
+                className="text-green-600 hover:text-green-800"
+              >
+                Duplikat
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Children Nodes */}
+        {hasChildren && isExpanded && (
+          <div className="ml-4">
+            {node.children.map(child => renderTreeNode(child))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // Set default cycle to active cycle with shortest duration when cycles are loaded
   const activeCycles = cycles.filter(cycle => cycle.status === 'active');
   const defaultCycle = activeCycles.length > 0 
@@ -239,7 +408,7 @@ export default function Dashboard() {
   });
 
   // Client-side filtering for status, cycle, and user
-  const okrs = allOkrs.filter(okr => {
+  const filteredOKRs = allOkrs.filter(okr => {
     // Status filter
     const statusMatch = statusFilter === 'all' || okr.status === statusFilter;
     
@@ -269,6 +438,32 @@ export default function Dashboard() {
     
     return statusMatch && cycleMatch && userMatch;
   });
+
+
+
+  // Build tree data for hierarchy view
+  const treeData = buildTree(filteredOKRs);
+
+  // Auto-expand root nodes that have children in hierarchy view
+  useEffect(() => {
+    if (activeTab === 'hierarchy' && filteredOKRs.length > 0 && !hasAutoExpanded) {
+      const rootNodesWithChildren = filteredOKRs
+        .filter((okr: any) => !okr.parentId) // root nodes
+        .filter((okr: any) => filteredOKRs.some((child: any) => child.parentId === okr.id)) // that have children
+        .map((okr: any) => okr.id);
+      
+      if (rootNodesWithChildren.length > 0) {
+        setExpandedNodes(new Set(rootNodesWithChildren));
+        setHasAutoExpanded(true);
+      }
+    }
+  }, [activeTab, filteredOKRs.length, hasAutoExpanded]);
+
+  // Reset auto-expand when switching tabs or filters
+  useEffect(() => {
+    setHasAutoExpanded(false);
+    setExpandedNodes(new Set());
+  }, [activeTab, cycleFilter, statusFilter]);
 
   // Mutation for deleting OKR
   const deleteOKRMutation = useMutation({
@@ -447,7 +642,7 @@ export default function Dashboard() {
       });
     } catch (error) {
       // Fallback to basic deletion if cascade info fails
-      const okrToDelete = okrs.find(okr => okr.id === okrId);
+      const okrToDelete = filteredOKRs.find(okr => okr.id === okrId);
       setDeleteConfirmModal({ 
         open: true, 
         okrId, 
@@ -536,13 +731,71 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Overview */}
-      <StatsOverview okrs={okrs} isLoading={isLoading} />
+      <StatsOverview okrs={filteredOKRs} isLoading={isLoading} />
+      
+      {/* View Tabs */}
+      <div className="mt-4 sm:mt-6 w-full">
+        <div className="flex items-center justify-between border-b border-gray-200">
+          <div className="flex space-x-8">
+            <button
+              onClick={() => setActiveTab('list')}
+              className={`pb-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'list'
+                  ? 'border-orange-500 text-orange-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <div className="flex items-center space-x-2">
+                <List className="w-4 h-4" />
+                <span>List View</span>
+              </div>
+            </button>
+            <button
+              onClick={() => setActiveTab('hierarchy')}
+              className={`pb-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'hierarchy'
+                  ? 'border-orange-500 text-orange-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <div className="flex items-center space-x-2">
+                <Network className="w-4 h-4" />
+                <span>Hierarchy View</span>
+              </div>
+            </button>
+          </div>
+          
+          {/* Hierarchy Controls */}
+          {activeTab === 'hierarchy' && (
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={expandAll}
+                className="text-xs"
+              >
+                <ChevronDown className="w-3 h-3 mr-1" />
+                Expand All
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={collapseAll}
+                className="text-xs"
+              >
+                <ChevronRight className="w-3 h-3 mr-1" />
+                Collapse All
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
       
       {/* Goals Content */}
       <div className="mt-4 sm:mt-6 w-full space-y-6">
         {isLoading ? (
           <OKRGridSkeleton count={6} />
-        ) : okrs.length === 0 ? (
+        ) : filteredOKRs.length === 0 ? (
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Plus className="w-8 h-8 text-gray-400" />
@@ -556,8 +809,9 @@ export default function Dashboard() {
             </p>
             <CreateOKRButton />
           </div>
-        ) : (
-          okrs.map((okr, index) => {
+        ) : activeTab === 'list' ? (
+          // List View
+          filteredOKRs.map((okr, index) => {
             // Find the cycle for this OKR to get start and end date
             const cycle = cycles.find(c => c.id === okr.cycleId);
             return (
@@ -579,6 +833,11 @@ export default function Dashboard() {
               />
             );
           })
+        ) : (
+          // Hierarchy View
+          <div className="space-y-2">
+            {treeData.map((node) => renderTreeNode(node))}
+          </div>
         )}
       </div>
 
@@ -648,7 +907,7 @@ export default function Dashboard() {
       <AIHelpBubble 
         context="dashboard" 
         data={{ 
-          totalOkrs: okrs.length,
+          totalOkrs: filteredOKRs.length,
           statusFilter,
           cycleFilter
         }}
