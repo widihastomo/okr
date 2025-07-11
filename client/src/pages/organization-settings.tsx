@@ -80,6 +80,7 @@ export default function OrganizationSettings() {
   ]);
   const [editingRole, setEditingRole] = useState<any>(null);
   const [roleSearchTerm, setRoleSearchTerm] = useState("");
+  const [selectedRoleForDetails, setSelectedRoleForDetails] = useState<any>(null);
 
   // Notification/Reminder settings states
   const [useCustomTime, setUseCustomTime] = useState(false);
@@ -1490,6 +1491,14 @@ export default function OrganizationSettings() {
                               <span className="text-xs text-gray-500">
                                 ({role.permissions.length} hak akses)
                               </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setSelectedRoleForDetails(role)}
+                                className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600"
+                              >
+                                <Eye className="h-3 w-3" />
+                              </Button>
                             </div>
                           </TableCell>
                         </TableRow>
@@ -1499,6 +1508,111 @@ export default function OrganizationSettings() {
                 </Table>
               </div>
 
+              {/* Role Details Modal */}
+              {selectedRoleForDetails && (
+                <Dialog open={!!selectedRoleForDetails} onOpenChange={() => setSelectedRoleForDetails(null)}>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <Shield className="h-5 w-5" />
+                        Detail Akses Role: {selectedRoleForDetails.name}
+                      </DialogTitle>
+                      <DialogDescription>
+                        Informasi lengkap tentang hak akses dan permission untuk role ini
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      {/* Role Summary */}
+                      <div className="p-4 bg-gray-50 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="font-medium text-gray-900">Ringkasan Role</h3>
+                          <Badge className={`text-xs ${(() => {
+                            const count = selectedRoleForDetails.permissions.length;
+                            if (count >= 8) return 'bg-red-100 text-red-800';
+                            if (count >= 6) return 'bg-orange-100 text-orange-800';
+                            if (count >= 3) return 'bg-yellow-100 text-yellow-800';
+                            return 'bg-gray-100 text-gray-800';
+                          })()}`}>
+                            {(() => {
+                              const count = selectedRoleForDetails.permissions.length;
+                              if (count >= 8) return 'Penuh';
+                              if (count >= 6) return 'Tinggi';
+                              if (count >= 3) return 'Sedang';
+                              return 'Terbatas';
+                            })()}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-2">{selectedRoleForDetails.description}</p>
+                        <p className="text-sm text-gray-500">
+                          Total {selectedRoleForDetails.permissions.length} hak akses
+                        </p>
+                      </div>
+
+                      {/* All Permissions */}
+                      <div className="space-y-3">
+                        <h3 className="font-medium text-gray-900">Semua Hak Akses</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {(() => {
+                            const permissionMap: { [key: string]: { label: string; description: string; category: string } } = {
+                              'manage_users': { label: 'Kelola User', description: 'Menambah, mengedit, dan menghapus user', category: 'User Management' },
+                              'invite_users': { label: 'Undang User', description: 'Mengundang user baru ke organisasi', category: 'User Management' },
+                              'view_users': { label: 'Lihat User', description: 'Melihat daftar dan detail user', category: 'User Management' },
+                              'deactivate_users': { label: 'Nonaktifkan User', description: 'Menonaktifkan akun user', category: 'User Management' },
+                              'create_objectives': { label: 'Buat Objective', description: 'Membuat objective baru', category: 'OKR Management' },
+                              'edit_objectives': { label: 'Edit Objective', description: 'Mengedit objective yang ada', category: 'OKR Management' },
+                              'delete_objectives': { label: 'Hapus Objective', description: 'Menghapus objective', category: 'OKR Management' },
+                              'view_objectives': { label: 'Lihat Objective', description: 'Melihat daftar dan detail objective', category: 'OKR Management' },
+                              'create_initiatives': { label: 'Buat Inisiatif', description: 'Membuat inisiatif baru', category: 'OKR Management' },
+                              'edit_initiatives': { label: 'Edit Inisiatif', description: 'Mengedit inisiatif yang ada', category: 'OKR Management' },
+                              'delete_initiatives': { label: 'Hapus Inisiatif', description: 'Menghapus inisiatif', category: 'OKR Management' },
+                              'view_initiatives': { label: 'Lihat Inisiatif', description: 'Melihat daftar dan detail inisiatif', category: 'OKR Management' },
+                              'view_analytics': { label: 'Lihat Analitik', description: 'Mengakses dashboard analitik', category: 'Analytics' },
+                              'export_data': { label: 'Export Data', description: 'Mengekspor data ke file', category: 'Analytics' },
+                              'manage_organization': { label: 'Kelola Organisasi', description: 'Mengelola pengaturan organisasi', category: 'Organization' },
+                              'manage_billing': { label: 'Kelola Tagihan', description: 'Mengelola billing dan subscription', category: 'Organization' },
+                              'system_admin': { label: 'Admin Sistem', description: 'Akses penuh ke sistem administrasi', category: 'System' },
+                              'audit_logs': { label: 'Log Audit', description: 'Melihat log aktivitas sistem', category: 'System' }
+                            };
+                            
+                            return selectedRoleForDetails.permissions.map((permission: string) => {
+                              const perm = permissionMap[permission] || { 
+                                label: permission.replace('_', ' '), 
+                                description: `Akses untuk ${permission.replace('_', ' ')}`,
+                                category: 'Other'
+                              };
+                              return (
+                                <div key={permission} className="flex items-start space-x-3 p-3 border rounded-lg">
+                                  <div className="flex-shrink-0 mt-1">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between">
+                                      <p className="text-sm font-medium text-gray-900">{perm.label}</p>
+                                      <Badge variant="outline" className="text-xs">
+                                        {perm.category}
+                                      </Badge>
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-1">{perm.description}</p>
+                                  </div>
+                                </div>
+                              );
+                            });
+                          })()}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex justify-end">
+                      <Button
+                        variant="outline"
+                        onClick={() => setSelectedRoleForDetails(null)}
+                        className="border-orange-300 text-orange-700 hover:bg-orange-50"
+                      >
+                        Tutup
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              )}
 
             </CardContent>
           </Card>
