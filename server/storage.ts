@@ -316,7 +316,21 @@ export class DatabaseStorage implements IStorage {
 
   async getReminderSettings(userId: string): Promise<any> {
     const [user] = await db.select().from(users).where(eq(users.id, userId));
-    return user?.reminderConfig || null;
+    if (!user || !user.reminderConfig) {
+      return null;
+    }
+    
+    // Handle both object and JSON string formats for backward compatibility
+    if (typeof user.reminderConfig === 'string') {
+      try {
+        return JSON.parse(user.reminderConfig);
+      } catch (error) {
+        console.error('Error parsing reminder config JSON:', error);
+        return null;
+      }
+    } else {
+      return user.reminderConfig;
+    }
   }
 
   async deleteUser(id: string): Promise<boolean> {

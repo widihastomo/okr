@@ -30,7 +30,7 @@ export class ReminderSystem {
       // For now, we'll use a simple approach and store in user table
       await db.update(users)
         .set({
-          reminderConfig: JSON.stringify(config)
+          reminderConfig: config  // Store as object, not JSON string
         })
         .where(eq(users.id, config.userId));
 
@@ -54,7 +54,20 @@ export class ReminderSystem {
         return null;
       }
 
-      return JSON.parse(user.reminderConfig as string) as ReminderConfig;
+      // Handle both object and JSON string formats for backward compatibility
+      if (typeof user.reminderConfig === 'string') {
+        try {
+          return JSON.parse(user.reminderConfig) as ReminderConfig;
+        } catch (parseError) {
+          console.error('❌ Error parsing reminder config JSON:', parseError);
+          return null;
+        }
+      } else if (typeof user.reminderConfig === 'object' && user.reminderConfig !== null) {
+        return user.reminderConfig as ReminderConfig;
+      } else {
+        console.warn('⚠️ Invalid reminder config format');
+        return null;
+      }
     } catch (error) {
       console.error('❌ Error getting reminder config:', error);
       return null;
@@ -189,7 +202,25 @@ export class ReminderSystem {
 
       for (const user of activeUsers) {
         try {
-          const config = JSON.parse(user.reminderConfig as string) as ReminderConfig;
+          let config: ReminderConfig;
+          
+          // Debug logging
+          console.log(`Processing user ${user.id}, reminderConfig type: ${typeof user.reminderConfig}, value:`, user.reminderConfig);
+          
+          // Handle both object and JSON string formats for backward compatibility
+          if (typeof user.reminderConfig === 'string') {
+            try {
+              config = JSON.parse(user.reminderConfig) as ReminderConfig;
+            } catch (parseError) {
+              console.error(`❌ Error parsing JSON for user ${user.id}:`, parseError);
+              continue; // Skip this user if JSON parsing fails
+            }
+          } else if (typeof user.reminderConfig === 'object' && user.reminderConfig !== null) {
+            config = user.reminderConfig as ReminderConfig;
+          } else {
+            console.warn(`⚠️ Invalid reminder config format for user ${user.id}`);
+            continue; // Skip this user if config format is invalid
+          }
           
           if (this.shouldSendReminder(config)) {
             await this.sendReminderNotification(user.id, config);

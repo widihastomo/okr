@@ -767,11 +767,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/reminder-settings", requireAuth, async (req, res) => {
     try {
       const currentUser = req.user as User;
-      const config = await reminderSystem.getReminderConfig(currentUser.id);
       
-      if (!config) {
-        // Return default settings based on onboarding data if no config exists
-        const onboardingStatus = await storage.getOnboardingStatus(currentUser.organizationId!);
+      // First try to get user's existing reminder settings
+      const existingSettings = await storage.getReminderSettings(currentUser.id);
+      
+      if (existingSettings) {
+        return res.json(existingSettings);
+      }
+      
+      // If no existing settings, return default settings based on onboarding data
+      try {
+        const onboardingStatus = await storage.getOnboardingProgress(currentUser.organizationId!);
         const defaultSettings = {
           isEnabled: false,
           cadence: onboardingStatus?.data?.cadence || 'harian',
@@ -784,9 +790,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
           reminderMessage: 'Saatnya update progress harian Anda!'
         };
         return res.json(defaultSettings);
+      } catch (onboardingError) {
+        // If onboarding data is not available, return simple defaults
+        const defaultSettings = {
+          isEnabled: false,
+          cadence: 'harian',
+          reminderTime: '17:00',
+          reminderDay: 'senin',
+          reminderDate: '1',
+          enableEmailReminders: true,
+          enableNotifications: true,
+          autoUpdateTasks: false,
+          reminderMessage: 'Saatnya update progress harian Anda!'
+        };
+        return res.json(defaultSettings);
       }
-      
-      res.json(config);
     } catch (error) {
       console.error("Error fetching reminder settings:", error);
       res.status(500).json({ message: "Failed to fetch reminder settings" });

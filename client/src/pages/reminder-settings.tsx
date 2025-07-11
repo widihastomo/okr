@@ -79,20 +79,37 @@ export default function ReminderSettings() {
     reminderMessage: 'Saatnya update progress harian Anda!'
   });
 
+  const [useCustomTime, setUseCustomTime] = useState(false);
+  const [customTime, setCustomTime] = useState('17:00');
+
   // Initialize settings from API data or onboarding data
   React.useEffect(() => {
     if (reminderSettings) {
       setSettings(reminderSettings);
+      // Check if the time is in preset options
+      const isPresetTime = timeOptions.some(option => option.value === reminderSettings.reminderTime);
+      if (!isPresetTime && reminderSettings.reminderTime) {
+        setUseCustomTime(true);
+        setCustomTime(reminderSettings.reminderTime);
+      }
     } else if (onboardingData?.data) {
       // Use onboarding data as defaults
       const onboarding = onboardingData.data;
+      const reminderTime = onboarding.reminderTime || '17:00';
       setSettings(prev => ({
         ...prev,
         cadence: onboarding.cadence || 'harian',
-        reminderTime: onboarding.reminderTime || '17:00',
+        reminderTime: reminderTime,
         reminderDay: onboarding.reminderDay || 'senin',
         reminderDate: onboarding.reminderDate || '1'
       }));
+      
+      // Check if the time is in preset options
+      const isPresetTime = timeOptions.some(option => option.value === reminderTime);
+      if (!isPresetTime) {
+        setUseCustomTime(true);
+        setCustomTime(reminderTime);
+      }
     }
   }, [reminderSettings, onboardingData]);
 
@@ -262,23 +279,72 @@ export default function ReminderSettings() {
 
                 <div>
                   <Label className="text-sm font-medium">Waktu Reminder</Label>
-                  <Select
-                    value={settings.reminderTime}
-                    onValueChange={(value) => 
-                      setSettings({ ...settings, reminderTime: value })
-                    }
-                  >
-                    <SelectTrigger className="w-full mt-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {timeOptions.map(time => (
-                        <SelectItem key={time.value} value={time.value}>
-                          {time.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  
+                  {/* Toggle between preset and custom time */}
+                  <div className="flex items-center gap-4 mt-2 mb-3">
+                    <button
+                      type="button"
+                      onClick={() => setUseCustomTime(false)}
+                      className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                        !useCustomTime
+                          ? 'bg-orange-100 text-orange-700 border border-orange-300'
+                          : 'bg-gray-100 text-gray-600 border border-gray-300'
+                      }`}
+                    >
+                      Pilih Waktu
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setUseCustomTime(true)}
+                      className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                        useCustomTime
+                          ? 'bg-orange-100 text-orange-700 border border-orange-300'
+                          : 'bg-gray-100 text-gray-600 border border-gray-300'
+                      }`}
+                    >
+                      Waktu Kustom
+                    </button>
+                  </div>
+
+                  {/* Preset time selector */}
+                  {!useCustomTime && (
+                    <Select
+                      value={settings.reminderTime}
+                      onValueChange={(value) => 
+                        setSettings({ ...settings, reminderTime: value })
+                      }
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {timeOptions.map(time => (
+                          <SelectItem key={time.value} value={time.value}>
+                            {time.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+
+                  {/* Custom time input */}
+                  {useCustomTime && (
+                    <div className="space-y-2">
+                      <Input
+                        type="time"
+                        value={customTime}
+                        onChange={(e) => {
+                          setCustomTime(e.target.value);
+                          setSettings({ ...settings, reminderTime: e.target.value });
+                        }}
+                        className="w-full"
+                        placeholder="HH:MM"
+                      />
+                      <p className="text-xs text-gray-500">
+                        Format: HH:MM (24 jam). Contoh: 09:30, 14:15, 20:45
+                      </p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
