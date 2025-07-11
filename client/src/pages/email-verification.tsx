@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, Mail, AlertCircle, ArrowRight, RefreshCw, ArrowLeft } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { apiRequest } from "@/lib/queryClient";
-import { LoadingButton } from "@/components/ui/playful-loading";
+// Button will be replaced with Button
 import refokusLogo from "@assets/refokus_1751810711179.png";
 
 export default function EmailVerification() {
@@ -230,15 +230,15 @@ export default function EmailVerification() {
                 </div>
               </div>
               
-              <LoadingButton
+              <Button
                 onClick={handleVerification}
                 loading={isLoading}
-                loadingType="processing"
+                
                 className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium h-11"
                 disabled={code.length !== 6 || (!email && !code)}
               >
                 Verifikasi Email
-              </LoadingButton>
+              </Button>
               
               <div className="text-center space-y-3">
                 <p className="text-sm text-gray-600 mb-2">

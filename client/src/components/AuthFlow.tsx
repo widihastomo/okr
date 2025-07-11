@@ -21,7 +21,7 @@ import {
   ArrowRight
 } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { LoadingButton } from "@/components/ui/playful-loading";
+// Button will be replaced with Button
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
@@ -471,14 +471,14 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
               </div>
 
               <div className="pt-2">
-                <LoadingButton
+                <Button
                   type="submit"
-                  isLoading={loginMutation.isPending}
-                  loadingType="processing"
+                  disabled={loginMutation.isPending}
+                  
                   className="w-full h-11 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium"
                 >
                   Masuk
-                </LoadingButton>
+                </Button>
               </div>
             </form>
 
@@ -599,14 +599,14 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
               </div>
 
               <div className="pt-2">
-                <LoadingButton
+                <Button
                   type="submit"
-                  isLoading={registerMutation.isPending}
-                  loadingType="creating"
+                  disabled={registerMutation.isPending}
+                  
                   className="w-full h-11 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium"
                 >
                   Daftar Akun
-                </LoadingButton>
+                </Button>
               </div>
             </form>
             
@@ -647,15 +647,15 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
               </div>
             </div>
             
-            <LoadingButton
+            <Button
               onClick={handleEmailVerification}
-              isLoading={isVerifying}
-              loadingType="processing"
+              disabled={isVerifying}
+              
               className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium h-11"
               disabled={verificationCode.length !== 6}
             >
               Verifikasi Email
-            </LoadingButton>
+            </Button>
             
             <div className="text-center">
               <p className="text-sm text-gray-600 mb-3">Tidak menerima kode?</p>
@@ -725,14 +725,14 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                 )}
               </div>
 
-              <LoadingButton
+              <Button
                 type="submit"
-                isLoading={forgotPasswordMutation.isPending}
-                loadingType="processing"
+                disabled={forgotPasswordMutation.isPending}
+                
                 className="w-full h-11 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-medium"
               >
                 Kirim Kode Reset
-              </LoadingButton>
+              </Button>
             </form>
             
             {renderBackButton()}
@@ -805,14 +805,14 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                 )}
               </div>
 
-              <LoadingButton
+              <Button
                 type="submit"
-                isLoading={resetPasswordMutation.isPending}
-                loadingType="processing"
+                disabled={resetPasswordMutation.isPending}
+                
                 className="w-full h-11 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-medium"
               >
                 Reset Password
-              </LoadingButton>
+              </Button>
             </form>
             
             {renderBackButton()}

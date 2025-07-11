@@ -35,7 +35,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Calendar } from "@/components/ui/calendar";
-import { LoadingButton } from "@/components/ui/playful-loading";
+// Button will be replaced with Button
 import { 
   CheckCircle2, 
   Clock, 
@@ -659,14 +659,14 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
           <Button variant="outline" onClick={onClose}>
             Batal
           </Button>
-          <LoadingButton 
+          <Button 
             onClick={handleSubmit}
-            isLoading={createMutation.isPending || updateMutation.isPending}
-            loadingType="saving"
+            disabled={createMutation.isPending || updateMutation.isPending}
+            
             className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
           >
             {isAdding ? "Tambah Task" : "Update Task"}
-          </LoadingButton>
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -21,8 +21,6 @@ import {
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { apiRequest } from "@/lib/queryClient";
 import refokusLogo from "@assets/refokus_1751810404513.png";
-import { LoadingButton, PlayfulLoading } from "@/components/ui/playful-loading";
-import { usePlayfulLoading, LOADING_CONFIGS } from "@/hooks/usePlayfulLoading";
 
 type RegistrationData = {
   name: string;
@@ -352,10 +350,10 @@ export default function Registration() {
                   </div>
                 </div>
 
-                <LoadingButton 
+                <Button 
                   type="submit" 
-                  isLoading={isVerifying}
-                  loadingType="processing"
+                  disabled={isVerifying}
+                  
                   className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
                   disabled={verificationCode.length !== 6}
                 >
@@ -363,7 +361,7 @@ export default function Registration() {
                     <ShieldCheck className="h-5 w-5" />
                     <span>Verifikasi Akun</span>
                   </div>
-                </LoadingButton>
+                </Button>
               </form>
 
               <div className="mt-6 text-center space-y-3">
@@ -548,17 +546,17 @@ export default function Registration() {
               </div>
 
               {/* Submit Button */}
-              <LoadingButton 
+              <Button 
                 type="submit" 
-                isLoading={isLoading}
-                loadingType="creating"
+                disabled={isLoading}
+                
                 className="w-full h-12 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-semibold transition-all duration-300"
               >
                 <div className="flex items-center space-x-2">
                   <span>Daftar Sekarang</span>
                   <ArrowRight className="h-5 w-5" />
                 </div>
-              </LoadingButton>
+              </Button>
             </form>
 
             {/* Login Link */}

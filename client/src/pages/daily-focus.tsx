@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { SkeletonLoading, LoadingButton } from "@/components/ui/playful-loading";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
@@ -884,7 +884,7 @@ export default function DailyFocusPage() {
   if (!userId) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <SkeletonLoading shape="card" />
+        <Skeleton />
       </div>
     );
   }
@@ -1098,10 +1098,10 @@ export default function DailyFocusPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {isLoadingAllTasks || isLoadingObjectives ? (
           <>
-            <SkeletonLoading shape="card" className="h-24" />
-            <SkeletonLoading shape="card" className="h-24" />
-            <SkeletonLoading shape="card" className="h-24" />
-            <SkeletonLoading shape="card" className="h-24" />
+            <Skeleton className="h-24" />
+            <Skeleton className="h-24" />
+            <Skeleton className="h-24" />
+            <Skeleton className="h-24" />
           </>
         ) : (
           <>
@@ -1830,14 +1830,13 @@ export default function DailyFocusPage() {
                         <Button type="button" variant="outline" onClick={() => setIsTaskModalOpen(false)}>
                           Batal
                         </Button>
-                        <LoadingButton 
+                        <Button 
                           type="submit" 
-                          isLoading={createTaskMutation.isPending}
-                          loadingType="creating"
+                          disabled={createTaskMutation.isPending}
                           className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
                         >
-                          Buat Task
-                        </LoadingButton>
+                          {createTaskMutation.isPending ? "Membuat..." : "Buat Task"}
+                        </Button>
                       </DialogFooter>
                     </form>
                   </DialogContent>
@@ -1865,30 +1864,30 @@ export default function DailyFocusPage() {
                           <tr key={i} className="hover:bg-gray-50">
                             <td className="px-4 py-4">
                               <div className="flex items-center gap-2">
-                                <SkeletonLoading shape="rectangle" className="h-4 w-4" />
+                                <Skeleton className="h-4 w-4" />
                                 <div className="space-y-1">
-                                  <SkeletonLoading shape="rectangle" className="h-4 w-32" />
-                                  <SkeletonLoading shape="rectangle" className="h-3 w-20" />
+                                  <Skeleton className="h-4 w-32" />
+                                  <Skeleton className="h-3 w-20" />
                                 </div>
                               </div>
                             </td>
                             <td className="px-4 py-4 text-center">
-                              <SkeletonLoading shape="rectangle" className="h-6 w-16 rounded-full mx-auto" />
+                              <Skeleton className="h-6 w-16 rounded-full mx-auto" />
                             </td>
                             <td className="px-4 py-4">
-                              <SkeletonLoading shape="rectangle" className="h-6 w-20 rounded-full" />
+                              <Skeleton className="h-6 w-20 rounded-full" />
                             </td>
                             <td className="px-4 py-4">
-                              <SkeletonLoading shape="rectangle" className="h-4 w-16" />
+                              <Skeleton className="h-4 w-16" />
                             </td>
                             <td className="px-4 py-4">
                               <div className="flex items-center gap-2">
-                                <SkeletonLoading shape="circle" className="h-8 w-8" />
-                                <SkeletonLoading shape="rectangle" className="h-4 w-16" />
+                                <Skeleton className="h-8 w-8 rounded-full" />
+                                <Skeleton className="h-4 w-16" />
                               </div>
                             </td>
                             <td className="px-4 py-4 text-center">
-                              <SkeletonLoading shape="rectangle" className="h-6 w-6 rounded mx-auto" />
+                              <Skeleton className="h-6 w-6 rounded mx-auto" />
                             </td>
                           </tr>
                         ))}
@@ -1902,19 +1901,19 @@ export default function DailyFocusPage() {
                       <div key={i} className="bg-white border rounded-lg p-4">
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex-1 space-y-2">
-                            <SkeletonLoading shape="rectangle" className="h-4 w-3/4" />
-                            <SkeletonLoading shape="rectangle" className="h-3 w-1/2" />
+                            <Skeleton className="h-4 w-3/4" />
+                            <Skeleton className="h-3 w-1/2" />
                           </div>
-                          <SkeletonLoading shape="rectangle" className="h-6 w-6 rounded" />
+                          <Skeleton className="h-6 w-6 rounded" />
                         </div>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <SkeletonLoading shape="rectangle" className="h-5 w-16 rounded-full" />
-                            <SkeletonLoading shape="rectangle" className="h-5 w-20 rounded-full" />
+                            <Skeleton className="h-5 w-16 rounded-full" />
+                            <Skeleton className="h-5 w-20 rounded-full" />
                           </div>
                           <div className="flex items-center gap-2">
-                            <SkeletonLoading shape="circle" className="h-6 w-6" />
-                            <SkeletonLoading shape="rectangle" className="h-3 w-12" />
+                            <Skeleton className="h-6 w-6 rounded-full" />
+                            <Skeleton className="h-3 w-12" />
                           </div>
                         </div>
                       </div>
@@ -2835,23 +2834,23 @@ export default function DailyFocusPage() {
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0 space-y-2">
                           <div className="flex items-center gap-2">
-                            <SkeletonLoading shape="rectangle" className="h-5 w-48" />
-                            <SkeletonLoading shape="rectangle" className="h-4 w-4" />
+                            <Skeleton className="h-5 w-48" />
+                            <Skeleton className="h-4 w-4" />
                           </div>
-                          <SkeletonLoading shape="rectangle" className="h-4 w-64" />
-                          <SkeletonLoading shape="rectangle" className="h-3 w-40" />
+                          <Skeleton className="h-4 w-64" />
+                          <Skeleton className="h-3 w-40" />
                         </div>
                         <div className="flex items-center gap-1 shrink-0">
-                          <SkeletonLoading shape="rectangle" className="h-8 w-20 rounded" />
-                          <SkeletonLoading shape="rectangle" className="h-8 w-8 rounded" />
+                          <Skeleton className="h-8 w-20 rounded" />
+                          <Skeleton className="h-8 w-8 rounded" />
                         </div>
                       </div>
                       <div className="space-y-3">
                         <div className="space-y-2">
-                          <SkeletonLoading shape="rectangle" className="h-2 w-full rounded-full" />
+                          <Skeleton className="h-2 w-full rounded-full" />
                           <div className="flex justify-between">
-                            <SkeletonLoading shape="rectangle" className="h-3 w-16" />
-                            <SkeletonLoading shape="rectangle" className="h-3 w-20" />
+                            <Skeleton className="h-3 w-16" />
+                            <Skeleton className="h-3 w-20" />
                           </div>
                         </div>
                       </div>
@@ -3081,36 +3080,36 @@ export default function DailyFocusPage() {
                           <tr key={i} className="hover:bg-gray-50">
                             <td className="px-4 py-4">
                               <div className="space-y-1">
-                                <SkeletonLoading shape="rectangle" className="h-4 w-40" />
-                                <SkeletonLoading shape="rectangle" className="h-3 w-24" />
+                                <Skeleton className="h-4 w-40" />
+                                <Skeleton className="h-3 w-24" />
                               </div>
                             </td>
                             <td className="px-4 py-4">
-                              <SkeletonLoading shape="rectangle" className="h-6 w-20 rounded-full" />
+                              <Skeleton className="h-6 w-20 rounded-full" />
                             </td>
                             <td className="px-4 py-4 text-center">
-                              <SkeletonLoading shape="rectangle" className="h-5 w-8 rounded mx-auto" />
+                              <Skeleton className="h-5 w-8 rounded mx-auto" />
                             </td>
                             <td className="px-4 py-4">
                               <div className="space-y-1">
-                                <SkeletonLoading shape="rectangle" className="h-2 w-full rounded-full" />
-                                <SkeletonLoading shape="rectangle" className="h-3 w-12" />
+                                <Skeleton className="h-2 w-full rounded-full" />
+                                <Skeleton className="h-3 w-12" />
                               </div>
                             </td>
                             <td className="px-4 py-4">
-                              <SkeletonLoading shape="rectangle" className="h-4 w-16" />
+                              <Skeleton className="h-4 w-16" />
                             </td>
                             <td className="px-4 py-4">
                               <div className="flex items-center gap-2">
-                                <SkeletonLoading shape="circle" className="h-6 w-6" />
-                                <SkeletonLoading shape="rectangle" className="h-4 w-16" />
+                                <Skeleton className="h-6 w-6 rounded-full" />
+                                <Skeleton className="h-4 w-16" />
                               </div>
                             </td>
                             <td className="px-4 py-4 text-center">
-                              <SkeletonLoading shape="rectangle" className="h-8 w-16 rounded" />
+                              <Skeleton className="h-8 w-16 rounded" />
                             </td>
                             <td className="px-4 py-4">
-                              <SkeletonLoading shape="rectangle" className="h-6 w-6 rounded" />
+                              <Skeleton className="h-6 w-6 rounded" />
                             </td>
                           </tr>
                         ))}
@@ -3124,19 +3123,19 @@ export default function DailyFocusPage() {
                       <div key={i} className="bg-white border rounded-lg p-4">
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex-1 space-y-2">
-                            <SkeletonLoading shape="rectangle" className="h-4 w-3/4" />
-                            <SkeletonLoading shape="rectangle" className="h-3 w-1/2" />
+                            <Skeleton className="h-4 w-3/4" />
+                            <Skeleton className="h-3 w-1/2" />
                           </div>
-                          <SkeletonLoading shape="rectangle" className="h-8 w-16 rounded" />
+                          <Skeleton className="h-8 w-16 rounded" />
                         </div>
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
-                            <SkeletonLoading shape="rectangle" className="h-5 w-20 rounded-full" />
-                            <SkeletonLoading shape="rectangle" className="h-5 w-8 rounded" />
+                            <Skeleton className="h-5 w-20 rounded-full" />
+                            <Skeleton className="h-5 w-8 rounded" />
                           </div>
                           <div className="space-y-1">
-                            <SkeletonLoading shape="rectangle" className="h-2 w-full rounded-full" />
-                            <SkeletonLoading shape="rectangle" className="h-3 w-16" />
+                            <Skeleton className="h-2 w-full rounded-full" />
+                            <Skeleton className="h-3 w-16" />
                           </div>
                         </div>
                       </div>
@@ -3985,14 +3984,13 @@ export default function DailyFocusPage() {
             <Button variant="outline" onClick={() => setIsEditTaskModalOpen(false)}>
               Batal
             </Button>
-            <LoadingButton 
+            <Button 
               onClick={handleEditTaskSubmit}
-              isLoading={editTaskMutation.isPending}
-              loadingType="saving"
+              disabled={editTaskMutation.isPending}
               className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
             >
-              Simpan
-            </LoadingButton>
+              {editTaskMutation.isPending ? "Menyimpan..." : "Simpan"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -4010,14 +4008,13 @@ export default function DailyFocusPage() {
             <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>
               Batal
             </AlertDialogCancel>
-            <LoadingButton
+            <Button
               onClick={handleConfirmDelete}
-              isLoading={deleteTaskMutation.isPending}
-              loadingType="deleting"
+              disabled={deleteTaskMutation.isPending}
               className="bg-red-600 hover:bg-red-700 text-white"
             >
-              Hapus
-            </LoadingButton>
+              {deleteTaskMutation.isPending ? "Menghapus..." : "Hapus"}
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -28,7 +28,7 @@ import {
   CreditCard,
   RefreshCw
 } from "lucide-react";
-import { SkeletonLoading } from "@/components/ui/skeleton-loading";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ClientStatusData {
   organizationId: string;
@@ -165,17 +165,17 @@ export default function ClientStatusMapping() {
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-7xl mx-auto">
           <div className="mb-6">
-            <SkeletonLoading shape="text" className="h-8 w-64 mb-2" />
-            <SkeletonLoading shape="text" className="h-4 w-96" />
+            <Skeleton className="h-8 w-64 mb-2" />
+            <Skeleton className="h-4 w-96" />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             {Array.from({ length: 4 }).map((_, i) => (
-              <SkeletonLoading key={i} shape="card" className="h-32" />
+              <Skeleton key={i} className="h-32" />
             ))}
           </div>
           
-          <SkeletonLoading shape="card" className="h-96" />
+          <Skeleton className="h-96" />
         </div>
       </div>
     );

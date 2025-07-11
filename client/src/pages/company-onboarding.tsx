@@ -3,8 +3,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
 import refokusLogo from "@assets/refokus_1751810711179.png";
 import { Button } from "@/components/ui/button";
-import { LoadingButton, PlayfulLoading } from "@/components/ui/playful-loading";
-import { usePlayfulLoading, LOADING_CONFIGS } from "@/hooks/usePlayfulLoading";
 import {
   Card,
   CardContent,
@@ -3489,14 +3487,13 @@ export default function CompanyOnboarding() {
                 )}
 
                 {onboardingData.currentStep === ONBOARDING_STEPS.length ? (
-                  <LoadingButton
+                  <Button
                     onClick={handleComplete}
-                    isLoading={completeOnboardingMutation.isPending || isRedirecting}
-                    loadingType={isRedirecting ? "creating" : "processing"}
+                    disabled={completeOnboardingMutation.isPending || isRedirecting}
                     className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:hover:scale-100 disabled:hover:shadow-none"
                   >
                     {isRedirecting ? "Menuju Dashboard..." : "Selesai"}
-                  </LoadingButton>
+                  </Button>
                 ) : (
                   <Button
                     onClick={handleNext}
