@@ -1255,15 +1255,17 @@ export default function DailyFocusPage() {
                 }
               </CardDescription>
             </div>
-            <Button 
-              size="sm" 
-              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 w-full sm:w-auto flex-shrink-0"
-              onClick={handleOpenGoalModal}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Tambah Goal</span>
-              <span className="sm:hidden">Tambah</span>
-            </Button>
+            {relatedObjectives.length > 0 && (
+              <Button 
+                size="sm" 
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 w-full sm:w-auto flex-shrink-0"
+                onClick={handleOpenGoalModal}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Tambah Goal</span>
+                <span className="sm:hidden">Tambah</span>
+              </Button>
+            )}
           </div>
         </CardHeader>
         <CardContent>
