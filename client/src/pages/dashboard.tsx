@@ -32,17 +32,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { DashboardHelpBubble } from "@/components/help-bubble";
 import AIHelpBubble from "@/components/ai-help-bubble";
 import { ObjectiveStatusBadge } from "@/components/objective-status-badge";
+import DashboardD3Tree from "@/components/dashboard-d3-tree";
 
 
 import { useLocation } from "wouter";
 import type { OKRWithKeyResults, KeyResult, Cycle, User } from "@shared/schema";
 
-interface TreeNode {
-  okr: OKRWithKeyResults;
-  children: TreeNode[];
-  level: number;
-  isExpanded: boolean;
-}
+
 
 
 export default function Dashboard() {
@@ -177,36 +173,7 @@ export default function Dashboard() {
     updateURL({ user: userValue });
   };
 
-  // Build tree structure for hierarchy view
-  const buildTree = (okrs: OKRWithKeyResults[]): TreeNode[] => {
-    const nodeMap = new Map<string, TreeNode>();
-    const rootNodes: TreeNode[] = [];
 
-    // Create nodes for all OKRs
-    okrs.forEach(okr => {
-      nodeMap.set(okr.id, {
-        okr,
-        children: [],
-        level: 0,
-        isExpanded: expandedNodes.has(okr.id)
-      });
-    });
-
-    // Build parent-child relationships and assign levels
-    okrs.forEach(okr => {
-      const node = nodeMap.get(okr.id)!;
-      
-      if (okr.parentId && nodeMap.has(okr.parentId)) {
-        const parent = nodeMap.get(okr.parentId)!;
-        parent.children.push(node);
-        node.level = parent.level + 1;
-      } else {
-        rootNodes.push(node);
-      }
-    });
-
-    return rootNodes;
-  };
 
   // Toggle expand/collapse for hierarchy nodes
   const toggleExpand = (nodeId: string) => {
@@ -219,120 +186,11 @@ export default function Dashboard() {
     setExpandedNodes(newExpanded);
   };
 
-  // Expand all nodes
-  const expandAll = () => {
-    const allIds = new Set(filteredOKRs.map((okr: OKRWithKeyResults) => okr.id));
-    setExpandedNodes(allIds);
-  };
-
-  // Collapse all nodes
-  const collapseAll = () => {
-    setExpandedNodes(new Set());
-  };
 
 
 
-  // Render hierarchy tree node
-  const renderTreeNode = (node: TreeNode): JSX.Element => {
-    const hasChildren = node.children.length > 0;
-    const isExpanded = expandedNodes.has(node.okr.id);
-    const indentLevel = node.level * 20; // 20px per level
 
-    return (
-      <div key={node.okr.id} className="relative">
-        {/* Node Content */}
-        <div 
-          className={`border rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow mb-2`}
-          style={{ marginLeft: `${indentLevel}px` }}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3 flex-1">
-              {/* Expand/Collapse Button */}
-              {hasChildren && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => toggleExpand(node.okr.id)}
-                  className="p-1 h-6 w-6"
-                >
-                  {isExpanded ? (
-                    <ChevronDown className="h-4 w-4" />
-                  ) : (
-                    <ChevronRight className="h-4 w-4" />
-                  )}
-                </Button>
-              )}
-              
-              {/* Level indicator */}
-              <div className="flex items-center space-x-1">
-                <Target className="h-4 w-4 text-blue-600" />
-                <span className="text-xs text-gray-500">Level {node.level + 1}</span>
-              </div>
 
-              {/* Goal Title */}
-              <div className="flex-1">
-                <h3 className="font-semibold text-gray-900 mb-1">{node.okr.title}</h3>
-                <p className="text-sm text-gray-600 mb-2">{node.okr.description}</p>
-                
-                {/* Status and Progress */}
-                <div className="flex items-center space-x-3">
-                  <ObjectiveStatusBadge status={node.okr.status} />
-                  <div className="flex items-center space-x-2">
-                    <div className="w-32 bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${node.okr.overallProgress}%` }}
-                      />
-                    </div>
-                    <span className="text-sm font-medium text-gray-700">
-                      {node.okr.overallProgress}%
-                    </span>
-                  </div>
-                </div>
-
-                {/* Key Results Summary */}
-                {node.okr.keyResults && node.okr.keyResults.length > 0 && (
-                  <div className="mt-2 text-sm text-gray-600">
-                    <span className="font-medium">{node.okr.keyResults.length} Angka Target</span>
-                    <span className="ml-2">
-                      {node.okr.keyResults.filter(kr => kr.progress >= 100).length} selesai
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleEditObjective(node.okr)}
-                className="text-blue-600 hover:text-blue-800"
-              >
-                Edit
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleDuplicateOKR(node.okr)}
-                className="text-green-600 hover:text-green-800"
-              >
-                Duplikat
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Children Nodes */}
-        {hasChildren && isExpanded && (
-          <div className="ml-4">
-            {node.children.map(child => renderTreeNode(child))}
-          </div>
-        )}
-      </div>
-    );
-  };
 
   // Set default cycle to active cycle with shortest duration when cycles are loaded
   const activeCycles = cycles.filter(cycle => cycle.status === 'active');
@@ -441,8 +299,7 @@ export default function Dashboard() {
 
 
 
-  // Build tree data for hierarchy view
-  const treeData = buildTree(filteredOKRs);
+
 
   // Auto-expand root nodes that have children in hierarchy view
   useEffect(() => {
@@ -766,28 +623,7 @@ export default function Dashboard() {
           </div>
           
           {/* Hierarchy Controls */}
-          {activeTab === 'hierarchy' && (
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={expandAll}
-                className="text-xs"
-              >
-                <ChevronDown className="w-3 h-3 mr-1" />
-                Expand All
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={collapseAll}
-                className="text-xs"
-              >
-                <ChevronRight className="w-3 h-3 mr-1" />
-                Collapse All
-              </Button>
-            </div>
-          )}
+
         </div>
       </div>
       
@@ -834,10 +670,16 @@ export default function Dashboard() {
             );
           })
         ) : (
-          // Hierarchy View
-          <div className="space-y-2">
-            {treeData.map((node) => renderTreeNode(node))}
-          </div>
+          // Hierarchy View with D3 Tree
+          <DashboardD3Tree
+            okrs={filteredOKRs}
+            expandedNodes={expandedNodes}
+            onToggleExpand={toggleExpand}
+            onNodeClick={(okr) => {
+              // Navigate to objective detail or show edit modal
+              // handleEditObjective(okr);
+            }}
+          />
         )}
       </div>
 
