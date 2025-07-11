@@ -231,6 +231,7 @@ All email configuration now uses environment variables:
 - Automatic fallback between providers
 
 ## Current Features
+- **SIMPLIFIED ROLE SYSTEM**: Streamlined 4-role system (Owner, Administrator, Member, Viewer) with clear permission boundaries and complete frontend integration
 - **FOCUSED REMINDER SYSTEM**: Streamlined notification types system with 4 specific categories based on user requirements (update overdue, task overdue, initiative overdue, chat mention)
 - **CUSTOM TIME IMPLEMENTATION**: Toggle functionality between preset times and custom time input with HTML5 time field and 24-hour format validation
 - **NOTIFICATION TYPES SYSTEM**: Individual toggle controls for each notification category with proper backend integration and JSON parsing error handling
@@ -245,6 +246,16 @@ All email configuration now uses environment variables:
 ## Changelog
 ```
 Changelog:
+- July 11, 2025. Successfully completed comprehensive role system simplification across entire application:
+  * Implemented 4-role system: Owner (full access), Administrator (all except advanced settings), Member (all except org settings), Viewer (objectives/analysis only)
+  * Updated shared/schema.ts to define new simplified role enumeration (owner, administrator, member, viewer)
+  * Updated server/role-management.ts with comprehensive permission definitions for each simplified role
+  * Updated all frontend components to use new role system: organization-settings.tsx, client-user-management.tsx, system-role-management.tsx, profile.tsx, users-page.tsx
+  * Fixed role selection dropdowns and filtering across all user management interfaces
+  * Added Eye icon imports for viewer role display across all relevant components
+  * Updated role badge colors: Owner (red), Administrator (blue), Member (green), Viewer (gray)
+  * Enhanced role-based access control with clear permission boundaries and consistent UI presentation
+  * Complete role system overhaul from complex 5+ role system to streamlined 4-role architecture
 - July 11, 2025. Successfully consolidated invoice management into organization settings with role-based client permissions:
   * Integrated InvoiceManagementSection component within organization settings -> subscription tab
   * Removed separate invoice management page and consolidated functionality within settings

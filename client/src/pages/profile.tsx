@@ -130,10 +130,14 @@ export default function Profile() {
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
-      case "admin":
+      case "owner":
         return "bg-red-100 text-red-800 border-red-200";
-      case "manager":
+      case "administrator":
         return "bg-blue-100 text-blue-800 border-blue-200";
+      case "member":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "viewer":
+        return "bg-gray-100 text-gray-800 border-gray-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
     }
@@ -141,10 +145,14 @@ export default function Profile() {
 
   const getRoleLabel = (role: string) => {
     switch (role) {
-      case "admin":
+      case "owner":
+        return "Owner";
+      case "administrator":
         return "Administrator";
-      case "manager":
-        return "Manager";
+      case "member":
+        return "Member";
+      case "viewer":
+        return "Viewer";
       default:
         return "Member";
     }
@@ -248,9 +256,10 @@ export default function Profile() {
                           <SelectValue placeholder="Pilih role" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="admin">Administrator</SelectItem>
-                          <SelectItem value="manager">Manager</SelectItem>
+                          <SelectItem value="owner">Owner</SelectItem>
+                          <SelectItem value="administrator">Administrator</SelectItem>
                           <SelectItem value="member">Member</SelectItem>
+                          <SelectItem value="viewer">Viewer</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

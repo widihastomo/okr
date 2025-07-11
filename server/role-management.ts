@@ -398,7 +398,27 @@ export class RoleManagementService {
    */
   getDefaultPermissions(role: string): Permission[] {
     const defaultRoles = {
-      organization_admin: [
+      owner: [
+        'manage_users' as Permission,
+        'invite_users' as Permission,
+        'view_users' as Permission,
+        'deactivate_users' as Permission,
+        'create_objectives' as Permission,
+        'edit_objectives' as Permission,
+        'delete_objectives' as Permission,
+        'view_objectives' as Permission,
+        'create_initiatives' as Permission,
+        'edit_initiatives' as Permission,
+        'delete_initiatives' as Permission,
+        'view_initiatives' as Permission,
+        'view_analytics' as Permission,
+        'export_data' as Permission,
+        'manage_organization' as Permission,
+        'manage_billing' as Permission,
+        'system_admin' as Permission,
+        'audit_logs' as Permission,
+      ],
+      administrator: [
         'manage_users' as Permission,
         'invite_users' as Permission,
         'view_users' as Permission,
@@ -412,32 +432,26 @@ export class RoleManagementService {
         'view_initiatives' as Permission,
         'view_analytics' as Permission,
         'export_data' as Permission,
-        'manage_organization' as Permission,
         'manage_billing' as Permission,
-      ],
-      manager: [
-        'view_users' as Permission,
-        'create_objectives' as Permission,
-        'edit_objectives' as Permission,
-        'view_objectives' as Permission,
-        'create_initiatives' as Permission,
-        'edit_initiatives' as Permission,
-        'view_initiatives' as Permission,
-        'view_analytics' as Permission,
       ],
       member: [
         'view_users' as Permission,
         'create_objectives' as Permission,
         'edit_objectives' as Permission,
+        'delete_objectives' as Permission,
         'view_objectives' as Permission,
         'create_initiatives' as Permission,
         'edit_initiatives' as Permission,
+        'delete_initiatives' as Permission,
         'view_initiatives' as Permission,
+        'view_analytics' as Permission,
+        'export_data' as Permission,
       ],
       viewer: [
         'view_users' as Permission,
         'view_objectives' as Permission,
         'view_initiatives' as Permission,
+        'view_analytics' as Permission,
       ],
     };
 

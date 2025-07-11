@@ -12,7 +12,8 @@ import {
   Power,
   Loader2,
   Crown,
-  Building
+  Building,
+  Eye
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -177,9 +178,9 @@ export default function SystemRoleManagement() {
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
-      case "organization_admin":
-        return "bg-purple-100 text-purple-800";
-      case "manager":
+      case "owner":
+        return "bg-red-100 text-red-800";
+      case "administrator":
         return "bg-blue-100 text-blue-800";
       case "member":
         return "bg-green-100 text-green-800";
@@ -332,8 +333,8 @@ export default function SystemRoleManagement() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Semua Role</SelectItem>
-                <SelectItem value="organization_admin">Organization Admin</SelectItem>
-                <SelectItem value="manager">Manager</SelectItem>
+                <SelectItem value="owner">Owner</SelectItem>
+                <SelectItem value="administrator">Administrator</SelectItem>
                 <SelectItem value="member">Member</SelectItem>
                 <SelectItem value="viewer">Viewer</SelectItem>
               </SelectContent>

@@ -287,20 +287,20 @@ export default function OrganizationSettings() {
   // Role styling functions
   const getRoleBadge = (role: string) => {
     const roleStyles = {
-      lead: "bg-blue-100 text-blue-800",
+      owner: "bg-red-100 text-red-800",
+      administrator: "bg-blue-100 text-blue-800",
       member: "bg-green-100 text-green-800",
-      contributor: "bg-purple-100 text-purple-800",
-      reviewer: "bg-orange-100 text-orange-800",
+      viewer: "bg-gray-100 text-gray-800",
     };
     return roleStyles[role as keyof typeof roleStyles] || "bg-gray-100 text-gray-800";
   };
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case "lead": return UserPlus;
+      case "owner": return Shield;
+      case "administrator": return UserPlus;
       case "member": return UserIcon;
-      case "contributor": return Users;
-      case "reviewer": return Shield;
+      case "viewer": return Eye;
       default: return UserIcon;
     }
   };
@@ -754,10 +754,10 @@ export default function OrganizationSettings() {
                               <SelectValue placeholder="Pilih role" />
                             </SelectTrigger>
                             <SelectContent>
+                              <SelectItem value="owner">Owner</SelectItem>
+                              <SelectItem value="administrator">Administrator</SelectItem>
                               <SelectItem value="member">Member</SelectItem>
-                              <SelectItem value="lead">Lead</SelectItem>
-                              <SelectItem value="contributor">Contributor</SelectItem>
-                              <SelectItem value="reviewer">Reviewer</SelectItem>
+                              <SelectItem value="viewer">Viewer</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -791,10 +791,10 @@ export default function OrganizationSettings() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Semua Role</SelectItem>
-                    <SelectItem value="lead">Lead</SelectItem>
+                    <SelectItem value="owner">Owner</SelectItem>
+                    <SelectItem value="administrator">Administrator</SelectItem>
                     <SelectItem value="member">Member</SelectItem>
-                    <SelectItem value="contributor">Contributor</SelectItem>
-                    <SelectItem value="reviewer">Reviewer</SelectItem>
+                    <SelectItem value="viewer">Viewer</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -966,10 +966,10 @@ export default function OrganizationSettings() {
                               <SelectValue placeholder="Pilih role" />
                             </SelectTrigger>
                             <SelectContent>
+                              <SelectItem value="owner">Owner</SelectItem>
+                              <SelectItem value="administrator">Administrator</SelectItem>
                               <SelectItem value="member">Member</SelectItem>
-                              <SelectItem value="lead">Lead</SelectItem>
-                              <SelectItem value="contributor">Contributor</SelectItem>
-                              <SelectItem value="reviewer">Reviewer</SelectItem>
+                              <SelectItem value="viewer">Viewer</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>

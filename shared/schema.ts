@@ -235,7 +235,7 @@ export const users = pgTable("users", {
   firstName: varchar("first_name", { length: 100 }),
   lastName: varchar("last_name", { length: 100 }),
   profileImageUrl: varchar("profile_image_url", { length: 500 }),
-  role: text("role").notNull().default("member"), // "organization_admin", "manager", "member", "viewer"
+  role: text("role").notNull().default("member"), // "owner", "administrator", "member", "viewer"
   isSystemOwner: boolean("is_system_owner").default(false).notNull(), // Super admin for entire system
   organizationId: uuid("organization_id").references(() => organizations.id),
   isActive: boolean("is_active").default(true).notNull(),
@@ -259,7 +259,7 @@ export const memberInvitations = pgTable("member_invitations", {
   email: varchar("email", { length: 255 }).notNull(),
   organizationId: uuid("organization_id").notNull().references(() => organizations.id),
   invitedBy: uuid("invited_by").notNull().references(() => users.id),
-  role: text("role").notNull().default("member"), // "organization_admin", "manager", "member", "viewer"
+  role: text("role").notNull().default("member"), // "owner", "administrator", "member", "viewer"
   department: text("department"),
   jobTitle: text("job_title"),
   invitationToken: uuid("invitation_token").defaultRandom().unique(),
