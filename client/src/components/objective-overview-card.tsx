@@ -60,15 +60,33 @@ export default function ObjectiveOverviewCard({
 }: ObjectiveOverviewCardProps) {
   // Helper function for displaying owner information
   const getOwnerDisplay = () => {
+    // Debug logging to understand what data we're getting
+    console.log("Owner data:", owner, "Owner type:", objective.ownerType);
+    
     if (objective.ownerType === "team") {
       // Handle team owner - check if owner has name property (Team type)
       return (owner as any)?.name || "Tim tidak ditemukan";
     } else {
       // Handle user owner - check if owner has firstName/lastName properties (User type)
       const userOwner = owner as any;
-      return userOwner?.firstName && userOwner?.lastName
-        ? `${userOwner.firstName} ${userOwner.lastName}`
-        : "User tidak ditemukan";
+      
+      // Try firstName + lastName first
+      if (userOwner?.firstName && userOwner?.lastName) {
+        return `${userOwner.firstName} ${userOwner.lastName}`;
+      }
+      
+      // Fallback to firstName only if available
+      if (userOwner?.firstName) {
+        return userOwner.firstName;
+      }
+      
+      // Fallback to lastName only if available
+      if (userOwner?.lastName) {
+        return userOwner.lastName;
+      }
+      
+      // Final fallback if no name data available
+      return "Pengguna";
     }
   };
 

@@ -435,12 +435,18 @@ export default function GoalDetail() {
 
   // Helper function to get user name
   const getUserName = (userId: string): string => {
-    if (!users) return userId;
+    if (!users) return "Pengguna";
     const user = users.find((u: any) => u.id === userId);
     if (user && user.firstName && user.lastName) {
       return `${user.firstName} ${user.lastName}`;
     }
-    return user?.email || userId;
+    if (user?.firstName) {
+      return user.firstName;
+    }
+    if (user?.lastName) {
+      return user.lastName;
+    }
+    return "Pengguna";
   };
 
   // Calculate days remaining based on cycle end date
