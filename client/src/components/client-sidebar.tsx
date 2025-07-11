@@ -158,12 +158,7 @@ export default function Sidebar({
       path: "/dashboard",
       active: location === "/dashboard",
     },
-    {
-      label: "Goals Perusahaan",
-      icon: Building2,
-      path: "/company-okr",
-      active: location === "/company-okr",
-    },
+
     {
       label: "Siklus",
       icon: RotateCcw,

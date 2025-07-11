@@ -246,6 +246,13 @@ All email configuration now uses environment variables:
 ## Changelog
 ```
 Changelog:
+- July 11, 2025. Successfully removed company OKR page completely from the application:
+  * Removed CompanyOKRPage import and route from App.tsx
+  * Removed "Goals Perusahaan" menu items from client-sidebar.tsx and sidebar.tsx
+  * Deleted company-okr.tsx, company-okrs.tsx, company-okr-d3-tree.tsx, and company-okrs.tsx files
+  * Updated onboarding context to redirect to dashboard instead of company-goals page
+  * Cleaned up all references to company OKR functionality across the application
+  * Simplified navigation by consolidating goal management into dashboard D3 tree view
 - July 11, 2025. Successfully enhanced role management table with improved user-friendly permission display:
   * Updated column headers from "Permissions" to "Hak Akses Utama" and "Total Permissions" to "Level Akses"
   * Added Indonesian translation for permission labels (read→Baca, write→Tulis, delete→Hapus, manage_team→Kelola Tim, etc.)

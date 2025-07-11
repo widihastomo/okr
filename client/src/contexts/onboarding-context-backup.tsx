@@ -194,7 +194,7 @@ export const ONBOARDING_TOURS: OnboardingTour[] = [
         description: "Di halaman ini Anda bisa melihat objectives di level perusahaan dan tim. Klik untuk menjelajahi.",
         target: "[data-tour='company-goals']",
         action: "click",
-        nextRoute: "/company-goals"
+        nextRoute: "/dashboard"
       },
       {
         id: "team-2",
