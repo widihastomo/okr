@@ -1407,42 +1407,74 @@ export default function OrganizationSettings() {
                     <TableRow>
                       <TableHead>Nama Role</TableHead>
                       <TableHead>Deskripsi</TableHead>
-                      <TableHead>Permissions</TableHead>
-                      <TableHead className="text-right">Total Permissions</TableHead>
+                      <TableHead>Hak Akses Utama</TableHead>
+                      <TableHead className="text-right">Level Akses</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredRoles.map((role) => (
-                      <TableRow key={role.id}>
-                        <TableCell>
-                          <div className="font-medium text-gray-900">{role.name}</div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="text-sm text-gray-600">{role.description}</div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex flex-wrap gap-1">
-                            {role.permissions.slice(0, 3).map((permission) => (
-                              <Badge key={permission} variant="outline" className="text-xs">
-                                {permission.replace('_', ' ')}
+                    {filteredRoles.map((role) => {
+                      const getPermissionLabels = (permissions: string[]) => {
+                        const permissionMap: { [key: string]: string } = {
+                          'read': 'Baca',
+                          'write': 'Tulis',
+                          'delete': 'Hapus',
+                          'admin': 'Admin',
+                          'manage_team': 'Kelola Tim',
+                          'manage_users': 'Kelola User',
+                          'manage_organization': 'Kelola Organisasi',
+                          'manage_billing': 'Kelola Tagihan',
+                          'view_analytics': 'Lihat Analitik',
+                          'system_admin': 'Admin Sistem'
+                        };
+                        return permissions.map(p => permissionMap[p] || p.replace('_', ' '));
+                      };
+
+                      const getAccessLevel = (permissions: string[]) => {
+                        const count = permissions.length;
+                        if (count >= 8) return { label: 'Penuh', color: 'bg-red-100 text-red-800' };
+                        if (count >= 6) return { label: 'Tinggi', color: 'bg-orange-100 text-orange-800' };
+                        if (count >= 3) return { label: 'Sedang', color: 'bg-yellow-100 text-yellow-800' };
+                        return { label: 'Terbatas', color: 'bg-gray-100 text-gray-800' };
+                      };
+
+                      const permissionLabels = getPermissionLabels(role.permissions);
+                      const accessLevel = getAccessLevel(role.permissions);
+
+                      return (
+                        <TableRow key={role.id}>
+                          <TableCell>
+                            <div className="font-medium text-gray-900">{role.name}</div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-sm text-gray-600">{role.description}</div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-wrap gap-1">
+                              {permissionLabels.slice(0, 3).map((permission, index) => (
+                                <Badge key={index} variant="outline" className="text-xs">
+                                  {permission}
+                                </Badge>
+                              ))}
+                              {permissionLabels.length > 3 && (
+                                <Badge variant="outline" className="text-xs">
+                                  +{permissionLabels.length - 3} lainnya
+                                </Badge>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end space-x-2">
+                              <Badge className={`text-xs ${accessLevel.color}`}>
+                                {accessLevel.label}
                               </Badge>
-                            ))}
-                            {role.permissions.length > 3 && (
-                              <Badge variant="outline" className="text-xs">
-                                +{role.permissions.length - 3} lainnya
-                              </Badge>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end space-x-2">
-                            <Badge variant="secondary" className="text-xs">
-                              {role.permissions.length} permission{role.permissions.length !== 1 ? 's' : ''}
-                            </Badge>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                              <span className="text-xs text-gray-500">
+                                ({role.permissions.length} hak akses)
+                              </span>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </div>

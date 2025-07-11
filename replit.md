@@ -246,6 +246,13 @@ All email configuration now uses environment variables:
 ## Changelog
 ```
 Changelog:
+- July 11, 2025. Successfully enhanced role management table with improved user-friendly permission display:
+  * Updated column headers from "Permissions" to "Hak Akses Utama" and "Total Permissions" to "Level Akses"
+  * Added Indonesian translation for permission labels (read→Baca, write→Tulis, delete→Hapus, manage_team→Kelola Tim, etc.)
+  * Implemented color-coded access level badges: Penuh (red), Tinggi (orange), Sedang (yellow), Terbatas (gray)
+  * Enhanced permission display with meaningful Indonesian labels instead of raw technical terms
+  * Added clear access level indicators based on permission count for better role hierarchy understanding
+  * Improved overall readability and user experience of role management interface
 - July 11, 2025. Successfully standardized role name capitalization across all components:
   * Updated all role names from capitalized (Owner, Administrator, Member, Viewer) to lowercase (owner, administrator, member, viewer)
   * Fixed role names in organization-settings.tsx hardcoded roles array
