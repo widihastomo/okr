@@ -306,16 +306,15 @@ export default function InitiativeDetailPage() {
           </Button>
 
           <div className="flex items-center gap-2">
-            {canEdit(initiativeData.status) && (
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setIsEditInitiativeModalOpen(true)}
-              >
-                <Edit className="w-4 h-4 mr-2" />
-                Edit
-              </Button>
-            )}
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setIsEditInitiativeModalOpen(true)}
+              disabled={!canEdit(initiativeData.status)}
+            >
+              <Edit className="w-4 h-4 mr-2" />
+              Edit
+            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
