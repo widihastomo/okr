@@ -833,23 +833,46 @@ export default function DailyFocusPage() {
   const getUserName = (userId: string): string => {
     if (!users || !userId) return "Tidak ditentukan";
     const user = users.find((u: any) => u.id === userId);
-    if (user && user.firstName && user.lastName) {
+    
+    // Check if firstName and lastName are both present and non-empty
+    if (user?.firstName && user?.lastName && user.lastName.trim() !== "") {
       return `${user.firstName} ${user.lastName}`;
     }
-    return user?.email || user?.username || "Tidak ditentukan";
+    
+    // Fallback to firstName only if available and non-empty
+    if (user?.firstName && user.firstName.trim() !== "") {
+      return user.firstName;
+    }
+    
+    // Fallback to lastName only if available and non-empty
+    if (user?.lastName && user.lastName.trim() !== "") {
+      return user.lastName;
+    }
+    
+    return "Pengguna";
   };
 
   // Helper function to get user initials for avatar
   const getUserInitials = (userId: string): string => {
     if (!users || !userId) return "?";
     const user = users.find((u: any) => u.id === userId);
-    if (user && user.firstName && user.lastName) {
+    
+    // Check if firstName and lastName are both present and non-empty
+    if (user?.firstName && user?.lastName && user.lastName.trim() !== "") {
       return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
     }
-    if (user?.email) {
-      return user.email.charAt(0).toUpperCase();
+    
+    // Fallback to firstName only if available and non-empty
+    if (user?.firstName && user.firstName.trim() !== "") {
+      return user.firstName.charAt(0).toUpperCase();
     }
-    return "?";
+    
+    // Fallback to lastName only if available and non-empty
+    if (user?.lastName && user.lastName.trim() !== "") {
+      return user.lastName.charAt(0).toUpperCase();
+    }
+    
+    return "U";
   };
 
   // Helper function to get initiative count for a key result

@@ -60,9 +60,6 @@ export default function ObjectiveOverviewCard({
 }: ObjectiveOverviewCardProps) {
   // Helper function for displaying owner information
   const getOwnerDisplay = () => {
-    // Debug logging to understand what data we're getting
-    console.log("Owner data:", owner, "Owner type:", objective.ownerType);
-    
     if (objective.ownerType === "team") {
       // Handle team owner - check if owner has name property (Team type)
       return (owner as any)?.name || "Tim tidak ditemukan";
@@ -70,18 +67,18 @@ export default function ObjectiveOverviewCard({
       // Handle user owner - check if owner has firstName/lastName properties (User type)
       const userOwner = owner as any;
       
-      // Try firstName + lastName first
-      if (userOwner?.firstName && userOwner?.lastName) {
+      // Check if firstName and lastName are both present and non-empty
+      if (userOwner?.firstName && userOwner?.lastName && userOwner.lastName.trim() !== "") {
         return `${userOwner.firstName} ${userOwner.lastName}`;
       }
       
-      // Fallback to firstName only if available
-      if (userOwner?.firstName) {
+      // Fallback to firstName only if available and non-empty
+      if (userOwner?.firstName && userOwner.firstName.trim() !== "") {
         return userOwner.firstName;
       }
       
-      // Fallback to lastName only if available
-      if (userOwner?.lastName) {
+      // Fallback to lastName only if available and non-empty
+      if (userOwner?.lastName && userOwner.lastName.trim() !== "") {
         return userOwner.lastName;
       }
       

@@ -197,7 +197,14 @@ function TaskOverviewCard({ task, assignedUser, initiative }: any) {
             <User className="w-4 h-4 text-gray-500 flex-shrink-0" />
             {assignedUser ? (
               <span className="text-xs text-gray-700 truncate">
-                {assignedUser.firstName} {assignedUser.lastName}
+                {assignedUser.firstName && assignedUser.lastName && assignedUser.lastName.trim() !== ""
+                  ? `${assignedUser.firstName} ${assignedUser.lastName}`
+                  : assignedUser.firstName && assignedUser.firstName.trim() !== ""
+                    ? assignedUser.firstName
+                    : assignedUser.lastName && assignedUser.lastName.trim() !== ""
+                      ? assignedUser.lastName
+                      : "Pengguna"
+                }
               </span>
             ) : (
               <span className="text-xs text-gray-500">Belum ditentukan</span>
