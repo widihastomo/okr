@@ -41,6 +41,18 @@ export default function DashboardD3Tree({
 }: DashboardD3TreeProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Suppress ResizeObserver warnings
+  useEffect(() => {
+    const handleResizeObserverError = (e: ErrorEvent) => {
+      if (e.message.includes('ResizeObserver loop')) {
+        e.preventDefault();
+      }
+    };
+    
+    window.addEventListener('error', handleResizeObserverError);
+    return () => window.removeEventListener('error', handleResizeObserverError);
+  }, []);
 
   const buildTree = (okrs: OKRWithKeyResults[]): TreeNode[] => {
     const nodeMap = new Map<string, TreeNode>();
@@ -96,15 +108,18 @@ export default function DashboardD3Tree({
   useEffect(() => {
     if (!svgRef.current || !containerRef.current || okrs.length === 0) return;
 
-    const width = containerRef.current.clientWidth;
-    const height = containerRef.current.clientHeight;
-    const nodeWidth = 320;
-    const nodeHeight = 140;
-    const horizontalSpacing = 400;
-    const verticalSpacing = 200;
+    // Debounce to prevent ResizeObserver issues
+    const timer = setTimeout(() => {
+      try {
+        const width = containerRef.current?.clientWidth || 800;
+        const height = containerRef.current?.clientHeight || 600;
+        const nodeWidth = 320;
+        const nodeHeight = 140;
+        const horizontalSpacing = 400;
+        const verticalSpacing = 200;
 
-    // Clear previous content
-    d3.select(svgRef.current).selectAll("*").remove();
+        // Clear previous content
+        d3.select(svgRef.current).selectAll("*").remove();
 
     const svg = d3.select(svgRef.current)
       .attr("width", width)
@@ -413,7 +428,13 @@ export default function DashboardD3Tree({
       .attr("fill", "#6b7280")
       .attr("font-size", "11px")
       .text(d => d.data.data.ownerName || "Tidak ada pemilik");
+      
+      } catch (error) {
+        console.error('Error rendering D3 tree:', error);
+      }
+    }, 50); // 50ms debounce
 
+    return () => clearTimeout(timer);
   }, [okrs, expandedNodes, onToggleExpand, onNodeClick]);
 
   return (
