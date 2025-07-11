@@ -1050,98 +1050,101 @@ export default function DailyFocusPage() {
       )}
       {/* Overview Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-        {isLoadingAllTasks ? (
-          <SkeletonLoading shape="card" className="h-24" />
+        {isLoadingAllTasks || isLoadingObjectives ? (
+          <>
+            <SkeletonLoading shape="card" className="h-24" />
+            <SkeletonLoading shape="card" className="h-24" />
+            <SkeletonLoading shape="card" className="h-24" />
+            <SkeletonLoading shape="card" className="h-24" />
+          </>
         ) : (
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Task Hari Ini</CardTitle>
-              <CheckCircle className="h-4 w-4 text-blue-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-2">
-                <div className="text-2xl font-bold">{todayTasks.length}</div>
-                {todayTasks.filter((t) => t.status === "completed").length >
-                  0 && (
-                  <div className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                    +
-                    {todayTasks.filter((t) => t.status === "completed").length *
-                      10}{" "}
-                    poin
+          <>
+            {/* Task Hari Ini */}
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Task Hari Ini</CardTitle>
+                <CheckCircle className="h-4 w-4 text-blue-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-2">
+                  <div className="text-2xl font-bold">{todayTasks.length}</div>
+                  {todayTasks.filter((t) => t.status === "completed").length >
+                    0 && (
+                    <div className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                      +
+                      {todayTasks.filter((t) => t.status === "completed").length *
+                        10}{" "}
+                      poin
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {todayTasks.filter((t) => t.status === "completed").length}{" "}
+                  selesai
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Task Terlambat */}
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Task Terlambat
+                </CardTitle>
+                <AlertTriangle className="h-4 w-4 text-red-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-red-600">
+                  {overdueTasks.length}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Perlu perhatian segera
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Angka Target Aktif */}
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Angka Target Aktif
+                </CardTitle>
+                <Target className="h-4 w-4 text-green-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{activeKeyResults.length}</div>
+                <p className="text-xs text-muted-foreground">
+                  Belum mencapai target
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Level & Progress */}
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Level & Progress
+                </CardTitle>
+                <Trophy className="h-4 w-4 text-yellow-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <div className="text-2xl font-bold">
+                      Level {(stats as any)?.level || 1}
+                    </div>
+                    <div className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full">
+                      {(stats as any)?.totalPoints || 0} poin
+                    </div>
                   </div>
-                )}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {todayTasks.filter((t) => t.status === "completed").length}{" "}
-                selesai
-              </p>
-            </CardContent>
-          </Card>
-        )}
-
-        {isLoadingAllTasks ? (
-          <SkeletonLoading shape="card" className="h-24" />
-        ) : (
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Task Terlambat
-              </CardTitle>
-              <AlertTriangle className="h-4 w-4 text-red-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-600">
-                {overdueTasks.length}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Perlu perhatian segera
-              </p>
-            </CardContent>
-          </Card>
-        )}
-
-        {isLoadingObjectives ? (
-          <SkeletonLoading shape="card" className="h-24" />
-        ) : (
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Angka Target Aktif
-              </CardTitle>
-              <Target className="h-4 w-4 text-green-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{activeKeyResults.length}</div>
-              <p className="text-xs text-muted-foreground">
-                Belum mencapai target
-              </p>
-            </CardContent>
-          </Card>
-        )}
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Level & Progress
-            </CardTitle>
-            <Trophy className="h-4 w-4 text-yellow-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <div className="text-2xl font-bold">
-                  Level {(stats as any)?.level || 1}
+                  <p className="text-xs text-muted-foreground">
+                    Streak: {(stats as any)?.currentStreak || 0} hari
+                  </p>
                 </div>
-                <div className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full">
-                  {(stats as any)?.totalPoints || 0} poin
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Streak: {(stats as any)?.currentStreak || 0} hari
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          </>
+        )}
       </div>
       {/* Compact Progress & Motivation */}
       <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
@@ -1606,8 +1609,83 @@ export default function DailyFocusPage() {
               </div>
             </CardHeader>
             <CardContent>
-              {/* Check if we have any tasks to show */}
-              {overdueTasks.length === 0 && todayTasks.length === 0 && tomorrowTasks.length === 0 ? (
+              {isLoadingAllTasks ? (
+                <div className="space-y-4">
+                  {/* Desktop Table Skeleton */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Task</th>
+                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Prioritas</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tenggat</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PIC</th>
+                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <tr key={i} className="hover:bg-gray-50">
+                            <td className="px-4 py-4">
+                              <div className="flex items-center gap-2">
+                                <SkeletonLoading shape="rectangle" className="h-4 w-4" />
+                                <div className="space-y-1">
+                                  <SkeletonLoading shape="rectangle" className="h-4 w-32" />
+                                  <SkeletonLoading shape="rectangle" className="h-3 w-20" />
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-4 py-4 text-center">
+                              <SkeletonLoading shape="rectangle" className="h-6 w-16 rounded-full mx-auto" />
+                            </td>
+                            <td className="px-4 py-4">
+                              <SkeletonLoading shape="rectangle" className="h-6 w-20 rounded-full" />
+                            </td>
+                            <td className="px-4 py-4">
+                              <SkeletonLoading shape="rectangle" className="h-4 w-16" />
+                            </td>
+                            <td className="px-4 py-4">
+                              <div className="flex items-center gap-2">
+                                <SkeletonLoading shape="circle" className="h-8 w-8" />
+                                <SkeletonLoading shape="rectangle" className="h-4 w-16" />
+                              </div>
+                            </td>
+                            <td className="px-4 py-4 text-center">
+                              <SkeletonLoading shape="rectangle" className="h-6 w-6 rounded mx-auto" />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  {/* Mobile Card Skeleton */}
+                  <div className="md:hidden space-y-3">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <div key={i} className="bg-white border rounded-lg p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1 space-y-2">
+                            <SkeletonLoading shape="rectangle" className="h-4 w-3/4" />
+                            <SkeletonLoading shape="rectangle" className="h-3 w-1/2" />
+                          </div>
+                          <SkeletonLoading shape="rectangle" className="h-6 w-6 rounded" />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <SkeletonLoading shape="rectangle" className="h-5 w-16 rounded-full" />
+                            <SkeletonLoading shape="rectangle" className="h-5 w-20 rounded-full" />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <SkeletonLoading shape="circle" className="h-6 w-6" />
+                            <SkeletonLoading shape="rectangle" className="h-3 w-12" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : overdueTasks.length === 0 && todayTasks.length === 0 && tomorrowTasks.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <CheckCircle className="h-12 w-12 mx-auto mb-3 text-gray-300" />
                   <p>Tidak ada task untuk hari ini dan besok</p>
@@ -2502,7 +2580,37 @@ export default function DailyFocusPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {activeKeyResults.length === 0 ? (
+              {isLoadingObjectives ? (
+                <div className="space-y-4">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="p-3 sm:p-4 bg-white border border-gray-200 rounded-lg space-y-2 sm:space-y-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0 space-y-2">
+                          <div className="flex items-center gap-2">
+                            <SkeletonLoading shape="rectangle" className="h-5 w-48" />
+                            <SkeletonLoading shape="rectangle" className="h-4 w-4" />
+                          </div>
+                          <SkeletonLoading shape="rectangle" className="h-4 w-64" />
+                          <SkeletonLoading shape="rectangle" className="h-3 w-40" />
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <SkeletonLoading shape="rectangle" className="h-8 w-20 rounded" />
+                          <SkeletonLoading shape="rectangle" className="h-8 w-8 rounded" />
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="space-y-2">
+                          <SkeletonLoading shape="rectangle" className="h-2 w-full rounded-full" />
+                          <div className="flex justify-between">
+                            <SkeletonLoading shape="rectangle" className="h-3 w-16" />
+                            <SkeletonLoading shape="rectangle" className="h-3 w-20" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : activeKeyResults.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <Target className="h-12 w-12 mx-auto mb-3 text-gray-300" />
                   <p>Semua angka target sudah tercapai</p>
@@ -2708,7 +2816,91 @@ export default function DailyFocusPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {activeInitiatives.length === 0 ? (
+              {isLoadingInitiatives ? (
+                <div className="space-y-4">
+                  {/* Desktop Table Skeleton */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Inisiatif</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Prioritas</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tenggat</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PIC</th>
+                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Update</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {Array.from({ length: 4 }).map((_, i) => (
+                          <tr key={i} className="hover:bg-gray-50">
+                            <td className="px-4 py-4">
+                              <div className="space-y-1">
+                                <SkeletonLoading shape="rectangle" className="h-4 w-40" />
+                                <SkeletonLoading shape="rectangle" className="h-3 w-24" />
+                              </div>
+                            </td>
+                            <td className="px-4 py-4">
+                              <SkeletonLoading shape="rectangle" className="h-6 w-20 rounded-full" />
+                            </td>
+                            <td className="px-4 py-4 text-center">
+                              <SkeletonLoading shape="rectangle" className="h-5 w-8 rounded mx-auto" />
+                            </td>
+                            <td className="px-4 py-4">
+                              <div className="space-y-1">
+                                <SkeletonLoading shape="rectangle" className="h-2 w-full rounded-full" />
+                                <SkeletonLoading shape="rectangle" className="h-3 w-12" />
+                              </div>
+                            </td>
+                            <td className="px-4 py-4">
+                              <SkeletonLoading shape="rectangle" className="h-4 w-16" />
+                            </td>
+                            <td className="px-4 py-4">
+                              <div className="flex items-center gap-2">
+                                <SkeletonLoading shape="circle" className="h-6 w-6" />
+                                <SkeletonLoading shape="rectangle" className="h-4 w-16" />
+                              </div>
+                            </td>
+                            <td className="px-4 py-4 text-center">
+                              <SkeletonLoading shape="rectangle" className="h-8 w-16 rounded" />
+                            </td>
+                            <td className="px-4 py-4">
+                              <SkeletonLoading shape="rectangle" className="h-6 w-6 rounded" />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  {/* Mobile Card Skeleton */}
+                  <div className="md:hidden space-y-4">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <div key={i} className="bg-white border rounded-lg p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1 space-y-2">
+                            <SkeletonLoading shape="rectangle" className="h-4 w-3/4" />
+                            <SkeletonLoading shape="rectangle" className="h-3 w-1/2" />
+                          </div>
+                          <SkeletonLoading shape="rectangle" className="h-8 w-16 rounded" />
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <SkeletonLoading shape="rectangle" className="h-5 w-20 rounded-full" />
+                            <SkeletonLoading shape="rectangle" className="h-5 w-8 rounded" />
+                          </div>
+                          <div className="space-y-1">
+                            <SkeletonLoading shape="rectangle" className="h-2 w-full rounded-full" />
+                            <SkeletonLoading shape="rectangle" className="h-3 w-16" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : activeInitiatives.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <BarChart3 className="h-12 w-12 mx-auto mb-3 text-gray-300" />
                   <p>
