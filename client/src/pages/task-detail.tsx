@@ -272,7 +272,7 @@ function TaskHistoryCard({ taskId }: { taskId: string }) {
       
       items.push({
         id: 'created',
-        action: "Task dibuat",
+        action: `Task dibuat oleh ${createdByName}`,
         user: createdByName,
         timestamp: new Date(taskData.createdAt).toLocaleString('id-ID'),
         type: "created"
@@ -286,7 +286,7 @@ function TaskHistoryCard({ taskId }: { taskId: string }) {
       
       items.push({
         id: 'updated',
-        action: "Task diperbarui",
+        action: `Task diperbarui oleh ${updatedByName}`,
         user: updatedByName,
         timestamp: new Date(taskData.updatedAt).toLocaleString('id-ID'),
         type: "general"
