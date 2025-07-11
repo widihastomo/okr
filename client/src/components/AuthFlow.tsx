@@ -37,7 +37,10 @@ const loginSchema = z.object({
 const registerSchema = z.object({
   name: z.string().min(2, "Nama minimal 2 karakter"),
   businessName: z.string().min(2, "Nama bisnis minimal 2 karakter"),
-  whatsappNumber: z.string().min(10, "Nomor WhatsApp minimal 10 digit"),
+  whatsappNumber: z.string()
+    .min(10, "Nomor WhatsApp minimal 10 digit")
+    .max(15, "Nomor WhatsApp maksimal 15 digit")
+    .regex(/^(\+62|62|0)8[1-9][0-9]{6,10}$/, "Format nomor handphone Indonesia tidak valid. Contoh: 08123456789, +628123456789, atau 628123456789"),
   email: z.string().email("Format email tidak valid"),
   password: z.string().min(6, "Password minimal 6 karakter"),
 });
@@ -548,13 +551,16 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                   <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <Input
                     id="whatsappNumber"
-                    placeholder="Masukkan nomor WhatsApp"
+                    placeholder="08123456789 atau +628123456789"
                     {...registerForm.register("whatsappNumber")}
                     className="pl-10 h-11"
                   />
                 </div>
                 {registerForm.formState.errors.whatsappNumber && (
                   <p className="text-sm text-red-600">{registerForm.formState.errors.whatsappNumber.message}</p>
+                )}
+                {!registerForm.formState.errors.whatsappNumber && (
+                  <p className="text-xs text-gray-500">Format yang didukung: 08123456789, +628123456789, atau 628123456789</p>
                 )}
               </div>
 

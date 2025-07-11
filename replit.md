@@ -246,6 +246,15 @@ All email configuration now uses environment variables:
 ## Changelog
 ```
 Changelog:
+- July 11, 2025. Successfully implemented Indonesian phone number validation for WhatsApp registration field:
+  * Added comprehensive regex validation for Indonesian phone numbers: /^(\+62|62|0)8[1-9][0-9]{6,10}$/
+  * Supports multiple formats: 08123456789, +628123456789, and 628123456789
+  * Added informative placeholder text showing valid format examples
+  * Added helper text displaying supported formats when no validation errors
+  * Enhanced user experience with clear format guidance and validation feedback
+  * Validates length between 10-15 digits for Indonesian mobile numbers
+  * Ensures proper Indonesian mobile number format with carriers starting with 8
+Changelog:
 - July 11, 2025. Successfully fixed task deletion functionality and completed comprehensive audit trail system:
   * FIXED: Task deletion foreign key constraint errors by implementing proper cascade deletion
   * SECURED: Added requireAuth middleware to DELETE /api/tasks/:id endpoint for proper authentication
