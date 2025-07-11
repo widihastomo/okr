@@ -32,6 +32,7 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { TaskCommentList } from "@/components/task-comment-list";
 import { TaskCommentEditor } from "@/components/task-comment-editor";
+import TaskModal from "@/components/task-modal";
 
 // UI Components
 import { 
@@ -450,6 +451,7 @@ export default function TaskDetailPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
 
   // Fetch task data
   const { data: task, isLoading, error } = useQuery({
@@ -568,7 +570,7 @@ export default function TaskDetailPage() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
                   <Edit className="w-4 h-4 mr-2" />
                   Edit Task
                 </DropdownMenuItem>
@@ -599,6 +601,20 @@ export default function TaskDetailPage() {
           <TaskHistoryCard taskId={id!} />
         </div>
       </div>
+
+      {/* Edit Task Dialog */}
+      <TaskModal
+        open={showEditDialog}
+        onClose={() => {
+          setShowEditDialog(false);
+          // Refresh task data after edit
+          queryClient.invalidateQueries({ queryKey: [`/api/tasks/${id}`] });
+          queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+        }}
+        task={taskData}
+        initiativeId={taskData?.initiativeId}
+        isAdding={false}
+      />
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
