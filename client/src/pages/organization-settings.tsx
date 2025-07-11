@@ -21,9 +21,11 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { Settings, Users, CreditCard, Building2, Loader2, Plus, Edit, Trash2, UserPlus, Shield, User as UserIcon, Search, UserCheck, UserX, MoreHorizontal, MoreVertical, Eye, EyeOff, Key, Bell, Clock, Calendar, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Settings, Users, CreditCard, Building2, Loader2, Plus, Edit, Trash2, UserPlus, Shield, User as UserIcon, Search, UserCheck, UserX, MoreHorizontal, MoreVertical, Eye, EyeOff, Key, Bell, Clock, Calendar, AlertCircle, CheckCircle2, FileText, Download, CheckCircle, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import PlanChangeWizard from "@/components/plan-change-wizard";
+import { CreateInvoiceModal } from "@/components/create-invoice-modal";
+import ComprehensiveInvoiceModal from "@/components/comprehensive-invoice-modal";
 
 type UserWithTeams = User & {
   teams?: (TeamMember & { team: Team })[];
@@ -621,7 +623,8 @@ export default function OrganizationSettings() {
         </TabsContent>
 
         {/* Subscription Tab */}
-        <TabsContent value="subscription">
+        <TabsContent value="subscription" className="space-y-6">
+          {/* Current Subscription Info */}
           <Card>
             <CardHeader>
               <CardTitle>Langganan Saat Ini</CardTitle>
@@ -664,6 +667,9 @@ export default function OrganizationSettings() {
               )}
             </CardContent>
           </Card>
+
+          {/* Invoice Management Section */}
+          <InvoiceManagementSection />
         </TabsContent>
 
         {/* Members Tab */}
@@ -2137,5 +2143,372 @@ export default function OrganizationSettings() {
         </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+// Invoice Management Section Component
+function InvoiceManagementSection() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [comprehensiveModalOpen, setComprehensiveModalOpen] = useState(false);
+  const [selectedOrganization, setSelectedOrganization] = useState<{ id: string; name: string } | null>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  interface InvoiceData {
+    invoice: {
+      id: string;
+      invoiceNumber: string;
+      amount: string;
+      currency: string;
+      status: string;
+      issueDate: string;
+      dueDate: string;
+      paidDate: string | null;
+      description: string | null;
+    };
+    organization: {
+      id: string;
+      name: string;
+    };
+    subscriptionPlan?: {
+      id: string;
+      name: string;
+    };
+    billingPeriod?: {
+      id: string;
+      periodType: string;
+      periodMonths: number;
+    };
+  }
+
+  const { data: invoices = [], isLoading } = useQuery({
+    queryKey: ["/api/invoices"],
+  });
+
+  const markPaidMutation = useMutation({
+    mutationFn: async (invoiceId: string) => {
+      await apiRequest("POST", `/api/invoices/${invoiceId}/mark-paid`, {
+        paymentMethod: "manual",
+        paidDate: new Date().toISOString()
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
+      toast({
+        title: "Berhasil",
+        description: "Invoice berhasil ditandai sebagai dibayar",
+        variant: "success"
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const payWithMidtransMutation = useMutation({
+    mutationFn: async (invoiceId: string) => {
+      const response = await apiRequest("POST", `/api/invoices/${invoiceId}/pay`);
+      return response.json();
+    },
+    onSuccess: (data) => {
+      window.open(data.redirectUrl, '_blank');
+      queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
+      toast({
+        title: "Pembayaran Dimulai",
+        description: "Anda akan diarahkan ke halaman pembayaran Midtrans",
+        variant: "success"
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error Pembayaran",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const filteredInvoices = invoices.filter((item: InvoiceData) => {
+    const matchesSearch = 
+      item.invoice.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.organization.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.invoice.description && item.invoice.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    const matchesStatus = statusFilter === "all" || item.invoice.status === statusFilter;
+    
+    return matchesSearch && matchesStatus;
+  });
+
+  const handleMarkPaid = (invoiceId: string) => {
+    markPaidMutation.mutate(invoiceId);
+  };
+
+  const handlePayWithMidtrans = (invoiceId: string) => {
+    payWithMidtransMutation.mutate(invoiceId);
+  };
+
+  const handleOpenComprehensiveModal = (organizationId: string, organizationName: string) => {
+    setSelectedOrganization({ id: organizationId, name: organizationName });
+    setComprehensiveModalOpen(true);
+  };
+
+  const handleCloseComprehensiveModal = () => {
+    setComprehensiveModalOpen(false);
+    setSelectedOrganization(null);
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Manajemen Invoice</CardTitle>
+        <CardDescription>
+          Kelola invoice langganan dan pembayaran organisasi
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Header Actions */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button 
+              onClick={() => setCreateModalOpen(true)}
+              variant="outline"
+              className="w-full sm:w-auto"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Invoice Sederhana
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 w-full sm:w-auto">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Invoice Komprehensif
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {invoices
+                  .filter((item: InvoiceData) => item.organization)
+                  .reduce((orgs: Array<{id: string, name: string}>, item: InvoiceData) => {
+                    const exists = orgs.find(org => org.id === item.organization.id);
+                    if (!exists) {
+                      orgs.push({
+                        id: item.organization.id,
+                        name: item.organization.name
+                      });
+                    }
+                    return orgs;
+                  }, [])
+                  .map((org) => (
+                    <DropdownMenuItem
+                      key={org.id}
+                      onClick={() => handleOpenComprehensiveModal(org.id, org.name)}
+                    >
+                      {org.name}
+                    </DropdownMenuItem>
+                  ))
+                }
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center">
+                <FileText className="h-8 w-8 text-blue-600" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Total Invoice</p>
+                  <p className="text-xl font-bold text-gray-900">{invoices.length}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center">
+                <Clock className="h-8 w-8 text-yellow-600" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Tertunda</p>
+                  <p className="text-xl font-bold text-gray-900">
+                    {invoices.filter((item: InvoiceData) => item.invoice.status === 'pending').length}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center">
+                <CheckCircle className="h-8 w-8 text-green-600" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Dibayar</p>
+                  <p className="text-xl font-bold text-gray-900">
+                    {invoices.filter((item: InvoiceData) => item.invoice.status === 'paid').length}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center">
+                <AlertCircle className="h-8 w-8 text-red-600" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Overdue</p>
+                  <p className="text-xl font-bold text-gray-900">
+                    {invoices.filter((item: InvoiceData) => item.invoice.status === 'overdue').length}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Filters */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
+            <Input
+              placeholder="Cari invoice..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full"
+            />
+          </div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full sm:w-48">
+              <SelectValue placeholder="Filter Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua Status</SelectItem>
+              <SelectItem value="pending">Tertunda</SelectItem>
+              <SelectItem value="paid">Dibayar</SelectItem>
+              <SelectItem value="overdue">Overdue</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Invoice Table */}
+        <div className="border rounded-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-32">No. Invoice</TableHead>
+                  <TableHead>Organisasi</TableHead>
+                  <TableHead>Jumlah</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Tanggal</TableHead>
+                  <TableHead className="text-right">Aksi</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8">
+                      <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+                      <p className="text-sm text-gray-500 mt-2">Memuat data...</p>
+                    </TableCell>
+                  </TableRow>
+                ) : filteredInvoices.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8">
+                      <FileText className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500">Tidak ada invoice ditemukan</p>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredInvoices.map((item: InvoiceData) => (
+                    <TableRow key={item.invoice.id}>
+                      <TableCell className="font-medium">
+                        {item.invoice.invoiceNumber}
+                      </TableCell>
+                      <TableCell>{item.organization.name}</TableCell>
+                      <TableCell>
+                        {item.invoice.currency} {parseInt(item.invoice.amount).toLocaleString("id-ID")}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={
+                          item.invoice.status === 'paid' ? 'default' : 
+                          item.invoice.status === 'pending' ? 'secondary' : 
+                          'destructive'
+                        }>
+                          {item.invoice.status === 'paid' ? 'Dibayar' : 
+                           item.invoice.status === 'pending' ? 'Tertunda' : 
+                           'Overdue'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {new Date(item.invoice.issueDate).toLocaleDateString("id-ID")}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Open menu</span>
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem>
+                              <Eye className="mr-2 h-4 w-4" />
+                              Lihat Detail
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Download className="mr-2 h-4 w-4" />
+                              Unduh PDF
+                            </DropdownMenuItem>
+                            {item.invoice.status === 'pending' && (
+                              <>
+                                <DropdownMenuItem 
+                                  onClick={() => handleMarkPaid(item.invoice.id)}
+                                  className="text-green-600"
+                                >
+                                  <CheckCircle className="mr-2 h-4 w-4" />
+                                  Tandai Dibayar
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  onClick={() => handlePayWithMidtrans(item.invoice.id)}
+                                  className="text-blue-600"
+                                >
+                                  <CreditCard className="mr-2 h-4 w-4" />
+                                  Bayar dengan Midtrans
+                                </DropdownMenuItem>
+                              </>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+
+        {/* Modals */}
+        <CreateInvoiceModal 
+          open={createModalOpen} 
+          onOpenChange={setCreateModalOpen}
+        />
+        
+        <ComprehensiveInvoiceModal 
+          open={comprehensiveModalOpen}
+          onOpenChange={setComprehensiveModalOpen}
+          organizationId={selectedOrganization?.id || ''}
+          organizationName={selectedOrganization?.name || ''}
+        />
+      </CardContent>
+    </Card>
   );
 }

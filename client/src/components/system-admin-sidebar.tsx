@@ -109,12 +109,7 @@ export default function SystemAdminSidebar({
       path: "/referral-codes",
       active: location === "/referral-codes",
     },
-    {
-      label: "Kelola Invoice",
-      icon: Receipt,
-      path: "/invoices",
-      active: location === "/invoices" || location.startsWith("/invoices/"),
-    },
+
     {
       label: "Pemetaan Status Client",
       icon: MapPin,

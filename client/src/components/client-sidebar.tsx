@@ -223,12 +223,7 @@ export default function Sidebar({
       path: "/member-invitations",
       active: location === "/member-invitations",
     });
-    regularUserMenuItems.push({
-      label: "Invoice",
-      icon: Receipt,
-      path: "/invoices",
-      active: location === "/invoices" || location.startsWith("/invoices/"),
-    });
+
   }
 
   // Choose menu items based on user type
