@@ -83,6 +83,11 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
     queryKey: ["/api/users"],
   });
 
+  // Fetch all initiatives for assignment
+  const { data: initiatives = [] } = useQuery({
+    queryKey: ["/api/initiatives"],
+  });
+
   // Fetch initiative details to get PIC and members
   const { data: initiative } = useQuery({
     queryKey: [`/api/initiatives/${initiativeId}`],
@@ -91,6 +96,7 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
 
   // Cast types for proper access and add debugging
   const usersData = (users as any) || [];
+  const initiativesData = (initiatives as any) || [];
   const initiativeData = (initiative as any) || {};
   const picId = initiativeData.picId;
   const initiativeMembers = initiativeData.members || [];
@@ -124,18 +130,34 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
 
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await fetch(`/api/initiatives/${initiativeId}/tasks`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error("Failed to create task");
-      return response.json();
+      // If task has an initiative ID, use the initiative-specific endpoint
+      if (data.initiativeId) {
+        const response = await fetch(`/api/initiatives/${data.initiativeId}/tasks`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        if (!response.ok) throw new Error("Failed to create task");
+        return response.json();
+      } else {
+        // Otherwise use the general tasks endpoint
+        const response = await fetch(`/api/tasks`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        if (!response.ok) throw new Error("Failed to create task");
+        return response.json();
+      }
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/tasks`], refetchType: 'active' });
-      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}`], refetchType: 'active' });
+      // Invalidate relevant queries based on context
+      if (data.initiativeId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${data.initiativeId}/tasks`], refetchType: 'active' });
+        queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${data.initiativeId}`], refetchType: 'active' });
+      }
       queryClient.invalidateQueries({ queryKey: ['/api/initiatives'], refetchType: 'active' });
+      queryClient.invalidateQueries({ queryKey: ['/api/tasks'], refetchType: 'active' });
 
       // Show success toast for task creation
       toast({
@@ -178,9 +200,17 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
       return response.json();
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/tasks`], refetchType: 'active' });
-      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}`], refetchType: 'active' });
+      // Invalidate queries for both old and new initiatives if they changed
+      if (task?.initiativeId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${task.initiativeId}/tasks`], refetchType: 'active' });
+        queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${task.initiativeId}`], refetchType: 'active' });
+      }
+      if (data.initiativeId && data.initiativeId !== task?.initiativeId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${data.initiativeId}/tasks`], refetchType: 'active' });
+        queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${data.initiativeId}`], refetchType: 'active' });
+      }
       queryClient.invalidateQueries({ queryKey: ['/api/initiatives'], refetchType: 'active' });
+      queryClient.invalidateQueries({ queryKey: ['/api/tasks'], refetchType: 'active' });
 
       // Show success toast for task update
       toast({
@@ -229,6 +259,7 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
       ...formData,
       assignedTo: formData.assignedTo === "unassigned" ? null : formData.assignedTo || null,
       dueDate: formData.dueDate ? formData.dueDate.toISOString().split('T')[0] : null,
+      initiativeId: formData.initiativeId === "unassigned" ? null : formData.initiativeId || initiativeId,
     };
 
     if (isAdding) {
@@ -405,82 +436,162 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="assignedTo" className="flex items-center gap-2 mb-2">
-              PIC
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="assignedTo" className="flex items-center gap-2 mb-2">
+                PIC
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button 
+                      type="button" 
+                      className="inline-flex items-center justify-center"
+                    >
+                      <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent side="right" className="max-w-xs">
+                    <p className="text-sm">
+                      <strong>Person In Charge (PIC)</strong>
+                      <br /><br />
+                      Orang yang bertanggung jawab untuk menyelesaikan task ini. Pilih anggota tim yang tepat berdasarkan keahlian dan beban kerja mereka.
+                    </p>
+                  </PopoverContent>
+                </Popover>
+              </Label>
               <Popover>
                 <PopoverTrigger asChild>
-                  <button 
-                    type="button" 
-                    className="inline-flex items-center justify-center"
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className="w-full justify-between"
                   >
-                    <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                  </button>
+                    {formData.assignedTo && formData.assignedTo !== "unassigned" 
+                      ? availableUsers?.find((user: any) => user.id === formData.assignedTo)?.firstName + " " + availableUsers?.find((user: any) => user.id === formData.assignedTo)?.lastName
+                      : formData.assignedTo === "unassigned" 
+                        ? "Belum ditentukan"
+                        : "Pilih PIC"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
                 </PopoverTrigger>
-                <PopoverContent side="right" className="max-w-xs">
-                  <p className="text-sm">
-                    <strong>Person In Charge (PIC)</strong>
-                    <br /><br />
-                    Orang yang bertanggung jawab untuk menyelesaikan task ini. Pilih anggota tim yang tepat berdasarkan keahlian dan beban kerja mereka.
-                  </p>
-                </PopoverContent>
-              </Popover>
-            </Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  className="w-full justify-between"
-                >
-                  {formData.assignedTo && formData.assignedTo !== "unassigned" 
-                    ? availableUsers?.find((user: any) => user.id === formData.assignedTo)?.firstName + " " + availableUsers?.find((user: any) => user.id === formData.assignedTo)?.lastName
-                    : formData.assignedTo === "unassigned" 
-                      ? "Belum ditentukan"
-                      : "Pilih PIC"}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-full p-0">
-                <Command>
-                  <CommandInput placeholder="Cari anggota tim..." />
-                  <CommandList>
-                    <CommandEmpty>Tidak ada anggota tim ditemukan.</CommandEmpty>
-                    <CommandGroup>
-                      <CommandItem
-                        value="unassigned"
-                        onSelect={() => {
-                          setFormData({ ...formData, assignedTo: "unassigned" });
-                        }}
-                      >
-                        <Check
-                          className={`mr-2 h-4 w-4 ${
-                            formData.assignedTo === "unassigned" ? "opacity-100" : "opacity-0"
-                          }`}
-                        />
-                        Belum ditentukan
-                      </CommandItem>
-                      {availableUsers?.map((user: any) => (
+                <PopoverContent className="w-full p-0">
+                  <Command>
+                    <CommandInput placeholder="Cari anggota tim..." />
+                    <CommandList>
+                      <CommandEmpty>Tidak ada anggota tim ditemukan.</CommandEmpty>
+                      <CommandGroup>
                         <CommandItem
-                          key={user.id}
-                          value={`${user.firstName} ${user.lastName}`}
+                          value="unassigned"
                           onSelect={() => {
-                            setFormData({ ...formData, assignedTo: user.id });
+                            setFormData({ ...formData, assignedTo: "unassigned" });
                           }}
                         >
                           <Check
                             className={`mr-2 h-4 w-4 ${
-                              formData.assignedTo === user.id ? "opacity-100" : "opacity-0"
+                              formData.assignedTo === "unassigned" ? "opacity-100" : "opacity-0"
                             }`}
                           />
-                          {user.firstName} {user.lastName}
+                          Belum ditentukan
                         </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
+                        {availableUsers?.map((user: any) => (
+                          <CommandItem
+                            key={user.id}
+                            value={`${user.firstName} ${user.lastName}`}
+                            onSelect={() => {
+                              setFormData({ ...formData, assignedTo: user.id });
+                            }}
+                          >
+                            <Check
+                              className={`mr-2 h-4 w-4 ${
+                                formData.assignedTo === user.id ? "opacity-100" : "opacity-0"
+                              }`}
+                            />
+                            {user.firstName} {user.lastName}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div>
+              <Label htmlFor="initiativeId" className="flex items-center gap-2 mb-2">
+                Initiative Terkait
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button 
+                      type="button" 
+                      className="inline-flex items-center justify-center"
+                    >
+                      <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent side="right" className="max-w-xs">
+                    <p className="text-sm">
+                      <strong>Initiative yang terkait dengan task</strong>
+                      <br /><br />
+                      Pilih initiative yang relevan dengan task ini. Initiative membantu mengelompokkan task berdasarkan tujuan yang sama.
+                    </p>
+                  </PopoverContent>
+                </Popover>
+              </Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className="w-full justify-between"
+                  >
+                    {formData.initiativeId && formData.initiativeId !== "unassigned" 
+                      ? initiativesData?.find((initiative: any) => initiative.id === formData.initiativeId)?.title
+                      : formData.initiativeId === "unassigned" 
+                        ? "Tanpa Initiative"
+                        : "Pilih Initiative"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0">
+                  <Command>
+                    <CommandInput placeholder="Cari initiative..." />
+                    <CommandList>
+                      <CommandEmpty>Tidak ada initiative ditemukan.</CommandEmpty>
+                      <CommandGroup>
+                        <CommandItem
+                          value="unassigned"
+                          onSelect={() => {
+                            setFormData({ ...formData, initiativeId: "unassigned" });
+                          }}
+                        >
+                          <Check
+                            className={`mr-2 h-4 w-4 ${
+                              formData.initiativeId === "unassigned" ? "opacity-100" : "opacity-0"
+                            }`}
+                          />
+                          Tanpa Initiative
+                        </CommandItem>
+                        {initiativesData?.map((initiative: any) => (
+                          <CommandItem
+                            key={initiative.id}
+                            value={initiative.title}
+                            onSelect={() => {
+                              setFormData({ ...formData, initiativeId: initiative.id });
+                            }}
+                          >
+                            <Check
+                              className={`mr-2 h-4 w-4 ${
+                                formData.initiativeId === initiative.id ? "opacity-100" : "opacity-0"
+                              }`}
+                            />
+                            {initiative.title}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
           </div>
           
           <div>
