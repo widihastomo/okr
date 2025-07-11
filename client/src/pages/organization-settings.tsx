@@ -81,6 +81,7 @@ export default function OrganizationSettings() {
   const [editingRole, setEditingRole] = useState<any>(null);
   const [roleSearchTerm, setRoleSearchTerm] = useState("");
   const [selectedRoleForDetails, setSelectedRoleForDetails] = useState<any>(null);
+  const [isResettingData, setIsResettingData] = useState(false);
 
   // Notification/Reminder settings states
   const [useCustomTime, setUseCustomTime] = useState(false);
@@ -402,6 +403,39 @@ export default function OrganizationSettings() {
       });
     },
     onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Data reset mutation
+  const resetDataMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/reset-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!response.ok) throw new Error('Failed to reset data');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/key-results"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/initiatives"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/cycles"] });
+      setIsResettingData(false);
+      toast({
+        title: "Data Berhasil Direset",
+        description: "Semua objective, key result, initiative, task, dan siklus telah dihapus.",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+    },
+    onError: (error) => {
+      setIsResettingData(false);
       toast({
         title: "Error",
         description: error.message,
@@ -2115,7 +2149,64 @@ export default function OrganizationSettings() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-6">
+                {/* Data Reset Section */}
+                <div className="p-4 border border-orange-200 rounded-lg bg-orange-50">
+                  <h4 className="font-semibold text-orange-900 mb-2">Reset Data</h4>
+                  <p className="text-sm text-orange-700 mb-4">
+                    Hapus semua objective, key result, initiative, task, dan siklus dari organisasi ini. 
+                    Data anggota dan tim akan tetap tersimpan.
+                  </p>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="border-orange-300 text-orange-700 hover:bg-orange-100"
+                        disabled={resetDataMutation.isPending}
+                      >
+                        {resetDataMutation.isPending ? "Mereset..." : "Reset Data"}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Konfirmasi Reset Data</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Apakah Anda yakin ingin mereset semua data OKR (Objective, Key Result, Initiative, Task, dan Siklus)? 
+                          Tindakan ini tidak dapat dibatalkan.
+                          <br /><br />
+                          <strong>Data yang akan dihapus:</strong>
+                          <ul className="list-disc ml-6 mt-2">
+                            <li>Semua objective dan key result</li>
+                            <li>Semua initiative dan task</li>
+                            <li>Semua siklus</li>
+                          </ul>
+                          <br />
+                          <strong>Data yang tetap tersimpan:</strong>
+                          <ul className="list-disc ml-6 mt-2">
+                            <li>Anggota dan tim</li>
+                            <li>Pengaturan organisasi</li>
+                            <li>Riwayat invoice</li>
+                          </ul>
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => {
+                            setIsResettingData(true);
+                            resetDataMutation.mutate();
+                          }}
+                          className="bg-orange-600 hover:bg-orange-700"
+                        >
+                          Ya, Reset Data
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+
+                {/* Danger Zone */}
                 <div className="p-4 border border-red-200 rounded-lg bg-red-50">
                   <h4 className="font-semibold text-red-900 mb-2">Zona Berbahaya</h4>
                   <p className="text-sm text-red-700 mb-4">

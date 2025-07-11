@@ -1214,6 +1214,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Reset data endpoint for organizations
+  app.post("/api/reset-data", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      
+      // Verify user has organization access
+      if (!currentUser.organizationId) {
+        return res.status(400).json({ message: "User not associated with an organization" });
+      }
+      
+      // Get all objectives for this organization
+      const objectives = await storage.getObjectivesByOrganization(currentUser.organizationId);
+      
+      // Delete all objectives with cascade (this will delete key results, initiatives, and tasks)
+      for (const objective of objectives) {
+        await storage.deleteObjectiveWithCascade(objective.id);
+      }
+      
+      // Delete all cycles for this organization
+      const cycles = await storage.getCyclesByOrganization(currentUser.organizationId);
+      for (const cycle of cycles) {
+        await storage.deleteCycle(cycle.id);
+      }
+      
+      res.json({ 
+        message: "All data reset successfully",
+        deletedObjectives: objectives.length,
+        deletedCycles: cycles.length
+      });
+    } catch (error) {
+      console.error("Error resetting data:", error);
+      res.status(500).json({ message: "Failed to reset data" });
+    }
+  });
+
   // User management endpoints
   app.get('/api/users', requireAuth, async (req, res) => {
     try {
