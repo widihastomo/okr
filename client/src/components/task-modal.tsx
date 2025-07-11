@@ -361,6 +361,84 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
             />
           </div>
 
+          <div>
+            <Label htmlFor="initiativeId" className="flex items-center gap-2 mb-2">
+              Initiative Terkait
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button 
+                    type="button" 
+                    className="inline-flex items-center justify-center"
+                  >
+                    <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent side="right" className="max-w-xs">
+                  <p className="text-sm">
+                    <strong>Initiative yang terkait dengan task</strong>
+                    <br /><br />
+                    Pilih initiative yang relevan dengan task ini. Initiative membantu mengelompokkan task berdasarkan tujuan yang sama.
+                  </p>
+                </PopoverContent>
+              </Popover>
+            </Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  className="w-full justify-between"
+                >
+                  {formData.initiativeId && formData.initiativeId !== "unassigned" 
+                    ? initiativesData?.find((initiative: any) => initiative.id === formData.initiativeId)?.title
+                    : formData.initiativeId === "unassigned" 
+                      ? "Tanpa Initiative"
+                      : "Pilih Initiative"}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0">
+                <Command>
+                  <CommandInput placeholder="Cari initiative..." />
+                  <CommandList>
+                    <CommandEmpty>Tidak ada initiative ditemukan.</CommandEmpty>
+                    <CommandGroup>
+                      <CommandItem
+                        value="unassigned"
+                        onSelect={() => {
+                          setFormData({ ...formData, initiativeId: "unassigned" });
+                        }}
+                      >
+                        <Check
+                          className={`mr-2 h-4 w-4 ${
+                            formData.initiativeId === "unassigned" ? "opacity-100" : "opacity-0"
+                          }`}
+                        />
+                        Tanpa Initiative
+                      </CommandItem>
+                      {initiativesData?.map((initiative: any) => (
+                        <CommandItem
+                          key={initiative.id}
+                          value={initiative.title}
+                          onSelect={() => {
+                            setFormData({ ...formData, initiativeId: initiative.id });
+                          }}
+                        >
+                          <Check
+                            className={`mr-2 h-4 w-4 ${
+                              formData.initiativeId === initiative.id ? "opacity-100" : "opacity-0"
+                            }`}
+                          />
+                          {initiative.title}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="priority" className="flex items-center gap-2 mb-2">
@@ -436,162 +514,82 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="assignedTo" className="flex items-center gap-2 mb-2">
-                PIC
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button 
-                      type="button" 
-                      className="inline-flex items-center justify-center"
-                    >
-                      <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent side="right" className="max-w-xs">
-                    <p className="text-sm">
-                      <strong>Person In Charge (PIC)</strong>
-                      <br /><br />
-                      Orang yang bertanggung jawab untuk menyelesaikan task ini. Pilih anggota tim yang tepat berdasarkan keahlian dan beban kerja mereka.
-                    </p>
-                  </PopoverContent>
-                </Popover>
-              </Label>
+          <div>
+            <Label htmlFor="assignedTo" className="flex items-center gap-2 mb-2">
+              PIC
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    className="w-full justify-between"
+                  <button 
+                    type="button" 
+                    className="inline-flex items-center justify-center"
                   >
-                    {formData.assignedTo && formData.assignedTo !== "unassigned" 
-                      ? availableUsers?.find((user: any) => user.id === formData.assignedTo)?.firstName + " " + availableUsers?.find((user: any) => user.id === formData.assignedTo)?.lastName
-                      : formData.assignedTo === "unassigned" 
-                        ? "Belum ditentukan"
-                        : "Pilih PIC"}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
+                    <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                  </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
-                  <Command>
-                    <CommandInput placeholder="Cari anggota tim..." />
-                    <CommandList>
-                      <CommandEmpty>Tidak ada anggota tim ditemukan.</CommandEmpty>
-                      <CommandGroup>
+                <PopoverContent side="right" className="max-w-xs">
+                  <p className="text-sm">
+                    <strong>Person In Charge (PIC)</strong>
+                    <br /><br />
+                    Orang yang bertanggung jawab untuk menyelesaikan task ini. Pilih anggota tim yang tepat berdasarkan keahlian dan beban kerja mereka.
+                  </p>
+                </PopoverContent>
+              </Popover>
+            </Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  className="w-full justify-between"
+                >
+                  {formData.assignedTo && formData.assignedTo !== "unassigned" 
+                    ? availableUsers?.find((user: any) => user.id === formData.assignedTo)?.firstName + " " + availableUsers?.find((user: any) => user.id === formData.assignedTo)?.lastName
+                    : formData.assignedTo === "unassigned" 
+                      ? "Belum ditentukan"
+                      : "Pilih PIC"}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0">
+                <Command>
+                  <CommandInput placeholder="Cari anggota tim..." />
+                  <CommandList>
+                    <CommandEmpty>Tidak ada anggota tim ditemukan.</CommandEmpty>
+                    <CommandGroup>
+                      <CommandItem
+                        value="unassigned"
+                        onSelect={() => {
+                          setFormData({ ...formData, assignedTo: "unassigned" });
+                        }}
+                      >
+                        <Check
+                          className={`mr-2 h-4 w-4 ${
+                            formData.assignedTo === "unassigned" ? "opacity-100" : "opacity-0"
+                          }`}
+                        />
+                        Belum ditentukan
+                      </CommandItem>
+                      {availableUsers?.map((user: any) => (
                         <CommandItem
-                          value="unassigned"
+                          key={user.id}
+                          value={`${user.firstName} ${user.lastName}`}
                           onSelect={() => {
-                            setFormData({ ...formData, assignedTo: "unassigned" });
+                            setFormData({ ...formData, assignedTo: user.id });
                           }}
                         >
                           <Check
                             className={`mr-2 h-4 w-4 ${
-                              formData.assignedTo === "unassigned" ? "opacity-100" : "opacity-0"
+                              formData.assignedTo === user.id ? "opacity-100" : "opacity-0"
                             }`}
                           />
-                          Belum ditentukan
+                          {user.firstName} {user.lastName}
                         </CommandItem>
-                        {availableUsers?.map((user: any) => (
-                          <CommandItem
-                            key={user.id}
-                            value={`${user.firstName} ${user.lastName}`}
-                            onSelect={() => {
-                              setFormData({ ...formData, assignedTo: user.id });
-                            }}
-                          >
-                            <Check
-                              className={`mr-2 h-4 w-4 ${
-                                formData.assignedTo === user.id ? "opacity-100" : "opacity-0"
-                              }`}
-                            />
-                            {user.firstName} {user.lastName}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            <div>
-              <Label htmlFor="initiativeId" className="flex items-center gap-2 mb-2">
-                Initiative Terkait
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button 
-                      type="button" 
-                      className="inline-flex items-center justify-center"
-                    >
-                      <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent side="right" className="max-w-xs">
-                    <p className="text-sm">
-                      <strong>Initiative yang terkait dengan task</strong>
-                      <br /><br />
-                      Pilih initiative yang relevan dengan task ini. Initiative membantu mengelompokkan task berdasarkan tujuan yang sama.
-                    </p>
-                  </PopoverContent>
-                </Popover>
-              </Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    className="w-full justify-between"
-                  >
-                    {formData.initiativeId && formData.initiativeId !== "unassigned" 
-                      ? initiativesData?.find((initiative: any) => initiative.id === formData.initiativeId)?.title
-                      : formData.initiativeId === "unassigned" 
-                        ? "Tanpa Initiative"
-                        : "Pilih Initiative"}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
-                  <Command>
-                    <CommandInput placeholder="Cari initiative..." />
-                    <CommandList>
-                      <CommandEmpty>Tidak ada initiative ditemukan.</CommandEmpty>
-                      <CommandGroup>
-                        <CommandItem
-                          value="unassigned"
-                          onSelect={() => {
-                            setFormData({ ...formData, initiativeId: "unassigned" });
-                          }}
-                        >
-                          <Check
-                            className={`mr-2 h-4 w-4 ${
-                              formData.initiativeId === "unassigned" ? "opacity-100" : "opacity-0"
-                            }`}
-                          />
-                          Tanpa Initiative
-                        </CommandItem>
-                        {initiativesData?.map((initiative: any) => (
-                          <CommandItem
-                            key={initiative.id}
-                            value={initiative.title}
-                            onSelect={() => {
-                              setFormData({ ...formData, initiativeId: initiative.id });
-                            }}
-                          >
-                            <Check
-                              className={`mr-2 h-4 w-4 ${
-                                formData.initiativeId === initiative.id ? "opacity-100" : "opacity-0"
-                              }`}
-                            />
-                            {initiative.title}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
           
           <div>
