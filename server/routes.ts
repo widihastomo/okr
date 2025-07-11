@@ -931,8 +931,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/cycles", requireAuth, async (req, res) => {
     try {
+      const currentUser = req.user as User;
       const data = insertCycleSchema.parse(req.body);
-      const cycle = await storage.createCycle(data);
+      
+      // Add created_by field for audit trail
+      const cycleData = {
+        ...data,
+        createdBy: currentUser.id
+      };
+      
+      const cycle = await storage.createCycle(cycleData);
       res.status(201).json(cycle);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -1851,7 +1859,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...validatedData.objective,
         ownerId: currentUser.id,
         owner: currentUser.username || currentUser.email || 'Unknown User', // Add backward compatibility field
-        teamId: validatedData.objective.ownerType === 'team' ? validatedData.objective.ownerId : null
+        teamId: validatedData.objective.ownerType === 'team' ? validatedData.objective.ownerId : null,
+        createdBy: currentUser.id // Add created_by field
       };
       
       // Create objective
@@ -1883,7 +1892,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           targetValue: krData.targetValue === "" ? "0" : krData.targetValue,
           currentValue: krData.currentValue === "" ? "0" : krData.currentValue,
           // Handle empty assignedTo field - convert empty string to null
-          assignedTo: krData.assignedTo === "" ? null : krData.assignedTo
+          assignedTo: krData.assignedTo === "" ? null : krData.assignedTo,
+          createdBy: currentUser.id // Add created_by field
         };
         const keyResult = await storage.createKeyResult(processedKrData);
         keyResults.push(keyResult);

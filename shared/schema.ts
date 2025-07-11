@@ -11,6 +11,8 @@ export const cycles = pgTable("cycles", {
   endDate: text("end_date").notNull(),
   status: text("status").notNull().default("planning"), // "planning", "active", "completed"
   description: text("description"),
+  createdBy: uuid("created_by").notNull().references(() => users.id), // user ID who created the cycle
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const templates = pgTable("templates", {
@@ -33,6 +35,8 @@ export const objectives = pgTable("objectives", {
   status: text("status").notNull().default("not_started"), // "not_started", "on_track", "at_risk", "behind", "paused", "canceled", "completed", "partially_achieved", "not_achieved"
   teamId: uuid("team_id").references(() => teams.id), // for team OKRs
   parentId: uuid("parent_id"), // self-reference for parent-child hierarchy
+  createdBy: uuid("created_by").notNull().references(() => users.id), // user ID who created the objective
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Session storage table for authentication
@@ -354,10 +358,11 @@ export const keyResults = pgTable("key_results", {
   }).notNull().default("increase_to"),
   status: text("status").notNull().default("on_track"), // "on_track", "at_risk", "behind", "completed"
   assignedTo: uuid("assigned_to").references(() => users.id), // Penanggung jawab angka target
-
+  createdBy: uuid("created_by").notNull().references(() => users.id), // user ID who created the key result
   lastUpdated: timestamp("last_updated").defaultNow(),
   confidence: integer("confidence").default(5), // 1-10 scale for confidence level
   timeProgressPercentage: integer("time_progress_percentage").default(0), // Ideal progress based on timeline
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Check-ins for tracking progress updates
