@@ -117,6 +117,7 @@ import { UserStatsCard } from "@/components/gamification/user-stats-card";
 import { DailyAchievements } from "@/components/daily-achievements";
 import { DailyUpdateSimple } from "@/components/daily-update-simple";
 import { useAuth } from "@/hooks/useAuth";
+import OKRFormModal from "@/components/okr-form-modal";
 
 // Icon mapping for mission cards
 const iconMapping = {
@@ -306,14 +307,6 @@ export default function DailyFocusPage() {
   
   // Goal creation modal state
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
-  const [goalFormData, setGoalFormData] = useState({
-    title: "",
-    description: "",
-    status: "not_started",
-    priority: "medium",
-    targetIdeal: 70,
-    cycleId: "",
-  });
 
   // Status update mutation
   const { toast } = useToast();
@@ -516,90 +509,8 @@ export default function DailyFocusPage() {
     },
   });
 
-  // Goal creation mutation
-  const createGoalMutation = useMutation({
-    mutationFn: async (goalData: any) => {
-      const response = await apiRequest("POST", "/api/objectives", goalData);
-      return response.json();
-    },
-    onSuccess: (data) => {
-      console.log("Goal creation success, invalidating cache...", data);
-      queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
-      
-      // Force refetch to ensure data is updated
-      setTimeout(() => {
-        queryClient.refetchQueries({ queryKey: ["/api/objectives"] });
-        queryClient.refetchQueries({ queryKey: ["/api/okrs"] });
-      }, 100);
-      
-      toast({
-        title: "Goal berhasil dibuat",
-        description: "Goal baru telah ditambahkan",
-        variant: "success",
-      });
-      setIsGoalModalOpen(false);
-      setGoalFormData({
-        title: "",
-        description: "",
-        status: "not_started",
-        priority: "medium",
-        targetIdeal: 70,
-        cycleId: "",
-      });
-    },
-    onError: (error: any) => {
-      console.error("Goal creation error:", error);
-      toast({
-        title: "Gagal membuat goal",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Handle goal form submission
-  const handleGoalSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!goalFormData.title.trim()) {
-      toast({
-        title: "Judul goal diperlukan",
-        description: "Mohon masukkan judul untuk goal",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!goalFormData.cycleId) {
-      toast({
-        title: "Cycle diperlukan",
-        description: "Mohon pilih cycle untuk goal",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const goalData = {
-      title: goalFormData.title,
-      description: goalFormData.description,
-      status: goalFormData.status,
-      priority: goalFormData.priority,
-      targetIdeal: goalFormData.targetIdeal,
-      cycleId: goalFormData.cycleId,
-    };
-
-    createGoalMutation.mutate(goalData);
-  };
-
   // Handle opening goal modal
   const handleOpenGoalModal = () => {
-    // Set default cycle if available
-    if (cycles.length > 0) {
-      setGoalFormData({
-        ...goalFormData,
-        cycleId: cycles[0].id,
-      });
-    }
     setIsGoalModalOpen(true);
   };
 
@@ -3424,105 +3335,11 @@ export default function DailyFocusPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Goal Creation Modal */}
-      <Dialog open={isGoalModalOpen} onOpenChange={setIsGoalModalOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Buat Goal Baru</DialogTitle>
-            <DialogDescription>
-              Tambahkan goal baru untuk mengarahkan aktivitas dan mencapai target
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleGoalSubmit} className="space-y-4">
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="goalTitle">Judul Goal *</Label>
-                <Input
-                  id="goalTitle"
-                  value={goalFormData.title}
-                  onChange={(e) => setGoalFormData({ ...goalFormData, title: e.target.value })}
-                  placeholder="Masukkan judul goal"
-                  required
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="goalDescription">Deskripsi</Label>
-                <Textarea
-                  id="goalDescription"
-                  value={goalFormData.description}
-                  onChange={(e) => setGoalFormData({ ...goalFormData, description: e.target.value })}
-                  placeholder="Masukkan deskripsi goal (opsional)"
-                  rows={3}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="goalCycle">Cycle *</Label>
-                <Select
-                  value={goalFormData.cycleId}
-                  onValueChange={(value) => setGoalFormData({ ...goalFormData, cycleId: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pilih cycle" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {cycles.map((cycle: any) => (
-                      <SelectItem key={cycle.id} value={cycle.id}>
-                        {cycle.name} ({cycle.type})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="goalPriority">Prioritas</Label>
-                <Select
-                  value={goalFormData.priority}
-                  onValueChange={(value) => setGoalFormData({ ...goalFormData, priority: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pilih prioritas" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Rendah</SelectItem>
-                    <SelectItem value="medium">Sedang</SelectItem>
-                    <SelectItem value="high">Tinggi</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="goalTarget">Target Ideal (%)</Label>
-                <Input
-                  id="goalTarget"
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={goalFormData.targetIdeal}
-                  onChange={(e) => setGoalFormData({ ...goalFormData, targetIdeal: parseInt(e.target.value) || 0 })}
-                  placeholder="Target ideal dalam persen"
-                />
-              </div>
-            </div>
-            
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsGoalModalOpen(false)}>
-                Batal
-              </Button>
-              <LoadingButton 
-                type="submit"
-                isLoading={createGoalMutation.isPending}
-                loadingType="creating"
-                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
-              >
-                Buat Goal
-              </LoadingButton>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      {/* Goal Creation Modal using existing OKRFormModal */}
+      <OKRFormModal
+        open={isGoalModalOpen}
+        onOpenChange={setIsGoalModalOpen}
+      />
     </div>
   );
 }
