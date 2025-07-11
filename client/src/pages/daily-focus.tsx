@@ -1242,13 +1242,13 @@ export default function DailyFocusPage() {
       {/* Goal Section - Always Show */}
       <Card className="border-blue-200 bg-blue-50">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-blue-900 flex items-center gap-2">
-                <Target className="h-5 w-5" />
-                Goal Terkait Aktivitas Hari Ini
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <CardTitle className="text-blue-900 flex items-center gap-2 text-base sm:text-lg">
+                <Target className="h-5 w-5 flex-shrink-0" />
+                <span className="truncate">Goal Terkait Aktivitas Hari Ini</span>
               </CardTitle>
-              <CardDescription className="text-blue-700">
+              <CardDescription className="text-blue-700 text-sm mt-1">
                 {relatedObjectives.length > 0 
                   ? "Tetap ingat tujuan utama yang mendorong aktivitas harian Anda"
                   : "Mulai dengan menetapkan goal utama untuk mengarahkan aktivitas harian Anda"
@@ -1257,11 +1257,12 @@ export default function DailyFocusPage() {
             </div>
             <Button 
               size="sm" 
-              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 w-full sm:w-auto flex-shrink-0"
               onClick={handleOpenGoalModal}
             >
               <Plus className="w-4 h-4 mr-2" />
-              Tambah Goal
+              <span className="hidden sm:inline">Tambah Goal</span>
+              <span className="sm:hidden">Tambah</span>
             </Button>
           </div>
         </CardHeader>
@@ -1285,7 +1286,7 @@ export default function DailyFocusPage() {
                   return (
                     <div
                       key={obj.id}
-                      className="p-4 bg-white border border-blue-200 rounded-lg flex-shrink-0 w-80"
+                      className="p-4 bg-white border border-blue-200 rounded-lg flex-shrink-0 w-80 sm:w-72"
                     >
                       <div className="space-y-3">
                         <div>
@@ -1360,14 +1361,14 @@ export default function DailyFocusPage() {
               )}
             </>
           ) : (
-            <div className="text-center py-8">
+            <div className="text-center py-8 px-4">
               <Target className="h-12 w-12 text-blue-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-blue-900 mb-2">Belum Ada Goal</h3>
-              <p className="text-sm text-blue-600 mb-4">
+              <p className="text-sm text-blue-600 mb-4 max-w-md mx-auto">
                 Buat goal pertama Anda untuk mengarahkan aktivitas harian dan mencapai target yang jelas
               </p>
               <Button 
-                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 w-full sm:w-auto"
                 onClick={handleOpenGoalModal}
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -1388,10 +1389,10 @@ export default function DailyFocusPage() {
         <TabsContent value="tasks" className="space-y-4">
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Task Prioritas Hari Ini</CardTitle>
-                  <CardDescription>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <CardTitle className="text-base sm:text-lg">Task Prioritas Hari Ini</CardTitle>
+                  <CardDescription className="text-sm mt-1">
                     Fokus pada task yang perlu diselesaikan hari ini
                   </CardDescription>
                 </div>
@@ -1399,11 +1400,12 @@ export default function DailyFocusPage() {
                   <DialogTrigger asChild>
                     <Button 
                       size="sm" 
-                      className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                      className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 w-full sm:w-auto flex-shrink-0"
                       onClick={handleOpenTaskModal}
                     >
                       <Plus className="w-4 h-4 mr-2" />
-                      Tambah Task
+                      <span className="hidden sm:inline">Tambah Task</span>
+                      <span className="sm:hidden">Tambah</span>
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[500px]">
