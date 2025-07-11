@@ -21,11 +21,10 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { Settings, Users, CreditCard, Building2, Loader2, Plus, Edit, Trash2, UserPlus, Shield, User as UserIcon, Search, UserCheck, UserX, MoreHorizontal, MoreVertical, Eye, EyeOff, Key, Bell, Clock, Calendar, AlertCircle, CheckCircle2, FileText, Download, CheckCircle, XCircle } from "lucide-react";
+import { Settings, Users, CreditCard, Building2, Loader2, Plus, Edit, Trash2, UserPlus, Shield, User as UserIcon, Search, UserCheck, UserX, MoreHorizontal, MoreVertical, Eye, EyeOff, Key, Bell, Clock, Calendar, AlertCircle, CheckCircle2, FileText, Download, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import PlanChangeWizard from "@/components/plan-change-wizard";
-import { CreateInvoiceModal } from "@/components/create-invoice-modal";
-import ComprehensiveInvoiceModal from "@/components/comprehensive-invoice-modal";
+
 
 type UserWithTeams = User & {
   teams?: (TeamMember & { team: Team })[];
@@ -2150,9 +2149,6 @@ export default function OrganizationSettings() {
 function InvoiceManagementSection() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [comprehensiveModalOpen, setComprehensiveModalOpen] = useState(false);
-  const [selectedOrganization, setSelectedOrganization] = useState<{ id: string; name: string } | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -2187,29 +2183,7 @@ function InvoiceManagementSection() {
     queryKey: ["/api/invoices"],
   });
 
-  const markPaidMutation = useMutation({
-    mutationFn: async (invoiceId: string) => {
-      await apiRequest("POST", `/api/invoices/${invoiceId}/mark-paid`, {
-        paymentMethod: "manual",
-        paidDate: new Date().toISOString()
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
-      toast({
-        title: "Berhasil",
-        description: "Invoice berhasil ditandai sebagai dibayar",
-        variant: "success"
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
+
 
   const payWithMidtransMutation = useMutation({
     mutationFn: async (invoiceId: string) => {
@@ -2245,22 +2219,8 @@ function InvoiceManagementSection() {
     return matchesSearch && matchesStatus;
   });
 
-  const handleMarkPaid = (invoiceId: string) => {
-    markPaidMutation.mutate(invoiceId);
-  };
-
   const handlePayWithMidtrans = (invoiceId: string) => {
     payWithMidtransMutation.mutate(invoiceId);
-  };
-
-  const handleOpenComprehensiveModal = (organizationId: string, organizationName: string) => {
-    setSelectedOrganization({ id: organizationId, name: organizationName });
-    setComprehensiveModalOpen(true);
-  };
-
-  const handleCloseComprehensiveModal = () => {
-    setComprehensiveModalOpen(false);
-    setSelectedOrganization(null);
   };
 
   return (
@@ -2272,48 +2232,10 @@ function InvoiceManagementSection() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Header Actions */}
+        {/* Header - hanya info untuk client */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex flex-col sm:flex-row gap-2">
-            <Button 
-              onClick={() => setCreateModalOpen(true)}
-              variant="outline"
-              className="w-full sm:w-auto"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Invoice Sederhana
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 w-full sm:w-auto">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Invoice Komprehensif
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {invoices
-                  .filter((item: InvoiceData) => item.organization)
-                  .reduce((orgs: Array<{id: string, name: string}>, item: InvoiceData) => {
-                    const exists = orgs.find(org => org.id === item.organization.id);
-                    if (!exists) {
-                      orgs.push({
-                        id: item.organization.id,
-                        name: item.organization.name
-                      });
-                    }
-                    return orgs;
-                  }, [])
-                  .map((org) => (
-                    <DropdownMenuItem
-                      key={org.id}
-                      onClick={() => handleOpenComprehensiveModal(org.id, org.name)}
-                    >
-                      {org.name}
-                    </DropdownMenuItem>
-                  ))
-                }
-              </DropdownMenuContent>
-            </DropdownMenu>
+          <div className="text-sm text-gray-600">
+            Berikut adalah riwayat invoice dan pembayaran untuk organisasi Anda
           </div>
         </div>
 
@@ -2468,22 +2390,13 @@ function InvoiceManagementSection() {
                               Unduh PDF
                             </DropdownMenuItem>
                             {item.invoice.status === 'pending' && (
-                              <>
-                                <DropdownMenuItem 
-                                  onClick={() => handleMarkPaid(item.invoice.id)}
-                                  className="text-green-600"
-                                >
-                                  <CheckCircle className="mr-2 h-4 w-4" />
-                                  Tandai Dibayar
-                                </DropdownMenuItem>
-                                <DropdownMenuItem 
-                                  onClick={() => handlePayWithMidtrans(item.invoice.id)}
-                                  className="text-blue-600"
-                                >
-                                  <CreditCard className="mr-2 h-4 w-4" />
-                                  Bayar dengan Midtrans
-                                </DropdownMenuItem>
-                              </>
+                              <DropdownMenuItem 
+                                onClick={() => handlePayWithMidtrans(item.invoice.id)}
+                                className="text-blue-600"
+                              >
+                                <CreditCard className="mr-2 h-4 w-4" />
+                                Bayar dengan Midtrans
+                              </DropdownMenuItem>
                             )}
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -2496,18 +2409,7 @@ function InvoiceManagementSection() {
           </div>
         </div>
 
-        {/* Modals */}
-        <CreateInvoiceModal 
-          open={createModalOpen} 
-          onOpenChange={setCreateModalOpen}
-        />
-        
-        <ComprehensiveInvoiceModal 
-          open={comprehensiveModalOpen}
-          onOpenChange={setComprehensiveModalOpen}
-          organizationId={selectedOrganization?.id || ''}
-          organizationName={selectedOrganization?.name || ''}
-        />
+
       </CardContent>
     </Card>
   );

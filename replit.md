@@ -245,6 +245,17 @@ All email configuration now uses environment variables:
 ## Changelog
 ```
 Changelog:
+- July 11, 2025. Successfully consolidated invoice management into organization settings with role-based client permissions:
+  * Integrated InvoiceManagementSection component within organization settings -> subscription tab
+  * Removed separate invoice management page and consolidated functionality within settings
+  * Implemented role-based invoice management: clients can only view their invoices and make payments
+  * Removed invoice creation capabilities for clients (no "Invoice Sederhana" or "Invoice Komprehensif" buttons)
+  * Removed "Tandai Dibayar" option from client interface - only payment via Midtrans allowed
+  * Removed invoice menu items from both client and system admin sidebars
+  * Cleaned up routing and imports for invoice-related pages
+  * Clients now access invoice management through Organization Settings → Subscription tab
+  * Maintained invoice payment functionality (/invoice-payment-finish) for payment processing
+  * Enhanced client UX with clear invoice status labels in Indonesian (Menunggu Pembayaran, Sudah Dibayar, Terlambat)
 - July 11, 2025. Successfully implemented consistent orange button styling across all reminder settings UI components:
   * Applied orange gradient theme to all cadence selection buttons (Harian, Mingguan, Bulanan)
   * Updated all day selection buttons (active days for daily, specific days for weekly) with orange styling
