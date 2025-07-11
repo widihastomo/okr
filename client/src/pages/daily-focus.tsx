@@ -3608,179 +3608,85 @@ export default function DailyFocusPage() {
       )}
       {/* Edit Task Modal */}
       <Dialog open={isEditTaskModalOpen} onOpenChange={setIsEditTaskModalOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Task</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Edit className="h-5 w-5 text-orange-500" />
+              Edit Task
+            </DialogTitle>
             <DialogDescription>
-              Update task information
+              Update task information and assignments
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-6">
+            {/* Basic Information */}
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="edit-title" className="text-sm font-medium mb-2 block">
+                  Judul Task *
+                </Label>
+                <Input
+                  id="edit-title"
+                  value={taskFormData.title}
+                  onChange={(e) =>
+                    setTaskFormData({ ...taskFormData, title: e.target.value })
+                  }
+                  placeholder="Masukkan judul task yang jelas"
+                  required
+                  className="focus:ring-orange-500 focus:border-orange-500"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="edit-description" className="text-sm font-medium mb-2 block">
+                  Deskripsi
+                </Label>
+                <Textarea
+                  id="edit-description"
+                  value={taskFormData.description}
+                  onChange={(e) =>
+                    setTaskFormData({
+                      ...taskFormData,
+                      description: e.target.value,
+                    })
+                  }
+                  placeholder="Deskripsikan tujuan dan langkah-langkah yang perlu dilakukan"
+                  rows={3}
+                  className="focus:ring-orange-500 focus:border-orange-500"
+                />
+              </div>
+            </div>
+
+            {/* Initiative Selection */}
             <div>
-              <Label htmlFor="edit-title" className="flex items-center gap-2 mb-2">
-                Title *
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button 
-                      type="button" 
-                      className="inline-flex items-center justify-center"
-                    >
-                      <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent side="right" className="max-w-xs">
-                    <p className="text-sm">
-                      <strong>Nama task yang jelas dan deskriptif</strong>
-                      <br /><br />
-                      Gunakan judul yang spesifik dan mudah dipahami sehingga anggota tim dapat dengan cepat memahami apa yang harus dikerjakan.
-                    </p>
-                  </PopoverContent>
-                </Popover>
+              <Label className="text-sm font-medium mb-2 block">
+                Initiative Terkait
               </Label>
-              <Input
-                id="edit-title"
-                value={taskFormData.title}
-                onChange={(e) =>
-                  setTaskFormData({ ...taskFormData, title: e.target.value })
+              <Select
+                value={taskFormData.initiativeId}
+                onValueChange={(value) =>
+                  setTaskFormData({ ...taskFormData, initiativeId: value })
                 }
-                placeholder="Masukkan title task"
-                required
-              />
+              >
+                <SelectTrigger className="focus:ring-orange-500 focus:border-orange-500">
+                  <SelectValue placeholder="Pilih initiative" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Tanpa Initiative</SelectItem>
+                  {initiatives?.map((initiative: any) => (
+                    <SelectItem key={initiative.id} value={initiative.id}>
+                      {initiative.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            
-            <div>
-              <Label htmlFor="edit-description" className="flex items-center gap-2 mb-2">
-                Deskripsi
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button 
-                      type="button" 
-                      className="inline-flex items-center justify-center"
-                    >
-                      <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent side="right" className="max-w-xs">
-                    <p className="text-sm">
-                      <strong>Penjelasan detail tentang task</strong>
-                      <br /><br />
-                      Deskripsikan tujuan yang ingin dicapai, langkah-langkah yang perlu dilakukan, dan hasil yang diharapkan untuk memberikan konteks yang jelas.
-                    </p>
-                  </PopoverContent>
-                </Popover>
-              </Label>
-              <Textarea
-                id="edit-description"
-                value={taskFormData.description}
-                onChange={(e) =>
-                  setTaskFormData({
-                    ...taskFormData,
-                    description: e.target.value,
-                  })
-                }
-                placeholder="Masukkan deskripsi task"
-                rows={3}
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="edit-initiativeId" className="flex items-center gap-2 mb-2">
-                Inisiatif (Opsional)
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button 
-                      type="button" 
-                      className="inline-flex items-center justify-center"
-                    >
-                      <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent side="right" className="max-w-xs">
-                    <p className="text-sm">
-                      <strong>Hubungkan dengan inisiatif yang relevan</strong>
-                      <br /><br />
-                      Pilih inisiatif yang berkaitan dengan task ini untuk memudahkan tracking progress dan memastikan task mendukung tujuan strategis yang lebih besar.
-                    </p>
-                  </PopoverContent>
-                </Popover>
-              </Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    className="w-full justify-between"
-                  >
-                    {taskFormData.initiativeId && taskFormData.initiativeId !== "none" 
-                      ? initiatives?.find((initiative: any) => initiative.id === taskFormData.initiativeId)?.title 
-                      : "Pilih inisiatif (opsional)"
-                    }
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
-                  <Command>
-                    <CommandInput placeholder="Cari inisiatif..." />
-                    <CommandList>
-                      <CommandEmpty>Tidak ada inisiatif ditemukan</CommandEmpty>
-                      <CommandGroup>
-                        <CommandItem
-                          value="none"
-                          onSelect={() => {
-                            setTaskFormData({ ...taskFormData, initiativeId: "none" });
-                          }}
-                        >
-                          <Check
-                            className={`mr-2 h-4 w-4 ${
-                              taskFormData.initiativeId === "none" ? "opacity-100" : "opacity-0"
-                            }`}
-                          />
-                          Tidak terkait inisiatif
-                        </CommandItem>
-                        {initiatives?.map((initiative: any) => (
-                          <CommandItem
-                            key={initiative.id}
-                            value={initiative.title}
-                            onSelect={() => {
-                              setTaskFormData({ ...taskFormData, initiativeId: initiative.id });
-                            }}
-                          >
-                            <Check
-                              className={`mr-2 h-4 w-4 ${
-                                taskFormData.initiativeId === initiative.id ? "opacity-100" : "opacity-0"
-                              }`}
-                            />
-                            {initiative.title}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
-            
+
+            {/* Status & Priority */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="edit-priority" className="flex items-center gap-2 mb-2">
+                <Label htmlFor="edit-priority" className="text-sm font-medium mb-2 block">
                   Prioritas
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <button 
-                        type="button" 
-                        className="inline-flex items-center justify-center"
-                      >
-                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent side="right" className="max-w-xs">
-                      <p className="text-sm">
-                        <strong>Tingkat kepentingan task</strong>
-                        <br /><br />
-                        Rendah: task yang bisa ditunda, Sedang: task penting namun tidak mendesak, Tinggi: task yang perlu segera dikerjakan, Kritis: task yang harus diselesaikan secepat mungkin.
-                      </p>
-                    </PopoverContent>
-                  </Popover>
                 </Label>
                 <Select
                   value={taskFormData.priority}
@@ -3788,38 +3694,41 @@ export default function DailyFocusPage() {
                     setTaskFormData({ ...taskFormData, priority: value })
                   }
                 >
-                  <SelectTrigger id="edit-priority">
+                  <SelectTrigger id="edit-priority" className="focus:ring-orange-500 focus:border-orange-500">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="low">Rendah</SelectItem>
-                    <SelectItem value="medium">Sedang</SelectItem>
-                    <SelectItem value="high">Tinggi</SelectItem>
-                    <SelectItem value="critical">Kritis</SelectItem>
+                    <SelectItem value="low">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Rendah
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="medium">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                        Sedang
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="high">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                        Tinggi
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="critical">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                        Kritis
+                      </div>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               
               <div>
-                <Label htmlFor="edit-status" className="flex items-center gap-2 mb-2">
+                <Label htmlFor="edit-status" className="text-sm font-medium mb-2 block">
                   Status
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <button 
-                        type="button" 
-                        className="inline-flex items-center justify-center"
-                      >
-                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent side="right" className="max-w-xs">
-                      <p className="text-sm">
-                        <strong>Status perkembangan task</strong>
-                        <br /><br />
-                        Belum Mulai: task belum dikerjakan, Sedang Berjalan: task sedang dalam proses, Selesai: task telah completed, Dibatalkan: task tidak akan dikerjakan.
-                      </p>
-                    </PopoverContent>
-                  </Popover>
                 </Label>
                 <Select
                   value={taskFormData.status}
@@ -3827,7 +3736,7 @@ export default function DailyFocusPage() {
                     setTaskFormData({ ...taskFormData, status: value })
                   }
                 >
-                  <SelectTrigger id="edit-status">
+                  <SelectTrigger id="edit-status" className="focus:ring-orange-500 focus:border-orange-500">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -3839,145 +3748,77 @@ export default function DailyFocusPage() {
                 </Select>
               </div>
             </div>
-            
-            <div>
-              <Label htmlFor="edit-assignedTo" className="flex items-center gap-2 mb-2">
-                PIC
+
+            {/* Assignment & Due Date */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-sm font-medium mb-2 block">
+                  PIC (Person In Charge)
+                </Label>
+                <Select
+                  value={taskFormData.assignedTo}
+                  onValueChange={(value) =>
+                    setTaskFormData({ ...taskFormData, assignedTo: value })
+                  }
+                >
+                  <SelectTrigger className="focus:ring-orange-500 focus:border-orange-500">
+                    <SelectValue placeholder="Pilih PIC" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="unassigned">Belum ditentukan</SelectItem>
+                    {users?.map((user: any) => (
+                      <SelectItem key={user.id} value={user.id}>
+                        {user.firstName} {user.lastName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label className="text-sm font-medium mb-2 block">
+                  Tenggat Waktu
+                </Label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button 
-                      type="button" 
-                      className="inline-flex items-center justify-center"
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal focus:ring-orange-500 focus:border-orange-500"
                     >
-                      <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                    </button>
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {taskFormData.dueDate
+                        ? taskFormData.dueDate.toLocaleDateString("id-ID")
+                        : "Pilih tanggal"}
+                    </Button>
                   </PopoverTrigger>
-                  <PopoverContent side="right" className="max-w-xs">
-                    <p className="text-sm">
-                      <strong>Person In Charge (PIC)</strong>
-                      <br /><br />
-                      Orang yang bertanggung jawab untuk menyelesaikan task ini. Pilih anggota tim yang tepat berdasarkan keahlian dan beban kerja mereka.
-                    </p>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <DateCalendar
+                      mode="single"
+                      selected={taskFormData.dueDate}
+                      onSelect={(date) => {
+                        if (date) {
+                          // Adjust for GMT+7 timezone to prevent date shifting
+                          const adjustedDate = new Date(date);
+                          adjustedDate.setHours(adjustedDate.getHours() + 7);
+                          setTaskFormData({ ...taskFormData, dueDate: adjustedDate });
+                        } else {
+                          setTaskFormData({ ...taskFormData, dueDate: date });
+                        }
+                      }}
+                      disabled={(date) => {
+                        // Use GMT+7 timezone for date comparison
+                        const now = new Date();
+                        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+                        const gmt7Date = new Date(utc + (7 * 3600000));
+                        const today = new Date(gmt7Date.getFullYear(), gmt7Date.getMonth(), gmt7Date.getDate());
+                        
+                        return date < today;
+                      }}
+                      initialFocus
+                    />
                   </PopoverContent>
                 </Popover>
-              </Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    className="w-full justify-between"
-                  >
-                    {taskFormData.assignedTo && taskFormData.assignedTo !== "unassigned" 
-                      ? users?.find((user: any) => user.id === taskFormData.assignedTo)?.firstName + " " + users?.find((user: any) => user.id === taskFormData.assignedTo)?.lastName
-                      : taskFormData.assignedTo === "unassigned" 
-                        ? "Belum ditentukan"
-                        : "Pilih PIC"}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
-                  <Command>
-                    <CommandInput placeholder="Cari anggota tim..." />
-                    <CommandList>
-                      <CommandEmpty>Tidak ada anggota tim ditemukan.</CommandEmpty>
-                      <CommandGroup>
-                        <CommandItem
-                          value="unassigned"
-                          onSelect={() => {
-                            setTaskFormData({ ...taskFormData, assignedTo: "unassigned" });
-                          }}
-                        >
-                          <Check
-                            className={`mr-2 h-4 w-4 ${
-                              taskFormData.assignedTo === "unassigned" ? "opacity-100" : "opacity-0"
-                            }`}
-                          />
-                          Belum ditentukan
-                        </CommandItem>
-                        {users?.map((user: any) => (
-                          <CommandItem
-                            key={user.id}
-                            value={`${user.firstName} ${user.lastName}`}
-                            onSelect={() => {
-                              setTaskFormData({ ...taskFormData, assignedTo: user.id });
-                            }}
-                          >
-                            <Check
-                              className={`mr-2 h-4 w-4 ${
-                                taskFormData.assignedTo === user.id ? "opacity-100" : "opacity-0"
-                              }`}
-                            />
-                            {user.firstName} {user.lastName}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
-            
-            <div>
-              <Label htmlFor="edit-dueDate" className="flex items-center gap-2 mb-2">
-                Tenggat Waktu
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button 
-                      type="button" 
-                      className="inline-flex items-center justify-center"
-                    >
-                      <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent side="right" className="max-w-xs">
-                    <p className="text-sm">
-                      <strong>Batas waktu penyelesaian task</strong>
-                      <br /><br />
-                      Tentukan tanggal realistic yang memberikan cukup waktu untuk menyelesaikan task dengan kualitas yang baik. Pastikan tanggal tidak terlalu ketat atau terlalu longgar.
-                    </p>
-                  </PopoverContent>
-                </Popover>
-              </Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal"
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {taskFormData.dueDate
-                      ? taskFormData.dueDate.toLocaleDateString("id-ID")
-                      : "Pilih tanggal"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <DateCalendar
-                    mode="single"
-                    selected={taskFormData.dueDate}
-                    onSelect={(date) => {
-                      if (date) {
-                        // Adjust for GMT+7 timezone to prevent date shifting
-                        const adjustedDate = new Date(date);
-                        adjustedDate.setHours(adjustedDate.getHours() + 7);
-                        setTaskFormData({ ...taskFormData, dueDate: adjustedDate });
-                      } else {
-                        setTaskFormData({ ...taskFormData, dueDate: date });
-                      }
-                    }}
-                    disabled={(date) => {
-                      // Use GMT+7 timezone for date comparison
-                      const now = new Date();
-                      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-                      const gmt7Date = new Date(utc + (7 * 3600000));
-                      const today = new Date(gmt7Date.getFullYear(), gmt7Date.getMonth(), gmt7Date.getDate());
-                      
-                      return date < today;
-                    }}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+              </div>
             </div>
           </div>
           <DialogFooter>
