@@ -31,7 +31,7 @@ const toastVariants = cva(
         destructive:
           "destructive group border-destructive bg-destructive text-destructive-foreground",
         success:
-          "success group !border-green-600 !bg-green-100 !text-green-900 dark:!border-green-500 dark:!bg-green-950 dark:!text-green-100",
+          "success group border-green-600 bg-green-100 text-green-900 dark:border-green-500 dark:bg-green-950 dark:text-green-100",
       },
     },
     defaultVariants: {
@@ -48,7 +48,12 @@ const Toast = React.forwardRef<
   return (
     <ToastPrimitives.Root
       ref={ref}
-      className={cn(toastVariants({ variant }), className)}
+      className={cn(
+        toastVariants({ variant }), 
+        variant === "success" && "toast-success",
+        className
+      )}
+      data-variant={variant}
       {...props}
     />
   )

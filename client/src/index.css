@@ -75,6 +75,38 @@
   --radius: 0.5rem;
 }
 
+/* Toast Success Variant Overrides */
+@layer components {
+  .toast-success {
+    background-color: rgb(220, 252, 231) !important;
+    border-color: rgb(22, 163, 74) !important;
+    color: rgb(20, 83, 45) !important;
+  }
+  
+  .toast-success .toast-title {
+    color: rgb(20, 83, 45) !important;
+  }
+  
+  .toast-success .toast-description {
+    color: rgb(20, 83, 45) !important;
+  }
+  
+  /* Success variant with data attribute */
+  [data-variant="success"] {
+    background-color: rgb(220, 252, 231) !important;
+    border-color: rgb(22, 163, 74) !important;
+    color: rgb(20, 83, 45) !important;
+  }
+  
+  [data-variant="success"] .toast-title {
+    color: rgb(20, 83, 45) !important;
+  }
+  
+  [data-variant="success"] .toast-description {
+    color: rgb(20, 83, 45) !important;
+  }
+}
+
 @layer base {
   * {
     @apply border-border;
