@@ -68,7 +68,7 @@ export default function ObjectiveOverviewCard({
       const userOwner = owner as any;
       return userOwner?.firstName && userOwner?.lastName
         ? `${userOwner.firstName} ${userOwner.lastName}`
-        : userOwner?.email || "User tidak ditemukan";
+        : "User tidak ditemukan";
     }
   };
 

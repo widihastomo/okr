@@ -1065,7 +1065,7 @@ export default function DailyFocusPage() {
                 {users?.find((u: any) => u.id === selectedUserId)?.firstName && 
                  users?.find((u: any) => u.id === selectedUserId)?.lastName
                   ? `${users.find((u: any) => u.id === selectedUserId)?.firstName} ${users.find((u: any) => u.id === selectedUserId)?.lastName}`
-                  : users?.find((u: any) => u.id === selectedUserId)?.email || "Unknown"}
+                  : "Unknown"}
               </span>
             </span>
           </div>
