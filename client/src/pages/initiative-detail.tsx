@@ -310,6 +310,7 @@ export default function InitiativeDetailPage() {
               variant="outline" 
               size="sm"
               onClick={() => setIsEditInitiativeModalOpen(true)}
+              disabled={initiativeData.status === 'selesai'}
             >
               <Edit className="w-4 h-4 mr-2" />
               Edit
