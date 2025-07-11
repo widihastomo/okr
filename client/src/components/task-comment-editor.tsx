@@ -365,19 +365,24 @@ export function TaskCommentEditor({
 
         {/* Action buttons */}
         <div className="flex justify-end gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
-              setContent("");
-              setMentionedUsers([]);
-              if (editorRef.current) {
-                editorRef.current.innerHTML = "";
-              }
-            }}
-          >
-            Batal
-          </Button>
+          {showCancelButton && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setContent("");
+                setMentionedUsers([]);
+                if (editorRef.current) {
+                  editorRef.current.innerHTML = "";
+                }
+                if (onCancel) {
+                  onCancel();
+                }
+              }}
+            >
+              Batal
+            </Button>
+          )}
           <Button
             type="submit"
             disabled={!content.trim() || isSubmitting || createCommentMutation.isPending}
