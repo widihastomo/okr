@@ -3326,7 +3326,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!currentUser.isSystemOwner) {
         const initiativeCreator = await storage.getUser(initiative.createdBy);
         if (!initiativeCreator || initiativeCreator.organizationId !== currentUser.organizationId) {
-          return res.status(403).json({ message: "Access denied to this initiative" });
+          console.log(`❌ Access denied: User ${currentUser.id} from org ${currentUser.organizationId} tried to access initiative ${id} created by user ${initiative.createdBy} from org ${initiativeCreator?.organizationId || 'unknown'}`);
+          return res.status(403).json({ message: "Akses ditolak. Inisiatif ini tidak tersedia dalam organisasi Anda" });
         }
       }
       

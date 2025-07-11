@@ -109,17 +109,17 @@ export async function authenticateUser(loginData: LoginData): Promise<User | nul
 }
 
 export const requireAuth: RequestHandler = async (req, res, next) => {
-  // Auto-login for development mode - DISABLED for registration testing
+  // Auto-login for development mode - DISABLED for normal operations
   // if (process.env.NODE_ENV === 'development') {
-  //   // Auto-set session to system owner if not already set
+  //   // Auto-set session to current user if not already set
   //   if (!req.session.userId) {
-  //     req.session.userId = "11111111-1111-1111-1111-111111111111"; // System owner ID
+  //     req.session.userId = "955b3705-14e4-4fd7-afa0-47d8e2475edf"; // Current user ID
   //     // Force session save for persistence
   //     req.session.save((err) => {
   //       if (err) {
   //         console.error('Session save error:', err);
   //       } else {
-  //         console.log('🔄 Auto-login session created and saved for system owner');
+  //         console.log('🔄 Auto-login session created and saved for current user');
   //       }
   //     });
   //   }

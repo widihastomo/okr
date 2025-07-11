@@ -299,7 +299,7 @@ export default function InitiativeDetailPage() {
             Inisiatif tidak ditemukan
           </div>
           <div className="text-gray-500 text-sm mb-4">
-            Inisiatif yang Anda cari tidak ada atau Anda tidak memiliki akses untuk melihatnya.
+            Inisiatif yang Anda cari tidak ada atau tidak tersedia dalam organisasi Anda.
           </div>
           <Button 
             onClick={() => window.location.href = '/dashboard?tab=initiatives'}
