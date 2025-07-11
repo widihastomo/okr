@@ -3177,11 +3177,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!currentUser.isSystemOwner) {
         const objectiveOwner = await storage.getUser(objective.ownerId);
         if (!objectiveOwner || objectiveOwner.organizationId !== currentUser.organizationId) {
-          return res.status(403).json({ message: "Access denied to this objective" });
+          return res.status(403).json({ message: "Akses ditolak. Objective ini tidak tersedia dalam organisasi Anda." });
         }
       }
       
-      const initiatives = await storage.getInitiativesByObjectiveId(objectiveId);
+      // Get initiatives with organization filtering for security
+      const initiatives = await storage.getInitiativesByObjectiveId(objectiveId, currentUser.organizationId);
       res.json(initiatives);
     } catch (error) {
       console.error("Error fetching initiatives for objective:", error);

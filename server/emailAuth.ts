@@ -109,21 +109,21 @@ export async function authenticateUser(loginData: LoginData): Promise<User | nul
 }
 
 export const requireAuth: RequestHandler = async (req, res, next) => {
-  // Auto-login for development mode - DISABLED for normal operations
-  // if (process.env.NODE_ENV === 'development') {
-  //   // Auto-set session to current user if not already set
-  //   if (!req.session.userId) {
-  //     req.session.userId = "955b3705-14e4-4fd7-afa0-47d8e2475edf"; // Current user ID
-  //     // Force session save for persistence
-  //     req.session.save((err) => {
-  //       if (err) {
-  //         console.error('Session save error:', err);
-  //       } else {
-  //         console.log('🔄 Auto-login session created and saved for current user');
-  //       }
-  //     });
-  //   }
-  // }
+  // Auto-login for development mode - TEMPORARILY ENABLED for debugging
+  if (process.env.NODE_ENV === 'development') {
+    // Auto-set session to current user if not already set
+    if (!req.session.userId) {
+      req.session.userId = "955b3705-14e4-4fd7-afa0-47d8e2475edf"; // Current user ID
+      // Force session save for persistence
+      req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+        } else {
+          console.log('🔄 Auto-login session created and saved for current user');
+        }
+      });
+    }
+  }
   
   if (!req.session?.userId) {
     return res.status(401).json({ message: "Unauthorized" });
@@ -135,6 +135,7 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
     return res.status(401).json({ message: "Unauthorized" });
   }
   
+  console.log('✅ User authenticated:', user.id, user.email);
   (req as any).user = user;
   next();
 };

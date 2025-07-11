@@ -97,7 +97,7 @@ export interface IStorage {
   getInitiatives(): Promise<Initiative[]>;
   getInitiativesByOrganization(organizationId: string): Promise<Initiative[]>;
   getInitiativesByKeyResultId(keyResultId: string): Promise<Initiative[]>;
-  getInitiativesByObjectiveId(objectiveId: string): Promise<Initiative[]>;
+  getInitiativesByObjectiveId(objectiveId: string, organizationId?: string): Promise<Initiative[]>;
   getInitiativeWithDetails(id: string): Promise<any>;
   createInitiative(initiative: InsertInitiative): Promise<Initiative>;
   updateInitiative(id: string, initiative: Partial<InsertInitiative>): Promise<Initiative | undefined>;
@@ -928,15 +928,32 @@ export class DatabaseStorage implements IStorage {
     return initiativesWithDetails;
   }
 
-  async getInitiativesByObjectiveId(objectiveId: string): Promise<Initiative[]> {
+  async getInitiativesByObjectiveId(objectiveId: string, organizationId?: string): Promise<Initiative[]> {
     // First get all key results for this objective
     const keyResultsList = await this.getKeyResultsByObjectiveId(objectiveId);
     
-    // Then get all initiatives for these key results
+    // Then get all initiatives for these key results with organization filtering
     const initiativesList = [];
     for (const kr of keyResultsList) {
-      const krInitiatives = await db.select().from(initiatives).where(eq(initiatives.keyResultId, kr.id));
-      initiativesList.push(...krInitiatives);
+      if (organizationId) {
+        // Filter by organization - get initiatives first, then filter by creator's organization
+        const krInitiatives = await db.select().from(initiatives).where(eq(initiatives.keyResultId, kr.id));
+        
+        // Filter by checking each initiative's creator organization
+        const filteredInitiatives = [];
+        for (const initiative of krInitiatives) {
+          const creator = await this.getUser(initiative.createdBy);
+          if (creator && creator.organizationId === organizationId) {
+            filteredInitiatives.push(initiative);
+          }
+        }
+        
+        initiativesList.push(...filteredInitiatives);
+      } else {
+        // No organization filter (backward compatibility)
+        const krInitiatives = await db.select().from(initiatives).where(eq(initiatives.keyResultId, kr.id));
+        initiativesList.push(...krInitiatives);
+      }
     }
     
     return initiativesList;
