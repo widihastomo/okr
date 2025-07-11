@@ -1226,112 +1226,144 @@ export default function DailyFocusPage() {
           </div>
         </CardContent>
       </Card>
-      {/* Objective Awareness Section */}
-      {relatedObjectives.length > 0 && (
-        <Card className="border-blue-200 bg-blue-50">
-          <CardHeader>
-            <CardTitle className="text-blue-900 flex items-center gap-2">
-              <Target className="h-5 w-5" />
-              Objective Terkait Aktivitas Hari Ini
-            </CardTitle>
-            <CardDescription className="text-blue-700">
-              Tetap ingat tujuan utama yang mendorong aktivitas harian Anda
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <div className="flex gap-4 pb-2 min-w-max">
-                {relatedObjectives.map((obj: any) => {
-                const objKeyResults = (keyResults as any[]).filter(
-                  (kr) => kr.objectiveId === obj.id,
-                );
-                const objProgress =
-                  objKeyResults.length > 0
-                    ? objKeyResults.reduce(
-                        (sum, kr) => sum + calculateKeyResultProgress(kr),
-                        0,
-                      ) / objKeyResults.length
-                    : 0;
+      {/* Goal Section - Always Show */}
+      <Card className="border-blue-200 bg-blue-50">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-blue-900 flex items-center gap-2">
+                <Target className="h-5 w-5" />
+                Goal Terkait Aktivitas Hari Ini
+              </CardTitle>
+              <CardDescription className="text-blue-700">
+                {relatedObjectives.length > 0 
+                  ? "Tetap ingat tujuan utama yang mendorong aktivitas harian Anda"
+                  : "Mulai dengan menetapkan goal utama untuk mengarahkan aktivitas harian Anda"
+                }
+              </CardDescription>
+            </div>
+            <Button 
+              size="sm" 
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+              onClick={() => window.location.href = '/objectives'}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Tambah Goal
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {relatedObjectives.length > 0 ? (
+            <>
+              <div className="overflow-x-auto">
+                <div className="flex gap-4 pb-2 min-w-max">
+                  {relatedObjectives.map((obj: any) => {
+                  const objKeyResults = (keyResults as any[]).filter(
+                    (kr) => kr.objectiveId === obj.id,
+                  );
+                  const objProgress =
+                    objKeyResults.length > 0
+                      ? objKeyResults.reduce(
+                          (sum, kr) => sum + calculateKeyResultProgress(kr),
+                          0,
+                        ) / objKeyResults.length
+                      : 0;
 
-                return (
-                  <div
-                    key={obj.id}
-                    className="p-4 bg-white border border-blue-200 rounded-lg flex-shrink-0 w-80"
-                  >
-                    <div className="space-y-3">
-                      <div>
-                        <Link href={`/objectives/${obj.id}`} className="font-medium text-blue-900 hover:text-blue-600 hover:underline cursor-pointer">
-                          <h3 className="line-clamp-2">
-                            {obj.title}
-                          </h3>
-                        </Link>
-                        
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-blue-700">Progress</span>
-                          <span className="font-medium text-blue-900">
-                            {objProgress.toFixed(0)}%
-                          </span>
+                  return (
+                    <div
+                      key={obj.id}
+                      className="p-4 bg-white border border-blue-200 rounded-lg flex-shrink-0 w-80"
+                    >
+                      <div className="space-y-3">
+                        <div>
+                          <Link href={`/objectives/${obj.id}`} className="font-medium text-blue-900 hover:text-blue-600 hover:underline cursor-pointer">
+                            <h3 className="line-clamp-2">
+                              {obj.title}
+                            </h3>
+                          </Link>
+                          
                         </div>
-                        <Progress value={objProgress} className="h-2" />
-                      </div>
 
-                      {/* Target Ideal Information */}
-                      <div className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
-                        Target Ideal: {obj.targetIdeal || "70"}% pada periode ini
-                      </div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-blue-700">Progress</span>
+                            <span className="font-medium text-blue-900">
+                              {objProgress.toFixed(0)}%
+                            </span>
+                          </div>
+                          <Progress value={objProgress} className="h-2" />
+                        </div>
 
-                      <div className="flex items-center justify-between">
-                        <Badge
-                          variant="outline"
-                          className={
-                            obj.status === "on_track"
-                              ? "border-green-300 text-green-700 bg-green-50"
+                        {/* Target Ideal Information */}
+                        <div className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                          Target Ideal: {obj.targetIdeal || "70"}% pada periode ini
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <Badge
+                            variant="outline"
+                            className={
+                              obj.status === "on_track"
+                                ? "border-green-300 text-green-700 bg-green-50"
+                                : obj.status === "at_risk"
+                                  ? "border-yellow-300 text-yellow-700 bg-yellow-50"
+                                  : obj.status === "behind"
+                                    ? "border-red-300 text-red-700 bg-red-50"
+                                    : obj.status === "not_started"
+                                      ? "border-gray-300 text-gray-700 bg-gray-50"
+                                      : "border-blue-300 text-blue-700 bg-blue-50"
+                            }
+                          >
+                            {obj.status === "on_track"
+                              ? "On Track"
                               : obj.status === "at_risk"
-                                ? "border-yellow-300 text-yellow-700 bg-yellow-50"
+                                ? "At Risk"
                                 : obj.status === "behind"
-                                  ? "border-red-300 text-red-700 bg-red-50"
+                                  ? "Behind"
                                   : obj.status === "not_started"
-                                    ? "border-gray-300 text-gray-700 bg-gray-50"
-                                    : "border-blue-300 text-blue-700 bg-blue-50"
-                          }
-                        >
-                          {obj.status === "on_track"
-                            ? "On Track"
-                            : obj.status === "at_risk"
-                              ? "At Risk"
-                              : obj.status === "behind"
-                                ? "Behind"
-                                : obj.status === "not_started"
-                                  ? "Belum Mulai"
-                                  : obj.status === "in_progress"
-                                    ? "Sedang Berjalan"
-                                    : obj.status}
-                        </Badge>
+                                    ? "Belum Mulai"
+                                    : obj.status === "in_progress"
+                                      ? "Sedang Berjalan"
+                                      : obj.status}
+                          </Badge>
 
-                        <div className="text-xs text-blue-600">
-                          {objKeyResults.length} Angka Target
+                          <div className="text-xs text-blue-600">
+                            {objKeyResults.length} Angka Target
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+                </div>
               </div>
-            </div>
 
-            {relatedObjectives.length > 3 && (
-              <div className="mt-4 text-center">
-                <p className="text-sm text-blue-600">
-                  Geser ke kanan untuk melihat objective lainnya
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+              {relatedObjectives.length > 3 && (
+                <div className="mt-4 text-center">
+                  <p className="text-sm text-blue-600">
+                    Geser ke kanan untuk melihat goal lainnya
+                  </p>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-8">
+              <Target className="h-12 w-12 text-blue-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-blue-900 mb-2">Belum Ada Goal</h3>
+              <p className="text-sm text-blue-600 mb-4">
+                Buat goal pertama Anda untuk mengarahkan aktivitas harian dan mencapai target yang jelas
+              </p>
+              <Button 
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                onClick={() => window.location.href = '/objectives'}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Buat Goal Pertama
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
       {/* Main Content Tabs */}
       <Tabs defaultValue="tasks" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
