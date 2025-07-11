@@ -306,11 +306,8 @@ export default function InitiativeDetailPage() {
               Kembali
             </Button>
             
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-gray-900">
-                {initiativeData.title}
-              </h1>
-              {getStatusBadge(initiativeData.status)}
+            <div className="text-sm text-gray-600">
+              Detail Inisiatif
             </div>
           </div>
           
@@ -357,9 +354,14 @@ export default function InitiativeDetailPage() {
             {/* Overview Card */}
             <Card className="border-gray-200 shadow-sm">
               <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-semibold text-gray-900">
-                  Detail Inisiatif
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <h1 className="text-2xl font-bold text-gray-900">
+                      {initiativeData.title}
+                    </h1>
+                    {getStatusBadge(initiativeData.status)}
+                  </div>
+                </div>
               </CardHeader>
               <CardContent className="pt-0">
                 <div className="space-y-4">

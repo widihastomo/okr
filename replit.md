@@ -246,6 +246,15 @@ All email configuration now uses environment variables:
 ## Changelog
 ```
 Changelog:
+- July 11, 2025. Successfully completed initiative detail page layout optimization for consistent design:
+  * Moved initiative title and status badge from header to overview card for cleaner header layout
+  * Enhanced overview card header with proper title positioning and status badge display
+  * Applied consistent styling patterns matching objective detail page design
+  * Fixed Plus icon import issue for "Tambah Metrik" and "Tambah Task" buttons
+  * Implemented consistent orange color scheme for all primary action buttons
+  * Applied consistent card styling with border-gray-200 shadow-sm across all sections
+  * Enhanced typography and spacing throughout the page for professional appearance
+  * Improved hover states and interactive elements for better user experience
 - July 11, 2025. Successfully removed pricing page completely from the application:
   * Removed PricingPage import and route from App.tsx
   * Removed "Harga" menu items from client-sidebar.tsx and sidebar.tsx
