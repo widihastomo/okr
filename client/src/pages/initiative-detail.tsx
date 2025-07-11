@@ -294,7 +294,21 @@ export default function InitiativeDetailPage() {
   if (!initiative) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-red-500">Initiative not found</div>
+        <div className="text-center">
+          <div className="text-red-500 text-lg font-medium mb-2">
+            Inisiatif tidak ditemukan
+          </div>
+          <div className="text-gray-500 text-sm mb-4">
+            Inisiatif yang Anda cari tidak ada atau Anda tidak memiliki akses untuk melihatnya.
+          </div>
+          <Button 
+            onClick={() => window.location.href = '/dashboard?tab=initiatives'}
+            className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Kembali ke Dashboard
+          </Button>
+        </div>
       </div>
     );
   }
