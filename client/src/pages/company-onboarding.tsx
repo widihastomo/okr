@@ -399,6 +399,9 @@ export default function CompanyOnboarding() {
       return apiRequest("POST", "/api/onboarding/complete", { onboardingData });
     },
     onSuccess: () => {
+      // Set redirecting state first to prevent double clicks
+      setIsRedirecting(true);
+      
       toast({
         title: "Selamat!",
         description:
@@ -406,18 +409,12 @@ export default function CompanyOnboarding() {
         variant: "success",
       });
       
-      // Set redirecting state to show loading
-      setIsRedirecting(true);
-      
-      // Use instant client-side navigation instead of window.location.href
-      // Invalidate cache to ensure fresh data on dashboard
+      // Immediate cache invalidation
       queryClient.invalidateQueries({ queryKey: ["/api/onboarding/status"] });
       queryClient.invalidateQueries({ queryKey: ["/api/onboarding/progress"] });
       
-      // Minimal delay to show success message then navigate
-      setTimeout(() => {
-        navigate("/");
-      }, 800); // Reduced from 1500ms to 800ms
+      // Immediate navigation without delay
+      navigate("/");
     },
     onError: (error) => {
       toast({
@@ -533,6 +530,11 @@ export default function CompanyOnboarding() {
   };
 
   const handleComplete = () => {
+    // Prevent double clicks
+    if (completeOnboardingMutation.isPending || isRedirecting) {
+      return;
+    }
+    
     const finalData = {
       ...onboardingData,
       completedSteps: [
