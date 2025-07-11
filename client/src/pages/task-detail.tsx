@@ -267,8 +267,17 @@ function TaskHistoryCard({ taskId }: { taskId: string }) {
     
     // Add task creation
     if (taskData?.createdAt) {
-      const createdByUser = taskData.createdByUser || {};
-      const createdByName = createdByUser.firstName || createdByUser.email || "System";
+      // Check if createdBy ID matches assignedUser ID (same person)
+      let createdByName = "System";
+      
+      if (taskData.createdBy && taskData.assignedUser && taskData.createdBy === taskData.assignedUser.id) {
+        // Use assignedUser data if creator is the same person
+        createdByName = taskData.assignedUser.firstName || taskData.assignedUser.email || "System";
+      } else if (taskData.createdBy) {
+        // For different creator, we'd need to fetch user data separately
+        // For now, show the creator ID or "System" if not available
+        createdByName = taskData.createdBy.firstName || taskData.createdBy.email || "System";
+      }
       
       items.push({
         id: 'created',
@@ -281,8 +290,14 @@ function TaskHistoryCard({ taskId }: { taskId: string }) {
 
     // Add last update info if available
     if (taskData?.updatedAt && taskData.updatedAt !== taskData.createdAt) {
-      const updatedByUser = taskData.lastUpdateByUser || {};
-      const updatedByName = updatedByUser.firstName || updatedByUser.email || "System";
+      let updatedByName = "System";
+      
+      // Check if lastUpdateBy matches assignedUser or createdBy
+      if (taskData.lastUpdateBy && taskData.assignedUser && taskData.lastUpdateBy === taskData.assignedUser.id) {
+        updatedByName = taskData.assignedUser.firstName || taskData.assignedUser.email || "System";
+      } else if (taskData.lastUpdateBy) {
+        updatedByName = taskData.lastUpdateBy.firstName || taskData.lastUpdateBy.email || "System";
+      }
       
       items.push({
         id: 'updated',
