@@ -13,7 +13,7 @@ import { OKRGridSkeleton } from "@/components/skeletons/okr-card-skeleton";
 import { StatsOverviewSkeleton, FiltersSkeleton } from "@/components/skeletons/dashboard-skeleton";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,9 +25,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
-import { Plus, Target, CheckSquare, Building2, Trophy } from "lucide-react";
-import MyTugas from "@/components/my-tasks";
-import Inisiatif from "@/components/initiatives";
+import { Plus, Target, Trophy } from "lucide-react";
 import TourLauncher from "@/components/onboarding/tour-launcher";
 import { useAuth } from "@/hooks/useAuth";
 import { DashboardHelpBubble } from "@/components/help-bubble";
@@ -47,7 +45,7 @@ export default function Dashboard() {
   const [cycleFilter, setCycleFilter] = useState<string>("all");
   const [userFilter, setUserFilter] = useState<string>("");
   const [hasAutoSelected, setHasAutoSelected] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<string>("objectives");
+
 
   const [editProgressModal, setEditProgressModal] = useState<{ open: boolean; keyResult?: KeyResult }>({
     open: false
@@ -92,46 +90,13 @@ export default function Dashboard() {
     queryKey: ['/api/users'],
   });
 
-  // Fetch filtered tasks based on current user filter
-  const showAllUsers = userFilter === 'all' || userFilter === '' || !userFilter;
-  const targetUserId = showAllUsers ? null : userFilter;
-  
-  const { data: filteredTasks = [] } = useQuery<any[]>({
-    queryKey: showAllUsers ? ['/api/tasks'] : [`/api/users/${targetUserId}/tasks`],
-    enabled: showAllUsers || !!targetUserId,
-  });
 
-  // Calculate filtered task notifications that respect current filters using GMT+7
-  const now = new Date();
-  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-  const today = new Date(utc + (7 * 3600000)); // GMT+7
-  today.setHours(0, 0, 0, 0);
 
-  const overdueAndDueTodayCount = filteredTasks.filter((task: any) => {
-    if (task.status === 'completed') return false;
-    
-    if (!task.dueDate) return false;
-    
-    const dueDate = new Date(task.dueDate);
-    dueDate.setHours(0, 0, 0, 0);
-    
-    // Include overdue tasks (due before today) and tasks due today
-    const isUrgent = dueDate <= today;
-    
-    return isUrgent;
-  }).length;
 
-  const hasNotifications = overdueAndDueTodayCount > 0;
 
-  // Initialize tab and filters from URL query parameters
+  // Initialize filters from URL query parameters
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    
-    // Initialize tab
-    const tabParam = urlParams.get('tab');
-    if (tabParam && ['objectives', 'initiatives', 'my-tasks'].includes(tabParam)) {
-      setActiveTab(tabParam);
-    }
     
     // Initialize filters
     const statusParam = urlParams.get('status');
@@ -152,11 +117,10 @@ export default function Dashboard() {
     }
   }, []);
 
-  // Update URL when tab or filters change
-  const updateURL = (updates: { tab?: string; status?: string; cycle?: string; user?: string }) => {
+  // Update URL when filters change
+  const updateURL = (updates: { status?: string; cycle?: string; user?: string }) => {
     const url = new URL(window.location.href);
     
-    if (updates.tab !== undefined) url.searchParams.set('tab', updates.tab);
     if (updates.status !== undefined) {
       // Always set status parameter, including "all" for "Semua Status"
       url.searchParams.set('status', updates.status);
@@ -178,10 +142,7 @@ export default function Dashboard() {
   };
 
   // Update URL when tab changes
-  const handleTabChange = (newTab: string) => {
-    setActiveTab(newTab);
-    updateURL({ tab: newTab });
-  };
+
 
   // Update URL when status filter changes
   const handleStatusFilterChange = (newStatus: string) => {
@@ -577,90 +538,49 @@ export default function Dashboard() {
       {/* Stats Overview */}
       <StatsOverview okrs={okrs} isLoading={isLoading} />
       
-      {/* Tabbed Content */}
-      <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-4 sm:mt-6 w-full">
-        <TabsList className="grid w-full grid-cols-3 h-9 sm:h-12">
-          <TabsTrigger value="objectives" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
-            <Target className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span className="hidden sm:inline">Goals</span>
-            <span className="sm:hidden">Goals</span>
-          </TabsTrigger>
-          <TabsTrigger value="initiatives" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
-            <Building2 className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span className="hidden sm:inline">Inisiatif</span>
-            <span className="sm:hidden">Inisiatif</span>
-          </TabsTrigger>
-          <TabsTrigger value="my-tasks" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
-            <CheckSquare className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span className="hidden sm:inline">Tugas Saya</span>
-            <span className="sm:hidden">Tugas</span>
-            {hasNotifications && (
-              <span className="ml-0.5 sm:ml-1 bg-red-500 text-white text-xs rounded-full px-1 sm:px-1.5 py-0.5 min-w-[16px] sm:min-w-[18px] h-3.5 sm:h-4 flex items-center justify-center">
-                {overdueAndDueTodayCount}
-              </span>
-            )}
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="objectives" className="space-y-6 mt-6">
-          {isLoading ? (
-            <OKRGridSkeleton count={6} />
-          ) : okrs.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Plus className="w-8 h-8 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Tidak ada Goal ditemukan</h3>
-              <p className="text-gray-500 mb-4">
-                {statusFilter !== "all" 
-                  ? "Tidak ada Goal yang sesuai dengan filter Anda. Coba sesuaikan kriteria pencarian."
-                  : "Mulai dengan membuat tujuan dan ukuran keberhasilan pertama Anda."
-                }
-              </p>
-              <CreateOKRButton />
+      {/* Goals Content */}
+      <div className="mt-4 sm:mt-6 w-full space-y-6">
+        {isLoading ? (
+          <OKRGridSkeleton count={6} />
+        ) : okrs.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Plus className="w-8 h-8 text-gray-400" />
             </div>
-          ) : (
-            okrs.map((okr, index) => {
-              // Find the cycle for this OKR to get start and end date
-              const cycle = cycles.find(c => c.id === okr.cycleId);
-              return (
-                <OKRCard
-                  key={okr.id}
-                  okr={okr}
-                  onEditProgress={handleEditProgress}
-                  onEditKeyResult={handleEditKeyResult}
-                  onDeleteKeyResult={handleDeleteKeyResult}
-                  onRefresh={refetch}
-                  onDuplicate={handleDuplicateOKR}
-                  onDelete={handleDeleteOKR}
-                  onEdit={handleEditObjective}
-                  cycleStartDate={cycle?.startDate}
-                  cycleEndDate={cycle?.endDate}
-                  cycle={cycle}
-                  index={index}
-                  users={users}
-                />
-              );
-            })
-          )}
-        </TabsContent>
-        
-        <TabsContent value="initiatives" className="mt-6">
-          <Inisiatif 
-            userFilter={userFilter} 
-            filteredKeyResultIds={okrs.flatMap(okr => okr.keyResults.map(kr => kr.id))}
-          />
-        </TabsContent>
-        
-        <TabsContent value="my-tasks" className="mt-6">
-          <MyTugas 
-            filteredKeyResultIds={okrs.flatMap(okr => okr.keyResults.map(kr => kr.id))}
-            userFilter={userFilter}
-          />
-        </TabsContent>
-
-
-      </Tabs>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Tidak ada Goal ditemukan</h3>
+            <p className="text-gray-500 mb-4">
+              {statusFilter !== "all" 
+                ? "Tidak ada Goal yang sesuai dengan filter Anda. Coba sesuaikan kriteria pencarian."
+                : "Mulai dengan membuat tujuan dan ukuran keberhasilan pertama Anda."
+              }
+            </p>
+            <CreateOKRButton />
+          </div>
+        ) : (
+          okrs.map((okr, index) => {
+            // Find the cycle for this OKR to get start and end date
+            const cycle = cycles.find(c => c.id === okr.cycleId);
+            return (
+              <OKRCard
+                key={okr.id}
+                okr={okr}
+                onEditProgress={handleEditProgress}
+                onEditKeyResult={handleEditKeyResult}
+                onDeleteKeyResult={handleDeleteKeyResult}
+                onRefresh={refetch}
+                onDuplicate={handleDuplicateOKR}
+                onDelete={handleDeleteOKR}
+                onEdit={handleEditObjective}
+                cycleStartDate={cycle?.startDate}
+                cycleEndDate={cycle?.endDate}
+                cycle={cycle}
+                index={index}
+                users={users}
+              />
+            );
+          })
+        )}
+      </div>
 
       {/* Modals */}
 
@@ -730,8 +650,7 @@ export default function Dashboard() {
         data={{ 
           totalOkrs: okrs.length,
           statusFilter,
-          cycleFilter,
-          activeTab 
+          cycleFilter
         }}
         position="bottom-right"
       />
