@@ -501,6 +501,8 @@ export const taskComments = pgTable("task_comments", {
 
 export const insertCycleSchema = createInsertSchema(cycles).omit({
   id: true,
+  createdBy: true, // Will be set by backend
+  createdAt: true, // Will be set by backend
 });
 
 export const insertTemplateSchema = createInsertSchema(templates).omit({
@@ -509,10 +511,14 @@ export const insertTemplateSchema = createInsertSchema(templates).omit({
 
 export const insertObjectiveSchema = createInsertSchema(objectives).omit({
   id: true,
+  createdBy: true, // Will be set by backend
+  createdAt: true, // Will be set by backend
 });
 
 export const insertKeyResultSchema = createInsertSchema(keyResults).omit({
   id: true,
+  createdBy: true, // Will be set by backend
+  createdAt: true, // Will be set by backend
 });
 
 export const insertCheckInSchema = createInsertSchema(checkIns).omit({
