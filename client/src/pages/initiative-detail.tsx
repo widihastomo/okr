@@ -349,11 +349,11 @@ export default function InitiativeDetailPage() {
             {/* Overview Card */}
             <Card className="border-gray-200 shadow-sm">
               <CardHeader className="pb-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <h1 className="text-2xl font-bold text-gray-900">
-                      {initiativeData.title}
-                    </h1>
+                <div className="flex items-start justify-between">
+                  <h1 className="text-2xl font-bold text-gray-900">
+                    {initiativeData.title}
+                  </h1>
+                  <div className="flex-shrink-0 ml-4">
                     {getStatusBadge(initiativeData.status)}
                   </div>
                 </div>
