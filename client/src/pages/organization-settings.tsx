@@ -2172,22 +2172,28 @@ export default function OrganizationSettings() {
                       <AlertDialogHeader>
                         <AlertDialogTitle>Konfirmasi Reset Data</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Apakah Anda yakin ingin mereset semua data OKR (Objective, Key Result, Initiative, Task, dan Siklus)? 
-                          Tindakan ini tidak dapat dibatalkan.
-                          <br /><br />
-                          <strong>Data yang akan dihapus:</strong>
-                          <ul className="list-disc ml-6 mt-2">
-                            <li>Semua objective dan key result</li>
-                            <li>Semua initiative dan task</li>
-                            <li>Semua siklus</li>
-                          </ul>
-                          <br />
-                          <strong>Data yang tetap tersimpan:</strong>
-                          <ul className="list-disc ml-6 mt-2">
-                            <li>Anggota dan tim</li>
-                            <li>Pengaturan organisasi</li>
-                            <li>Riwayat invoice</li>
-                          </ul>
+                          <div className="space-y-4">
+                            <p>Apakah Anda yakin ingin mereset semua data OKR (Objective, Key Result, Initiative, Task, dan Siklus)? 
+                            Tindakan ini tidak dapat dibatalkan.</p>
+                            
+                            <div>
+                              <strong>Data yang akan dihapus:</strong>
+                              <ul className="list-disc ml-6 mt-2">
+                                <li>Semua objective dan key result</li>
+                                <li>Semua initiative dan task</li>
+                                <li>Semua siklus</li>
+                              </ul>
+                            </div>
+                            
+                            <div>
+                              <strong>Data yang tetap tersimpan:</strong>
+                              <ul className="list-disc ml-6 mt-2">
+                                <li>Anggota dan tim</li>
+                                <li>Pengaturan organisasi</li>
+                                <li>Riwayat invoice</li>
+                              </ul>
+                            </div>
+                          </div>
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>

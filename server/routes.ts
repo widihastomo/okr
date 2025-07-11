@@ -1224,24 +1224,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "User not associated with an organization" });
       }
       
+      console.log(`🔄 Starting data reset for organization: ${currentUser.organizationId}`);
+      
       // Get all objectives for this organization
       const objectives = await storage.getObjectivesByOrganization(currentUser.organizationId);
+      console.log(`📋 Found ${objectives.length} objectives to delete`);
       
       // Delete all objectives with cascade (this will delete key results, initiatives, and tasks)
       for (const objective of objectives) {
+        console.log(`🗑️ Deleting objective: ${objective.title}`);
         await storage.deleteObjectiveWithCascade(objective.id);
+      }
+      
+      // Delete any remaining standalone tasks for this organization
+      const remainingTasks = await storage.getTasksByOrganization(currentUser.organizationId);
+      console.log(`📋 Found ${remainingTasks.length} remaining tasks to delete`);
+      
+      for (const task of remainingTasks) {
+        console.log(`🗑️ Deleting remaining task: ${task.title}`);
+        await storage.deleteTask(task.id);
       }
       
       // Delete all cycles for this organization
       const cycles = await storage.getCyclesByOrganization(currentUser.organizationId);
+      console.log(`📋 Found ${cycles.length} cycles to delete`);
+      
       for (const cycle of cycles) {
+        console.log(`🗑️ Deleting cycle: ${cycle.name}`);
         await storage.deleteCycle(cycle.id);
       }
+      
+      console.log(`✅ Data reset completed for organization: ${currentUser.organizationId}`);
       
       res.json({ 
         message: "All data reset successfully",
         deletedObjectives: objectives.length,
-        deletedCycles: cycles.length
+        deletedCycles: cycles.length,
+        deletedTasks: remainingTasks.length
       });
     } catch (error) {
       console.error("Error resetting data:", error);
