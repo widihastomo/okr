@@ -102,7 +102,7 @@ export function PackageSelection({ onSelect, selectedPackage, isLoading }: Packa
   if (plansLoading || addonsLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-4 border-orange-600 border-t-transparent rounded-full" />
       </div>
     );
   }

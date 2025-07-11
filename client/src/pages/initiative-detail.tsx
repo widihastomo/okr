@@ -427,7 +427,10 @@ export default function InitiativeDetailPage() {
   if (initiativeLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-gray-500">Loading...</div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto"></div>
+          <p className="text-orange-600 mt-2">Loading...</p>
+        </div>
       </div>
     );
   }

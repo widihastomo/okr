@@ -41,7 +41,7 @@ export default function SystemAdmin() {
     return (
       <div className="h-screen flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-600" />
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-orange-600" />
           <p className="text-gray-600">Memuat data sistem...</p>
         </div>
       </div>
