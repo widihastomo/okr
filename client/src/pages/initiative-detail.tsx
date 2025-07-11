@@ -56,7 +56,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import TaskModal from "@/components/task-modal";
-import InitiativeModal from "@/components/initiative-modal";
+import InitiativeFormModal from "@/components/initiative-form-modal";
 import { InitiativeNotes } from "@/components/initiative-notes";
 import SuccessMetricsModal from "@/components/success-metrics-modal-simple";
 import InitiativeClosureModal from "@/components/initiative-closure-modal";
@@ -648,15 +648,10 @@ export default function InitiativeDetailPage() {
       />
 
       {initiative && (
-        <InitiativeModal
-          keyResultId={(initiative as any).keyResult?.id || ""}
+        <InitiativeFormModal
           initiative={initiative}
           open={isEditInitiativeModalOpen}
-          onClose={() => setIsEditInitiativeModalOpen(false)}
-          onSuccess={() => {
-            setIsEditInitiativeModalOpen(false);
-            queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
-          }}
+          onOpenChange={setIsEditInitiativeModalOpen}
         />
       )}
 
