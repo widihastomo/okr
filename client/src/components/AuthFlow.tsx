@@ -305,6 +305,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
         toast({
           title: "Kode baru dikirim",
           description: "Silakan cek email Anda",
+          variant: "success",
         });
       } else {
         const error = await response.json();
