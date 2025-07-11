@@ -13,6 +13,8 @@ export const cycles = pgTable("cycles", {
   description: text("description"),
   createdBy: uuid("created_by").notNull().references(() => users.id), // user ID who created the cycle
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  lastUpdateBy: uuid("last_update_by").references(() => users.id), // user ID who last updated the cycle
 });
 
 export const templates = pgTable("templates", {
@@ -22,6 +24,9 @@ export const templates = pgTable("templates", {
   type: text("type").notNull(), // "monthly", "quarterly", "annual"
   isDefault: boolean("is_default").default(false),
   objectives: text("objectives").notNull(), // JSON string of objective templates
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  lastUpdateBy: uuid("last_update_by").references(() => users.id), // user ID who last updated the template
 });
 
 export const objectives = pgTable("objectives", {
@@ -37,6 +42,8 @@ export const objectives = pgTable("objectives", {
   parentId: uuid("parent_id"), // self-reference for parent-child hierarchy
   createdBy: uuid("created_by").notNull().references(() => users.id), // user ID who created the objective
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  lastUpdateBy: uuid("last_update_by").references(() => users.id), // user ID who last updated the objective
 });
 
 // Session storage table for authentication
@@ -333,6 +340,8 @@ export const teams = pgTable("teams", {
   organizationId: uuid("organization_id").references(() => organizations.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  createdBy: uuid("created_by").notNull().references(() => users.id), // user ID who created the team
+  lastUpdateBy: uuid("last_update_by").references(() => users.id), // user ID who last updated the team
 });
 
 // Simplified team membership - users can be members of multiple teams
@@ -342,6 +351,9 @@ export const teamMembers = pgTable("team_members", {
   userId: uuid("user_id").notNull().references(() => users.id),
   role: text("role").notNull().default("member"), // "lead", "member", "contributor"
   joinedAt: timestamp("joined_at").defaultNow(),
+  createdBy: uuid("created_by").notNull().references(() => users.id), // user ID who added the member
+  updatedAt: timestamp("updated_at").defaultNow(),
+  lastUpdateBy: uuid("last_update_by").references(() => users.id), // user ID who last updated the member
 });
 
 export const keyResults = pgTable("key_results", {
@@ -363,6 +375,8 @@ export const keyResults = pgTable("key_results", {
   confidence: integer("confidence").default(5), // 1-10 scale for confidence level
   timeProgressPercentage: integer("time_progress_percentage").default(0), // Ideal progress based on timeline
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  lastUpdateBy: uuid("last_update_by").references(() => users.id), // user ID who last updated the key result
 });
 
 // Check-ins for tracking progress updates
@@ -374,6 +388,8 @@ export const checkIns = pgTable("check_ins", {
   confidence: integer("confidence").notNull().default(5), // 1-10 scale
   createdAt: timestamp("created_at").defaultNow(),
   createdBy: uuid("created_by").notNull(), // user ID
+  updatedAt: timestamp("updated_at").defaultNow(),
+  lastUpdateBy: uuid("last_update_by").references(() => users.id), // user ID who last updated the check-in
 });
 
 // Initiatives/Projects linked to key results
@@ -443,6 +459,8 @@ export const initiativeSuccessMetrics = pgTable("initiative_success_metrics", {
   achievement: text("achievement").notNull().default("0"), // Capaian saat ini
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  createdBy: uuid("created_by").notNull().references(() => users.id), // user ID who created the metric
+  lastUpdateBy: uuid("last_update_by").references(() => users.id), // user ID who last updated the metric
 });
 
 // Updates/check-ins for success metrics - simplified
@@ -453,6 +471,8 @@ export const successMetricUpdates = pgTable("success_metric_updates", {
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
   createdBy: uuid("created_by").notNull(), // user ID
+  updatedAt: timestamp("updated_at").defaultNow(),
+  lastUpdateBy: uuid("last_update_by").references(() => users.id), // user ID who last updated
 });
 
 // Initiative notes for updates, budget allocations, and other information
@@ -484,6 +504,8 @@ export const tasks = pgTable("tasks", {
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow(),
   createdBy: uuid("created_by").notNull(), // user ID
+  updatedAt: timestamp("updated_at").defaultNow(),
+  lastUpdateBy: uuid("last_update_by").references(() => users.id), // user ID who last updated the task
 });
 
 // Task Comments for collaborative discussion

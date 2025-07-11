@@ -953,8 +953,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/cycles/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
       const data = insertCycleSchema.partial().parse(req.body);
-      const updated = await storage.updateCycle(id, data);
+      
+      // Add UPDATE audit trail fields
+      const updatedData = {
+        ...data,
+        updatedAt: new Date(),
+        lastUpdateBy: currentUser.id
+      };
+      
+      const updated = await storage.updateCycle(id, updatedData);
       
       if (!updated) {
         return res.status(404).json({ message: "Cycle not found" });
@@ -1039,8 +1048,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/templates/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
       const data = insertTemplateSchema.partial().parse(req.body);
-      const updated = await storage.updateTemplate(id, data);
+      
+      // Add UPDATE audit trail fields
+      const updatedData = {
+        ...data,
+        updatedAt: new Date(),
+        lastUpdateBy: currentUser.id
+      };
+      
+      const updated = await storage.updateTemplate(id, updatedData);
       
       if (!updated) {
         return res.status(404).json({ message: "Template not found" });
@@ -1927,9 +1945,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update complete OKR (objective + key results)
-  app.patch("/api/okrs/:id", async (req, res) => {
+  app.patch("/api/okrs/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
       console.log("Update OKR request received:", JSON.stringify(req.body, null, 2));
       
       const updateOKRSchema = z.object({
@@ -1954,7 +1973,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         teamId: validatedData.objective.ownerType === 'team' && validatedData.objective.ownerId 
           ? validatedData.objective.ownerId 
           : (validatedData.objective.ownerType === 'user' ? null : validatedData.objective.teamId),
-        parentId: validatedData.objective.parentId ? validatedData.objective.parentId.toString() : undefined
+        parentId: validatedData.objective.parentId ? validatedData.objective.parentId.toString() : undefined,
+        // Add UPDATE audit trail fields
+        updatedAt: new Date(),
+        lastUpdateBy: currentUser.id
       };
 
       // Update objective
@@ -1971,7 +1993,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ...krData,
           baseValue: krData.baseValue === "" ? null : krData.baseValue,
           // Handle empty assignedTo field - convert empty string to null
-          assignedTo: krData.assignedTo === "" ? null : krData.assignedTo
+          assignedTo: krData.assignedTo === "" ? null : krData.assignedTo,
+          // Add UPDATE audit trail fields for key results
+          updatedAt: new Date(),
+          lastUpdateBy: currentUser.id
         };
         
         if (krData.id) {
@@ -1987,7 +2012,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               title: krData.title,
               targetValue: krData.targetValue,
               // Ensure numeric fields have proper defaults
-              currentValue: krData.currentValue === "" ? "0" : krData.currentValue || "0"
+              currentValue: krData.currentValue === "" ? "0" : krData.currentValue || "0",
+              createdBy: currentUser.id // Add created_by field for new key results
             });
             keyResults.push(created);
           }
@@ -2100,12 +2126,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update objective
-  app.patch("/api/objectives/:id", async (req, res) => {
+  app.patch("/api/objectives/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
       const updateData = insertObjectiveSchema.partial().parse(req.body);
       
-      const updated = await storage.updateObjective(id, updateData);
+      // Add UPDATE audit trail fields
+      const updatedData = {
+        ...updateData,
+        updatedAt: new Date(),
+        lastUpdateBy: currentUser.id
+      };
+      
+      const updated = await storage.updateObjective(id, updatedData);
       if (!updated) {
         return res.status(404).json({ message: "Objective not found" });
       }
@@ -2120,15 +2154,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update key result progress
-  app.patch("/api/key-results/:id/progress", async (req, res) => {
+  app.patch("/api/key-results/:id/progress", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
       const updateData = updateKeyResultProgressSchema.parse({
         ...req.body,
         id
       });
       
-      const updated = await storage.updateKeyResultProgress(updateData);
+      // Add UPDATE audit trail fields to the progress update data
+      const updatedProgressData = {
+        ...updateData,
+        lastUpdateBy: currentUser.id
+      };
+      
+      const updated = await storage.updateKeyResultProgress(updatedProgressData);
       if (!updated) {
         return res.status(404).json({ message: "Key result not found" });
       }
@@ -2457,9 +2498,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update initiative
-  app.patch("/api/initiatives/:id", async (req, res) => {
+  app.patch("/api/initiatives/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
       
       const updateSchema = z.object({
         title: z.string().optional(),
@@ -2473,6 +2515,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const processedData = {
         ...validatedData,
         dueDate: validatedData.dueDate ? new Date(validatedData.dueDate) : null,
+        // Add UPDATE audit trail fields
+        updatedAt: new Date(),
+        lastUpdateBy: currentUser.id
       };
       const updatedInitiative = await storage.updateInitiative(id, processedData);
       
@@ -2491,9 +2536,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update initiative
-  app.put("/api/initiatives/:id", async (req, res) => {
+  app.put("/api/initiatives/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
       const updateData = req.body;
       
       // Convert date strings to Date objects if present
@@ -2571,7 +2617,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Remove members from updateData before passing to storage
       const { members, ...dataToUpdate } = updateData;
       
-      const updatedInitiative = await storage.updateInitiative(id, dataToUpdate);
+      // Add UPDATE audit trail fields
+      const dataWithAuditTrail = {
+        ...dataToUpdate,
+        updatedAt: new Date(),
+        lastUpdateBy: currentUser.id
+      };
+      
+      const updatedInitiative = await storage.updateInitiative(id, dataWithAuditTrail);
       
       if (!updatedInitiative) {
         return res.status(404).json({ message: "Initiative not found" });
@@ -2697,7 +2750,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updateNoteSchema = insertInitiativeNoteSchema.partial();
       const updateData = updateNoteSchema.parse(req.body);
       
-      const updatedNote = await storage.updateInitiativeNote(noteId, updateData);
+      // Add UPDATE audit trail fields
+      const updateDataWithAuditTrail = {
+        ...updateData,
+        updatedAt: new Date(),
+        lastUpdateBy: currentUser.id
+      };
+      
+      const updatedNote = await storage.updateInitiativeNote(noteId, updateDataWithAuditTrail);
       
       if (!updatedNote) {
         return res.status(404).json({ message: "Note not found" });
@@ -2786,7 +2846,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/success-metrics/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
-      const updatedMetric = await storage.updateSuccessMetric(id, req.body);
+      const currentUser = req.user as User;
+      
+      // Add UPDATE audit trail fields
+      const updateDataWithAuditTrail = {
+        ...req.body,
+        updatedAt: new Date(),
+        lastUpdateBy: currentUser.id
+      };
+      
+      const updatedMetric = await storage.updateSuccessMetric(id, updateDataWithAuditTrail);
       
       if (!updatedMetric) {
         return res.status(404).json({ message: "Success metric not found" });
@@ -2881,7 +2950,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         updateData.dueDate = new Date(updateData.dueDate);
       }
       
-      const updatedTask = await storage.updateTask(id, updateData);
+      // Add UPDATE audit trail fields
+      const updateDataWithAuditTrail = {
+        ...updateData,
+        updatedAt: new Date(),
+        lastUpdateBy: currentUser.id
+      };
+      
+      const updatedTask = await storage.updateTask(id, updateDataWithAuditTrail);
       
       if (!updatedTask) {
         return res.status(404).json({ message: "Task not found" });
@@ -3984,7 +4060,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      const updatedTask = await storage.updateTask(id, req.body);
+      // Add UPDATE audit trail fields
+      const updateDataWithAuditTrail = {
+        ...req.body,
+        updatedAt: new Date(),
+        lastUpdateBy: currentUser.id
+      };
+      
+      const updatedTask = await storage.updateTask(id, updateDataWithAuditTrail);
       
       if (!updatedTask) {
         return res.status(404).json({ message: "Task not found" });

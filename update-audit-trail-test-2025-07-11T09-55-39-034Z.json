@@ -1,0 +1,50 @@
+{
+  "timestamp": "2025-07-11T09:55:39.034Z",
+  "results": {
+    "cycle": {
+      "id": "4bc29c6f-0f50-4f5e-b995-491134972cec",
+      "name": "Updated Cycle Name - Audit Trail Test",
+      "type": "monthly",
+      "startDate": "2025-07-01",
+      "endDate": "2025-07-31",
+      "status": "active",
+      "description": "Updated description for audit trail testing",
+      "createdBy": "955b3705-14e4-4fd7-afa0-47d8e2475edf",
+      "createdAt": "2025-07-11T09:26:13.731Z",
+      "updatedAt": "2025-07-11T09:55:38.395Z",
+      "lastUpdateBy": "12345678-1234-4567-8901-123456789012"
+    },
+    "objective": null,
+    "keyResult": null,
+    "initiative": {
+      "id": "ae6d5bcf-95a6-4014-bd2d-85251f4514f0",
+      "keyResultId": "c084b673-1fa0-4cbe-af7a-d5a55be73827",
+      "title": "Updated Initiative - Audit Trail Test",
+      "description": "Updated description for audit trail testing",
+      "status": "in_progress",
+      "priority": "high",
+      "picId": null,
+      "startDate": null,
+      "dueDate": null,
+      "completedAt": null,
+      "budget": null,
+      "budgetUsed": null,
+      "progressPercentage": 0,
+      "finalResult": null,
+      "learningInsights": null,
+      "closureNotes": null,
+      "attachmentUrls": null,
+      "closedBy": null,
+      "closedAt": null,
+      "impactScore": 5,
+      "effortScore": 5,
+      "confidenceScore": 5,
+      "priorityScore": "5.00",
+      "createdAt": "2025-07-11T09:16:17.891Z",
+      "createdBy": "955b3705-14e4-4fd7-afa0-47d8e2475edf",
+      "updatedAt": "2025-07-11T09:55:38.752Z"
+    },
+    "task": null,
+    "successMetric": null
+  }
+}
