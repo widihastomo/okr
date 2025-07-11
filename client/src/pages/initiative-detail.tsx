@@ -306,17 +306,6 @@ export default function InitiativeDetailPage() {
           </Button>
 
           <div className="flex items-center gap-2">
-            {canEdit(initiativeData.status) && (
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setIsEditInitiativeModalOpen(true)}
-              >
-                <Edit className="w-4 h-4 mr-2" />
-                Edit
-              </Button>
-            )}
-            
             {canClose(initiativeData.status) && (
               <Button 
                 size="sm"
@@ -353,8 +342,35 @@ export default function InitiativeDetailPage() {
                   <h1 className="text-2xl font-bold text-gray-900">
                     {initiativeData.title}
                   </h1>
-                  <div className="flex-shrink-0 ml-4">
+                  <div className="flex items-center gap-2 flex-shrink-0 ml-4">
                     {getStatusBadge(initiativeData.status)}
+                    {canEdit(initiativeData.status) && (
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setIsEditInitiativeModalOpen(true)}
+                      >
+                        <Edit className="w-4 h-4 mr-1" />
+                        Edit
+                      </Button>
+                    )}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem>
+                          <FileText className="w-4 h-4 mr-2" />
+                          Duplikat Inisiatif
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="text-red-600 hover:text-red-700">
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Hapus Inisiatif
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               </CardHeader>
