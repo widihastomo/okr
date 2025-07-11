@@ -140,9 +140,25 @@ export default function OrganizationSettings() {
       if (!isPresetTime && apiReminderSettings.reminderTime) {
         setUseCustomTime(true);
         setCustomTime(apiReminderSettings.reminderTime);
+      } else {
+        setUseCustomTime(false);
       }
     }
   }, [apiReminderSettings]);
+
+  // Update time settings when reminderSettings.reminderTime changes
+  useEffect(() => {
+    if (reminderSettings.reminderTime) {
+      const timeOptions = ['08:00', '09:00', '12:00', '15:00', '17:00', '19:00'];
+      const isPresetTime = timeOptions.includes(reminderSettings.reminderTime);
+      if (!isPresetTime) {
+        setUseCustomTime(true);
+        setCustomTime(reminderSettings.reminderTime);
+      } else {
+        setUseCustomTime(false);
+      }
+    }
+  }, [reminderSettings.reminderTime]);
 
   // Filtered users based on search and role filter
   const filteredUsers = users.filter(u => {
@@ -477,7 +493,33 @@ export default function OrganizationSettings() {
         <p className="text-gray-600">Kelola pengaturan dan informasi organisasi Anda</p>
       </div>
 
-      <Tabs defaultValue="general" className="space-y-6">
+      <Tabs defaultValue="general" className="space-y-6" onValueChange={(value) => {
+        // Reset notification settings when switching to notifications tab
+        if (value === 'notifications' && apiReminderSettings) {
+          const updatedSettings = {
+            ...apiReminderSettings,
+            notificationTypes: {
+              updateOverdue: true,
+              taskOverdue: true,
+              initiativeOverdue: true,
+              chatMention: true,
+              ...apiReminderSettings.notificationTypes
+            }
+          };
+          
+          setReminderSettings(updatedSettings);
+          
+          // Check if custom time is being used and update accordingly
+          const timeOptions = ['08:00', '09:00', '12:00', '15:00', '17:00', '19:00'];
+          const isPresetTime = timeOptions.includes(apiReminderSettings.reminderTime);
+          if (!isPresetTime && apiReminderSettings.reminderTime) {
+            setUseCustomTime(true);
+            setCustomTime(apiReminderSettings.reminderTime);
+          } else {
+            setUseCustomTime(false);
+          }
+        }
+      }}>
         <TabsList className="grid w-full grid-cols-7 max-w-5xl">
           <TabsTrigger value="general">
             <Building2 className="h-4 w-4 mr-2" />
@@ -1580,7 +1622,7 @@ export default function OrganizationSettings() {
         </TabsContent>
 
         {/* Notifications Tab */}
-        <TabsContent value="notifications">
+        <TabsContent value="notifications" key={`notifications-${apiReminderSettings?.reminderTime || 'default'}`}>
           <Card>
             <CardHeader>
               <CardTitle>Pengaturan Notifikasi & Reminder</CardTitle>
@@ -1658,7 +1700,7 @@ export default function OrganizationSettings() {
                   
                   {!useCustomTime ? (
                     <div className="grid grid-cols-3 gap-3">
-                      {['08:00', '12:00', '17:00', '09:00', '15:00', '19:00'].map((time) => (
+                      {['08:00', '09:00', '12:00', '15:00', '17:00', '19:00'].map((time) => (
                         <Button
                           key={time}
                           variant={reminderSettings.reminderTime === time ? 'default' : 'outline'}
