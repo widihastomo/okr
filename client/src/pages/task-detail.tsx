@@ -580,6 +580,7 @@ export default function TaskDetailPage() {
           setShowEditDialog(false);
           // Refresh task data after edit
           queryClient.invalidateQueries({ queryKey: [`/api/tasks/${id}`] });
+          queryClient.invalidateQueries({ queryKey: [`/api/tasks/${id}/audit-trail`] });
           queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
         }}
         task={taskData}

@@ -2975,6 +2975,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Task not found" });
       }
       
+      // Create audit trail for task update
+      try {
+        const changes = [];
+        
+        if (updateData.title && updateData.title !== existingTask.title) {
+          changes.push(`Judul diubah dari "${existingTask.title}" menjadi "${updateData.title}"`);
+        }
+        
+        if (updateData.description && updateData.description !== existingTask.description) {
+          changes.push(`Deskripsi diperbarui`);
+        }
+        
+        if (updateData.assignedTo && updateData.assignedTo !== existingTask.assignedTo) {
+          const oldAssignee = existingTask.assignedTo ? await storage.getUser(existingTask.assignedTo) : null;
+          const newAssignee = updateData.assignedTo ? await storage.getUser(updateData.assignedTo) : null;
+          const oldName = oldAssignee ? (oldAssignee.firstName || oldAssignee.email) : "Tidak ada";
+          const newName = newAssignee ? (newAssignee.firstName || newAssignee.email) : "Tidak ada";
+          changes.push(`Penugasan diubah dari "${oldName}" menjadi "${newName}"`);
+        }
+        
+        if (updateData.dueDate && updateData.dueDate !== existingTask.dueDate) {
+          const oldDate = existingTask.dueDate ? new Date(existingTask.dueDate).toLocaleDateString('id-ID') : "Tidak ada";
+          const newDate = updateData.dueDate ? new Date(updateData.dueDate).toLocaleDateString('id-ID') : "Tidak ada";
+          changes.push(`Deadline diubah dari "${oldDate}" menjadi "${newDate}"`);
+        }
+        
+        if (updateData.priority && updateData.priority !== existingTask.priority) {
+          changes.push(`Prioritas diubah dari "${existingTask.priority}" menjadi "${updateData.priority}"`);
+        }
+        
+        if (changes.length > 0) {
+          await storage.createTaskAuditTrail({
+            taskId: id,
+            userId: currentUser.id,
+            action: "task_updated",
+            oldValue: null,
+            newValue: null,
+            changeDescription: `Task diperbarui oleh ${currentUser.firstName || currentUser.email}: ${changes.join(", ")}`
+          });
+        }
+      } catch (auditError) {
+        console.error("Error creating task audit trail:", auditError);
+      }
+      
       // Auto-add assigned user as initiative member if not already a member
       let addedAsMember = false;
       if (updatedTask.assignedTo && updatedTask.initiativeId) {
@@ -3994,6 +4038,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!updatedTask) {
         return res.status(404).json({ message: "Task not found" });
+      }
+      
+      // Create audit trail for task update
+      try {
+        const changes = [];
+        
+        if (req.body.title && req.body.title !== originalTask.title) {
+          changes.push(`Judul diubah dari "${originalTask.title}" menjadi "${req.body.title}"`);
+        }
+        
+        if (req.body.description && req.body.description !== originalTask.description) {
+          changes.push(`Deskripsi diperbarui`);
+        }
+        
+        if (req.body.assignedTo && req.body.assignedTo !== originalTask.assignedTo) {
+          const oldAssignee = originalTask.assignedTo ? await storage.getUser(originalTask.assignedTo) : null;
+          const newAssignee = req.body.assignedTo ? await storage.getUser(req.body.assignedTo) : null;
+          const oldName = oldAssignee ? (oldAssignee.firstName || oldAssignee.email) : "Tidak ada";
+          const newName = newAssignee ? (newAssignee.firstName || newAssignee.email) : "Tidak ada";
+          changes.push(`Penugasan diubah dari "${oldName}" menjadi "${newName}"`);
+        }
+        
+        if (req.body.dueDate && req.body.dueDate !== originalTask.dueDate) {
+          const oldDate = originalTask.dueDate ? new Date(originalTask.dueDate).toLocaleDateString('id-ID') : "Tidak ada";
+          const newDate = req.body.dueDate ? new Date(req.body.dueDate).toLocaleDateString('id-ID') : "Tidak ada";
+          changes.push(`Deadline diubah dari "${oldDate}" menjadi "${newDate}"`);
+        }
+        
+        if (req.body.priority && req.body.priority !== originalTask.priority) {
+          changes.push(`Prioritas diubah dari "${originalTask.priority}" menjadi "${req.body.priority}"`);
+        }
+        
+        if (changes.length > 0) {
+          await storage.createTaskAuditTrail({
+            taskId: id,
+            userId: currentUser.id,
+            action: "task_updated",
+            oldValue: null,
+            newValue: null,
+            changeDescription: `Task diperbarui oleh ${currentUser.firstName || currentUser.email}: ${changes.join(", ")}`
+          });
+        }
+      } catch (auditError) {
+        console.error("Error creating task audit trail:", auditError);
       }
       
       // Auto-add assigned user as initiative member if not already a member
