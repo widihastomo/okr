@@ -47,6 +47,7 @@ import {
   CheckSquare,
   LineChart,
   Zap,
+  MessageSquare,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -380,6 +381,41 @@ export default function DailyFocusPage() {
     queryKey: ["/api/trial/achievements"],
     enabled: !!userId,
   });
+
+  // Custom hook to get comment count for a specific task
+  const useTaskCommentCount = (taskId: string) => {
+    const { data: comments = [] } = useQuery({
+      queryKey: [`/api/tasks/${taskId}/comments`],
+      enabled: !!taskId,
+      staleTime: 30000, // Cache for 30 seconds
+    });
+    return comments.length;
+  };
+
+  // Task Comment Count Component
+  const TaskCommentCount = ({ taskId }: { taskId: string }) => {
+    const commentCount = useTaskCommentCount(taskId);
+    
+    if (commentCount === 0) {
+      return null;
+    }
+    
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 cursor-pointer">
+              <MessageSquare className="h-3 w-3" />
+              <span>{commentCount}</span>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{commentCount} komentar</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  };
 
   // Specific 10-step sequential missions configuration
   const missionSequence = [
@@ -1727,6 +1763,9 @@ export default function DailyFocusPage() {
                                       Inisiatif: {task.initiative.title}
                                     </div>
                                   )}
+                                  <div className="mt-1">
+                                    <TaskCommentCount taskId={task.id} />
+                                  </div>
                                 </div>
                               </div>
                             </td>
@@ -1869,6 +1908,9 @@ export default function DailyFocusPage() {
                                       Inisiatif: {task.initiative.title}
                                     </div>
                                   )}
+                                  <div className="mt-1">
+                                    <TaskCommentCount taskId={task.id} />
+                                  </div>
                                 </div>
                               </div>
                             </td>
@@ -2011,6 +2053,9 @@ export default function DailyFocusPage() {
                                       Inisiatif: {task.initiative.title}
                                     </div>
                                   )}
+                                  <div className="mt-1">
+                                    <TaskCommentCount taskId={task.id} />
+                                  </div>
                                 </div>
                               </div>
                             </td>
@@ -2158,6 +2203,7 @@ export default function DailyFocusPage() {
                                   <Badge className={getTaskPriorityColor(task.priority || "medium")}>
                                     {getTaskPriorityLabel(task.priority || "medium")}
                                   </Badge>
+                                  <TaskCommentCount taskId={task.id} />
                                 </div>
                               </div>
                               <DropdownMenu>
@@ -2295,6 +2341,7 @@ export default function DailyFocusPage() {
                                   <Badge className={getTaskPriorityColor(task.priority || "medium")}>
                                     {getTaskPriorityLabel(task.priority || "medium")}
                                   </Badge>
+                                  <TaskCommentCount taskId={task.id} />
                                 </div>
                               </div>
                               <DropdownMenu>
@@ -2433,6 +2480,7 @@ export default function DailyFocusPage() {
                                   <Badge className={getTaskPriorityColor(task.priority || "medium")}>
                                     {getTaskPriorityLabel(task.priority || "medium")}
                                   </Badge>
+                                  <TaskCommentCount taskId={task.id} />
                                 </div>
                               </div>
                               <DropdownMenu>
