@@ -78,7 +78,30 @@ function TaskOverviewCard({ task, assignedUser, initiative }: any) {
   const getCreatorName = (task: any): string => {
     if (!task?.createdBy) return "System";
     
-    // Check if createdBy has user data with firstName/lastName
+    // If createdBy is just an ID string, check if it matches assignedUser
+    if (typeof task.createdBy === 'string') {
+      // Check if creator is same as assigned user
+      if (task.assignedUser && task.createdBy === task.assignedUser.id) {
+        // Use assignedUser data for creator name
+        if (task.assignedUser.firstName && task.assignedUser.lastName && task.assignedUser.lastName.trim() !== "") {
+          return `${task.assignedUser.firstName} ${task.assignedUser.lastName}`;
+        }
+        
+        if (task.assignedUser.firstName && task.assignedUser.firstName.trim() !== "") {
+          return task.assignedUser.firstName;
+        }
+        
+        if (task.assignedUser.lastName && task.assignedUser.lastName.trim() !== "") {
+          return task.assignedUser.lastName;
+        }
+      }
+      
+      // If creator ID is different from assignedUser, we'd need to fetch creator data
+      // For now, return a generic name
+      return "System";
+    }
+    
+    // If createdBy is an object with user data
     if (task.createdBy.firstName && task.createdBy.lastName && task.createdBy.lastName.trim() !== "") {
       return `${task.createdBy.firstName} ${task.createdBy.lastName}`;
     }
