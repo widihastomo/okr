@@ -1603,7 +1603,7 @@ export default function GoalDetail() {
               </div>
               <Button
                 onClick={() => setShowInitiativeFormModal(true)}
-                className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto sm:ml-4 shrink-0"
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white w-full sm:w-auto sm:ml-4 shrink-0"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 <span className="sm:hidden">Tambah</span>
