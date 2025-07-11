@@ -252,6 +252,8 @@ Changelog:
   * Implemented color-coded access level badges: Penuh (red), Tinggi (orange), Sedang (yellow), Terbatas (gray)
   * Enhanced permission display with meaningful Indonesian labels instead of raw technical terms
   * Added clear access level indicators based on permission count for better role hierarchy understanding
+  * Fixed owner role permissions to show complete access (18 permissions) resulting in "Penuh" level badge
+  * Updated all role permissions to accurately reflect the actual system roles and capabilities
   * Improved overall readability and user experience of role management interface
 - July 11, 2025. Successfully standardized role name capitalization across all components:
   * Updated all role names from capitalized (Owner, Administrator, Member, Viewer) to lowercase (owner, administrator, member, viewer)

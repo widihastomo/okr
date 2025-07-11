@@ -53,10 +53,30 @@ export default function OrganizationSettings() {
 
   // Role management states
   const [roles, setRoles] = useState([
-    { id: "1", name: "owner", description: "Full access to all features", permissions: ["read", "write", "delete", "admin"] },
-    { id: "2", name: "administrator", description: "Can manage team and projects", permissions: ["read", "write", "manage_team"] },
-    { id: "3", name: "member", description: "Basic access to projects", permissions: ["read", "write"] },
-    { id: "4", name: "viewer", description: "Read-only access", permissions: ["read"] }
+    { 
+      id: "1", 
+      name: "owner", 
+      description: "Full access to all features", 
+      permissions: ["manage_users", "invite_users", "view_users", "deactivate_users", "create_objectives", "edit_objectives", "delete_objectives", "view_objectives", "create_initiatives", "edit_initiatives", "delete_initiatives", "view_initiatives", "view_analytics", "export_data", "manage_organization", "manage_billing", "system_admin", "audit_logs"]
+    },
+    { 
+      id: "2", 
+      name: "administrator", 
+      description: "Can manage team and projects", 
+      permissions: ["manage_users", "invite_users", "view_users", "create_objectives", "edit_objectives", "delete_objectives", "view_objectives", "create_initiatives", "edit_initiatives", "delete_initiatives", "view_initiatives", "view_analytics", "export_data", "manage_billing"]
+    },
+    { 
+      id: "3", 
+      name: "member", 
+      description: "Basic access to projects", 
+      permissions: ["view_users", "create_objectives", "edit_objectives", "delete_objectives", "view_objectives", "create_initiatives", "edit_initiatives", "delete_initiatives", "view_initiatives", "view_analytics", "export_data"]
+    },
+    { 
+      id: "4", 
+      name: "viewer", 
+      description: "Read-only access", 
+      permissions: ["view_users", "view_objectives", "view_initiatives", "view_analytics"]
+    }
   ]);
   const [editingRole, setEditingRole] = useState<any>(null);
   const [roleSearchTerm, setRoleSearchTerm] = useState("");
