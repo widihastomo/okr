@@ -560,6 +560,7 @@ export default function DailyFocusPage() {
       title: task.title,
       description: task.description || "",
       priority: task.priority || "medium",
+      status: task.status || "not_started",
       assignedTo: task.assignedTo || userId || "unassigned",
       dueDate: task.dueDate ? new Date(task.dueDate) : null,
       initiativeId: task.initiativeId || "none",
@@ -616,6 +617,7 @@ export default function DailyFocusPage() {
       title: "",
       description: "",
       priority: "medium",
+      status: "not_started",
       assignedTo: userId || "unassigned", // Default to current user
       dueDate: null,
       initiativeId: "none",
@@ -1597,13 +1599,7 @@ export default function DailyFocusPage() {
                                   <p className="text-sm">
                                     <strong>Tingkat kepentingan task</strong>
                                     <br /><br />
-                                    <strong>Rendah:</strong> Task yang bisa dikerjakan kapan saja
-                                    <br />
-                                    <strong>Sedang:</strong> Task penting dengan tenggat fleksibel
-                                    <br />
-                                    <strong>Tinggi:</strong> Task krusial yang perlu diselesaikan segera
-                                    <br />
-                                    <strong>Urgent:</strong> Task darurat yang harus diselesaikan hari ini
+                                    Rendah: task yang bisa ditunda, Sedang: task penting namun tidak mendesak, Tinggi: task yang perlu segera dikerjakan, Kritis: task yang harus diselesaikan secepat mungkin.
                                   </p>
                                 </PopoverContent>
                               </Popover>
@@ -1619,14 +1615,14 @@ export default function DailyFocusPage() {
                                 <SelectItem value="low">Rendah</SelectItem>
                                 <SelectItem value="medium">Sedang</SelectItem>
                                 <SelectItem value="high">Tinggi</SelectItem>
-                                <SelectItem value="urgent">Urgent</SelectItem>
+                                <SelectItem value="critical">Kritis</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
 
                           <div>
-                            <Label htmlFor="assignedTo" className="flex items-center gap-2 mb-2">
-                              PIC
+                            <Label htmlFor="status" className="flex items-center gap-2 mb-2">
+                              Status
                               <Popover>
                                 <PopoverTrigger asChild>
                                   <button 
@@ -1638,30 +1634,67 @@ export default function DailyFocusPage() {
                                 </PopoverTrigger>
                                 <PopoverContent side="right" className="max-w-xs">
                                   <p className="text-sm">
-                                    <strong>Person in Charge</strong>
+                                    <strong>Status perkembangan task</strong>
                                     <br /><br />
-                                    Pilih anggota tim yang bertanggung jawab menyelesaikan task ini. PIC akan menerima notifikasi dan bertanggung jawab atas progress task.
+                                    Belum Mulai: task belum dikerjakan, Sedang Berjalan: task sedang dalam proses, Selesai: task telah completed, Dibatalkan: task tidak akan dikerjakan.
                                   </p>
                                 </PopoverContent>
                               </Popover>
                             </Label>
                             <Select 
-                              value={taskFormData.assignedTo} 
-                              onValueChange={(value) => setTaskFormData({ ...taskFormData, assignedTo: value })}
+                              value={taskFormData.status} 
+                              onValueChange={(value) => setTaskFormData({ ...taskFormData, status: value })}
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder="Pilih PIC" />
+                                <SelectValue placeholder="Pilih status" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="unassigned">Belum ditentukan</SelectItem>
-                                {users?.map((user: any) => (
-                                  <SelectItem key={user.id} value={user.id}>
-                                    {user.firstName} {user.lastName}
-                                  </SelectItem>
-                                ))}
+                                <SelectItem value="not_started">Belum Mulai</SelectItem>
+                                <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
+                                <SelectItem value="completed">Selesai</SelectItem>
+                                <SelectItem value="cancelled">Dibatalkan</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="assignedTo" className="flex items-center gap-2 mb-2">
+                            PIC
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <button 
+                                  type="button" 
+                                  className="inline-flex items-center justify-center"
+                                >
+                                  <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent side="right" className="max-w-xs">
+                                <p className="text-sm">
+                                  <strong>Person In Charge (PIC)</strong>
+                                  <br /><br />
+                                  Orang yang bertanggung jawab untuk menyelesaikan task ini. Pilih anggota tim yang tepat berdasarkan keahlian dan beban kerja mereka.
+                                </p>
+                              </PopoverContent>
+                            </Popover>
+                          </Label>
+                          <Select 
+                            value={taskFormData.assignedTo} 
+                            onValueChange={(value) => setTaskFormData({ ...taskFormData, assignedTo: value })}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih PIC" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="unassigned">Belum ditentukan</SelectItem>
+                              {users?.map((user: any) => (
+                                <SelectItem key={user.id} value={user.id}>
+                                  {user.firstName} {user.lastName}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
 
                         <div>
@@ -3592,6 +3625,83 @@ export default function DailyFocusPage() {
                 placeholder="Masukkan deskripsi task"
                 rows={3}
               />
+            </div>
+            
+            <div>
+              <Label htmlFor="edit-initiativeId" className="flex items-center gap-2 mb-2">
+                Inisiatif (Opsional)
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button 
+                      type="button" 
+                      className="inline-flex items-center justify-center"
+                    >
+                      <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent side="right" className="max-w-xs">
+                    <p className="text-sm">
+                      <strong>Hubungkan dengan inisiatif yang relevan</strong>
+                      <br /><br />
+                      Pilih inisiatif yang berkaitan dengan task ini untuk memudahkan tracking progress dan memastikan task mendukung tujuan strategis yang lebih besar.
+                    </p>
+                  </PopoverContent>
+                </Popover>
+              </Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className="w-full justify-between"
+                  >
+                    {taskFormData.initiativeId && taskFormData.initiativeId !== "none" 
+                      ? initiatives?.find((initiative: any) => initiative.id === taskFormData.initiativeId)?.title 
+                      : "Pilih inisiatif (opsional)"
+                    }
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0">
+                  <Command>
+                    <CommandInput placeholder="Cari inisiatif..." />
+                    <CommandList>
+                      <CommandEmpty>Tidak ada inisiatif ditemukan</CommandEmpty>
+                      <CommandGroup>
+                        <CommandItem
+                          value="none"
+                          onSelect={() => {
+                            setTaskFormData({ ...taskFormData, initiativeId: "none" });
+                          }}
+                        >
+                          <Check
+                            className={`mr-2 h-4 w-4 ${
+                              taskFormData.initiativeId === "none" ? "opacity-100" : "opacity-0"
+                            }`}
+                          />
+                          Tidak terkait inisiatif
+                        </CommandItem>
+                        {initiatives?.map((initiative: any) => (
+                          <CommandItem
+                            key={initiative.id}
+                            value={initiative.title}
+                            onSelect={() => {
+                              setTaskFormData({ ...taskFormData, initiativeId: initiative.id });
+                            }}
+                          >
+                            <Check
+                              className={`mr-2 h-4 w-4 ${
+                                taskFormData.initiativeId === initiative.id ? "opacity-100" : "opacity-0"
+                              }`}
+                            />
+                            {initiative.title}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
             
             <div>
