@@ -41,7 +41,7 @@ export default function TrialStatusHeader() {
           </span>
         </div>
 
-        <Link to="/pricing">
+        <Link to="/organization-settings">
           <Button 
             size="sm" 
             className="h-7 px-3 text-xs bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"

@@ -246,6 +246,13 @@ All email configuration now uses environment variables:
 ## Changelog
 ```
 Changelog:
+- July 11, 2025. Successfully removed pricing page completely from the application:
+  * Removed PricingPage import and route from App.tsx
+  * Removed "Harga" menu items from client-sidebar.tsx and sidebar.tsx
+  * Deleted pricing.tsx file completely
+  * Updated trial status components to redirect to organization-settings instead of pricing page
+  * Cleaned up all references to pricing page functionality across the application
+  * Users can now manage subscriptions through Organization Settings → Subscription tab
 - July 11, 2025. Successfully removed company OKR page completely from the application:
   * Removed CompanyOKRPage import and route from App.tsx
   * Removed "Goals Perusahaan" menu items from client-sidebar.tsx and sidebar.tsx

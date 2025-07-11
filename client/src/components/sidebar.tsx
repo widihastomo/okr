@@ -149,12 +149,7 @@ export default function Sidebar({
       path: "/network",
       active: location === "/network",
     },
-    {
-      label: "Harga",
-      icon: CreditCard,
-      path: "/pricing",
-      active: location === "/pricing",
-    },
+
   ];
 
   // Add organization management items for organization owners

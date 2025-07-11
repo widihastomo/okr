@@ -190,12 +190,7 @@ export default function Sidebar({
       active: location === "/organization-settings",
     },
 
-    {
-      label: "Harga",
-      icon: CreditCard,
-      path: "/pricing",
-      active: location === "/pricing",
-    },
+
     {
       label: "Add-Ons",
       icon: Package,

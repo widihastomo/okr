@@ -36,7 +36,7 @@ import AnalyticsPage from "@/pages/analytics";
 import AchievementsPage from "@/pages/achievements";
 
 import DailyFocusPage from "@/pages/daily-focus";
-import PricingPage from "@/pages/pricing";
+
 import OrganizationSettings from "@/pages/organization-settings";
 import SystemAdmin from "@/pages/system-admin";
 import ClientUserManagement from "@/pages/client-user-management";
@@ -233,7 +233,7 @@ function Router() {
 
               <Route path="/analytics" component={AnalyticsPage} />
 
-              <Route path="/pricing" component={PricingPage} />
+
               <Route
                 path="/organization-settings"
                 component={OrganizationSettings}
