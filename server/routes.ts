@@ -1815,17 +1815,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create new OKR with key results
-  app.post("/api/okrs", async (req, res) => {
+  app.post("/api/okrs", requireAuth, async (req, res) => {
     try {
+      const currentUser = (req as any).user;
       console.log("Create OKR request received:", JSON.stringify(req.body, null, 2));
+      console.log("Current user:", currentUser);
       
       const createOKRSchema = z.object({
-        objective: insertObjectiveSchema.extend({
-          ownerId: z.string(), // Now expects UUID string
+        objective: z.object({
+          title: z.string().min(1, "Title is required"),
+          description: z.string().optional(),
+          cycleId: z.string().nullable().optional(),
+          ownerId: z.string().optional(), // Will be overridden by currentUser
+          ownerType: z.enum(["user", "team"]).default("user"),
           teamId: z.string().nullable().optional(),
           parentId: z.string().nullable().optional(),
+          status: z.string().optional(),
         }),
-        keyResults: z.array(insertKeyResultSchema.omit({ objectiveId: true }).extend({
+        keyResults: z.array(z.object({
+          title: z.string().min(1, "Title is required"),
+          currentValue: z.string().default("0"),
+          targetValue: z.string().min(1, "Target value is required"),
+          baseValue: z.string().nullable().optional(),
+          unit: z.string().default("number"),
+          keyResultType: z.enum(["increase_to", "decrease_to", "achieve_or_not", "should_stay_above", "should_stay_below"]).default("increase_to"),
           assignedTo: z.string().nullable().optional(),
         })).optional().default([])
       });
@@ -1833,9 +1846,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = createOKRSchema.parse(req.body);
       console.log("Validated data:", JSON.stringify(validatedData, null, 2));
       
-      // If ownerType is team, set teamId to ownerId
+      // Ensure ownerId is set to current user for security
       const objectiveData = {
         ...validatedData.objective,
+        ownerId: currentUser.id,
+        owner: currentUser.username || currentUser.email || 'Unknown User', // Add backward compatibility field
         teamId: validatedData.objective.ownerType === 'team' ? validatedData.objective.ownerId : null
       };
       
@@ -1847,7 +1862,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         const { trialAchievementService } = await import("./trial-achievement-service");
         await trialAchievementService.checkAndAwardAchievements(
-          (req as any).user?.id || validatedData.objective.ownerId, 
+          currentUser.id, 
           "create_objective", 
           { objectiveId: objective.id }
         );
@@ -1877,7 +1892,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         try {
           const { trialAchievementService } = await import("./trial-achievement-service");
           await trialAchievementService.checkAndAwardAchievements(
-            krData.assignedTo || (req as any).user?.id || validatedData.objective.ownerId, 
+            krData.assignedTo || currentUser.id, 
             "create_key_result", 
             { keyResultId: keyResult.id, objectiveId: objective.id }
           );
