@@ -170,7 +170,7 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
   // Mutation for deleting task
   const deleteTaskMutation = useMutation({
     mutationFn: async (taskId: string) => {
-      return await apiRequest(`/api/tasks/${taskId}`, 'DELETE');
+      return await apiRequest('DELETE', `/api/tasks/${taskId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });

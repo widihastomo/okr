@@ -427,9 +427,16 @@ export default function TaskDetailPage() {
   // Delete task mutation
   const deleteTaskMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest(`/api/tasks/${id}`, 'DELETE');
+      return await apiRequest('DELETE', `/api/tasks/${id}`);
     },
     onSuccess: () => {
+      // Invalidate relevant queries
+      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+      queryClient.invalidateQueries({ queryKey: [`/api/tasks/${id}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/tasks/${id}/audit-trail`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/initiatives'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
+      
       toast({
         title: "Task dihapus",
         description: "Task berhasil dihapus",
