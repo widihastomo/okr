@@ -368,7 +368,7 @@ export default function InitiativeDetailPage() {
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <DollarSign className="h-4 w-4 text-green-500" />
-                        <span className="text-gray-600">Budget:</span>
+                        <span className="text-gray-600">Anggaran:</span>
                         <span className="font-medium">
                           {initiativeData.budget ? `Rp ${Number(initiativeData.budget).toLocaleString('id-ID')}` : 'Tidak ada'}
                         </span>
@@ -411,7 +411,7 @@ export default function InitiativeDetailPage() {
                           <div className="text-lg font-bold text-blue-900">
                             {(keyResult.progress || 0).toFixed(1)}%
                           </div>
-                          <div className="text-xs text-blue-700">Progress</div>
+                          <div className="text-xs text-blue-700">Kemajuan</div>
                         </div>
                       </div>
                     </div>
@@ -539,14 +539,14 @@ export default function InitiativeDetailPage() {
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => handleEditTask(task)}>
                               <Edit className="h-4 w-4 mr-2" />
-                              Edit
+                              Edit Task
                             </DropdownMenuItem>
                             <DropdownMenuItem 
                               onClick={() => handleDeleteTask(task.id)}
                               className="text-red-600"
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
-                              Hapus
+                              Hapus Task
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
