@@ -231,10 +231,10 @@ All email configuration now uses environment variables:
 - Automatic fallback between providers
 
 ## Current Features
-- **ENHANCED REMINDER SYSTEM**: Comprehensive notification types system with granular control over different overdue scenarios (update overdue, task overdue, initiative overdue, key result overdue, check-in overdue, progress reminders, deadline warnings)
+- **FOCUSED REMINDER SYSTEM**: Streamlined notification types system with 4 specific categories based on user requirements (update overdue, task overdue, initiative overdue, chat mention)
 - **CUSTOM TIME IMPLEMENTATION**: Toggle functionality between preset times and custom time input with HTML5 time field and 24-hour format validation
 - **NOTIFICATION TYPES SYSTEM**: Individual toggle controls for each notification category with proper backend integration and JSON parsing error handling
-- **UI ENHANCEMENTS**: Added comprehensive notification types interface with individual switch controls for better user control
+- **UI ENHANCEMENTS**: Added focused notification types interface with individual switch controls for precise user control
 
 ## Current Issues
 - **PERSISTENT DROPDOWN ISSUE**: Daily instant update task status dropdowns consistently fail to register clicks or onChange events despite multiple debugging approaches including native HTML select, custom buttons, visual debugging, and state management fixes. Root cause appears to be a deeper React/DOM interaction issue that requires alternative UI pattern.
@@ -244,15 +244,16 @@ All email configuration now uses environment variables:
 ## Changelog
 ```
 Changelog:
-- July 11, 2025. Successfully implemented comprehensive notification types system for granular reminder control:
-  * Enhanced ReminderSettings interface to include notificationTypes object with 7 specific categories
-  * Added notification type toggles: updateOverdue, taskOverdue, initiativeOverdue, keyResultOverdue, checkInOverdue, progressReminder, deadlineWarning
-  * Created comprehensive UI with individual Switch controls for each notification type with descriptive labels
-  * Updated backend ReminderConfig interface to support notification types for enhanced reminder processing
+- July 11, 2025. Successfully implemented focused notification types system based on user requirements:
+  * Simplified notification types to 4 specific categories: updateOverdue, taskOverdue, initiativeOverdue, chatMention
+  * Enhanced ReminderSettings interface to include focused notificationTypes object with user-requested categories
+  * Added notification type toggles: Update Overdue (daily update missing), Task Overdue (deadline passed), Initiative Overdue (deadline passed, not closed), Chat Mention (mentions from other users)
+  * Created streamlined UI with individual Switch controls for each notification type with precise Indonesian descriptions
+  * Updated backend ReminderConfig interface to support focused notification types for enhanced reminder processing
   * Fixed JSON parsing errors in reminder system with improved backward compatibility handling
-  * Enhanced default settings to include all notification types enabled by default for new users
+  * Enhanced default settings to include all 4 notification types enabled by default for new users
   * Improved error handling for reminder configuration storage and retrieval
-  * Added notification types card to reminder settings page with proper state management
+  * Added focused notification types card to reminder settings page with proper state management
 - July 11, 2025. Successfully implemented custom time input feature for reminder settings with enhanced user control:
   * Added toggle functionality between preset times and custom time input for precise time selection
   * Implemented HTML5 time input field with 24-hour format validation and format guidance

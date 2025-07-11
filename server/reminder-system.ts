@@ -16,10 +16,7 @@ export interface ReminderConfig {
     updateOverdue: boolean;
     taskOverdue: boolean;
     initiativeOverdue: boolean;
-    keyResultOverdue: boolean;
-    checkInOverdue: boolean;
-    progressReminder: boolean;
-    deadlineWarning: boolean;
+    chatMention: boolean;
   };
 }
 

@@ -792,10 +792,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             updateOverdue: true,
             taskOverdue: true,
             initiativeOverdue: true,
-            keyResultOverdue: true,
-            checkInOverdue: true,
-            progressReminder: true,
-            deadlineWarning: true,
+            chatMention: true,
           }
         };
         return res.json(defaultSettings);
@@ -815,10 +812,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             updateOverdue: true,
             taskOverdue: true,
             initiativeOverdue: true,
-            keyResultOverdue: true,
-            checkInOverdue: true,
-            progressReminder: true,
-            deadlineWarning: true,
+            chatMention: true,
           }
         };
         return res.json(defaultSettings);

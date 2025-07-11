@@ -34,10 +34,7 @@ interface ReminderSettings {
     updateOverdue: boolean;
     taskOverdue: boolean;
     initiativeOverdue: boolean;
-    keyResultOverdue: boolean;
-    checkInOverdue: boolean;
-    progressReminder: boolean;
-    deadlineWarning: boolean;
+    chatMention: boolean;
   };
 }
 
@@ -90,10 +87,7 @@ export default function ReminderSettings() {
       updateOverdue: true,
       taskOverdue: true,
       initiativeOverdue: true,
-      keyResultOverdue: true,
-      checkInOverdue: true,
-      progressReminder: true,
-      deadlineWarning: true,
+      chatMention: true,
     }
   });
 
@@ -454,7 +448,7 @@ export default function ReminderSettings() {
                       Update Overdue
                     </Label>
                     <p className="text-sm text-gray-600 mt-1">
-                      Notifikasi ketika update progress terlambat
+                      Notifikasi ketika user belum melakukan daily update
                     </p>
                   </div>
                   <Switch
@@ -506,7 +500,7 @@ export default function ReminderSettings() {
                       Inisiatif Overdue
                     </Label>
                     <p className="text-sm text-gray-600 mt-1">
-                      Notifikasi ketika update inisiatif terlambat
+                      Notifikasi ketika deadline inisiatif terlewat dan belum ditutup inisiatifnya
                     </p>
                   </div>
                   <Switch
@@ -528,100 +522,22 @@ export default function ReminderSettings() {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label htmlFor="keyresult-overdue" className="text-base font-medium">
-                      Key Result Overdue
+                    <Label htmlFor="chat-mention" className="text-base font-medium">
+                      Chat Mention
                     </Label>
                     <p className="text-sm text-gray-600 mt-1">
-                      Notifikasi ketika update key result terlambat
+                      Notifikasi ketika di-mention oleh user lain dalam chat
                     </p>
                   </div>
                   <Switch
-                    id="keyresult-overdue"
-                    checked={settings.notificationTypes?.keyResultOverdue || false}
+                    id="chat-mention"
+                    checked={settings.notificationTypes?.chatMention || false}
                     onCheckedChange={(checked) => 
                       setSettings({ 
                         ...settings, 
                         notificationTypes: { 
                           ...settings.notificationTypes, 
-                          keyResultOverdue: checked 
-                        } 
-                      })
-                    }
-                  />
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="checkin-overdue" className="text-base font-medium">
-                      Check-in Overdue
-                    </Label>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Notifikasi ketika check-in rutin terlambat
-                    </p>
-                  </div>
-                  <Switch
-                    id="checkin-overdue"
-                    checked={settings.notificationTypes?.checkInOverdue || false}
-                    onCheckedChange={(checked) => 
-                      setSettings({ 
-                        ...settings, 
-                        notificationTypes: { 
-                          ...settings.notificationTypes, 
-                          checkInOverdue: checked 
-                        } 
-                      })
-                    }
-                  />
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="progress-reminder" className="text-base font-medium">
-                      Progress Reminder
-                    </Label>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Reminder rutin untuk update progress
-                    </p>
-                  </div>
-                  <Switch
-                    id="progress-reminder"
-                    checked={settings.notificationTypes?.progressReminder || false}
-                    onCheckedChange={(checked) => 
-                      setSettings({ 
-                        ...settings, 
-                        notificationTypes: { 
-                          ...settings.notificationTypes, 
-                          progressReminder: checked 
-                        } 
-                      })
-                    }
-                  />
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="deadline-warning" className="text-base font-medium">
-                      Deadline Warning
-                    </Label>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Peringatan sebelum deadline mendekati
-                    </p>
-                  </div>
-                  <Switch
-                    id="deadline-warning"
-                    checked={settings.notificationTypes?.deadlineWarning || false}
-                    onCheckedChange={(checked) => 
-                      setSettings({ 
-                        ...settings, 
-                        notificationTypes: { 
-                          ...settings.notificationTypes, 
-                          deadlineWarning: checked 
+                          chatMention: checked 
                         } 
                       })
                     }
