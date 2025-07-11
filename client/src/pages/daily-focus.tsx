@@ -3743,82 +3743,84 @@ export default function DailyFocusPage() {
               </Popover>
             </div>
             
-            <div>
-              <Label htmlFor="edit-priority" className="flex items-center gap-2 mb-2">
-                Prioritas
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button 
-                      type="button" 
-                      className="inline-flex items-center justify-center"
-                    >
-                      <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent side="right" className="max-w-xs">
-                    <p className="text-sm">
-                      <strong>Tingkat kepentingan task</strong>
-                      <br /><br />
-                      Rendah: task yang bisa ditunda, Sedang: task penting namun tidak mendesak, Tinggi: task yang perlu segera dikerjakan, Kritis: task yang harus diselesaikan secepat mungkin.
-                    </p>
-                  </PopoverContent>
-                </Popover>
-              </Label>
-              <Select
-                value={taskFormData.priority}
-                onValueChange={(value) =>
-                  setTaskFormData({ ...taskFormData, priority: value })
-                }
-              >
-                <SelectTrigger id="edit-priority">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Rendah</SelectItem>
-                  <SelectItem value="medium">Sedang</SelectItem>
-                  <SelectItem value="high">Tinggi</SelectItem>
-                  <SelectItem value="critical">Kritis</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <Label htmlFor="edit-status" className="flex items-center gap-2 mb-2">
-                Status
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button 
-                      type="button" 
-                      className="inline-flex items-center justify-center"
-                    >
-                      <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent side="right" className="max-w-xs">
-                    <p className="text-sm">
-                      <strong>Status perkembangan task</strong>
-                      <br /><br />
-                      Belum Mulai: task belum dikerjakan, Sedang Berjalan: task sedang dalam proses, Selesai: task telah completed, Dibatalkan: task tidak akan dikerjakan.
-                    </p>
-                  </PopoverContent>
-                </Popover>
-              </Label>
-              <Select
-                value={taskFormData.status}
-                onValueChange={(value) =>
-                  setTaskFormData({ ...taskFormData, status: value })
-                }
-              >
-                <SelectTrigger id="edit-status">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="not_started">Belum Mulai</SelectItem>
-                  <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
-                  <SelectItem value="completed">Selesai</SelectItem>
-                  <SelectItem value="cancelled">Dibatalkan</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit-priority" className="flex items-center gap-2 mb-2">
+                  Prioritas
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button 
+                        type="button" 
+                        className="inline-flex items-center justify-center"
+                      >
+                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent side="right" className="max-w-xs">
+                      <p className="text-sm">
+                        <strong>Tingkat kepentingan task</strong>
+                        <br /><br />
+                        Rendah: task yang bisa ditunda, Sedang: task penting namun tidak mendesak, Tinggi: task yang perlu segera dikerjakan, Kritis: task yang harus diselesaikan secepat mungkin.
+                      </p>
+                    </PopoverContent>
+                  </Popover>
+                </Label>
+                <Select
+                  value={taskFormData.priority}
+                  onValueChange={(value) =>
+                    setTaskFormData({ ...taskFormData, priority: value })
+                  }
+                >
+                  <SelectTrigger id="edit-priority">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Rendah</SelectItem>
+                    <SelectItem value="medium">Sedang</SelectItem>
+                    <SelectItem value="high">Tinggi</SelectItem>
+                    <SelectItem value="critical">Kritis</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label htmlFor="edit-status" className="flex items-center gap-2 mb-2">
+                  Status
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button 
+                        type="button" 
+                        className="inline-flex items-center justify-center"
+                      >
+                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent side="right" className="max-w-xs">
+                      <p className="text-sm">
+                        <strong>Status perkembangan task</strong>
+                        <br /><br />
+                        Belum Mulai: task belum dikerjakan, Sedang Berjalan: task sedang dalam proses, Selesai: task telah completed, Dibatalkan: task tidak akan dikerjakan.
+                      </p>
+                    </PopoverContent>
+                  </Popover>
+                </Label>
+                <Select
+                  value={taskFormData.status}
+                  onValueChange={(value) =>
+                    setTaskFormData({ ...taskFormData, status: value })
+                  }
+                >
+                  <SelectTrigger id="edit-status">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="not_started">Belum Mulai</SelectItem>
+                    <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
+                    <SelectItem value="completed">Selesai</SelectItem>
+                    <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             
             <div>
