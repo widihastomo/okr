@@ -488,18 +488,10 @@ export default function TaskDetailPage() {
   // Update task status mutation
   const updateTaskStatusMutation = useMutation({
     mutationFn: async ({ status }: { status: string }) => {
-      console.log('Updating task status:', { id, status });
-      try {
-        const result = await apiRequest(`/api/tasks/${id}`, 'PATCH', { status });
-        console.log('Status update result:', result);
-        return result;
-      } catch (error) {
-        console.error('API request failed:', error);
-        throw error;
-      }
+      const result = await apiRequest('PATCH', `/api/tasks/${id}`, { status });
+      return result;
     },
-    onSuccess: (data) => {
-      console.log('Status update successful:', data);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/tasks/${id}`] });
       toast({
         title: "Status diperbarui",
@@ -567,10 +559,7 @@ export default function TaskDetailPage() {
           <div className="flex items-center gap-2">
             <Select
               value={taskData?.status || ""}
-              onValueChange={(value) => {
-                console.log('Status change triggered:', value);
-                updateTaskStatusMutation.mutate({ status: value });
-              }}
+              onValueChange={(value) => updateTaskStatusMutation.mutate({ status: value })}
             >
               <SelectTrigger className="w-[140px]">
                 <SelectValue placeholder="Status" />
