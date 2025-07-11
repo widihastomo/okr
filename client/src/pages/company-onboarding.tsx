@@ -396,6 +396,14 @@ export default function CompanyOnboarding() {
   // Complete onboarding
   const completeOnboardingMutation = useMutation({
     mutationFn: async () => {
+      console.log("🔄 Sending onboarding completion with data:", {
+        cadence: onboardingData.cadence,
+        reminderTime: onboardingData.reminderTime,
+        reminderDay: onboardingData.reminderDay,
+        reminderDate: onboardingData.reminderDate,
+        teamFocus: onboardingData.teamFocus,
+        fullData: onboardingData
+      });
       return apiRequest("POST", "/api/onboarding/complete", { onboardingData });
     },
     onSuccess: () => {

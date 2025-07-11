@@ -8714,6 +8714,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const currentUser = req.user as User;
       const { onboardingData } = req.body;
       
+      console.log("📥 Received onboarding completion request:", {
+        userId: currentUser.id,
+        organizationId: currentUser.organizationId,
+        hasOnboardingData: !!onboardingData,
+        reminderConfig: {
+          cadence: onboardingData?.cadence,
+          reminderTime: onboardingData?.reminderTime,
+          reminderDay: onboardingData?.reminderDay,
+          reminderDate: onboardingData?.reminderDate,
+          teamFocus: onboardingData?.teamFocus
+        },
+        fullOnboardingData: onboardingData
+      });
+      
       // Create first objective from onboarding data
       if (onboardingData && onboardingData.objective) {
         try {
@@ -8783,24 +8797,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Save reminder configuration if provided
+      console.log("🔄 Processing reminder config from onboarding data:", {
+        hasOnboardingData: !!onboardingData,
+        cadence: onboardingData?.cadence,
+        reminderTime: onboardingData?.reminderTime,
+        reminderDay: onboardingData?.reminderDay,
+        reminderDate: onboardingData?.reminderDate,
+        teamFocus: onboardingData?.teamFocus
+      });
+      
       if (onboardingData && onboardingData.cadence && onboardingData.reminderTime) {
         try {
           const reminderConfig = {
             userId: currentUser.id,
             cadence: onboardingData.cadence,
             reminderTime: onboardingData.reminderTime,
-            reminderDay: onboardingData.reminderDay,
-            reminderDate: onboardingData.reminderDate,
+            reminderDay: onboardingData.reminderDay || '',
+            reminderDate: onboardingData.reminderDate || '',
             isActive: true,
             teamFocus: onboardingData.teamFocus
           };
           
+          console.log("💾 Saving reminder config:", reminderConfig);
           await reminderSystem.saveReminderConfig(reminderConfig);
           console.log("✅ Reminder config saved during onboarding completion");
         } catch (error) {
-          console.error("Error saving reminder config:", error);
+          console.error("❌ Error saving reminder config:", error);
           // Continue with completion even if reminder config fails
         }
+      } else {
+        console.log("⚠️ No reminder config to save - missing cadence or reminderTime");
       }
       
       const result = await storage.completeOrganizationOnboarding(currentUser.organizationId);
