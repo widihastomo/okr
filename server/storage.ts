@@ -1815,35 +1815,42 @@ export class DatabaseStorage implements IStorage {
         throw new Error("User not found");
       }
       
-      // Find or create active cycle
-      let activeCycle = await db.select().from(cycles).where(eq(cycles.status, "active")).limit(1);
-      if (!activeCycle.length) {
-        // Create a new cycle from onboarding data
-        const startDate = onboardingData.cycleStartDate ? new Date(onboardingData.cycleStartDate) : new Date();
-        const endDate = onboardingData.cycleEndDate ? new Date(onboardingData.cycleEndDate) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-        
-        // Generate cycle name based on dates and duration
-        const cycleName = onboardingData.cycleDuration === '1_bulan' ? 
-          `Bulanan - ${startDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}` :
-          onboardingData.cycleDuration === '3_bulan' ? 
-          `Triwulanan - ${startDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}` :
-          `Tahunan - ${startDate.getFullYear()}`;
-        
-        const cycleData = {
-          name: cycleName,
-          type: onboardingData.cycleDuration === '1_bulan' ? 'monthly' : 
-                onboardingData.cycleDuration === '3_bulan' ? 'quarterly' : 'annual',
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString(),
-          status: 'active',
-          description: `Siklus pertama dari hasil onboarding perusahaan - ${onboardingData.teamFocus || 'General'}`
-        };
-        
-        console.log(`🔄 Creating cycle from onboarding: ${cycleName} (${cycleData.startDate} to ${cycleData.endDate})`);
-        
-        const [newCycle] = await db.insert(cycles).values(cycleData).returning();
-        activeCycle = [newCycle];
-      }
+      // Always create a new cycle from onboarding data to ensure it matches user input
+      const startDate = onboardingData.cycleStartDate ? new Date(onboardingData.cycleStartDate) : new Date();
+      const endDate = onboardingData.cycleEndDate ? new Date(onboardingData.cycleEndDate) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      
+      console.log(`🔄 Creating cycle from onboarding data:`, {
+        cycleStartDate: onboardingData.cycleStartDate,
+        cycleEndDate: onboardingData.cycleEndDate,
+        cycleDuration: onboardingData.cycleDuration,
+        calculatedStartDate: startDate.toISOString(),
+        calculatedEndDate: endDate.toISOString()
+      });
+      
+      // Generate cycle name based on dates and duration
+      const cycleName = onboardingData.cycleDuration === '1_bulan' ? 
+        `Bulanan - ${startDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}` :
+        onboardingData.cycleDuration === '3_bulan' ? 
+        `Triwulanan - ${startDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}` :
+        onboardingData.cycleDuration === '6_bulan' ? 
+        `Semester - ${startDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}` :
+        `Tahunan - ${startDate.getFullYear()}`;
+      
+      const cycleData = {
+        name: cycleName,
+        type: onboardingData.cycleDuration === '1_bulan' ? 'monthly' : 
+              onboardingData.cycleDuration === '3_bulan' ? 'quarterly' :
+              onboardingData.cycleDuration === '6_bulan' ? 'biannual' : 'annual',
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        status: 'active',
+        description: `Siklus dari hasil onboarding perusahaan - ${onboardingData.teamFocus || 'General'}`
+      };
+      
+      console.log(`🔄 Creating cycle from onboarding: ${cycleName} (${cycleData.startDate} to ${cycleData.endDate})`);
+      
+      const [newCycle] = await db.insert(cycles).values(cycleData).returning();
+      const activeCycle = [newCycle];
       
       // Create objective from onboarding data
       const objectiveData = {
