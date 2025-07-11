@@ -311,7 +311,7 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
                 id="title"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="Masukkan judul task yang jelas"
+                placeholder="Contoh: Buat laporan analisis penjualan bulanan"
                 required
                 className="focus:ring-orange-500 focus:border-orange-500"
               />
@@ -325,7 +325,7 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Deskripsikan tujuan dan langkah-langkah yang perlu dilakukan"
+                placeholder="Contoh: Analisis data penjualan Q3, buat visualisasi dengan chart, dan susun rekomendasi untuk meningkatkan performa"
                 rows={3}
                 className="focus:ring-orange-500 focus:border-orange-500"
               />
@@ -342,7 +342,7 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
               onValueChange={(value) => setFormData({ ...formData, initiativeId: value })}
             >
               <SelectTrigger className="focus:ring-orange-500 focus:border-orange-500">
-                <SelectValue placeholder="Pilih initiative" />
+                <SelectValue placeholder="Pilih initiative untuk mengelompokkan task" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="unassigned">Tanpa Initiative</SelectItem>
@@ -366,7 +366,7 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
                 onValueChange={(value) => setFormData({ ...formData, priority: value })}
               >
                 <SelectTrigger id="priority" className="focus:ring-orange-500 focus:border-orange-500">
-                  <SelectValue />
+                  <SelectValue placeholder="Pilih tingkat prioritas" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="low">
@@ -400,7 +400,7 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
                 onValueChange={(value) => setFormData({ ...formData, status: value })}
               >
                 <SelectTrigger id="status" className="focus:ring-orange-500 focus:border-orange-500">
-                  <SelectValue />
+                  <SelectValue placeholder="Pilih status task" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="not_started">Belum Mulai</SelectItem>
@@ -423,7 +423,7 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
                 onValueChange={(value) => setFormData({ ...formData, assignedTo: value })}
               >
                 <SelectTrigger className="focus:ring-orange-500 focus:border-orange-500">
-                  <SelectValue placeholder="Pilih PIC" />
+                  <SelectValue placeholder="Pilih anggota tim yang bertanggung jawab" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="unassigned">Belum ditentukan</SelectItem>
@@ -449,7 +449,7 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {formData.dueDate
                       ? formData.dueDate.toLocaleDateString("id-ID")
-                      : "Pilih tanggal"}
+                      : "Pilih tanggal deadline task"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
