@@ -409,7 +409,7 @@ export const SkeletonLoading: React.FC<{
   className?: string;
 }> = ({ lines = 3, showCharacter = true, className = '' }) => {
   return (
-    <div className={`animate-pulse ${className}`}>
+    <>
       {showCharacter && (
         <div className="flex items-center space-x-3 mb-4">
           <LoadingCharacter type="loading" size="sm" />
@@ -425,6 +425,6 @@ export const SkeletonLoading: React.FC<{
           </div>
         ))}
       </div>
-    </div>
+    </>
   );
 };
