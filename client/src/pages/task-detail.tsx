@@ -74,6 +74,26 @@ import {
 function TaskOverviewCard({ task, assignedUser, initiative }: any) {
   const isOverdue = task?.dueDate ? new Date(task.dueDate) < new Date() : false;
   
+  // Helper function to get creator name
+  const getCreatorName = (task: any): string => {
+    if (!task?.createdBy) return "System";
+    
+    // Check if createdBy has user data with firstName/lastName
+    if (task.createdBy.firstName && task.createdBy.lastName && task.createdBy.lastName.trim() !== "") {
+      return `${task.createdBy.firstName} ${task.createdBy.lastName}`;
+    }
+    
+    if (task.createdBy.firstName && task.createdBy.firstName.trim() !== "") {
+      return task.createdBy.firstName;
+    }
+    
+    if (task.createdBy.lastName && task.createdBy.lastName.trim() !== "") {
+      return task.createdBy.lastName;
+    }
+    
+    return "System";
+  };
+  
   const getTaskStatusColor = (status: string) => {
     switch (status) {
       case "completed":
@@ -218,6 +238,9 @@ function TaskOverviewCard({ task, assignedUser, initiative }: any) {
               <p className="text-xs font-medium text-gray-900">Dibuat</p>
               <p className="text-xs text-gray-600 truncate">
                 {task?.createdAt ? formatDate(task.createdAt) : "Tidak diketahui"}
+              </p>
+              <p className="text-xs text-gray-500 truncate">
+                oleh {getCreatorName(task)}
               </p>
             </div>
           </div>
