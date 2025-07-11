@@ -48,6 +48,7 @@ import {
   LineChart,
   Zap,
   MessageSquare,
+  Info,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -1442,7 +1443,19 @@ export default function DailyFocusPage() {
                     <form onSubmit={handleTaskSubmit} className="space-y-4">
                       <div className="space-y-4">
                         <div>
-                          <Label htmlFor="title">Title *</Label>
+                          <Label htmlFor="title" className="flex items-center gap-2">
+                            Title *
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Nama task yang jelas dan deskriptif</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </Label>
                           <Input
                             id="title"
                             value={taskFormData.title}
@@ -1453,7 +1466,19 @@ export default function DailyFocusPage() {
                         </div>
                         
                         <div>
-                          <Label htmlFor="description">Deskripsi</Label>
+                          <Label htmlFor="description" className="flex items-center gap-2">
+                            Deskripsi
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Penjelasan detail tentang task dan tujuan yang ingin dicapai</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </Label>
                           <Textarea
                             id="description"
                             value={taskFormData.description}
@@ -1464,7 +1489,19 @@ export default function DailyFocusPage() {
                         </div>
 
                         <div>
-                          <Label htmlFor="initiativeId">Inisiatif (Opsional)</Label>
+                          <Label htmlFor="initiativeId" className="flex items-center gap-2">
+                            Inisiatif (Opsional)
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Hubungkan task dengan inisiatif yang relevan untuk tracking progress</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </Label>
                           <Popover>
                             <PopoverTrigger asChild>
                               <Button
@@ -1523,7 +1560,19 @@ export default function DailyFocusPage() {
 
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <Label htmlFor="priority">Prioritas</Label>
+                            <Label htmlFor="priority" className="flex items-center gap-2">
+                              Prioritas
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Tingkat kepentingan task: Rendah, Sedang, Tinggi, atau Urgent</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </Label>
                             <Select 
                               value={taskFormData.priority} 
                               onValueChange={(value) => setTaskFormData({ ...taskFormData, priority: value })}
@@ -1541,7 +1590,19 @@ export default function DailyFocusPage() {
                           </div>
 
                           <div>
-                            <Label htmlFor="assignedTo">PIC</Label>
+                            <Label htmlFor="assignedTo" className="flex items-center gap-2">
+                              PIC
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Person in Charge - anggota tim yang bertanggung jawab menyelesaikan task</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </Label>
                             <Select 
                               value={taskFormData.assignedTo} 
                               onValueChange={(value) => setTaskFormData({ ...taskFormData, assignedTo: value })}
@@ -1562,7 +1623,19 @@ export default function DailyFocusPage() {
                         </div>
 
                         <div>
-                          <Label htmlFor="dueDate">Tenggat Waktu</Label>
+                          <Label htmlFor="dueDate" className="flex items-center gap-2">
+                            Tenggat Waktu
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Tanggal target penyelesaian task - tidak boleh lebih awal dari hari ini</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </Label>
                           <Popover>
                             <PopoverTrigger asChild>
                               <Button
