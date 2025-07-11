@@ -306,28 +306,33 @@ export default function InitiativeDetailPage() {
           </Button>
 
           <div className="flex items-center gap-2">
-            {canClose(initiativeData.status) && (
-              <Button 
-                size="sm"
-                onClick={() => setIsClosureModalOpen(true)}
-                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
-              >
-                <CheckCircle className="w-4 h-4 mr-2" />
-                Tutup Inisiatif
-              </Button>
-            )}
-            
-            {canCancel(initiativeData.status) && (
+            {canEdit(initiativeData.status) && (
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => setIsCancelModalOpen(true)}
-                className="border-red-300 text-red-600 hover:bg-red-50"
+                onClick={() => setIsEditInitiativeModalOpen(true)}
               >
-                <XCircle className="w-4 h-4 mr-2" />
-                Batalkan
+                <Edit className="w-4 h-4 mr-2" />
+                Edit
               </Button>
             )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem>
+                  <FileText className="w-4 h-4 mr-2" />
+                  Duplikat Inisiatif
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-red-600 hover:text-red-700">
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Hapus Inisiatif
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
@@ -342,35 +347,8 @@ export default function InitiativeDetailPage() {
                   <h1 className="text-2xl font-bold text-gray-900">
                     {initiativeData.title}
                   </h1>
-                  <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+                  <div className="flex-shrink-0 ml-4">
                     {getStatusBadge(initiativeData.status)}
-                    {canEdit(initiativeData.status) && (
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => setIsEditInitiativeModalOpen(true)}
-                      >
-                        <Edit className="w-4 h-4 mr-1" />
-                        Edit
-                      </Button>
-                    )}
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                          <MoreVertical className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <FileText className="w-4 h-4 mr-2" />
-                          Duplikat Inisiatif
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600 hover:text-red-700">
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Hapus Inisiatif
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
                   </div>
                 </div>
               </CardHeader>
