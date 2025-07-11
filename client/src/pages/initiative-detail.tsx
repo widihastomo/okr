@@ -19,6 +19,7 @@ import {
   ChevronDown,
   CheckCircle,
   XCircle,
+  Plus,
 } from "lucide-react";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
@@ -292,7 +293,7 @@ export default function InitiativeDetailPage() {
             <Button 
               variant="ghost" 
               size="sm"
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 hover:bg-gray-100"
               onClick={() => {
                 if (window.history.length > 1) {
                   window.history.back();
@@ -306,7 +307,7 @@ export default function InitiativeDetailPage() {
             </Button>
             
             <div className="flex items-center gap-3">
-              <h1 className="text-xl font-semibold text-gray-900">
+              <h1 className="text-2xl font-bold text-gray-900">
                 {initiativeData.title}
               </h1>
               {getStatusBadge(initiativeData.status)}
@@ -318,7 +319,7 @@ export default function InitiativeDetailPage() {
               <Button 
                 variant="outline" 
                 onClick={() => setIsEditInitiativeModalOpen(true)}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 hover:bg-gray-50"
               >
                 <Edit className="h-4 w-4" />
                 Edit
@@ -328,7 +329,7 @@ export default function InitiativeDetailPage() {
             {canClose(initiativeData.status) && (
               <Button 
                 onClick={() => setIsClosureModalOpen(true)}
-                className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+                className="flex items-center gap-2 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white"
               >
                 <CheckCircle className="h-4 w-4" />
                 Tutup Inisiatif
@@ -354,8 +355,13 @@ export default function InitiativeDetailPage() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Overview Card */}
-            <Card>
-              <CardContent className="p-6">
+            <Card className="border-gray-200 shadow-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg font-semibold text-gray-900">
+                  Detail Inisiatif
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
                 <div className="space-y-4">
                   <div>
                     <p className="text-gray-600 text-sm leading-relaxed">
@@ -367,8 +373,8 @@ export default function InitiativeDetailPage() {
                     <div className="space-y-3">
                       <div className="flex items-center gap-2 text-sm">
                         <Flag className="h-4 w-4 text-orange-500" />
-                        <span className="text-gray-600">Priority:</span>
-                        <span className="font-medium">{initiativeData.priority}</span>
+                        <span className="text-gray-600">Prioritas:</span>
+                        <span className="font-medium capitalize">{initiativeData.priority}</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <DollarSign className="h-4 w-4 text-green-500" />
@@ -425,11 +431,11 @@ export default function InitiativeDetailPage() {
             </Card>
 
           {/* Success Metrics Management Section */}
-          <Card>
+          <Card className="border-gray-200 shadow-sm">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900">
+                  <Target className="h-5 w-5 text-orange-500" />
                   Metrik Keberhasilan
                 </CardTitle>
                 <Button 
@@ -438,13 +444,14 @@ export default function InitiativeDetailPage() {
                     setIsSuccessMetricsModalOpen(true);
                   }}
                   size="sm"
-                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
                 >
+                  <Plus className="h-4 w-4 mr-2" />
                   Tambah Metrik
                 </Button>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               {successMetrics.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <Target className="h-12 w-12 mx-auto mb-3 text-gray-300" />
@@ -454,7 +461,7 @@ export default function InitiativeDetailPage() {
               ) : (
                 <div className="space-y-3">
                   {successMetrics.map((metric: any) => (
-                    <div key={metric.id} className="border border-gray-200 rounded-lg p-3">
+                    <div key={metric.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-3">
@@ -471,7 +478,7 @@ export default function InitiativeDetailPage() {
                         {/* Action Buttons */}
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" className="hover:bg-gray-100">
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -498,23 +505,24 @@ export default function InitiativeDetailPage() {
           </Card>
 
           {/* Task Management Section */}
-          <Card>
+          <Card className="border-gray-200 shadow-sm">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900">
+                  <FileText className="h-5 w-5 text-orange-500" />
                   Manajemen Task
                 </CardTitle>
                 <Button 
                   onClick={() => setIsAddTaskModalOpen(true)}
                   size="sm"
-                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
                 >
+                  <Plus className="h-4 w-4 mr-2" />
                   Tambah Task
                 </Button>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               {tasks.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <FileText className="h-12 w-12 mx-auto mb-3 text-gray-300" />
@@ -523,7 +531,7 @@ export default function InitiativeDetailPage() {
               ) : (
                 <div className="space-y-2">
                   {tasks.map((task: any) => (
-                    <div key={task.id} className="flex items-center justify-between p-3 hover:bg-gray-50 transition-colors group">
+                    <div key={task.id} className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors group border border-gray-200 rounded-lg">
                       <div className="flex-1">
                         <h4 className="font-medium text-gray-900">{task.title}</h4>
                         <p className="text-sm text-gray-600">{task.description}</p>
@@ -534,7 +542,7 @@ export default function InitiativeDetailPage() {
                         </Badge>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" className="hover:bg-gray-100">
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -564,14 +572,14 @@ export default function InitiativeDetailPage() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Team Information */}
-          <Card>
+          <Card className="border-gray-200 shadow-sm">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900">
+                <Users className="h-5 w-5 text-orange-500" />
                 Tim
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               {/* PIC */}
               {pic && (
                 <div className="mb-4">
