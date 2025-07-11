@@ -1444,7 +1444,7 @@ export default function DailyFocusPage() {
                     <form onSubmit={handleTaskSubmit} className="space-y-4">
                       <div className="space-y-4">
                         <div>
-                          <Label htmlFor="title" className="flex items-center gap-2">
+                          <Label htmlFor="title" className="flex items-center gap-2 mb-2">
                             Title *
                             <Popover>
                               <PopoverTrigger asChild>
@@ -1474,7 +1474,7 @@ export default function DailyFocusPage() {
                         </div>
                         
                         <div>
-                          <Label htmlFor="description" className="flex items-center gap-2">
+                          <Label htmlFor="description" className="flex items-center gap-2 mb-2">
                             Deskripsi
                             <Popover>
                               <PopoverTrigger asChild>
@@ -1504,7 +1504,7 @@ export default function DailyFocusPage() {
                         </div>
 
                         <div>
-                          <Label htmlFor="initiativeId" className="flex items-center gap-2">
+                          <Label htmlFor="initiativeId" className="flex items-center gap-2 mb-2">
                             Inisiatif (Opsional)
                             <Popover>
                               <PopoverTrigger asChild>
@@ -1582,7 +1582,7 @@ export default function DailyFocusPage() {
 
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <Label htmlFor="priority" className="flex items-center gap-2">
+                            <Label htmlFor="priority" className="flex items-center gap-2 mb-2">
                               Prioritas
                               <Popover>
                                 <PopoverTrigger asChild>
@@ -1625,7 +1625,7 @@ export default function DailyFocusPage() {
                           </div>
 
                           <div>
-                            <Label htmlFor="assignedTo" className="flex items-center gap-2">
+                            <Label htmlFor="assignedTo" className="flex items-center gap-2 mb-2">
                               PIC
                               <Popover>
                                 <PopoverTrigger asChild>
@@ -1665,7 +1665,7 @@ export default function DailyFocusPage() {
                         </div>
 
                         <div>
-                          <Label htmlFor="dueDate" className="flex items-center gap-2">
+                          <Label htmlFor="dueDate" className="flex items-center gap-2 mb-2">
                             Tenggat Waktu
                             <Popover>
                               <PopoverTrigger asChild>
