@@ -162,7 +162,6 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
       
       return dueDate === todayStr || dueDate === yesterdayStr || task.status === 'in_progress';
     });
-    console.log('Today tasks filtered:', filtered.map(t => ({ id: t.id, title: t.title, status: t.status, dueDate: t.dueDate })));
     return filtered;
   }, [allTasks, todayStr, today]);
 
@@ -245,8 +244,6 @@ export function DailyInstantUpdate({ trigger }: DailyInstantUpdateProps) {
         index === self.findIndex(t => t.id === task.id)
       );
 
-      console.log('Setting update data with tasks:', uniqueTodayTasks.map(t => ({ id: t.id, title: t.title, status: t.status, newStatus: t.newStatus })));
-      
       setUpdateData({
         keyResults: uniqueKeyResults.map((kr: any) => ({
           id: kr.id,
