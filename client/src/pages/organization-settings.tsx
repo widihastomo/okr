@@ -488,11 +488,11 @@ export default function OrganizationSettings() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-7xl">
+    <div className="container mx-auto py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8 max-w-7xl">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Pengaturan Organisasi</h1>
-        <p className="text-gray-600">Kelola pengaturan dan informasi organisasi Anda</p>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2">Pengaturan Organisasi</h1>
+        <p className="text-sm sm:text-base text-gray-600">Kelola pengaturan dan informasi organisasi Anda</p>
       </div>
 
       <Tabs defaultValue="general" className="space-y-6" onValueChange={(value) => {
@@ -523,34 +523,34 @@ export default function OrganizationSettings() {
           }
         }
       }}>
-        <TabsList className="grid w-full grid-cols-7 max-w-5xl">
-          <TabsTrigger value="general">
-            <Building2 className="h-4 w-4 mr-2" />
-            Umum
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 max-w-5xl gap-1 h-auto">
+          <TabsTrigger value="general" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
+            <Building2 className="h-4 w-4" />
+            <span className="text-xs sm:text-sm">Umum</span>
           </TabsTrigger>
-          <TabsTrigger value="subscription">
-            <CreditCard className="h-4 w-4 mr-2" />
-            Langganan
+          <TabsTrigger value="subscription" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
+            <CreditCard className="h-4 w-4" />
+            <span className="text-xs sm:text-sm">Langganan</span>
           </TabsTrigger>
-          <TabsTrigger value="members">
-            <Users className="h-4 w-4 mr-2" />
-            Anggota
+          <TabsTrigger value="members" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
+            <Users className="h-4 w-4" />
+            <span className="text-xs sm:text-sm">Anggota</span>
           </TabsTrigger>
-          <TabsTrigger value="teams">
-            <Users className="h-4 w-4 mr-2" />
-            Tim
+          <TabsTrigger value="teams" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
+            <Users className="h-4 w-4" />
+            <span className="text-xs sm:text-sm">Tim</span>
           </TabsTrigger>
-          <TabsTrigger value="roles">
-            <Shield className="h-4 w-4 mr-2" />
-            Roles
+          <TabsTrigger value="roles" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
+            <Shield className="h-4 w-4" />
+            <span className="text-xs sm:text-sm">Roles</span>
           </TabsTrigger>
-          <TabsTrigger value="notifications">
-            <Bell className="h-4 w-4 mr-2" />
-            Notifikasi
+          <TabsTrigger value="notifications" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
+            <Bell className="h-4 w-4" />
+            <span className="text-xs sm:text-sm">Notifikasi</span>
           </TabsTrigger>
-          <TabsTrigger value="settings">
-            <Settings className="h-4 w-4 mr-2" />
-            Lanjutan
+          <TabsTrigger value="settings" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
+            <Settings className="h-4 w-4" />
+            <span className="text-xs sm:text-sm">Lanjutan</span>
           </TabsTrigger>
         </TabsList>
 
@@ -563,8 +563,8 @@ export default function OrganizationSettings() {
                 Update informasi dasar organisasi Anda
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
+            <CardContent className="space-y-4 p-4 sm:p-6">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="name">Nama Organisasi</Label>
                   <Input
@@ -612,7 +612,7 @@ export default function OrganizationSettings() {
                     title: "Berhasil",
                     description: "Informasi organisasi telah diperbarui"
                   });
-                }}>
+                }} className="w-full sm:w-auto">
                   Simpan Perubahan
                 </Button>
               </div>
@@ -1635,7 +1635,7 @@ export default function OrganizationSettings() {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Reminder Enable/Disable */}
-              <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg gap-3">
                 <div className="space-y-1">
                   <Label className="text-base font-medium">
                     Aktifkan Reminder
@@ -1657,7 +1657,7 @@ export default function OrganizationSettings() {
                 <Label className="text-base font-medium">
                   Frekuensi Reminder
                 </Label>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   <Button
                     variant={reminderSettings.cadence === 'harian' ? 'default' : 'outline'}
                     onClick={() => setReminderSettings({ ...reminderSettings, cadence: 'harian' })}
@@ -1704,7 +1704,7 @@ export default function OrganizationSettings() {
                     <p className="text-sm text-gray-600">
                       Pilih hari-hari ketika reminder akan aktif
                     </p>
-                    <div className="grid grid-cols-7 gap-2">
+                    <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
                       {[
                         { key: 'senin', label: 'Sen' },
                         { key: 'selasa', label: 'Sel' },
@@ -1733,7 +1733,7 @@ export default function OrganizationSettings() {
                         </Button>
                       ))}
                     </div>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <Button
                         variant="outline"
                         size="sm"
@@ -1781,7 +1781,7 @@ export default function OrganizationSettings() {
                     <p className="text-sm text-gray-600">
                       Pilih hari dalam seminggu untuk reminder mingguan
                     </p>
-                    <div className="grid grid-cols-7 gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
                       {[
                         { key: '1', label: 'Senin' },
                         { key: '2', label: 'Selasa' },
@@ -1817,7 +1817,7 @@ export default function OrganizationSettings() {
                     <p className="text-sm text-gray-600">
                       Pilih tanggal dalam bulan untuk reminder bulanan
                     </p>
-                    <div className="grid grid-cols-5 gap-2">
+                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                       {[1, 2, 3, 4, 5, 10, 15, 20, 25, 28].map((date) => (
                         <Button
                           key={date}
@@ -1865,7 +1865,7 @@ export default function OrganizationSettings() {
                   </div>
                   
                   {!useCustomTime ? (
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {['08:00', '09:00', '12:00', '15:00', '17:00', '19:00'].map((time) => (
                         <Button
                           key={time}
@@ -1909,7 +1909,7 @@ export default function OrganizationSettings() {
                   Jenis Notifikasi
                 </Label>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg gap-3">
                     <div className="space-y-1">
                       <Label className="text-sm font-medium">
                         Update Overdue
@@ -1932,7 +1932,7 @@ export default function OrganizationSettings() {
                     />
                   </div>
 
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg gap-3">
                     <div className="space-y-1">
                       <Label className="text-sm font-medium">
                         Task Overdue
@@ -1955,7 +1955,7 @@ export default function OrganizationSettings() {
                     />
                   </div>
 
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg gap-3">
                     <div className="space-y-1">
                       <Label className="text-sm font-medium">
                         Initiative Overdue
@@ -1978,7 +1978,7 @@ export default function OrganizationSettings() {
                     />
                   </div>
 
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg gap-3">
                     <div className="space-y-1">
                       <Label className="text-sm font-medium">
                         Chat Mention
@@ -2009,7 +2009,7 @@ export default function OrganizationSettings() {
                   Channel Notifikasi
                 </Label>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg gap-3">
                     <div className="space-y-1">
                       <Label className="text-sm font-medium">
                         Email Notifications
@@ -2026,7 +2026,7 @@ export default function OrganizationSettings() {
                     />
                   </div>
 
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg gap-3">
                     <div className="space-y-1">
                       <Label className="text-sm font-medium">
                         In-App Notifications
@@ -2061,7 +2061,7 @@ export default function OrganizationSettings() {
               </div>
 
               {/* Save Button */}
-              <div className="flex justify-end space-x-3">
+              <div className="flex flex-col sm:flex-row justify-end gap-3">
                 <Button
                   variant="outline"
                   onClick={async () => {
@@ -2080,7 +2080,7 @@ export default function OrganizationSettings() {
                       });
                     }
                   }}
-                  className="border-orange-300 text-orange-700 hover:bg-orange-50"
+                  className="border-orange-300 text-orange-700 hover:bg-orange-50 w-full sm:w-auto"
                 >
                   Test Reminder
                 </Button>
@@ -2102,7 +2102,7 @@ export default function OrganizationSettings() {
                       });
                     }
                   }}
-                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white w-full sm:w-auto"
                 >
                   Simpan Pengaturan
                 </Button>
