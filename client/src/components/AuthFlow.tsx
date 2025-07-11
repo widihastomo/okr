@@ -116,6 +116,9 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
       return response.json();
     },
     onSuccess: async (data) => {
+      // Clear logout flag on successful login
+      localStorage.removeItem("isLoggedOut");
+      
       // Invalidate auth cache to force refresh with new user data
       await queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       

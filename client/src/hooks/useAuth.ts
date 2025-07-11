@@ -12,10 +12,13 @@ export function useAuth() {
 
   // If we get a 401 error, user is not authenticated
   const isUnauthorized = error && (error as any).status === 401;
+  
+  // Check if user is explicitly logged out
+  const isLoggedOut = localStorage.getItem("isLoggedOut") === "true";
 
   return {
     user,
     isLoading,
-    isAuthenticated: !!user && !isUnauthorized,
+    isAuthenticated: !!user && !isUnauthorized && !isLoggedOut,
   };
 }
