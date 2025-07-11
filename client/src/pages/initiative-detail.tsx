@@ -20,6 +20,7 @@ import {
   CheckCircle,
   XCircle,
   Plus,
+  MessageSquare,
 } from "lucide-react";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
@@ -75,6 +76,121 @@ const translatePriority = (priority: string): string => {
     'mendesak': 'mendesak'
   };
   return translations[priority?.toLowerCase()] || priority;
+};
+
+// Helper functions for task management
+const getTaskStatusColor = (status: string): string => {
+  switch (status) {
+    case 'not_started':
+      return 'bg-gray-100 text-gray-800 border-gray-300';
+    case 'in_progress':
+      return 'bg-blue-100 text-blue-800 border-blue-300';
+    case 'completed':
+      return 'bg-green-100 text-green-800 border-green-300';
+    case 'cancelled':
+      return 'bg-red-100 text-red-800 border-red-300';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-300';
+  }
+};
+
+const getTaskStatusLabel = (status: string): string => {
+  switch (status) {
+    case 'not_started':
+      return 'Belum Mulai';
+    case 'in_progress':
+      return 'Sedang Berjalan';
+    case 'completed':
+      return 'Selesai';
+    case 'cancelled':
+      return 'Dibatalkan';
+    default:
+      return 'Belum Mulai';
+  }
+};
+
+const getTaskPriorityColor = (priority: string): string => {
+  switch (priority) {
+    case 'low':
+      return 'bg-gray-100 text-gray-800 border-gray-300';
+    case 'medium':
+      return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+    case 'high':
+      return 'bg-orange-100 text-orange-800 border-orange-300';
+    case 'urgent':
+      return 'bg-red-100 text-red-800 border-red-300';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-300';
+  }
+};
+
+const getTaskPriorityLabel = (priority: string): string => {
+  switch (priority) {
+    case 'low':
+      return 'Rendah';
+    case 'medium':
+      return 'Sedang';
+    case 'high':
+      return 'Tinggi';
+    case 'urgent':
+      return 'Mendesak';
+    default:
+      return 'Sedang';
+  }
+};
+
+const getUserInitials = (userId: string): string => {
+  // This is a simple implementation - in a real app you'd get user data
+  return userId.substring(0, 2).toUpperCase();
+};
+
+const getUserName = (userId: string): string => {
+  // This is a simple implementation - in a real app you'd get user data
+  return 'User';
+};
+
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('id-ID', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+};
+
+// Custom hook to get comment count for a specific task
+const useTaskCommentCount = (taskId: string) => {
+  const { data: comments = [] } = useQuery({
+    queryKey: [`/api/tasks/${taskId}/comments`],
+    enabled: !!taskId,
+    staleTime: 30000, // Cache for 30 seconds
+  });
+  return comments.length;
+};
+
+// Task Comment Count Component
+const TaskCommentCount = ({ taskId }: { taskId: string }) => {
+  const commentCount = useTaskCommentCount(taskId);
+  
+  if (commentCount === 0) {
+    return null;
+  }
+  
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 cursor-pointer">
+            <MessageSquare className="h-3 w-3" />
+            <span>{commentCount}</span>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{commentCount} komentar</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
 };
 
 export default function InitiativeDetailPage() {
@@ -187,6 +303,27 @@ export default function InitiativeDetailPage() {
     },
   });
 
+  const updateTaskStatusMutation = useMutation({
+    mutationFn: async ({ taskId, status }: { taskId: string; status: string }) => {
+      return await apiRequest("PATCH", `/api/tasks/${taskId}`, { status });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/tasks`] });
+      toast({
+        title: "Status berhasil diperbarui",
+        description: "Status task berhasil diperbarui",
+        variant: "success",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal memperbarui status",
+        description: error.message || "Terjadi kesalahan saat memperbarui status task",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleCancelInitiative = () => {
     if (cancelReason.trim()) {
       cancelInitiativeMutation.mutate({ reason: cancelReason });
@@ -258,6 +395,10 @@ export default function InitiativeDetailPage() {
   const handleEditTask = (task: any) => {
     setSelectedTask(task);
     setIsEditTaskModalOpen(true);
+  };
+
+  const handleStatusUpdate = (taskId: string, newStatus: string) => {
+    updateTaskStatusMutation.mutate({ taskId, status: newStatus });
   };
 
   const handleDeleteTask = (taskId: string) => {
@@ -548,41 +689,231 @@ export default function InitiativeDetailPage() {
                   <p className="text-sm">Belum ada task</p>
                 </div>
               ) : (
-                <div className="space-y-2">
-                  {tasks.map((task: any) => (
-                    <div key={task.id} className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors group border border-gray-200 rounded-lg">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-gray-900">{task.title}</h4>
-                        <p className="text-sm text-gray-600">{task.description}</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge className="text-xs">
-                          {task.status}
-                        </Badge>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="hover:bg-gray-100">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleEditTask(task)}>
-                              <Edit className="h-4 w-4 mr-2" />
-                              Edit Task
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => handleDeleteTask(task.id)}
-                              className="text-red-600"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Hapus Task
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
+                <>
+                  {/* Desktop Table View */}
+                  <div className="hidden md:block">
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="border-b border-gray-200">
+                            <th className="text-left px-4 py-3 text-sm font-medium text-gray-700">Task</th>
+                            <th className="text-center px-4 py-3 text-sm font-medium text-gray-700">Prioritas</th>
+                            <th className="text-center px-4 py-3 text-sm font-medium text-gray-700">Status</th>
+                            <th className="text-left px-4 py-3 text-sm font-medium text-gray-700">Ditugaskan ke</th>
+                            <th className="text-center px-4 py-3 text-sm font-medium text-gray-700">Tenggat</th>
+                            <th className="text-center px-4 py-3 text-sm font-medium text-gray-700">Aksi</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {tasks.map((task: any) => (
+                            <tr key={task.id} className="hover:bg-gray-50 border-b border-gray-100">
+                              <td className="px-4 py-4">
+                                <div className="flex items-center gap-2">
+                                  <div>
+                                    <div className="font-medium text-gray-900 hover:text-orange-600 cursor-pointer">
+                                      {task.title}
+                                    </div>
+                                    {task.description && (
+                                      <div className="text-sm text-gray-600 mt-1">{task.description}</div>
+                                    )}
+                                    <div className="mt-1">
+                                      <TaskCommentCount taskId={task.id} />
+                                    </div>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-4 py-4 text-center">
+                                <Badge className={getTaskPriorityColor(task.priority || "medium")}>
+                                  {getTaskPriorityLabel(task.priority || "medium")}
+                                </Badge>
+                              </td>
+                              <td className="px-4 py-4 text-center">
+                                <div className="flex items-center justify-center gap-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleStatusUpdate(task.id, 'not_started')}
+                                    className={`h-8 px-3 text-xs font-medium ${task.status === 'not_started' ? 'bg-gray-100 text-gray-800' : 'hover:bg-gray-100 text-gray-600'}`}
+                                  >
+                                    Belum
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleStatusUpdate(task.id, 'in_progress')}
+                                    className={`h-8 px-3 text-xs font-medium ${task.status === 'in_progress' ? 'bg-blue-100 text-blue-800' : 'hover:bg-blue-100 text-blue-600'}`}
+                                  >
+                                    Jalan
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleStatusUpdate(task.id, 'completed')}
+                                    className={`h-8 px-3 text-xs font-medium ${task.status === 'completed' ? 'bg-green-100 text-green-800' : 'hover:bg-green-100 text-green-600'}`}
+                                  >
+                                    Selesai
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleStatusUpdate(task.id, 'cancelled')}
+                                    className={`h-8 px-3 text-xs font-medium ${task.status === 'cancelled' ? 'bg-red-100 text-red-800' : 'hover:bg-red-100 text-red-600'}`}
+                                  >
+                                    Batal
+                                  </Button>
+                                </div>
+                              </td>
+                              <td className="px-4 py-4">
+                                <div className="flex items-center gap-2">
+                                  {task.assignedTo && (
+                                    <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                                      {getUserInitials(task.assignedTo)}
+                                    </div>
+                                  )}
+                                  <span className="text-sm text-gray-600">
+                                    {task.assignedTo ? getUserName(task.assignedTo) : "Belum ditugaskan"}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="px-4 py-4 text-center">
+                                <span className="text-sm text-gray-600">
+                                  {task.dueDate ? formatDate(task.dueDate) : "Belum diatur"}
+                                </span>
+                              </td>
+                              <td className="px-4 py-4 text-center">
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <button className="p-2 hover:bg-gray-100 rounded-full">
+                                      <MoreVertical className="h-4 w-4" />
+                                    </button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem
+                                      onClick={() => handleEditTask(task)}
+                                      className="cursor-pointer"
+                                    >
+                                      <Edit className="w-4 h-4 mr-2" />
+                                      Edit
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() => handleDeleteTask(task.id)}
+                                      className="cursor-pointer text-red-600"
+                                    >
+                                      <Trash2 className="w-4 h-4 mr-2" />
+                                      Hapus
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
-                  ))}
-                </div>
+                  </div>
+
+                  {/* Mobile Card View */}
+                  <div className="md:hidden space-y-4">
+                    {tasks.map((task: any) => (
+                      <div
+                        key={task.id}
+                        className="p-3 bg-gray-50 border border-gray-200 rounded-lg space-y-2"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-900 cursor-pointer">
+                              {task.title}
+                            </div>
+                            {task.description && (
+                              <div className="text-sm text-gray-600 mt-1">{task.description}</div>
+                            )}
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge className={getTaskPriorityColor(task.priority || "medium")}>
+                                {getTaskPriorityLabel(task.priority || "medium")}
+                              </Badge>
+                              <TaskCommentCount taskId={task.id} />
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleStatusUpdate(task.id, 'not_started')}
+                              className={`h-6 px-2 text-xs font-medium ${task.status === 'not_started' ? 'bg-gray-100 text-gray-800' : 'hover:bg-gray-100 text-gray-600'}`}
+                            >
+                              Belum
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleStatusUpdate(task.id, 'in_progress')}
+                              className={`h-6 px-2 text-xs font-medium ${task.status === 'in_progress' ? 'bg-blue-100 text-blue-800' : 'hover:bg-blue-100 text-blue-600'}`}
+                            >
+                              Jalan
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleStatusUpdate(task.id, 'completed')}
+                              className={`h-6 px-2 text-xs font-medium ${task.status === 'completed' ? 'bg-green-100 text-green-800' : 'hover:bg-green-100 text-green-600'}`}
+                            >
+                              Selesai
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleStatusUpdate(task.id, 'cancelled')}
+                              className={`h-6 px-2 text-xs font-medium ${task.status === 'cancelled' ? 'bg-red-100 text-red-800' : 'hover:bg-red-100 text-red-600'}`}
+                            >
+                              Batal
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center pt-2 border-t border-gray-200">
+                          <div className="flex items-center gap-2">
+                            {task.assignedTo && (
+                              <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                                {getUserInitials(task.assignedTo)}
+                              </div>
+                            )}
+                            <span className="text-sm text-gray-600">
+                              {task.assignedTo ? getUserName(task.assignedTo) : "Belum ditugaskan"}
+                            </span>
+                          </div>
+                          <span className="text-sm text-gray-600">
+                            {task.dueDate ? formatDate(task.dueDate) : "Belum diatur"}
+                          </span>
+                        </div>
+                        <div className="flex justify-end">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm" className="hover:bg-gray-100">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => handleEditTask(task)}
+                                className="cursor-pointer"
+                              >
+                                <Edit className="w-4 h-4 mr-2" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleDeleteTask(task.id)}
+                                className="cursor-pointer text-red-600"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Hapus
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              
               )}
             </CardContent>
           </Card>
