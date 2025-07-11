@@ -3030,11 +3030,6 @@ export default function DailyFocusPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 Kelola Inisiatif Aktif
-                {selectedUserId !== "all" && (
-                  <span className="text-sm font-normal text-blue-600 bg-blue-50 px-2 py-1 rounded">
-                    {getUserName(selectedUserId)}
-                  </span>
-                )}
               </CardTitle>
               <CardDescription>
                 Update metrics dan kelola inisiatif aktif{selectedUserId === "all" ? " semua anggota tim" : " yang ditanggung jawabi"}
