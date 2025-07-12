@@ -352,10 +352,8 @@ export default function Registration() {
 
                 <Button 
                   type="submit" 
-                  disabled={isVerifying}
-                  
+                  disabled={isVerifying || verificationCode.length !== 6}
                   className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
-                  disabled={verificationCode.length !== 6}
                 >
                   <div className="flex items-center space-x-2">
                     <ShieldCheck className="h-5 w-5" />

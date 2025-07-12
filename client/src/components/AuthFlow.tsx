@@ -656,10 +656,8 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
             
             <Button
               onClick={handleEmailVerification}
-              disabled={isVerifying}
-              
+              disabled={isVerifying || verificationCode.length !== 6}
               className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium h-11"
-              disabled={verificationCode.length !== 6}
             >
               Verifikasi Email
             </Button>
