@@ -3623,9 +3623,10 @@ export default function DailyFocusPage() {
             {/* Basic Information */}
             <div className="space-y-4">
               <div>
-                <Label htmlFor="edit-title" className="text-sm font-medium mb-2 block">
+                <Label htmlFor="edit-title" className="text-sm font-medium mb-1 block">
                   Judul Task *
                 </Label>
+                <p className="text-xs text-gray-500 mb-2">Gunakan nama yang jelas dan spesifik agar mudah dipahami tim</p>
                 <Input
                   id="edit-title"
                   value={taskFormData.title}
@@ -3639,9 +3640,10 @@ export default function DailyFocusPage() {
               </div>
 
               <div>
-                <Label htmlFor="edit-description" className="text-sm font-medium mb-2 block">
+                <Label htmlFor="edit-description" className="text-sm font-medium mb-1 block">
                   Deskripsi
                 </Label>
+                <p className="text-xs text-gray-500 mb-2">Jelaskan tujuan, langkah kerja, dan hasil yang diharapkan</p>
                 <Textarea
                   id="edit-description"
                   value={taskFormData.description}
@@ -3660,9 +3662,10 @@ export default function DailyFocusPage() {
 
             {/* Initiative Selection */}
             <div>
-              <Label className="text-sm font-medium mb-2 block">
+              <Label className="text-sm font-medium mb-1 block">
                 Initiative Terkait
               </Label>
+              <p className="text-xs text-gray-500 mb-2">Hubungkan dengan initiative untuk tracking progress yang lebih baik</p>
               <Select
                 value={taskFormData.initiativeId}
                 onValueChange={(value) => setTaskFormData({ ...taskFormData, initiativeId: value })}
@@ -3683,9 +3686,10 @@ export default function DailyFocusPage() {
             {/* Status & Priority */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="edit-priority" className="text-sm font-medium mb-2 block">
+                <Label htmlFor="edit-priority" className="text-sm font-medium mb-1 block">
                   Prioritas
                 </Label>
+                <p className="text-xs text-gray-500 mb-2">Tentukan urgensi berdasarkan dampak dan deadline</p>
                 <Select
                   value={taskFormData.priority}
                   onValueChange={(value) =>
@@ -3719,9 +3723,10 @@ export default function DailyFocusPage() {
               </div>
               
               <div>
-                <Label htmlFor="edit-status" className="text-sm font-medium mb-2 block">
+                <Label htmlFor="edit-status" className="text-sm font-medium mb-1 block">
                   Status
                 </Label>
+                <p className="text-xs text-gray-500 mb-2">Update progress saat ini untuk tracking yang akurat</p>
                 <Select
                   value={taskFormData.status}
                   onValueChange={(value) =>
@@ -3744,9 +3749,10 @@ export default function DailyFocusPage() {
             {/* Assignment & Due Date */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-sm font-medium mb-2 block">
+                <Label className="text-sm font-medium mb-1 block">
                   PIC (Person In Charge)
                 </Label>
+                <p className="text-xs text-gray-500 mb-2">Pilih anggota yang tepat sesuai keahlian dan beban kerja</p>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -3805,9 +3811,10 @@ export default function DailyFocusPage() {
               </div>
               
               <div>
-                <Label className="text-sm font-medium mb-2 block">
+                <Label className="text-sm font-medium mb-1 block">
                   Tenggat Waktu
                 </Label>
+                <p className="text-xs text-gray-500 mb-2">Tetapkan deadline yang realistis dan dapat dicapai</p>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
