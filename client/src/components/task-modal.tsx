@@ -10,6 +10,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -410,7 +411,7 @@ export default function TaskModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <CardContent className="space-y-6">
           {/* Basic Information */}
           <div className="space-y-4">
             <div>
@@ -907,7 +908,7 @@ export default function TaskModal({
               </Popover>
             </div>
           </div>
-        </div>
+        </CardContent>
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
