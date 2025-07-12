@@ -9581,8 +9581,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { token } = req.params;
       const { firstName, lastName, password } = req.body;
       
-      if (!firstName || !lastName || !password) {
-        return res.status(400).json({ message: "All fields are required" });
+      if (!firstName || !password) {
+        return res.status(400).json({ message: "First name and password are required" });
       }
       
       const invitation = await storage.getMemberInvitationByToken(token);

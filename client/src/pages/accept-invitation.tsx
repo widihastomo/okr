@@ -89,20 +89,38 @@ export default function AcceptInvitation() {
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
       
-      await apiRequest("POST", `/api/member-invitations/accept/${token}`, {
+      // Ensure we have at least firstName
+      if (!firstName) {
+        toast({
+          title: "Error",
+          description: "Nama lengkap diperlukan",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      console.log("🔍 Sending invitation acceptance data:", {
         firstName,
         lastName,
+        password: "[HIDDEN]",
+      });
+      
+      const response = await apiRequest("POST", `/api/member-invitations/accept/${token}`, {
+        firstName,
+        lastName: lastName || '', // Send empty string instead of undefined
         password: data.password,
       });
 
       toast({
         title: "Berhasil bergabung",
         description: "Akun Anda telah dibuat dan bergabung dengan tim",
+        variant: "default",
       });
 
       // Redirect to login
       navigate("/login");
     } catch (err: any) {
+      console.error("❌ Error accepting invitation:", err);
       toast({
         title: "Error",
         description: err.message || "Gagal menerima undangan",
