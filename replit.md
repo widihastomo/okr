@@ -246,11 +246,12 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
-- July 12, 2025. Successfully changed virtual assistant animation from typing to fade-up effect:
-  * CHANGED: Replaced character-by-character typing animation with smooth fade-up effect
-  * ENHANCED: Messages now appear instantly with elegant slide-in-from-bottom animation
-  * IMPROVED: Removed typing cursor animation and delays for immediate content display
-  * RESULT: Faster, more modern animation that doesn't keep users waiting for text to appear
+- July 12, 2025. Successfully implemented partial fade-up animation for virtual assistant messages:
+  * CREATED: Custom usePartialFadeUp hook that displays words one by one with fade-up animation
+  * ENHANCED: Each word appears with individual slide-in-from-bottom animation with staggered delays
+  * OPTIMIZED: Word-by-word animation (300ms interval) creates smooth, dynamic text reveal effect
+  * IMPROVED: Each word gets 500ms animation duration with 50ms staggered delays for seamless flow
+  * RESULT: More engaging and dynamic message display that keeps users visually interested
 - July 12, 2025. Successfully fixed organization slug duplicate constraint error during registration:
   * FIXED: Registration now handles duplicate organization slug gracefully with unique slug generation
   * ENHANCED: Automatic slug uniqueness checking with counter-based fallback (e.g., "jujura-1", "jujura-2")
