@@ -544,7 +544,7 @@ export default function OrganizationSettings() {
   }
 
   return (
-    <div className="container mx-auto py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8 max-w-7xl">
+    <div className="max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold mb-2">Pengaturan Organisasi</h1>

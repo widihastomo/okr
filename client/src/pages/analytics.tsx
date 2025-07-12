@@ -332,7 +332,7 @@ export default function AnalyticsPage() {
   };
 
   return (
-    <div className="container mx-auto space-y-6">
+    <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
