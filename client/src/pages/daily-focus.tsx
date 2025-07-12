@@ -927,15 +927,17 @@ export default function DailyFocusPage() {
           </div>
         </div>
 
-        {/* Onboarding Missions Section */}
-        <div data-testid="onboarding-missions">
-          <MissionCard
-            missions={orderlyMissions}
-            title="Panduan Onboarding Platform"
-            description="Ikuti langkah-langkah ini untuk memulai menggunakan platform"
-            className="mb-6"
-          />
-        </div>
+        {/* Onboarding Missions Section - Only for client owners */}
+        {user && (user as any).role === "owner" && (
+          <div data-testid="onboarding-missions">
+            <MissionCard
+              missions={orderlyMissions}
+              title="Panduan Onboarding Platform"
+              description="Ikuti langkah-langkah ini untuk memulai menggunakan platform"
+              className="mb-6"
+            />
+          </div>
+        )}
 
         {/* Controls */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
