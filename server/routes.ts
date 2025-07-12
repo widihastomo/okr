@@ -8504,19 +8504,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
           res.status(400).json({ error: "User already exists in this organization" });
         }
       } else {
-        // For now, we'll create a placeholder user that needs to complete registration
-        // In a real implementation, you'd send an invitation email
-        const [newUser] = await db.insert(users).values({
-          id: crypto.randomUUID(),
+        // Create invitation user with proper invitation fields
+        const invitationData = {
           email,
-          passwordHash: "", // Empty until they complete registration
-          organizationId: user.organizationId,
           role: "member",
-          isActive: false, // Inactive until they complete registration
-          createdAt: new Date().toISOString()
-        }).returning();
+          organizationId: user.organizationId,
+          invitedBy: user.id,
+          invitationStatus: 'pending',
+          isActive: false,
+          isEmailVerified: false,
+        };
 
-        res.json({ message: "Invitation sent successfully", user: newUser });
+        const invitation = await storage.createMemberInvitation(invitationData);
+        
+        // Send invitation email
+        try {
+          const organization = await storage.getOrganization(user.organizationId);
+          const inviterName = `${user.firstName} ${user.lastName}`.trim() || user.email;
+          const organizationName = organization?.name || "Organization";
+          
+          // Construct the invitation link
+          const baseUrl = `${req.protocol}://${req.get('host')}`;
+          const invitationLink = `${baseUrl}/accept-invitation?token=${invitation.invitationToken}`;
+          
+          const emailHtml = emailService.generateInvitationEmail(
+            inviterName,
+            organizationName,
+            invitationLink
+          );
+          
+          await emailService.sendEmail({
+            from: "no-reply@yourcompany.com",
+            to: invitation.email,
+            subject: `Undangan Bergabung dengan ${organizationName}`,
+            html: emailHtml,
+          });
+        } catch (emailError) {
+          console.error("Error sending invitation email:", emailError);
+          // Don't fail the invitation creation if email fails
+        }
+
+        res.json({ message: "Invitation sent successfully", user: invitation });
       }
     } catch (error) {
       console.error("Error inviting user:", error);
@@ -9416,22 +9444,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "User not associated with an organization" });
       }
       
-      const invitationData = {
-        ...req.body,
-        organizationId: user.organizationId,
-        invitedBy: user.id,
-        invitationToken: Math.random().toString(36).substr(2, 9) + Date.now().toString(36),
-      };
+      const { email, role, department, jobTitle } = req.body;
       
-      const result = insertMemberInvitationSchema.safeParse(invitationData);
-      if (!result.success) {
-        return res.status(400).json({ 
-          message: "Invalid invitation data", 
-          errors: result.error.errors 
-        });
+      // Validate required fields
+      if (!email || !role) {
+        return res.status(400).json({ message: "Email and role are required" });
       }
       
-      const invitation = await storage.createMemberInvitation(result.data);
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "User with this email already exists" });
+      }
+      
+      const invitationData = {
+        email,
+        role,
+        department: department || null,
+        jobTitle: jobTitle || null,
+        organizationId: user.organizationId,
+        invitedBy: user.id,
+        invitationStatus: 'pending',
+        isActive: false,
+        isEmailVerified: false,
+      };
+      
+      const invitation = await storage.createMemberInvitation(invitationData);
       
       // Send invitation email
       try {
@@ -9462,8 +9500,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.status(201).json(invitation);
     } catch (error) {
-      console.error("Error creating member invitation:", error);
-      res.status(500).json({ message: "Failed to create member invitation" });
+      console.error("Error inviting user:", error);
+      res.status(500).json({ error: "Failed to invite user" });
     }
   });
 
