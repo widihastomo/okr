@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import {
   LayoutDashboard,
   Building2,
@@ -60,6 +61,11 @@ export default function Sidebar({
 
   // Check if user is system owner
   const isSystemOwner = (user as any)?.isSystemOwner || false;
+
+  // Check trial status for margin adjustment
+  const { data: trialStatus } = useQuery({
+    queryKey: ["/api/trial-status"],
+  });
 
   // Different menu items for system owners vs regular users
   const systemOwnerMenuItems = [
@@ -243,7 +249,11 @@ export default function Sidebar({
             "w-64",
           )}
         >
-          <nav className="flex-1 px-2 py-4 overflow-y-auto">
+          <nav className={cn(
+            "flex-1 px-2 py-4 overflow-y-auto",
+            // Add margin top when trial notification is active
+            trialStatus?.isTrialActive ? "mt-[60px]" : ""
+          )}>
             <ul className="space-y-1">
               {menuItems.map((item) => {
                 const menuItem = (
