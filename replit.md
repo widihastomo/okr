@@ -237,6 +237,7 @@ All email configuration now uses environment variables:
 - **NOTIFICATION TYPES SYSTEM**: Individual toggle controls for each notification category with proper backend integration and JSON parsing error handling
 - **DAY-BASED REMINDER FILTERING**: Advanced activeDays system allowing users to specify which days of the week to receive reminders
 - **UI ENHANCEMENTS**: Added focused notification types interface with individual switch controls for precise user control
+- **AI INTEGRATION**: OpenAI API integration for contextual insights and intelligent recommendations throughout the application
 
 ## Current Issues
 - **PERSISTENT DROPDOWN ISSUE**: Daily instant update task status dropdowns consistently fail to register clicks or onChange events despite multiple debugging approaches including native HTML select, custom buttons, visual debugging, and state management fixes. Root cause appears to be a deeper React/DOM interaction issue that requires alternative UI pattern.
