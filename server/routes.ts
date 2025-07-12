@@ -9559,8 +9559,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get invitation details by token (public)
-  app.get("/api/member-invitations/token/:token", requireAuth, async (req, res) => {
+  // Get invitation details by token (public) - used by accept invitation page
+  app.get("/api/member-invitations/verify/:token", async (req, res) => {
     try {
       const { token } = req.params;
       
@@ -9570,15 +9570,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Invitation not found" });
       }
       
+      console.log("Invitation found:", {
+        id: invitation.id,
+        email: invitation.email,
+        status: invitation.invitationStatus,
+        expiresAt: invitation.invitationExpiresAt,
+        currentTime: new Date().toISOString()
+      });
+      
       // Check if invitation is expired
-      if (invitation.expiresAt && new Date() > invitation.expiresAt) {
+      if (invitation.invitationExpiresAt && new Date() > invitation.invitationExpiresAt) {
+        console.log("Invitation expired");
         return res.status(400).json({ message: "Invitation has expired" });
       }
       
       // Check if invitation is already accepted
-      if (invitation.status === "accepted") {
+      if (invitation.invitationStatus !== "pending") {
+        console.log("Invitation status is not pending:", invitation.invitationStatus);
         return res.status(400).json({ message: "Invitation has already been accepted" });
       }
+      
+      // Get organization details
+      const organization = await storage.getOrganization(invitation.organizationId);
       
       // Return invitation details without sensitive information
       res.json({
@@ -9588,9 +9601,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         department: invitation.department,
         jobTitle: invitation.jobTitle,
         organizationId: invitation.organizationId,
-        status: invitation.status,
+        invitationStatus: invitation.invitationStatus,
         createdAt: invitation.createdAt,
-        expiresAt: invitation.expiresAt,
+        invitationExpiresAt: invitation.invitationExpiresAt,
+        organization: {
+          id: organization?.id,
+          name: organization?.name,
+        },
       });
     } catch (error) {
       console.error("Error fetching invitation:", error);
@@ -9598,19 +9615,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Accept invitation (public)
-  app.post("/api/member-invitations/accept", requireAuth, async (req, res) => {
+  // Accept invitation (public) - used by accept invitation page
+  app.post("/api/member-invitations/accept/:token", async (req, res) => {
     try {
-      const { token, userData } = req.body;
+      const { token } = req.params;
+      const { firstName, lastName, password } = req.body;
       
-      if (!token || !userData) {
-        return res.status(400).json({ message: "Token and user data are required" });
+      if (!firstName || !lastName || !password) {
+        return res.status(400).json({ message: "All fields are required" });
       }
       
-      const user = await storage.acceptMemberInvitation(token, userData);
+      const invitation = await storage.getMemberInvitationByToken(token);
+      
+      if (!invitation) {
+        return res.status(404).json({ message: "Invitation not found" });
+      }
+      
+      // Check if invitation is expired
+      if (invitation.invitationExpiresAt && new Date() > invitation.invitationExpiresAt) {
+        return res.status(400).json({ message: "Invitation has expired" });
+      }
+      
+      // Check if invitation is already accepted
+      if (invitation.invitationStatus !== "pending") {
+        return res.status(400).json({ message: "Invitation has already been accepted" });
+      }
+      
+      // Hash password
+      const { hashPassword } = await import("./emailAuth");
+      const hashedPassword = await hashPassword(password);
+      
+      // Update user with password and personal information
+      const user = await storage.acceptMemberInvitation(token, {
+        firstName,
+        lastName,
+        password: hashedPassword,
+      });
       
       if (!user) {
-        return res.status(400).json({ message: "Failed to accept invitation" });
+        return res.status(500).json({ message: "Failed to update user" });
       }
       
       res.json({
