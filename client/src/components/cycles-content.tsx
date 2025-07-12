@@ -118,7 +118,7 @@ export default function CyclesContent() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6">
+    <div className="max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Siklus</h1>
