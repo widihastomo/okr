@@ -5,23 +5,27 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { Loader2, CheckCircle, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import refokusLogo from "@assets/refokus_1751810404513.png";
+import refokusLogo from "@assets/refokus_1751810711179.png";
 
-const acceptInvitationSchema = z.object({
-  firstName: z.string().min(1, "Nama depan harus diisi"),
-  lastName: z.string().min(1, "Nama belakang harus diisi"),
-  password: z.string().min(6, "Password minimal 6 karakter"),
-  confirmPassword: z.string().min(6, "Konfirmasi password minimal 6 karakter"),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Password dan konfirmasi password tidak cocok",
-  path: ["confirmPassword"],
-});
+const acceptInvitationSchema = z
+  .object({
+    firstName: z.string().min(1, "Nama depan harus diisi"),
+    lastName: z.string().min(1, "Nama belakang harus diisi"),
+    password: z.string().min(6, "Password minimal 6 karakter"),
+    confirmPassword: z
+      .string()
+      .min(6, "Konfirmasi password minimal 6 karakter"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Password dan konfirmasi password tidak cocok",
+    path: ["confirmPassword"],
+  });
 
 type AcceptInvitationFormData = z.infer<typeof acceptInvitationSchema>;
 
@@ -33,6 +37,8 @@ export default function AcceptInvitation() {
   const [invitation, setInvitation] = useState<any>(null);
   const [isLoadingInvitation, setIsLoadingInvitation] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -56,7 +62,10 @@ export default function AcceptInvitation() {
     // Fetch invitation details
     const fetchInvitation = async () => {
       try {
-        const response = await apiRequest("GET", `/api/member-invitations/verify/${token}`);
+        const response = await apiRequest(
+          "GET",
+          `/api/member-invitations/verify/${token}`,
+        );
         const data = await response.json();
         console.log("🔍 Invitation data received:", data);
         setInvitation(data);
@@ -125,10 +134,7 @@ export default function AcceptInvitation() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
             <div className="mt-4 text-center">
-              <Button 
-                variant="outline" 
-                onClick={() => navigate("/login")}
-              >
+              <Button variant="outline" onClick={() => navigate("/login")}>
                 Kembali ke Login
               </Button>
             </div>
@@ -142,9 +148,9 @@ export default function AcceptInvitation() {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <img 
-            src={refokusLogo} 
-            alt="Refokus Logo" 
+          <img
+            src={refokusLogo}
+            alt="Refokus Logo"
             className="w-32 h-32 mx-auto"
           />
         </div>
@@ -160,101 +166,128 @@ export default function AcceptInvitation() {
               Bergabung dengan <strong>{invitation?.organization?.name}</strong>
             </p>
             <p className="text-sm text-gray-600 text-center">
-              Diundang oleh: {invitation?.inviter?.firstName} {invitation?.inviter?.lastName}
+              Diundang oleh: {invitation?.inviter?.firstName}{" "}
+              {invitation?.inviter?.lastName}
             </p>
           </CardHeader>
-        <CardContent className="space-y-4">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <Label htmlFor="firstName">Nama Depan</Label>
-              <Input
-                id="firstName"
-                type="text"
-                placeholder="Masukkan nama depan"
-                {...register("firstName")}
-                className={errors.firstName ? "border-red-500" : ""}
-              />
-              {errors.firstName && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors.firstName.message}
-                </p>
-              )}
+          <CardContent className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div>
+                <Label htmlFor="firstName">Nama Depan</Label>
+                <Input
+                  id="firstName"
+                  type="text"
+                  placeholder="Masukkan nama depan"
+                  {...register("firstName")}
+                  className={errors.firstName ? "border-red-500" : ""}
+                />
+                {errors.firstName && (
+                  <p className="text-sm text-red-500 mt-1">
+                    {errors.firstName.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="lastName">Nama Belakang</Label>
+                <Input
+                  id="lastName"
+                  type="text"
+                  placeholder="Masukkan nama belakang"
+                  {...register("lastName")}
+                  className={errors.lastName ? "border-red-500" : ""}
+                />
+                {errors.lastName && (
+                  <p className="text-sm text-red-500 mt-1">
+                    {errors.lastName.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Masukkan password"
+                    {...register("password")}
+                    className={errors.password ? "border-red-500 pr-10" : "pr-10"}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="text-sm text-red-500 mt-1">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="confirmPassword">Konfirmasi Password</Label>
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Konfirmasi password"
+                    {...register("confirmPassword")}
+                    className={errors.confirmPassword ? "border-red-500 pr-10" : "pr-10"}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+                {errors.confirmPassword && (
+                  <p className="text-sm text-red-500 mt-1">
+                    {errors.confirmPassword.message}
+                  </p>
+                )}
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-orange-600 to-orange-500 text-white hover:from-orange-700 hover:to-orange-600"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Memproses...
+                  </>
+                ) : (
+                  "Bergabung dengan Tim"
+                )}
+              </Button>
+            </form>
+
+            <div className="text-center">
+              <Button
+                variant="outline"
+                onClick={() => navigate("/login")}
+                className="w-full"
+              >
+                Sudah punya akun? Login
+              </Button>
             </div>
-
-            <div>
-              <Label htmlFor="lastName">Nama Belakang</Label>
-              <Input
-                id="lastName"
-                type="text"
-                placeholder="Masukkan nama belakang"
-                {...register("lastName")}
-                className={errors.lastName ? "border-red-500" : ""}
-              />
-              {errors.lastName && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors.lastName.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Masukkan password"
-                {...register("password")}
-                className={errors.password ? "border-red-500" : ""}
-              />
-              {errors.password && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="confirmPassword">Konfirmasi Password</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                placeholder="Konfirmasi password"
-                {...register("confirmPassword")}
-                className={errors.confirmPassword ? "border-red-500" : ""}
-              />
-              {errors.confirmPassword && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors.confirmPassword.message}
-                </p>
-              )}
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full bg-gradient-to-r from-orange-600 to-orange-500 text-white hover:from-orange-700 hover:to-orange-600"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Memproses...
-                </>
-              ) : (
-                "Bergabung dengan Tim"
-              )}
-            </Button>
-          </form>
-
-          <div className="text-center">
-            <Button 
-              variant="outline" 
-              onClick={() => navigate("/login")}
-              className="w-full"
-            >
-              Sudah punya akun? Login
-            </Button>
-          </div>
-        </CardContent>
+          </CardContent>
         </Card>
       </div>
     </div>

@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { apiRequest } from "@/lib/queryClient";
-import refokusLogo from "@assets/refokus_1751810404513.png";
+import refokusLogo from "@assets/refokus_1751810711179.png";
 
 type RegistrationData = {
   name: string;
