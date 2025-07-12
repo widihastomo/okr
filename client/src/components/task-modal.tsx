@@ -397,7 +397,7 @@ export default function TaskModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="w-[90vw] max-w-[600px] max-h-[90vh] overflow-y-auto sm:w-full p-3 sm:p-6">
+      <DialogContent className="w-[80vw] max-w-[600px] max-h-[90vh] overflow-y-auto sm:w-full p-2 sm:p-6">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CheckCircle2 className="h-5 w-5 text-orange-500" />
@@ -421,7 +421,7 @@ export default function TaskModal({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-auto p-0 text-blue-500 hover:text-blue-600"
+                      className="h-auto p-0 text-blue-500 hover:text-blue-600 hidden sm:inline-flex"
                     >
                       <HelpCircle className="h-4 w-4" />
                     </Button>
@@ -461,7 +461,7 @@ export default function TaskModal({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-auto p-0 text-blue-500 hover:text-blue-600"
+                      className="h-auto p-0 text-blue-500 hover:text-blue-600 hidden sm:inline-flex"
                     >
                       <HelpCircle className="h-4 w-4" />
                     </Button>
@@ -502,7 +502,7 @@ export default function TaskModal({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 text-blue-500 hover:text-blue-600"
+                    className="h-auto p-0 text-blue-500 hover:text-blue-600 hidden sm:inline-flex"
                   >
                     <HelpCircle className="h-4 w-4" />
                   </Button>
@@ -594,7 +594,7 @@ export default function TaskModal({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-auto p-0 text-blue-500 hover:text-blue-600"
+                      className="h-auto p-0 text-blue-500 hover:text-blue-600 hidden sm:inline-flex"
                     >
                       <HelpCircle className="h-4 w-4" />
                     </Button>
@@ -757,7 +757,7 @@ export default function TaskModal({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-auto p-0 text-blue-500 hover:text-blue-600"
+                      className="h-auto p-0 text-blue-500 hover:text-blue-600 hidden sm:inline-flex"
                     >
                       <HelpCircle className="h-4 w-4" />
                     </Button>
@@ -844,7 +844,7 @@ export default function TaskModal({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-auto p-0 text-blue-500 hover:text-blue-600"
+                      className="h-auto p-0 text-blue-500 hover:text-blue-600 hidden sm:inline-flex"
                     >
                       <HelpCircle className="h-4 w-4" />
                     </Button>
