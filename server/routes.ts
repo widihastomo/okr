@@ -31,7 +31,7 @@ import {
   type HabitAlignmentRequest 
 } from "./habit-alignment";
 import { db } from "./db";
-import { eq, and, desc, inArray, isNotNull } from "drizzle-orm";
+import { eq, and, desc, inArray, isNotNull, sql } from "drizzle-orm";
 import { createSnapTransaction } from "./midtrans";
 import { reminderSystem } from "./reminder-system";
 import { emailService } from "./email-service";
@@ -252,22 +252,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create trial subscription for new organization
       try {
-        const { subscriptionPlans, organizationSubscriptions } = await import("@shared/schema");
+        console.log("Starting trial subscription creation for organization:", organizationId);
+        const { subscriptionPlans, organizationSubscriptions, invoices, invoiceLineItems } = await import("@shared/schema");
         
-        // Get free trial plan
-        const [freeTrialPlan] = await db.select()
+        // Get starter plan for trial purposes (fallback to first available active plan)
+        const [trialPlan] = await db.select()
           .from(subscriptionPlans)
-          .where(eq(subscriptionPlans.name, "Free Trial"))
+          .where(eq(subscriptionPlans.isActive, true))
+          .orderBy(subscriptionPlans.price)
           .limit(1);
         
-        if (freeTrialPlan && freeTrialPlan.isActive) {
+        console.log("Found trial plan:", trialPlan ? { id: trialPlan.id, name: trialPlan.name, price: trialPlan.price } : "No plan found");
+        
+        if (trialPlan && trialPlan.isActive) {
           const trialStartDate = new Date();
-          const trialEndDate = new Date(trialStartDate.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days trial
+          const trialEndDate = new Date(trialStartDate.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days trial
           
           // Create organization subscription for free trial
-          await db.insert(organizationSubscriptions).values({
+          const [newSubscription] = await db.insert(organizationSubscriptions).values({
             organizationId: organizationId,
-            planId: freeTrialPlan.id,
+            planId: trialPlan.id,
             status: "trialing",
             currentPeriodStart: trialStartDate,
             currentPeriodEnd: trialEndDate,
@@ -275,12 +279,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
             trialEnd: trialEndDate,
             createdAt: new Date(),
             updatedAt: new Date(),
-          });
+          }).returning();
           
           console.log("Created trial subscription for organization:", organizationId);
+          
+          // Create free trial invoice with paid status
+          const currentYear = new Date().getFullYear();
+          const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
+          const invoiceNumber = `INV-${currentYear}-${currentMonth}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+          
+          // Create invoice for free trial (amount: 0, status: paid)
+          const [newInvoice] = await db.insert(invoices).values({
+            invoiceNumber: invoiceNumber,
+            organizationId: organizationId,
+            subscriptionPlanId: trialPlan.id,
+            organizationSubscriptionId: newSubscription.id,
+            amount: "0.00", // Free trial - no cost
+            subtotal: "0.00",
+            taxAmount: "0.00",
+            taxRate: "0.00",
+            currency: "IDR",
+            status: "paid", // Mark as paid immediately
+            issueDate: new Date(),
+            dueDate: new Date(), // Same as issue date since it's free
+            paidDate: new Date(), // Mark as paid immediately
+            description: "Free Trial - 30 Hari Gratis",
+            notes: "Invoice otomatis untuk paket trial gratis",
+            paymentMethod: "Free Trial",
+            createdBy: userId,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          }).returning();
+          
+          // Create invoice line item for free trial using direct SQL to avoid schema mismatch
+          await db.execute(sql`
+            INSERT INTO invoice_line_items (
+              invoice_id,
+              description,
+              quantity,
+              unit_price,
+              total_price,
+              discount_amount,
+              discount_percentage,
+              period_start,
+              period_end,
+              subscription_plan_id,
+              metadata
+            ) VALUES (
+              ${newInvoice.id},
+              'Free Trial - 30 Hari Gratis',
+              1,
+              ${trialPlan.price || "0.00"},
+              '0.00',
+              ${parseFloat(trialPlan.price || "0")},
+              100,
+              ${trialStartDate},
+              ${trialEndDate},
+              ${trialPlan.id},
+              ${JSON.stringify({
+                trial: true,
+                originalPrice: parseFloat(trialPlan.price || "0"),
+                discountReason: "Free Trial Registration"
+              })}
+            )
+          `);
+          
+          console.log("Created free trial invoice:", invoiceNumber, "for organization:", organizationId);
         }
       } catch (subscriptionError) {
-        console.error("Error creating trial subscription:", subscriptionError);
+        console.error("Error creating trial subscription and invoice:", subscriptionError);
         // Don't fail registration if trial creation fails
       }
       
