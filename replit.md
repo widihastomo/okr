@@ -246,6 +246,16 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 12, 2025. Successfully completed member invitations system refactoring with full integration into users table:
+  * REFACTORED: Completely eliminated member_invitations table and migrated all invitation functionality to users table
+  * ENHANCED: Added invitation fields to users table: invitationToken, invitedBy, invitedAt, invitationExpiresAt, invitationStatus
+  * FIXED: Updated all storage layer methods to use users table for invitation operations instead of separate table
+  * CORRECTED: Fixed POST /api/member-invitations endpoint to use proper user schema validation instead of obsolete insertMemberInvitationSchema
+  * IMPROVED: Updated POST /api/organization/invite endpoint to use new invitation system with proper email integration
+  * CLEANED: Removed all references to member_invitations table from database schema and codebase
+  * SIMPLIFIED: Unified invitation system now manages all user states (active, inactive, pending invitation) in single users table
+  * VERIFIED: All invitation endpoints now work correctly with proper timestamp handling and schema validation
+  * RESULT: Clean, streamlined invitation system with proper database normalization and consistent API behavior
 - July 12, 2025. Successfully fixed database schema mismatch for application settings and completed comprehensive default plan integration:
   * FIXED: Added missing "type" column to application_settings table in database to match schema definition
   * ENHANCED: Both build-seeder.ts and create-production-seeder.ts now properly include type field in application settings
