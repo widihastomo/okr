@@ -6648,71 +6648,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Member invitation acceptance endpoint
-  app.post("/api/member-invitations/accept/:token", async (req, res) => {
-    try {
-      const { token } = req.params;
-      const { firstName, lastName, password } = req.body;
-      
-      // Validate required fields
-      if (!firstName || !lastName || !password) {
-        return res.status(400).json({ message: "Semua field harus diisi" });
-      }
-      
-      const invitation = await storage.getMemberInvitationByToken(token);
-      
-      if (!invitation) {
-        return res.status(404).json({ message: "Undangan tidak ditemukan" });
-      }
-      
-      if (invitation.status !== "pending") {
-        return res.status(400).json({ message: "Undangan sudah tidak valid" });
-      }
-      
-      if (invitation.expiresAt && new Date() > invitation.expiresAt) {
-        return res.status(400).json({ message: "Undangan sudah kedaluwarsa" });
-      }
-      
-      // Check if user with this email already exists
-      const existingUser = await storage.getUserByEmail(invitation.email);
-      if (existingUser) {
-        return res.status(400).json({ message: "Email sudah terdaftar" });
-      }
-      
-      // Create new user
-      const { hashPassword } = await import("./emailAuth");
-      const hashedPassword = await hashPassword(password);
-      
-      const newUser = await storage.createUser({
-        email: invitation.email,
-        firstName,
-        lastName,
-        password: hashedPassword,
-        organizationId: invitation.organizationId,
-        role: invitation.role || "member",
-        isEmailVerified: true, // Email already verified through invitation
-      });
-      
-      // Update invitation status
-      await storage.updateMemberInvitation(invitation.id, {
-        status: "accepted",
-        acceptedAt: new Date(),
-      });
-      
-      res.json({ 
-        message: "Berhasil bergabung dengan tim",
-        user: {
-          id: newUser.id,
-          email: newUser.email,
-          firstName: newUser.firstName,
-          lastName: newUser.lastName,
-        }
-      });
-    } catch (error) {
-      console.error("Error accepting invitation:", error);
-      res.status(500).json({ message: "Failed to accept invitation" });
-    }
-  });
+  // REMOVED DUPLICATE - Using the accept endpoint at line 9579 which has correct validation
 
   // Get current user's organization and subscription
   app.get("/api/my-organization", requireAuth, async (req, res) => {
