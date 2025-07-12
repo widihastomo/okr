@@ -398,7 +398,7 @@ export default function TaskModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-[600px] max-h-[90vh] overflow-y-auto sm:w-auto">
+      <DialogContent className="w-[95vw] max-w-[600px] max-h-[90vh] overflow-y-auto sm:w-full sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CheckCircle2 className="h-5 w-5 text-orange-500" />
@@ -427,7 +427,7 @@ export default function TaskModal({
                       <HelpCircle className="h-4 w-4" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-80" side="right">
+                  <PopoverContent className="w-80" side="top" sideOffset={5}>
                     <div className="space-y-2">
                       <h4 className="font-medium">Tips Membuat Judul Task</h4>
                       <p className="text-sm text-muted-foreground">
@@ -467,7 +467,7 @@ export default function TaskModal({
                       <HelpCircle className="h-4 w-4" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-80" side="right">
+                  <PopoverContent className="w-80" side="top" sideOffset={5}>
                     <div className="space-y-2">
                       <h4 className="font-medium">
                         Deskripsi Task yang Efektif
@@ -508,7 +508,7 @@ export default function TaskModal({
                     <HelpCircle className="h-4 w-4" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-80" side="right">
+                <PopoverContent className="w-80" side="top" sideOffset={5}>
                   <div className="space-y-2">
                     <h4 className="font-medium">Mengelompokkan Task</h4>
                     <p className="text-sm text-muted-foreground">
@@ -619,7 +619,7 @@ export default function TaskModal({
                       <HelpCircle className="h-4 w-4" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-80" side="right">
+                  <PopoverContent className="w-80" side="top" sideOffset={5}>
                     <div className="space-y-2">
                       <h4 className="font-medium">Menentukan Prioritas</h4>
                       <p className="text-sm text-muted-foreground">
@@ -793,7 +793,7 @@ export default function TaskModal({
                       <HelpCircle className="h-4 w-4" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-80" side="right">
+                  <PopoverContent className="w-80" side="top" sideOffset={5}>
                     <div className="space-y-2">
                       <h4 className="font-medium">Menentukan PIC</h4>
                       <p className="text-sm text-muted-foreground">
@@ -891,7 +891,7 @@ export default function TaskModal({
                       <HelpCircle className="h-4 w-4" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-80" side="right">
+                  <PopoverContent className="w-80" side="top" sideOffset={5}>
                     <div className="space-y-2">
                       <h4 className="font-medium">Menentukan Deadline</h4>
                       <p className="text-sm text-muted-foreground">
