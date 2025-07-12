@@ -9592,6 +9592,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Convert invitation to inactive member
+  app.post("/api/member-invitations/:id/convert-to-member", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const { id } = req.params;
+      
+      if (!user.organizationId) {
+        return res.status(400).json({ message: "User not associated with an organization" });
+      }
+      
+      // Only owners and administrators can convert invitations
+      if (user.role !== "owner" && user.role !== "administrator") {
+        return res.status(403).json({ message: "Insufficient permissions to convert invitation" });
+      }
+      
+      const inactiveMember = await storage.convertInvitationToInactiveMember(id);
+      
+      if (!inactiveMember) {
+        return res.status(400).json({ message: "Failed to convert invitation to inactive member" });
+      }
+      
+      res.json({
+        message: "Invitation converted to inactive member successfully",
+        member: {
+          id: inactiveMember.id,
+          email: inactiveMember.email,
+          firstName: inactiveMember.firstName,
+          lastName: inactiveMember.lastName,
+          role: inactiveMember.role,
+          department: inactiveMember.department,
+          jobTitle: inactiveMember.jobTitle,
+          isActive: inactiveMember.isActive,
+          organizationId: inactiveMember.organizationId,
+        },
+      });
+    } catch (error) {
+      console.error("Error converting invitation to inactive member:", error);
+      res.status(500).json({ message: error.message || "Failed to convert invitation to inactive member" });
+    }
+  });
+
   // Client Status Mapping API - Track user progression through 4 stages
   app.get("/api/admin/client-status-mapping", requireAuth, async (req, res) => {
     try {

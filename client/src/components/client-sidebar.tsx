@@ -151,7 +151,6 @@ export default function Sidebar({
   ];
 
   const regularUserMenuItems = [
-
     {
       label: "Daily Focus",
       icon: Sun,
@@ -196,7 +195,6 @@ export default function Sidebar({
       active: location === "/organization-settings",
     },
 
-
     {
       label: "Add-Ons",
       icon: Package,
@@ -219,7 +217,6 @@ export default function Sidebar({
       path: "/member-invitations",
       active: location === "/member-invitations",
     });
-
   }
 
   // Choose menu items based on user type
@@ -249,11 +246,13 @@ export default function Sidebar({
             "w-64",
           )}
         >
-          <nav className={cn(
-            "flex-1 px-2 py-4 overflow-y-auto",
-            // Add margin top when trial notification is active
-            trialStatus?.isTrialActive ? "mt-[60px]" : ""
-          )}>
+          <nav
+            className={cn(
+              "flex-1 px-2 py-4 overflow-y-auto",
+              // Add margin top when trial notification is active
+              trialStatus?.isTrialActive ? "mt-[45px]" : "",
+            )}
+          >
             <ul className="space-y-1">
               {menuItems.map((item) => {
                 const menuItem = (

@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, Mail, Trash2, Edit, Users } from "lucide-react";
+import { Loader2, Plus, Mail, Trash2, Edit, Users, UserPlus } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { id } from "date-fns/locale";
 
@@ -80,6 +80,26 @@ export default function MemberInvitations() {
       toast({
         title: "Gagal Menghapus Undangan",
         description: error.message || "Terjadi kesalahan saat menghapus undangan.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Convert invitation to inactive member mutation
+  const convertToMember = useMutation({
+    mutationFn: (id: string) => apiRequest("POST", `/api/member-invitations/${id}/convert-to-member`),
+    onSuccess: () => {
+      toast({
+        title: "Berhasil Dikonversi",
+        description: "Undangan berhasil dikonversi menjadi member organisasi yang belum aktif.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/member-invitations"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/organization/users"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal Mengkonversi Undangan",
+        description: error.message || "Terjadi kesalahan saat mengkonversi undangan menjadi member.",
         variant: "destructive",
       });
     },
@@ -271,8 +291,18 @@ export default function MemberInvitations() {
                       <Button
                         variant="ghost"
                         size="sm"
+                        onClick={() => convertToMember.mutate(invitation.id)}
+                        disabled={convertToMember.isPending || invitation.status === "accepted"}
+                        title="Konversi ke Member Organisasi"
+                      >
+                        <UserPlus className="h-4 w-4 text-blue-600" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => deleteInvitation.mutate(invitation.id)}
                         disabled={deleteInvitation.isPending}
+                        title="Hapus Undangan"
                       >
                         <Trash2 className="h-4 w-4 text-red-600" />
                       </Button>

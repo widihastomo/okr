@@ -2094,6 +2094,48 @@ export class DatabaseStorage implements IStorage {
       throw error;
     }
   }
+
+  async convertInvitationToInactiveMember(invitationId: string): Promise<User | undefined> {
+    try {
+      // Get the invitation
+      const invitation = await this.getMemberInvitation(invitationId);
+      if (!invitation) {
+        throw new Error("Invitation not found");
+      }
+
+      // Check if invitation is already accepted
+      if (invitation.status === "accepted") {
+        throw new Error("Invitation has already been accepted");
+      }
+
+      // Create inactive user from invitation
+      const inactiveUser = await this.createUser({
+        email: invitation.email,
+        password: '', // Empty password since user hasn't set one yet
+        firstName: invitation.email.split('@')[0], // Use email prefix as temporary name
+        lastName: '',
+        organizationId: invitation.organizationId,
+        role: invitation.role,
+        department: invitation.department,
+        jobTitle: invitation.jobTitle,
+        invitedBy: invitation.invitedBy,
+        invitedAt: new Date(),
+        isActive: false, // Set as inactive
+        isEmailVerified: false, // Not verified since they haven't registered
+      });
+
+      // Update invitation status to converted
+      await this.updateMemberInvitation(invitation.id, {
+        status: "accepted", // Mark as accepted to avoid confusion
+        acceptedAt: new Date(),
+      });
+
+      return inactiveUser;
+    } catch (error) {
+      console.error("Error converting invitation to inactive member:", error);
+      throw error;
+    }
+  }
   
   // Application Settings methods
   async getApplicationSettings(): Promise<ApplicationSetting[]> {
