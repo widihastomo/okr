@@ -334,10 +334,9 @@ export default function Profile() {
               </Card>
             </div>
           </div>
-        </div>
 
-        {/* Change Password Section */}
-        <Card className="shadow-sm border-0 bg-white mt-6">
+          {/* Change Password Section */}
+          <Card className="shadow-sm border-0 bg-white mt-6">
             <CardHeader className="pb-6">
               <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-900">
                 <Shield className="w-5 h-5 text-blue-600" />
