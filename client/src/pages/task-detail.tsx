@@ -239,14 +239,14 @@ function TaskOverviewCard({ task, assignedUser, initiative }: any) {
           </div>
         )}
 
-        {/* Key Information - Compact Grid */}
-        <div className="grid grid-cols-2 gap-4 text-sm">
+        {/* Key Information - Responsive Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
           {/* Due Date */}
           <div className="flex items-center gap-2">
             <CalendarDays className="w-4 h-4 text-gray-500 flex-shrink-0" />
             <div className="min-w-0">
               <p className="text-xs font-medium text-gray-900">Tenggat</p>
-              <p className={`text-xs truncate ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-600'}`}>
+              <p className={`text-xs break-words ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-600'}`}>
                 {task?.dueDate ? formatDate(task.dueDate) : "Tidak ditentukan"}
               </p>
             </div>
@@ -255,20 +255,23 @@ function TaskOverviewCard({ task, assignedUser, initiative }: any) {
           {/* Assigned User */}
           <div className="flex items-center gap-2">
             <User className="w-4 h-4 text-gray-500 flex-shrink-0" />
-            {assignedUser ? (
-              <span className="text-xs text-gray-700 truncate">
-                {assignedUser.firstName && assignedUser.lastName && assignedUser.lastName.trim() !== ""
-                  ? `${assignedUser.firstName} ${assignedUser.lastName}`
-                  : assignedUser.firstName && assignedUser.firstName.trim() !== ""
-                    ? assignedUser.firstName
-                    : assignedUser.lastName && assignedUser.lastName.trim() !== ""
-                      ? assignedUser.lastName
-                      : "Pengguna"
-                }
-              </span>
-            ) : (
-              <span className="text-xs text-gray-500">Belum ditentukan</span>
-            )}
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-gray-900">PIC</p>
+              {assignedUser ? (
+                <p className="text-xs text-gray-700 break-words">
+                  {assignedUser.firstName && assignedUser.lastName && assignedUser.lastName.trim() !== ""
+                    ? `${assignedUser.firstName} ${assignedUser.lastName}`
+                    : assignedUser.firstName && assignedUser.firstName.trim() !== ""
+                      ? assignedUser.firstName
+                      : assignedUser.lastName && assignedUser.lastName.trim() !== ""
+                        ? assignedUser.lastName
+                        : "Pengguna"
+                  }
+                </p>
+              ) : (
+                <p className="text-xs text-gray-500">Belum ditentukan</p>
+              )}
+            </div>
           </div>
 
           {/* Created Date */}
@@ -276,10 +279,10 @@ function TaskOverviewCard({ task, assignedUser, initiative }: any) {
             <Clock className="w-4 h-4 text-gray-500 flex-shrink-0" />
             <div className="min-w-0">
               <p className="text-xs font-medium text-gray-900">Dibuat</p>
-              <p className="text-xs text-gray-600 truncate">
+              <p className="text-xs text-gray-600 break-words">
                 {task?.createdAt ? formatDate(task.createdAt) : "Tidak diketahui"}
               </p>
-              <p className="text-xs text-gray-500 truncate">
+              <p className="text-xs text-gray-500 break-words">
                 oleh {getCreatorName(task)}
               </p>
             </div>
@@ -291,7 +294,7 @@ function TaskOverviewCard({ task, assignedUser, initiative }: any) {
               <Target className="w-4 h-4 text-gray-500 flex-shrink-0" />
               <div className="min-w-0">
                 <p className="text-xs font-medium text-gray-900">Inisiatif</p>
-                <Link href={`/initiatives/${initiative.id}`} className="text-xs text-blue-600 hover:underline truncate block">
+                <Link href={`/initiatives/${initiative.id}`} className="text-xs text-blue-600 hover:underline break-words block">
                   {initiative.title}
                 </Link>
               </div>
@@ -583,13 +586,13 @@ export default function TaskDetailPage() {
                   variant="outline"
                   role="combobox"
                   aria-expanded={statusPopoverOpen}
-                  className="w-[180px] justify-between focus:ring-2 focus:ring-orange-500"
+                  className="w-[160px] sm:w-[180px] justify-between focus:ring-2 focus:ring-orange-500"
                 >
                   {taskData?.status ? getStatusDisplay(taskData.status) : "Pilih status"}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[180px] p-0">
+              <PopoverContent className="w-[160px] sm:w-[180px] p-0">
                 <Command>
                   <CommandInput placeholder="Cari status..." />
                   <CommandList>
@@ -690,8 +693,8 @@ export default function TaskDetailPage() {
       </div>
 
       {/* Main Content Grid */}
-      <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+        <div className="lg:col-span-2 space-y-4 lg:space-y-6">
           <TaskOverviewCard 
             task={taskData}
             assignedUser={assignedUser}
@@ -699,7 +702,7 @@ export default function TaskDetailPage() {
           />
           <CommentsCard taskId={id!} />
         </div>
-        <div className="lg:col-span-1 h-full">
+        <div className="lg:col-span-1">
           <TaskHistoryCard taskId={id!} />
         </div>
       </div>
