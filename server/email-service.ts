@@ -54,6 +54,11 @@ class MailtrapProvider implements EmailProvider {
         throw new Error('Mailtrap credentials not configured');
       }
       
+      // Skip if using placeholder credentials
+      if (settings.mailtrap_user === 'deb40b3a0b567f' || settings.mailtrap_pass === '1a8d3f2b2e7c39') {
+        throw new Error('Mailtrap using placeholder credentials - please update .env file with real credentials');
+      }
+      
       const transporter = nodemailer.createTransport({
         host: settings.mailtrap_host,
         port: parseInt(settings.mailtrap_port),
@@ -179,6 +184,23 @@ class SMTPProvider implements EmailProvider {
   }
 }
 
+// Development Email Provider (fallback when no real credentials are configured)
+class DevelopmentEmailProvider implements EmailProvider {
+  name = 'Development (Simulated)';
+  
+  async sendEmail(config: EmailConfig): Promise<boolean> {
+    console.log('📧 DEVELOPMENT MODE - Email would be sent:', {
+      from: config.from,
+      to: config.to,
+      subject: config.subject,
+      html: config.html.substring(0, 100) + '...' // Show first 100 chars
+    });
+    
+    // Simulate email sending in development
+    return true;
+  }
+}
+
 // Email Service with fallback providers
 class EmailService {
   private providers: EmailProvider[] = [
@@ -203,6 +225,20 @@ class EmailService {
         console.log(`${provider.name} failed: ${errorMessage}`);
         lastError = errorMessage;
         continue;
+      }
+    }
+    
+    // In development mode, use development provider as fallback
+    if (process.env.NODE_ENV === 'development') {
+      console.log('⚠️  All email providers failed, using development fallback');
+      try {
+        const devProvider = new DevelopmentEmailProvider();
+        const success = await devProvider.sendEmail(config);
+        if (success) {
+          return { success: true, provider: devProvider.name };
+        }
+      } catch (devError) {
+        console.error('Development provider also failed:', devError);
       }
     }
     

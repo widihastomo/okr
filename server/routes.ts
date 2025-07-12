@@ -320,6 +320,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`✅ Verification email sent successfully to ${email} using ${emailResult.provider}`);
         } else {
           console.error(`❌ Failed to send verification email to ${email}:`, emailResult.error);
+          // Don't fail registration if email fails - just log the error
+          console.log(`⚠️  Registration will continue despite email failure`);
         }
         
       } catch (emailError) {
