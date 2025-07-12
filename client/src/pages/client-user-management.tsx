@@ -80,6 +80,7 @@ export default function ClientUserManagement() {
       toast({
         title: "Berhasil",
         description: "Undangan telah dikirim ke pengguna",
+        variant: "default",
       });
       setShowInviteModal(false);
       setInviteEmail("");
@@ -104,6 +105,7 @@ export default function ClientUserManagement() {
       toast({
         title: "Berhasil",
         description: "Status pengguna berhasil diperbarui",
+        variant: "default",
       });
     },
     onError: () => {
@@ -126,6 +128,7 @@ export default function ClientUserManagement() {
       toast({
         title: "Berhasil",
         description: "Pengguna berhasil dihapus dari organisasi",
+        variant: "default",
       });
     },
     onError: () => {
