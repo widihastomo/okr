@@ -50,7 +50,7 @@ function getTaskStatusLabel(status: string): string {
 }
 
 // System Owner middleware to protect admin endpoints
-const isSystemOwner = (req: any, res: any, next: any) => {
+const requireSystemOwner = (req: any, res: any, next: any) => {
   const user = req.user as User;
   if (!user?.isSystemOwner) {
     return res.status(403).json({ message: "Access denied. System owner access required." });
@@ -255,29 +255,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("Starting trial subscription creation for organization:", organizationId);
         const { subscriptionPlans, organizationSubscriptions, invoices, invoiceLineItems } = await import("@shared/schema");
         
-        // Get Free Trial plan for trial purposes (fallback to cheapest plan if not available)
-        const [trialPlan] = await db.select()
-          .from(subscriptionPlans)
-          .where(
-            and(
-              eq(subscriptionPlans.slug, "free-trial"),
-              eq(subscriptionPlans.isActive, true)
-            )
-          )
+        // Get default plan from application settings
+        const [defaultPlanSetting] = await db.select()
+          .from(applicationSettings)
+          .where(eq(applicationSettings.key, 'default_trial_plan'))
           .limit(1);
         
-        console.log("Found trial plan:", trialPlan ? { id: trialPlan.id, name: trialPlan.name, price: trialPlan.price } : "No plan found");
+        let finalTrialPlan = null;
         
-        // Fallback to cheapest plan if Free Trial plan is not available
-        let finalTrialPlan = trialPlan;
+        if (defaultPlanSetting) {
+          // Use the configured default plan
+          const [defaultPlan] = await db.select()
+            .from(subscriptionPlans)
+            .where(
+              and(
+                eq(subscriptionPlans.id, defaultPlanSetting.value),
+                eq(subscriptionPlans.isActive, true)
+              )
+            )
+            .limit(1);
+          finalTrialPlan = defaultPlan;
+          console.log("Using configured default plan:", finalTrialPlan ? { id: finalTrialPlan.id, name: finalTrialPlan.name, price: finalTrialPlan.price } : "Default plan not found");
+        }
+        
+        // Fallback 1: Try Free Trial plan if no default plan is configured
         if (!finalTrialPlan) {
-          const [fallbackPlan] = await db.select()
+          const [trialPlan] = await db.select()
+            .from(subscriptionPlans)
+            .where(
+              and(
+                eq(subscriptionPlans.slug, "free-trial"),
+                eq(subscriptionPlans.isActive, true)
+              )
+            )
+            .limit(1);
+          finalTrialPlan = trialPlan;
+          console.log("Using fallback Free Trial plan:", finalTrialPlan ? { id: finalTrialPlan.id, name: finalTrialPlan.name, price: finalTrialPlan.price } : "Free Trial plan not found");
+        }
+        
+        // Fallback 2: Use cheapest plan if neither default nor Free Trial is available
+        if (!finalTrialPlan) {
+          const [cheapestPlan] = await db.select()
             .from(subscriptionPlans)
             .where(eq(subscriptionPlans.isActive, true))
             .orderBy(subscriptionPlans.price)
             .limit(1);
-          finalTrialPlan = fallbackPlan;
-          console.log("Using fallback plan:", finalTrialPlan ? { id: finalTrialPlan.id, name: finalTrialPlan.name, price: finalTrialPlan.price } : "No fallback plan found");
+          finalTrialPlan = cheapestPlan;
+          console.log("Using cheapest plan as final fallback:", finalTrialPlan ? { id: finalTrialPlan.id, name: finalTrialPlan.name, price: finalTrialPlan.price } : "No active plans found");
         }
         
         if (finalTrialPlan && finalTrialPlan.isActive) {
@@ -4929,7 +4953,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Email Test API Route (System Admin Only) - using env variables
-  app.post("/api/admin/email-settings/test", requireAuth, isSystemOwner, async (req, res) => {
+  app.post("/api/admin/email-settings/test", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { to, subject, message } = req.body;
       
@@ -4962,7 +4986,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin API - Get all subscription plans (including inactive)
-  app.get("/api/admin/subscription-plans", requireAuth, isSystemOwner, async (req, res) => {
+  app.get("/api/admin/subscription-plans", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
       const plans = await db.select().from(subscriptionPlans).orderBy(subscriptionPlans.createdAt);
@@ -4974,7 +4998,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get subscription plans with billing periods
-  app.get("/api/admin/subscription-plans-with-periods", requireAuth, isSystemOwner, async (req, res) => {
+  app.get("/api/admin/subscription-plans-with-periods", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
       const { billingPeriods } = await import("@shared/schema");
@@ -4999,7 +5023,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get single subscription plan with billing periods (optimized)
-  app.get("/api/admin/subscription-plans/:id/with-periods", requireAuth, isSystemOwner, async (req, res) => {
+  app.get("/api/admin/subscription-plans/:id/with-periods", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
       const { billingPeriods } = await import("@shared/schema");
@@ -5035,7 +5059,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin API - Create new subscription plan
-  app.post("/api/admin/subscription-plans", requireAuth, isSystemOwner, async (req, res) => {
+  app.post("/api/admin/subscription-plans", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
       const insertSubscriptionPlanSchema = createInsertSchema(subscriptionPlans).omit({
@@ -5070,7 +5094,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin API - Update subscription plan
-  app.put("/api/admin/subscription-plans/:id", requireAuth, isSystemOwner, async (req, res) => {
+  app.put("/api/admin/subscription-plans/:id", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
       const { eq } = await import("drizzle-orm");
@@ -5099,7 +5123,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin API - Get organizations with detailed information
-  app.get("/api/admin/organizations-detailed", requireAuth, isSystemOwner, async (req, res) => {
+  app.get("/api/admin/organizations-detailed", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
       const { eq, sql } = await import("drizzle-orm");
@@ -5157,7 +5181,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin API - Approve organization
-  app.post("/api/admin/organizations/:id/approve", requireAuth, isSystemOwner, async (req, res) => {
+  app.post("/api/admin/organizations/:id/approve", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
       const { eq } = await import("drizzle-orm");
@@ -5190,7 +5214,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin API - Reject organization
-  app.post("/api/admin/organizations/:id/reject", requireAuth, isSystemOwner, async (req, res) => {
+  app.post("/api/admin/organizations/:id/reject", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
       const { eq } = await import("drizzle-orm");
@@ -5228,7 +5252,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin API - Suspend organization
-  app.post("/api/admin/organizations/:id/suspend", requireAuth, isSystemOwner, async (req, res) => {
+  app.post("/api/admin/organizations/:id/suspend", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
       const { eq } = await import("drizzle-orm");
@@ -5254,7 +5278,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin API - Reactivate organization
-  app.post("/api/admin/organizations/:id/reactivate", requireAuth, isSystemOwner, async (req, res) => {
+  app.post("/api/admin/organizations/:id/reactivate", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
       const { eq } = await import("drizzle-orm");
@@ -5280,7 +5304,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin API - Delete subscription plan
-  app.delete("/api/admin/subscription-plans/:id", requireAuth, isSystemOwner, async (req, res) => {
+  app.delete("/api/admin/subscription-plans/:id", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
       const { eq } = await import("drizzle-orm");
@@ -5330,7 +5354,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin API - Toggle subscription plan status
-  app.patch("/api/admin/subscription-plans/:id/toggle-status", requireAuth, isSystemOwner, async (req, res) => {
+  app.patch("/api/admin/subscription-plans/:id/toggle-status", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
       const { eq } = await import("drizzle-orm");
@@ -5361,7 +5385,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Billing Period Management Endpoints
-  app.post("/api/admin/billing-periods", requireAuth, isSystemOwner, async (req, res) => {
+  app.post("/api/admin/billing-periods", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
       const { billingPeriods } = await import("@shared/schema");
@@ -5391,7 +5415,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/admin/billing-periods/:id", requireAuth, isSystemOwner, async (req, res) => {
+  app.put("/api/admin/billing-periods/:id", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
       const { billingPeriods } = await import("@shared/schema");
@@ -5421,7 +5445,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/admin/billing-periods/:id", requireAuth, isSystemOwner, async (req, res) => {
+  app.delete("/api/admin/billing-periods/:id", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
       const { billingPeriods } = await import("@shared/schema");
@@ -5700,7 +5724,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Generate invoice from subscription
-  app.post("/api/invoices/generate-subscription", requireAuth, isSystemOwner, async (req, res) => {
+  app.post("/api/invoices/generate-subscription", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
       const { invoices, invoiceLineItems, organizationSubscriptions, subscriptionPlans, billingPeriods } = await import("@shared/schema");
@@ -6453,7 +6477,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Organization subscription assignment endpoints (System Owner only)
   
   // Get organization with subscription details
-  app.get("/api/admin/organizations/:id/subscription", isSystemOwner, async (req, res) => {
+  app.get("/api/admin/organizations/:id/subscription", requireSystemOwner, async (req, res) => {
     try {
       const { id } = req.params;
       const { db } = await import("./db");
@@ -6484,7 +6508,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Assign subscription plan to organization
-  app.post("/api/admin/organizations/:id/subscription", isSystemOwner, async (req, res) => {
+  app.post("/api/admin/organizations/:id/subscription", requireSystemOwner, async (req, res) => {
     try {
       const { id } = req.params;
       const { planId } = req.body;
@@ -6559,7 +6583,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Remove subscription from organization
-  app.delete("/api/admin/organizations/:id/subscription", isSystemOwner, async (req, res) => {
+  app.delete("/api/admin/organizations/:id/subscription", requireSystemOwner, async (req, res) => {
     try {
       const { id } = req.params;
       const { db } = await import("./db");
@@ -7057,23 +7081,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // System Admin Routes (only for system owner)
-  const requireSystemOwner = async (req: any, res: any, next: any) => {
-    try {
-      const userId = req.session?.userId;
-      if (!userId) {
-        return res.status(401).json({ message: "Authentication required" });
-      }
-
-      const user = await storage.getUser(userId);
-      if (!user || !(user as any).isSystemOwner) {
-        return res.status(403).json({ message: "Access denied. System owner only." });
-      }
-
-      next();
-    } catch (error) {
-      res.status(500).json({ message: "Authorization check failed" });
-    }
-  };
+  // Note: using requireSystemOwner middleware defined at the top of the file
 
   // Get all organizations (system admin)
   app.get("/api/admin/organizations", requireSystemOwner, async (req, res) => {
@@ -9857,6 +9865,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting application setting:", error);
       res.status(500).json({ message: "Failed to delete application setting" });
+    }
+  });
+
+  // Default Plan Management endpoints
+  app.get('/api/admin/default-plan', requireAuth, requireSystemOwner, async (req, res) => {
+    try {
+      const [defaultPlanSetting] = await db.select()
+        .from(applicationSettings)
+        .where(eq(applicationSettings.key, 'default_trial_plan'));
+      
+      if (defaultPlanSetting) {
+        const [plan] = await db.select()
+          .from(subscriptionPlans)
+          .where(eq(subscriptionPlans.id, defaultPlanSetting.value));
+        res.json({ defaultPlan: plan || null, setting: defaultPlanSetting });
+      } else {
+        res.json({ defaultPlan: null, setting: null });
+      }
+    } catch (error) {
+      console.error('Error fetching default plan:', error);
+      res.status(500).json({ message: 'Failed to fetch default plan' });
+    }
+  });
+
+  // Set default plan
+  app.post('/api/admin/default-plan', requireAuth, requireSystemOwner, async (req, res) => {
+    try {
+      const { planId } = req.body;
+      
+      // Validate that the plan exists
+      const [plan] = await db.select()
+        .from(subscriptionPlans)
+        .where(eq(subscriptionPlans.id, planId));
+      
+      if (!plan) {
+        return res.status(404).json({ message: 'Plan tidak ditemukan' });
+      }
+
+      // Update or create the default plan setting
+      const [existingSetting] = await db.select()
+        .from(applicationSettings)
+        .where(eq(applicationSettings.key, 'default_trial_plan'));
+
+      if (existingSetting) {
+        await db.update(applicationSettings)
+          .set({ 
+            value: planId,
+            updatedAt: new Date()
+          })
+          .where(eq(applicationSettings.key, 'default_trial_plan'));
+      } else {
+        await db.insert(applicationSettings).values({
+          key: 'default_trial_plan',
+          value: planId,
+          category: 'business',
+          description: 'Default subscription plan untuk registrasi baru',
+          isPublic: false
+        });
+      }
+
+      res.json({ 
+        message: 'Default plan berhasil diubah',
+        plan: plan
+      });
+    } catch (error) {
+      console.error('Error setting default plan:', error);
+      res.status(500).json({ message: 'Failed to set default plan' });
+    }
+  });
+
+  // Get all subscription plans (for admin dropdown)
+  app.get('/api/admin/subscription-plans', requireAuth, requireSystemOwner, async (req, res) => {
+    try {
+      const plans = await db.select()
+        .from(subscriptionPlans)
+        .where(eq(subscriptionPlans.isActive, true))
+        .orderBy(subscriptionPlans.name);
+      res.json(plans);
+    } catch (error) {
+      console.error('Error fetching subscription plans:', error);
+      res.status(500).json({ message: 'Failed to fetch subscription plans' });
     }
   });
 

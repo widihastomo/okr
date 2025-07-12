@@ -246,6 +246,16 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 12, 2025. Successfully implemented default plan management system for admin control:
+  * ADDED: Default plan management endpoints GET/POST /api/admin/default-plan for system owners
+  * ADDED: Application setting 'default_trial_plan' to configure which plan new registrations use
+  * ENHANCED: Registration logic now uses configured default plan from application settings
+  * IMPLEMENTED: Three-tier fallback system: 1) configured default plan, 2) Free Trial plan, 3) cheapest plan
+  * ADDED: Admin endpoint /api/admin/subscription-plans to list all plans for admin dropdown
+  * CONFIGURED: Free Trial plan (43ee40b6-4f63-4cdf-b9bd-02d577867f61) set as default plan
+  * VERIFIED: Registration process now uses default plan setting instead of hardcoded logic
+  * SECURED: All admin endpoints protected with requireAuth + requireSystemOwner middleware
+  * RESULT: System owners can now control which plan new registrations use through application settings
 - July 12, 2025. Successfully implemented dedicated Free Trial plan with 7-day trial period:
   * CREATED: New "Free Trial" subscription plan with slug "free-trial" and price 0.00
   * UPDATED: Registration logic now uses dedicated Free Trial plan instead of Enterprise plan
