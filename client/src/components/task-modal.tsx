@@ -81,6 +81,7 @@ export default function TaskModal({
   const { toast } = useToast();
   const [picPopoverOpen, setPicPopoverOpen] = useState(false);
   const [initiativePopoverOpen, setInitiativePopoverOpen] = useState(false);
+  const [statusPopoverOpen, setStatusPopoverOpen] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -90,6 +91,42 @@ export default function TaskModal({
     dueDate: null as Date | null,
     initiativeId: "",
   });
+
+  // Helper function to get status display with visual indicator
+  const getStatusDisplay = (status: string) => {
+    switch (status) {
+      case "not_started":
+        return (
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+            Belum Mulai
+          </div>
+        );
+      case "in_progress":
+        return (
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+            Sedang Berjalan
+          </div>
+        );
+      case "completed":
+        return (
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            Selesai
+          </div>
+        );
+      case "cancelled":
+        return (
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+            Dibatalkan
+          </div>
+        );
+      default:
+        return "Pilih status task";
+    }
+  };
 
   // Fetch users for assignment
   const { data: users = [] } = useQuery({
@@ -616,25 +653,97 @@ export default function TaskModal({
               >
                 Status
               </Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, status: value })
-                }
-              >
-                <SelectTrigger
-                  id="status"
-                  className="focus:ring-orange-500 focus:border-orange-500"
-                >
-                  <SelectValue placeholder="Pilih status task" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="not_started">Belum Mulai</SelectItem>
-                  <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
-                  <SelectItem value="completed">Selesai</SelectItem>
-                  <SelectItem value="cancelled">Dibatalkan</SelectItem>
-                </SelectContent>
-              </Select>
+              <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={statusPopoverOpen}
+                    className="w-full justify-between focus:ring-orange-500 focus:border-orange-500"
+                  >
+                    {getStatusDisplay(formData.status)}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0">
+                  <Command>
+                    <CommandInput placeholder="Cari status..." />
+                    <CommandList>
+                      <CommandEmpty>Tidak ada status ditemukan.</CommandEmpty>
+                      <CommandGroup>
+                        <CommandItem
+                          value="not_started"
+                          onSelect={() => {
+                            setFormData({ ...formData, status: "not_started" });
+                            setStatusPopoverOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={`mr-2 h-4 w-4 ${
+                              formData.status === "not_started" ? "opacity-100" : "opacity-0"
+                            }`}
+                          />
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                            Belum Mulai
+                          </div>
+                        </CommandItem>
+                        <CommandItem
+                          value="in_progress"
+                          onSelect={() => {
+                            setFormData({ ...formData, status: "in_progress" });
+                            setStatusPopoverOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={`mr-2 h-4 w-4 ${
+                              formData.status === "in_progress" ? "opacity-100" : "opacity-0"
+                            }`}
+                          />
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            Sedang Berjalan
+                          </div>
+                        </CommandItem>
+                        <CommandItem
+                          value="completed"
+                          onSelect={() => {
+                            setFormData({ ...formData, status: "completed" });
+                            setStatusPopoverOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={`mr-2 h-4 w-4 ${
+                              formData.status === "completed" ? "opacity-100" : "opacity-0"
+                            }`}
+                          />
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            Selesai
+                          </div>
+                        </CommandItem>
+                        <CommandItem
+                          value="cancelled"
+                          onSelect={() => {
+                            setFormData({ ...formData, status: "cancelled" });
+                            setStatusPopoverOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={`mr-2 h-4 w-4 ${
+                              formData.status === "cancelled" ? "opacity-100" : "opacity-0"
+                            }`}
+                          />
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                            Dibatalkan
+                          </div>
+                        </CommandItem>
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
 
