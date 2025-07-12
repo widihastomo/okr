@@ -3623,10 +3623,26 @@ export default function DailyFocusPage() {
             {/* Basic Information */}
             <div className="space-y-4">
               <div>
-                <Label htmlFor="edit-title" className="text-sm font-medium mb-1 block">
+                <Label htmlFor="edit-title" className="flex items-center gap-2 mb-2">
                   Judul Task *
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button 
+                        type="button" 
+                        className="inline-flex items-center justify-center"
+                      >
+                        <HelpCircle className="w-4 h-4 text-orange-500 hover:text-orange-600 cursor-pointer" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent side="right" className="max-w-xs">
+                      <p className="text-sm">
+                        <strong>Nama task yang jelas dan spesifik</strong>
+                        <br /><br />
+                        Gunakan judul yang mudah dipahami seluruh tim dan menjelaskan apa yang akan dikerjakan. Hindari singkatan atau istilah yang ambigu.
+                      </p>
+                    </PopoverContent>
+                  </Popover>
                 </Label>
-                <p className="text-xs text-gray-500 mb-2">Gunakan nama yang jelas dan spesifik agar mudah dipahami tim</p>
                 <Input
                   id="edit-title"
                   value={taskFormData.title}
@@ -3640,10 +3656,26 @@ export default function DailyFocusPage() {
               </div>
 
               <div>
-                <Label htmlFor="edit-description" className="text-sm font-medium mb-1 block">
+                <Label htmlFor="edit-description" className="flex items-center gap-2 mb-2">
                   Deskripsi
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button 
+                        type="button" 
+                        className="inline-flex items-center justify-center"
+                      >
+                        <HelpCircle className="w-4 h-4 text-orange-500 hover:text-orange-600 cursor-pointer" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent side="right" className="max-w-xs">
+                      <p className="text-sm">
+                        <strong>Penjelasan detail tentang task</strong>
+                        <br /><br />
+                        Jelaskan tujuan, langkah-langkah kerja yang perlu dilakukan, dan hasil akhir yang diharapkan. Semakin detail semakin mudah dikerjakan.
+                      </p>
+                    </PopoverContent>
+                  </Popover>
                 </Label>
-                <p className="text-xs text-gray-500 mb-2">Jelaskan tujuan, langkah kerja, dan hasil yang diharapkan</p>
                 <Textarea
                   id="edit-description"
                   value={taskFormData.description}
@@ -3662,10 +3694,26 @@ export default function DailyFocusPage() {
 
             {/* Initiative Selection */}
             <div>
-              <Label className="text-sm font-medium mb-1 block">
+              <Label className="flex items-center gap-2 mb-2">
                 Initiative Terkait
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button 
+                      type="button" 
+                      className="inline-flex items-center justify-center"
+                    >
+                      <HelpCircle className="w-4 h-4 text-orange-500 hover:text-orange-600 cursor-pointer" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent side="right" className="max-w-xs">
+                    <p className="text-sm">
+                      <strong>Menghubungkan task dengan initiative</strong>
+                      <br /><br />
+                      Pilih initiative yang relevan untuk mengelompokkan task dan memudahkan tracking progress secara keseluruhan. Task tanpa initiative juga boleh untuk aktivitas independen.
+                    </p>
+                  </PopoverContent>
+                </Popover>
               </Label>
-              <p className="text-xs text-gray-500 mb-2">Hubungkan dengan initiative untuk tracking progress yang lebih baik</p>
               <Select
                 value={taskFormData.initiativeId}
                 onValueChange={(value) => setTaskFormData({ ...taskFormData, initiativeId: value })}
@@ -3686,10 +3734,26 @@ export default function DailyFocusPage() {
             {/* Status & Priority */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="edit-priority" className="text-sm font-medium mb-1 block">
+                <Label htmlFor="edit-priority" className="flex items-center gap-2 mb-2">
                   Prioritas
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button 
+                        type="button" 
+                        className="inline-flex items-center justify-center"
+                      >
+                        <HelpCircle className="w-4 h-4 text-orange-500 hover:text-orange-600 cursor-pointer" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent side="right" className="max-w-xs">
+                      <p className="text-sm">
+                        <strong>Tingkat kepentingan task</strong>
+                        <br /><br />
+                        Rendah: task yang bisa ditunda, Sedang: task penting namun tidak mendesak, Tinggi: task yang perlu segera dikerjakan. Pertimbangkan dampak dan deadline.
+                      </p>
+                    </PopoverContent>
+                  </Popover>
                 </Label>
-                <p className="text-xs text-gray-500 mb-2">Tentukan urgensi berdasarkan dampak dan deadline</p>
                 <Select
                   value={taskFormData.priority}
                   onValueChange={(value) =>
@@ -3723,10 +3787,26 @@ export default function DailyFocusPage() {
               </div>
               
               <div>
-                <Label htmlFor="edit-status" className="text-sm font-medium mb-1 block">
+                <Label htmlFor="edit-status" className="flex items-center gap-2 mb-2">
                   Status
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button 
+                        type="button" 
+                        className="inline-flex items-center justify-center"
+                      >
+                        <HelpCircle className="w-4 h-4 text-orange-500 hover:text-orange-600 cursor-pointer" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent side="right" className="max-w-xs">
+                      <p className="text-sm">
+                        <strong>Status perkembangan task</strong>
+                        <br /><br />
+                        Belum Mulai: task belum dikerjakan, Sedang Berjalan: task sedang dalam proses, Selesai: task telah selesai, Dibatalkan: task tidak akan dikerjakan.
+                      </p>
+                    </PopoverContent>
+                  </Popover>
                 </Label>
-                <p className="text-xs text-gray-500 mb-2">Update progress saat ini untuk tracking yang akurat</p>
                 <Select
                   value={taskFormData.status}
                   onValueChange={(value) =>
@@ -3749,10 +3829,26 @@ export default function DailyFocusPage() {
             {/* Assignment & Due Date */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-sm font-medium mb-1 block">
+                <Label className="flex items-center gap-2 mb-2">
                   PIC (Person In Charge)
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button 
+                        type="button" 
+                        className="inline-flex items-center justify-center"
+                      >
+                        <HelpCircle className="w-4 h-4 text-orange-500 hover:text-orange-600 cursor-pointer" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent side="right" className="max-w-xs">
+                      <p className="text-sm">
+                        <strong>Person In Charge (PIC)</strong>
+                        <br /><br />
+                        Orang yang bertanggung jawab untuk menyelesaikan task ini. Pilih anggota tim yang tepat berdasarkan keahlian dan beban kerja mereka.
+                      </p>
+                    </PopoverContent>
+                  </Popover>
                 </Label>
-                <p className="text-xs text-gray-500 mb-2">Pilih anggota yang tepat sesuai keahlian dan beban kerja</p>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -3811,10 +3907,26 @@ export default function DailyFocusPage() {
               </div>
               
               <div>
-                <Label className="text-sm font-medium mb-1 block">
+                <Label className="flex items-center gap-2 mb-2">
                   Tenggat Waktu
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button 
+                        type="button" 
+                        className="inline-flex items-center justify-center"
+                      >
+                        <HelpCircle className="w-4 h-4 text-orange-500 hover:text-orange-600 cursor-pointer" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent side="right" className="max-w-xs">
+                      <p className="text-sm">
+                        <strong>Batas waktu penyelesaian task</strong>
+                        <br /><br />
+                        Tentukan tanggal realistis yang memberikan cukup waktu untuk menyelesaikan task dengan kualitas yang baik. Pastikan tanggal tidak terlalu ketat atau terlalu longgar.
+                      </p>
+                    </PopoverContent>
+                  </Popover>
                 </Label>
-                <p className="text-xs text-gray-500 mb-2">Tetapkan deadline yang realistis dan dapat dicapai</p>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
