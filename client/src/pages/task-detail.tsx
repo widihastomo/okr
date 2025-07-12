@@ -583,13 +583,13 @@ export default function TaskDetailPage() {
                   variant="outline"
                   role="combobox"
                   aria-expanded={statusPopoverOpen}
-                  className="w-[140px] justify-between focus:ring-2 focus:ring-orange-500"
+                  className="w-[170px] justify-between focus:ring-2 focus:ring-orange-500"
                 >
                   {taskData?.status ? getStatusDisplay(taskData.status) : "Pilih status"}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[140px] p-0">
+              <PopoverContent className="w-[170px] p-0">
                 <Command>
                   <CommandInput placeholder="Cari status..." />
                   <CommandList>
