@@ -411,7 +411,7 @@ export default function TaskModal({
           </DialogDescription>
         </DialogHeader>
 
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 border border-gray-200 rounded-lg p-6">
           {/* Basic Information */}
           <div className="space-y-4">
             <div>
@@ -520,7 +520,10 @@ export default function TaskModal({
                 </PopoverContent>
               </Popover>
             </Label>
-            <Popover open={initiativePopoverOpen} onOpenChange={setInitiativePopoverOpen}>
+            <Popover
+              open={initiativePopoverOpen}
+              onOpenChange={setInitiativePopoverOpen}
+            >
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
@@ -531,8 +534,14 @@ export default function TaskModal({
                   {formData.initiativeId
                     ? formData.initiativeId === "unassigned"
                       ? "Tanpa Initiative"
-                      : initiativesData?.find((initiative: any) => initiative.id === formData.initiativeId)
-                        ? initiativesData?.find((initiative: any) => initiative.id === formData.initiativeId)?.title
+                      : initiativesData?.find(
+                            (initiative: any) =>
+                              initiative.id === formData.initiativeId,
+                          )
+                        ? initiativesData?.find(
+                            (initiative: any) =>
+                              initiative.id === formData.initiativeId,
+                          )?.title
                         : "Pilih initiative..."
                     : "Pilih initiative..."}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -547,13 +556,18 @@ export default function TaskModal({
                       <CommandItem
                         value="unassigned"
                         onSelect={() => {
-                          setFormData({ ...formData, initiativeId: "unassigned" });
+                          setFormData({
+                            ...formData,
+                            initiativeId: "unassigned",
+                          });
                           setInitiativePopoverOpen(false);
                         }}
                       >
                         <Check
                           className={`mr-2 h-4 w-4 ${
-                            formData.initiativeId === "unassigned" ? "opacity-100" : "opacity-0"
+                            formData.initiativeId === "unassigned"
+                              ? "opacity-100"
+                              : "opacity-0"
                           }`}
                         />
                         Tanpa Initiative
@@ -563,13 +577,18 @@ export default function TaskModal({
                           key={initiative.id}
                           value={initiative.title}
                           onSelect={() => {
-                            setFormData({ ...formData, initiativeId: initiative.id });
+                            setFormData({
+                              ...formData,
+                              initiativeId: initiative.id,
+                            });
                             setInitiativePopoverOpen(false);
                           }}
                         >
                           <Check
                             className={`mr-2 h-4 w-4 ${
-                              formData.initiativeId === initiative.id ? "opacity-100" : "opacity-0"
+                              formData.initiativeId === initiative.id
+                                ? "opacity-100"
+                                : "opacity-0"
                             }`}
                           />
                           {initiative.title}
@@ -654,7 +673,10 @@ export default function TaskModal({
               >
                 Status
               </Label>
-              <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
+              <Popover
+                open={statusPopoverOpen}
+                onOpenChange={setStatusPopoverOpen}
+              >
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
@@ -681,7 +703,9 @@ export default function TaskModal({
                         >
                           <Check
                             className={`mr-2 h-4 w-4 ${
-                              formData.status === "not_started" ? "opacity-100" : "opacity-0"
+                              formData.status === "not_started"
+                                ? "opacity-100"
+                                : "opacity-0"
                             }`}
                           />
                           <div className="flex items-center gap-2">
@@ -698,7 +722,9 @@ export default function TaskModal({
                         >
                           <Check
                             className={`mr-2 h-4 w-4 ${
-                              formData.status === "in_progress" ? "opacity-100" : "opacity-0"
+                              formData.status === "in_progress"
+                                ? "opacity-100"
+                                : "opacity-0"
                             }`}
                           />
                           <div className="flex items-center gap-2">
@@ -715,7 +741,9 @@ export default function TaskModal({
                         >
                           <Check
                             className={`mr-2 h-4 w-4 ${
-                              formData.status === "completed" ? "opacity-100" : "opacity-0"
+                              formData.status === "completed"
+                                ? "opacity-100"
+                                : "opacity-0"
                             }`}
                           />
                           <div className="flex items-center gap-2">
@@ -732,7 +760,9 @@ export default function TaskModal({
                         >
                           <Check
                             className={`mr-2 h-4 w-4 ${
-                              formData.status === "cancelled" ? "opacity-100" : "opacity-0"
+                              formData.status === "cancelled"
+                                ? "opacity-100"
+                                : "opacity-0"
                             }`}
                           />
                           <div className="flex items-center gap-2">
@@ -752,7 +782,7 @@ export default function TaskModal({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label className="flex items-center gap-2 mb-2">
-                PIC (Person In Charge)
+                PIC
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -786,7 +816,9 @@ export default function TaskModal({
                     {formData.assignedTo
                       ? formData.assignedTo === "unassigned"
                         ? "Belum ditentukan"
-                        : availableUsers?.find((user: any) => user.id === formData.assignedTo)
+                        : availableUsers?.find(
+                              (user: any) => user.id === formData.assignedTo,
+                            )
                           ? `${availableUsers?.find((user: any) => user.id === formData.assignedTo)?.firstName} ${availableUsers?.find((user: any) => user.id === formData.assignedTo)?.lastName}`
                           : "Pilih anggota tim..."
                       : "Pilih anggota tim..."}
@@ -797,18 +829,25 @@ export default function TaskModal({
                   <Command>
                     <CommandInput placeholder="Cari anggota tim..." />
                     <CommandList>
-                      <CommandEmpty>Tidak ada anggota tim ditemukan.</CommandEmpty>
+                      <CommandEmpty>
+                        Tidak ada anggota tim ditemukan.
+                      </CommandEmpty>
                       <CommandGroup>
                         <CommandItem
                           value="unassigned"
                           onSelect={() => {
-                            setFormData({ ...formData, assignedTo: "unassigned" });
+                            setFormData({
+                              ...formData,
+                              assignedTo: "unassigned",
+                            });
                             setPicPopoverOpen(false);
                           }}
                         >
                           <Check
                             className={`mr-2 h-4 w-4 ${
-                              formData.assignedTo === "unassigned" ? "opacity-100" : "opacity-0"
+                              formData.assignedTo === "unassigned"
+                                ? "opacity-100"
+                                : "opacity-0"
                             }`}
                           />
                           Belum ditentukan
@@ -824,7 +863,9 @@ export default function TaskModal({
                           >
                             <Check
                               className={`mr-2 h-4 w-4 ${
-                                formData.assignedTo === user.id ? "opacity-100" : "opacity-0"
+                                formData.assignedTo === user.id
+                                  ? "opacity-100"
+                                  : "opacity-0"
                               }`}
                             />
                             {user.firstName} {user.lastName}
@@ -871,7 +912,7 @@ export default function TaskModal({
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {formData.dueDate
                       ? formData.dueDate.toLocaleDateString("id-ID")
-                      : "Pilih tanggal deadline task"}
+                      : "Pilih tanggal"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
