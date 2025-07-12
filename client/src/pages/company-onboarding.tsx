@@ -121,43 +121,41 @@ interface OnboardingData extends CompanyOnboardingData {
 }
 
 // Custom hook for typing effect
-const usePartialFadeUp = (text: string, speed: number = 200) => {
-  const [visibleWords, setVisibleWords] = useState<string[]>([]);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const animationRef = useRef<NodeJS.Timeout | null>(null);
+const useTypingEffect = (text: string, speed: number = 30) => {
+  const [displayText, setDisplayText] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const typewriterRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (animationRef.current) {
-      clearTimeout(animationRef.current);
+    if (typewriterRef.current) {
+      clearTimeout(typewriterRef.current);
     }
 
-    setVisibleWords([]);
-    setIsAnimating(true);
+    setDisplayText("");
+    setIsTyping(true);
 
-    const words = text.split(' ');
     let currentIndex = 0;
-
-    const showNextWord = () => {
-      if (currentIndex < words.length) {
-        setVisibleWords(words.slice(0, currentIndex + 1));
+    const typeNextChar = () => {
+      if (currentIndex < text.length) {
+        setDisplayText(text.slice(0, currentIndex + 1));
         currentIndex++;
-        animationRef.current = setTimeout(showNextWord, speed);
+        typewriterRef.current = setTimeout(typeNextChar, speed);
       } else {
-        setIsAnimating(false);
+        setIsTyping(false);
       }
     };
 
-    // Start animation after a brief delay
-    animationRef.current = setTimeout(showNextWord, 100);
+    // Start typing after a brief delay
+    typewriterRef.current = setTimeout(typeNextChar, 100);
 
     return () => {
-      if (animationRef.current) {
-        clearTimeout(animationRef.current);
+      if (typewriterRef.current) {
+        clearTimeout(typewriterRef.current);
       }
     };
   }, [text, speed]);
 
-  return { visibleWords, isAnimating };
+  return { displayText, isTyping };
 };
 
 export default function CompanyOnboarding() {
@@ -3286,9 +3284,8 @@ export default function CompanyOnboarding() {
     );
   };
 
-  // Use partial fade-up effect for virtual assistant message
+  // Use fade-up effect for virtual assistant message
   const assistantMessage = getVirtualAssistantMessage();
-  const { visibleWords, isAnimating } = usePartialFadeUp(assistantMessage, 300);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
@@ -3405,20 +3402,9 @@ export default function CompanyOnboarding() {
                   </h4>
                   <p
                     key={`assistant-message-${onboardingData.currentStep}`}
-                    className="text-sm text-gray-700 leading-relaxed"
+                    className="text-sm text-gray-700 leading-relaxed transition-all duration-700 animate-in fade-in slide-in-from-bottom-4"
                   >
-                    {visibleWords.map((word, index) => (
-                      <span
-                        key={index}
-                        className="inline-block animate-in fade-in slide-in-from-bottom-2 duration-500"
-                        style={{
-                          animationDelay: `${index * 50}ms`,
-                          animationFillMode: 'both'
-                        }}
-                      >
-                        {word}{index < visibleWords.length - 1 ? ' ' : ''}
-                      </span>
-                    ))}
+                    {assistantMessage}
                   </p>
                 </div>
               </div>
