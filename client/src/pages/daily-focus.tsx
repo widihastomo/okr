@@ -891,7 +891,7 @@ export default function DailyFocusPage() {
   const relatedObjectives = getRelatedObjectives();
 
   return (
-    <div className="p-3 md:p-6 space-y-4 md:space-y-6 pt-[10px] pb-[10px] ml-[0px] mr-[0px] mt-[0px] mb-[0px]">
+    <div className="space-y-4 md:space-y-6">
       {/* Header */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">

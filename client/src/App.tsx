@@ -204,10 +204,10 @@ function Router() {
             "flex-1 min-h-[calc(100vh-6rem)] py-3 overflow-x-hidden",
             // Different padding for onboarding page and trial status
             isOnboardingPage 
-              ? "pt-0" 
+              ? "pt-0 px-0" 
               : trialStatus?.isTrialActive 
-                ? "pt-[108px] sm:pt-[108px]" 
-                : "pt-[64px] sm:pt-[64px]"
+                ? "pt-[108px] sm:pt-[108px] px-3 sm:px-6" 
+                : "pt-[64px] sm:pt-[64px] px-3 sm:px-6"
           )}>
             <Switch>
               <Route path="/onboarding" component={CompanyOnboarding} />

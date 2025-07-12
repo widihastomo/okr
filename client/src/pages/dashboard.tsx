@@ -518,7 +518,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="p-3 sm:p-6 overflow-x-hidden">
+    <div className="overflow-x-hidden">
       {/* Page Header */}
       <div className="mb-4 sm:mb-6 w-full">
         <div className="flex flex-col space-y-3 sm:space-y-4">

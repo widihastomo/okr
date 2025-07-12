@@ -160,8 +160,8 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="p-6">
-        <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto">
+        <div className="space-y-6">
           {/* Header */}
           <div className="mb-6 sm:mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Profil Saya</h1>
@@ -175,15 +175,15 @@ export default function Profile() {
             <div className="lg:col-span-2">
               <Card className="shadow-sm border-0 bg-white">
                 <CardHeader className="flex flex-row items-center justify-between pb-6">
-                  <div>
-                    <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-900">
-                      <User className="w-5 h-5 text-blue-600" />
-                      Informasi Profil
-                    </CardTitle>
-                    <CardDescription className="mt-2 text-gray-600">
-                      Perbarui informasi profil dan pengaturan akun Anda
-                    </CardDescription>
-                  </div>
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-900">
+                    <User className="w-5 h-5 text-blue-600" />
+                    Informasi Profil
+                  </CardTitle>
+                  <CardDescription className="mt-2 text-gray-600">
+                    Perbarui informasi profil dan pengaturan akun Anda
+                  </CardDescription>
+                </div>
                   {!isEditing ? (
                     <Button onClick={() => setIsEditing(true)} variant="outline">
                       <User className="w-4 h-4 mr-2" />
@@ -334,9 +334,10 @@ export default function Profile() {
               </Card>
             </div>
           </div>
+        </div>
 
-          {/* Change Password Section */}
-          <Card className="shadow-sm border-0 bg-white mt-6">
+        {/* Change Password Section */}
+        <Card className="shadow-sm border-0 bg-white mt-6">
             <CardHeader className="pb-6">
               <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-900">
                 <Shield className="w-5 h-5 text-blue-600" />
