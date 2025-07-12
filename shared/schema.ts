@@ -238,11 +238,11 @@ export const referralUsage = pgTable("referral_usage", {
   expiresAt: timestamp("expires_at"), // For free months tracking
 });
 
-// Users table with email/password authentication
+// Users table with email/password authentication and invitation management
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: varchar("email", { length: 255 }).unique().notNull(),
-  password: varchar("password", { length: 255 }).notNull(),
+  password: varchar("password", { length: 255 }), // Can be null for invited users who haven't registered yet
   firstName: varchar("first_name", { length: 100 }),
   lastName: varchar("last_name", { length: 100 }),
   profileImageUrl: varchar("profile_image_url", { length: 500 }),
@@ -260,26 +260,16 @@ export const users = pgTable("users", {
   lastLoginAt: timestamp("last_login_at"),
   invitedBy: uuid("invited_by").references(() => users.id),
   invitedAt: timestamp("invited_at"),
+  // Invitation fields (previously in memberInvitations table)
+  invitationToken: uuid("invitation_token").defaultRandom().unique(),
+  invitationStatus: text("invitation_status").notNull().default("registered"), // "pending", "accepted", "expired", "cancelled", "registered"
+  invitationExpiresAt: timestamp("invitation_expires_at"),
+  invitationAcceptedAt: timestamp("invitation_accepted_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Member Invitations table for email invitations
-export const memberInvitations = pgTable("member_invitations", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  email: varchar("email", { length: 255 }).notNull(),
-  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
-  invitedBy: uuid("invited_by").notNull().references(() => users.id),
-  role: text("role").notNull().default("member"), // "owner", "administrator", "member", "viewer"
-  department: text("department"),
-  jobTitle: text("job_title"),
-  invitationToken: uuid("invitation_token").defaultRandom().unique(),
-  status: text("status").notNull().default("pending"), // "pending", "accepted", "expired", "cancelled"
-  expiresAt: timestamp("expires_at").notNull(),
-  acceptedAt: timestamp("accepted_at"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+
 
 // User Permissions table for granular access control
 export const userPermissions = pgTable("user_permissions", {
@@ -1366,16 +1356,8 @@ export const companyOnboardingDataSchema = z.object({
 
 export type CompanyOnboardingData = z.infer<typeof companyOnboardingDataSchema>;
 
-// Member Invitation schemas
-export const insertMemberInvitationSchema = createInsertSchema(memberInvitations).omit({
-  id: true,
-  invitationToken: true,
-  createdAt: true,
-  updatedAt: true,
-});
 
-export type InsertMemberInvitation = z.infer<typeof insertMemberInvitationSchema>;
-export type MemberInvitation = typeof memberInvitations.$inferSelect;
+
 
 // Referral Code schemas
 export const insertReferralCodeSchema = createInsertSchema(referralCodes).omit({

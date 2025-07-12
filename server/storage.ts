@@ -1,8 +1,7 @@
 import { 
   cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives, tasks, taskComments, taskAuditTrail,
   initiativeMembers, initiativeDocuments, initiativeNotes, initiativeSuccessMetrics, successMetricUpdates,
-  notifications, notificationPreferences, userOnboardingProgress, organizations, memberInvitations, applicationSettings,
-  insertMemberInvitationSchema,
+  notifications, notificationPreferences, userOnboardingProgress, organizations, applicationSettings,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
   type CheckIn, type Initiative, type Task, type TaskComment, type TaskAuditTrail, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
   type InitiativeNote, type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
@@ -12,7 +11,7 @@ import {
   type SuccessMetric, type InsertSuccessMetric, type SuccessMetricUpdate, type InsertSuccessMetricUpdate,
   type Notification, type InsertNotification, type NotificationPreferences, type InsertNotificationPreferences,
   type UserOnboardingProgress, type InsertUserOnboardingProgress, type UpdateOnboardingProgress,
-  type MemberInvitation, type InsertMemberInvitation, type ApplicationSetting, type InsertApplicationSetting, type UpdateApplicationSetting,
+  type ApplicationSetting, type InsertApplicationSetting, type UpdateApplicationSetting,
   type Organization
 } from "@shared/schema";
 import { db } from "./db";
@@ -188,12 +187,12 @@ export interface IStorage {
   createFirstObjectiveFromOnboarding(userId: string, onboardingData: any): Promise<Objective | undefined>;
   
   // Member Invitations
-  getMemberInvitations(organizationId: string): Promise<MemberInvitation[]>;
-  getMemberInvitationByToken(token: string): Promise<MemberInvitation | undefined>;
-  createMemberInvitation(invitation: InsertMemberInvitation): Promise<MemberInvitation>;
-  updateMemberInvitation(id: string, invitation: Partial<InsertMemberInvitation>): Promise<MemberInvitation | undefined>;
+  getMemberInvitations(organizationId: string): Promise<User[]>;
+  getMemberInvitationByToken(token: string): Promise<User | undefined>;
+  createMemberInvitation(invitation: Omit<InsertUser, 'id' | 'password' | 'invitationToken'>): Promise<User>;
+  updateMemberInvitation(id: string, invitation: Partial<InsertUser>): Promise<User | undefined>;
   deleteMemberInvitation(id: string): Promise<boolean>;
-  acceptMemberInvitation(token: string, userData: InsertUser): Promise<User | undefined>;
+  acceptMemberInvitation(token: string, userData: { password: string; firstName?: string; lastName?: string }): Promise<User | undefined>;
   
   // Application Settings
   getApplicationSettings(): Promise<ApplicationSetting[]>;
@@ -1973,13 +1972,16 @@ export class DatabaseStorage implements IStorage {
   }
   
   // Member Invitation methods
-  async getMemberInvitations(organizationId: string): Promise<MemberInvitation[]> {
+  async getMemberInvitations(organizationId: string): Promise<User[]> {
     try {
       const invitations = await db
         .select()
-        .from(memberInvitations)
-        .where(eq(memberInvitations.organizationId, organizationId))
-        .orderBy(desc(memberInvitations.createdAt));
+        .from(users)
+        .where(and(
+          eq(users.organizationId, organizationId),
+          eq(users.invitationStatus, 'pending')
+        ))
+        .orderBy(desc(users.createdAt));
       
       return invitations;
     } catch (error) {
@@ -1988,12 +1990,12 @@ export class DatabaseStorage implements IStorage {
     }
   }
   
-  async getMemberInvitationByToken(token: string): Promise<MemberInvitation | undefined> {
+  async getMemberInvitationByToken(token: string): Promise<User | undefined> {
     try {
       const [invitation] = await db
         .select()
-        .from(memberInvitations)
-        .where(eq(memberInvitations.invitationToken, token));
+        .from(users)
+        .where(eq(users.invitationToken, token));
       
       return invitation;
     } catch (error) {
@@ -2002,16 +2004,18 @@ export class DatabaseStorage implements IStorage {
     }
   }
   
-  async createMemberInvitation(invitation: InsertMemberInvitation): Promise<MemberInvitation> {
+  async createMemberInvitation(invitation: Omit<InsertUser, 'id' | 'password' | 'invitationToken'>): Promise<User> {
     try {
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiration
       
       const [newInvitation] = await db
-        .insert(memberInvitations)
+        .insert(users)
         .values({
           ...invitation,
-          expiresAt,
+          invitationStatus: 'pending',
+          invitationExpiresAt: expiresAt,
+          password: null, // No password for invited users
         })
         .returning();
       
@@ -2022,15 +2026,15 @@ export class DatabaseStorage implements IStorage {
     }
   }
   
-  async updateMemberInvitation(id: string, invitation: Partial<InsertMemberInvitation>): Promise<MemberInvitation | undefined> {
+  async updateMemberInvitation(id: string, invitation: Partial<InsertUser>): Promise<User | undefined> {
     try {
       const [updatedInvitation] = await db
-        .update(memberInvitations)
+        .update(users)
         .set({
           ...invitation,
           updatedAt: new Date(),
         })
-        .where(eq(memberInvitations.id, id))
+        .where(eq(users.id, id))
         .returning();
       
       return updatedInvitation;
@@ -2043,8 +2047,8 @@ export class DatabaseStorage implements IStorage {
   async deleteMemberInvitation(id: string): Promise<boolean> {
     try {
       const result = await db
-        .delete(memberInvitations)
-        .where(eq(memberInvitations.id, id));
+        .delete(users)
+        .where(eq(users.id, id));
       
       return result.rowCount > 0;
     } catch (error) {
@@ -2053,7 +2057,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
   
-  async acceptMemberInvitation(token: string, userData: InsertUser): Promise<User | undefined> {
+  async acceptMemberInvitation(token: string, userData: { password: string; firstName?: string; lastName?: string }): Promise<User | undefined> {
     try {
       // Get the invitation
       const invitation = await this.getMemberInvitationByToken(token);
@@ -2062,33 +2066,32 @@ export class DatabaseStorage implements IStorage {
       }
       
       // Check if invitation is expired
-      if (invitation.expiresAt && new Date() > invitation.expiresAt) {
+      if (invitation.invitationExpiresAt && new Date() > invitation.invitationExpiresAt) {
         throw new Error("Invitation has expired");
       }
       
       // Check if invitation is already accepted
-      if (invitation.status === "accepted") {
+      if (invitation.invitationStatus === "accepted") {
         throw new Error("Invitation has already been accepted");
       }
       
-      // Create the user
-      const newUser = await this.createUser({
-        ...userData,
-        organizationId: invitation.organizationId,
-        role: invitation.role,
-        department: invitation.department,
-        jobTitle: invitation.jobTitle,
-        invitedBy: invitation.invitedBy,
-        invitedAt: new Date(),
-      });
+      // Update the user with password and acceptance info
+      const [updatedUser] = await db
+        .update(users)
+        .set({
+          password: userData.password, // Add password
+          firstName: userData.firstName || invitation.firstName,
+          lastName: userData.lastName || invitation.lastName,
+          invitationStatus: "accepted",
+          invitationAcceptedAt: new Date(),
+          isActive: true,
+          isEmailVerified: true,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, invitation.id))
+        .returning();
       
-      // Update invitation status
-      await this.updateMemberInvitation(invitation.id, {
-        status: "accepted",
-        acceptedAt: new Date(),
-      });
-      
-      return newUser;
+      return updatedUser;
     } catch (error) {
       console.error("Error accepting member invitation:", error);
       throw error;
@@ -2097,38 +2100,30 @@ export class DatabaseStorage implements IStorage {
 
   async convertInvitationToInactiveMember(invitationId: string): Promise<User | undefined> {
     try {
-      // Get the invitation
-      const invitation = await this.getMemberInvitation(invitationId);
+      // Get the invitation user
+      const invitation = await this.getUser(invitationId);
       if (!invitation) {
         throw new Error("Invitation not found");
       }
 
       // Check if invitation is already accepted
-      if (invitation.status === "accepted") {
+      if (invitation.invitationStatus === "accepted") {
         throw new Error("Invitation has already been accepted");
       }
 
-      // Create inactive user from invitation
-      const inactiveUser = await this.createUser({
-        email: invitation.email,
-        password: '', // Empty password since user hasn't set one yet
-        firstName: invitation.email.split('@')[0], // Use email prefix as temporary name
-        lastName: '',
-        organizationId: invitation.organizationId,
-        role: invitation.role,
-        department: invitation.department,
-        jobTitle: invitation.jobTitle,
-        invitedBy: invitation.invitedBy,
-        invitedAt: new Date(),
-        isActive: false, // Set as inactive
-        isEmailVerified: false, // Not verified since they haven't registered
-      });
-
-      // Update invitation status to converted
-      await this.updateMemberInvitation(invitation.id, {
-        status: "accepted", // Mark as accepted to avoid confusion
-        acceptedAt: new Date(),
-      });
+      // Update the user to inactive member status
+      const [inactiveUser] = await db
+        .update(users)
+        .set({
+          invitationStatus: "inactive", // Mark as inactive member
+          invitationAcceptedAt: new Date(),
+          isActive: false, // Set as inactive
+          isEmailVerified: false, // Not verified since they haven't registered
+          firstName: invitation.firstName || invitation.email.split('@')[0], // Use email prefix as temporary name
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, invitationId))
+        .returning();
 
       return inactiveUser;
     } catch (error) {

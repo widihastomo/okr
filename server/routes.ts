@@ -7,10 +7,10 @@ import {
   insertTaskSchema, insertTaskCommentSchema, insertTaskAuditTrailSchema, insertInitiativeNoteSchema, updateKeyResultProgressSchema, createOKRFromTemplateSchema,
   insertSuccessMetricSchema, insertSuccessMetricUpdateSchema, insertDailyReflectionSchema, updateOnboardingProgressSchema,
   subscriptionPlans, organizations, organizationSubscriptions, users, dailyReflections, companyOnboardingDataSchema,
-  insertMemberInvitationSchema, trialAchievements, userTrialAchievements, billingPeriods,
+  trialAchievements, userTrialAchievements, billingPeriods,
   applicationSettings, insertApplicationSettingSchema, updateApplicationSettingSchema,
   type User, type SubscriptionPlan, type Organization, type OrganizationSubscription, type UserOnboardingProgress, type UpdateOnboardingProgress, type CompanyOnboardingData,
-  type MemberInvitation, type InsertUser, type ApplicationSetting, type InsertApplicationSetting, type UpdateApplicationSetting,
+  type InsertUser, type ApplicationSetting, type InsertApplicationSetting, type UpdateApplicationSetting,
   type TaskAuditTrail, type InsertTaskAuditTrail
 } from "@shared/schema";
 import { z } from "zod";
