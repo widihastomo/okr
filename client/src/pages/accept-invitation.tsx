@@ -11,6 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import refokusLogo from "@assets/refokus_1751810404513.png";
 
 const acceptInvitationSchema = z.object({
   firstName: z.string().min(1, "Nama depan harus diisi"),
@@ -138,22 +139,30 @@ export default function AcceptInvitation() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-2">
-          <div className="flex items-center justify-center mb-4">
-            <CheckCircle className="h-12 w-12 text-green-500" />
-          </div>
-          <CardTitle className="text-xl font-bold text-center">
-            Terima Undangan Tim
-          </CardTitle>
-          <p className="text-sm text-gray-600 text-center">
-            Bergabung dengan <strong>{invitation?.organization?.name}</strong>
-          </p>
-          <p className="text-sm text-gray-600 text-center">
-            Diundang oleh: {invitation?.inviter?.firstName} {invitation?.inviter?.lastName}
-          </p>
-        </CardHeader>
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex items-center justify-center p-4">
+      <div className="max-w-md w-full">
+        <div className="text-center mb-8">
+          <img 
+            src={refokusLogo} 
+            alt="Refokus Logo" 
+            className="w-32 h-32 mx-auto"
+          />
+        </div>
+        <Card className="w-full">
+          <CardHeader className="space-y-2">
+            <div className="flex items-center justify-center mb-4">
+              <CheckCircle className="h-12 w-12 text-green-500" />
+            </div>
+            <CardTitle className="text-xl font-bold text-center">
+              Terima Undangan Tim
+            </CardTitle>
+            <p className="text-sm text-gray-600 text-center">
+              Bergabung dengan <strong>{invitation?.organization?.name}</strong>
+            </p>
+            <p className="text-sm text-gray-600 text-center">
+              Diundang oleh: {invitation?.inviter?.firstName} {invitation?.inviter?.lastName}
+            </p>
+          </CardHeader>
         <CardContent className="space-y-4">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
@@ -246,7 +255,8 @@ export default function AcceptInvitation() {
             </Button>
           </div>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 }
