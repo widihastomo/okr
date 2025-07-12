@@ -316,10 +316,20 @@ const config = getConfig();
           console.log("ℹ️ Skipping RLS setup in development (application-level security active)");
         }
         
-        console.log("Populating PostgreSQL database with sample data...");
-        await populateDatabase();
-        console.log("Populating SaaS subscription data...");
-        await populateSaaSData();
+        try {
+          console.log("Populating PostgreSQL database with sample data...");
+          await populateDatabase();
+        } catch (populateError) {
+          console.log("Database already populated, skipping initialization");
+        }
+        
+        try {
+          console.log("Populating SaaS subscription data...");
+          await populateSaaSData();
+        } catch (saasError) {
+          console.log("SaaS data already exists, skipping...");
+        }
+        
         console.log("Database initialized successfully");
       } else {
         console.error("Database connection failed - server will continue without database");

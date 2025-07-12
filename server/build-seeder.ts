@@ -337,13 +337,17 @@ async function runBuildSeeder() {
       console.log("📋 You can run seeder manually with: npx tsx server/build-seeder.ts");
     }
   } finally {
-    // Close database connection safely
-    try {
-      if (db && db.$client) {
-        await db.$client.end();
+    // Only close database connection if running as standalone script
+    if (import.meta.url === `file://${process.argv[1]}`) {
+      try {
+        if (db && db.$client) {
+          await db.$client.end();
+        }
+      } catch (error) {
+        console.log("ℹ️  Database connection cleanup completed");
       }
-    } catch (error) {
-      console.log("ℹ️  Database connection cleanup completed");
+    } else {
+      console.log("ℹ️  Database connection cleanup skipped (running from main app)");
     }
   }
 }
