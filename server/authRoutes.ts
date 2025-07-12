@@ -29,6 +29,31 @@ export function setupEmailAuth(app: Express) {
       timestamp: new Date().toISOString()
     });
   });
+  
+  // Debug email environment variables
+  app.get('/api/debug/email-env', (req, res) => {
+    const emailEnv = {
+      MAILTRAP_HOST: process.env.MAILTRAP_HOST || 'not set',
+      MAILTRAP_PORT: process.env.MAILTRAP_PORT || 'not set',
+      MAILTRAP_USER: process.env.MAILTRAP_USER || 'not set',
+      MAILTRAP_PASS: process.env.MAILTRAP_PASS ? 'configured' : 'not set',
+      MAILTRAP_FROM: process.env.MAILTRAP_FROM || 'not set',
+      SENDGRID_API_KEY: process.env.SENDGRID_API_KEY ? 'configured' : 'not set',
+      SENDGRID_FROM: process.env.SENDGRID_FROM || 'not set',
+      GMAIL_EMAIL: process.env.GMAIL_EMAIL || 'not set',
+      GMAIL_PASSWORD: process.env.GMAIL_PASSWORD ? 'configured' : 'not set',
+      GMAIL_FROM: process.env.GMAIL_FROM || 'not set',
+      SMTP_HOST: process.env.SMTP_HOST || 'not set',
+      SMTP_PORT: process.env.SMTP_PORT || 'not set',
+      SMTP_USER: process.env.SMTP_USER || 'not set',
+      SMTP_PASS: process.env.SMTP_PASS ? 'configured' : 'not set',
+      SMTP_FROM: process.env.SMTP_FROM || 'not set',
+      NODE_ENV: process.env.NODE_ENV || 'not set',
+      dotenv_loaded: Boolean(process.env.DATABASE_URL || process.env.MAILTRAP_HOST),
+    };
+    
+    res.json(emailEnv);
+  });
 
   // Register endpoint - REMOVED: Now handled in routes.ts with email verification
 

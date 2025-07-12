@@ -15,7 +15,7 @@ interface EmailProvider {
 
 // Get email settings from environment variables
 function getEmailSettings(): Record<string, string> {
-  return {
+  const settings = {
     // Mailtrap settings
     mailtrap_host: process.env.MAILTRAP_HOST || '',
     mailtrap_port: process.env.MAILTRAP_PORT || '',
@@ -40,6 +40,17 @@ function getEmailSettings(): Record<string, string> {
     smtp_pass: process.env.SMTP_PASS || '',
     smtp_from: process.env.SMTP_FROM || '',
   };
+  
+  // Debug: Log environment variables status
+  console.log('📧 Email service environment check:');
+  console.log('  - MAILTRAP_HOST:', settings.mailtrap_host ? 'configured' : 'not configured');
+  console.log('  - MAILTRAP_USER:', settings.mailtrap_user ? 'configured' : 'not configured');
+  console.log('  - MAILTRAP_PASS:', settings.mailtrap_pass ? 'configured' : 'not configured');
+  console.log('  - SENDGRID_API_KEY:', settings.sendgrid_api_key ? 'configured' : 'not configured');
+  console.log('  - GMAIL_EMAIL:', settings.gmail_email ? 'configured' : 'not configured');
+  console.log('  - SMTP_HOST:', settings.smtp_host ? 'configured' : 'not configured');
+  
+  return settings;
 }
 
 // Mailtrap Provider
@@ -54,9 +65,17 @@ class MailtrapProvider implements EmailProvider {
         throw new Error('Mailtrap credentials not configured');
       }
       
-      // Skip if using placeholder credentials
-      if (settings.mailtrap_user === 'deb40b3a0b567f' || settings.mailtrap_pass === '1a8d3f2b2e7c39') {
+      // Skip if using placeholder credentials (only in production)
+      if (process.env.NODE_ENV === 'production' && 
+          (settings.mailtrap_user === 'deb40b3a0b567f' || settings.mailtrap_pass === '1a8d3f2b2e7c39')) {
         throw new Error('Mailtrap using placeholder credentials - please update .env file with real credentials');
+      }
+      
+      // In development, allow placeholder credentials but warn user
+      if (process.env.NODE_ENV === 'development' && 
+          (settings.mailtrap_user === 'deb40b3a0b567f' || settings.mailtrap_pass === '1a8d3f2b2e7c39')) {
+        console.log('📧 Using placeholder Mailtrap credentials in development mode - this may fail');
+        // Continue to attempt sending in development mode
       }
       
       const transporter = nodemailer.createTransport({
