@@ -9581,7 +9581,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { token } = req.params;
       const { firstName, lastName, password } = req.body;
       
+      console.log("🔍 Accept invitation request data:", {
+        token,
+        firstName,
+        lastName: lastName || '[EMPTY]',
+        password: password ? '[PROVIDED]' : '[MISSING]'
+      });
+      
       if (!firstName || !password) {
+        console.log("❌ Validation failed - missing required fields");
         return res.status(400).json({ message: "First name and password are required" });
       }
       

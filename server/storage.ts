@@ -2075,41 +2075,75 @@ export class DatabaseStorage implements IStorage {
   
   async acceptMemberInvitation(token: string, userData: { password: string; firstName?: string; lastName?: string }): Promise<User | undefined> {
     try {
+      console.log("🔍 acceptMemberInvitation called with:", {
+        token,
+        userData: {
+          password: userData.password ? '[PROVIDED]' : '[MISSING]',
+          firstName: userData.firstName || '[MISSING]',
+          lastName: userData.lastName || '[MISSING]'
+        }
+      });
+      
       // Get the invitation
       const invitation = await this.getMemberInvitationByToken(token);
       if (!invitation) {
+        console.log("❌ Invalid invitation token");
         throw new Error("Invalid invitation token");
       }
       
+      console.log("✅ Invitation found:", {
+        id: invitation.id,
+        email: invitation.email,
+        status: invitation.invitationStatus,
+        expiresAt: invitation.invitationExpiresAt
+      });
+      
       // Check if invitation is expired
       if (invitation.invitationExpiresAt && new Date() > invitation.invitationExpiresAt) {
+        console.log("❌ Invitation has expired");
         throw new Error("Invitation has expired");
       }
       
       // Check if invitation is already accepted
       if (invitation.invitationStatus === "accepted") {
+        console.log("❌ Invitation has already been accepted");
         throw new Error("Invitation has already been accepted");
       }
       
       // Update the user with password and acceptance info
+      const updateData = {
+        password: userData.password, // Add password
+        firstName: userData.firstName || invitation.firstName,
+        lastName: userData.lastName || invitation.lastName,
+        invitationStatus: "accepted",
+        invitationAcceptedAt: new Date(),
+        isActive: true,
+        isEmailVerified: true,
+        updatedAt: new Date(),
+      };
+      
+      console.log("🔄 Updating user with data:", {
+        ...updateData,
+        password: '[HIDDEN]'
+      });
+      
       const [updatedUser] = await db
         .update(users)
-        .set({
-          password: userData.password, // Add password
-          firstName: userData.firstName || invitation.firstName,
-          lastName: userData.lastName || invitation.lastName,
-          invitationStatus: "accepted",
-          invitationAcceptedAt: new Date(),
-          isActive: true,
-          isEmailVerified: true,
-          updatedAt: new Date(),
-        })
+        .set(updateData)
         .where(eq(users.id, invitation.id))
         .returning();
       
+      console.log("✅ User updated successfully:", {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        isActive: updatedUser.isActive
+      });
+      
       return updatedUser;
     } catch (error) {
-      console.error("Error accepting member invitation:", error);
+      console.error("❌ Error accepting member invitation:", error);
       throw error;
     }
   }
