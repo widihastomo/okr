@@ -146,7 +146,7 @@ const useTypingEffect = (text: string, speed: number = 30) => {
     };
 
     // Start typing after a brief delay
-    typewriterRef.current = setTimeout(typeNextChar, 200);
+    typewriterRef.current = setTimeout(typeNextChar, 100);
 
     return () => {
       if (typewriterRef.current) {
@@ -3288,7 +3288,7 @@ export default function CompanyOnboarding() {
   const assistantMessage = getVirtualAssistantMessage();
   const { displayText: typedMessage, isTyping } = useTypingEffect(
     assistantMessage,
-    35,
+    15,
   );
 
   return (
