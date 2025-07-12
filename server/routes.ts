@@ -161,18 +161,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const organizationId = crypto.randomUUID();
       
       // Generate slug from business name
-      let organizationSlug = businessName.toLowerCase()
+      let baseSlug = businessName.toLowerCase()
         .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
         .replace(/\s+/g, '-') // Replace spaces with hyphens
         .replace(/-+/g, '-') // Replace multiple hyphens with single
         .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
       
       // If slug is empty, use fallback
-      if (!organizationSlug || organizationSlug.trim() === '') {
-        organizationSlug = `org-${organizationId.slice(0, 8)}`;
+      if (!baseSlug || baseSlug.trim() === '') {
+        baseSlug = `org-${organizationId.slice(0, 8)}`;
       }
       
-      console.log("Generated slug:", organizationSlug);
+      // Check for existing slug and create unique one if needed
+      let organizationSlug = baseSlug;
+      let counter = 1;
+      
+      while (true) {
+        try {
+          // Check if slug already exists
+          const existingOrg = await db.select()
+            .from(organizations)
+            .where(eq(organizations.slug, organizationSlug))
+            .limit(1);
+          
+          if (existingOrg.length === 0) {
+            // Slug is unique, break the loop
+            break;
+          }
+          
+          // Slug exists, try with counter
+          organizationSlug = `${baseSlug}-${counter}`;
+          counter++;
+          
+          // Safety check to prevent infinite loop
+          if (counter > 100) {
+            organizationSlug = `${baseSlug}-${Date.now()}`;
+            break;
+          }
+        } catch (error) {
+          console.error("Error checking slug uniqueness:", error);
+          // Use timestamp as fallback
+          organizationSlug = `${baseSlug}-${Date.now()}`;
+          break;
+        }
+      }
+      
+      console.log("Generated unique slug:", organizationSlug);
       console.log("Business name:", businessName);
       
       const orgValues = {
@@ -337,6 +371,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
     } catch (error) {
       console.error("Registration error:", error);
+      
+      // Handle specific database constraint errors
+      if (error.code === '23505' && error.constraint === 'organizations_slug_key') {
+        return res.status(409).json({ 
+          message: "Nama organisasi sudah digunakan. Silakan gunakan nama yang berbeda." 
+        });
+      }
+      
+      if (error.code === '23505' && error.constraint === 'users_email_key') {
+        return res.status(409).json({ 
+          message: "Email sudah terdaftar. Silakan gunakan email yang berbeda." 
+        });
+      }
+      
+      // Handle other database errors
+      if (error.code) {
+        return res.status(500).json({ 
+          message: "Terjadi kesalahan database. Silakan coba lagi." 
+        });
+      }
+      
       res.status(500).json({ 
         message: "Gagal mendaftarkan akun. Silakan coba lagi." 
       });

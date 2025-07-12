@@ -246,6 +246,12 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 12, 2025. Successfully fixed organization slug duplicate constraint error during registration:
+  * FIXED: Registration now handles duplicate organization slug gracefully with unique slug generation
+  * ENHANCED: Automatic slug uniqueness checking with counter-based fallback (e.g., "jujura-1", "jujura-2")
+  * IMPROVED: Better database constraint error handling with specific error messages in Indonesian
+  * RESOLVED: 500 error when registering with existing organization name now returns proper 409 conflict response
+  * ADDED: Safety mechanisms to prevent infinite loops with timestamp fallback for edge cases
 - July 12, 2025. Successfully fixed task form reset issue after save operations:
   * FIXED: Task form now properly resets after successful save operations (both create and update)
   * ENHANCED: Added custom handleClose function to ensure form state is cleared when modal closes
