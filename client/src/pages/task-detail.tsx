@@ -24,6 +24,7 @@ import {
   Timer,
   CalendarDays,
   MessageSquare,
+  ChevronsUpDown,
 } from "lucide-react";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
@@ -70,6 +71,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 
 // Task Overview Card Component
 function TaskOverviewCard({ task, assignedUser, initiative }: any) {
@@ -413,6 +427,43 @@ export default function TaskDetailPage() {
   const queryClient = useQueryClient();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [statusPopoverOpen, setStatusPopoverOpen] = useState(false);
+
+  // Helper function to get status display with visual indicator
+  const getStatusDisplay = (status: string) => {
+    switch (status) {
+      case "not_started":
+        return (
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+            Belum Mulai
+          </div>
+        );
+      case "in_progress":
+        return (
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+            Sedang Berjalan
+          </div>
+        );
+      case "completed":
+        return (
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            Selesai
+          </div>
+        );
+      case "cancelled":
+        return (
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+            Dibatalkan
+          </div>
+        );
+      default:
+        return "Pilih status task";
+    }
+  };
 
   // Fetch task data
   const { data: task, isLoading, error } = useQuery({
@@ -526,20 +577,93 @@ export default function TaskDetailPage() {
           </Button>
 
           <div className="flex items-center gap-2">
-            <Select
-              value={taskData?.status || ""}
-              onValueChange={(value) => updateTaskStatusMutation.mutate({ status: value })}
-            >
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="not_started">Belum Mulai</SelectItem>
-                <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
-                <SelectItem value="completed">Selesai</SelectItem>
-                <SelectItem value="cancelled">Dibatalkan</SelectItem>
-              </SelectContent>
-            </Select>
+            <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={statusPopoverOpen}
+                  className="w-[140px] justify-between focus:ring-2 focus:ring-orange-500"
+                >
+                  {taskData?.status ? getStatusDisplay(taskData.status) : "Pilih status"}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[140px] p-0">
+                <Command>
+                  <CommandInput placeholder="Cari status..." />
+                  <CommandList>
+                    <CommandEmpty>Tidak ada status yang cocok.</CommandEmpty>
+                    <CommandGroup>
+                      <CommandItem
+                        onSelect={() => {
+                          updateTaskStatusMutation.mutate({ status: "not_started" });
+                          setStatusPopoverOpen(false);
+                        }}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                          Belum Mulai
+                        </div>
+                        <Check
+                          className={`ml-auto h-4 w-4 ${
+                            taskData?.status === "not_started" ? "opacity-100" : "opacity-0"
+                          }`}
+                        />
+                      </CommandItem>
+                      <CommandItem
+                        onSelect={() => {
+                          updateTaskStatusMutation.mutate({ status: "in_progress" });
+                          setStatusPopoverOpen(false);
+                        }}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          Sedang Berjalan
+                        </div>
+                        <Check
+                          className={`ml-auto h-4 w-4 ${
+                            taskData?.status === "in_progress" ? "opacity-100" : "opacity-0"
+                          }`}
+                        />
+                      </CommandItem>
+                      <CommandItem
+                        onSelect={() => {
+                          updateTaskStatusMutation.mutate({ status: "completed" });
+                          setStatusPopoverOpen(false);
+                        }}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          Selesai
+                        </div>
+                        <Check
+                          className={`ml-auto h-4 w-4 ${
+                            taskData?.status === "completed" ? "opacity-100" : "opacity-0"
+                          }`}
+                        />
+                      </CommandItem>
+                      <CommandItem
+                        onSelect={() => {
+                          updateTaskStatusMutation.mutate({ status: "cancelled" });
+                          setStatusPopoverOpen(false);
+                        }}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                          Dibatalkan
+                        </div>
+                        <Check
+                          className={`ml-auto h-4 w-4 ${
+                            taskData?.status === "cancelled" ? "opacity-100" : "opacity-0"
+                          }`}
+                        />
+                      </CommandItem>
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
