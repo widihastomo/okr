@@ -304,8 +304,24 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
           {/* Basic Information */}
           <div className="space-y-4">
             <div>
-              <Label htmlFor="title" className="text-sm font-medium mb-2 block">
+              <Label htmlFor="title" className="flex items-center gap-2 mb-2">
                 Judul Task *
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-auto p-0 text-blue-500 hover:text-blue-600">
+                      <HelpCircle className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80" side="right">
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Tips Membuat Judul Task</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Gunakan kata kerja aktif dan spesifik. Contoh: "Buat laporan analisis penjualan Q3" 
+                        lebih baik dari "Laporan penjualan".
+                      </p>
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </Label>
               <Input
                 id="title"
@@ -318,8 +334,24 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
             </div>
 
             <div>
-              <Label htmlFor="description" className="text-sm font-medium mb-2 block">
+              <Label htmlFor="description" className="flex items-center gap-2 mb-2">
                 Deskripsi
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-auto p-0 text-blue-500 hover:text-blue-600">
+                      <HelpCircle className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80" side="right">
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Deskripsi Task yang Efektif</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Jelaskan apa yang harus dilakukan, bagaimana melakukannya, dan hasil yang diharapkan. 
+                        Sertakan context yang diperlukan untuk menyelesaikan task.
+                      </p>
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </Label>
               <Textarea
                 id="description"
@@ -334,8 +366,24 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
 
           {/* Initiative Selection */}
           <div>
-            <Label className="text-sm font-medium mb-2 block">
+            <Label className="flex items-center gap-2 mb-2">
               Initiative Terkait
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-auto p-0 text-blue-500 hover:text-blue-600">
+                    <HelpCircle className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80" side="right">
+                  <div className="space-y-2">
+                    <h4 className="font-medium">Mengelompokkan Task</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Pilih initiative yang relevan untuk mengelompokkan task ini. 
+                      Ini membantu dalam pelaporan progress dan koordinasi tim.
+                    </p>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </Label>
             <Select
               value={formData.initiativeId}
@@ -358,8 +406,25 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
           {/* Status & Priority */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="priority" className="text-sm font-medium mb-2 block">
+              <Label htmlFor="priority" className="flex items-center gap-2 mb-2">
                 Prioritas
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-auto p-0 text-blue-500 hover:text-blue-600">
+                      <HelpCircle className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80" side="right">
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Menentukan Prioritas</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Tinggi: Urgent dan penting (deadline ketat). 
+                        Sedang: Penting tapi tidak urgent. 
+                        Rendah: Nice to have, bisa ditunda.
+                      </p>
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </Label>
               <Select
                 value={formData.priority}
@@ -415,8 +480,24 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
           {/* Assignment & Due Date */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-sm font-medium mb-2 block">
+              <Label className="flex items-center gap-2 mb-2">
                 PIC (Person In Charge)
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-auto p-0 text-blue-500 hover:text-blue-600">
+                      <HelpCircle className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80" side="right">
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Menentukan PIC</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Pilih anggota tim yang akan bertanggung jawab menyelesaikan task ini. 
+                        PIC akan menerima notifikasi dan bertanggung jawab atas progress task.
+                      </p>
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </Label>
               <Select
                 value={formData.assignedTo}
@@ -437,8 +518,24 @@ export default function TaskModal({ open, onClose, task, initiativeId, isAdding 
             </div>
             
             <div>
-              <Label className="text-sm font-medium mb-2 block">
+              <Label className="flex items-center gap-2 mb-2">
                 Tenggat Waktu
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-auto p-0 text-blue-500 hover:text-blue-600">
+                      <HelpCircle className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80" side="right">
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Menentukan Deadline</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Pilih tanggal yang realistis untuk menyelesaikan task ini. 
+                        Pertimbangkan kompleksitas task, workload PIC, dan dependencies lainnya.
+                      </p>
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </Label>
               <Popover>
                 <PopoverTrigger asChild>
