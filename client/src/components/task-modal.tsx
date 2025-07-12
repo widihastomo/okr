@@ -952,15 +952,15 @@ export default function TaskModal({
         </CardContent>
 
         <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
-          <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
-            Batal
-          </Button>
           <Button
             onClick={handleSubmit}
             disabled={createMutation.isPending || updateMutation.isPending}
-            className="w-full sm:w-auto bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+            className="w-full sm:w-auto bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white order-1 sm:order-2"
           >
             {isAdding ? "Tambah Task" : "Update Task"}
+          </Button>
+          <Button variant="outline" onClick={onClose} className="w-full sm:w-auto order-2 sm:order-1">
+            Batal
           </Button>
         </DialogFooter>
       </DialogContent>
