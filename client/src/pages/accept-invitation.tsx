@@ -56,8 +56,10 @@ export default function AcceptInvitation() {
     const fetchInvitation = async () => {
       try {
         const response = await apiRequest("GET", `/api/member-invitations/verify/${token}`);
+        console.log("🔍 Invitation data received:", response);
         setInvitation(response);
       } catch (err) {
+        console.error("❌ Error fetching invitation:", err);
         setError("Undangan tidak valid atau telah kedaluwarsa");
       } finally {
         setIsLoadingInvitation(false);
