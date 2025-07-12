@@ -3747,22 +3747,61 @@ export default function DailyFocusPage() {
                 <Label className="text-sm font-medium mb-2 block">
                   PIC (Person In Charge)
                 </Label>
-                <Select
-                  value={taskFormData.assignedTo}
-                  onValueChange={(value) => setTaskFormData({ ...taskFormData, assignedTo: value })}
-                >
-                  <SelectTrigger className="focus:ring-orange-500 focus:border-orange-500">
-                    <SelectValue placeholder="Pilih anggota tim yang bertanggung jawab" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="unassigned">Belum ditentukan</SelectItem>
-                    {users?.map((user: any) => (
-                      <SelectItem key={user.id} value={user.id}>
-                        {user.firstName} {user.lastName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      className="w-full justify-between focus:ring-orange-500 focus:border-orange-500"
+                    >
+                      {taskFormData.assignedTo && taskFormData.assignedTo !== "unassigned" 
+                        ? users?.find((user: any) => user.id === taskFormData.assignedTo)?.firstName + " " + users?.find((user: any) => user.id === taskFormData.assignedTo)?.lastName
+                        : taskFormData.assignedTo === "unassigned" 
+                          ? "Belum ditentukan"
+                          : "Pilih anggota tim yang bertanggung jawab"}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0">
+                    <Command>
+                      <CommandInput placeholder="Cari anggota tim..." />
+                      <CommandList>
+                        <CommandEmpty>Tidak ada anggota tim ditemukan.</CommandEmpty>
+                        <CommandGroup>
+                          <CommandItem
+                            value="unassigned"
+                            onSelect={() => {
+                              setTaskFormData({ ...taskFormData, assignedTo: "unassigned" });
+                            }}
+                          >
+                            <Check
+                              className={`mr-2 h-4 w-4 ${
+                                taskFormData.assignedTo === "unassigned" ? "opacity-100" : "opacity-0"
+                              }`}
+                            />
+                            Belum ditentukan
+                          </CommandItem>
+                          {users?.map((user: any) => (
+                            <CommandItem
+                              key={user.id}
+                              value={`${user.firstName} ${user.lastName}`}
+                              onSelect={() => {
+                                setTaskFormData({ ...taskFormData, assignedTo: user.id });
+                              }}
+                            >
+                              <Check
+                                className={`mr-2 h-4 w-4 ${
+                                  taskFormData.assignedTo === user.id ? "opacity-100" : "opacity-0"
+                                }`}
+                              />
+                              {user.firstName} {user.lastName}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
               
               <div>
