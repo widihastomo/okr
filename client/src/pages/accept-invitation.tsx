@@ -261,23 +261,25 @@ export default function AcceptInvitation() {
                 )}
               </div>
 
-              <Button
-                type="submit"
-                className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium h-11"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Memproses...
-                  </>
-                ) : (
-                  "Bergabung dengan Tim"
-                )}
-              </Button>
+              <div className="pt-2">
+                <Button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium h-11"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Memproses...
+                    </>
+                  ) : (
+                    "Bergabung dengan Tim"
+                  )}
+                </Button>
+              </div>
             </form>
 
-            <div className="text-center">
+            <div className="text-center mt-4">
               <Button
                 variant="outline"
                 onClick={() => navigate("/login")}
