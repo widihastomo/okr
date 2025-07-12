@@ -77,7 +77,7 @@ export default function TrialSettingsPage() {
 
   if (isLoading) {
     return (
-      <div className="p-6 space-y-6">
+      <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex items-center gap-2">
           <Settings className="h-6 w-6 text-orange-600" />
           <h1 className="text-2xl font-bold">Pengaturan Free Trial</h1>
@@ -91,7 +91,7 @@ export default function TrialSettingsPage() {
 
   if (!trialConfig || !formData) {
     return (
-      <div className="p-6 space-y-6">
+      <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex items-center gap-2">
           <Settings className="h-6 w-6 text-orange-600" />
           <h1 className="text-2xl font-bold">Pengaturan Free Trial</h1>
@@ -106,7 +106,7 @@ export default function TrialSettingsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">

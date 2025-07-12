@@ -182,7 +182,7 @@ export default function ApplicationSettingsPage() {
 
   if (isLoading) {
     return (
-      <div className="p-6">
+      <div className="max-w-7xl mx-auto">
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
@@ -217,7 +217,7 @@ export default function ApplicationSettingsPage() {
   }, {} as Record<string, ApplicationSetting[]>) || {};
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="max-w-7xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
