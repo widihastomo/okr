@@ -2020,9 +2020,9 @@ export class DatabaseStorage implements IStorage {
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiration
       
-      // Generate random token for invitation
+      // Generate random UUID token for invitation
       const crypto = await import('crypto');
-      const invitationToken = crypto.randomBytes(32).toString('hex');
+      const invitationToken = crypto.randomUUID();
       
       const [newInvitation] = await db
         .insert(users)
