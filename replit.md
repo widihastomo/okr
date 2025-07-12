@@ -246,12 +246,13 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
-- July 12, 2025. Successfully implemented dedicated Free Trial plan for proper trial subscription management:
+- July 12, 2025. Successfully implemented dedicated Free Trial plan with 7-day trial period:
   * CREATED: New "Free Trial" subscription plan with slug "free-trial" and price 0.00
   * UPDATED: Registration logic now uses dedicated Free Trial plan instead of Enterprise plan
   * ENHANCED: Added fallback mechanism to use cheapest plan if Free Trial plan is unavailable
   * IMPROVED: Trial subscriptions now properly reference the correct plan type in database
   * VERIFIED: New registrations create subscriptions with "Free Trial" plan instead of Enterprise plan
+  * CONFIGURED: Trial period set to 7 days with proper invoice line item description "Free Trial - 7 Hari Gratis"
   * RESULT: Cleaner subscription management with proper plan categorization and billing records
 - July 12, 2025. Successfully fixed database schema mismatch issue and completed free trial invoice creation:
   * FIXED: Database schema inconsistency between shared/schema.ts and actual database structure

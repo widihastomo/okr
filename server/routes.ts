@@ -282,7 +282,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         if (finalTrialPlan && finalTrialPlan.isActive) {
           const trialStartDate = new Date();
-          const trialEndDate = new Date(trialStartDate.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days trial
+          const trialEndDate = new Date(trialStartDate.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days trial
           
           // Create organization subscription for free trial
           const [newSubscription] = await db.insert(organizationSubscriptions).values({
@@ -343,7 +343,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               metadata
             ) VALUES (
               ${newInvoice.id},
-              'Free Trial - 30 Hari Gratis',
+              'Free Trial - 7 Hari Gratis',
               1,
               ${finalTrialPlan.price || "0.00"},
               '0.00',
