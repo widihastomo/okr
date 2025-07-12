@@ -126,7 +126,7 @@ async function createSystemOwner() {
     isSystemOwner: true,
     isEmailVerified: true,
     organizationId: systemOrg.id,
-    role: "system_owner",
+    role: "owner",
     isActive: true,
   }).returning();
 

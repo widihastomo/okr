@@ -86,12 +86,14 @@ async function createSystemOwner() {
     .values({
       id: systemOwnerId,
       email: 'admin@refokus.com',
-      name: 'System Administrator',
+      firstName: 'System',
+      lastName: 'Administrator',
       password: hashedPassword,
       isSystemOwner: true,
-      isVerified: true,
+      isEmailVerified: true,
+      isActive: true,
       organizationId: systemOrgId,
-      role: 'organization_admin'
+      role: 'owner'
     })
     .onConflictDoNothing()
     .returning();

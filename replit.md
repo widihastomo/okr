@@ -246,6 +246,13 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 12, 2025. Successfully updated all seeder scripts to set system owner email as pre-verified:
+  * UPDATED: server/build-seeder.ts to use correct isEmailVerified field and proper user schema structure
+  * UPDATED: All seeder scripts now consistently use role: "owner" for system owner account
+  * ENHANCED: System owner account created with firstName/lastName fields for proper user structure
+  * VERIFIED: All three seeder scripts (build-seeder.ts, create-production-admin.ts, create-production-seeder.ts) now create system owner with isEmailVerified: true
+  * BENEFIT: System owner admin@refokus.com can login immediately without email verification step
+  * CONSISTENCY: All seeder scripts now use identical field structure matching the users table schema
 - July 12, 2025. Successfully resolved email service .env configuration issue and confirmed proper functionality:
   * CONFIRMED: .env file is being read correctly by the email service (dotenv_loaded: true)
   * CONFIRMED: Environment variables are properly loaded (MAILTRAP_HOST, MAILTRAP_USER, MAILTRAP_PASS, etc.)
