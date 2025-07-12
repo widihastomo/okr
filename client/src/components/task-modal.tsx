@@ -397,7 +397,7 @@ export default function TaskModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-[600px] max-h-[90vh] overflow-y-auto sm:w-full p-4 sm:p-6">
+      <DialogContent className="w-[90vw] max-w-[600px] max-h-[90vh] overflow-y-auto sm:w-full p-3 sm:p-6">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CheckCircle2 className="h-5 w-5 text-orange-500" />
@@ -410,7 +410,7 @@ export default function TaskModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Basic Information */}
           <div className="space-y-4">
             <div>
