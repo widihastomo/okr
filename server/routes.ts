@@ -6601,21 +6601,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Member invitation verification endpoint
+  // Member invitation verification endpoint - FIXED to use correct schema
   app.get("/api/member-invitations/verify/:token", async (req, res) => {
     try {
       const { token } = req.params;
+      console.log("🔍 Verifying invitation token (first endpoint):", token);
+      
       const invitation = await storage.getMemberInvitationByToken(token);
       
       if (!invitation) {
+        console.log("❌ Invitation not found");
         return res.status(404).json({ message: "Undangan tidak ditemukan" });
       }
       
-      if (invitation.status !== "pending") {
+      console.log("✅ Invitation found (first endpoint):", {
+        id: invitation.id,
+        email: invitation.email,
+        status: invitation.invitationStatus,
+        expiresAt: invitation.invitationExpiresAt
+      });
+      
+      // Use correct field names from users table
+      if (invitation.invitationStatus !== "pending") {
+        console.log("🚫 Invitation status is not pending:", invitation.invitationStatus);
         return res.status(400).json({ message: "Undangan sudah tidak valid" });
       }
       
-      if (invitation.expiresAt && new Date() > invitation.expiresAt) {
+      if (invitation.invitationExpiresAt && new Date() > invitation.invitationExpiresAt) {
+        console.log("⏰ Invitation expired");
         return res.status(400).json({ message: "Undangan sudah kedaluwarsa" });
       }
       
@@ -6623,6 +6636,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const organization = await storage.getOrganization(invitation.organizationId);
       const inviter = await storage.getUser(invitation.invitedBy);
       
+      console.log("✅ Invitation is valid, returning details");
       res.json({
         invitation,
         organization,
@@ -9559,61 +9573,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get invitation details by token (public) - used by accept invitation page
-  app.get("/api/member-invitations/verify/:token", async (req, res) => {
-    try {
-      const { token } = req.params;
-      
-      const invitation = await storage.getMemberInvitationByToken(token);
-      
-      if (!invitation) {
-        return res.status(404).json({ message: "Invitation not found" });
-      }
-      
-      console.log("Invitation found:", {
-        id: invitation.id,
-        email: invitation.email,
-        status: invitation.invitationStatus,
-        expiresAt: invitation.invitationExpiresAt,
-        currentTime: new Date().toISOString()
-      });
-      
-      // Check if invitation is expired
-      if (invitation.invitationExpiresAt && new Date() > invitation.invitationExpiresAt) {
-        console.log("Invitation expired");
-        return res.status(400).json({ message: "Invitation has expired" });
-      }
-      
-      // Check if invitation is already accepted
-      if (invitation.invitationStatus !== "pending") {
-        console.log("Invitation status is not pending:", invitation.invitationStatus);
-        return res.status(400).json({ message: "Invitation has already been accepted" });
-      }
-      
-      // Get organization details
-      const organization = await storage.getOrganization(invitation.organizationId);
-      
-      // Return invitation details without sensitive information
-      res.json({
-        id: invitation.id,
-        email: invitation.email,
-        role: invitation.role,
-        department: invitation.department,
-        jobTitle: invitation.jobTitle,
-        organizationId: invitation.organizationId,
-        invitationStatus: invitation.invitationStatus,
-        createdAt: invitation.createdAt,
-        invitationExpiresAt: invitation.invitationExpiresAt,
-        organization: {
-          id: organization?.id,
-          name: organization?.name,
-        },
-      });
-    } catch (error) {
-      console.error("Error fetching invitation:", error);
-      res.status(500).json({ message: "Failed to fetch invitation" });
-    }
-  });
+  // REMOVED DUPLICATE - Using the first endpoint at line 6607
 
   // Accept invitation (public) - used by accept invitation page
   app.post("/api/member-invitations/accept/:token", async (req, res) => {

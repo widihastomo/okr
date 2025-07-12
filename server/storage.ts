@@ -1992,10 +1992,21 @@ export class DatabaseStorage implements IStorage {
   
   async getMemberInvitationByToken(token: string): Promise<User | undefined> {
     try {
+      console.log("🔍 Searching for invitation token:", token);
       const [invitation] = await db
         .select()
         .from(users)
         .where(eq(users.invitationToken, token));
+      
+      console.log("📋 Query result:", invitation ? "Found invitation" : "No invitation found");
+      if (invitation) {
+        console.log("✅ Invitation details:", {
+          id: invitation.id,
+          email: invitation.email,
+          status: invitation.invitationStatus,
+          token: invitation.invitationToken
+        });
+      }
       
       return invitation;
     } catch (error) {
