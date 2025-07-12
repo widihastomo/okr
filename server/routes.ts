@@ -255,23 +255,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("Starting trial subscription creation for organization:", organizationId);
         const { subscriptionPlans, organizationSubscriptions, invoices, invoiceLineItems } = await import("@shared/schema");
         
-        // Get starter plan for trial purposes (fallback to first available active plan)
+        // Get Free Trial plan for trial purposes (fallback to cheapest plan if not available)
         const [trialPlan] = await db.select()
           .from(subscriptionPlans)
-          .where(eq(subscriptionPlans.isActive, true))
-          .orderBy(subscriptionPlans.price)
+          .where(
+            and(
+              eq(subscriptionPlans.slug, "free-trial"),
+              eq(subscriptionPlans.isActive, true)
+            )
+          )
           .limit(1);
         
         console.log("Found trial plan:", trialPlan ? { id: trialPlan.id, name: trialPlan.name, price: trialPlan.price } : "No plan found");
         
-        if (trialPlan && trialPlan.isActive) {
+        // Fallback to cheapest plan if Free Trial plan is not available
+        let finalTrialPlan = trialPlan;
+        if (!finalTrialPlan) {
+          const [fallbackPlan] = await db.select()
+            .from(subscriptionPlans)
+            .where(eq(subscriptionPlans.isActive, true))
+            .orderBy(subscriptionPlans.price)
+            .limit(1);
+          finalTrialPlan = fallbackPlan;
+          console.log("Using fallback plan:", finalTrialPlan ? { id: finalTrialPlan.id, name: finalTrialPlan.name, price: finalTrialPlan.price } : "No fallback plan found");
+        }
+        
+        if (finalTrialPlan && finalTrialPlan.isActive) {
           const trialStartDate = new Date();
           const trialEndDate = new Date(trialStartDate.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days trial
           
           // Create organization subscription for free trial
           const [newSubscription] = await db.insert(organizationSubscriptions).values({
             organizationId: organizationId,
-            planId: trialPlan.id,
+            planId: finalTrialPlan.id,
             status: "trialing",
             currentPeriodStart: trialStartDate,
             currentPeriodEnd: trialEndDate,
@@ -292,7 +308,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const [newInvoice] = await db.insert(invoices).values({
             invoiceNumber: invoiceNumber,
             organizationId: organizationId,
-            subscriptionPlanId: trialPlan.id,
+            subscriptionPlanId: finalTrialPlan.id,
             organizationSubscriptionId: newSubscription.id,
             amount: "0.00", // Free trial - no cost
             subtotal: "0.00",
@@ -329,16 +345,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
               ${newInvoice.id},
               'Free Trial - 30 Hari Gratis',
               1,
-              ${trialPlan.price || "0.00"},
+              ${finalTrialPlan.price || "0.00"},
               '0.00',
-              ${parseFloat(trialPlan.price || "0")},
+              ${parseFloat(finalTrialPlan.price || "0")},
               100,
               ${trialStartDate},
               ${trialEndDate},
-              ${trialPlan.id},
+              ${finalTrialPlan.id},
               ${JSON.stringify({
                 trial: true,
-                originalPrice: parseFloat(trialPlan.price || "0"),
+                originalPrice: parseFloat(finalTrialPlan.price || "0"),
                 discountReason: "Free Trial Registration"
               })}
             )
