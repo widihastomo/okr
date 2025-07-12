@@ -8393,10 +8393,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/organization/invite", requireAuth, async (req, res) => {
     try {
       const user = req.user as any;
-      const { email } = req.body;
+      const { email, role = "member" } = req.body;
 
       if (!user.organizationId) {
         return res.status(400).json({ error: "User not associated with an organization" });
+      }
+
+      // Validate role
+      const validRoles = ["owner", "administrator", "member", "viewer"];
+      if (!validRoles.includes(role)) {
+        return res.status(400).json({ error: "Invalid role. Must be one of: owner, administrator, member, viewer" });
       }
 
       // Only organization owners can invite users
@@ -8457,7 +8463,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Create invitation user with proper invitation fields
         const invitationData = {
           email,
-          role: "member",
+          role: role || "member",
           organizationId: user.organizationId,
           invitedBy: user.id,
           invitationStatus: 'pending',

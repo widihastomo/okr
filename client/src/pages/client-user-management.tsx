@@ -50,6 +50,7 @@ export default function ClientUserManagement() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState("member");
 
   // Check if current user can manage users in their organization
   if (!isOwner) {
@@ -71,8 +72,8 @@ export default function ClientUserManagement() {
 
   // Invite user mutation
   const inviteUserMutation = useMutation({
-    mutationFn: async (email: string) => {
-      const response = await apiRequest("POST", "/api/organization/invite", { email });
+    mutationFn: async ({ email, role }: { email: string; role: string }) => {
+      const response = await apiRequest("POST", "/api/organization/invite", { email, role });
       return response.json();
     },
     onSuccess: () => {
@@ -84,6 +85,7 @@ export default function ClientUserManagement() {
       });
       setShowInviteModal(false);
       setInviteEmail("");
+      setInviteRole("member");
     },
     onError: () => {
       toast({
@@ -153,7 +155,10 @@ export default function ClientUserManagement() {
 
   const handleInviteUser = () => {
     if (inviteEmail.trim()) {
-      inviteUserMutation.mutate(inviteEmail.trim());
+      inviteUserMutation.mutate({ 
+        email: inviteEmail.trim(), 
+        role: inviteRole 
+      });
     }
   };
 
@@ -211,6 +216,22 @@ export default function ClientUserManagement() {
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
               />
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Role Pengguna
+                </label>
+                <Select value={inviteRole} onValueChange={setInviteRole}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="member">Member - Akses standar untuk mengelola OKR</SelectItem>
+                    <SelectItem value="administrator">Administrator - Akses lanjutan kecuali pengaturan organisasi</SelectItem>
+                    <SelectItem value="viewer">Viewer - Hanya dapat melihat objektif dan analisis</SelectItem>
+                    <SelectItem value="owner">Owner - Akses penuh termasuk pengaturan organisasi</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => setShowInviteModal(false)}>
                   Batal
