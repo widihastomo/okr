@@ -25,7 +25,7 @@ export default function TrialStatusHeader() {
 
   return (
     <div 
-      className={`w-full px-2 sm:px-4 py-2 border-b fixed top-0 left-0 right-0 z-50 ${
+      className={`w-full px-2 sm:px-4 py-2 border-b fixed top-0 left-0 right-0 z-40 ${
         isExpiring ? 'bg-red-50 border-red-200' : 'bg-yellow-50 border-yellow-200'
       }`}
       style={{ minHeight: '44px', height: 'auto' }}
