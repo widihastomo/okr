@@ -54,8 +54,20 @@ const authLimiter = rateLimit({
   }
 });
 
+// More permissive rate limit for /api/auth/me endpoint
+const authMeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // 100 requests per 15 minutes for auth checks
+  skipSuccessfulRequests: true,
+  message: {
+    error: "Too many authentication requests from this IP, please try again later.",
+    retryAfter: "15 minutes"
+  }
+});
+
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
+app.use('/api/auth/me', authMeLimiter);
 
 // Data sanitization
 app.use(mongoSanitize());

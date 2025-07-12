@@ -246,6 +246,12 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 12, 2025. Successfully fixed 429 Too Many Requests error for authentication endpoint:
+  * FIXED: Added specific rate limiting for /api/auth/me endpoint (100 requests per 15 minutes)
+  * OPTIMIZED: Increased useAuth hook cache times from 10 seconds to 2 minutes stale time
+  * ENHANCED: Extended cache duration to 5 minutes for reduced API calls
+  * RESOLVED: 429 rate limiting errors on authentication checks
+  * IMPROVED: Better balance between security and user experience for auth requests
 - July 12, 2025. Successfully fixed JSX duplicate disabled attribute warnings in email verification forms:
   * FIXED: Removed duplicate disabled attributes in client/src/pages/registration.tsx
   * FIXED: Removed duplicate disabled attributes in client/src/components/AuthFlow.tsx
