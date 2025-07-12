@@ -404,7 +404,7 @@ export default function TaskModal({
             <CheckCircle2 className="h-5 w-5 text-orange-500" />
             {isAdding ? "Tambah Task Baru" : "Edit Task"}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-left">
             {isAdding
               ? "Buat task baru untuk initiative ini"
               : "Modifikasi detail task dan penugasan"}
