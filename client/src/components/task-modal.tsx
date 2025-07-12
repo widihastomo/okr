@@ -398,7 +398,7 @@ export default function TaskModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-[600px] max-h-[90vh] overflow-y-auto sm:w-full sm:max-w-[600px]">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CheckCircle2 className="h-5 w-5 text-orange-500" />
@@ -411,9 +411,14 @@ export default function TaskModal({
           </DialogDescription>
         </DialogHeader>
 
-        <CardContent className="space-y-6 border border-gray-200 rounded-lg p-4 sm:p-6">
-          {/* Basic Information */}
-          <div className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5" />
+              Informasi Task
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
             <div>
               <Label htmlFor="title" className="flex items-center gap-2 mb-2">
                 Judul Task *
@@ -492,34 +497,32 @@ export default function TaskModal({
                 className="focus:ring-orange-500 focus:border-orange-500"
               />
             </div>
-          </div>
 
-          {/* Initiative Selection */}
-          <div>
-            <Label className="flex items-center gap-2 mb-2">
-              Inisiatif Terkait (opsional)
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-auto p-0 text-blue-500 hover:text-blue-600"
-                  >
-                    <HelpCircle className="h-4 w-4" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-80" side="top" sideOffset={5}>
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Mengelompokkan Task</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Pilih initiative yang relevan untuk mengelompokkan task
-                      ini. Ini membantu dalam pelaporan progress dan koordinasi
-                      tim.
-                    </p>
-                  </div>
-                </PopoverContent>
-              </Popover>
-            </Label>
+            <div>
+              <Label className="flex items-center gap-2 mb-2">
+                Inisiatif Terkait (opsional)
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-auto p-0 text-blue-500 hover:text-blue-600"
+                    >
+                      <HelpCircle className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80" side="top" sideOffset={5}>
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Mengelompokkan Task</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Pilih initiative yang relevan untuk mengelompokkan task
+                        ini. Ini membantu dalam pelaporan progress dan koordinasi
+                        tim.
+                      </p>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </Label>
             <Popover
               open={initiativePopoverOpen}
               onOpenChange={setInitiativePopoverOpen}
@@ -601,36 +604,35 @@ export default function TaskModal({
             </Popover>
           </div>
 
-          {/* Status & Priority */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <Label
-                htmlFor="priority"
-                className="flex items-center gap-2 mb-2"
-              >
-                Prioritas
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-auto p-0 text-blue-500 hover:text-blue-600"
-                    >
-                      <HelpCircle className="h-4 w-4" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-80" side="top" sideOffset={5}>
-                    <div className="space-y-2">
-                      <h4 className="font-medium">Menentukan Prioritas</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Tinggi: Urgent dan penting (deadline ketat). Sedang:
-                        Penting tapi tidak urgent. Rendah: Nice to have, bisa
-                        ditunda.
-                      </p>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label
+                  htmlFor="priority"
+                  className="flex items-center gap-2 mb-2"
+                >
+                  Prioritas
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-auto p-0 text-blue-500 hover:text-blue-600"
+                      >
+                        <HelpCircle className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80" side="top" sideOffset={5}>
+                      <div className="space-y-2">
+                        <h4 className="font-medium">Menentukan Prioritas</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Tinggi: Urgent dan penting (deadline ketat). Sedang:
+                          Penting tapi tidak urgent. Rendah: Nice to have, bisa
+                          ditunda.
+                        </p>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </Label>
               <Select
                 value={formData.priority}
                 onValueChange={(value) =>
@@ -778,33 +780,32 @@ export default function TaskModal({
             </div>
           </div>
 
-          {/* Assignment & Due Date */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <Label className="flex items-center gap-2 mb-2">
-                PIC
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-auto p-0 text-blue-500 hover:text-blue-600"
-                    >
-                      <HelpCircle className="h-4 w-4" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-80" side="top" sideOffset={5}>
-                    <div className="space-y-2">
-                      <h4 className="font-medium">Menentukan PIC</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Pilih anggota tim yang akan bertanggung jawab
-                        menyelesaikan task ini. PIC akan menerima notifikasi dan
-                        bertanggung jawab atas progress task.
-                      </p>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label className="flex items-center gap-2 mb-2">
+                  PIC
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-auto p-0 text-blue-500 hover:text-blue-600"
+                      >
+                        <HelpCircle className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80" side="top" sideOffset={5}>
+                      <div className="space-y-2">
+                        <h4 className="font-medium">Menentukan PIC</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Pilih anggota tim yang akan bertanggung jawab
+                          menyelesaikan task ini. PIC akan menerima notifikasi dan
+                          bertanggung jawab atas progress task.
+                        </p>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </Label>
               <Popover open={picPopoverOpen} onOpenChange={setPicPopoverOpen}>
                 <PopoverTrigger asChild>
                   <Button
@@ -876,80 +877,81 @@ export default function TaskModal({
                   </Command>
                 </PopoverContent>
               </Popover>
-            </div>
+              </div>
 
-            <div>
-              <Label className="flex items-center gap-2 mb-2">
-                Tenggat Waktu
+              <div>
+                <Label className="flex items-center gap-2 mb-2">
+                  Tenggat Waktu
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-auto p-0 text-blue-500 hover:text-blue-600"
+                      >
+                        <HelpCircle className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80" side="top" sideOffset={5}>
+                      <div className="space-y-2">
+                        <h4 className="font-medium">Menentukan Deadline</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Pilih tanggal yang realistis untuk menyelesaikan task
+                          ini. Pertimbangkan kompleksitas task, workload PIC, dan
+                          dependencies lainnya.
+                        </p>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-auto p-0 text-blue-500 hover:text-blue-600"
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal focus:ring-orange-500 focus:border-orange-500"
                     >
-                      <HelpCircle className="h-4 w-4" />
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {formData.dueDate
+                        ? formData.dueDate.toLocaleDateString("id-ID")
+                        : "Pilih tanggal"}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-80" side="top" sideOffset={5}>
-                    <div className="space-y-2">
-                      <h4 className="font-medium">Menentukan Deadline</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Pilih tanggal yang realistis untuk menyelesaikan task
-                        ini. Pertimbangkan kompleksitas task, workload PIC, dan
-                        dependencies lainnya.
-                      </p>
-                    </div>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={formData.dueDate}
+                      onSelect={(date) => {
+                        if (date) {
+                          // Adjust for GMT+7 timezone to prevent date shifting
+                          const adjustedDate = new Date(date);
+                          adjustedDate.setHours(adjustedDate.getHours() + 7);
+                          setFormData({ ...formData, dueDate: adjustedDate });
+                        } else {
+                          setFormData({ ...formData, dueDate: date });
+                        }
+                      }}
+                      disabled={(date) => {
+                        // Use GMT+7 timezone for date comparison
+                        const now = new Date();
+                        const utc =
+                          now.getTime() + now.getTimezoneOffset() * 60000;
+                        const gmt7Date = new Date(utc + 7 * 3600000);
+                        const today = new Date(
+                          gmt7Date.getFullYear(),
+                          gmt7Date.getMonth(),
+                          gmt7Date.getDate(),
+                        );
+
+                        return date < today;
+                      }}
+                      initialFocus
+                    />
                   </PopoverContent>
                 </Popover>
-              </Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal focus:ring-orange-500 focus:border-orange-500"
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formData.dueDate
-                      ? formData.dueDate.toLocaleDateString("id-ID")
-                      : "Pilih tanggal"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={formData.dueDate}
-                    onSelect={(date) => {
-                      if (date) {
-                        // Adjust for GMT+7 timezone to prevent date shifting
-                        const adjustedDate = new Date(date);
-                        adjustedDate.setHours(adjustedDate.getHours() + 7);
-                        setFormData({ ...formData, dueDate: adjustedDate });
-                      } else {
-                        setFormData({ ...formData, dueDate: date });
-                      }
-                    }}
-                    disabled={(date) => {
-                      // Use GMT+7 timezone for date comparison
-                      const now = new Date();
-                      const utc =
-                        now.getTime() + now.getTimezoneOffset() * 60000;
-                      const gmt7Date = new Date(utc + 7 * 3600000);
-                      const today = new Date(
-                        gmt7Date.getFullYear(),
-                        gmt7Date.getMonth(),
-                        gmt7Date.getDate(),
-                      );
-
-                      return date < today;
-                    }}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+              </div>
             </div>
-          </div>
         </CardContent>
+        </Card>
 
         <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
           <Button
