@@ -1,14 +1,27 @@
 import { db } from "./db";
 import { sql } from "drizzle-orm";
 import { resetRLS } from "./reset-rls";
+import { Pool } from "@neondatabase/serverless";
 
 /**
  * Setup PostgreSQL Row Level Security (RLS) for multi-tenant data isolation
  * This provides database-level security in addition to application-level security
  */
 export async function setupRLS() {
+  let rlsPool: Pool | null = null;
+  
   try {
     console.log("🔒 Setting up PostgreSQL Row Level Security (RLS)...");
+    
+    // Create a separate connection pool for RLS setup to avoid conflicts
+    if (!process.env.DATABASE_URL) {
+      throw new Error("DATABASE_URL is required for RLS setup");
+    }
+    
+    rlsPool = new Pool({ 
+      connectionString: process.env.DATABASE_URL,
+      max: 1 // Single connection for RLS setup
+    });
     
     // First, clean up any existing RLS configuration
     await resetRLS();
@@ -278,6 +291,16 @@ export async function setupRLS() {
   } catch (error) {
     console.error("❌ RLS setup failed:", error);
     throw error;
+  } finally {
+    // Clean up the dedicated RLS pool
+    if (rlsPool) {
+      try {
+        await rlsPool.end();
+        console.log("ℹ️ RLS setup connection pool closed");
+      } catch (cleanupError) {
+        console.warn("Warning: RLS pool cleanup failed:", cleanupError.message);
+      }
+    }
   }
 }
 

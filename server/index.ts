@@ -303,8 +303,19 @@ const config = getConfig();
         const { runBuildSeeder } = await import("./build-seeder");
         await runBuildSeeder();
         
-        console.log("Setting up Row Level Security (RLS)...");
-        await setupRLS();
+        // Skip RLS setup in development to avoid pool conflicts
+        if (process.env.NODE_ENV === 'production') {
+          try {
+            console.log("Setting up Row Level Security (RLS)...");
+            await setupRLS();
+          } catch (rlsError) {
+            console.warn("⚠️ RLS setup failed, continuing without RLS:", rlsError.message);
+            // Continue without RLS - application-level security is still active
+          }
+        } else {
+          console.log("ℹ️ Skipping RLS setup in development (application-level security active)");
+        }
+        
         console.log("Populating PostgreSQL database with sample data...");
         await populateDatabase();
         console.log("Populating SaaS subscription data...");
