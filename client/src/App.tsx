@@ -18,7 +18,6 @@ import Dashboard from "@/pages/dashboard";
 import TemplatesContent from "@/components/templates-content";
 import CyclesContent from "@/components/cycles-content";
 
-
 import KeyResultDetail from "@/pages/key-result-detail";
 import InitiativeDetail from "@/pages/initiative-detail";
 import ObjectiveDetail from "@/pages/objective-detail";
@@ -71,7 +70,7 @@ function Router() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [location, navigate] = useLocation();
-  
+
   // Check trial status for dynamic content positioning
   const { data: trialStatus } = useQuery({
     queryKey: ["/api/trial-status"],
@@ -79,7 +78,7 @@ function Router() {
     staleTime: 5 * 60 * 1000, // 5 minutes cache (increased from 1 minute)
     refetchOnWindowFocus: false, // Prevent unnecessary refetch on focus
   });
-  
+
   // Check onboarding status for redirect (efficient version)
   const { data: onboardingStatus } = useQuery({
     queryKey: ["/api/onboarding/status"],
@@ -99,7 +98,13 @@ function Router() {
 
   // Handle onboarding redirect only on root path
   useEffect(() => {
-    if (isAuthenticated && !isLoading && location === "/" && onboardingStatus && !onboardingStatus.isCompleted) {
+    if (
+      isAuthenticated &&
+      !isLoading &&
+      location === "/" &&
+      onboardingStatus &&
+      !onboardingStatus.isCompleted
+    ) {
       navigate("/onboarding");
     }
   }, [isAuthenticated, isLoading, location, onboardingStatus, navigate]);
@@ -157,7 +162,7 @@ function Router() {
       <div className="min-h-screen bg-gray-50">
         {/* Trial Status Header - Shows above main header - Hide on onboarding */}
         {!isOnboardingPage && <TrialStatusHeader />}
-        
+
         {/* Global Header - Hide on onboarding */}
         {!isOnboardingPage && (
           <GlobalHeader
@@ -167,7 +172,7 @@ function Router() {
             onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
           />
         )}
-        
+
         {/* Sidebar - Hide on onboarding */}
         {!isOnboardingPage && (
           <>
@@ -200,15 +205,17 @@ function Router() {
           )}
         >
           {/* Main Content */}
-          <div className={cn(
-            "flex-1 min-h-[calc(100vh-6rem)] py-3 overflow-x-hidden",
-            // Different padding for onboarding page and trial status
-            isOnboardingPage 
-              ? "pt-0 px-0" 
-              : trialStatus?.isTrialActive 
-                ? "pt-[108px] sm:pt-[108px] px-3 sm:px-6" 
-                : "pt-[64px] sm:pt-[64px] px-3 sm:px-6"
-          )}>
+          <div
+            className={cn(
+              "flex-1 min-h-[calc(100vh-6rem)] py-3 overflow-x-hidden",
+              // Different padding for onboarding page and trial status
+              isOnboardingPage
+                ? "pt-0 px-0"
+                : trialStatus?.isTrialActive
+                  ? "pt-[120px] sm:pt-[120px] px-3 sm:px-6"
+                  : "pt-[64px] sm:pt-[64px] px-3 sm:px-6",
+            )}
+          >
             <Switch>
               <Route path="/onboarding" component={CompanyOnboarding} />
               <Route path="/" component={DailyFocusPage} />
@@ -232,7 +239,6 @@ function Router() {
               <Route path="/achievements" component={AchievementsPage} />
 
               <Route path="/analytics" component={AnalyticsPage} />
-
 
               <Route
                 path="/organization-settings"
