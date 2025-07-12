@@ -8664,32 +8664,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update organization with owner ID
       await storage.updateOrganization(organization.id, { ownerId: user.id });
       
-      // Automatically assign free trial subscription
+      // Automatically assign default trial subscription
       try {
-        const { subscriptionPlans, organizationSubscriptions } = await import("@shared/schema");
-        const { eq } = await import("drizzle-orm");
+        const { subscriptionPlans, organizationSubscriptions, applicationSettings } = await import("@shared/schema");
+        const { eq, and } = await import("drizzle-orm");
         const { db } = await import("./db");
         
-        console.log("🔍 Looking for Free Trial subscription plan...");
+        console.log("🔍 Looking for default trial subscription plan...");
         
-        const freeTrialPlan = await db.select()
-          .from(subscriptionPlans)
-          .where(eq(subscriptionPlans.slug, 'free-trial'))
+        // Get default plan from application settings
+        const [defaultPlanSetting] = await db.select()
+          .from(applicationSettings)
+          .where(eq(applicationSettings.key, 'default_trial_plan'))
           .limit(1);
         
-        if (freeTrialPlan.length > 0) {
-          const trialPlan = freeTrialPlan[0];
-          console.log("✅ Found Free Trial plan:", trialPlan.name, "with ID:", trialPlan.id);
-          
+        let finalTrialPlan = null;
+        
+        if (defaultPlanSetting) {
+          // Use the configured default plan
+          const [defaultPlan] = await db.select()
+            .from(subscriptionPlans)
+            .where(
+              and(
+                eq(subscriptionPlans.id, defaultPlanSetting.value),
+                eq(subscriptionPlans.isActive, true)
+              )
+            )
+            .limit(1);
+          finalTrialPlan = defaultPlan;
+          console.log("✅ Using configured default plan:", finalTrialPlan ? { id: finalTrialPlan.id, name: finalTrialPlan.name, price: finalTrialPlan.price } : "Default plan not found");
+        }
+        
+        // Fallback 1: Try Free Trial plan if no default plan is configured
+        if (!finalTrialPlan) {
+          const [trialPlan] = await db.select()
+            .from(subscriptionPlans)
+            .where(
+              and(
+                eq(subscriptionPlans.slug, "free-trial"),
+                eq(subscriptionPlans.isActive, true)
+              )
+            )
+            .limit(1);
+          finalTrialPlan = trialPlan;
+          console.log("✅ Using fallback Free Trial plan:", finalTrialPlan ? { id: finalTrialPlan.id, name: finalTrialPlan.name, price: finalTrialPlan.price } : "Free Trial plan not found");
+        }
+        
+        // Fallback 2: Use cheapest plan if neither default nor Free Trial is available
+        if (!finalTrialPlan) {
+          const [cheapestPlan] = await db.select()
+            .from(subscriptionPlans)
+            .where(eq(subscriptionPlans.isActive, true))
+            .orderBy(subscriptionPlans.price)
+            .limit(1);
+          finalTrialPlan = cheapestPlan;
+          console.log("✅ Using cheapest plan as final fallback:", finalTrialPlan ? { id: finalTrialPlan.id, name: finalTrialPlan.name, price: finalTrialPlan.price } : "No active plans found");
+        }
+        
+        if (finalTrialPlan && finalTrialPlan.isActive) {
           const trialStartDate = new Date();
           const trialEndDate = new Date(trialStartDate.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days from now
           
           console.log("📅 Trial period:", trialStartDate.toISOString(), "to", trialEndDate.toISOString());
           
-          // Create organization subscription for free trial
+          // Create organization subscription for trial
           const [newSubscription] = await db.insert(organizationSubscriptions).values({
             organizationId: organization.id,
-            planId: trialPlan.id,
+            planId: finalTrialPlan.id,
             status: "trialing",
             currentPeriodStart: trialStartDate,
             currentPeriodEnd: trialEndDate,
@@ -8699,7 +8740,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           console.log("🎉 Trial subscription created successfully:", newSubscription.id);
         } else {
-          console.error("❌ Free Trial plan not found!");
+          console.error("❌ No active subscription plan found!");
         }
       } catch (subscriptionError) {
         console.error("❌ Error creating trial subscription:", subscriptionError);
@@ -9932,6 +9973,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error setting default plan:', error);
       res.status(500).json({ message: 'Failed to set default plan' });
+    }
+  });
+
+  // Delete default plan setting
+  app.delete('/api/admin/default-plan', requireAuth, requireSystemOwner, async (req, res) => {
+    try {
+      const deletedRows = await db.delete(applicationSettings)
+        .where(eq(applicationSettings.key, 'default_trial_plan'));
+      
+      if (deletedRows) {
+        res.json({ message: 'Default plan setting berhasil dihapus' });
+      } else {
+        res.status(404).json({ message: 'Default plan setting tidak ditemukan' });
+      }
+    } catch (error) {
+      console.error('Error deleting default plan:', error);
+      res.status(500).json({ message: 'Failed to delete default plan' });
     }
   });
 

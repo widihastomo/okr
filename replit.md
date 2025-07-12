@@ -246,6 +246,14 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 12, 2025. Successfully fixed database schema mismatch for application settings and completed comprehensive default plan integration:
+  * FIXED: Added missing "type" column to application_settings table in database to match schema definition
+  * ENHANCED: Both build-seeder.ts and create-production-seeder.ts now properly include type field in application settings
+  * INTEGRATED: Updated client registration endpoint to use same default plan lookup logic as main registration
+  * UNIFIED: Both registration flows now use three-tier fallback: configured default plan → Free Trial plan → cheapest plan
+  * COMPLETED: Added DELETE /api/admin/default-plan endpoint to complement GET/POST endpoints
+  * VERIFIED: All seeder scripts now run successfully with proper application settings creation
+  * RESULT: Complete default plan management system operational with consistent behavior across all registration flows
 - July 12, 2025. Successfully implemented default plan management system for admin control:
   * ADDED: Default plan management endpoints GET/POST /api/admin/default-plan for system owners
   * ADDED: Application setting 'default_trial_plan' to configure which plan new registrations use

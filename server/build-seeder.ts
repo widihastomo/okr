@@ -114,38 +114,39 @@ async function createApplicationSettings() {
 
   const settings = [
     // General Settings
-    { key: 'app_name', value: 'Refokus OKR Platform', category: 'general', description: 'Nama aplikasi yang ditampilkan di header dan title', isPublic: true },
-    { key: 'app_description', value: 'Platform manajemen OKR terdepan untuk pencapaian tujuan organisasi', category: 'general', description: 'Deskripsi singkat aplikasi', isPublic: true },
-    { key: 'app_version', value: '1.0.0', category: 'general', description: 'Versi aplikasi saat ini', isPublic: true },
-    { key: 'company_name', value: 'Refokus', category: 'general', description: 'Nama perusahaan yang mengoperasikan platform', isPublic: true },
-    { key: 'contact_email', value: 'support@refokus.com', category: 'general', description: 'Email kontak untuk support dan pertanyaan', isPublic: true },
-    { key: 'support_phone', value: '+62-21-12345678', category: 'general', description: 'Nomor telepon support', isPublic: true },
+    { key: 'app_name', value: 'Refokus OKR Platform', type: 'text', category: 'general', description: 'Nama aplikasi yang ditampilkan di header dan title', isPublic: true },
+    { key: 'app_description', value: 'Platform manajemen OKR terdepan untuk pencapaian tujuan organisasi', type: 'text', category: 'general', description: 'Deskripsi singkat aplikasi', isPublic: true },
+    { key: 'app_version', value: '1.0.0', type: 'text', category: 'general', description: 'Versi aplikasi saat ini', isPublic: true },
+    { key: 'company_name', value: 'Refokus', type: 'text', category: 'general', description: 'Nama perusahaan yang mengoperasikan platform', isPublic: true },
+    { key: 'contact_email', value: 'support@refokus.com', type: 'text', category: 'general', description: 'Email kontak untuk support dan pertanyaan', isPublic: true },
+    { key: 'support_phone', value: '+62-21-12345678', type: 'text', category: 'general', description: 'Nomor telepon support', isPublic: true },
     
     // Appearance Settings
-    { key: 'primary_color', value: '#f97316', category: 'appearance', description: 'Warna utama aplikasi (orange)', isPublic: true },
-    { key: 'secondary_color', value: '#dc2626', category: 'appearance', description: 'Warna sekunder aplikasi (red)', isPublic: true },
-    { key: 'logo_url', value: '/assets/logo.png', category: 'appearance', description: 'URL logo aplikasi', isPublic: true },
-    { key: 'favicon_url', value: '/assets/favicon.ico', category: 'appearance', description: 'URL favicon aplikasi', isPublic: true },
+    { key: 'primary_color', value: '#f97316', type: 'text', category: 'appearance', description: 'Warna utama aplikasi (orange)', isPublic: true },
+    { key: 'secondary_color', value: '#dc2626', type: 'text', category: 'appearance', description: 'Warna sekunder aplikasi (red)', isPublic: true },
+    { key: 'logo_url', value: '/assets/logo.png', type: 'url', category: 'appearance', description: 'URL logo aplikasi', isPublic: true },
+    { key: 'favicon_url', value: '/assets/favicon.ico', type: 'url', category: 'appearance', description: 'URL favicon aplikasi', isPublic: true },
     
     // Feature Settings
-    { key: 'enable_notifications', value: 'true', category: 'features', description: 'Aktifkan sistem notifikasi', isPublic: false },
-    { key: 'enable_achievements', value: 'true', category: 'features', description: 'Aktifkan sistem achievement', isPublic: false },
-    { key: 'enable_gamification', value: 'true', category: 'features', description: 'Aktifkan sistem gamifikasi', isPublic: false },
-    { key: 'enable_trials', value: 'true', category: 'features', description: 'Aktifkan sistem trial', isPublic: false },
+    { key: 'enable_notifications', value: 'true', type: 'boolean', category: 'features', description: 'Aktifkan sistem notifikasi', isPublic: false },
+    { key: 'enable_achievements', value: 'true', type: 'boolean', category: 'features', description: 'Aktifkan sistem achievement', isPublic: false },
+    { key: 'enable_gamification', value: 'true', type: 'boolean', category: 'features', description: 'Aktifkan sistem gamifikasi', isPublic: false },
+    { key: 'enable_trials', value: 'true', type: 'boolean', category: 'features', description: 'Aktifkan sistem trial', isPublic: false },
     
     // Security Settings
-    { key: 'session_timeout', value: '3600', category: 'security', description: 'Timeout sesi dalam detik', isPublic: false },
-    { key: 'password_min_length', value: '8', category: 'security', description: 'Panjang minimum password', isPublic: false },
-    { key: 'max_login_attempts', value: '5', category: 'security', description: 'Maksimal percobaan login', isPublic: false },
+    { key: 'session_timeout', value: '3600', type: 'number', category: 'security', description: 'Timeout sesi dalam detik', isPublic: false },
+    { key: 'password_min_length', value: '8', type: 'number', category: 'security', description: 'Panjang minimum password', isPublic: false },
+    { key: 'max_login_attempts', value: '5', type: 'number', category: 'security', description: 'Maksimal percobaan login', isPublic: false },
     
     // Business Settings
-    { key: 'default_trial_days', value: '7', category: 'business', description: 'Durasi trial default dalam hari', isPublic: false },
-    { key: 'max_trial_users', value: '3', category: 'business', description: 'Maksimal user dalam trial', isPublic: false },
-    { key: 'currency', value: 'IDR', category: 'business', description: 'Mata uang default', isPublic: true },
+    { key: 'default_trial_days', value: '7', type: 'number', category: 'business', description: 'Durasi trial default dalam hari', isPublic: false },
+    { key: 'max_trial_users', value: '3', type: 'number', category: 'business', description: 'Maksimal user dalam trial', isPublic: false },
+    { key: 'currency', value: 'IDR', type: 'text', category: 'business', description: 'Mata uang default', isPublic: true },
+    { key: 'default_trial_plan', value: '43ee40b6-4f63-4cdf-b9bd-02d577867f61', type: 'text', category: 'business', description: 'Default subscription plan untuk registrasi baru', isPublic: false },
     
     // Integration Settings
-    { key: 'enable_email_notifications', value: 'true', category: 'integration', description: 'Aktifkan notifikasi email', isPublic: false },
-    { key: 'email_provider', value: 'mailtrap', category: 'integration', description: 'Provider email default', isPublic: false },
+    { key: 'enable_email_notifications', value: 'true', type: 'boolean', category: 'integration', description: 'Aktifkan notifikasi email', isPublic: false },
+    { key: 'email_provider', value: 'mailtrap', type: 'text', category: 'integration', description: 'Provider email default', isPublic: false },
   ];
 
   let createdCount = 0;
@@ -157,6 +158,7 @@ async function createApplicationSettings() {
         .values({
           key: setting.key,
           value: setting.value,
+          type: setting.type,
           category: setting.category,
           description: setting.description,
           isPublic: setting.isPublic

@@ -3,7 +3,8 @@ import {
   users, 
   organizations,
   subscriptionPlans, 
-  organizationSubscriptions 
+  organizationSubscriptions,
+  applicationSettings
 } from "../shared/schema";
 import { hashPassword } from "./emailAuth";
 import { eq } from "drizzle-orm";
@@ -77,7 +78,10 @@ async function seedProductionData() {
     // 2. Create basic subscription plans
     await createSubscriptionPlans();
     
-    // 3. Verify setup
+    // 3. Create application settings with default plan
+    await createApplicationSettings();
+    
+    // 4. Verify setup
     await verifySetup();
     
     console.log(`✅ ${environment} seeding completed successfully!`);
@@ -165,6 +169,7 @@ async function createSubscriptionPlans() {
   // Create basic subscription plans
   const plans = [
     {
+      id: "43ee40b6-4f63-4cdf-b9bd-02d577867f61", // Set consistent ID for Free Trial
       name: "Free Trial",
       slug: "free-trial",
       description: "7 hari gratis untuk mencoba semua fitur",
@@ -245,6 +250,38 @@ async function createSubscriptionPlans() {
   for (const plan of plans) {
     await db.insert(subscriptionPlans).values(plan);
     console.log(`✅ Created plan: ${plan.name} (${plan.slug})`);
+  }
+}
+
+async function createApplicationSettings() {
+  console.log("⚙️  Creating application settings...");
+
+  // Check if settings already exist
+  const existingSettings = await db.select().from(applicationSettings).limit(1);
+  
+  if (existingSettings.length > 0) {
+    console.log("ℹ️  Application settings already exist, skipping creation");
+    return;
+  }
+
+  const settings = [
+    { key: 'default_trial_plan', value: '43ee40b6-4f63-4cdf-b9bd-02d577867f61', type: 'text', category: 'business', description: 'Default subscription plan untuk registrasi baru', isPublic: false },
+    { key: 'app_name', value: 'Refokus OKR Platform', type: 'text', category: 'general', description: 'Nama aplikasi', isPublic: true },
+    { key: 'app_version', value: '1.0.0', type: 'text', category: 'general', description: 'Versi aplikasi', isPublic: true },
+    { key: 'default_trial_days', value: '7', type: 'number', category: 'business', description: 'Durasi trial default', isPublic: false },
+    { key: 'currency', value: 'IDR', type: 'text', category: 'business', description: 'Mata uang default', isPublic: true },
+  ];
+
+  for (const setting of settings) {
+    await db.insert(applicationSettings).values({
+      key: setting.key,
+      value: setting.value,
+      type: setting.type,
+      category: setting.category,
+      description: setting.description,
+      isPublic: setting.isPublic
+    });
+    console.log(`✅ Created setting: ${setting.key}`);
   }
 }
 
