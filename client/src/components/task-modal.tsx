@@ -35,7 +35,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Calendar } from "@/components/ui/calendar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+// Button will be replaced with Button
 import {
   CheckCircle2,
   Clock,
@@ -56,122 +56,43 @@ interface TaskModalProps {
   isAdding?: boolean;
 }
 
+const getStatusLabel = (status: string) => {
+  switch (status) {
+    case "not_started":
+      return "Belum Dimulai";
+    case "in_progress":
+      return "Sedang Dikerjakan";
+    case "completed":
+      return "Selesai";
+    case "cancelled":
+      return "Dibatalkan";
+    default:
+      return status;
+  }
+};
+
 export default function TaskModal({
   open,
   onClose,
   task,
   initiativeId,
-  isAdding = false,
+  isAdding,
 }: TaskModalProps) {
   const { toast } = useToast();
-  const [formData, setFormData] = useState({
-    title: task?.title || "",
-    description: task?.description || "",
-    assignedTo: task?.assignedTo || "",
-    dueDate: task?.dueDate ? new Date(task.dueDate) : null,
-    priority: task?.priority || "medium",
-    status: task?.status || "not_started",
-    initiativeId:
-      initiativeId || task?.initiativeId || task?.initiative?.id || "",
-  });
-
-  const [statusPopoverOpen, setStatusPopoverOpen] = useState(false);
   const [picPopoverOpen, setPicPopoverOpen] = useState(false);
   const [initiativePopoverOpen, setInitiativePopoverOpen] = useState(false);
-
-  const { data: initiativesData, isLoading: initiativesLoading } = useQuery({
-    queryKey: ["/api/initiatives"],
-    enabled: open,
+  const [statusPopoverOpen, setStatusPopoverOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    status: "not_started",
+    priority: "medium",
+    assignedTo: "",
+    dueDate: null as Date | null,
+    initiativeId: "",
   });
 
-  const { data: availableUsers } = useQuery({
-    queryKey: ["/api/users"],
-    enabled: open,
-  });
-
-  const createMutation = useMutation({
-    mutationFn: async (taskData: any) => {
-      const response = await fetch("/api/tasks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(taskData),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to create task");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Task berhasil dibuat",
-        description: "Task baru telah ditambahkan ke sistem",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
-      onClose();
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Gagal membuat task",
-        description: error.message || "Terjadi kesalahan saat membuat task",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async (taskData: any) => {
-      const response = await fetch(`/api/tasks/${task.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(taskData),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to update task");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Task berhasil diperbarui",
-        description: "Perubahan task telah disimpan",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
-      onClose();
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Gagal memperbarui task",
-        description: error.message || "Terjadi kesalahan saat memperbarui task",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleSubmit = async () => {
-    if (!formData.title.trim()) {
-      toast({
-        title: "Judul task diperlukan",
-        description: "Silakan masukkan judul task",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const taskData = {
-      ...formData,
-      initiativeId:
-        formData.initiativeId === "unassigned" ? null : formData.initiativeId,
-      assignedTo: formData.assignedTo === "unassigned" ? null : formData.assignedTo,
-      dueDate: formData.dueDate ? formData.dueDate.toISOString() : null,
-    };
-
-    if (isAdding) {
-      createMutation.mutate(taskData);
-    } else {
-      updateMutation.mutate(taskData);
-    }
-  };
-
+  // Helper function to get status display with visual indicator
   const getStatusDisplay = (status: string) => {
     switch (status) {
       case "not_started":
@@ -203,12 +124,261 @@ export default function TaskModal({
           </div>
         );
       default:
-        return (
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-            Belum Mulai
-          </div>
+        return "Pilih status task";
+    }
+  };
+
+  // Fetch users for assignment
+  const { data: users = [] } = useQuery({
+    queryKey: ["/api/users"],
+  });
+
+  // Fetch all initiatives for assignment
+  const { data: initiatives = [] } = useQuery({
+    queryKey: ["/api/initiatives"],
+  });
+
+  // Fetch initiative details to get PIC and members
+  const { data: initiative } = useQuery({
+    queryKey: [`/api/initiatives/${initiativeId}`],
+    enabled: !!initiativeId,
+  });
+
+  // Cast types for proper access and add debugging
+  const usersData = (users as any) || [];
+  const initiativesData = (initiatives as any) || [];
+  const initiativeData = (initiative as any) || {};
+  const picId = initiativeData.picId;
+  const initiativeMembers = initiativeData.members || [];
+
+  // Show all users for task assignment
+  const availableUsers = Array.isArray(usersData) ? usersData : [];
+
+  useEffect(() => {
+    if (task && !isAdding) {
+      setFormData({
+        title: task.title || "",
+        description: task.description || "",
+        status: task.status || "not_started",
+        priority: task.priority || "medium",
+        assignedTo: task.assignedTo?.id || task.assignedTo || "",
+        dueDate: task.dueDate ? new Date(task.dueDate) : null,
+        initiativeId: task.initiativeId || "",
+      });
+    } else {
+      setFormData({
+        title: "",
+        description: "",
+        status: "not_started",
+        priority: "medium",
+        assignedTo: "",
+        dueDate: null,
+        initiativeId: initiativeId || "",
+      });
+    }
+  }, [task, isAdding, initiativeId]);
+
+  const createMutation = useMutation({
+    mutationFn: async (data: any) => {
+      // If task has an initiative ID, use the initiative-specific endpoint
+      if (data.initiativeId) {
+        const response = await fetch(
+          `/api/initiatives/${data.initiativeId}/tasks`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          },
         );
+        if (!response.ok) throw new Error("Failed to create task");
+        return response.json();
+      } else {
+        // Otherwise use the general tasks endpoint
+        const response = await fetch(`/api/tasks`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        if (!response.ok) throw new Error("Failed to create task");
+        return response.json();
+      }
+    },
+    onSuccess: (data) => {
+      // Invalidate relevant queries based on context
+      if (data.initiativeId) {
+        queryClient.invalidateQueries({
+          queryKey: [`/api/initiatives/${data.initiativeId}/tasks`],
+          refetchType: "active",
+        });
+        queryClient.invalidateQueries({
+          queryKey: [`/api/initiatives/${data.initiativeId}`],
+          refetchType: "active",
+        });
+      }
+      queryClient.invalidateQueries({
+        queryKey: ["/api/initiatives"],
+        refetchType: "active",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/tasks"],
+        refetchType: "active",
+      });
+
+      // Show success toast for task creation
+      toast({
+        title: "Task berhasil dibuat",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+
+      // Show additional toast if user was automatically added as member
+      if (data.addedAsMember) {
+        const assignedUser = availableUsers.find(
+          (u) => u.id === formData.assignedTo,
+        );
+        const userName = assignedUser
+          ? `${assignedUser.firstName} ${assignedUser.lastName}`
+          : "User";
+
+        setTimeout(() => {
+          toast({
+            title: "Member baru ditambahkan",
+            description: `${userName} otomatis ditambahkan sebagai member initiative`,
+            className: "border-blue-200 bg-blue-50 text-blue-800",
+          });
+        }, 500);
+      }
+
+      onClose();
+    },
+    onError: () => {
+      toast({
+        title: "Gagal membuat task",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await fetch(`/api/tasks/${task.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error("Failed to update task");
+      return response.json();
+    },
+    onSuccess: (data) => {
+      // Invalidate queries for both old and new initiatives if they changed
+      if (task?.initiativeId) {
+        queryClient.invalidateQueries({
+          queryKey: [`/api/initiatives/${task.initiativeId}/tasks`],
+          refetchType: "active",
+        });
+        queryClient.invalidateQueries({
+          queryKey: [`/api/initiatives/${task.initiativeId}`],
+          refetchType: "active",
+        });
+      }
+      if (data.initiativeId && data.initiativeId !== task?.initiativeId) {
+        queryClient.invalidateQueries({
+          queryKey: [`/api/initiatives/${data.initiativeId}/tasks`],
+          refetchType: "active",
+        });
+        queryClient.invalidateQueries({
+          queryKey: [`/api/initiatives/${data.initiativeId}`],
+          refetchType: "active",
+        });
+      }
+      queryClient.invalidateQueries({
+        queryKey: ["/api/initiatives"],
+        refetchType: "active",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/tasks"],
+        refetchType: "active",
+      });
+
+      // Show success toast for task update
+      toast({
+        title: "Task berhasil diupdate",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+
+      // Show additional toast if user was automatically added as member
+      if (data.addedAsMember) {
+        const assignedUser = availableUsers.find(
+          (u) => u.id === formData.assignedTo,
+        );
+        const userName = assignedUser
+          ? `${assignedUser.firstName} ${assignedUser.lastName}`
+          : "User";
+
+        setTimeout(() => {
+          toast({
+            title: "Member baru ditambahkan",
+            description: `${userName} otomatis ditambahkan sebagai member initiative`,
+            className: "border-blue-200 bg-blue-50 text-blue-800",
+          });
+        }, 500);
+      }
+
+      // Show toast if user was automatically removed as member
+      if (data.removedAsMember) {
+        setTimeout(() => {
+          toast({
+            title: "Member dihapus",
+            description:
+              "User dihapus dari initiative karena tidak memiliki task lagi",
+            className: "border-orange-200 bg-orange-50 text-orange-800",
+          });
+        }, 1000);
+      }
+
+      onClose();
+    },
+    onError: () => {
+      toast({
+        title: "Gagal mengupdate task",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const submitData = {
+      ...formData,
+      assignedTo:
+        formData.assignedTo === "unassigned"
+          ? null
+          : formData.assignedTo || null,
+      dueDate: formData.dueDate
+        ? formData.dueDate.toISOString().split("T")[0]
+        : null,
+      initiativeId:
+        formData.initiativeId === "unassigned"
+          ? null
+          : formData.initiativeId || initiativeId,
+    };
+
+    if (isAdding) {
+      createMutation.mutate(submitData);
+    } else {
+      updateMutation.mutate(submitData);
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "Menunggu";
+      case "in_progress":
+        return "Sedang Dikerjakan";
+      case "completed":
+        return "Selesai";
+      default:
+        return status;
     }
   };
 
@@ -227,9 +397,10 @@ export default function TaskModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <CheckCircle2 className="h-5 w-5 text-orange-500" />
             {isAdding ? "Tambah Task Baru" : "Edit Task"}
           </DialogTitle>
           <DialogDescription>
@@ -240,273 +411,512 @@ export default function TaskModal({
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Basic Information Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-orange-500" />
-                Informasi Dasar
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="title" className="flex items-center gap-2 mb-2">
-                  Judul Task *
-                </Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) =>
-                    setFormData({ ...formData, title: e.target.value })
-                  }
-                  placeholder="Contoh: Buat laporan analisis penjualan bulanan"
-                  required
-                  className="focus:ring-orange-500 focus:border-orange-500"
-                />
-              </div>
+          {/* Basic Information */}
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="title" className="flex items-center gap-2 mb-2">
+                Judul Task *
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-auto p-0 text-blue-500 hover:text-blue-600"
+                    >
+                      <HelpCircle className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80" side="right">
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Tips Membuat Judul Task</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Gunakan kata kerja aktif dan spesifik. Contoh: "Buat
+                        laporan analisis penjualan Q3" lebih baik dari "Laporan
+                        penjualan".
+                      </p>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </Label>
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
+                placeholder="Contoh: Buat laporan analisis penjualan bulanan"
+                required
+                className="focus:ring-orange-500 focus:border-orange-500"
+              />
+            </div>
 
-              <div>
-                <Label htmlFor="description" className="flex items-center gap-2 mb-2">
-                  Deskripsi
-                </Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  placeholder="Contoh: Analisis data penjualan Q3, buat visualisasi dengan chart, dan susun rekomendasi untuk meningkatkan performa"
-                  rows={3}
-                  className="focus:ring-orange-500 focus:border-orange-500"
-                />
-              </div>
-            </CardContent>
-          </Card>
+            <div>
+              <Label
+                htmlFor="description"
+                className="flex items-center gap-2 mb-2"
+              >
+                Deskripsi
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-auto p-0 text-blue-500 hover:text-blue-600"
+                    >
+                      <HelpCircle className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80" side="right">
+                    <div className="space-y-2">
+                      <h4 className="font-medium">
+                        Deskripsi Task yang Efektif
+                      </h4>
+                      <p className="text-sm text-muted-foreground">
+                        Jelaskan apa yang harus dilakukan, bagaimana
+                        melakukannya, dan hasil yang diharapkan. Sertakan
+                        context yang diperlukan untuk menyelesaikan task.
+                      </p>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                placeholder="Contoh: Analisis data penjualan Q3, buat visualisasi dengan chart, dan susun rekomendasi untuk meningkatkan performa"
+                rows={3}
+                className="focus:ring-orange-500 focus:border-orange-500"
+              />
+            </div>
+          </div>
 
-          {/* Initiative Selection Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="w-5 h-5 text-orange-500" />
-                Inisiatif Terkait
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div>
-                <Label className="flex items-center gap-2 mb-2">
-                  Inisiatif Terkait (opsional)
-                </Label>
-                <Select
-                  value={formData.initiativeId}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, initiativeId: value })
-                  }
+          {/* Initiative Selection */}
+          <div>
+            <Label className="flex items-center gap-2 mb-2">
+              Inisiatif Terkait (opsional)
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 text-blue-500 hover:text-blue-600"
+                  >
+                    <HelpCircle className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80" side="right">
+                  <div className="space-y-2">
+                    <h4 className="font-medium">Mengelompokkan Task</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Pilih initiative yang relevan untuk mengelompokkan task
+                      ini. Ini membantu dalam pelaporan progress dan koordinasi
+                      tim.
+                    </p>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </Label>
+            <Popover open={initiativePopoverOpen} onOpenChange={setInitiativePopoverOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={initiativePopoverOpen}
+                  className="w-full justify-between focus:ring-orange-500 focus:border-orange-500"
                 >
-                  <SelectTrigger className="focus:ring-orange-500 focus:border-orange-500">
-                    <SelectValue placeholder="Pilih initiative..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="unassigned">Tanpa Initiative</SelectItem>
-                    {initiativesData?.map((initiative: any) => (
-                      <SelectItem key={initiative.id} value={initiative.id}>
-                        {initiative.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Status & Priority Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Flag className="w-5 h-5 text-orange-500" />
-                Status & Prioritas
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="priority" className="flex items-center gap-2 mb-2">
-                    Prioritas
-                  </Label>
-                  <Select
-                    value={formData.priority}
-                    onValueChange={(value) =>
-                      setFormData({ ...formData, priority: value })
-                    }
-                  >
-                    <SelectTrigger
-                      id="priority"
-                      className="focus:ring-orange-500 focus:border-orange-500"
-                    >
-                      <SelectValue placeholder="Pilih tingkat prioritas" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="low">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                          Rendah
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="medium">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                          Sedang
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="high">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                          Tinggi
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="status" className="flex items-center gap-2 mb-2">
-                    Status
-                  </Label>
-                  <Select
-                    value={formData.status}
-                    onValueChange={(value) =>
-                      setFormData({ ...formData, status: value })
-                    }
-                  >
-                    <SelectTrigger
-                      id="status"
-                      className="focus:ring-orange-500 focus:border-orange-500"
-                    >
-                      <SelectValue placeholder="Pilih status task" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="not_started">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                          Belum Mulai
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="in_progress">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                          Sedang Berjalan
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="completed">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                          Selesai
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="cancelled">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                          Dibatalkan
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Assignment & Due Date Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="w-5 h-5 text-orange-500" />
-                Penugasan & Deadline
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <Label className="flex items-center gap-2 mb-2">
-                    PIC (Person In Charge)
-                  </Label>
-                  <Select
-                    value={formData.assignedTo}
-                    onValueChange={(value) =>
-                      setFormData({ ...formData, assignedTo: value })
-                    }
-                  >
-                    <SelectTrigger className="focus:ring-orange-500 focus:border-orange-500">
-                      <SelectValue placeholder="Pilih anggota tim..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="unassigned">Belum ditentukan</SelectItem>
-                      {availableUsers?.map((user: any) => (
-                        <SelectItem key={user.id} value={user.id}>
-                          {user.firstName} {user.lastName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label className="flex items-center gap-2 mb-2">
-                    Tenggat Waktu
-                  </Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start text-left font-normal focus:ring-orange-500 focus:border-orange-500"
+                  {formData.initiativeId
+                    ? formData.initiativeId === "unassigned"
+                      ? "Tanpa Initiative"
+                      : initiativesData?.find((initiative: any) => initiative.id === formData.initiativeId)
+                        ? initiativesData?.find((initiative: any) => initiative.id === formData.initiativeId)?.title
+                        : "Pilih initiative..."
+                    : "Pilih initiative..."}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0">
+                <Command>
+                  <CommandInput placeholder="Cari initiative..." />
+                  <CommandList>
+                    <CommandEmpty>Tidak ada initiative ditemukan.</CommandEmpty>
+                    <CommandGroup>
+                      <CommandItem
+                        value="unassigned"
+                        onSelect={() => {
+                          setFormData({ ...formData, initiativeId: "unassigned" });
+                          setInitiativePopoverOpen(false);
+                        }}
                       >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {formData.dueDate
-                          ? formData.dueDate.toLocaleDateString("id-ID")
-                          : "Pilih tanggal deadline task"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={formData.dueDate}
-                        onSelect={(date) => {
-                          if (date) {
-                            const adjustedDate = new Date(date);
-                            adjustedDate.setHours(adjustedDate.getHours() + 7);
-                            setFormData({ ...formData, dueDate: adjustedDate });
-                          } else {
-                            setFormData({ ...formData, dueDate: date });
-                          }
-                        }}
-                        disabled={(date) => {
-                          const now = new Date();
-                          const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-                          const gmt7Date = new Date(utc + 7 * 3600000);
-                          const today = new Date(
-                            gmt7Date.getFullYear(),
-                            gmt7Date.getMonth(),
-                            gmt7Date.getDate(),
-                          );
-                          return date < today;
-                        }}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                        <Check
+                          className={`mr-2 h-4 w-4 ${
+                            formData.initiativeId === "unassigned" ? "opacity-100" : "opacity-0"
+                          }`}
+                        />
+                        Tanpa Initiative
+                      </CommandItem>
+                      {initiativesData?.map((initiative: any) => (
+                        <CommandItem
+                          key={initiative.id}
+                          value={initiative.title}
+                          onSelect={() => {
+                            setFormData({ ...formData, initiativeId: initiative.id });
+                            setInitiativePopoverOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={`mr-2 h-4 w-4 ${
+                              formData.initiativeId === initiative.id ? "opacity-100" : "opacity-0"
+                            }`}
+                          />
+                          {initiative.title}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          {/* Status & Priority */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label
+                htmlFor="priority"
+                className="flex items-center gap-2 mb-2"
+              >
+                Prioritas
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-auto p-0 text-blue-500 hover:text-blue-600"
+                    >
+                      <HelpCircle className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80" side="right">
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Menentukan Prioritas</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Tinggi: Urgent dan penting (deadline ketat). Sedang:
+                        Penting tapi tidak urgent. Rendah: Nice to have, bisa
+                        ditunda.
+                      </p>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </Label>
+              <Select
+                value={formData.priority}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, priority: value })
+                }
+              >
+                <SelectTrigger
+                  id="priority"
+                  className="focus:ring-orange-500 focus:border-orange-500"
+                >
+                  <SelectValue placeholder="Pilih tingkat prioritas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      Rendah
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="medium">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                      Sedang
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="high">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                      Tinggi
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label
+                htmlFor="status"
+                className="text-sm font-medium mb-2 block"
+              >
+                Status
+              </Label>
+              <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={statusPopoverOpen}
+                    className="w-full justify-between focus:ring-orange-500 focus:border-orange-500"
+                  >
+                    {getStatusDisplay(formData.status)}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0">
+                  <Command>
+                    <CommandInput placeholder="Cari status..." />
+                    <CommandList>
+                      <CommandEmpty>Tidak ada status ditemukan.</CommandEmpty>
+                      <CommandGroup>
+                        <CommandItem
+                          value="not_started"
+                          onSelect={() => {
+                            setFormData({ ...formData, status: "not_started" });
+                            setStatusPopoverOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={`mr-2 h-4 w-4 ${
+                              formData.status === "not_started" ? "opacity-100" : "opacity-0"
+                            }`}
+                          />
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                            Belum Mulai
+                          </div>
+                        </CommandItem>
+                        <CommandItem
+                          value="in_progress"
+                          onSelect={() => {
+                            setFormData({ ...formData, status: "in_progress" });
+                            setStatusPopoverOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={`mr-2 h-4 w-4 ${
+                              formData.status === "in_progress" ? "opacity-100" : "opacity-0"
+                            }`}
+                          />
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            Sedang Berjalan
+                          </div>
+                        </CommandItem>
+                        <CommandItem
+                          value="completed"
+                          onSelect={() => {
+                            setFormData({ ...formData, status: "completed" });
+                            setStatusPopoverOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={`mr-2 h-4 w-4 ${
+                              formData.status === "completed" ? "opacity-100" : "opacity-0"
+                            }`}
+                          />
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            Selesai
+                          </div>
+                        </CommandItem>
+                        <CommandItem
+                          value="cancelled"
+                          onSelect={() => {
+                            setFormData({ ...formData, status: "cancelled" });
+                            setStatusPopoverOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={`mr-2 h-4 w-4 ${
+                              formData.status === "cancelled" ? "opacity-100" : "opacity-0"
+                            }`}
+                          />
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                            Dibatalkan
+                          </div>
+                        </CommandItem>
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+
+          {/* Assignment & Due Date */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="flex items-center gap-2 mb-2">
+                PIC (Person In Charge)
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-auto p-0 text-blue-500 hover:text-blue-600"
+                    >
+                      <HelpCircle className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80" side="right">
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Menentukan PIC</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Pilih anggota tim yang akan bertanggung jawab
+                        menyelesaikan task ini. PIC akan menerima notifikasi dan
+                        bertanggung jawab atas progress task.
+                      </p>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </Label>
+              <Popover open={picPopoverOpen} onOpenChange={setPicPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={picPopoverOpen}
+                    className="w-full justify-between focus:ring-orange-500 focus:border-orange-500"
+                  >
+                    {formData.assignedTo
+                      ? formData.assignedTo === "unassigned"
+                        ? "Belum ditentukan"
+                        : availableUsers?.find((user: any) => user.id === formData.assignedTo)
+                          ? `${availableUsers?.find((user: any) => user.id === formData.assignedTo)?.firstName} ${availableUsers?.find((user: any) => user.id === formData.assignedTo)?.lastName}`
+                          : "Pilih anggota tim..."
+                      : "Pilih anggota tim..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0">
+                  <Command>
+                    <CommandInput placeholder="Cari anggota tim..." />
+                    <CommandList>
+                      <CommandEmpty>Tidak ada anggota tim ditemukan.</CommandEmpty>
+                      <CommandGroup>
+                        <CommandItem
+                          value="unassigned"
+                          onSelect={() => {
+                            setFormData({ ...formData, assignedTo: "unassigned" });
+                            setPicPopoverOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={`mr-2 h-4 w-4 ${
+                              formData.assignedTo === "unassigned" ? "opacity-100" : "opacity-0"
+                            }`}
+                          />
+                          Belum ditentukan
+                        </CommandItem>
+                        {availableUsers?.map((user: any) => (
+                          <CommandItem
+                            key={user.id}
+                            value={`${user.firstName} ${user.lastName}`}
+                            onSelect={() => {
+                              setFormData({ ...formData, assignedTo: user.id });
+                              setPicPopoverOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={`mr-2 h-4 w-4 ${
+                                formData.assignedTo === user.id ? "opacity-100" : "opacity-0"
+                              }`}
+                            />
+                            {user.firstName} {user.lastName}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div>
+              <Label className="flex items-center gap-2 mb-2">
+                Tenggat Waktu
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-auto p-0 text-blue-500 hover:text-blue-600"
+                    >
+                      <HelpCircle className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80" side="right">
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Menentukan Deadline</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Pilih tanggal yang realistis untuk menyelesaikan task
+                        ini. Pertimbangkan kompleksitas task, workload PIC, dan
+                        dependencies lainnya.
+                      </p>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal focus:ring-orange-500 focus:border-orange-500"
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {formData.dueDate
+                      ? formData.dueDate.toLocaleDateString("id-ID")
+                      : "Pilih tanggal deadline task"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={formData.dueDate}
+                    onSelect={(date) => {
+                      if (date) {
+                        // Adjust for GMT+7 timezone to prevent date shifting
+                        const adjustedDate = new Date(date);
+                        adjustedDate.setHours(adjustedDate.getHours() + 7);
+                        setFormData({ ...formData, dueDate: adjustedDate });
+                      } else {
+                        setFormData({ ...formData, dueDate: date });
+                      }
+                    }}
+                    disabled={(date) => {
+                      // Use GMT+7 timezone for date comparison
+                      const now = new Date();
+                      const utc =
+                        now.getTime() + now.getTimezoneOffset() * 60000;
+                      const gmt7Date = new Date(utc + 7 * 3600000);
+                      const today = new Date(
+                        gmt7Date.getFullYear(),
+                        gmt7Date.getMonth(),
+                        gmt7Date.getDate(),
+                      );
+
+                      return date < today;
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
         </div>
 
-        <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
-          <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
             Batal
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={createMutation.isPending || updateMutation.isPending}
-            className="w-full sm:w-auto bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+            className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
           >
             {isAdding ? "Tambah Task" : "Update Task"}
           </Button>
