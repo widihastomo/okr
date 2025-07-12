@@ -93,6 +93,28 @@ export default function TaskModal({
     initiativeId: "",
   });
 
+  // Custom close handler to reset form when modal is closed
+  const handleClose = () => {
+    // Reset form data to ensure clean state for next use
+    setFormData({
+      title: "",
+      description: "",
+      status: "not_started",
+      priority: "medium",
+      assignedTo: "",
+      dueDate: null,
+      initiativeId: initiativeId || "",
+    });
+    
+    // Close popovers
+    setPicPopoverOpen(false);
+    setInitiativePopoverOpen(false);
+    setStatusPopoverOpen(false);
+    
+    // Call parent close handler
+    onClose();
+  };
+
   // Helper function to get status display with visual indicator
   const getStatusDisplay = (status: string) => {
     switch (status) {
@@ -249,7 +271,7 @@ export default function TaskModal({
         }, 500);
       }
 
-      onClose();
+      handleClose();
     },
     onError: () => {
       toast({
@@ -336,7 +358,7 @@ export default function TaskModal({
         }, 1000);
       }
 
-      onClose();
+      handleClose();
     },
     onError: () => {
       toast({
@@ -397,7 +419,7 @@ export default function TaskModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="w-[95vw] max-w-[95vw] sm:max-w-2xl lg:max-w-4xl max-h-[90vh] overflow-y-auto p-3 sm:p-6 mx-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">

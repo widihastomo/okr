@@ -246,6 +246,12 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 12, 2025. Successfully fixed task form reset issue after save operations:
+  * FIXED: Task form now properly resets after successful save operations (both create and update)
+  * ENHANCED: Added custom handleClose function to ensure form state is cleared when modal closes
+  * IMPROVED: Form data automatically resets to default values after successful task creation/update
+  * RESOLVED: Issue where previous task data remained in form when opening modal for new tasks
+  * ADDED: Comprehensive form reset handling in all modal close scenarios
 - July 12, 2025. Successfully fixed 429 Too Many Requests error for authentication endpoint:
   * FIXED: Added specific rate limiting for /api/auth/me endpoint (100 requests per 15 minutes)
   * OPTIMIZED: Increased useAuth hook cache times from 10 seconds to 2 minutes stale time
