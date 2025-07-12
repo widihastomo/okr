@@ -18,7 +18,7 @@ export default function AchievementsPage() {
 
   return (
     <div className="flex-1 overflow-auto bg-gray-50">
-      <div className="container mx-auto py-8 px-4">
+      <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
             <Trophy className="h-8 w-8 text-yellow-500" />
