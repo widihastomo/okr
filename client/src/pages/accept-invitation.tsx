@@ -15,8 +15,7 @@ import refokusLogo from "@assets/refokus_1751810711179.png";
 
 const acceptInvitationSchema = z
   .object({
-    firstName: z.string().min(1, "Nama depan harus diisi"),
-    lastName: z.string().min(1, "Nama belakang harus diisi"),
+    fullName: z.string().min(2, "Nama lengkap minimal 2 karakter"),
     password: z.string().min(6, "Password minimal 6 karakter"),
     confirmPassword: z
       .string()
@@ -85,9 +84,14 @@ export default function AcceptInvitation() {
 
     setIsLoading(true);
     try {
+      // Split fullName into firstName and lastName
+      const nameParts = data.fullName.trim().split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+      
       await apiRequest("POST", `/api/member-invitations/accept/${token}`, {
-        firstName: data.firstName,
-        lastName: data.lastName,
+        firstName,
+        lastName,
         password: data.password,
       });
 
@@ -174,33 +178,17 @@ export default function AcceptInvitation() {
           <CardContent className="px-8 pb-8">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="firstName">Nama Depan</Label>
+                <Label htmlFor="fullName">Nama Lengkap</Label>
                 <Input
-                  id="firstName"
+                  id="fullName"
                   type="text"
-                  placeholder="Masukkan nama depan"
-                  {...register("firstName")}
-                  className={errors.firstName ? "border-red-500 h-11" : "h-11"}
+                  placeholder="Masukkan nama lengkap"
+                  {...register("fullName")}
+                  className={errors.fullName ? "border-red-500 h-11" : "h-11"}
                 />
-                {errors.firstName && (
+                {errors.fullName && (
                   <p className="text-sm text-red-600">
-                    {errors.firstName.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="lastName">Nama Belakang</Label>
-                <Input
-                  id="lastName"
-                  type="text"
-                  placeholder="Masukkan nama belakang"
-                  {...register("lastName")}
-                  className={errors.lastName ? "border-red-500 h-11" : "h-11"}
-                />
-                {errors.lastName && (
-                  <p className="text-sm text-red-600">
-                    {errors.lastName.message}
+                    {errors.fullName.message}
                   </p>
                 )}
               </div>
