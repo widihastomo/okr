@@ -38,6 +38,7 @@ interface User {
   isActive: boolean;
   organizationId: string | null;
   createdAt: string;
+  invitationStatus: string;
 }
 
 export default function ClientUserManagement() {
@@ -142,7 +143,8 @@ export default function ClientUserManagement() {
                          `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === "all" || 
                          (statusFilter === "active" && user.isActive) ||
-                         (statusFilter === "inactive" && !user.isActive);
+                         (statusFilter === "inactive" && !user.isActive) ||
+                         (statusFilter === "pending" && user.invitationStatus === "pending");
     return matchesSearch && matchesStatus;
   });
 
@@ -257,10 +259,12 @@ export default function ClientUserManagement() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <Building className="h-8 w-8 text-purple-600" />
+              <Mail className="h-8 w-8 text-yellow-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Organisasi</p>
-                <p className="text-lg font-bold text-gray-900">{organization?.name}</p>
+                <p className="text-sm font-medium text-gray-600">Undangan Pending</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {users.filter(u => u.invitationStatus === "pending").length}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -297,6 +301,7 @@ export default function ClientUserManagement() {
                 <SelectItem value="all">Semua Status</SelectItem>
                 <SelectItem value="active">Aktif</SelectItem>
                 <SelectItem value="inactive">Nonaktif</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -309,6 +314,7 @@ export default function ClientUserManagement() {
                   <TableHead>Pengguna</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Undangan</TableHead>
                   <TableHead>Bergabung</TableHead>
                   <TableHead className="text-right">Aksi</TableHead>
                 </TableRow>
@@ -316,14 +322,14 @@ export default function ClientUserManagement() {
               <TableBody>
                 {loadingUsers ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8">
+                    <TableCell colSpan={6} className="text-center py-8">
                       <Loader2 className="h-6 w-6 animate-spin mx-auto" />
                       <p className="mt-2 text-gray-500">Memuat pengguna...</p>
                     </TableCell>
                   </TableRow>
                 ) : filteredUsers.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8">
+                    <TableCell colSpan={6} className="text-center py-8">
                       <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                       <p className="text-gray-500">Tidak ada pengguna ditemukan</p>
                     </TableCell>
@@ -361,6 +367,22 @@ export default function ClientUserManagement() {
                           }
                         >
                           {user.isActive ? "Aktif" : "Nonaktif"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant={user.invitationStatus === "pending" ? "secondary" : "default"}
+                          className={user.invitationStatus === "pending"
+                            ? "bg-yellow-100 text-yellow-800 border-0"
+                            : user.invitationStatus === "accepted"
+                            ? "bg-green-100 text-green-800 border-0"
+                            : "bg-gray-100 text-gray-800 border-0"
+                          }
+                        >
+                          {user.invitationStatus === "pending" ? "Menunggu" : 
+                           user.invitationStatus === "accepted" ? "Diterima" : 
+                           user.invitationStatus === "registered" ? "Terdaftar" : 
+                           user.invitationStatus}
                         </Badge>
                       </TableCell>
                       <TableCell>

@@ -85,6 +85,12 @@ export async function authenticateUser(loginData: LoginData): Promise<User | nul
       return null;
     }
 
+    // Check if user has pending invitation status
+    if (user.invitationStatus === 'pending') {
+      console.log('User has pending invitation status:', user.email);
+      throw new Error('INVITATION_PENDING');
+    }
+
     const isValidPassword = await verifyPassword(loginData.password, user.password);
     console.log('Password verification:', isValidPassword ? 'Valid' : 'Invalid');
     
@@ -101,7 +107,7 @@ export async function authenticateUser(loginData: LoginData): Promise<User | nul
     return user;
   } catch (error) {
     console.error("Authentication error:", error);
-    if (error instanceof Error && error.message === 'EMAIL_NOT_VERIFIED') {
+    if (error instanceof Error && (error.message === 'EMAIL_NOT_VERIFIED' || error.message === 'INVITATION_PENDING')) {
       throw error;
     }
     throw new Error("Database connection failed during authentication");

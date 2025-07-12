@@ -91,6 +91,15 @@ export function setupEmailAuth(app: Express) {
         });
       }
       
+      // Handle pending invitation error
+      if (error.message === 'INVITATION_PENDING') {
+        return res.status(403).json({ 
+          message: "Akun masih dalam status pending. Silakan terima undangan terlebih dahulu melalui email.",
+          errorCode: "INVITATION_PENDING",
+          email: req.body?.email
+        });
+      }
+      
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: error.errors[0].message });
       }
