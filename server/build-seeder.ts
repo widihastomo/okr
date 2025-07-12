@@ -9,6 +9,7 @@ import {
 } from "../shared/schema";
 import { hashPassword } from "./emailAuth";
 import { eq } from "drizzle-orm";
+import { randomUUID } from "crypto";
 
 /**
  * Build-time seeder that creates essential data for production deployment
@@ -58,17 +59,21 @@ async function createSystemOwner() {
     return existingSystemOwner[0];
   }
 
+  // Generate consistent UUIDs for system entities
+  const systemOrgId = randomUUID();
+  const systemOwnerId = randomUUID();
+
   // Create system organization first
   const systemOrg = await db
     .insert(organizations)
     .values({
-      id: 'system-org-refokus',
+      id: systemOrgId,
       name: 'Refokus System',
       slug: 'refokus-system',
       industry: 'Technology',
       size: 'enterprise',
       isSystemOrganization: true,
-      ownerId: 'system-owner-refokus'
+      ownerId: systemOwnerId
     })
     .onConflictDoNothing()
     .returning();
@@ -79,13 +84,13 @@ async function createSystemOwner() {
   const systemOwner = await db
     .insert(users)
     .values({
-      id: 'system-owner-refokus',
+      id: systemOwnerId,
       email: 'admin@refokus.com',
       name: 'System Administrator',
       password: hashedPassword,
       isSystemOwner: true,
       isVerified: true,
-      organizationId: 'system-org-refokus',
+      organizationId: systemOrgId,
       role: 'organization_admin'
     })
     .onConflictDoNothing()
@@ -96,7 +101,7 @@ async function createSystemOwner() {
   console.log("🔑 Password: RefokusAdmin2025!");
   console.log("⚠️  Please change the default password after first login");
   
-  return systemOwner[0] || { id: 'system-owner-refokus' };
+  return systemOwner[0] || { id: systemOwnerId };
 }
 
 /**
@@ -178,10 +183,10 @@ async function createSubscriptionPlans() {
     return;
   }
 
-  // Create subscription plans
+  // Create subscription plans with proper UUIDs
   const plans = [
     {
-      id: 'free-trial',
+      id: randomUUID(),
       name: 'Free Trial',
       slug: 'free-trial',
       description: 'Trial gratis 7 hari dengan fitur lengkap',
@@ -197,7 +202,7 @@ async function createSubscriptionPlans() {
       trialDays: 7
     },
     {
-      id: 'starter',
+      id: randomUUID(),
       name: 'Starter',
       slug: 'starter',
       description: 'Paket dasar untuk tim kecil',
@@ -212,7 +217,7 @@ async function createSubscriptionPlans() {
       isTrial: false
     },
     {
-      id: 'growth',
+      id: randomUUID(),
       name: 'Growth',
       slug: 'growth',
       description: 'Paket pertumbuhan untuk tim menengah',
@@ -227,7 +232,7 @@ async function createSubscriptionPlans() {
       isTrial: false
     },
     {
-      id: 'enterprise',
+      id: randomUUID(),
       name: 'Enterprise',
       slug: 'enterprise',
       description: 'Paket enterprise untuk organisasi besar',
@@ -243,32 +248,44 @@ async function createSubscriptionPlans() {
     }
   ];
 
+  // Store plan IDs for billing periods
+  const planIds = {};
+  
   for (const plan of plans) {
-    await db
+    const inserted = await db
       .insert(subscriptionPlans)
       .values(plan)
-      .onConflictDoNothing();
+      .onConflictDoNothing()
+      .returning();
+    
+    // Store plan ID by slug for billing periods
+    if (inserted.length > 0) {
+      planIds[plan.slug] = plan.id;
+    }
   }
 
-  // Create billing periods
+  // Create billing periods using actual plan IDs
   const periods = [
-    { planId: 'free-trial', period: 'trial', duration: 7, price: 0 },
-    { planId: 'starter', period: 'monthly', duration: 1, price: 199000 },
-    { planId: 'starter', period: 'quarterly', duration: 3, price: 549000 },
-    { planId: 'starter', period: 'annual', duration: 12, price: 1990000 },
-    { planId: 'growth', period: 'monthly', duration: 1, price: 499000 },
-    { planId: 'growth', period: 'quarterly', duration: 3, price: 1347000 },
-    { planId: 'growth', period: 'annual', duration: 12, price: 4990000 },
-    { planId: 'enterprise', period: 'monthly', duration: 1, price: 999000 },
-    { planId: 'enterprise', period: 'quarterly', duration: 3, price: 2697000 },
-    { planId: 'enterprise', period: 'annual', duration: 12, price: 9990000 }
+    { planId: planIds['free-trial'], period: 'trial', duration: 7, price: 0 },
+    { planId: planIds['starter'], period: 'monthly', duration: 1, price: 199000 },
+    { planId: planIds['starter'], period: 'quarterly', duration: 3, price: 549000 },
+    { planId: planIds['starter'], period: 'annual', duration: 12, price: 1990000 },
+    { planId: planIds['growth'], period: 'monthly', duration: 1, price: 499000 },
+    { planId: planIds['growth'], period: 'quarterly', duration: 3, price: 1347000 },
+    { planId: planIds['growth'], period: 'annual', duration: 12, price: 4990000 },
+    { planId: planIds['enterprise'], period: 'monthly', duration: 1, price: 999000 },
+    { planId: planIds['enterprise'], period: 'quarterly', duration: 3, price: 2697000 },
+    { planId: planIds['enterprise'], period: 'annual', duration: 12, price: 9990000 }
   ];
 
   for (const period of periods) {
-    await db
-      .insert(billingPeriods)
-      .values(period)
-      .onConflictDoNothing();
+    // Only create billing periods if we have a valid plan ID
+    if (period.planId) {
+      await db
+        .insert(billingPeriods)
+        .values(period)
+        .onConflictDoNothing();
+    }
   }
 
   console.log("✅ Subscription plans and billing periods created successfully");
