@@ -398,7 +398,7 @@ export default function TaskModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-[95vw] sm:max-w-2xl lg:max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[95vw] max-w-[95vw] sm:max-w-2xl lg:max-w-4xl max-h-[90vh] overflow-y-auto p-3 sm:p-6 mx-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CheckCircle2 className="h-5 w-5 text-orange-500" />
@@ -418,7 +418,7 @@ export default function TaskModal({
               Informasi Task
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4 sm:space-y-6 px-3 sm:px-6">
             <div>
               <Label htmlFor="title" className="flex items-center gap-2 mb-2">
                 Judul Task *
@@ -604,7 +604,7 @@ export default function TaskModal({
             </Popover>
           </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <Label
                   htmlFor="priority"
@@ -780,7 +780,7 @@ export default function TaskModal({
             </div>
           </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <Label className="flex items-center gap-2 mb-2">
                   PIC
