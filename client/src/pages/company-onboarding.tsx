@@ -3284,12 +3284,8 @@ export default function CompanyOnboarding() {
     );
   };
 
-  // Use typing effect for virtual assistant message
+  // Use fade-up effect for virtual assistant message
   const assistantMessage = getVirtualAssistantMessage();
-  const { displayText: typedMessage, isTyping } = useTypingEffect(
-    assistantMessage,
-    15,
-  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
@@ -3406,12 +3402,9 @@ export default function CompanyOnboarding() {
                   </h4>
                   <p
                     key={`assistant-message-${onboardingData.currentStep}`}
-                    className="text-sm text-gray-700 leading-relaxed transition-all duration-500 animate-fade-in-up"
+                    className="text-sm text-gray-700 leading-relaxed transition-all duration-700 animate-in fade-in slide-in-from-bottom-4"
                   >
-                    {typedMessage}
-                    {isTyping && (
-                      <span className="inline-block w-2 h-4 bg-orange-500 ml-1 animate-typing-cursor"></span>
-                    )}
+                    {assistantMessage}
                   </p>
                 </div>
               </div>

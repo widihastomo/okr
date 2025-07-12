@@ -246,11 +246,11 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
-- July 12, 2025. Successfully optimized typing animation speed for virtual assistant messages:
-  * ENHANCED: Typing speed increased from 35ms to 15ms between characters (2x faster)
-  * IMPROVED: Initial delay reduced from 200ms to 100ms for more responsive start
-  * OPTIMIZED: Virtual assistant messages now appear much faster while maintaining smooth typing effect
-  * RESULT: Better user experience with quicker message display during onboarding process
+- July 12, 2025. Successfully changed virtual assistant animation from typing to fade-up effect:
+  * CHANGED: Replaced character-by-character typing animation with smooth fade-up effect
+  * ENHANCED: Messages now appear instantly with elegant slide-in-from-bottom animation
+  * IMPROVED: Removed typing cursor animation and delays for immediate content display
+  * RESULT: Faster, more modern animation that doesn't keep users waiting for text to appear
 - July 12, 2025. Successfully fixed organization slug duplicate constraint error during registration:
   * FIXED: Registration now handles duplicate organization slug gracefully with unique slug generation
   * ENHANCED: Automatic slug uniqueness checking with counter-based fallback (e.g., "jujura-1", "jujura-2")
