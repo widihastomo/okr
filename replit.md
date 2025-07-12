@@ -246,6 +246,11 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 12, 2025. Successfully fixed JSX duplicate "disabled" attribute warning in email verification form:
+  * Removed non-existent `loading` prop from Button component that was causing duplicate attribute warning
+  * Combined loading state with existing disabled condition: `disabled={isLoading || code.length !== 6 || (!email && !code)}`
+  * Added loading text feedback: "Memverifikasi..." when button is in loading state
+  * Fixed Vite build warning about duplicate disabled attributes in email verification page
 Changelog:
 - July 11, 2025. Successfully implemented Indonesian phone number validation for WhatsApp registration field:
   * Added comprehensive regex validation for Indonesian phone numbers: /^(\+62|62|0)8[1-9][0-9]{6,10}$/

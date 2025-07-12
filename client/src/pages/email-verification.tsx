@@ -232,12 +232,10 @@ export default function EmailVerification() {
               
               <Button
                 onClick={handleVerification}
-                loading={isLoading}
-                
                 className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium h-11"
-                disabled={code.length !== 6 || (!email && !code)}
+                disabled={isLoading || code.length !== 6 || (!email && !code)}
               >
-                Verifikasi Email
+                {isLoading ? "Memverifikasi..." : "Verifikasi Email"}
               </Button>
               
               <div className="text-center space-y-3">
