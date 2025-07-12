@@ -148,63 +148,64 @@ export default function AcceptInvitation() {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <img
-            src={refokusLogo}
-            alt="Refokus Logo"
-            className="w-32 h-32 mx-auto"
+          <img 
+            src={refokusLogo} 
+            alt="Refokus Logo" 
+            className="h-12 w-auto mx-auto"
           />
         </div>
-        <Card className="w-full">
-          <CardHeader className="space-y-2">
+        
+        <Card className="border-0 shadow-2xl">
+          <CardHeader className="text-center pb-8 pt-8">
             <div className="flex items-center justify-center mb-4">
               <CheckCircle className="h-12 w-12 text-green-500" />
             </div>
-            <CardTitle className="text-xl font-bold text-center">
+            <CardTitle className="text-2xl font-bold text-gray-900">
               Terima Undangan Tim
             </CardTitle>
-            <p className="text-sm text-gray-600 text-center">
+            <p className="text-gray-600 mt-2">
               Bergabung dengan <strong>{invitation?.organization?.name}</strong>
             </p>
-            <p className="text-sm text-gray-600 text-center">
+            <p className="text-gray-600 mt-1">
               Diundang oleh: {invitation?.inviter?.firstName}{" "}
               {invitation?.inviter?.lastName}
             </p>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div>
+          <CardContent className="px-8 pb-8">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div className="space-y-2">
                 <Label htmlFor="firstName">Nama Depan</Label>
                 <Input
                   id="firstName"
                   type="text"
                   placeholder="Masukkan nama depan"
                   {...register("firstName")}
-                  className={errors.firstName ? "border-red-500" : ""}
+                  className={errors.firstName ? "border-red-500 h-11" : "h-11"}
                 />
                 {errors.firstName && (
-                  <p className="text-sm text-red-500 mt-1">
+                  <p className="text-sm text-red-600">
                     {errors.firstName.message}
                   </p>
                 )}
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="lastName">Nama Belakang</Label>
                 <Input
                   id="lastName"
                   type="text"
                   placeholder="Masukkan nama belakang"
                   {...register("lastName")}
-                  className={errors.lastName ? "border-red-500" : ""}
+                  className={errors.lastName ? "border-red-500 h-11" : "h-11"}
                 />
                 {errors.lastName && (
-                  <p className="text-sm text-red-500 mt-1">
+                  <p className="text-sm text-red-600">
                     {errors.lastName.message}
                   </p>
                 )}
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
                   <Input
@@ -212,28 +213,24 @@ export default function AcceptInvitation() {
                     type={showPassword ? "text" : "password"}
                     placeholder="Masukkan password"
                     {...register("password")}
-                    className={errors.password ? "border-red-500 pr-10" : "pr-10"}
+                    className={errors.password ? "border-red-500 pr-10 h-11" : "pr-10 h-11"}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="text-sm text-red-500 mt-1">
+                  <p className="text-sm text-red-600">
                     {errors.password.message}
                   </p>
                 )}
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Konfirmasi Password</Label>
                 <div className="relative">
                   <Input
@@ -241,22 +238,18 @@ export default function AcceptInvitation() {
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="Konfirmasi password"
                     {...register("confirmPassword")}
-                    className={errors.confirmPassword ? "border-red-500 pr-10" : "pr-10"}
+                    className={errors.confirmPassword ? "border-red-500 pr-10 h-11" : "pr-10 h-11"}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
+                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
                 {errors.confirmPassword && (
-                  <p className="text-sm text-red-500 mt-1">
+                  <p className="text-sm text-red-600">
                     {errors.confirmPassword.message}
                   </p>
                 )}
@@ -264,7 +257,7 @@ export default function AcceptInvitation() {
 
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-orange-600 to-orange-500 text-white hover:from-orange-700 hover:to-orange-600"
+                className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium h-11"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -282,7 +275,7 @@ export default function AcceptInvitation() {
               <Button
                 variant="outline"
                 onClick={() => navigate("/login")}
-                className="w-full"
+                className="w-full text-gray-600 hover:text-gray-800 border-gray-300 hover:border-gray-400 h-11"
               >
                 Sudah punya akun? Login
               </Button>
