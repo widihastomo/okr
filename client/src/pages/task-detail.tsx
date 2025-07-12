@@ -579,20 +579,20 @@ export default function TaskDetailPage() {
             Kembali
           </Button>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   role="combobox"
                   aria-expanded={statusPopoverOpen}
-                  className="w-[160px] sm:w-[180px] justify-between focus:ring-2 focus:ring-orange-500"
+                  className="w-[140px] sm:w-[160px] lg:w-[180px] justify-between focus:ring-2 focus:ring-orange-500"
                 >
                   {taskData?.status ? getStatusDisplay(taskData.status) : "Pilih status"}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[160px] sm:w-[180px] p-0">
+              <PopoverContent className="w-[140px] sm:w-[160px] lg:w-[180px] p-0">
                 <Command>
                   <CommandInput placeholder="Cari status..." />
                   <CommandList>
