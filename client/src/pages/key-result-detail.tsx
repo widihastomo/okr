@@ -838,7 +838,6 @@ export default function KeyResultDetailPage() {
   };
 
   return (
-    <>
     <div className="p-6">
       
 
@@ -1542,7 +1541,6 @@ export default function KeyResultDetailPage() {
           </Card>
         </div>
       </div>
-    </div>
     
     {/* Edit Initiative Modal */}
     {editingInitiative && (
@@ -2150,6 +2148,7 @@ export default function KeyResultDetailPage() {
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-    </>
+    
+    </div>
   );
 }
