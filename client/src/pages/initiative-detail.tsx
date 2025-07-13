@@ -472,6 +472,8 @@ export default function InitiativeDetailPage() {
   const [isClosureModalOpen, setIsClosureModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
+  const [isDeleteMetricModalOpen, setIsDeleteMetricModalOpen] = useState(false);
+  const [metricToDelete, setMetricToDelete] = useState<any>(null);
 
   // All queries declared at the top level
   const { data: initiative, isLoading: initiativeLoading } = useQuery({
@@ -548,6 +550,8 @@ export default function InitiativeDetailPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/success-metrics`] });
+      setIsDeleteMetricModalOpen(false);
+      setMetricToDelete(null);
       toast({
         title: "Berhasil",
         description: "Metrik keberhasilan berhasil dihapus",
@@ -700,10 +704,9 @@ export default function InitiativeDetailPage() {
     setIsSuccessMetricsModalOpen(true);
   };
 
-  const handleDeleteSuccessMetric = (metricId: string) => {
-    if (confirm("Apakah Anda yakin ingin menghapus metrik keberhasilan ini?")) {
-      deleteSuccessMetricMutation.mutate(metricId);
-    }
+  const handleDeleteSuccessMetric = (metric: any) => {
+    setMetricToDelete(metric);
+    setIsDeleteMetricModalOpen(true);
   };
 
   // Extract data
@@ -1033,7 +1036,7 @@ export default function InitiativeDetailPage() {
                               Edit Metrik
                             </DropdownMenuItem>
                             <DropdownMenuItem 
-                              onClick={() => handleDeleteSuccessMetric(metric.id)}
+                              onClick={() => handleDeleteSuccessMetric(metric)}
                               className="text-red-600"
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
@@ -1579,6 +1582,37 @@ export default function InitiativeDetailPage() {
               className="bg-red-600 hover:bg-red-700"
             >
               {cancelInitiativeMutation.isPending ? "Membatalkan..." : "Batalkan Inisiatif"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Success Metric Modal */}
+      <AlertDialog open={isDeleteMetricModalOpen} onOpenChange={setIsDeleteMetricModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Metrik Keberhasilan</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus metrik keberhasilan "{metricToDelete?.name}"? Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setIsDeleteMetricModalOpen(false);
+              setMetricToDelete(null);
+            }}>
+              Batal
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (metricToDelete) {
+                  deleteSuccessMetricMutation.mutate(metricToDelete.id);
+                }
+              }}
+              disabled={deleteSuccessMetricMutation.isPending}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {deleteSuccessMetricMutation.isPending ? "Menghapus..." : "Hapus Metrik"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
