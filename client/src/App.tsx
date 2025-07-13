@@ -212,8 +212,8 @@ function Router() {
               isOnboardingPage
                 ? "pt-0 px-0"
                 : trialStatus?.isTrialActive
-                  ? "pt-[120px] sm:pt-[120px] px-3 sm:px-6"
-                  : "pt-[64px] sm:pt-[64px] px-3 sm:px-6",
+                  ? "pt-[108px] sm:pt-[108px] px-3 sm:px-6" // Header (64px) + Trial Header (44px)
+                  : "pt-[64px] sm:pt-[64px] px-3 sm:px-6",   // Just header
             )}
           >
             <Switch>
