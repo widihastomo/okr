@@ -246,6 +246,13 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 13, 2025. Successfully enhanced administrator role permissions to include organization settings management:
+  * ADDED: manage_organization permission to administrator role in server/role-management.ts
+  * UPDATED: Administrator role description from "Akses lanjutan kecuali pengaturan organisasi" to "Akses lanjutan termasuk pengaturan organisasi"
+  * CORRECTED: Role permission definitions in organization-settings.tsx to include manage_organization permission
+  * ENHANCED: Administrator role now has proper access to organization settings as expected by users
+  * VERIFIED: Administrators can now manage organization settings including billing and team management
+  * RESULT: Complete administrator role functionality with appropriate organization management permissions
 - July 13, 2025. Successfully fixed user invitation status issue during onboarding process:
   * FIXED: Invited users during onboarding now properly have "pending" status instead of active
   * CORRECTED: Member invitation creation in onboarding now properly sets isActive: false for invited users

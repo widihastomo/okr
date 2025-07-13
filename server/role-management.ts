@@ -432,6 +432,7 @@ export class RoleManagementService {
         'view_initiatives' as Permission,
         'view_analytics' as Permission,
         'export_data' as Permission,
+        'manage_organization' as Permission,
         'manage_billing' as Permission,
       ],
       member: [

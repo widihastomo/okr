@@ -226,7 +226,7 @@ export default function ClientUserManagement() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="member">Member - Akses standar untuk mengelola OKR</SelectItem>
-                    <SelectItem value="administrator">Administrator - Akses lanjutan kecuali pengaturan organisasi</SelectItem>
+                    <SelectItem value="administrator">Administrator - Akses lanjutan termasuk pengaturan organisasi</SelectItem>
                     <SelectItem value="viewer">Viewer - Hanya dapat melihat objektif dan analisis</SelectItem>
                   </SelectContent>
                 </Select>

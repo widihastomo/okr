@@ -62,8 +62,8 @@ export default function OrganizationSettings() {
     { 
       id: "2", 
       name: "administrator", 
-      description: "Can manage team and projects", 
-      permissions: ["manage_users", "invite_users", "view_users", "create_objectives", "edit_objectives", "delete_objectives", "view_objectives", "create_initiatives", "edit_initiatives", "delete_initiatives", "view_initiatives", "view_analytics", "export_data", "manage_billing"]
+      description: "Can manage team, projects, and organization settings", 
+      permissions: ["manage_users", "invite_users", "view_users", "create_objectives", "edit_objectives", "delete_objectives", "view_objectives", "create_initiatives", "edit_initiatives", "delete_initiatives", "view_initiatives", "view_analytics", "export_data", "manage_organization", "manage_billing"]
     },
     { 
       id: "3", 
