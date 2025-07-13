@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Dialog,
   DialogContent,
@@ -80,6 +81,7 @@ export default function TaskModal({
   isAdding,
 }: TaskModalProps) {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [picPopoverOpen, setPicPopoverOpen] = useState(false);
   const [initiativePopoverOpen, setInitiativePopoverOpen] = useState(false);
   const [statusPopoverOpen, setStatusPopoverOpen] = useState(false);
@@ -88,7 +90,7 @@ export default function TaskModal({
     description: "",
     status: "not_started",
     priority: "medium",
-    assignedTo: "",
+    assignedTo: user?.id || "",
     dueDate: null as Date | null,
     initiativeId: "",
   });
@@ -101,7 +103,7 @@ export default function TaskModal({
       description: "",
       status: "not_started",
       priority: "medium",
-      assignedTo: "",
+      assignedTo: user?.id || "",
       dueDate: null,
       initiativeId: initiativeId || "",
     });
@@ -194,12 +196,12 @@ export default function TaskModal({
         description: "",
         status: "not_started",
         priority: "medium",
-        assignedTo: "",
+        assignedTo: user?.id || "",
         dueDate: null,
         initiativeId: initiativeId || "",
       });
     }
-  }, [task, isAdding, initiativeId]);
+  }, [task, isAdding, initiativeId, user]);
 
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
