@@ -289,11 +289,16 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
       // Debug: Log form data and cycle information
       console.log('🔍 Form submission data:', data);
       console.log('🔍 Cycle data during submission:', cycle);
+      console.log('🔍 Objective data during submission:', objective);
+      
+      // Get cycle data from objective if cycle is null
+      const cycleData = cycle || (objective && objective.cycle) || null;
+      console.log('🔍 Final cycle data for validation:', cycleData);
       
       // Validate dates against cycle before submission
-      if (cycle && cycle.startDate && cycle.endDate) {
-        const cycleStart = new Date(cycle.startDate);
-        const cycleEnd = new Date(cycle.endDate);
+      if (cycleData && cycleData.startDate && cycleData.endDate) {
+        const cycleStart = new Date(cycleData.startDate);
+        const cycleEnd = new Date(cycleData.endDate);
         cycleStart.setHours(0, 0, 0, 0);
         cycleEnd.setHours(23, 59, 59, 999);
         
@@ -316,6 +321,8 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
         if (dueDateOnly < cycleStart || dueDateOnly > cycleEnd) {
           throw new Error(`Tanggal selesai harus berada dalam rentang siklus (${cycleStart.toLocaleDateString('id-ID')} - ${cycleEnd.toLocaleDateString('id-ID')})`);
         }
+      } else {
+        console.log('⚠️ No cycle data available for validation');
       }
       
       // Calculate priority automatically based on scores (5-point scale)
