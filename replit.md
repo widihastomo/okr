@@ -246,7 +246,7 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
-- July 13, 2025. Successfully implemented milestone bar and progress bar in initiative detail page with comprehensive progress tracking:
+- July 13, 2025. Successfully implemented milestone bar, progress bar, and mission card in initiative detail page with comprehensive progress tracking:
   * ADDED: MilestoneBar component with 3 stages: Perencanaan (Planning), Eksekusi (Execution), Selesai (Completed)
   * IMPLEMENTED: Smart milestone detection based on initiative status and task progress
   * ENHANCED: Visual progress line with orange color scheme and smooth transitions
@@ -257,8 +257,13 @@ All email configuration now uses environment variables:
   * IMPLEMENTED: Progress bar with orange gradient showing completed/total tasks ratio
   * ENHANCED: Task status breakdown showing counts for each status (Belum Mulai, Sedang Berjalan, Selesai, Dibatalkan)
   * OPTIMIZED: Helper function calculateProgressStats for efficient progress calculation
+  * ADDED: MissionCard component in sidebar with 2 critical missions for each initiative
+  * IMPLEMENTED: Mission requirements: minimum 1 success metric and 1 task per initiative
+  * ENHANCED: Mission completion tracking with points, difficulty levels, and visual feedback
+  * ADDED: Mission UI with green completion state, orange pending state, and actionable buttons
+  * INTEGRATED: Mission actions directly connected to add metric and add task functionality
   * STYLED: Responsive design with consistent orange theme and proper spacing
-  * VERIFIED: Both milestone and progress bars update automatically based on initiative and task status changes
+  * VERIFIED: All components update automatically based on initiative and task status changes
 - July 13, 2025. Successfully implemented resend invitation functionality and removed redundant member invitation page:
   * ADDED: Resend invitation feature for users with pending status in user management
   * IMPLEMENTED: POST `/api/organization/users/:userId/resend-invitation` endpoint with proper authentication
