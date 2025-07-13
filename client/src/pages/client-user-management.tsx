@@ -142,6 +142,29 @@ export default function ClientUserManagement() {
     },
   });
 
+  // Resend invitation mutation
+  const resendInvitationMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const response = await apiRequest("POST", `/api/organization/users/${userId}/resend-invitation`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/organization/users"] });
+      toast({
+        title: "Berhasil",
+        description: "Undangan berhasil dikirim ulang",
+        variant: "success",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Gagal mengirim ulang undangan",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Filter users
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -170,6 +193,10 @@ export default function ClientUserManagement() {
     if (confirm("Apakah Anda yakin ingin menghapus pengguna ini dari organisasi?")) {
       removeUserMutation.mutate(userId);
     }
+  };
+
+  const handleResendInvitation = (userId: string) => {
+    resendInvitationMutation.mutate(userId);
   };
 
   const getRoleBadge = (role: string) => {
@@ -422,6 +449,15 @@ export default function ClientUserManagement() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
+                            {user.invitationStatus === "pending" && (
+                              <DropdownMenuItem 
+                                onClick={() => handleResendInvitation(user.id)}
+                                disabled={resendInvitationMutation.isPending}
+                              >
+                                <Mail className="mr-2 h-4 w-4" />
+                                Kirim Ulang Undangan
+                              </DropdownMenuItem>
+                            )}
                             <DropdownMenuItem 
                               onClick={() => handleToggleUserStatus(user.id, user.isActive)}
                             >

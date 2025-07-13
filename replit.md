@@ -246,14 +246,18 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
-- July 13, 2025. Successfully fixed user invitation status display and removed redundant member invitation page:
+- July 13, 2025. Successfully implemented resend invitation functionality and removed redundant member invitation page:
+  * ADDED: Resend invitation feature for users with pending status in user management
+  * IMPLEMENTED: POST `/api/organization/users/:userId/resend-invitation` endpoint with proper authentication
+  * ENHANCED: Frontend dropdown menu now shows "Kirim Ulang Undangan" for pending users
+  * ADDED: New invitation token generation and email sending for resend functionality
   * FIXED: Added invitationStatus field to `/api/organization/users` endpoint response
   * RESOLVED: User invitation status now properly displays "Menunggu" (pending) for invited users
   * REMOVED: Deleted redundant member-invitations.tsx page as functionality consolidated in user management
   * CLEANED: Removed "Undangan Member" menu item from sidebar navigation
   * UPDATED: Route configuration to remove /member-invitations path
   * ENHANCED: User management now handles both active users and pending invitations in single interface
-  * VERIFIED: Invited users display correct yellow "Menunggu" badge status
+  * VERIFIED: Invited users display correct yellow "Menunggu" badge status with resend capability
 - July 13, 2025. Successfully fixed cycle data visibility issue and standardized container padding across all detail pages:
   * FIXED: Cycle data now properly displays in UI instead of showing "Tidak ada cycle"
   * RESOLVED: Error `storage.getObjectivesByUserId is not a function` in cycle endpoint

@@ -8653,6 +8653,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Resend invitation endpoint
+  app.post("/api/organization/users/:userId/resend-invitation", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { userId } = req.params;
+
+      if (!user.organizationId) {
+        return res.status(400).json({ error: "User not associated with an organization" });
+      }
+
+      // Only organization owners can resend invitations
+      const organization = await db.select().from(organizations).where(eq(organizations.id, user.organizationId)).limit(1);
+      if (organization.length === 0) {
+        return res.status(404).json({ error: "Organization not found" });
+      }
+
+      const isOwner = organization[0].ownerId === user.id || user.role === "admin" || user.isSystemOwner;
+      if (!isOwner) {
+        return res.status(403).json({ error: "Access denied. Only organization owners can resend invitations." });
+      }
+
+      // Find the user with pending invitation
+      const [targetUser] = await db.select().from(users).where(
+        and(
+          eq(users.id, userId),
+          eq(users.organizationId, user.organizationId),
+          eq(users.invitationStatus, "pending")
+        )
+      );
+
+      if (!targetUser) {
+        return res.status(404).json({ error: "User not found or invitation not pending" });
+      }
+
+      // Generate new invitation token and expiration
+      const newInvitationToken = crypto.randomBytes(32).toString('hex');
+      const newInvitationExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
+
+      // Update user with new invitation token and expiry
+      await db.update(users)
+        .set({ 
+          invitationToken: newInvitationToken,
+          invitationExpiresAt: newInvitationExpiry.toISOString(),
+          invitedAt: new Date().toISOString()
+        })
+        .where(eq(users.id, userId));
+
+      // Send invitation email
+      try {
+        const inviterName = `${user.firstName} ${user.lastName}`.trim() || user.email;
+        const organizationName = organization[0].name || "Organization";
+        
+        // Construct the invitation link
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        const invitationLink = `${baseUrl}/accept-invitation?token=${newInvitationToken}`;
+        
+        const emailHtml = emailService.generateInvitationEmail(
+          inviterName,
+          organizationName,
+          invitationLink
+        );
+        
+        await emailService.sendEmail({
+          from: "no-reply@yourcompany.com",
+          to: targetUser.email,
+          subject: `Undangan Ulang Bergabung dengan ${organizationName}`,
+          html: emailHtml,
+        });
+
+        res.json({ message: "Invitation resent successfully" });
+      } catch (emailError) {
+        console.error("Error sending invitation email:", emailError);
+        res.status(500).json({ error: "Failed to send invitation email" });
+      }
+    } catch (error) {
+      console.error("Error resending invitation:", error);
+      res.status(500).json({ error: "Failed to resend invitation" });
+    }
+  });
+
   // Client registration endpoint
   app.post('/api/client-registration', async (req, res) => {
     try {
