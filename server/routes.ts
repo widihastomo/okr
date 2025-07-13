@@ -1309,21 +1309,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = req.params.id;
       const currentUser = req.user as User;
       
-      const objective = await storage.getObjective(id);
+      const objectiveWithKeyResults = await storage.getOKRWithKeyResults(id);
       
-      if (!objective) {
+      if (!objectiveWithKeyResults) {
         return res.status(404).json({ message: "Objective not found" });
       }
       
       // Verify user has access to this objective
       if (!currentUser.isSystemOwner) {
-        const objectiveOwner = await storage.getUser(objective.ownerId);
+        const objectiveOwner = await storage.getUser(objectiveWithKeyResults.ownerId);
         if (!objectiveOwner || objectiveOwner.organizationId !== currentUser.organizationId) {
           return res.status(403).json({ message: "Access denied to this objective" });
         }
       }
       
-      res.json(objective);
+      res.json(objectiveWithKeyResults);
     } catch (error) {
       console.error("Error fetching objective:", error);
       res.status(500).json({ message: "Failed to fetch objective" });
