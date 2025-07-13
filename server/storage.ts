@@ -1848,7 +1848,9 @@ export class DatabaseStorage implements IStorage {
       
       console.log(`🔄 Creating cycle from onboarding: ${cycleName} (${cycleData.startDate} to ${cycleData.endDate})`);
       
+      console.log("🔄 Inserting cycle data:", cycleData);
       const [newCycle] = await db.insert(cycles).values(cycleData).returning();
+      console.log("✅ Cycle created successfully:", newCycle);
       const activeCycle = [newCycle];
       
       // Create objective from onboarding data

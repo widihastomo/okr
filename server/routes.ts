@@ -8904,9 +8904,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create first objective from onboarding data
       if (onboardingData && onboardingData.objective) {
         try {
-          await storage.createFirstObjectiveFromOnboarding(currentUser.id, onboardingData);
+          console.log("🔄 Starting first objective creation with data:", {
+            userId: currentUser.id,
+            objective: onboardingData.objective,
+            cycleStartDate: onboardingData.cycleStartDate,
+            cycleEndDate: onboardingData.cycleEndDate,
+            cycleDuration: onboardingData.cycleDuration,
+            keyResults: onboardingData.keyResults?.length,
+            selectedInitiatives: onboardingData.selectedInitiatives?.length
+          });
+          
+          const result = await storage.createFirstObjectiveFromOnboarding(currentUser.id, onboardingData);
+          console.log("✅ First objective created successfully:", result);
         } catch (error) {
-          console.error("Error creating first objective from onboarding:", error);
+          console.error("❌ Error creating first objective from onboarding:", error);
+          console.error("❌ Error details:", {
+            message: error.message,
+            stack: error.stack,
+            onboardingData: JSON.stringify(onboardingData, null, 2)
+          });
           // Continue with completion even if objective creation fails
         }
       }
