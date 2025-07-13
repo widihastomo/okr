@@ -809,7 +809,6 @@ export default function OrganizationSettings() {
                               <SelectValue placeholder="Pilih role" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="owner">Owner</SelectItem>
                               <SelectItem value="administrator">Administrator</SelectItem>
                               <SelectItem value="member">Member</SelectItem>
                               <SelectItem value="viewer">Viewer</SelectItem>
@@ -1021,7 +1020,6 @@ export default function OrganizationSettings() {
                               <SelectValue placeholder="Pilih role" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="owner">Owner</SelectItem>
                               <SelectItem value="administrator">Administrator</SelectItem>
                               <SelectItem value="member">Member</SelectItem>
                               <SelectItem value="viewer">Viewer</SelectItem>

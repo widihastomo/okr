@@ -59,7 +59,9 @@ export default function Profile() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updateProfileMutation.mutate(formData);
+    // Remove role from form data since users cannot change their own roles
+    const { role, ...profileData } = formData;
+    updateProfileMutation.mutate(profileData);
   };
 
   const changePasswordMutation = useMutation({
@@ -251,17 +253,14 @@ export default function Profile() {
 
                     <div className="space-y-2">
                       <Label htmlFor="role">Role</Label>
-                      <Select value={formData.role} onValueChange={(value) => setFormData({...formData, role: value})} disabled={!isEditing}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih role" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="owner">Owner</SelectItem>
-                          <SelectItem value="administrator">Administrator</SelectItem>
-                          <SelectItem value="member">Member</SelectItem>
-                          <SelectItem value="viewer">Viewer</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <div className="flex items-center gap-2">
+                        <Badge className={getRoleBadgeColor((user as any)?.role || "member")}>
+                          {getRoleLabel((user as any)?.role || "member")}
+                        </Badge>
+                        <span className="text-sm text-gray-500">
+                          (Role tidak dapat diubah sendiri)
+                        </span>
+                      </div>
                     </div>
 
                     <Separator />

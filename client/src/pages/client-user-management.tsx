@@ -228,7 +228,6 @@ export default function ClientUserManagement() {
                     <SelectItem value="member">Member - Akses standar untuk mengelola OKR</SelectItem>
                     <SelectItem value="administrator">Administrator - Akses lanjutan kecuali pengaturan organisasi</SelectItem>
                     <SelectItem value="viewer">Viewer - Hanya dapat melihat objektif dan analisis</SelectItem>
-                    <SelectItem value="owner">Owner - Akses penuh termasuk pengaturan organisasi</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
