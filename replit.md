@@ -269,6 +269,12 @@ All email configuration now uses environment variables:
   * IMPROVED: Error handling with detailed logging for better debugging
   * RESOLVED: Access control issue that was preventing initiative updates from working properly
   * RESULT: Initiative update functionality now works correctly with proper multi-tenant security
+- July 13, 2025. Successfully fixed end date display issue in initiative detail page:
+  * FIXED: Changed `initiativeData.endDate` to `initiativeData.dueDate` in initiative detail page
+  * ENHANCED: Added null check for both startDate and dueDate with "Belum diatur" fallback
+  * RESOLVED: End date now displays properly in initiative detail page overview section
+  * IMPROVED: Better error handling for missing date fields
+  * RESULT: Initiative dates now display correctly with proper Indonesian formatting
 - July 13, 2025. Successfully fixed initiative status system and disabled initiative field for tasks from initiative detail:
   * FIXED: Initiative creation now properly uses "draft" status instead of "not_started" (matching database schema)
   * CORRECTED: Server-side POST /api/initiatives endpoint now sets default status to "draft" 

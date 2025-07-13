@@ -855,14 +855,14 @@ export default function InitiativeDetailPage() {
                         <Calendar className="h-4 w-4 text-blue-500" />
                         <span className="text-gray-600">Mulai:</span>
                         <span className="font-medium">
-                          {new Date(initiativeData.startDate).toLocaleDateString('id-ID')}
+                          {initiativeData.startDate ? new Date(initiativeData.startDate).toLocaleDateString('id-ID') : 'Belum diatur'}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <Clock className="h-4 w-4 text-red-500" />
                         <span className="text-gray-600">Berakhir:</span>
                         <span className="font-medium">
-                          {new Date(initiativeData.endDate).toLocaleDateString('id-ID')}
+                          {initiativeData.dueDate ? new Date(initiativeData.dueDate).toLocaleDateString('id-ID') : 'Belum diatur'}
                         </span>
                       </div>
                     </div>
