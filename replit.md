@@ -246,6 +246,16 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 13, 2025. Successfully implemented bi-directional auto-update status initiative system based on task status changes:
+  * IMPLEMENTED: Auto-update logic - task "in_progress" → initiative "sedang_berjalan" 
+  * IMPLEMENTED: Reverse auto-update logic - all tasks "not_started" → initiative "draft"
+  * FIXED: Function name error from `storage.getInitiative` to `storage.getInitiativeWithDetails` in all endpoints
+  * ENHANCED: Added comprehensive debug logging for troubleshooting auto-update functionality
+  * UPDATED: All task update endpoints (PUT and PATCH) with bi-directional status update logic
+  * OPTIMIZED: Cache invalidation for initiative detail page to refresh initiative status when task status changes
+  * VERIFIED: Backend auto-update logic working correctly with detailed console logging
+  * IMPROVED: Frontend cache invalidation includes initiative detail, task list, and initiative list refresh
+  * RESULT: Complete bi-directional status synchronization between tasks and initiatives with real-time UI updates
 - July 13, 2025. Successfully completed comprehensive active user filtering implementation and task modal consistency upgrade:
   * IMPLEMENTED: Active user filtering (isActive === true) across all SearchableUserSelect components throughout the application
   * UPDATED: Task modal, edit objective modal, goal form modal, and key result modal with active user filtering

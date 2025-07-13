@@ -591,7 +591,12 @@ export default function InitiativeDetailPage() {
       return await apiRequest("PATCH", `/api/tasks/${taskId}`, { status });
     },
     onSuccess: () => {
+      // Invalidate task list
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/tasks`] });
+      // Invalidate initiative detail (to refresh status)
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
+      // Invalidate initiative list (if user navigates back)
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives`] });
       toast({
         title: "Status berhasil diperbarui",
         description: "Status task berhasil diperbarui",
