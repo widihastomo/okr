@@ -37,7 +37,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Calendar } from "@/components/ui/calendar";
-// Button will be replaced with Button
+import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 import {
   CheckCircle2,
   Clock,
@@ -82,7 +82,7 @@ export default function TaskModal({
 }: TaskModalProps) {
   const { toast } = useToast();
   const { user } = useAuth();
-  const [picPopoverOpen, setPicPopoverOpen] = useState(false);
+
   const [initiativePopoverOpen, setInitiativePopoverOpen] = useState(false);
   const [statusPopoverOpen, setStatusPopoverOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -109,7 +109,6 @@ export default function TaskModal({
     });
     
     // Close popovers
-    setPicPopoverOpen(false);
     setInitiativePopoverOpen(false);
     setStatusPopoverOpen(false);
     
@@ -835,87 +834,16 @@ export default function TaskModal({
                     </PopoverContent>
                   </Popover>
                 </Label>
-              <Popover open={picPopoverOpen} onOpenChange={setPicPopoverOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={picPopoverOpen}
-                    className="w-full justify-between focus:ring-orange-500 focus:border-orange-500"
-                  >
-                    {formData.assignedTo
-                      ? formData.assignedTo === "unassigned"
-                        ? "Belum ditentukan"
-                        : availableUsers?.find(
-                              (user: any) => user.id === formData.assignedTo,
-                            )
-                          ? (() => {
-                              const user = availableUsers?.find((u: any) => u.id === formData.assignedTo);
-                              const firstName = user?.firstName || "";
-                              const lastName = user?.lastName || "";
-                              return `${firstName} ${lastName}`.trim() || user?.email || "User";
-                            })()
-                          : "Pilih anggota tim..."
-                      : "Pilih anggota tim..."}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
-                  <Command>
-                    <CommandInput placeholder="Cari anggota tim..." />
-                    <CommandList>
-                      <CommandEmpty>
-                        Tidak ada anggota tim ditemukan.
-                      </CommandEmpty>
-                      <CommandGroup>
-                        <CommandItem
-                          value="unassigned"
-                          onSelect={() => {
-                            setFormData({
-                              ...formData,
-                              assignedTo: "unassigned",
-                            });
-                            setPicPopoverOpen(false);
-                          }}
-                        >
-                          <Check
-                            className={`mr-2 h-4 w-4 ${
-                              formData.assignedTo === "unassigned"
-                                ? "opacity-100"
-                                : "opacity-0"
-                            }`}
-                          />
-                          Belum ditentukan
-                        </CommandItem>
-                        {availableUsers?.map((user: any) => {
-                          const firstName = user.firstName || "";
-                          const lastName = user.lastName || "";
-                          const displayName = `${firstName} ${lastName}`.trim() || user.email || "User";
-                          return (
-                            <CommandItem
-                              key={user.id}
-                              value={displayName}
-                              onSelect={() => {
-                                setFormData({ ...formData, assignedTo: user.id });
-                                setPicPopoverOpen(false);
-                              }}
-                            >
-                              <Check
-                                className={`mr-2 h-4 w-4 ${
-                                  formData.assignedTo === user.id
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                }`}
-                              />
-                              {displayName}
-                            </CommandItem>
-                          );
-                        })}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
+              <SearchableUserSelect
+                users={availableUsers?.filter(user => user.isActive === true) || []}
+                value={formData.assignedTo === "unassigned" ? "" : formData.assignedTo}
+                onValueChange={(value) => {
+                  setFormData({ ...formData, assignedTo: value || "unassigned" });
+                }}
+                placeholder="Pilih anggota tim..."
+                emptyMessage="Tidak ada anggota tim ditemukan"
+                allowUnassigned={true}
+              />
               </div>
 
               <div>

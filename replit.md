@@ -246,8 +246,8 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
-- July 13, 2025. Successfully completed comprehensive active user filtering implementation across all user selection components:
-  * IMPLEMENTED: Active user filtering (isActive === true) across all SearchableUserSelect components
+- July 13, 2025. Successfully completed comprehensive active user filtering implementation and task modal consistency upgrade:
+  * IMPLEMENTED: Active user filtering (isActive === true) across all SearchableUserSelect components throughout the application
   * UPDATED: Task modal, edit objective modal, goal form modal, and key result modal with active user filtering
   * ENHANCED: Initiative form modal and initiative modal with active user filtering for PIC assignment
   * IMPROVED: Quick task FAB and standalone task modal with active user filtering
@@ -255,8 +255,10 @@ All email configuration now uses environment variables:
   * FILTERED: Dashboard user filter to show only active users while maintaining "all" option for comprehensive data view
   * PREVENTED: Assignment of tasks, objectives, key results, and initiatives to pending/inactive users
   * CONSISTENCY: All user selection dropdowns now consistently show only active users throughout the application
+  * UPGRADED: Task modal now uses SearchableUserSelect component for consistency with objective modal
+  * SIMPLIFIED: Removed custom Command/Popover user selection in task modal and replaced with standardized SearchableUserSelect
   * ENHANCED: User experience by preventing assignment to users who cannot actively participate in tasks and goals
-  * RESULT: Complete user assignment system now filters inactive users, ensuring only active participants are assigned to work items
+  * RESULT: Complete user assignment system now filters inactive users and uses consistent UI patterns across all modals
 - July 13, 2025. Successfully fixed initiative status system and disabled initiative field for tasks from initiative detail:
   * FIXED: Initiative creation now properly uses "draft" status instead of "not_started" (matching database schema)
   * CORRECTED: Server-side POST /api/initiatives endpoint now sets default status to "draft" 
