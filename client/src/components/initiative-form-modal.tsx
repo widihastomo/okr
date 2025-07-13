@@ -226,6 +226,27 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
   // Create form with dynamic schema based on cycle data
   const formSchema = useMemo(() => createInitiativeFormSchema(cycle), [cycle]);
   
+  // Custom validation for date fields
+  const validateDate = (date: Date, fieldName: string) => {
+    if (!cycle || !cycle.startDate || !cycle.endDate) {
+      return null; // No validation if cycle data not available
+    }
+    
+    const cycleStart = new Date(cycle.startDate);
+    const cycleEnd = new Date(cycle.endDate);
+    cycleStart.setHours(0, 0, 0, 0);
+    cycleEnd.setHours(23, 59, 59, 999);
+    
+    const inputDate = new Date(date);
+    inputDate.setHours(0, 0, 0, 0);
+    
+    if (inputDate < cycleStart || inputDate > cycleEnd) {
+      return `${fieldName} harus berada dalam rentang siklus (${cycleStart.toLocaleDateString('id-ID')} - ${cycleEnd.toLocaleDateString('id-ID')})`;
+    }
+    
+    return null;
+  };
+  
   const form = useForm<InitiativeFormData>({
     resolver: zodResolver(formSchema),
     mode: "onChange", // Validate on every change
@@ -619,7 +640,18 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                             <Calendar
                               mode="single"
                               selected={field.value}
-                              onSelect={field.onChange}
+                              onSelect={(date) => {
+                                field.onChange(date);
+                                // Validate date immediately after selection
+                                if (date) {
+                                  const error = validateDate(date, "Tanggal mulai");
+                                  if (error) {
+                                    form.setError("startDate", { message: error });
+                                  } else {
+                                    form.clearErrors("startDate");
+                                  }
+                                }
+                              }}
                               disabled={(date) => {
                                 const today = new Date();
                                 today.setHours(0, 0, 0, 0); // Reset time to start of day
@@ -682,7 +714,18 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                             <Calendar
                               mode="single"
                               selected={field.value}
-                              onSelect={field.onChange}
+                              onSelect={(date) => {
+                                field.onChange(date);
+                                // Validate date immediately after selection
+                                if (date) {
+                                  const error = validateDate(date, "Tanggal selesai");
+                                  if (error) {
+                                    form.setError("dueDate", { message: error });
+                                  } else {
+                                    form.clearErrors("dueDate");
+                                  }
+                                }
+                              }}
                               disabled={(date) => {
                                 const today = new Date();
                                 today.setHours(0, 0, 0, 0); // Reset time to start of day
