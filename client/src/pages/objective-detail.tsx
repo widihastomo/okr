@@ -384,7 +384,7 @@ export default function GoalDetail() {
 
   // Fetch goal data
   const { data: goal, isLoading } = useQuery<GoalWithKeyResults>({
-    queryKey: [`/api/goals/${id}`],
+    queryKey: [`/api/objectives/${id}`],
     enabled: !!id,
   });
 
@@ -405,7 +405,7 @@ export default function GoalDetail() {
 
   // Fetch parent objective data
   const { data: parentObjective } = useQuery<GoalWithKeyResults>({
-    queryKey: [`/api/goals/${goal?.parentId}`],
+    queryKey: [`/api/objectives/${goal?.parentId}`],
     enabled: !!goal?.parentId,
   });
 
