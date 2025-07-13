@@ -306,14 +306,52 @@ const MilestoneBar = ({ initiative, tasks }: { initiative: any; tasks: any[] }) 
   ];
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
-      <h3 className="text-sm font-medium text-gray-900 mb-4">Progress Milestone</h3>
-      <div className="flex items-center gap-2">
-        {milestones.map((milestone, index) => (
+    <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-4 mb-6">
+      <h3 className="text-sm font-medium text-gray-900 mb-3 sm:mb-4">Progress Milestone</h3>
+      
+      {/* Mobile View - Vertical Stack */}
+      <div className="block sm:hidden space-y-3">
+        {milestones.map((milestone) => (
+          <div key={milestone.id} className="flex items-center gap-3">
+            <div 
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0 ${
+                milestone.id <= currentMilestone
+                  ? 'bg-gradient-to-r from-orange-500 to-orange-400 text-white'
+                  : 'bg-gray-100 text-gray-500'
+              }`}
+            >
+              {milestone.id <= currentMilestone ? (
+                <Check className="w-4 h-4" />
+              ) : (
+                milestone.id
+              )}
+            </div>
+            <div className="flex-1">
+              <div className={`text-sm font-medium ${
+                milestone.id <= currentMilestone ? 'text-orange-600' : 'text-gray-600'
+              }`}>
+                {milestone.name}
+                {milestone.id === currentMilestone && milestone.id < 3 && (
+                  <span className="ml-2 text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">
+                    Saat ini
+                  </span>
+                )}
+              </div>
+              <div className="text-xs text-gray-400">
+                {milestone.description}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop View - Horizontal Bars */}
+      <div className="hidden sm:flex items-center gap-2">
+        {milestones.map((milestone) => (
           <div key={milestone.id} className="flex items-center flex-1">
             {/* Step Bar */}
             <div 
-              className={`flex-1 h-12 rounded-l-lg rounded-r-lg flex items-center justify-between px-4 transition-all duration-300 ${
+              className={`flex-1 h-12 rounded-lg flex items-center justify-between px-4 transition-all duration-300 ${
                 milestone.id <= currentMilestone
                   ? 'bg-gradient-to-r from-orange-500 to-orange-400 text-white'
                   : 'bg-gray-100 text-gray-500'
@@ -350,8 +388,6 @@ const MilestoneBar = ({ initiative, tasks }: { initiative: any; tasks: any[] }) 
                 </div>
               )}
             </div>
-            
-
           </div>
         ))}
       </div>

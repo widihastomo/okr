@@ -256,6 +256,8 @@ All email configuration now uses environment variables:
   * REDESIGNED: Milestone bar to horizontal step design with orange gradient bars instead of vertical timeline
   * ENHANCED: Step bars with rounded corners, gradient backgrounds, and "Saat ini" indicator for current step
   * IMPROVED: Connector arrows between steps and better visual hierarchy with step descriptions
+  * OPTIMIZED: Responsive design with mobile-first approach - vertical stack for mobile, horizontal bars for desktop
+  * ENHANCED: Mobile view uses circular icons with vertical layout for better readability on small screens
   * ADDED: Initiative progress bar in overview card showing task completion percentage
   * IMPLEMENTED: Progress bar with orange gradient showing completed/total tasks ratio
   * ENHANCED: Task status breakdown showing counts for each status (Belum Mulai, Sedang Berjalan, Selesai, Dibatalkan)
