@@ -882,7 +882,7 @@ export default function GoalDetail() {
     );
   }
 
-  const overallProgress = calculateOverallProgress(goal.keyResults);
+  const overallProgress = calculateOverallProgress(goal?.keyResults || []);
 
   return (
     <div className="p-4 sm:p-6 max-w-full">
@@ -952,11 +952,11 @@ export default function GoalDetail() {
           />
         </div>
         <div className="lg:col-span-1 h-full">
-          <ActivityLogCard objectiveId={goal.id} />
+          <ActivityLogCard objectiveId={goal?.id} />
         </div>
       </div>
       {/* Mission Card - Show when not all missions completed */}
-      {goal && !(goal.keyResults.length > 0 && inisiatif.length > 0 && tugas.length > 0) && (
+      {goal && !(goal.keyResults?.length > 0 && inisiatif.length > 0 && tugas.length > 0) && (
         <MissionCard
           missions={[
             {
@@ -965,7 +965,7 @@ export default function GoalDetail() {
               description: 'Buat minimal 1 angka target untuk mengukur kemajuan goal ini. Angka target yang jelas akan membantu tracking progress.',
               icon: <Target className="h-5 w-5" />,
               action: () => setAddKeyResultModal({ open: true }),
-              isCompleted: goal.keyResults.length > 0,
+              isCompleted: goal.keyResults?.length > 0,
               points: 25,
               difficulty: 'easy'
             },
@@ -1011,9 +1011,9 @@ export default function GoalDetail() {
               1
             </span>
             <span className="hidden sm:inline">
-              Angka Target ({goal.keyResults.length})
+              Angka Target ({goal?.keyResults?.length || 0})
             </span>
-            <span className="sm:hidden">Target ({goal.keyResults.length})</span>
+            <span className="sm:hidden">Target ({goal?.keyResults?.length || 0})</span>
           </TabsTrigger>
 
           {/* Tab 2 */}
@@ -1072,7 +1072,7 @@ export default function GoalDetail() {
                 </h3>
                 <p className="text-blue-700 text-sm leading-relaxed">Angka target menentukan bagaimana goal ini akan diukur. Setiap angka target memiliki target yang spesifik dan dapat diukur untuk memastikan pencapaian yang objektif.</p>
               </div>
-              {goal.keyResults.length > 0 && (
+              {goal?.keyResults?.length > 0 && (
                 <Button
                   onClick={() => setAddKeyResultModal({ open: true })}
                   className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white w-full sm:w-auto sm:ml-4 shrink-0"
@@ -1085,7 +1085,7 @@ export default function GoalDetail() {
             </div>
 
             {/* Quick Stats - only show when there are key results */}
-            {goal.keyResults.length > 0 && (
+            {goal?.keyResults?.length > 0 && (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
                 <div className="bg-white p-4 rounded-lg border border-blue-100">
                   <div className="flex items-center gap-2 mb-1">
@@ -1096,7 +1096,7 @@ export default function GoalDetail() {
                   </div>
                   <div className="text-2xl font-bold text-green-600">
                     {
-                      goal.keyResults.filter((kr) => {
+                      goal?.keyResults?.filter((kr) => {
                         const progress = calculateProgress(
                           kr.currentValue,
                           kr.targetValue,
@@ -1104,11 +1104,11 @@ export default function GoalDetail() {
                           kr.baseValue,
                         );
                         return progress >= 100;
-                      }).length
+                      }).length || 0
                     }
                   </div>
                   <div className="text-xs text-gray-500">
-                    dari {goal.keyResults.length} ukuran
+                    dari {goal?.keyResults?.length || 0} ukuran
                   </div>
                 </div>
 
@@ -1121,7 +1121,7 @@ export default function GoalDetail() {
                   </div>
                   <div className="text-2xl font-bold text-orange-600">
                     {
-                      goal.keyResults.filter((kr) => {
+                      goal?.keyResults?.filter((kr) => {
                         const progress = calculateProgress(
                           kr.currentValue,
                           kr.targetValue,
@@ -1129,7 +1129,7 @@ export default function GoalDetail() {
                           kr.baseValue,
                         );
                         return progress > 0 && progress < 100;
-                      }).length
+                      }).length || 0
                     }
                   </div>
                   <div className="text-xs text-gray-500">sedang berjalan</div>
@@ -1152,7 +1152,7 @@ export default function GoalDetail() {
 
             {/* Key Results List */}
             <div className="mt-6 space-y-4">
-              {goal.keyResults.length === 0 ? (
+              {goal?.keyResults?.length === 0 ? (
                 <div className="border-2 border-dashed border-blue-200 bg-blue-50/50 rounded-lg p-8 text-center">
                   <Target className="w-12 h-12 text-blue-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-blue-900 mb-2">
@@ -1171,7 +1171,7 @@ export default function GoalDetail() {
                   </Button>
                 </div>
               ) : (
-                goal.keyResults.map((kr) => {
+                goal?.keyResults?.map((kr) => {
                   const progress = calculateProgress(
                     kr.currentValue,
                     kr.targetValue,
