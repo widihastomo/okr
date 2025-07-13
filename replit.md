@@ -246,6 +246,12 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 13, 2025. Successfully fixed goal update refresh issue and enhanced cache invalidation system:
+  * FIXED: Added comprehensive cache invalidation in edit-objective-modal.tsx for both `/api/goals` and `/api/objectives` endpoints
+  * ENHANCED: Cache invalidation now includes activity log, initiatives, and tasks for updated objectives
+  * RESOLVED: Goal detail page now properly refreshes after update operations
+  * IMPROVED: Update goal functionality now works seamlessly with proper frontend-backend data flow
+  * VERIFIED: PATCH `/api/goals/:id` endpoint working correctly with enhanced error logging
 - July 13, 2025. Successfully completed comprehensive OKR → Goal terminology replacement across entire frontend application (COMPLETE):
   * UPDATED: Dashboard completely converted - all variables (filteredOKRs→filteredGoals), function names (handleDeleteOKR→handleDeleteGoal), and UI text
   * UPDATED: Home page, analytics page, help components, and hierarchy view with Goal terminology

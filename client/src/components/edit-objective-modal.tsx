@@ -110,9 +110,10 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
       });
       queryClient.invalidateQueries({ queryKey: ["/api/goals"] });
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
-      // Invalidate specific objective data
+      // Invalidate specific objective data - both endpoints
       if (objective?.id) {
         queryClient.invalidateQueries({ queryKey: [`/api/goals/${objective.id}`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/objectives/${objective.id}`] });
       }
       // Invalidate cycle data if cycleId exists
       if (objective?.cycleId) {
@@ -128,7 +129,13 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
       // Invalidate parent objective if parentId exists
       if (objective?.parentId) {
         queryClient.invalidateQueries({ queryKey: [`/api/goals/${objective.parentId}`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/objectives/${objective.parentId}`] });
       }
+      // Invalidate activity log for this objective
+      queryClient.invalidateQueries({ queryKey: [`/api/objectives/${objective?.id}/activity-log`] });
+      // Invalidate initiatives and tasks for this objective
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/objective/${objective?.id}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/tasks/objective/${objective?.id}`] });
       onOpenChange(false);
     },
     onError: (error: Error) => {
