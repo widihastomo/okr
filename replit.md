@@ -257,8 +257,11 @@ All email configuration now uses environment variables:
   * CONSISTENCY: All user selection dropdowns now consistently show only active users throughout the application
   * UPGRADED: Task modal now uses SearchableUserSelect component for consistency with objective modal
   * SIMPLIFIED: Removed custom Command/Popover user selection in task modal and replaced with standardized SearchableUserSelect
-  * ENHANCED: User experience by preventing assignment to users who cannot actively participate in tasks and goals
-  * RESULT: Complete user assignment system now filters inactive users and uses consistent UI patterns across all modals
+  * REQUIRED: Made PIC field mandatory for all tasks by removing allowUnassigned option
+  * VALIDATED: Added form validation to ensure PIC is selected before task submission
+  * ENHANCED: Button disable state when PIC is not selected, with clear validation messages
+  * IMPROVED: User experience by preventing assignment to users who cannot actively participate in tasks and goals
+  * RESULT: Complete user assignment system now filters inactive users, uses consistent UI patterns, and enforces mandatory PIC assignment across all modals
 - July 13, 2025. Successfully fixed initiative status system and disabled initiative field for tasks from initiative detail:
   * FIXED: Initiative creation now properly uses "draft" status instead of "not_started" (matching database schema)
   * CORRECTED: Server-side POST /api/initiatives endpoint now sets default status to "draft" 

@@ -373,6 +373,17 @@ export default function TaskModal({
 
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    
+    // Validate that PIC is assigned
+    if (!formData.assignedTo || formData.assignedTo === "unassigned") {
+      toast({
+        title: "PIC harus diisi",
+        description: "Silakan pilih anggota tim yang akan bertanggung jawab atas task ini",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const submitData = {
       ...formData,
       assignedTo:
@@ -811,7 +822,7 @@ export default function TaskModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <Label className="flex items-center gap-2 mb-2">
-                  PIC
+                  PIC <span className="text-red-500">*</span>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -824,11 +835,11 @@ export default function TaskModal({
                     </PopoverTrigger>
                     <PopoverContent className="w-80" side="top" sideOffset={5}>
                       <div className="space-y-2">
-                        <h4 className="font-medium">Menentukan PIC</h4>
+                        <h4 className="font-medium">Menentukan PIC (Wajib)</h4>
                         <p className="text-sm text-muted-foreground">
                           Pilih anggota tim yang akan bertanggung jawab
                           menyelesaikan task ini. PIC akan menerima notifikasi dan
-                          bertanggung jawab atas progress task.
+                          bertanggung jawab atas progress task. Field ini wajib diisi.
                         </p>
                       </div>
                     </PopoverContent>
@@ -838,11 +849,11 @@ export default function TaskModal({
                 users={availableUsers?.filter(user => user.isActive === true) || []}
                 value={formData.assignedTo === "unassigned" ? "" : formData.assignedTo}
                 onValueChange={(value) => {
-                  setFormData({ ...formData, assignedTo: value || "unassigned" });
+                  setFormData({ ...formData, assignedTo: value || "" });
                 }}
-                placeholder="Pilih anggota tim..."
+                placeholder="Pilih anggota tim... (wajib)"
                 emptyMessage="Tidak ada anggota tim ditemukan"
-                allowUnassigned={true}
+                allowUnassigned={false}
               />
               </div>
 
@@ -923,7 +934,7 @@ export default function TaskModal({
         <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
           <Button
             onClick={handleSubmit}
-            disabled={createMutation.isPending || updateMutation.isPending}
+            disabled={createMutation.isPending || updateMutation.isPending || !formData.assignedTo || formData.assignedTo === "unassigned"}
             className="w-full sm:w-auto bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white order-1 sm:order-2"
           >
             {isAdding ? "Tambah Task" : "Update Task"}
