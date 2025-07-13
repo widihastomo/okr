@@ -228,7 +228,10 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
   
   // Custom validation for date fields
   const validateDate = (date: Date, fieldName: string) => {
+    console.log('🔍 validateDate called with:', { date, fieldName, cycle });
+    
     if (!cycle || !cycle.startDate || !cycle.endDate) {
+      console.log('❌ No cycle data available for validation');
       return null; // No validation if cycle data not available
     }
     
@@ -240,10 +243,21 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
     const inputDate = new Date(date);
     inputDate.setHours(0, 0, 0, 0);
     
+    console.log('🔍 Date comparison:', {
+      inputDate: inputDate.toISOString(),
+      cycleStart: cycleStart.toISOString(),
+      cycleEnd: cycleEnd.toISOString(),
+      isBeforeStart: inputDate < cycleStart,
+      isAfterEnd: inputDate > cycleEnd
+    });
+    
     if (inputDate < cycleStart || inputDate > cycleEnd) {
-      return `${fieldName} harus berada dalam rentang siklus (${cycleStart.toLocaleDateString('id-ID')} - ${cycleEnd.toLocaleDateString('id-ID')})`;
+      const errorMessage = `${fieldName} harus berada dalam rentang siklus (${cycleStart.toLocaleDateString('id-ID')} - ${cycleEnd.toLocaleDateString('id-ID')})`;
+      console.log('❌ Validation failed:', errorMessage);
+      return errorMessage;
     }
     
+    console.log('✅ Validation passed');
     return null;
   };
   
@@ -437,6 +451,26 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
   });
 
   const onSubmit = (data: InitiativeFormData) => {
+    // Validate dates before submission
+    if (data.startDate) {
+      const startDateError = validateDate(data.startDate, "Tanggal mulai");
+      if (startDateError) {
+        console.log('🚨 Start date validation failed:', startDateError);
+        form.setError("startDate", { message: startDateError });
+        return;
+      }
+    }
+    
+    if (data.dueDate) {
+      const dueDateError = validateDate(data.dueDate, "Tanggal selesai");
+      if (dueDateError) {
+        console.log('🚨 Due date validation failed:', dueDateError);
+        form.setError("dueDate", { message: dueDateError });
+        return;
+      }
+    }
+    
+    console.log('✅ All validations passed, submitting form');
     createInitiativeMutation.mutate(data);
   };
 
@@ -718,7 +752,10 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                                 field.onChange(date);
                                 // Validate date immediately after selection
                                 if (date) {
+                                  console.log('🔍 Validating date:', date);
+                                  console.log('🔍 Cycle data for validation:', cycle);
                                   const error = validateDate(date, "Tanggal selesai");
+                                  console.log('🔍 Validation error:', error);
                                   if (error) {
                                     form.setError("dueDate", { message: error });
                                   } else {
