@@ -389,10 +389,23 @@ export default function GoalDetail() {
   });
 
   // Fetch cycle data
-  const { data: cycle } = useQuery<Cycle>({
+  const { data: cycle, error: cycleError } = useQuery<Cycle>({
     queryKey: [`/api/cycles/${goal?.cycleId}`],
     enabled: !!goal?.cycleId,
   });
+
+  // Debug logging for cycle data
+  useEffect(() => {
+    if (goal?.cycleId) {
+      console.log("🔍 Fetching cycle data for ID:", goal.cycleId);
+    }
+    if (cycle) {
+      console.log("✅ Cycle data loaded successfully:", cycle);
+    }
+    if (cycleError) {
+      console.error("❌ Error loading cycle data:", cycleError);
+    }
+  }, [goal?.cycleId, cycle, cycleError]);
 
   // Fetch owner data
   const { data: owner } = useQuery<User | Team>({
