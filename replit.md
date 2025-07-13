@@ -255,6 +255,8 @@ All email configuration now uses environment variables:
   * IMPROVED: Task modal now disables "Inisiatif Terkait" field when task is created from initiative detail page
   * ADDED: Visual indicator "(otomatis dipilih)" when initiative field is disabled
   * UPDATED: Help text contextually changes based on whether initiative is pre-selected or not
+  * FIXED: User display issue in task modal to handle null firstName/lastName values properly
+  * ENHANCED: User display now shows email or "User" fallback when firstName/lastName are null
   * RESULT: Initiative status system now consistent throughout application with proper filtering and form behavior
 - July 13, 2025. Successfully fixed initiative onboarding date alignment and implemented milestone bar, progress bar, and mission card in initiative detail page with comprehensive progress tracking:
   * FIXED: Initiative creation during onboarding now properly uses cycle start/end dates instead of random dates

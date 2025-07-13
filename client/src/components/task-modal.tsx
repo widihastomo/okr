@@ -845,7 +845,12 @@ export default function TaskModal({
                         : availableUsers?.find(
                               (user: any) => user.id === formData.assignedTo,
                             )
-                          ? `${availableUsers?.find((user: any) => user.id === formData.assignedTo)?.firstName} ${availableUsers?.find((user: any) => user.id === formData.assignedTo)?.lastName}`
+                          ? (() => {
+                              const user = availableUsers?.find((u: any) => u.id === formData.assignedTo);
+                              const firstName = user?.firstName || "";
+                              const lastName = user?.lastName || "";
+                              return `${firstName} ${lastName}`.trim() || user?.email || "User";
+                            })()
                           : "Pilih anggota tim..."
                       : "Pilih anggota tim..."}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -878,25 +883,30 @@ export default function TaskModal({
                           />
                           Belum ditentukan
                         </CommandItem>
-                        {availableUsers?.map((user: any) => (
-                          <CommandItem
-                            key={user.id}
-                            value={`${user.firstName} ${user.lastName}`}
-                            onSelect={() => {
-                              setFormData({ ...formData, assignedTo: user.id });
-                              setPicPopoverOpen(false);
-                            }}
-                          >
-                            <Check
-                              className={`mr-2 h-4 w-4 ${
-                                formData.assignedTo === user.id
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              }`}
-                            />
-                            {user.firstName} {user.lastName}
-                          </CommandItem>
-                        ))}
+                        {availableUsers?.map((user: any) => {
+                          const firstName = user.firstName || "";
+                          const lastName = user.lastName || "";
+                          const displayName = `${firstName} ${lastName}`.trim() || user.email || "User";
+                          return (
+                            <CommandItem
+                              key={user.id}
+                              value={displayName}
+                              onSelect={() => {
+                                setFormData({ ...formData, assignedTo: user.id });
+                                setPicPopoverOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={`mr-2 h-4 w-4 ${
+                                  formData.assignedTo === user.id
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                }`}
+                              />
+                              {displayName}
+                            </CommandItem>
+                          );
+                        })}
                       </CommandGroup>
                     </CommandList>
                   </Command>
