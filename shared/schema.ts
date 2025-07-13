@@ -594,6 +594,7 @@ export const insertSuccessMetricSchema = createInsertSchema(initiativeSuccessMet
   id: true,
   createdAt: true,
   updatedAt: true,
+  lastUpdateBy: true, // This can be omitted as it's optional
 });
 
 export const insertSuccessMetricUpdateSchema = createInsertSchema(successMetricUpdates).omit({

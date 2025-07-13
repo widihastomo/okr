@@ -89,9 +89,18 @@ export default function SuccessMetricsModal({
       form.reset();
     },
     onError: (error: any) => {
+      console.error("Error creating success metric:", error);
+      let errorMessage = "Gagal menambahkan metrik keberhasilan";
+      
+      if (error.errors && Array.isArray(error.errors)) {
+        errorMessage = error.errors.map((err: any) => `${err.field}: ${err.message}`).join(", ");
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Error",
-        description: error.message || "Gagal menambahkan metrik keberhasilan",
+        description: errorMessage,
         variant: "destructive",
       });
     },
@@ -111,9 +120,18 @@ export default function SuccessMetricsModal({
       onOpenChange(false);
     },
     onError: (error: any) => {
+      console.error("Error updating success metric:", error);
+      let errorMessage = "Gagal mengupdate metrik keberhasilan";
+      
+      if (error.errors && Array.isArray(error.errors)) {
+        errorMessage = error.errors.map((err: any) => `${err.field}: ${err.message}`).join(", ");
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Error",
-        description: error.message || "Gagal mengupdate metrik keberhasilan",
+        description: errorMessage,
         variant: "destructive",
       });
     },

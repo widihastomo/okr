@@ -3076,20 +3076,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/initiatives/:initiativeId/success-metrics", requireAuth, async (req, res) => {
     try {
       const initiativeId = req.params.initiativeId;
+      const currentUser = req.user;
+      
+      console.log("Creating success metric with data:", req.body);
+      
       const result = insertSuccessMetricSchema.safeParse({
         ...req.body,
-        initiativeId
+        initiativeId,
+        createdBy: currentUser.id,
+        achievement: req.body.achievement || "0", // Default value if not provided
       });
       
       if (!result.success) {
-        return res.status(400).json({ message: "Invalid success metric data", errors: result.error.errors });
+        console.error("Validation error:", result.error.errors);
+        return res.status(400).json({ 
+          message: "Data metrik keberhasilan tidak valid", 
+          errors: result.error.errors.map(err => ({
+            field: err.path.join('.'),
+            message: err.message
+          }))
+        });
       }
 
       const metric = await storage.createSuccessMetric(result.data);
       res.status(201).json(metric);
     } catch (error) {
       console.error("Error creating success metric:", error);
-      res.status(500).json({ message: "Failed to create success metric" });
+      res.status(500).json({ message: "Gagal membuat metrik keberhasilan" });
     }
   });
 
