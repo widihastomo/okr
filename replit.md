@@ -254,9 +254,6 @@ All email configuration now uses environment variables:
   * REQUIRED: Made startDate and dueDate mandatory fields in initiative form with proper validation
   * ADDED: Default values for new initiatives - startDate: today, dueDate: 30 days from today
   * IMPROVED: Form validation with clear error messages for required date fields
-  * ENHANCED: Date validation to ensure initiative dates are within cycle date range
-  * IMPLEMENTED: Calendar component restrictions preventing selection of dates outside cycle range
-  * ADDED: Dynamic schema validation based on objective's cycle dates
   * ADDED: MilestoneBar component with 3 stages: Perencanaan (Planning), Eksekusi (Execution), Selesai (Completed)
   * IMPLEMENTED: Smart milestone detection based on initiative status and task progress
   * ENHANCED: Visual progress line with orange color scheme and smooth transitions

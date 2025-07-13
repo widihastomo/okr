@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -29,75 +29,35 @@ import { SearchableKeyResultSelect } from "@/components/ui/searchable-key-result
 import { formatNumberWithSeparator, handleNumberInputChange, getNumberValueForSubmission } from "@/lib/number-utils";
 import type { KeyResult, User, Initiative } from "@shared/schema";
 
-// Create a dynamic schema function to include cycle date validation
-const createInitiativeFormSchema = (cycle?: any) => {
-  return z.object({
-    title: z.string().min(1, "Judul inisiatif wajib diisi"),
-    description: z.string().optional(),
-    keyResultId: z.string().min(1, "Angka target wajib dipilih"),
-    picId: z.string().optional(),
-    startDate: z.date({
-      required_error: "Tanggal mulai wajib diisi",
-      invalid_type_error: "Tanggal mulai harus berupa tanggal yang valid"
-    }),
-    dueDate: z.date({
-      required_error: "Tanggal selesai wajib diisi", 
-      invalid_type_error: "Tanggal selesai harus berupa tanggal yang valid"
-    }),
-    priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
-    budget: z.string().optional(),
-    // Priority calculation inputs
-    impactScore: z.number().min(1).max(5).default(3),
-    effortScore: z.number().min(1).max(5).default(3),
-    confidenceScore: z.number().min(1).max(5).default(3),
-  }).refine((data) => {
-    // Validate that start date is not greater than end date
-    return data.startDate <= data.dueDate;
-  }, {
-    message: "Tanggal mulai tidak boleh lebih besar dari tanggal selesai",
-    path: ["startDate"], // Show error on startDate field
-  }).refine((data) => {
-    // Validate that dates are within cycle range if cycle data is available
-    if (cycle && cycle.startDate && cycle.endDate) {
-      const cycleStart = new Date(cycle.startDate);
-      const cycleEnd = new Date(cycle.endDate);
-      
-      // Reset time to compare dates only
-      cycleStart.setHours(0, 0, 0, 0);
-      cycleEnd.setHours(23, 59, 59, 999);
-      
-      const startDateOnly = new Date(data.startDate);
-      const dueDateOnly = new Date(data.dueDate);
-      startDateOnly.setHours(0, 0, 0, 0);
-      dueDateOnly.setHours(0, 0, 0, 0);
-      
-      console.log('🔍 Validating dates:', {
-        cycleStart: cycleStart.toISOString(),
-        cycleEnd: cycleEnd.toISOString(),
-        startDate: startDateOnly.toISOString(),
-        dueDate: dueDateOnly.toISOString()
-      });
-      
-      // Check if start date is within cycle range
-      if (startDateOnly < cycleStart || startDateOnly > cycleEnd) {
-        console.log('❌ Start date outside cycle range');
-        return false;
-      }
-      
-      // Check if due date is within cycle range
-      if (dueDateOnly < cycleStart || dueDateOnly > cycleEnd) {
-        console.log('❌ Due date outside cycle range');
-        return false;
-      }
-    }
-    return true;
-  }, {
-    message: cycle ? `Tanggal inisiatif harus berada dalam rentang siklus (${new Date(cycle.startDate).toLocaleDateString('id-ID')} - ${new Date(cycle.endDate).toLocaleDateString('id-ID')})` : "Tanggal inisiatif harus berada dalam rentang siklus",
-    path: ["dueDate"], // Show error on dueDate field since it's most likely to be outside range
-  });
-};
+// Form schema matching the actual Initiative database schema
+const initiativeFormSchema = z.object({
+  title: z.string().min(1, "Judul inisiatif wajib diisi"),
+  description: z.string().optional(),
+  keyResultId: z.string().min(1, "Angka target wajib dipilih"),
+  picId: z.string().optional(),
+  startDate: z.date({
+    required_error: "Tanggal mulai wajib diisi",
+    invalid_type_error: "Tanggal mulai harus berupa tanggal yang valid"
+  }),
+  dueDate: z.date({
+    required_error: "Tanggal selesai wajib diisi", 
+    invalid_type_error: "Tanggal selesai harus berupa tanggal yang valid"
+  }),
+  priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
+  budget: z.string().optional(),
+  // Priority calculation inputs
+  impactScore: z.number().min(1).max(5).default(3),
+  effortScore: z.number().min(1).max(5).default(3),
+  confidenceScore: z.number().min(1).max(5).default(3),
+}).refine((data) => {
+  // Validate that start date is not greater than end date
+  return data.startDate <= data.dueDate;
+}, {
+  message: "Tanggal mulai tidak boleh lebih besar dari tanggal selesai",
+  path: ["startDate"], // Show error on startDate field
+});
 
-type InitiativeFormData = z.infer<ReturnType<typeof createInitiativeFormSchema>>;
+type InitiativeFormData = z.infer<typeof initiativeFormSchema>;
 
 interface InitiativeFormModalProps {
   isOpen: boolean;
@@ -206,64 +166,8 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
     enabled: isOpen,
   });
 
-  // Fetch objective data to get cycle information
-  const { data: objective } = useQuery({
-    queryKey: ["/api/objectives", objectiveId],
-    enabled: isOpen && !!objectiveId,
-  });
-
-  // Get current objective from the objectives array
-  const currentObjective = Array.isArray(objective) ? 
-    objective.find(obj => obj.id === objectiveId) : 
-    objective;
-
-  // Fetch cycle data for date validation using the current objective's cycleId
-  const { data: cycle } = useQuery({
-    queryKey: ["/api/cycles", currentObjective?.cycleId],
-    enabled: isOpen && !!currentObjective?.cycleId,
-  });
-
-  // Create form with dynamic schema based on cycle data
-  const formSchema = useMemo(() => createInitiativeFormSchema(cycle), [cycle]);
-  
-  // Custom validation for date fields
-  const validateDate = (date: Date, fieldName: string) => {
-    console.log('🔍 validateDate called with:', { date, fieldName, cycle });
-    
-    if (!cycle || !cycle.startDate || !cycle.endDate) {
-      console.log('❌ No cycle data available for validation');
-      return null; // No validation if cycle data not available
-    }
-    
-    const cycleStart = new Date(cycle.startDate);
-    const cycleEnd = new Date(cycle.endDate);
-    cycleStart.setHours(0, 0, 0, 0);
-    cycleEnd.setHours(23, 59, 59, 999);
-    
-    const inputDate = new Date(date);
-    inputDate.setHours(0, 0, 0, 0);
-    
-    console.log('🔍 Date comparison:', {
-      inputDate: inputDate.toISOString(),
-      cycleStart: cycleStart.toISOString(),
-      cycleEnd: cycleEnd.toISOString(),
-      isBeforeStart: inputDate < cycleStart,
-      isAfterEnd: inputDate > cycleEnd
-    });
-    
-    if (inputDate < cycleStart || inputDate > cycleEnd) {
-      const errorMessage = `${fieldName} harus berada dalam rentang siklus (${cycleStart.toLocaleDateString('id-ID')} - ${cycleEnd.toLocaleDateString('id-ID')})`;
-      console.log('❌ Validation failed:', errorMessage);
-      return errorMessage;
-    }
-    
-    console.log('✅ Validation passed');
-    return null;
-  };
-  
   const form = useForm<InitiativeFormData>({
-    resolver: zodResolver(formSchema),
-    mode: "onChange", // Validate on every change
+    resolver: zodResolver(initiativeFormSchema),
     defaultValues: {
       title: "",
       description: "",
@@ -278,17 +182,6 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
       confidenceScore: 5,
     },
   });
-
-  // Update form validation when cycle data changes
-  useEffect(() => {
-    if (cycle) {
-      console.log('📅 Cycle data available for validation:', cycle);
-      // Trigger validation on date fields when cycle data is available
-      setTimeout(() => {
-        form.trigger(['startDate', 'dueDate']);
-      }, 100);
-    }
-  }, [cycle, form]);
 
   // Reset form with initiative data when editing
   useEffect(() => {
@@ -326,61 +219,6 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
 
   const createInitiativeMutation = useMutation({
     mutationFn: async (data: InitiativeFormData) => {
-      // Debug: Log form data and cycle information
-      console.log('🔍 Form submission data:', data);
-      console.log('🔍 Cycle data during submission:', cycle);
-      console.log('🔍 Objective data during submission:', objective);
-      
-      // Get cycle data from objective if cycle is null
-      let cycleData = cycle;
-      if (!cycleData && currentObjective) {
-        // Try to get cycle data from the current objective
-        if (currentObjective.cycle) {
-          cycleData = currentObjective.cycle;
-        } else {
-          // Create cycle data structure from objective's cycle properties
-          cycleData = {
-            id: currentObjective.cycleId,
-            startDate: currentObjective.cycleStartDate,
-            endDate: currentObjective.cycleEndDate,
-            name: currentObjective.cycleName || 'Current Cycle',
-            type: currentObjective.cycleType || 'monthly',
-            status: currentObjective.cycleStatus || 'active'
-          };
-        }
-      }
-      console.log('🔍 Final cycle data for validation:', cycleData);
-      
-      // Validate dates against cycle before submission
-      if (cycleData && cycleData.startDate && cycleData.endDate) {
-        const cycleStart = new Date(cycleData.startDate);
-        const cycleEnd = new Date(cycleData.endDate);
-        cycleStart.setHours(0, 0, 0, 0);
-        cycleEnd.setHours(23, 59, 59, 999);
-        
-        const startDateOnly = new Date(data.startDate);
-        const dueDateOnly = new Date(data.dueDate);
-        startDateOnly.setHours(0, 0, 0, 0);
-        dueDateOnly.setHours(0, 0, 0, 0);
-        
-        console.log('🔍 Final validation before submit:', {
-          cycleStart: cycleStart.toISOString(),
-          cycleEnd: cycleEnd.toISOString(),
-          startDate: startDateOnly.toISOString(),
-          dueDate: dueDateOnly.toISOString()
-        });
-        
-        if (startDateOnly < cycleStart || startDateOnly > cycleEnd) {
-          throw new Error(`Tanggal mulai harus berada dalam rentang siklus (${cycleStart.toLocaleDateString('id-ID')} - ${cycleEnd.toLocaleDateString('id-ID')})`);
-        }
-        
-        if (dueDateOnly < cycleStart || dueDateOnly > cycleEnd) {
-          throw new Error(`Tanggal selesai harus berada dalam rentang siklus (${cycleStart.toLocaleDateString('id-ID')} - ${cycleEnd.toLocaleDateString('id-ID')})`);
-        }
-      } else {
-        console.log('⚠️ No cycle data available for validation');
-      }
-      
       // Calculate priority automatically based on scores (5-point scale)
       const priorityScore = (data.impactScore * 0.4) + ((6 - data.effortScore) * 0.3) + (data.confidenceScore * 0.3);
       const calculatedPriority = priorityScore >= 4.0 ? 'critical' : 
@@ -451,26 +289,6 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
   });
 
   const onSubmit = (data: InitiativeFormData) => {
-    // Validate dates before submission
-    if (data.startDate) {
-      const startDateError = validateDate(data.startDate, "Tanggal mulai");
-      if (startDateError) {
-        console.log('🚨 Start date validation failed:', startDateError);
-        form.setError("startDate", { message: startDateError });
-        return;
-      }
-    }
-    
-    if (data.dueDate) {
-      const dueDateError = validateDate(data.dueDate, "Tanggal selesai");
-      if (dueDateError) {
-        console.log('🚨 Due date validation failed:', dueDateError);
-        form.setError("dueDate", { message: dueDateError });
-        return;
-      }
-    }
-    
-    console.log('✅ All validations passed, submitting form');
     createInitiativeMutation.mutate(data);
   };
 
@@ -674,40 +492,11 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                             <Calendar
                               mode="single"
                               selected={field.value}
-                              onSelect={(date) => {
-                                field.onChange(date);
-                                // Validate date immediately after selection
-                                if (date) {
-                                  const error = validateDate(date, "Tanggal mulai");
-                                  if (error) {
-                                    form.setError("startDate", { message: error });
-                                  } else {
-                                    form.clearErrors("startDate");
-                                  }
-                                }
-                              }}
+                              onSelect={field.onChange}
                               disabled={(date) => {
                                 const today = new Date();
                                 today.setHours(0, 0, 0, 0); // Reset time to start of day
-                                
-                                // Basic date validation
-                                if (date < today || date < new Date("1900-01-01")) {
-                                  return true;
-                                }
-                                
-                                // Cycle date validation for start date
-                                if (cycle && cycle.startDate && cycle.endDate) {
-                                  const cycleStart = new Date(cycle.startDate);
-                                  const cycleEnd = new Date(cycle.endDate);
-                                  cycleStart.setHours(0, 0, 0, 0);
-                                  cycleEnd.setHours(0, 0, 0, 0);
-                                  
-                                  if (date < cycleStart || date > cycleEnd) {
-                                    return true;
-                                  }
-                                }
-                                
-                                return false;
+                                return date < today || date < new Date("1900-01-01");
                               }}
                               initialFocus
                             />
@@ -748,43 +537,11 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                             <Calendar
                               mode="single"
                               selected={field.value}
-                              onSelect={(date) => {
-                                field.onChange(date);
-                                // Validate date immediately after selection
-                                if (date) {
-                                  console.log('🔍 Validating date:', date);
-                                  console.log('🔍 Cycle data for validation:', cycle);
-                                  const error = validateDate(date, "Tanggal selesai");
-                                  console.log('🔍 Validation error:', error);
-                                  if (error) {
-                                    form.setError("dueDate", { message: error });
-                                  } else {
-                                    form.clearErrors("dueDate");
-                                  }
-                                }
-                              }}
+                              onSelect={field.onChange}
                               disabled={(date) => {
                                 const today = new Date();
                                 today.setHours(0, 0, 0, 0); // Reset time to start of day
-                                
-                                // Basic date validation
-                                if (date < today || date < new Date("1900-01-01")) {
-                                  return true;
-                                }
-                                
-                                // Cycle date validation for due date
-                                if (cycle && cycle.startDate && cycle.endDate) {
-                                  const cycleStart = new Date(cycle.startDate);
-                                  const cycleEnd = new Date(cycle.endDate);
-                                  cycleStart.setHours(0, 0, 0, 0);
-                                  cycleEnd.setHours(0, 0, 0, 0);
-                                  
-                                  if (date < cycleStart || date > cycleEnd) {
-                                    return true;
-                                  }
-                                }
-                                
-                                return false;
+                                return date < today || date < new Date("1900-01-01");
                               }}
                               initialFocus
                             />
