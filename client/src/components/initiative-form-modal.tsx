@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -62,20 +62,38 @@ const createInitiativeFormSchema = (cycle?: any) => {
       const cycleStart = new Date(cycle.startDate);
       const cycleEnd = new Date(cycle.endDate);
       
+      // Reset time to compare dates only
+      cycleStart.setHours(0, 0, 0, 0);
+      cycleEnd.setHours(23, 59, 59, 999);
+      
+      const startDateOnly = new Date(data.startDate);
+      const dueDateOnly = new Date(data.dueDate);
+      startDateOnly.setHours(0, 0, 0, 0);
+      dueDateOnly.setHours(0, 0, 0, 0);
+      
+      console.log('🔍 Validating dates:', {
+        cycleStart: cycleStart.toISOString(),
+        cycleEnd: cycleEnd.toISOString(),
+        startDate: startDateOnly.toISOString(),
+        dueDate: dueDateOnly.toISOString()
+      });
+      
       // Check if start date is within cycle range
-      if (data.startDate < cycleStart || data.startDate > cycleEnd) {
+      if (startDateOnly < cycleStart || startDateOnly > cycleEnd) {
+        console.log('❌ Start date outside cycle range');
         return false;
       }
       
       // Check if due date is within cycle range
-      if (data.dueDate < cycleStart || data.dueDate > cycleEnd) {
+      if (dueDateOnly < cycleStart || dueDateOnly > cycleEnd) {
+        console.log('❌ Due date outside cycle range');
         return false;
       }
     }
     return true;
   }, {
     message: cycle ? `Tanggal inisiatif harus berada dalam rentang siklus (${new Date(cycle.startDate).toLocaleDateString('id-ID')} - ${new Date(cycle.endDate).toLocaleDateString('id-ID')})` : "Tanggal inisiatif harus berada dalam rentang siklus",
-    path: ["startDate"], // Show error on startDate field
+    path: ["dueDate"], // Show error on dueDate field since it's most likely to be outside range
   });
 };
 
@@ -200,8 +218,12 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
     enabled: isOpen && !!objective?.cycleId,
   });
 
+  // Create form with dynamic schema based on cycle data
+  const formSchema = useMemo(() => createInitiativeFormSchema(cycle), [cycle]);
+  
   const form = useForm<InitiativeFormData>({
-    resolver: zodResolver(createInitiativeFormSchema()),
+    resolver: zodResolver(formSchema),
+    mode: "onChange", // Validate on every change
     defaultValues: {
       title: "",
       description: "",
@@ -217,21 +239,14 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
     },
   });
 
-  // Update form resolver when cycle data changes
+  // Update form validation when cycle data changes
   useEffect(() => {
     if (cycle) {
-      form.clearErrors();
-      const currentFormData = form.getValues();
-      const newSchema = createInitiativeFormSchema(cycle);
-      
-      // Update the form with new schema
-      form.reset(currentFormData, {
-        keepDirty: true,
-        keepErrors: false,
-      });
-      
-      // Update resolver
-      form.resolver = zodResolver(newSchema);
+      console.log('📅 Cycle data available for validation:', cycle);
+      // Trigger validation on date fields when cycle data is available
+      setTimeout(() => {
+        form.trigger(['startDate', 'dueDate']);
+      }, 100);
     }
   }, [cycle, form]);
 
