@@ -353,9 +353,9 @@ const MilestoneBar = ({ initiative, tasks }: { initiative: any; tasks: any[] }) 
             
             {/* Connector Arrow */}
             {index < milestones.length - 1 && (
-              <div className="w-4 h-4 mx-1 flex items-center justify-center">
+              <div className="w-8 h-8 mx-2 flex items-center justify-center">
                 <div 
-                  className={`w-0 h-0 border-l-4 border-t-2 border-b-2 border-t-transparent border-b-transparent transition-all duration-300 ${
+                  className={`w-0 h-0 border-l-8 border-t-4 border-b-4 border-t-transparent border-b-transparent transition-all duration-300 ${
                     milestone.id < currentMilestone
                       ? 'border-l-orange-400'
                       : 'border-l-gray-300'
