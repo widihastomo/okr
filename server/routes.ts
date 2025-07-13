@@ -8951,6 +8951,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId: currentUser.id,
         organizationId: currentUser.organizationId,
         hasOnboardingData: !!onboardingData,
+        requestBody: JSON.stringify(req.body, null, 2),
         reminderConfig: {
           cadence: onboardingData?.cadence,
           reminderTime: onboardingData?.reminderTime,
@@ -8960,6 +8961,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         fullOnboardingData: onboardingData
       });
+      
+      // Add validation
+      if (!onboardingData) {
+        console.log("❌ No onboarding data provided");
+        return res.status(400).json({ message: "Onboarding data is required" });
+      }
+      
+      if (!currentUser.organizationId) {
+        console.log("❌ User has no organization ID");
+        return res.status(400).json({ message: "User not associated with an organization" });
+      }
       
       // Create first objective from onboarding data
       if (onboardingData && onboardingData.objective) {
