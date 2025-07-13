@@ -1084,6 +1084,35 @@ export default function GoalDetail() {
                 <h3 className="text-lg sm:text-xl font-semibold text-blue-900 mb-2 flex items-center gap-2">
                   <Target className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 shrink-0" />
                   Angka Target
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button 
+                        type="button" 
+                        className="inline-flex items-center justify-center ml-1"
+                      >
+                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent side="right" className="max-w-sm">
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-sm">Angka Target</h4>
+                        <p className="text-sm text-gray-600">
+                          Angka target adalah metrik kuantitatif yang mengukur keberhasilan goal secara objektif. 
+                          Setiap angka target memiliki:
+                        </p>
+                        <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                          <li>Nilai baseline (titik awal pengukuran)</li>
+                          <li>Nilai target (hasil yang ingin dicapai)</li>
+                          <li>Nilai saat ini (progress terkini)</li>
+                          <li>Tipe target (increase, decrease, binary, threshold)</li>
+                          <li>Unit pengukuran (%, Rp, jumlah, dll)</li>
+                        </ul>
+                        <p className="text-sm text-gray-600 mt-2">
+                          <strong>Contoh:</strong> Meningkatkan penjualan dari 100 juta menjadi 150 juta per bulan
+                        </p>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 </h3>
                 <p className="text-blue-700 text-sm leading-relaxed">Angka target menentukan bagaimana goal ini akan diukur. Setiap angka target memiliki target yang spesifik dan dapat diukur untuk memastikan pencapaian yang objektif.</p>
               </div>
@@ -1615,6 +1644,35 @@ export default function GoalDetail() {
                 <h3 className="text-lg sm:text-xl font-semibold text-green-900 mb-2 flex items-center gap-2">
                   <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 shrink-0" />
                   Inisiatif
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button 
+                        type="button" 
+                        className="inline-flex items-center justify-center ml-1"
+                      >
+                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent side="right" className="max-w-sm">
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-sm">Inisiatif</h4>
+                        <p className="text-sm text-gray-600">
+                          Inisiatif adalah langkah-langkah strategis dan terstruktur yang dirancang untuk mencapai angka target. 
+                          Setiap inisiatif memiliki:
+                        </p>
+                        <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                          <li>Tujuan yang jelas dan terukur</li>
+                          <li>Timeline dengan tanggal mulai dan selesai</li>
+                          <li>Budget dan alokasi sumber daya</li>
+                          <li>PIC (Person In Charge) yang bertanggung jawab</li>
+                          <li>Priority score untuk menentukan urgensi</li>
+                        </ul>
+                        <p className="text-sm text-gray-600 mt-2">
+                          <strong>Contoh:</strong> Kampanye digital marketing untuk meningkatkan brand awareness
+                        </p>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 </h3>
                 <p className="text-green-700 text-sm leading-relaxed">
                   Inisiatif adalah langkah-langkah strategis untuk mencapai ukuran
@@ -2193,6 +2251,35 @@ export default function GoalDetail() {
                 <h3 className="text-xl font-semibold text-purple-900 mb-2 flex items-center gap-2">
                   <CheckSquare className="w-6 h-6 text-purple-600" />
                   Tugas & Aktivitas
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button 
+                        type="button" 
+                        className="inline-flex items-center justify-center ml-1"
+                      >
+                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent side="right" className="max-w-sm">
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-sm">Tugas & Aktivitas</h4>
+                        <p className="text-sm text-gray-600">
+                          Tugas adalah aktivitas operasional harian yang mendukung pelaksanaan inisiatif strategis. 
+                          Setiap tugas memiliki:
+                        </p>
+                        <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                          <li>Deskripsi yang jelas dan actionable</li>
+                          <li>PIC (Person In Charge) yang bertanggung jawab</li>
+                          <li>Deadline untuk penyelesaian</li>
+                          <li>Tingkat prioritas (rendah, sedang, tinggi, kritis)</li>
+                          <li>Status tracking (belum mulai, berjalan, selesai, dibatalkan)</li>
+                        </ul>
+                        <p className="text-sm text-gray-600 mt-2">
+                          <strong>Contoh:</strong> Membuat konten sosial media untuk kampanye produk baru
+                        </p>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 </h3>
                 <p className="text-purple-700 text-sm leading-relaxed">
                   Tugas adalah aktivitas operasional yang mendukung pelaksanaan
