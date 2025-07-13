@@ -246,7 +246,11 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
-- July 13, 2025. Successfully implemented milestone bar, progress bar, and mission card in initiative detail page with comprehensive progress tracking:
+- July 13, 2025. Successfully fixed initiative onboarding date alignment and implemented milestone bar, progress bar, and mission card in initiative detail page with comprehensive progress tracking:
+  * FIXED: Initiative creation during onboarding now properly uses cycle start/end dates instead of random dates
+  * CORRECTED: Initiatives now have startDate set to cycleStartDate and dueDate set to cycleEndDate from onboarding data
+  * RESOLVED: Initiative date consistency issue where dates didn't match selected cycle duration
+  * ENHANCED: Console logging to show proper date assignment for initiatives created during onboarding
   * ADDED: MilestoneBar component with 3 stages: Perencanaan (Planning), Eksekusi (Execution), Selesai (Completed)
   * IMPLEMENTED: Smart milestone detection based on initiative status and task progress
   * ENHANCED: Visual progress line with orange color scheme and smooth transitions

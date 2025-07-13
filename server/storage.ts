@@ -1932,7 +1932,8 @@ export class DatabaseStorage implements IStorage {
               confidenceScore: 3,
               priorityScore: "3.00",
               createdBy: userId,
-              dueDate: generateRandomDeadline(cycleStartDate, cycleEndDate)
+              startDate: new Date(cycleStartDate),
+              dueDate: new Date(cycleEndDate)
             }));
           
           if (initiativesData.length > 0) {
@@ -1961,7 +1962,7 @@ export class DatabaseStorage implements IStorage {
               }
             }
             
-            console.log(`📅 Created ${initiativesData.length} initiatives with random deadlines between ${cycleStartDate} and ${cycleEndDate}`);
+            console.log(`📅 Created ${initiativesData.length} initiatives with startDate: ${cycleStartDate} and dueDate: ${cycleEndDate}`);
           }
         }
       }
