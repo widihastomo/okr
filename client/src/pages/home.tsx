@@ -8,15 +8,15 @@ import { LogoutButton } from "@/components/logout-button";
 export default function Home() {
   const quickActions = [
     {
-      title: "Lihat OKR",
+      title: "Lihat Goal",
       description: "Kelola dan pantau semua Objectives & Key Results",
       icon: Target,
       href: "/",
       color: "bg-blue-500"
     },
     {
-      title: "Company OKRs",
-      description: "OKR tingkat perusahaan dan strategis",
+      title: "Company Goals",
+      description: "Goal tingkat perusahaan dan strategis",
       icon: TrendingUp,
       href: "/company-okrs",
       color: "bg-green-500"
@@ -30,7 +30,7 @@ export default function Home() {
     },
     {
       title: "Siklus & Template",
-      description: "Atur periode dan template OKR",
+      description: "Atur periode dan template Goal",
       icon: Calendar,
       href: "/cycles",
       color: "bg-orange-500"
@@ -48,7 +48,7 @@ export default function Home() {
                 <Target className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">OKR Manager</h1>
+                <h1 className="text-2xl font-bold text-gray-900">Goal Manager</h1>
                 <p className="text-sm text-gray-500">Selamat datang kembali!</p>
               </div>
             </div>
@@ -75,7 +75,7 @@ export default function Home() {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Dashboard OKR
+            Dashboard Goal
           </h2>
           <p className="text-gray-600">
             Kelola tujuan dan hasil kunci untuk mencapai kesuksesan tim dan organisasi
@@ -112,7 +112,7 @@ export default function Home() {
               <CardHeader>
                 <CardTitle>Aktivitas Terbaru</CardTitle>
                 <CardDescription>
-                  Update terbaru dari OKR dan progress tim
+                  Update terbaru dari Goal dan progress tim
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -130,7 +130,7 @@ export default function Home() {
                     <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                     <div>
                       <p className="text-sm text-gray-900">
-                        <span className="font-medium">New OKR:</span> Objective baru "Improve Customer Satisfaction" telah dibuat
+                        <span className="font-medium">New Goal:</span> Objective baru "Improve Customer Satisfaction" telah dibuat
                       </p>
                       <p className="text-xs text-gray-500">5 jam yang lalu</p>
                     </div>
@@ -153,7 +153,7 @@ export default function Home() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Status OKR</CardTitle>
+                <CardTitle>Status Goal</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">

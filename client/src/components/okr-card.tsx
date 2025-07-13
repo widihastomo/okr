@@ -14,7 +14,7 @@ import { useState } from "react";
 
 
 
-interface OKRCardProps {
+interface GoalCardProps {
   okr: OKRWithKeyResults;
   onEditProgress: (keyResult: KeyResult) => void;
   onEditKeyResult?: (keyResult: KeyResult) => void;
@@ -30,7 +30,7 @@ interface OKRCardProps {
   users?: any[];
 }
 
-export default function OKRCard({ okr, onEditProgress, onEditKeyResult, onDeleteKeyResult, onDuplicate, onDelete, onEdit, cycleStartDate, cycleEndDate, cycle, index = 0, users = [] }: OKRCardProps) {
+export default function GoalCard({ okr, onEditProgress, onEditKeyResult, onDeleteKeyResult, onDuplicate, onDelete, onEdit, cycleStartDate, cycleEndDate, cycle, index = 0, users = [] }: GoalCardProps) {
   const [isExpanded, setIsExpanded] = useState(index === 0);
 
   // Helper function to get user name

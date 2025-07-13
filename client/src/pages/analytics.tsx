@@ -338,7 +338,7 @@ export default function AnalyticsPage() {
         <div>
           <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
           <p className="text-gray-500">
-            Monitor progress dan performa OKR, initiative, dan tim
+            Monitor progress dan performa Goal, initiative, dan tim
           </p>
         </div>
         <div className="flex gap-4">
@@ -593,7 +593,7 @@ export default function AnalyticsPage() {
             <CardHeader>
               <CardTitle>Team Performance Comparison</CardTitle>
               <CardDescription>
-                Perbandingan performa antar tim berdasarkan progress OKR
+                Perbandingan performa antar tim berdasarkan progress Goal
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -664,7 +664,7 @@ export default function AnalyticsPage() {
             <CardHeader>
               <CardTitle>Top Performers</CardTitle>
               <CardDescription>
-                10 user dengan progress OKR terbaik
+                10 user dengan progress Goal terbaik
               </CardDescription>
             </CardHeader>
             <CardContent>

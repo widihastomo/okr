@@ -19,7 +19,7 @@ interface AIInsight {
 }
 
 interface AIHelpBubbleProps {
-  context: 'dashboard' | 'objective_detail' | 'key_result_detail' | 'check_in' | 'create_okr';
+  context: 'dashboard' | 'objective_detail' | 'key_result_detail' | 'check_in' | 'create_goal';
   data?: any;
   position?: 'top-right' | 'bottom-right' | 'bottom-left';
   className?: string;
@@ -111,8 +111,8 @@ export function AIHelpBubble({
         return 'Bantuan Angka Target';
       case 'check_in':
         return 'Bantuan Check-in';
-      case 'create_okr':
-        return 'Bantuan Buat OKR';
+      case 'create_goal':
+        return 'Bantuan Buat Goal';
       default:
         return 'Bantuan AI';
     }
@@ -130,7 +130,7 @@ export function AIHelpBubble({
           {
             type: 'tip',
             title: 'Tip Dashboard',
-            message: 'Gunakan filter status dan siklus untuk fokus pada OKR yang perlu perhatian khusus.',
+            message: 'Gunakan filter status dan siklus untuk fokus pada Goal yang perlu perhatian khusus.',
             confidence: 0.9,
             actionable: true,
             context: 'dashboard_navigation'
@@ -167,11 +167,11 @@ export function AIHelpBubble({
         return [
           {
             type: 'tip',
-            title: 'Tip OKR',
-            message: 'Sistem OKR membantu meningkatkan fokus dan alignment dalam tim.',
+            title: 'Tip Goal',
+            message: 'Sistem Goal membantu meningkatkan fokus dan alignment dalam tim.',
             confidence: 0.8,
             actionable: false,
-            context: 'general_okr'
+            context: 'general_goal'
           }
         ];
     }

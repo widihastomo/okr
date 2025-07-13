@@ -132,7 +132,7 @@ interface ObjectiveFormModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export default function OKRFormModal({ okr, open, onOpenChange }: ObjectiveFormModalProps) {
+export default function GoalFormModal({ okr, open, onOpenChange }: ObjectiveFormModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
@@ -1849,8 +1849,8 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
   );
 }
 
-// Component untuk tombol Create OKR
-export function CreateOKRButton() {
+// Component untuk tombol Create Goal
+export function CreateGoalButton() {
   const [open, setOpen] = useState(false);
 
   return (

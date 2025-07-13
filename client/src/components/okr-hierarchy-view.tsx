@@ -337,7 +337,7 @@ const ObjectiveCard = ({ objective }: { objective: Objective }) => {
   );
 };
 
-export default function OKRHierarchyView() {
+export default function GoalHierarchyView() {
   const { data: objectives, isLoading } = useQuery({
     queryKey: ["/api/okrs-with-hierarchy"],
     retry: false,
@@ -348,7 +348,7 @@ export default function OKRHierarchyView() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-          <p className="text-gray-600">Memuat struktur OKR...</p>
+          <p className="text-gray-600">Memuat struktur Goal...</p>
         </div>
       </div>
     );
@@ -358,9 +358,9 @@ export default function OKRHierarchyView() {
     return (
       <div className="text-center py-12">
         <Target className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Belum Ada OKR</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">Belum Ada Goal</h3>
         <p className="text-gray-600 mb-4">
-          Mulai dengan membuat objective pertama Anda dan bangun struktur OKR lengkap.
+          Mulai dengan membuat objective pertama Anda dan bangun struktur Goal lengkap.
         </p>
         <Button>
           <Plus className="w-4 h-4 mr-2" />
@@ -373,7 +373,7 @@ export default function OKRHierarchyView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Struktur OKR</h2>
+        <h2 className="text-2xl font-bold text-gray-900">Struktur Goal</h2>
         <div className="flex items-center space-x-2 text-sm text-gray-600">
           <div className="flex items-center space-x-1">
             <div className="w-3 h-3 bg-green-400 rounded"></div>

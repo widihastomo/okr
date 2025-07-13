@@ -17,11 +17,11 @@ export default function StatsOverview({ okrs, isLoading }: StatsOverviewProps) {
   const [scrollLeft, setScrollLeft] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
 
-  // Calculate stats from filtered OKR data
+  // Calculate stats from filtered Goal data
   const calculateStats = () => {
     if (!okrs || okrs.length === 0) {
       return {
-        totalOKRs: 0,
+        totalGoals: 0,
         onTrack: 0,
         atRisk: 0,
         completed: 0,
@@ -58,7 +58,7 @@ export default function StatsOverview({ okrs, isLoading }: StatsOverviewProps) {
     }, 0);
 
     return {
-      totalOKRs: okrs.length,
+      totalGoals: okrs.length,
       ...statusCounts,
       avgProgress: okrs.length > 0 ? Math.round(totalProgress / okrs.length) : 0
     };
@@ -68,8 +68,8 @@ export default function StatsOverview({ okrs, isLoading }: StatsOverviewProps) {
 
   const statCards = [
     {
-      title: "Total OKRs",
-      value: stats.totalOKRs.toString(),
+      title: "Total Goals",
+      value: stats.totalGoals.toString(),
       icon: Target,
       iconBg: "bg-blue-100",
       iconColor: "text-blue-600"

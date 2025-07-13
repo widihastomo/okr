@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton, SkeletonAvatar, SkeletonBadge, SkeletonProgressBar } from "@/components/ui/skeleton";
 
-export function OKRCardSkeleton() {
+export function GoalCardSkeleton() {
   return (
     <Card className="transition-all duration-200">
       <CardContent className="p-6">
@@ -64,11 +64,11 @@ export function OKRCardSkeleton() {
   );
 }
 
-export function OKRGridSkeleton({ count = 6 }: { count?: number }) {
+export function GoalGridSkeleton({ count = 6 }: { count?: number }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {Array.from({ length: count }).map((_, i) => (
-        <OKRCardSkeleton key={i} />
+        <GoalCardSkeleton key={i} />
       ))}
     </div>
   );

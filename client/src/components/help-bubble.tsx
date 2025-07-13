@@ -32,7 +32,7 @@ interface AIInsight {
 
 interface ContextualHelpRequest {
   userId: string;
-  context: 'dashboard' | 'objective_detail' | 'key_result_detail' | 'check_in' | 'create_okr';
+  context: 'dashboard' | 'objective_detail' | 'key_result_detail' | 'check_in' | 'create_goal';
   data?: any;
 }
 
@@ -85,8 +85,8 @@ const getContextTitle = (context: string) => {
       return 'Analisis Key Result';
     case 'check_in':
       return 'Panduan Update';
-    case 'create_okr':
-      return 'Tips Pembuatan OKR';
+    case 'create_goal':
+      return 'Tips Pembuatan Goal';
     default:
       return 'AI Assistant';
   }
@@ -266,7 +266,7 @@ export function HelpBubble({
 
               <div className="mt-4 pt-3 border-t">
                 <p className="text-xs text-gray-500 text-center">
-                  💡 Insight berdasarkan analisis AI dari data OKR Anda
+                  💡 Insight berdasarkan analisis AI dari data Goal Anda
                 </p>
               </div>
             </CardContent>
@@ -326,10 +326,10 @@ export function CheckInHelpBubble({ userId, keyResultId }: { userId: string; key
   );
 }
 
-export function CreateOKRHelpBubble({ userId }: { userId: string }) {
+export function CreateGoalHelpBubble({ userId }: { userId: string }) {
   return (
     <HelpBubble
-      context="create_okr"
+      context="create_goal"
       userId={userId}
       variant="inline"
       className="ml-2"

@@ -225,7 +225,7 @@ export default function ClientUserManagement() {
                     <SelectValue placeholder="Pilih role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="member">Member - Akses standar untuk mengelola OKR</SelectItem>
+                    <SelectItem value="member">Member - Akses standar untuk mengelola Goal</SelectItem>
                     <SelectItem value="administrator">Administrator - Akses lanjutan termasuk pengaturan organisasi</SelectItem>
                     <SelectItem value="viewer">Viewer - Hanya dapat melihat objektif dan analisis</SelectItem>
                   </SelectContent>

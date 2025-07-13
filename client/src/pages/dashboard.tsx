@@ -3,13 +3,13 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import StatsOverview from "@/components/stats-overview";
-import OKRCard from "@/components/okr-card";
-import { CreateOKRButton } from "@/components/okr-form-modal";
+import GoalCard from "@/components/okr-card";
+import { CreateGoalButton } from "@/components/okr-form-modal";
 import EditProgressModal from "@/components/edit-progress-modal";
 import EditKeyResultModal from "@/components/edit-key-result-modal";
 import { CascadeDeleteConfirmationModal } from "@/components/cascade-delete-confirmation-modal";
 import EditObjectiveModal from "@/components/edit-objective-modal";
-import { OKRGridSkeleton } from "@/components/skeletons/okr-card-skeleton";
+import { GoalGridSkeleton } from "@/components/skeletons/okr-card-skeleton";
 import {
   StatsOverviewSkeleton,
   FiltersSkeleton,
@@ -251,7 +251,7 @@ export default function Dashboard() {
   }, [currentUser]);
 
   const {
-    data: allOkrs = [],
+    data: allGoals = [],
     isLoading,
     refetch,
   } = useQuery<OKRWithKeyResults[]>({
@@ -260,33 +260,33 @@ export default function Dashboard() {
 
   // Helper function to check if a cycle is related to selected cycle
   const isRelatedCycle = (
-    okrCycleId: string | null,
+    goalCycleId: string | null,
     selectedCycleId: string,
   ) => {
     // Always return true for "all cycles" filter
     if (selectedCycleId === "all") return true;
 
-    // Handle null cycleId (OKRs without cycles)
-    if (!okrCycleId) return selectedCycleId === "all";
+    // Handle null cycleId (Goals without cycles)
+    if (!goalCycleId) return selectedCycleId === "all";
 
     // Direct match
-    if (okrCycleId === selectedCycleId) return true;
+    if (goalCycleId === selectedCycleId) return true;
 
-    // Find the selected cycle and OKR cycle
+    // Find the selected cycle and Goal cycle
     const selectedCycle = cycles.find((c) => c.id === selectedCycleId);
-    const okrCycle = cycles.find((c) => c.id === okrCycleId);
+    const goalCycle = cycles.find((c) => c.id === goalCycleId);
 
-    if (!selectedCycle || !okrCycle) return false;
+    if (!selectedCycle || !goalCycle) return false;
 
     // If selected cycle is quarterly, include monthly cycles within that quarter
-    if (selectedCycle.type === "quarterly" && okrCycle.type === "monthly") {
+    if (selectedCycle.type === "quarterly" && goalCycle.type === "monthly") {
       const selectedStart = new Date(selectedCycle.startDate);
       const selectedEnd = new Date(selectedCycle.endDate);
-      const okrStart = new Date(okrCycle.startDate);
-      const okrEnd = new Date(okrCycle.endDate);
+      const goalStart = new Date(goalCycle.startDate);
+      const goalEnd = new Date(goalCycle.endDate);
 
       // Check if monthly cycle falls within quarterly cycle period
-      return okrStart >= selectedStart && okrEnd <= selectedEnd;
+      return goalStart >= selectedStart && goalEnd <= selectedEnd;
     }
 
     return false;
@@ -298,15 +298,15 @@ export default function Dashboard() {
   });
 
   // Client-side filtering for status, cycle, and user
-  const filteredOKRs = allOkrs.filter((okr) => {
+  const filteredGoals = allGoals.filter((goal) => {
     // Status filter
-    const statusMatch = statusFilter === "all" || okr.status === statusFilter;
+    const statusMatch = statusFilter === "all" || goal.status === statusFilter;
 
     // Cycle filter with related cycle logic
-    const cycleMatch = isRelatedCycle(okr.cycleId, cycleFilter);
+    const cycleMatch = isRelatedCycle(goal.cycleId, cycleFilter);
 
-    // User filter - show OKRs where:
-    // 1. If userFilter is 'all' or empty, show all OKRs
+    // User filter - show Goals where:
+    // 1. If userFilter is 'all' or empty, show all Goals
     // 2. The user is the owner of the objective
     // 3. The user is a member/owner of the team that owns the objective
     let userMatch = true;
@@ -314,11 +314,11 @@ export default function Dashboard() {
       userMatch = false; // Start with false and set to true if conditions are met
 
       // Check if user is the direct owner
-      if (okr.ownerId === userFilter) {
+      if (goal.ownerId === userFilter) {
         userMatch = true;
-      } else if (okr.teamId) {
+      } else if (goal.teamId) {
         // Check if user is a member or owner of the team
-        const team = teams.find((t: any) => t.id === okr.teamId);
+        const team = teams.find((t: any) => t.id === goal.teamId);
         if (team) {
           userMatch =
             team.ownerId === userFilter ||
@@ -335,22 +335,22 @@ export default function Dashboard() {
   useEffect(() => {
     if (
       activeTab === "hierarchy" &&
-      filteredOKRs.length > 0 &&
+      filteredGoals.length > 0 &&
       !hasAutoExpanded
     ) {
-      const rootNodesWithChildren = filteredOKRs
-        .filter((okr: any) => !okr.parentId) // root nodes
-        .filter((okr: any) =>
-          filteredOKRs.some((child: any) => child.parentId === okr.id),
+      const rootNodesWithChildren = filteredGoals
+        .filter((goal: any) => !goal.parentId) // root nodes
+        .filter((goal: any) =>
+          filteredGoals.some((child: any) => child.parentId === goal.id),
         ) // that have children
-        .map((okr: any) => okr.id);
+        .map((goal: any) => goal.id);
 
       if (rootNodesWithChildren.length > 0) {
         setExpandedNodes(new Set(rootNodesWithChildren));
         setHasAutoExpanded(true);
       }
     }
-  }, [activeTab, filteredOKRs.length, hasAutoExpanded]);
+  }, [activeTab, filteredGoals.length, hasAutoExpanded]);
 
   // Reset auto-expand when switching tabs or filters
   useEffect(() => {
@@ -358,10 +358,10 @@ export default function Dashboard() {
     setExpandedNodes(new Set());
   }, [activeTab, cycleFilter, statusFilter]);
 
-  // Mutation for deleting OKR
-  const deleteOKRMutation = useMutation({
-    mutationFn: async (okrId: string) => {
-      const response = await fetch(`/api/objectives/${okrId}`, {
+  // Mutation for deleting Goal
+  const deleteGoalMutation = useMutation({
+    mutationFn: async (goalId: string) => {
+      const response = await fetch(`/api/objectives/${goalId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -369,7 +369,7 @@ export default function Dashboard() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to delete OKR");
+        throw new Error("Failed to delete Goal");
       }
 
       return response.json();
@@ -387,8 +387,8 @@ export default function Dashboard() {
     },
     onError: (error) => {
       toast({
-        title: "Gagal menghapus OKR",
-        description: error.message || "Terjadi kesalahan saat menghapus OKR.",
+        title: "Gagal menghapus Goal",
+        description: error.message || "Terjadi kesalahan saat menghapus Goal.",
         variant: "destructive",
       });
     },
@@ -424,9 +424,9 @@ export default function Dashboard() {
     },
   });
 
-  // Mutation for duplicating OKR
-  const duplicateOKRMutation = useMutation({
-    mutationFn: async (okr: OKRWithKeyResults) => {
+  // Mutation for duplicating Goal
+  const duplicateGoalMutation = useMutation({
+    mutationFn: async (goal: OKRWithKeyResults) => {
       // Create new objective
       const response = await fetch("/api/objectives", {
         method: "POST",
@@ -434,15 +434,15 @@ export default function Dashboard() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          title: `${okr.title} (Copy)`,
-          description: okr.description,
-          owner: okr.owner,
-          ownerType: okr.ownerType,
-          ownerId: okr.ownerId,
+          title: `${goal.title} (Copy)`,
+          description: goal.description,
+          owner: goal.owner,
+          ownerType: goal.ownerType,
+          ownerId: goal.ownerId,
           status: "not_started",
-          cycleId: okr.cycleId,
-          teamId: okr.teamId,
-          parentId: okr.parentId,
+          cycleId: goal.cycleId,
+          teamId: goal.teamId,
+          parentId: goal.parentId,
         }),
       });
 
@@ -453,7 +453,7 @@ export default function Dashboard() {
       const newObjective = await response.json();
 
       // Create key results for the new objective
-      for (const kr of okr.keyResults) {
+      for (const kr of goal.keyResults) {
         const krResponse = await fetch("/api/key-results", {
           method: "POST",
           headers: {
@@ -491,9 +491,9 @@ export default function Dashboard() {
     },
     onError: (error) => {
       toast({
-        title: "Gagal menduplikasi OKR",
+        title: "Gagal menduplikasi Goal",
         description:
-          error.message || "Terjadi kesalahan saat menduplikasi OKR.",
+          error.message || "Terjadi kesalahan saat menduplikasi Goal.",
         variant: "destructive",
       });
     },
@@ -513,23 +513,23 @@ export default function Dashboard() {
 
   // Key result click now navigates to dedicated page via Link in OKRCard
 
-  const handleDuplicateOKR = (okr: OKRWithKeyResults) => {
-    duplicateOKRMutation.mutate(okr);
+  const handleDuplicateGoal = (goal: OKRWithKeyResults) => {
+    duplicateGoalMutation.mutate(goal);
   };
 
-  const handleEditObjective = (okr: OKRWithKeyResults) => {
-    setEditObjectiveModal({ open: true, objective: okr });
+  const handleEditObjective = (goal: OKRWithKeyResults) => {
+    setEditObjectiveModal({ open: true, objective: goal });
   };
 
-  const handleDeleteOKR = async (okrId: string) => {
+  const handleDeleteGoal = async (goalId: string) => {
     try {
       // Get cascade deletion info
-      const response = await fetch(`/api/objectives/${okrId}/cascade-info`);
+      const response = await fetch(`/api/objectives/${goalId}/cascade-info`);
       const data = await response.json();
 
       setDeleteConfirmModal({
         open: true,
-        okrId,
+        okrId: goalId,
         okrTitle: data.objective.title,
         keyResultsCount: data.counts.keyResults,
         initiativesCount: data.counts.initiatives,
@@ -537,11 +537,11 @@ export default function Dashboard() {
       });
     } catch (error) {
       // Fallback to basic deletion if cascade info fails
-      const okrToDelete = filteredOKRs.find((okr) => okr.id === okrId);
+      const goalToDelete = filteredGoals.find((goal) => goal.id === goalId);
       setDeleteConfirmModal({
         open: true,
-        okrId,
-        okrTitle: okrToDelete?.title || "OKR ini",
+        okrId: goalId,
+        okrTitle: goalToDelete?.title || "Goal ini",
         keyResultsCount: 0,
         initiativesCount: 0,
         tasksCount: 0,
@@ -549,9 +549,9 @@ export default function Dashboard() {
     }
   };
 
-  const confirmDeleteOKR = () => {
+  const confirmDeleteGoal = () => {
     if (deleteConfirmModal.okrId) {
-      deleteOKRMutation.mutate(deleteConfirmModal.okrId);
+      deleteGoalMutation.mutate(deleteConfirmModal.okrId);
     }
   };
 
@@ -582,7 +582,7 @@ export default function Dashboard() {
             </div>
             <div className="flex-shrink-0 flex gap-2">
               <TourLauncher />
-              <CreateOKRButton data-tour="create-okr-button" />
+              <CreateGoalButton data-tour="create-goal-button" />
             </div>
           </div>
 
@@ -640,7 +640,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Overview */}
-      <StatsOverview okrs={filteredOKRs} isLoading={isLoading} />
+      <StatsOverview okrs={filteredGoals} isLoading={isLoading} />
 
       {/* View Tabs */}
       <div className="mt-4 sm:mt-6 w-full">
@@ -681,8 +681,8 @@ export default function Dashboard() {
       {/* Goals Content */}
       <div className="mt-4 sm:mt-6 w-full space-y-6">
         {isLoading ? (
-          <OKRGridSkeleton count={6} />
-        ) : filteredOKRs.length === 0 ? (
+          <GoalGridSkeleton count={6} />
+        ) : filteredGoals.length === 0 ? (
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Plus className="w-8 h-8 text-gray-400" />
@@ -695,23 +695,23 @@ export default function Dashboard() {
                 ? "Tidak ada Goal yang sesuai dengan filter Anda. Coba sesuaikan kriteria pencarian."
                 : "Mulai dengan membuat tujuan dan ukuran keberhasilan pertama Anda."}
             </p>
-            <CreateOKRButton />
+            <CreateGoalButton />
           </div>
         ) : activeTab === "list" ? (
           // List View
-          filteredOKRs.map((okr, index) => {
-            // Find the cycle for this OKR to get start and end date
-            const cycle = cycles.find((c) => c.id === okr.cycleId);
+          filteredGoals.map((goal, index) => {
+            // Find the cycle for this Goal to get start and end date
+            const cycle = cycles.find((c) => c.id === goal.cycleId);
             return (
-              <OKRCard
-                key={okr.id}
-                okr={okr}
+              <GoalCard
+                key={goal.id}
+                okr={goal}
                 onEditProgress={handleEditProgress}
                 onEditKeyResult={handleEditKeyResult}
                 onDeleteKeyResult={handleDeleteKeyResult}
                 onRefresh={refetch}
-                onDuplicate={handleDuplicateOKR}
-                onDelete={handleDeleteOKR}
+                onDuplicate={handleDuplicateGoal}
+                onDelete={handleDeleteGoal}
                 onEdit={handleEditObjective}
                 cycleStartDate={cycle?.startDate}
                 cycleEndDate={cycle?.endDate}
@@ -724,12 +724,12 @@ export default function Dashboard() {
         ) : (
           // Hierarchy View with D3 Tree
           <DashboardD3Tree
-            okrs={filteredOKRs}
+            okrs={filteredGoals}
             expandedNodes={expandedNodes}
             onToggleExpand={toggleExpand}
-            onNodeClick={(okr) => {
+            onNodeClick={(goal) => {
               // Navigate to objective detail or show edit modal
-              // handleEditObjective(okr);
+              // handleEditObjective(goal);
             }}
           />
         )}
@@ -776,7 +776,7 @@ export default function Dashboard() {
       <CascadeDeleteConfirmationModal
         open={deleteConfirmModal.open}
         onOpenChange={(open: boolean) => setDeleteConfirmModal({ open })}
-        onConfirm={confirmDeleteOKR}
+        onConfirm={confirmDeleteGoal}
         objectiveTitle={deleteConfirmModal.okrTitle || ""}
         keyResultsCount={deleteConfirmModal.keyResultsCount || 0}
         initiativesCount={deleteConfirmModal.initiativesCount || 0}
@@ -820,7 +820,7 @@ export default function Dashboard() {
       <AIHelpBubble
         context="dashboard"
         data={{
-          totalOkrs: filteredOKRs.length,
+          totalGoals: filteredGoals.length,
           statusFilter,
           cycleFilter,
         }}

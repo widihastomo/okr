@@ -118,7 +118,7 @@ export default function CreateTemplateModal({ open, onOpenChange, onSuccess }: C
         <DialogHeader>
           <DialogTitle className="text-lg">Create New Template</DialogTitle>
           <DialogDescription className="text-sm">
-            Create a reusable OKR template for your organization
+            Create a reusable Goal template for your organization
           </DialogDescription>
         </DialogHeader>
         

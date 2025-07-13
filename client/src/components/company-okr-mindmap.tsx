@@ -41,7 +41,7 @@ interface MindmapNode {
   y0?: number;
 }
 
-export default function CompanyOKRMindmap() {
+export default function CompanyGoalMindmap() {
   const svgRef = useRef<SVGSVGElement>(null);
   const [selectedNode, setSelectedNode] = useState<MindmapNode | null>(null);
   const [currentTransform, setCurrentTransform] = useState<any>(null);
@@ -90,7 +90,7 @@ export default function CompanyOKRMindmap() {
     return 0;
   };
 
-  const buildCompanyOKRData = (): MindmapNode => {
+  const buildCompanyGoalData = (): MindmapNode => {
     const userMap = new Map((users as any[]).map(u => [u.id, `${u.firstName} ${u.lastName}`]));
     const teamMap = new Map((teams as any[]).map(t => [t.id, t.name]));
     
@@ -108,7 +108,7 @@ export default function CompanyOKRMindmap() {
     // Build company root node
     const companyNode: MindmapNode = {
       id: 'company',
-      name: 'Company OKRs',
+      name: 'Company Goals',
       type: 'company',
       status: 'active',
       progress: 0,
@@ -278,7 +278,7 @@ export default function CompanyOKRMindmap() {
     
     svg.call(zoom);
 
-    const data = buildCompanyOKRData();
+    const data = buildCompanyGoalData();
     
     // Create hierarchy
     const root = d3.hierarchy(data);
@@ -586,7 +586,7 @@ export default function CompanyOKRMindmap() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <h2 className="text-2xl font-bold">Company OKR Mindmap</h2>
+          <h2 className="text-2xl font-bold">Company Goal Mindmap</h2>
           <Select value={viewMode} onValueChange={(value: 'tree' | 'radial') => setViewMode(value)}>
             <SelectTrigger className="w-40">
               <SelectValue />

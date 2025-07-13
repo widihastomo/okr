@@ -128,7 +128,7 @@ export function CheckInModal({
         });
       }
       
-      // Force refetch all OKR-related queries with invalidateQueries using refetchType: 'active'
+      // Force refetch all Goal-related queries with invalidateQueries using refetchType: 'active'
       queryClient.invalidateQueries({ 
         predicate: (query) => {
           const queryKey = query.queryKey[0] as string;

@@ -92,7 +92,7 @@ export default function GoalMindmap() {
     
     const rootNode: MindmapNode = {
       id: 'root',
-      name: 'OKR System',
+      name: 'Goal System',
       type: 'root',
       status: 'active',
       children: []
