@@ -124,6 +124,83 @@ const getTaskPriorityColor = (priority: string): string => {
   }
 };
 
+// Milestone Component
+const MilestoneBar = ({ initiative, tasks }: { initiative: any; tasks: any[] }) => {
+  // Determine current milestone based on initiative status and task progress
+  const getCurrentMilestone = () => {
+    if (initiative.status === 'selesai' || initiative.status === 'completed') {
+      return 3; // Selesai
+    }
+    
+    // Check if any task is in progress or completed
+    const hasProgressingTasks = tasks.some(task => 
+      task.status === 'in_progress' || task.status === 'completed'
+    );
+    
+    if (hasProgressingTasks) {
+      return 2; // Eksekusi
+    }
+    
+    return 1; // Perencanaan
+  };
+
+  const currentMilestone = getCurrentMilestone();
+  
+  const milestones = [
+    { id: 1, name: 'Perencanaan', description: 'Inisiatif baru dibuat' },
+    { id: 2, name: 'Eksekusi', description: 'Ada task yang berjalan' },
+    { id: 3, name: 'Selesai', description: 'Inisiatif sudah ditutup' }
+  ];
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
+      <h3 className="text-sm font-medium text-gray-900 mb-4">Progress Milestone</h3>
+      <div className="relative">
+        {/* Progress Line */}
+        <div className="absolute top-4 left-4 right-4 h-0.5 bg-gray-200">
+          <div 
+            className="h-full bg-orange-500 transition-all duration-500 ease-in-out"
+            style={{ 
+              width: `${((currentMilestone - 1) / (milestones.length - 1)) * 100}%` 
+            }}
+          />
+        </div>
+        
+        {/* Milestone Points */}
+        <div className="relative flex justify-between">
+          {milestones.map((milestone) => (
+            <div key={milestone.id} className="flex flex-col items-center">
+              <div 
+                className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-medium transition-all duration-300 ${
+                  milestone.id <= currentMilestone
+                    ? 'bg-orange-500 border-orange-500 text-white'
+                    : 'bg-white border-gray-300 text-gray-500'
+                }`}
+              >
+                {milestone.id <= currentMilestone ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  milestone.id
+                )}
+              </div>
+              <div className="mt-2 text-center">
+                <div className={`text-xs font-medium ${
+                  milestone.id <= currentMilestone ? 'text-orange-600' : 'text-gray-500'
+                }`}>
+                  {milestone.name}
+                </div>
+                <div className="text-xs text-gray-400 mt-1 max-w-20 leading-tight">
+                  {milestone.description}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const getTaskPriorityLabel = (priority: string): string => {
   switch (priority) {
     case 'low':
@@ -508,6 +585,10 @@ export default function InitiativeDetailPage() {
           </div>
         </div>
       </div>
+      
+      {/* Milestone Bar */}
+      <MilestoneBar initiative={initiativeData} tasks={tasks || []} />
+      
       {/* Main Content Grid */}
       <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6 mb-6">
           {/* Main Content */}

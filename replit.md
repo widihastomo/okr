@@ -246,6 +246,15 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 13, 2025. Successfully implemented milestone bar in initiative detail page with progress tracking system:
+  * ADDED: MilestoneBar component with 3 stages: Perencanaan (Planning), Eksekusi (Execution), Selesai (Completed)
+  * IMPLEMENTED: Smart milestone detection based on initiative status and task progress
+  * ENHANCED: Visual progress line with orange color scheme and smooth transitions
+  * ADDED: Check icons for completed milestones and numbered circles for pending ones
+  * INTEGRATED: Milestone logic - Planning (default), Execution (has running/completed tasks), Completed (initiative closed)
+  * POSITIONED: Milestone bar placed prominently between header and main content in initiative detail page
+  * STYLED: Responsive design with consistent orange theme and proper spacing
+  * VERIFIED: Milestone updates automatically based on initiative and task status changes
 - July 13, 2025. Successfully implemented resend invitation functionality and removed redundant member invitation page:
   * ADDED: Resend invitation feature for users with pending status in user management
   * IMPLEMENTED: POST `/api/organization/users/:userId/resend-invitation` endpoint with proper authentication
