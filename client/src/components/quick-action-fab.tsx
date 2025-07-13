@@ -31,7 +31,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import OKRFormModal from "@/components/okr-form-modal";
+import GoalFormModal from "@/components/goal-form-modal";
 
 const taskSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -48,7 +48,7 @@ type TaskFormData = z.infer<typeof taskSchema>;
 export default function QuickActionFAB() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showTaskModal, setShowTaskModal] = useState(false);
-  const [showOKRModal, setShowOKRModal] = useState(false);
+  const [showGoalModal, setShowGoalModal] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -133,13 +133,13 @@ export default function QuickActionFAB() {
     createTaskMutation.mutate(sanitizedData);
   };
 
-  const handleOKRModalChange = (open: boolean) => {
-    setShowOKRModal(open);
+  const handleGoalModalChange = (open: boolean) => {
+    setShowGoalModal(open);
     if (!open) {
       setIsExpanded(false);
-      // Add a small delay to check if OKR was successfully created
+      // Add a small delay to check if Goal was successfully created
       setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/goals"] });
       }, 100);
     }
   };
@@ -153,8 +153,8 @@ export default function QuickActionFAB() {
     setIsExpanded(false);
   };
 
-  const handleOKRClick = () => {
-    setShowOKRModal(true);
+  const handleGoalClick = () => {
+    setShowGoalModal(true);
     setIsExpanded(false);
   };
 
@@ -185,7 +185,7 @@ export default function QuickActionFAB() {
         }`}>
           {/* Buat Goal Button */}
           <Button
-            onClick={handleOKRClick}
+            onClick={handleGoalClick}
             className="flex items-center space-x-2 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-4 py-3 rounded-full"
           >
             <Target className="h-5 w-5" />
@@ -402,10 +402,10 @@ export default function QuickActionFAB() {
         </DialogContent>
       </Dialog>
 
-      {/* OKR Creation Modal */}
-      <OKRFormModal
-        open={showOKRModal}
-        onOpenChange={handleOKRModalChange}
+      {/* Goal Creation Modal */}
+      <GoalFormModal
+        open={showGoalModal}
+        onOpenChange={handleGoalModalChange}
       />
     </>
   );

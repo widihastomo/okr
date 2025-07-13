@@ -802,7 +802,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 3: // Tentukan OKR Cycle
+      case 3: // Tentukan Goal Cycle
         return (
           <div className="space-y-4">
             <Label htmlFor="cycle-duration">Pilih durasi Goal:</Label>

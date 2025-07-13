@@ -11,7 +11,7 @@ import {
   CheckSquare,
   TrendingUp
 } from "lucide-react";
-import type { OKRWithKeyResults, Initiative, Task } from "@shared/schema";
+import type { GoalWithKeyResults, Initiative, Task } from "@shared/schema";
 
 interface TimelineItem {
   id: string;
@@ -30,7 +30,7 @@ interface TimelineItem {
 }
 
 interface ObjectiveTimelineProps {
-  objective: OKRWithKeyResults;
+  objective: GoalWithKeyResults;
   initiatives?: Initiative[];
   tasks?: Task[];
 }

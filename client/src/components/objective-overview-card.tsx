@@ -22,7 +22,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import type {
-  OKRWithKeyResults,
+  GoalWithKeyResults,
   Initiative,
   Task,
   User,
@@ -38,12 +38,12 @@ import {
 import { ObjectiveStatusBadge } from "./objective-status-badge";
 
 interface ObjectiveOverviewCardProps {
-  objective: OKRWithKeyResults;
+  objective: GoalWithKeyResults;
   initiatives?: Initiative[];
   tasks?: Task[];
   daysRemaining?: number;
   cycle?: Cycle;
-  parentObjective?: OKRWithKeyResults;
+  parentObjective?: GoalWithKeyResults;
   owner?: User | any; // Can be User or Team
   team?: any;
 }

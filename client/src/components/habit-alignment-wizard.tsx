@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { OKRWithKeyResults } from "@shared/schema";
+import { GoalWithKeyResults } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -75,8 +75,8 @@ export default function HabitAlignmentWizard({ trigger }: HabitAlignmentWizardPr
   const [isOneClickMode, setIsOneClickMode] = useState(false);
 
   // Fetch user's objectives
-  const { data: objectives = [], isLoading: objectivesLoading } = useQuery<OKRWithKeyResults[]>({
-    queryKey: ["/api/okrs"],
+  const { data: objectives = [], isLoading: objectivesLoading } = useQuery<GoalWithKeyResults[]>({
+    queryKey: ["/api/goals"],
     enabled: isOpen,
   });
 
@@ -86,10 +86,10 @@ export default function HabitAlignmentWizard({ trigger }: HabitAlignmentWizardPr
       objectiveIds: string[];
       preferences: HabitPreferences;
     }) => {
-      const selectedOKRs = objectives.filter(obj => data.objectiveIds.includes(obj.id));
+      const selectedGoals = objectives.filter(obj => data.objectiveIds.includes(obj.id));
       const response = await apiRequest("POST", "/api/habits/generate", {
         objectiveIds: data.objectiveIds,
-        objectives: selectedOKRs,
+        objectives: selectedGoals,
         preferences: data.preferences,
         userId: (user as any)?.id,
       });
@@ -139,10 +139,10 @@ export default function HabitAlignmentWizard({ trigger }: HabitAlignmentWizardPr
         focusAreas: determineAutoFocusAreas(objectives.filter(obj => autoSelectedObjectives.includes(obj.id)))
       };
 
-      const selectedOKRs = objectives.filter(obj => autoSelectedObjectives.includes(obj.id));
+      const selectedGoals = objectives.filter(obj => autoSelectedObjectives.includes(obj.id));
       const response = await apiRequest("POST", "/api/habits/generate", {
         objectiveIds: autoSelectedObjectives,
-        objectives: selectedOKRs,
+        objectives: selectedGoals,
         preferences: smartPreferences,
         userId: (user as any)?.id,
       });

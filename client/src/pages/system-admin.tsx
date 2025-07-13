@@ -54,7 +54,7 @@ export default function SystemAdmin() {
       <div className="mb-8 flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold mb-2">System Admin Dashboard</h1>
-          <p className="text-gray-600">Kelola seluruh sistem SaaS OKR</p>
+          <p className="text-gray-600">Kelola seluruh sistem SaaS Goal</p>
         </div>
 
       </div>

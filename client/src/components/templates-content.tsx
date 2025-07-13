@@ -56,8 +56,8 @@ export default function TemplatesContent() {
     <div className="max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Template OKR</h1>
-          <p className="text-gray-600 mt-1">Template siap pakai untuk mempercepat pembuatan OKR</p>
+          <h1 className="text-2xl font-bold text-gray-900">Template Goal</h1>
+          <p className="text-gray-600 mt-1">Template siap pakai untuk mempercepat pembuatan Goal</p>
         </div>
         <Button 
           onClick={() => setCreateModalOpen(true)}
@@ -89,7 +89,7 @@ export default function TemplatesContent() {
         <div className="text-center py-12">
           <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">Belum ada template</h3>
-          <p className="text-gray-500 mb-6">Buat template pertama Anda untuk mempercepat pembuatan OKR</p>
+          <p className="text-gray-500 mb-6">Buat template pertama Anda untuk mempercepat pembuatan Goal</p>
           <Button 
             onClick={() => setCreateModalOpen(true)}
             className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"

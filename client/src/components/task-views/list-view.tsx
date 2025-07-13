@@ -49,7 +49,7 @@ export default function ListView({ tasks, onEditTask, onDeleteTask, userId }: Li
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
       queryClient.invalidateQueries({ queryKey: ['/api/initiatives'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/goals'] });
       toast({
         title: "Task status berhasil diupdate",
         variant: "success",

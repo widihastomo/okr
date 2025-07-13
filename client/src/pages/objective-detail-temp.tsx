@@ -94,7 +94,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
-import { KeyResultModal } from "@/components/okr-form-modal";
+import { KeyResultModal } from "@/components/goal-form-modal";
 import {
   Form,
   FormControl,
@@ -113,7 +113,7 @@ import ObjectiveOverviewCard from "@/components/objective-overview-card";
 import ObjectiveTimeline from "@/components/objective-timeline";
 import ActivityLogCard from "@/components/activity-log-card";
 import type {
-  OKRWithKeyResults,
+  GoalWithKeyResults,
   KeyResult,
   Initiative,
   Task,
@@ -356,7 +356,7 @@ export default function GoalDetail() {
   }, [location]);
 
   // Fetch goal data
-  const { data: goal, isLoading } = useQuery<OKRWithKeyResults>({
+  const { data: goal, isLoading } = useQuery<GoalWithKeyResults>({
     queryKey: [`/api/okrs/${id}`],
     enabled: !!id,
   });
@@ -377,7 +377,7 @@ export default function GoalDetail() {
   });
 
   // Fetch parent objective data
-  const { data: parentObjective } = useQuery<OKRWithKeyResults>({
+  const { data: parentObjective } = useQuery<GoalWithKeyResults>({
     queryKey: [`/api/okrs/${goal?.parentId}`],
     enabled: !!goal?.parentId,
   });

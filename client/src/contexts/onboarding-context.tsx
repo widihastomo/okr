@@ -66,13 +66,13 @@ export const ONBOARDING_TOURS: OnboardingTour[] = [
   {
     id: "welcome",
     name: "Welcome Tour",
-    title: "Selamat Datang di OKR Management!",
+    title: "Selamat Datang di Goal Management!",
     description: "Mari kenali fitur-fitur utama platform ini",
     steps: [
       {
         id: "welcome-1",
         title: "Selamat Datang!",
-        description: "Platform OKR Management akan membantu Anda mengelola objectives dan key results dengan efektif. Mari mulai perjalanan Anda!",
+        description: "Platform Goal Management akan membantu Anda mengelola objectives dan key results dengan efektif. Mari mulai perjalanan Anda!",
         action: "observe",
         canSkip: false
       },
@@ -87,8 +87,8 @@ export const ONBOARDING_TOURS: OnboardingTour[] = [
       {
         id: "welcome-3",
         title: "Buat Objective Pertama",
-        description: "Klik tombol 'Buat OKR' untuk membuat objective dan key results pertama Anda.",
-        target: "[data-tour='create-okr-button']",
+        description: "Klik tombol 'Buat Goal' untuk membuat objective dan key results pertama Anda.",
+        target: "[data-tour='create-goal-button']",
         action: "click",
         canSkip: true
       },
@@ -143,13 +143,13 @@ export const ONBOARDING_TOURS: OnboardingTour[] = [
     ]
   },
   {
-    id: "okr-creation",
-    name: "OKR Creation Tour",
-    title: "Membuat OKR Pertama",
+    id: "goal-creation",
+    name: "Goal Creation Tour",
+    title: "Membuat Goal Pertama",
     description: "Tutorial lengkap membuat Objective dan Key Results",
     steps: [
       {
-        id: "okr-1",
+        id: "goal-1",
         title: "Form Objective",
         description: "Mulai dengan menulis objective yang jelas dan terukur. Objective adalah tujuan yang ingin Anda capai.",
         target: "[data-tour='objective-form']",
@@ -157,7 +157,7 @@ export const ONBOARDING_TOURS: OnboardingTour[] = [
         canSkip: false
       },
       {
-        id: "okr-2",
+        id: "goal-2",
         title: "Pilih Owner",
         description: "Tentukan siapa yang bertanggung jawab atas objective ini. Bisa Anda sendiri atau anggota tim lain.",
         target: "[data-tour='objective-owner']",
@@ -165,7 +165,7 @@ export const ONBOARDING_TOURS: OnboardingTour[] = [
         canSkip: true
       },
       {
-        id: "okr-3",
+        id: "goal-3",
         title: "Tambah Key Results",
         description: "Key Results adalah metrik terukur yang menunjukkan kemajuan objective. Tambahkan minimal 2-3 key results.",
         target: "[data-tour='add-key-result']",
@@ -173,7 +173,7 @@ export const ONBOARDING_TOURS: OnboardingTour[] = [
         canSkip: true
       },
       {
-        id: "okr-4",
+        id: "goal-4",
         title: "Set Target Values",
         description: "Tetapkan nilai target yang spesifik dan terukur untuk setiap key result. Ini akan membantu tracking progress.",
         target: "[data-tour='key-result-targets']",

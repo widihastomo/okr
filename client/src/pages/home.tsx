@@ -18,7 +18,7 @@ export default function Home() {
       title: "Company Goals",
       description: "Goal tingkat perusahaan dan strategis",
       icon: TrendingUp,
-      href: "/company-okrs",
+      href: "/company-goals",
       color: "bg-green-500"
     },
     {

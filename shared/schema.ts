@@ -669,7 +669,7 @@ export const updateKeyResultProgressSchema = z.object({
   status: z.enum(["on_track", "at_risk", "completed", "in_progress"]).optional(),
 });
 
-export const createOKRFromTemplateSchema = z.object({
+export const createGoalFromTemplateSchema = z.object({
   cycleId: z.string(),
   templateId: z.string(),
 });
@@ -787,7 +787,7 @@ export type InsertTask = z.infer<typeof insertTaskSchema>;
 export type InsertTaskComment = z.infer<typeof insertTaskCommentSchema>;
 export type InsertInitiativeNote = z.infer<typeof insertInitiativeNoteSchema>;
 export type UpdateKeyResultProgress = z.infer<typeof updateKeyResultProgressSchema>;
-export type CreateOKRFromTemplate = z.infer<typeof createOKRFromTemplateSchema>;
+export type CreateGoalFromTemplate = z.infer<typeof createGoalFromTemplateSchema>;
 
 // Gamification Types
 export type InsertAchievement = z.infer<typeof insertAchievementSchema>;

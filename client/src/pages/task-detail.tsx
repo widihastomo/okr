@@ -489,7 +489,7 @@ export default function TaskDetailPage() {
       queryClient.invalidateQueries({ queryKey: [`/api/tasks/${id}`] });
       queryClient.invalidateQueries({ queryKey: [`/api/tasks/${id}/audit-trail`] });
       queryClient.invalidateQueries({ queryKey: ['/api/initiatives'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/goals'] });
       
       toast({
         title: "Task dihapus",

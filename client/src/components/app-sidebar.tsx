@@ -101,7 +101,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     },
     {
       title: "Goals Perusahaan",
-      url: "/company-okr",
+      url: "/company-goals",
       icon: FileText,
     },
     {
@@ -180,7 +180,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-blue-600 text-white text-sm font-semibold">
             OK
           </div>
-          <span className="truncate font-semibold">OKR Manager</span>
+          <span className="truncate font-semibold">Goal Manager</span>
         </div>
       </SidebarHeader>
       <SidebarContent>

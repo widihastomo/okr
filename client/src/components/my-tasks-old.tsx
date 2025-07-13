@@ -199,7 +199,7 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
       queryClient.invalidateQueries({ queryKey: ['/api/initiatives'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/goals'] });
       toast({
         title: "Task berhasil dibuat",
         className: "border-green-200 bg-green-50 text-green-800",
@@ -230,7 +230,7 @@ export default function MyTasks({ filteredKeyResultIds }: MyTasksProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
       queryClient.invalidateQueries({ queryKey: ['/api/initiatives'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/goals'] });
       toast({
         title: "Task berhasil diupdate",
         className: "border-green-200 bg-green-50 text-green-800",

@@ -36,7 +36,7 @@ export default function TourLauncher() {
     {
       id: "welcome",
       name: "Welcome Tour",
-      title: "Selamat Datang di OKR Management!",
+      title: "Selamat Datang di Goal Management!",
       description: "Mari kenali fitur-fitur utama platform ini",
       steps: []
     },
@@ -48,9 +48,9 @@ export default function TourLauncher() {
       steps: []
     },
     {
-      id: "okr-creation",
-      name: "OKR Creation Tour",
-      title: "Membuat OKR Pertama",
+      id: "goal-creation",
+      name: "Goal Creation Tour",
+      title: "Membuat Goal Pertama",
       description: "Tutorial lengkap membuat Objective dan Key Results",
       steps: []
     },
@@ -77,7 +77,7 @@ export default function TourLauncher() {
         return <Sparkles className="w-4 h-4" />;
       case "daily-focus":
         return <Sun className="w-4 h-4" />;
-      case "okr-creation":
+      case "goal-creation":
         return <Target className="w-4 h-4" />;
       case "team-collaboration":
         return <Users className="w-4 h-4" />;

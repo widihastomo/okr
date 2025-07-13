@@ -86,7 +86,7 @@ export default function SimpleTaskModal({ open, onClose, task, onSuccess }: Simp
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
       queryClient.invalidateQueries({ queryKey: ['/api/initiatives'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/goals'] });
       toast({
         title: "Task berhasil dibuat",
         variant: "success",

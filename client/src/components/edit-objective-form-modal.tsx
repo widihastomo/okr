@@ -102,10 +102,10 @@ export default function EditObjectiveFormModal({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/goals"] });
       // Invalidate specific objective data
       if (objective?.id) {
-        queryClient.invalidateQueries({ queryKey: [`/api/okrs/${objective.id}`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/goals/${objective.id}`] });
       }
       // Invalidate cycle data if cycleId exists
       if (objective?.cycleId) {
@@ -120,7 +120,7 @@ export default function EditObjectiveFormModal({
       }
       // Invalidate parent objective if parentId exists
       if (objective?.parentId) {
-        queryClient.invalidateQueries({ queryKey: [`/api/okrs/${objective.parentId}`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/goals/${objective.parentId}`] });
       }
       toast({
         title: "Berhasil",

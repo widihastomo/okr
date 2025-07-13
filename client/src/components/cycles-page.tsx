@@ -128,8 +128,8 @@ export default function CyclesPage() {
         <div className="p-4 lg:p-6 max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 lg:mb-8 space-y-4 sm:space-y-0">
             <div>
-              <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Siklus OKR</h1>
-              <p className="text-gray-600 mt-2 text-sm lg:text-base">Kelola siklus OKR bulanan, kuartalan, dan tahunan</p>
+              <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Siklus Goal</h1>
+              <p className="text-gray-600 mt-2 text-sm lg:text-base">Kelola siklus Goal bulanan, kuartalan, dan tahunan</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               <Button 
@@ -167,7 +167,7 @@ export default function CyclesPage() {
                     <TableCell colSpan={7} className="text-center py-12">
                       <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                       <h3 className="text-lg font-medium text-gray-900 mb-2">Belum ada siklus</h3>
-                      <p className="text-gray-500 mb-4">Buat siklus OKR pertama Anda untuk memulai</p>
+                      <p className="text-gray-500 mb-4">Buat siklus Goal pertama Anda untuk memulai</p>
                       <Button onClick={() => setCreateModalOpen(true)} className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
                         <Plus className="w-4 h-4 mr-2" />
                         Buat Siklus

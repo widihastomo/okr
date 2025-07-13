@@ -97,7 +97,7 @@ export default function MetricsUpdateModal({
       // Invalidate and refetch to ensure fresh data
       await queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/success-metrics`] });
       await queryClient.invalidateQueries({ queryKey: ["/api/initiatives"] });
-      await queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/goals"] });
       
       // Force refetch the success metrics to update current achievement values
       await queryClient.refetchQueries({ queryKey: [`/api/initiatives/${initiativeId}/success-metrics`] });

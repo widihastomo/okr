@@ -88,7 +88,7 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
       };
 
       if (!objective?.id) throw new Error("Objective not found");
-      const response = await fetch(`/api/okrs/${objective?.id}`, {
+      const response = await fetch(`/api/goals/${objective?.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -108,11 +108,11 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
         variant: "default",
         className: "border-green-200 bg-green-50 text-green-800",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/goals"] });
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
       // Invalidate specific objective data
       if (objective?.id) {
-        queryClient.invalidateQueries({ queryKey: [`/api/okrs/${objective.id}`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/goals/${objective.id}`] });
       }
       // Invalidate cycle data if cycleId exists
       if (objective?.cycleId) {
@@ -127,7 +127,7 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
       }
       // Invalidate parent objective if parentId exists
       if (objective?.parentId) {
-        queryClient.invalidateQueries({ queryKey: [`/api/okrs/${objective.parentId}`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/goals/${objective.parentId}`] });
       }
       onOpenChange(false);
     },

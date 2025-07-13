@@ -56,7 +56,7 @@ export default function Landing() {
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <Target className="w-6 h-6 text-blue-600" />
               </div>
-              <CardTitle>Manajemen OKR</CardTitle>
+              <CardTitle>Manajemen Goal</CardTitle>
               <CardDescription>
                 Buat, kelola, dan lacak Objectives dan Key Results dengan mudah
               </CardDescription>
@@ -129,7 +129,7 @@ export default function Landing() {
       <div className="bg-white py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            Mengapa Menggunakan OKR Manager?
+            Mengapa Menggunakan Goal Manager?
           </h2>
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
@@ -138,7 +138,7 @@ export default function Landing() {
                   <CheckCircle className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold text-gray-900">Peningkatan Fokus</h3>
-                    <p className="text-gray-600">Metodologi OKR membantu tim fokus pada tujuan yang paling penting</p>
+                    <p className="text-gray-600">Metodologi Goal membantu tim fokus pada tujuan yang paling penting</p>
                   </div>
                 </li>
                 <li className="flex items-start space-x-3">
@@ -189,7 +189,7 @@ export default function Landing() {
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <Target className="w-4 h-4 text-white" />
             </div>
-            <span className="text-xl font-bold">OKR Manager</span>
+            <span className="text-xl font-bold">Goal Manager</span>
           </div>
           <p className="text-gray-400">
             Platform manajemen tujuan yang membantu tim mencapai hasil terbaik

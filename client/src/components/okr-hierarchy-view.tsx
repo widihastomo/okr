@@ -339,7 +339,7 @@ const ObjectiveCard = ({ objective }: { objective: Objective }) => {
 
 export default function GoalHierarchyView() {
   const { data: objectives, isLoading } = useQuery({
-    queryKey: ["/api/okrs-with-hierarchy"],
+    queryKey: ["/api/goals-with-hierarchy"],
     retry: false,
   });
 

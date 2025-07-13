@@ -28,7 +28,7 @@ const wizardSteps: WizardStep[] = [
   {
     id: "welcome",
     title: "Selamat Datang!",
-    description: "Mari mulai perjalanan OKR Anda",
+    description: "Mari mulai perjalanan Goal Anda",
     icon: <Rocket className="w-8 h-8 text-orange-600" />,
     content: (
       <div className="text-center space-y-4">
@@ -36,7 +36,7 @@ const wizardSteps: WizardStep[] = [
           <Rocket className="w-8 h-8 text-white" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Selamat Datang di OKR Management!</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Selamat Datang di Goal Management!</h2>
           <p className="text-gray-600 mt-2">
             Platform terdepan untuk mengelola Objectives dan Key Results dengan efektif
           </p>
@@ -53,7 +53,7 @@ const wizardSteps: WizardStep[] = [
   {
     id: "objectives",
     title: "Apa itu Objectives?",
-    description: "Pelajari konsep dasar OKR",
+    description: "Pelajari konsep dasar Goal",
     icon: <Target className="w-8 h-8 text-orange-600" />,
     content: (
       <div className="space-y-4">

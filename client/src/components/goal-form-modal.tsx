@@ -23,7 +23,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 import { formatNumberWithSeparator, handleNumberInputChange, getNumberValueForSubmission } from "@/lib/number-utils";
-import type { OKRWithKeyResults, Cycle, User, Objective, Team } from "@shared/schema";
+import type { GoalWithKeyResults, Cycle, User, Objective, Team } from "@shared/schema";
 
 // Unit options for Key Results
 const unitOptions = [
@@ -127,19 +127,19 @@ export type KeyResultFormData = z.infer<typeof keyResultSchema>;
 
 
 interface ObjectiveFormModalProps {
-  okr?: OKRWithKeyResults; // undefined untuk create, object untuk edit
+  goal?: GoalWithKeyResults; // undefined untuk create, object untuk edit
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export default function GoalFormModal({ okr, open, onOpenChange }: ObjectiveFormModalProps) {
+export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFormModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
   const [keyResultModalOpen, setKeyResultModalOpen] = useState(false);
   const [editingKeyResultIndex, setEditingKeyResultIndex] = useState<number | null>(null);
-  const isEditMode = !!okr;
+  const isEditMode = !!goal;
 
   // Fetch data yang diperlukan
   const { data: cycles } = useQuery<Cycle[]>({ queryKey: ["/api/cycles"] });
@@ -151,17 +151,17 @@ export default function GoalFormModal({ okr, open, onOpenChange }: ObjectiveForm
     resolver: zodResolver(objectiveFormSchema),
     defaultValues: isEditMode ? {
       objective: {
-        title: okr.title,
-        description: okr.description || "",
-        owner: okr.owner,
-        ownerType: okr.ownerType as "user" | "team",
-        ownerId: okr.ownerId,
-        status: okr.status,
-        cycleId: okr.cycleId === null ? undefined : okr.cycleId,
-        teamId: okr.teamId === null ? undefined : okr.teamId,
-        parentId: okr.parentId === null ? undefined : okr.parentId,
+        title: goal.title,
+        description: goal.description || "",
+        owner: goal.owner,
+        ownerType: goal.ownerType as "user" | "team",
+        ownerId: goal.ownerId,
+        status: goal.status,
+        cycleId: goal.cycleId === null ? undefined : goal.cycleId,
+        teamId: goal.teamId === null ? undefined : goal.teamId,
+        parentId: goal.parentId === null ? undefined : goal.parentId,
       },
-      keyResults: okr.keyResults?.map(kr => ({
+      keyResults: goal.keyResults?.map(kr => ({
         id: kr.id,
         title: kr.title,
         description: kr.description || "",
@@ -188,24 +188,24 @@ export default function GoalFormModal({ okr, open, onOpenChange }: ObjectiveForm
     },
   });
 
-  // Reset form when okr prop changes or dialog opens
+  // Reset form when goal prop changes or dialog opens
   useEffect(() => {
     if (open) {
       setCurrentStep(1); // Reset to step 1 when dialog opens
-      if (isEditMode && okr) {
+      if (isEditMode && goal) {
         form.reset({
           objective: {
-            title: okr.title,
-            description: okr.description || "",
-            owner: okr.owner,
-            ownerType: okr.ownerType as "user" | "team",
-            ownerId: okr.ownerId,
-            status: okr.status,
-            cycleId: okr.cycleId === null ? undefined : okr.cycleId,
-            teamId: okr.teamId === null ? undefined : okr.teamId,
-            parentId: okr.parentId === null ? undefined : okr.parentId,
+            title: goal.title,
+            description: goal.description || "",
+            owner: goal.owner,
+            ownerType: goal.ownerType as "user" | "team",
+            ownerId: goal.ownerId,
+            status: goal.status,
+            cycleId: goal.cycleId === null ? undefined : goal.cycleId,
+            teamId: goal.teamId === null ? undefined : goal.teamId,
+            parentId: goal.parentId === null ? undefined : goal.parentId,
           },
-          keyResults: okr.keyResults?.map(kr => ({
+          keyResults: goal.keyResults?.map(kr => ({
             id: kr.id,
             title: kr.title,
             description: kr.description || "",
@@ -234,7 +234,7 @@ export default function GoalFormModal({ okr, open, onOpenChange }: ObjectiveForm
         });
       }
     }
-  }, [open, okr, isEditMode, form]);
+  }, [open, goal, isEditMode, form]);
 
 
 
@@ -272,7 +272,7 @@ export default function GoalFormModal({ okr, open, onOpenChange }: ObjectiveForm
       };
 
       const response = isEditMode
-        ? await fetch(`/api/okrs/${okr.id}`, {
+        ? await fetch(`/api/okrs/${goal.id}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
@@ -285,7 +285,7 @@ export default function GoalFormModal({ okr, open, onOpenChange }: ObjectiveForm
 
       if (!response.ok) {
         const errorData = await response.text();
-        throw new Error(`Failed to ${isEditMode ? 'update' : 'create'} OKR: ${errorData}`);
+        throw new Error(`Failed to ${isEditMode ? 'update' : 'create'} Goal: ${errorData}`);
       }
 
       return await response.json();
@@ -311,7 +311,7 @@ export default function GoalFormModal({ okr, open, onOpenChange }: ObjectiveForm
     onError: (error: Error) => {
       toast({
         title: "Error",
-        description: `Failed to ${isEditMode ? 'update' : 'create'} OKR: ${error.message}`,
+        description: `Failed to ${isEditMode ? 'update' : 'create'} Goal: ${error.message}`,
         variant: "destructive",
       });
     },
@@ -714,7 +714,7 @@ export default function GoalFormModal({ okr, open, onOpenChange }: ObjectiveForm
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="none">Tanpa Goal Induk</SelectItem>
-                          {objectives?.filter(obj => !isEditMode || obj.id !== okr?.id).map((objective) => (
+                          {objectives?.filter(obj => !isEditMode || obj.id !== goal?.id).map((objective) => (
                             <SelectItem key={objective.id} value={objective.id}>
                               {objective.title}
                             </SelectItem>
@@ -1704,7 +1704,7 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
                                 <p>
                                   <strong>Nilai baseline sebagai titik awal pengukuran</strong>
                                   <br /><br />
-                                  Masukkan kondisi saat ini atau kondisi awal sebelum dimulainya OKR ini.
+                                  Masukkan kondisi saat ini atau kondisi awal sebelum dimulainya Goal ini.
                                   <br /><br />
                                   <strong>Tips:</strong> Gunakan data aktual yang valid dan dapat diverifikasi
                                   <br /><br />
@@ -1862,7 +1862,7 @@ export function CreateGoalButton() {
         <Plus className="w-4 h-4 mr-2" />
         Buat Goal
       </Button>
-      <OKRFormModal open={open} onOpenChange={setOpen} />
+      <GoalFormModal open={open} onOpenChange={setOpen} />
     </>
   );
 }

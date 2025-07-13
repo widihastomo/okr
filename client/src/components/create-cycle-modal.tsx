@@ -103,7 +103,7 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
         <DialogHeader>
           <DialogTitle className="text-lg">Create New Cycle</DialogTitle>
           <DialogDescription className="text-sm">
-            Create a new OKR cycle for your organization
+            Create a new Goal cycle for your organization
           </DialogDescription>
         </DialogHeader>
         

@@ -88,7 +88,7 @@ export default function MyTugas({ filteredKeyResultIds, userFilter }: MyTugasPro
         queryClient.invalidateQueries({ queryKey: [`/api/users/${targetUserId}/tasks`] });
       }
       queryClient.invalidateQueries({ queryKey: ['/api/initiatives'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/goals'] });
       toast({
         title: "Task berhasil diupdate",
         variant: "success",
@@ -120,7 +120,7 @@ export default function MyTugas({ filteredKeyResultIds, userFilter }: MyTugasPro
         queryClient.invalidateQueries({ queryKey: [`/api/users/${targetUserId}/tasks`] });
       }
       queryClient.invalidateQueries({ queryKey: ['/api/initiatives'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/okrs'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/goals'] });
       toast({
         title: "Task berhasil dihapus",
         variant: "success",

@@ -121,7 +121,7 @@ import { UserStatsCard } from "@/components/gamification/user-stats-card";
 import { DailyAchievements } from "@/components/daily-achievements";
 import { DailyUpdateSimple } from "@/components/daily-update-simple";
 import { useAuth } from "@/hooks/useAuth";
-import OKRFormModal from "@/components/okr-form-modal";
+import GoalFormModal from "@/components/goal-form-modal";
 import TaskModal from "@/components/task-modal";
 
 // Icon mapping for mission cards
@@ -3716,8 +3716,8 @@ export default function DailyFocusPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Goal Creation Modal using existing OKRFormModal */}
-      <OKRFormModal open={isGoalModalOpen} onOpenChange={setIsGoalModalOpen} />
+      {/* Goal Creation Modal using existing GoalFormModal */}
+      <GoalFormModal open={isGoalModalOpen} onOpenChange={setIsGoalModalOpen} />
 
       {/* Task Modal */}
       <TaskModal

@@ -99,7 +99,7 @@ export function CheckInModal({
       });
       
       // Invalidate general lists first
-      queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/goals"] });
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
       
       // Invalidate specific key result data
@@ -111,7 +111,7 @@ export function CheckInModal({
       if (response?.objectiveId) {
         // Invalidate the main objective detail query (most important)
         queryClient.invalidateQueries({ 
-          queryKey: [`/api/okrs/${response.objectiveId}`] 
+          queryKey: [`/api/goals/${response.objectiveId}`] 
         });
         
         // Invalidate activity log
@@ -132,7 +132,7 @@ export function CheckInModal({
       queryClient.invalidateQueries({ 
         predicate: (query) => {
           const queryKey = query.queryKey[0] as string;
-          return queryKey?.includes('/api/okrs/') || 
+          return queryKey?.includes('/api/goals/') || 
                  queryKey?.includes('/api/objectives/');
         },
         refetchType: 'active'

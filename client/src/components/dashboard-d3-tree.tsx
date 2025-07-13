@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import * as d3 from "d3";
-import { OKRWithKeyResults } from "@shared/schema";
+import { GoalWithKeyResults } from "@shared/schema";
 import { ObjectiveStatusBadge } from "@/components/objective-status-badge";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import {
 
 interface TreeNode {
   id: string;
-  data: OKRWithKeyResults;
+  data: GoalWithKeyResults;
   children: TreeNode[];
   parent?: TreeNode;
   x?: number;
@@ -27,14 +27,14 @@ interface TreeNode {
 }
 
 interface DashboardD3TreeProps {
-  okrs: OKRWithKeyResults[];
+  goals: GoalWithKeyResults[];
   expandedNodes: Set<string>;
   onToggleExpand: (nodeId: string) => void;
-  onNodeClick?: (okr: OKRWithKeyResults) => void;
+  onNodeClick?: (goal: GoalWithKeyResults) => void;
 }
 
 export default function DashboardD3Tree({ 
-  okrs, 
+  goals, 
   expandedNodes, 
   onToggleExpand,
   onNodeClick 
@@ -54,25 +54,25 @@ export default function DashboardD3Tree({
     return () => window.removeEventListener('error', handleResizeObserverError);
   }, []);
 
-  const buildTree = (okrs: OKRWithKeyResults[]): TreeNode[] => {
+  const buildTree = (goals: GoalWithKeyResults[]): TreeNode[] => {
     const nodeMap = new Map<string, TreeNode>();
     const rootNodes: TreeNode[] = [];
 
-    // Create nodes for all OKRs
-    okrs.forEach(okr => {
-      nodeMap.set(okr.id, {
-        id: okr.id,
-        data: okr,
+    // Create nodes for all Goals
+    goals.forEach(goal => {
+      nodeMap.set(goal.id, {
+        id: goal.id,
+        data: goal,
         children: []
       });
     });
 
     // Build parent-child relationships
-    okrs.forEach(okr => {
-      const node = nodeMap.get(okr.id)!;
+    goals.forEach(goal => {
+      const node = nodeMap.get(goal.id)!;
       
-      if (okr.parentId && nodeMap.has(okr.parentId)) {
-        const parent = nodeMap.get(okr.parentId)!;
+      if (goal.parentId && nodeMap.has(goal.parentId)) {
+        const parent = nodeMap.get(goal.parentId)!;
         parent.children.push(node);
         node.parent = parent;
       } else {
@@ -106,7 +106,7 @@ export default function DashboardD3Tree({
   };
 
   useEffect(() => {
-    if (!svgRef.current || !containerRef.current || okrs.length === 0) return;
+    if (!svgRef.current || !containerRef.current || goals.length === 0) return;
 
     // Debounce to prevent ResizeObserver issues
     const timer = setTimeout(() => {
@@ -153,7 +153,7 @@ export default function DashboardD3Tree({
     svg.call(zoom);
 
     // Build tree data
-    const treeData = buildTree(okrs);
+    const treeData = buildTree(goals);
     if (treeData.length === 0) return;
 
     // Create hierarchy and tree layout - handle multiple roots or single root
@@ -435,7 +435,7 @@ export default function DashboardD3Tree({
     }, 50); // 50ms debounce
 
     return () => clearTimeout(timer);
-  }, [okrs, expandedNodes, onToggleExpand, onNodeClick]);
+  }, [goals, expandedNodes, onToggleExpand, onNodeClick]);
 
   return (
     <Card className="w-full h-full">

@@ -9,11 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { createOKRFromTemplateSchema } from "@shared/schema";
+import { createGoalFromTemplateSchema } from "@shared/schema";
 import type { Template, Cycle } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
 
-const useTemplateFormSchema = createOKRFromTemplateSchema;
+const useTemplateFormSchema = createGoalFromTemplateSchema;
 
 type UseTemplateFormData = z.infer<typeof useTemplateFormSchema>;
 
@@ -48,7 +48,7 @@ export default function UseTemplateModal({ open, template, onOpenChange, onSucce
     onSuccess: () => {
       toast({
         title: "Success",
-        description: "OKRs created from template successfully",
+        description: "Goals created from template successfully",
       });
       form.reset();
       onSuccess();
@@ -56,7 +56,7 @@ export default function UseTemplateModal({ open, template, onOpenChange, onSucce
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to create OKRs from template",
+        description: error.message || "Failed to create Goals from template",
         variant: "destructive",
       });
     },
@@ -84,7 +84,7 @@ export default function UseTemplateModal({ open, template, onOpenChange, onSucce
         <DialogHeader>
           <DialogTitle className="text-lg">Use Template: {template.name}</DialogTitle>
           <DialogDescription className="text-sm">
-            Select a cycle to create OKRs from this template
+            Select a cycle to create Goals from this template
           </DialogDescription>
         </DialogHeader>
         
@@ -146,7 +146,7 @@ export default function UseTemplateModal({ open, template, onOpenChange, onSucce
                   disabled={mutation.isPending}
                   className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
                 >
-                  {mutation.isPending ? "Creating..." : "Create OKRs"}
+                  {mutation.isPending ? "Creating..." : "Create Goals"}
                 </Button>
               </div>
             </form>

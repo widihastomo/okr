@@ -3,13 +3,13 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import StatsOverview from "@/components/stats-overview";
-import GoalCard from "@/components/okr-card";
-import { CreateGoalButton } from "@/components/okr-form-modal";
+import GoalCard from "@/components/goal-card";
+import { CreateGoalButton } from "@/components/goal-form-modal";
 import EditProgressModal from "@/components/edit-progress-modal";
 import EditKeyResultModal from "@/components/edit-key-result-modal";
 import { CascadeDeleteConfirmationModal } from "@/components/cascade-delete-confirmation-modal";
 import EditObjectiveModal from "@/components/edit-objective-modal";
-import { GoalGridSkeleton } from "@/components/skeletons/okr-card-skeleton";
+import { GoalGridSkeleton } from "@/components/skeletons/goal-card-skeleton";
 import {
   StatsOverviewSkeleton,
   FiltersSkeleton,
@@ -53,7 +53,7 @@ import { ObjectiveStatusBadge } from "@/components/objective-status-badge";
 import DashboardD3Tree from "@/components/dashboard-d3-tree";
 
 import { useLocation } from "wouter";
-import type { OKRWithKeyResults, KeyResult, Cycle, User } from "@shared/schema";
+import type { GoalWithKeyResults, KeyResult, Cycle, User } from "@shared/schema";
 
 export default function Dashboard() {
   const { toast } = useToast();
@@ -84,8 +84,8 @@ export default function Dashboard() {
 
   const [deleteConfirmModal, setDeleteConfirmModal] = useState<{
     open: boolean;
-    okrId?: string;
-    okrTitle?: string;
+    goalId?: string;
+    goalTitle?: string;
     keyResultsCount?: number;
     initiativesCount?: number;
     tasksCount?: number;
@@ -102,7 +102,7 @@ export default function Dashboard() {
 
   const [editObjectiveModal, setEditObjectiveModal] = useState<{
     open: boolean;
-    objective?: OKRWithKeyResults;
+    objective?: GoalWithKeyResults;
   }>({
     open: false,
   });
@@ -254,7 +254,7 @@ export default function Dashboard() {
     data: allGoals = [],
     isLoading,
     refetch,
-  } = useQuery<OKRWithKeyResults[]>({
+  } = useQuery<GoalWithKeyResults[]>({
     queryKey: ["/api/okrs"],
   });
 
@@ -426,7 +426,7 @@ export default function Dashboard() {
 
   // Mutation for duplicating Goal
   const duplicateGoalMutation = useMutation({
-    mutationFn: async (goal: OKRWithKeyResults) => {
+    mutationFn: async (goal: GoalWithKeyResults) => {
       // Create new objective
       const response = await fetch("/api/objectives", {
         method: "POST",
@@ -481,8 +481,8 @@ export default function Dashboard() {
     },
     onSuccess: () => {
       toast({
-        title: "OKR berhasil diduplikasi",
-        description: "OKR baru telah dibuat dengan progress direset ke 0.",
+        title: "Goal berhasil diduplikasi",
+        description: "Goal baru telah dibuat dengan progress direset ke 0.",
         variant: "default",
         className: "border-green-200 bg-green-50 text-green-800",
       });
@@ -511,13 +511,13 @@ export default function Dashboard() {
     setDeleteKeyResultModal({ open: true, keyResult });
   };
 
-  // Key result click now navigates to dedicated page via Link in OKRCard
+  // Key result click now navigates to dedicated page via Link in GoalCard
 
-  const handleDuplicateGoal = (goal: OKRWithKeyResults) => {
+  const handleDuplicateGoal = (goal: GoalWithKeyResults) => {
     duplicateGoalMutation.mutate(goal);
   };
 
-  const handleEditObjective = (goal: OKRWithKeyResults) => {
+  const handleEditObjective = (goal: GoalWithKeyResults) => {
     setEditObjectiveModal({ open: true, objective: goal });
   };
 
@@ -529,8 +529,8 @@ export default function Dashboard() {
 
       setDeleteConfirmModal({
         open: true,
-        okrId: goalId,
-        okrTitle: data.objective.title,
+        goalId: goalId,
+        goalTitle: data.objective.title,
         keyResultsCount: data.counts.keyResults,
         initiativesCount: data.counts.initiatives,
         tasksCount: data.counts.tasks,
@@ -540,8 +540,8 @@ export default function Dashboard() {
       const goalToDelete = filteredGoals.find((goal) => goal.id === goalId);
       setDeleteConfirmModal({
         open: true,
-        okrId: goalId,
-        okrTitle: goalToDelete?.title || "Goal ini",
+        goalId: goalId,
+        goalTitle: goalToDelete?.title || "Goal ini",
         keyResultsCount: 0,
         initiativesCount: 0,
         tasksCount: 0,
@@ -550,8 +550,8 @@ export default function Dashboard() {
   };
 
   const confirmDeleteGoal = () => {
-    if (deleteConfirmModal.okrId) {
-      deleteGoalMutation.mutate(deleteConfirmModal.okrId);
+    if (deleteConfirmModal.goalId) {
+      deleteGoalMutation.mutate(deleteConfirmModal.goalId);
     }
   };
 
@@ -640,7 +640,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Overview */}
-      <StatsOverview okrs={filteredGoals} isLoading={isLoading} />
+      <StatsOverview goals={filteredGoals} isLoading={isLoading} />
 
       {/* View Tabs */}
       <div className="mt-4 sm:mt-6 w-full">
@@ -705,7 +705,7 @@ export default function Dashboard() {
             return (
               <GoalCard
                 key={goal.id}
-                okr={goal}
+                goal={goal}
                 onEditProgress={handleEditProgress}
                 onEditKeyResult={handleEditKeyResult}
                 onDeleteKeyResult={handleDeleteKeyResult}
@@ -724,7 +724,7 @@ export default function Dashboard() {
         ) : (
           // Hierarchy View with D3 Tree
           <DashboardD3Tree
-            okrs={filteredGoals}
+            goals={filteredGoals}
             expandedNodes={expandedNodes}
             onToggleExpand={toggleExpand}
             onNodeClick={(goal) => {
@@ -777,7 +777,7 @@ export default function Dashboard() {
         open={deleteConfirmModal.open}
         onOpenChange={(open: boolean) => setDeleteConfirmModal({ open })}
         onConfirm={confirmDeleteGoal}
-        objectiveTitle={deleteConfirmModal.okrTitle || ""}
+        objectiveTitle={deleteConfirmModal.goalTitle || ""}
         keyResultsCount={deleteConfirmModal.keyResultsCount || 0}
         initiativesCount={deleteConfirmModal.initiativesCount || 0}
         tasksCount={deleteConfirmModal.tasksCount || 0}

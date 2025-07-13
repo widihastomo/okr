@@ -1,16 +1,16 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Target, CheckCircle, AlertTriangle, TrendingUp, Clock, Trophy } from "lucide-react";
-import type { OKRWithKeyResults } from "@shared/schema";
+import type { GoalWithKeyResults } from "@shared/schema";
 import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { StatsOverviewSkeleton } from "@/components/skeletons/dashboard-skeleton";
 
 interface StatsOverviewProps {
-  okrs: OKRWithKeyResults[];
+  goals: GoalWithKeyResults[];
   isLoading?: boolean;
 }
 
-export default function StatsOverview({ okrs, isLoading }: StatsOverviewProps) {
+export default function StatsOverview({ goals, isLoading }: StatsOverviewProps) {
   const [currentCard, setCurrentCard] = useState(0);
   const sliderRef = useRef<HTMLDivElement>(null);
   const [startX, setStartX] = useState(0);
@@ -19,7 +19,7 @@ export default function StatsOverview({ okrs, isLoading }: StatsOverviewProps) {
 
   // Calculate stats from filtered Goal data
   const calculateStats = () => {
-    if (!okrs || okrs.length === 0) {
+    if (!goals || goals.length === 0) {
       return {
         totalGoals: 0,
         onTrack: 0,
@@ -30,8 +30,8 @@ export default function StatsOverview({ okrs, isLoading }: StatsOverviewProps) {
       };
     }
 
-    const statusCounts = okrs.reduce((acc, okr) => {
-      const status = okr.status;
+    const statusCounts = goals.reduce((acc, goal) => {
+      const status = goal.status;
       if (status === 'on_track') acc.onTrack++;
       else if (status === 'at_risk') acc.atRisk++;
       else if (status === 'completed') acc.completed++;
@@ -39,8 +39,8 @@ export default function StatsOverview({ okrs, isLoading }: StatsOverviewProps) {
       return acc;
     }, { onTrack: 0, atRisk: 0, completed: 0, behind: 0 });
 
-    const totalProgress = okrs.reduce((sum, okr) => {
-      const progress = okr.keyResults.reduce((keyResultSum, kr) => {
+    const totalProgress = goals.reduce((sum, goal) => {
+      const progress = goal.keyResults.reduce((keyResultSum, kr) => {
         const currentValue = parseFloat(kr.currentValue || '0');
         const targetValue = parseFloat(kr.targetValue);
         const baseValue = parseFloat(kr.baseValue || '0');
@@ -54,13 +54,13 @@ export default function StatsOverview({ okrs, isLoading }: StatsOverviewProps) {
         }
       }, 0);
       
-      return sum + (okr.keyResults.length > 0 ? progress / okr.keyResults.length : 0);
+      return sum + (goal.keyResults.length > 0 ? progress / goal.keyResults.length : 0);
     }, 0);
 
     return {
-      totalGoals: okrs.length,
+      totalGoals: goals.length,
       ...statusCounts,
-      avgProgress: okrs.length > 0 ? Math.round(totalProgress / okrs.length) : 0
+      avgProgress: goals.length > 0 ? Math.round(totalProgress / goals.length) : 0
     };
   };
 

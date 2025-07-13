@@ -32,7 +32,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import OKRFormModal from "@/components/okr-form-modal";
+import GoalFormModal from "@/components/goal-form-modal";
 
 const taskSchema = z.object({
   title: z.string().min(1, "Title is required"),

@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Calendar, User, Users, Clock, Edit, MoreVertical, Copy, Trash2, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Target, Settings, MoveUp, MoveDown, Eye } from "lucide-react";
-import type { OKRWithKeyResults, KeyResult } from "@shared/schema";
+import type { GoalWithKeyResults, KeyResult } from "@shared/schema";
 import { Link } from "wouter";
 import { CheckInModal } from "./check-in-modal";
 import { SimpleProgressStatus } from "./progress-status";
@@ -15,14 +15,14 @@ import { useState } from "react";
 
 
 interface GoalCardProps {
-  okr: OKRWithKeyResults;
+  goal: GoalWithKeyResults;
   onEditProgress: (keyResult: KeyResult) => void;
   onEditKeyResult?: (keyResult: KeyResult) => void;
   onDeleteKeyResult?: (keyResult: KeyResult) => void;
   onRefresh: () => void;
-  onDuplicate?: (okr: OKRWithKeyResults) => void;
-  onDelete?: (okrId: string) => void;
-  onEdit?: (okr: OKRWithKeyResults) => void;
+  onDuplicate?: (goal: GoalWithKeyResults) => void;
+  onDelete?: (goalId: string) => void;
+  onEdit?: (goal: GoalWithKeyResults) => void;
   cycleStartDate?: string;
   cycleEndDate?: string;
   cycle?: { id: string; name: string; type: string; startDate: string; endDate: string; status: string; description: string | null; };
@@ -30,7 +30,7 @@ interface GoalCardProps {
   users?: any[];
 }
 
-export default function GoalCard({ okr, onEditProgress, onEditKeyResult, onDeleteKeyResult, onDuplicate, onDelete, onEdit, cycleStartDate, cycleEndDate, cycle, index = 0, users = [] }: GoalCardProps) {
+export default function GoalCard({ goal, onEditProgress, onEditKeyResult, onDeleteKeyResult, onDuplicate, onDelete, onEdit, cycleStartDate, cycleEndDate, cycle, index = 0, users = [] }: GoalCardProps) {
   const [isExpanded, setIsExpanded] = useState(index === 0);
 
   // Helper function to get user name
@@ -74,7 +74,7 @@ export default function GoalCard({ okr, onEditProgress, onEditKeyResult, onDelet
   };
   
   // Calculate overall progress as average of key results
-  const calculateOverallProgress = (keyResults: typeof okr.keyResults): number => {
+  const calculateOverallProgress = (keyResults: typeof goal.keyResults): number => {
     if (keyResults.length === 0) return 0;
     
     const totalProgress = keyResults.reduce((sum, kr) => {
@@ -85,10 +85,10 @@ export default function GoalCard({ okr, onEditProgress, onEditKeyResult, onDelet
     return totalProgress / keyResults.length;
   };
   
-  const overallProgress = calculateOverallProgress(okr.keyResults);
+  const overallProgress = calculateOverallProgress(goal.keyResults);
 
   // Calculate ideal progress based on key result types and time
-  const calculateIdealProgress = (keyResults: typeof okr.keyResults): number => {
+  const calculateIdealProgress = (keyResults: typeof goal.keyResults): number => {
     if (keyResults.length === 0) return 0;
     
     const now = new Date();
@@ -122,7 +122,7 @@ export default function GoalCard({ okr, onEditProgress, onEditKeyResult, onDelet
     return totalIdealProgress / keyResults.length;
   };
 
-  const idealProgress = calculateIdealProgress(okr.keyResults);
+  const idealProgress = calculateIdealProgress(goal.keyResults);
 
   // Calculate days remaining based on cycle end date
   const calculateDaysRemaining = () => {
@@ -185,21 +185,21 @@ export default function GoalCard({ okr, onEditProgress, onEditKeyResult, onDelet
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem asChild>
-                <Link href={`/objectives/${okr.id}`} className="flex items-center w-full">
+                <Link href={`/objectives/${goal.id}`} className="flex items-center w-full">
                   <Eye className="w-4 h-4 mr-2" />
                   Lihat Detail
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onEdit?.(okr)}>
+              <DropdownMenuItem onClick={() => onEdit?.(goal)}>
                 <Settings className="w-4 h-4 mr-2" />
                 Edit Goal
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onDuplicate?.(okr)}>
+              <DropdownMenuItem onClick={() => onDuplicate?.(goal)}>
                 <Copy className="w-4 h-4 mr-2" />
                 Duplikat
               </DropdownMenuItem>
               <DropdownMenuItem 
-                onClick={() => onDelete?.(okr.id)}
+                onClick={() => onDelete?.(goal.id)}
                 className="text-red-600 hover:text-red-700"
               >
                 <Trash2 className="w-4 h-4 mr-2" />
@@ -230,30 +230,30 @@ export default function GoalCard({ okr, onEditProgress, onEditKeyResult, onDelet
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Link href={`/objectives/${okr.id}`}>
+                          <Link href={`/objectives/${goal.id}`}>
                             <h3 className="text-lg sm:text-xl font-bold hover:underline cursor-pointer leading-tight truncate max-w-full cursor-help">
-                              {truncateText(okr.title, 50, 30)}
+                              {truncateText(goal.title, 50, 30)}
                             </h3>
                           </Link>
                         </TooltipTrigger>
-                        {okr.title.length > (window.innerWidth < 768 ? 30 : 50) && (
+                        {goal.title.length > (window.innerWidth < 768 ? 30 : 50) && (
                           <TooltipContent className="max-w-xs">
-                            <p>{okr.title}</p>
+                            <p>{goal.title}</p>
                           </TooltipContent>
                         )}
                       </Tooltip>
                     </TooltipProvider>
-                    {okr.description && (
+                    {goal.description && (
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <p className="text-xs sm:text-sm text-gray-600 mt-1 truncate max-w-full cursor-help">
-                              {truncateText(okr.description, 60, 40)}
+                              {truncateText(goal.description, 60, 40)}
                             </p>
                           </TooltipTrigger>
-                          {okr.description.length > (window.innerWidth < 768 ? 40 : 60) && (
+                          {goal.description.length > (window.innerWidth < 768 ? 40 : 60) && (
                             <TooltipContent className="max-w-sm">
-                              <p>{okr.description}</p>
+                              <p>{goal.description}</p>
                             </TooltipContent>
                           )}
                         </Tooltip>
@@ -271,21 +271,21 @@ export default function GoalCard({ okr, onEditProgress, onEditKeyResult, onDelet
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
                         <DropdownMenuItem asChild>
-                          <Link href={`/objectives/${okr.id}`} className="flex items-center w-full">
+                          <Link href={`/objectives/${goal.id}`} className="flex items-center w-full">
                             <Eye className="w-4 h-4 mr-2" />
                             Lihat Detail
                           </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onEdit?.(okr)}>
+                        <DropdownMenuItem onClick={() => onEdit?.(goal)}>
                           <Settings className="w-4 h-4 mr-2" />
                           Edit Goal
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onDuplicate?.(okr)}>
+                        <DropdownMenuItem onClick={() => onDuplicate?.(goal)}>
                           <Copy className="w-4 h-4 mr-2" />
                           Duplikat
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                          onClick={() => onDelete?.(okr.id)}
+                          onClick={() => onDelete?.(goal.id)}
                           className="text-red-600 hover:text-red-700"
                         >
                           <Trash2 className="w-4 h-4 mr-2" />
@@ -324,7 +324,7 @@ export default function GoalCard({ okr, onEditProgress, onEditKeyResult, onDelet
                         return { bgColor: 'bg-gray-100', textColor: 'text-gray-800', dotColor: 'bg-gray-500', label: 'Tidak Diketahui' };
                     }
                   };
-                  const config = getProgressConfig(okr.status);
+                  const config = getProgressConfig(goal.status);
                   return (
                     <div className={`flex items-center gap-1 px-2 py-0.5 ${config.bgColor} ${config.textColor} rounded-full text-xs sm:text-sm font-medium whitespace-nowrap`}>
                       <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 ${config.dotColor} rounded-full flex-shrink-0`}></div>
@@ -357,7 +357,7 @@ export default function GoalCard({ okr, onEditProgress, onEditKeyResult, onDelet
                   return (
                     <>
                       <div 
-                        className={`${getProgressBarColor(okr.status)} h-2 transition-all duration-300 ${
+                        className={`${getProgressBarColor(goal.status)} h-2 transition-all duration-300 ${
                           overallProgress >= 100 ? 'rounded-full' : 'rounded-l-full'
                         }`}
                         style={{ width: `${Math.min(100, Math.max(0, overallProgress))}%` }}
@@ -385,19 +385,19 @@ export default function GoalCard({ okr, onEditProgress, onEditKeyResult, onDelet
         {/* Full width container for owner, date, and remaining days on all screens */}
         <div className="w-full flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-600 mt-2">
           <span className="flex items-center gap-2">
-            {okr.ownerType === 'team' ? (
+            {goal.ownerType === 'team' ? (
               <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
                 <Users className="w-3 h-3 text-blue-600" />
               </div>
             ) : (
               <Avatar className="w-6 h-6">
-                <AvatarImage src="" alt={okr.owner} />
+                <AvatarImage src="" alt={goal.owner} />
                 <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
-                  {okr.owner.split(' ').map(n => n[0]).join('').toUpperCase()}
+                  {goal.owner.split(' ').map(n => n[0]).join('').toUpperCase()}
                 </AvatarFallback>
               </Avatar>
             )}
-            {okr.owner}
+            {goal.owner}
           </span>
           
           {cycle && (
@@ -441,7 +441,7 @@ export default function GoalCard({ okr, onEditProgress, onEditKeyResult, onDelet
                     return { bgColor: 'bg-gray-100', textColor: 'text-gray-800', dotColor: 'bg-gray-500', label: 'Tidak Diketahui' };
                 }
               };
-              const config = getProgressConfig(okr.status);
+              const config = getProgressConfig(goal.status);
               return (
                 <div className={`flex items-center gap-1 px-2 py-0.5 ${config.bgColor} ${config.textColor} rounded-full text-xs font-medium whitespace-nowrap`}>
                   <div className={`w-1.5 h-1.5 ${config.dotColor} rounded-full flex-shrink-0`}></div>
@@ -474,7 +474,7 @@ export default function GoalCard({ okr, onEditProgress, onEditKeyResult, onDelet
                 return (
                   <>
                     <div 
-                      className={`${getProgressBarColor(okr.status)} h-2 transition-all duration-300 ${
+                      className={`${getProgressBarColor(goal.status)} h-2 transition-all duration-300 ${
                         overallProgress >= 100 ? 'rounded-full' : 'rounded-l-full'
                       }`}
                       style={{ width: `${Math.min(100, Math.max(0, overallProgress))}%` }}
@@ -500,7 +500,7 @@ export default function GoalCard({ okr, onEditProgress, onEditKeyResult, onDelet
         <CardContent className="p-3 sm:p-6">
           <h4 className="text-sm font-semibold text-gray-700 mb-3 sm:mb-4">Angka Target</h4>
         <div className="space-y-3 sm:space-y-4">
-          {okr.keyResults.map((kr) => {
+          {goal.keyResults.map((kr) => {
             const progress = calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue);
             const getKeyResultTypeLabel = (type: string) => {
               switch (type) {

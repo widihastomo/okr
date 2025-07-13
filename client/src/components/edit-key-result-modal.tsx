@@ -191,7 +191,7 @@ export default function EditKeyResultModal({
       });
       
       // Invalidate all related queries
-      queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/goals"] });
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
       
       // Invalidate specific key result query
@@ -199,17 +199,17 @@ export default function EditKeyResultModal({
         queryClient.invalidateQueries({ queryKey: ["/api/key-results", keyResult.id] });
       }
       
-      // If we have objective ID, invalidate the specific OKR detail query
+      // If we have objective ID, invalidate the specific Goal detail query
       const targetObjectiveId = keyResult?.objectiveId || objectiveId;
       if (targetObjectiveId) {
-        queryClient.invalidateQueries({ queryKey: ["/api/okrs", targetObjectiveId] });
+        queryClient.invalidateQueries({ queryKey: ["/api/goals", targetObjectiveId] });
         queryClient.invalidateQueries({ queryKey: ["/api/objectives", targetObjectiveId, "activity-log"] });
-        queryClient.invalidateQueries({ queryKey: [`/api/okrs/${targetObjectiveId}`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/goals/${targetObjectiveId}`] });
       }
       
       // Force refetch with active type
       queryClient.invalidateQueries({ 
-        queryKey: ["/api/okrs"], 
+        queryKey: ["/api/goals"], 
         refetchType: 'active' 
       });
       

@@ -203,7 +203,7 @@ export function AdminDataForm({ onSubmit, initialData, isLoading }: AdminDataFor
           <h4 className="font-semibold text-blue-900 mb-2">Informasi Penting</h4>
           <ul className="text-sm text-blue-800 space-y-1">
             <li>• Email dan password ini akan digunakan untuk login sebagai Administrator</li>
-            <li>• Administrator memiliki akses penuh ke sistem OKR perusahaan</li>
+            <li>• Administrator memiliki akses penuh ke sistem Goal perusahaan</li>
             <li>• Pastikan email yang digunakan valid dan dapat diakses</li>
           </ul>
         </div>

@@ -226,7 +226,7 @@ export function PaymentProcess({ invoiceData, onPaymentComplete, isLoading }: Pa
         <CardContent>
           <div className="space-y-2 text-sm">
             <div>
-              <strong>Email:</strong> support@okrsystem.com
+              <strong>Email:</strong> support@goalsystem.com
             </div>
             <div>
               <strong>WhatsApp:</strong> +62 812-3456-7890

@@ -250,7 +250,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
       queryClient.invalidateQueries({ queryKey: ["/api/initiatives"] });
       queryClient.invalidateQueries({ queryKey: ["/api/initiative-members"] });
       queryClient.invalidateQueries({ queryKey: ["/api/initiatives/objective"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/goals"] });
       
       // Also invalidate specific objective queries if keyResultId is provided
       if (keyResultId) {
@@ -259,7 +259,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
         const keyResult = keyResults?.find(kr => kr.id === keyResultId);
         if (keyResult?.objectiveId) {
           queryClient.invalidateQueries({ queryKey: [`/api/initiatives/objective/${keyResult.objectiveId}`] });
-          queryClient.invalidateQueries({ queryKey: [`/api/okrs/${keyResult.objectiveId}`] });
+          queryClient.invalidateQueries({ queryKey: [`/api/goals/${keyResult.objectiveId}`] });
         }
       }
       

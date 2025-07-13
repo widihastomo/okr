@@ -49,7 +49,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import OKRFormModal from "./okr-form-modal";
+import GoalFormModal from "./goal-form-modal";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { useLogout } from "@/hooks/useLogout";
@@ -77,7 +77,7 @@ export default function GlobalHeader({
   sidebarCollapsed,
   onToggleCollapse,
 }: GlobalHeaderProps) {
-  const [isOKRModalOpen, setIsOKRModalOpen] = useState(false);
+  const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const { logout } = useLogout();
   const { user } = useAuth();
@@ -172,12 +172,12 @@ export default function GlobalHeader({
     return "U";
   };
 
-  // Global keyboard shortcut for creating OKR (Ctrl+K or Cmd+K)
+  // Global keyboard shortcut for creating Goal (Ctrl+K or Cmd+K)
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.key === "k") {
         event.preventDefault();
-        setIsOKRModalOpen(true);
+        setIsGoalModalOpen(true);
       }
     };
 
@@ -466,8 +466,8 @@ export default function GlobalHeader({
         </DialogContent>
       </Dialog>
 
-      {/* Global OKR Creation Modal */}
-      <OKRFormModal open={isOKRModalOpen} onOpenChange={setIsOKRModalOpen} />
+      {/* Global Goal Creation Modal */}
+      <GoalFormModal open={isGoalModalOpen} onOpenChange={setIsGoalModalOpen} />
     </header>
   );
 }

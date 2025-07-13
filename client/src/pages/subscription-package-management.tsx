@@ -418,7 +418,7 @@ function PackageFormModal({
                 <Input
                   value={newFeature}
                   onChange={(e) => setNewFeature(e.target.value)}
-                  placeholder="Contoh: Hingga 10 pengguna, OKR Unlimited, Email Support"
+                  placeholder="Contoh: Hingga 10 pengguna, Goal Unlimited, Email Support"
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addFeature())}
                   className="flex-1"
                 />
