@@ -3676,6 +3676,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dueDate: req.body.dueDate ? new Date(req.body.dueDate) : null,
         priorityScore: calculatedPriorityScore,
         priority: calculatedPriorityLevel,
+        status: req.body.status || "draft", // Ensure default status is "draft"
       };
       
       const result = insertInitiativeSchema.safeParse(initiativeData);

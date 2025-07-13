@@ -235,7 +235,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
         budget: data.budget ? getNumberValueForSubmission(data.budget) : null,
         startDate: data.startDate ? new Date(data.startDate) : null,
         dueDate: data.dueDate ? new Date(data.dueDate) : null,
-        status: "not_started", // Auto-set status to not_started for new initiatives
+        status: "draft", // Auto-set status to draft for new initiatives
         priority: calculatedPriority, // Use calculated priority instead of manual selection
         priorityScore: priorityScore.toString(), // Store the calculated score as string
         createdBy: "550e8400-e29b-41d4-a716-446655440001", // Current user ID
