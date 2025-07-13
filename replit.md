@@ -257,6 +257,8 @@ All email configuration now uses environment variables:
   * REQUIRED: Made "Penanggung Jawab" (responsible person) mandatory field with proper validation
   * ENHANCED: Current user automatically selected as default responsible person for new initiatives
   * ALLOWED: Back dating for start date - removed restriction preventing past dates selection
+  * ADDED: Informative placeholder text for date inputs: "Pilih tanggal mulai inisiatif" dan "Pilih tanggal selesai inisiatif"
+  * ENHANCED: Helper text for date fields explaining validation rules and permitted date ranges
   * ADDED: MilestoneBar component with 3 stages: Perencanaan (Planning), Eksekusi (Execution), Selesai (Completed)
   * IMPLEMENTED: Smart milestone detection based on initiative status and task progress
   * ENHANCED: Visual progress line with orange color scheme and smooth transitions

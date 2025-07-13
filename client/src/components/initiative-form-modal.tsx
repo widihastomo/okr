@@ -487,7 +487,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                                 {field.value ? (
                                   format(field.value, "dd/MM/yyyy", { locale: id })
                                 ) : (
-                                  <span>Pilih tanggal</span>
+                                  <span>Pilih tanggal mulai inisiatif</span>
                                 )}
                                 <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                               </Button>
@@ -507,6 +507,9 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                           </PopoverContent>
                         </Popover>
                         <FormMessage />
+                        <FormDescription>
+                          Tanggal dimulainya inisiatif ini (bisa memilih tanggal sebelumnya)
+                        </FormDescription>
                       </FormItem>
                     )}
                   />
@@ -531,7 +534,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                                 {field.value ? (
                                   format(field.value, "dd/MM/yyyy", { locale: id })
                                 ) : (
-                                  <span>Pilih tanggal</span>
+                                  <span>Pilih tanggal selesai inisiatif</span>
                                 )}
                                 <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                               </Button>
@@ -552,6 +555,9 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                           </PopoverContent>
                         </Popover>
                         <FormMessage />
+                        <FormDescription>
+                          Target tanggal selesai inisiatif ini (minimal hari ini)
+                        </FormDescription>
                       </FormItem>
                     )}
                   />
