@@ -8955,9 +8955,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   organizationId: currentUser.organizationId,
                   email: memberEmail.trim(),
                   invitedBy: currentUser.id,
-                  invitationToken,
-                  expiresAt,
-                  status: "pending"
+                  role: "member", // Default role for onboarding invitations
+                  invitationStatus: "pending",
+                  isActive: false,
+                  isEmailVerified: false
                 });
                 
                 console.log(`📧 Sending invitation email to ${memberEmail.trim()}`);

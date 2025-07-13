@@ -2034,6 +2034,7 @@ export class DatabaseStorage implements IStorage {
           invitationExpiresAt: expiresAt,
           invitationToken: invitationToken,
           password: null, // No password for invited users
+          isActive: false, // Invited users should be inactive until they accept
         })
         .returning();
       

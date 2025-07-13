@@ -246,6 +246,14 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 13, 2025. Successfully fixed user invitation status issue during onboarding process:
+  * FIXED: Invited users during onboarding now properly have "pending" status instead of active
+  * CORRECTED: Member invitation creation in onboarding now properly sets isActive: false for invited users
+  * ENHANCED: Updated onboarding invitation parameters to match regular invitation system with proper status fields
+  * VERIFIED: Database confirmed invited users now have is_active: false and invitation_status: pending
+  * IMPROVED: Onboarding invitation system now consistent with regular member invitation workflow
+  * TESTED: Both regular invitations and onboarding invitations now create users with correct pending status
+  * RESULT: Clean invitation system with proper user status management across all invitation flows
 - July 12, 2025. Successfully completed comprehensive padding standardization across all pages for consistent UI layout:
   * CENTRALIZED: Implemented centralized padding in App.tsx with responsive design (px-3 sm:px-6)
   * STANDARDIZED: Applied consistent padding across all pages (daily-focus, dashboard, analytics, profile, cycles, templates, achievements)
