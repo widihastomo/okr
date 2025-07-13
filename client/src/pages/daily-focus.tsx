@@ -1125,7 +1125,7 @@ export default function DailyFocusPage() {
         </div>
 
         {/* Onboarding Missions Section - Only for client owners */}
-        {user && (user as any).role === "owner" && (
+        {user && (
           <div data-testid="onboarding-missions">
             <MissionCard
               missions={orderlyMissions}
