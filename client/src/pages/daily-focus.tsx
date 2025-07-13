@@ -1582,6 +1582,7 @@ export default function DailyFocusPage() {
                                 <DropdownMenuTrigger asChild>
                                   <button 
                                     className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
+                                    data-tour="task-actions"
                                   >
                                     {getTaskStatusLabel(task.status)}
                                     <ChevronDown className="h-3 w-3" />
@@ -3286,9 +3287,12 @@ export default function DailyFocusPage() {
       />
       
       {/* Tour Restart Button */}
-      <div className="fixed bottom-4 right-4 z-50">
+      <div className="fixed bottom-4 right-4 z-[9999]">
         <Button
-          onClick={() => setRunTour(true)}
+          onClick={() => {
+            console.log('Help button clicked');
+            setRunTour(true);
+          }}
           className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white shadow-lg"
           size="sm"
         >
