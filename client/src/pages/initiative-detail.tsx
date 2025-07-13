@@ -307,8 +307,7 @@ const MilestoneBar = ({ initiative, tasks }: { initiative: any; tasks: any[] }) 
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-4 mb-6">
-      <h3 className="text-sm font-medium text-gray-900 mb-3 sm:mb-4">Progress Milestone</h3>
-      
+      <h3 className="text-sm font-medium text-gray-900 mb-3 sm:mb-4">Tahapan Inisiatif</h3>
       {/* Mobile View - Vertical Stack */}
       <div className="block sm:hidden space-y-3">
         {milestones.map((milestone) => (
@@ -344,7 +343,6 @@ const MilestoneBar = ({ initiative, tasks }: { initiative: any; tasks: any[] }) 
           </div>
         ))}
       </div>
-
       {/* Desktop View - Horizontal Bars */}
       <div className="hidden sm:flex items-center gap-2">
         {milestones.map((milestone) => (
