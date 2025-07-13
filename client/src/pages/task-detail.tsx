@@ -566,7 +566,7 @@ export default function TaskDetailPage() {
   }
 
   return (
-    <div className="p-4 sm:p-6 max-w-full">
+    <div className="max-w-7xl mx-auto space-y-6">
       {/* Page Header with Back Button and Actions */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">

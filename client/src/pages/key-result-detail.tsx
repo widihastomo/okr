@@ -838,7 +838,7 @@ export default function KeyResultDetailPage() {
   };
 
   return (
-    <div className="p-6">
+    <div className="max-w-7xl mx-auto space-y-6">
       
 
       {/* Header */}

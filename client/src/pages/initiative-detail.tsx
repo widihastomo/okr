@@ -458,7 +458,7 @@ export default function InitiativeDetailPage() {
   }
 
   return (
-    <div className="p-4 sm:p-6 max-w-full">
+    <div className="max-w-7xl mx-auto space-y-6">
       {/* Page Header with Back Button and Actions */}
       <div className="mb-6">
         {/* Back button and Actions in same row */}
