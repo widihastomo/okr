@@ -8454,7 +8454,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         role: users.role,
         isActive: users.isActive,
         organizationId: users.organizationId,
-        createdAt: users.createdAt
+        createdAt: users.createdAt,
+        invitationStatus: users.invitationStatus
       }).from(users).where(eq(users.organizationId, user.organizationId));
 
       res.json(orgUsers);
