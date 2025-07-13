@@ -1040,6 +1040,35 @@ export default function InitiativeDetailPage() {
                 <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900">
                   <FileText className="h-5 w-5 text-orange-500" />
                   Manajemen Task
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button 
+                        type="button" 
+                        className="inline-flex items-center justify-center ml-1"
+                      >
+                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent side="right" className="max-w-sm">
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-sm">Manajemen Task</h4>
+                        <p className="text-sm text-gray-600">
+                          Task adalah aktivitas spesifik yang harus diselesaikan untuk mencapai tujuan inisiatif. 
+                          Sistem task management membantu Anda:
+                        </p>
+                        <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                          <li>Memecah inisiatif besar menjadi langkah-langkah yang dapat dilakukan</li>
+                          <li>Menetapkan prioritas dan tenggat waktu untuk setiap aktivitas</li>
+                          <li>Melacak progress dan status penyelesaian task</li>
+                          <li>Mengassign tanggung jawab kepada anggota tim</li>
+                          <li>Mengidentifikasi bottleneck dan hambatan dalam eksekusi</li>
+                        </ul>
+                        <p className="text-sm text-gray-600 mt-2">
+                          <strong>Status Task:</strong> Belum (Not Started), Jalan (In Progress), Selesai (Completed), Batal (Cancelled)
+                        </p>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 </CardTitle>
                 <Button 
                   onClick={() => setIsAddTaskModalOpen(true)}

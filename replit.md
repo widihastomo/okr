@@ -295,6 +295,12 @@ All email configuration now uses environment variables:
   * ENHANCED: User education with practical examples and use cases
   * IMPROVED: Better user understanding of success metrics functionality
   * RESULT: Users now have clear guidance on how to use success metrics effectively
+- July 13, 2025. Successfully added help popover for task management explanation in initiative detail page:
+  * ADDED: HelpCircle icon with popover trigger next to "Manajemen Task" title  
+  * IMPLEMENTED: Comprehensive explanation of task management system and its benefits
+  * ENHANCED: User education with 5 key benefits of task management system
+  * IMPROVED: Better user understanding of task status workflow (Belum, Jalan, Selesai, Batal)
+  * RESULT: Users now have clear guidance on how to effectively manage tasks within initiatives
 - July 13, 2025. Successfully fixed initiative status system and disabled initiative field for tasks from initiative detail:
   * FIXED: Initiative creation now properly uses "draft" status instead of "not_started" (matching database schema)
   * CORRECTED: Server-side POST /api/initiatives endpoint now sets default status to "draft" 
