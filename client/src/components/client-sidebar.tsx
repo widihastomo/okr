@@ -158,6 +158,12 @@ export default function Sidebar({
       active: location === "/" || location === "/daily-focus",
     },
     {
+      label: "Tasks",
+      icon: CheckSquare,
+      path: "/tasks",
+      active: location === "/tasks",
+    },
+    {
       label: "Goals",
       icon: Target,
       path: "/dashboard",
