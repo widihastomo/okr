@@ -1093,30 +1093,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Verify user has access to this cycle
       if (!currentUser.isSystemOwner) {
-        console.log("🔍 Checking cycle access for user:", currentUser.id, "cycle:", id);
-        
         // Check if the cycle has objectives that belong to the current user's organization
         const allObjectives = await storage.getObjectives();
-        console.log("📋 Found objectives:", allObjectives.length);
-        
         const userOrgObjectives = allObjectives.filter(obj => {
           // Find the user who created this objective
           return obj.ownerId === currentUser.id || obj.cycleId === id;
         });
         
-        console.log("🎯 User objectives in cycle:", userOrgObjectives.length);
-        
         const hasCycleAccess = userOrgObjectives.some(obj => obj.cycleId === id);
-        console.log("✅ Has cycle access:", hasCycleAccess);
         
         if (!hasCycleAccess) {
           // Additional check: verify cycle creator is in same organization
           const cycleCreator = await storage.getUser(cycle.createdBy);
-          console.log("👤 Cycle creator:", cycleCreator?.id, "org:", cycleCreator?.organizationId);
-          console.log("🏢 Current user org:", currentUser.organizationId);
           
           if (!cycleCreator || cycleCreator.organizationId !== currentUser.organizationId) {
-            console.log("❌ Access denied to cycle");
             return res.status(403).json({ message: "Access denied to this cycle" });
           }
         }

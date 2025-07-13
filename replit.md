@@ -246,6 +246,15 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 13, 2025. Successfully fixed cycle data visibility issue and standardized container padding:
+  * FIXED: Cycle data now properly displays in UI instead of showing "Tidak ada cycle"
+  * RESOLVED: Error `storage.getObjectivesByUserId is not a function` in cycle endpoint
+  * UPDATED: Cycle endpoint access control to use correct `storage.getObjectives()` method
+  * ENHANCED: Multi-tenant cycle access validation to check user objectives in cycle
+  * STANDARDIZED: Objective detail page container padding to match daily focus layout (max-w-7xl mx-auto space-y-6)
+  * CLEANED: Removed excessive debug logging and limited development-only console output
+  * IMPROVED: Container consistency across all pages for better UI uniformity
+  * VERIFIED: Cycle data successfully loads and displays with proper name, dates, and progress calculations
 - July 13, 2025. Successfully fixed goal update refresh issue and enhanced cache invalidation system:
   * FIXED: Added comprehensive cache invalidation in edit-objective-modal.tsx for both `/api/goals` and `/api/objectives` endpoints
   * ENHANCED: Cache invalidation now includes activity log, initiatives, and tasks for updated objectives

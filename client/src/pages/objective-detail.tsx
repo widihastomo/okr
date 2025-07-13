@@ -394,16 +394,18 @@ export default function GoalDetail() {
     enabled: !!goal?.cycleId,
   });
 
-  // Debug logging for cycle data
+  // Debug logging for cycle data (development only)
   useEffect(() => {
-    if (goal?.cycleId) {
-      console.log("🔍 Fetching cycle data for ID:", goal.cycleId);
-    }
-    if (cycle) {
-      console.log("✅ Cycle data loaded successfully:", cycle);
-    }
-    if (cycleError) {
-      console.error("❌ Error loading cycle data:", cycleError);
+    if (process.env.NODE_ENV === 'development') {
+      if (goal?.cycleId) {
+        console.log("🔍 Fetching cycle data for ID:", goal.cycleId);
+      }
+      if (cycle) {
+        console.log("✅ Cycle data loaded successfully:", cycle);
+      }
+      if (cycleError) {
+        console.error("❌ Error loading cycle data:", cycleError);
+      }
     }
   }, [goal?.cycleId, cycle, cycleError]);
 
@@ -898,7 +900,7 @@ export default function GoalDetail() {
   const overallProgress = calculateOverallProgress(goal?.keyResults || []);
 
   return (
-    <div className="p-4 sm:p-6 max-w-full pl-[0px] pr-[0px] pt-[0px] pb-[0px]">
+    <div className="max-w-7xl mx-auto space-y-6">
       {/* Page Header with Back Button and Actions */}
       <div className="mb-6">
         {/* Back button and Actions in same row */}
