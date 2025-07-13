@@ -286,6 +286,38 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
 
   const createInitiativeMutation = useMutation({
     mutationFn: async (data: InitiativeFormData) => {
+      // Debug: Log form data and cycle information
+      console.log('🔍 Form submission data:', data);
+      console.log('🔍 Cycle data during submission:', cycle);
+      
+      // Validate dates against cycle before submission
+      if (cycle && cycle.startDate && cycle.endDate) {
+        const cycleStart = new Date(cycle.startDate);
+        const cycleEnd = new Date(cycle.endDate);
+        cycleStart.setHours(0, 0, 0, 0);
+        cycleEnd.setHours(23, 59, 59, 999);
+        
+        const startDateOnly = new Date(data.startDate);
+        const dueDateOnly = new Date(data.dueDate);
+        startDateOnly.setHours(0, 0, 0, 0);
+        dueDateOnly.setHours(0, 0, 0, 0);
+        
+        console.log('🔍 Final validation before submit:', {
+          cycleStart: cycleStart.toISOString(),
+          cycleEnd: cycleEnd.toISOString(),
+          startDate: startDateOnly.toISOString(),
+          dueDate: dueDateOnly.toISOString()
+        });
+        
+        if (startDateOnly < cycleStart || startDateOnly > cycleEnd) {
+          throw new Error(`Tanggal mulai harus berada dalam rentang siklus (${cycleStart.toLocaleDateString('id-ID')} - ${cycleEnd.toLocaleDateString('id-ID')})`);
+        }
+        
+        if (dueDateOnly < cycleStart || dueDateOnly > cycleEnd) {
+          throw new Error(`Tanggal selesai harus berada dalam rentang siklus (${cycleStart.toLocaleDateString('id-ID')} - ${cycleEnd.toLocaleDateString('id-ID')})`);
+        }
+      }
+      
       // Calculate priority automatically based on scores (5-point scale)
       const priorityScore = (data.impactScore * 0.4) + ((6 - data.effortScore) * 0.3) + (data.confidenceScore * 0.3);
       const calculatedPriority = priorityScore >= 4.0 ? 'critical' : 
