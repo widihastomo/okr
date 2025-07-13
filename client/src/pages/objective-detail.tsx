@@ -898,7 +898,7 @@ export default function GoalDetail() {
   const overallProgress = calculateOverallProgress(goal?.keyResults || []);
 
   return (
-    <div className="p-4 sm:p-6 max-w-full">
+    <div className="p-4 sm:p-6 max-w-full pl-[0px] pr-[0px] pt-[0px] pb-[0px]">
       {/* Page Header with Back Button and Actions */}
       <div className="mb-6">
         {/* Back button and Actions in same row */}
@@ -2566,7 +2566,6 @@ export default function GoalDetail() {
         onSubmit={(data) => handleCreateKeyResult(data as any)}
         users={users}
       />
-
       {/* Initiative Form Modal */}
       <InitiativeFormModal
         isOpen={showInitiativeFormModal}
@@ -2582,7 +2581,6 @@ export default function GoalDetail() {
         objectiveId={id}
         initiative={editingInitiative ?? undefined}
       />
-
       {/* Edit Objective Modal */}
       {goal && (
         <EditObjectiveModal
@@ -2591,7 +2589,6 @@ export default function GoalDetail() {
           onOpenChange={setEditObjectiveModal}
         />
       )}
-
       {/* Task Modal */}
       <SimpleTaskModal
         open={showTaskModal}
@@ -2601,7 +2598,6 @@ export default function GoalDetail() {
           setActiveTab("tasks");
         }}
       />
-
       {/* AI Help Bubble */}
       <AIHelpBubble
         context="objective_detail"
@@ -2645,7 +2641,6 @@ export default function GoalDetail() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
       {/* Delete Initiative Confirmation Dialog */}
       <AlertDialog open={!!deletingInitiative} onOpenChange={() => setDeletingInitiative(null)}>
         <AlertDialogContent>
