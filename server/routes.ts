@@ -8687,27 +8687,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "User not found or invitation not pending" });
       }
 
-      // Generate new invitation token and expiration
+      // Generate new invitation token 
       const newInvitationToken = crypto.randomBytes(32).toString('hex');
-      const newInvitationExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
 
-      // Update user with new invitation token and expiry
-      await db.update(users)
-        .set({ 
-          invitationToken: newInvitationToken,
-          invitationExpiresAt: newInvitationExpiry.toISOString(),
-          invitedAt: new Date().toISOString()
-        })
-        .where(eq(users.id, userId));
-
-      // Send invitation email
+      // Send invitation email without updating database first
       try {
         const inviterName = `${user.firstName} ${user.lastName}`.trim() || user.email;
         const organizationName = organization[0].name || "Organization";
         
-        // Construct the invitation link
+        // Construct the invitation link - use existing token if available, otherwise use new one
         const baseUrl = `${req.protocol}://${req.get('host')}`;
-        const invitationLink = `${baseUrl}/accept-invitation?token=${newInvitationToken}`;
+        const invitationLink = `${baseUrl}/accept-invitation?token=${targetUser.invitationToken || newInvitationToken}`;
         
         const emailHtml = emailService.generateInvitationEmail(
           inviterName,
