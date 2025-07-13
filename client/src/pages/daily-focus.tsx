@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import Joyride, { CallBackProps, STATUS, Step } from "react-joyride";
 import {
   Card,
   CardContent,
@@ -305,6 +306,86 @@ export default function DailyFocusPage() {
   // Goal creation modal state
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
 
+  // Tour state
+  const [runTour, setRunTour] = useState(false);
+  const [tourStepIndex, setTourStepIndex] = useState(0);
+  
+
+
+  
+  // Tour steps configuration
+  const tourSteps: Step[] = [
+    {
+      target: '[data-tour="overview-cards"]',
+      content: 'Ini adalah ringkasan aktivitas harian Anda. Lihat jumlah task hari ini, task terlambat, target aktif, dan level progress Anda.',
+      disableBeacon: true,
+      placement: 'bottom'
+    },
+    {
+      target: '[data-tour="user-filter"]',
+      content: 'Gunakan filter ini untuk melihat task dan target berdasarkan anggota tim tertentu atau semua anggota.',
+      placement: 'bottom'
+    },
+    {
+      target: '[data-tour="progress-card"]',
+      content: 'Kartu progress menampilkan pencapaian hari ini dan motivasi. Klik untuk melihat detail lebih lanjut.',
+      placement: 'bottom'
+    },
+    {
+      target: '[data-tour="main-tabs"]',
+      content: 'Navigasi utama Daily Focus. Gunakan tab ini untuk beralih antara task hari ini, semua task, target, dan inisiatif.',
+      placement: 'bottom'
+    },
+    {
+      target: '[data-tour="create-task"]',
+      content: 'Klik tombol ini untuk membuat task baru. Anda dapat menambahkan detail seperti judul, deskripsi, prioritas, dan deadline.',
+      placement: 'left'
+    },
+    {
+      target: '[data-tour="task-actions"]',
+      content: 'Setiap task memiliki tombol aksi untuk update status. Gunakan tombol ini untuk mengubah status task menjadi Sedang Berjalan, Selesai, atau Dibatalkan.',
+      placement: 'top'
+    },
+    {
+      target: '[data-tour="task-details"]',
+      content: 'Klik pada task untuk melihat detail lengkap termasuk deskripsi, prioritas, deadline, dan opsi edit atau hapus.',
+      placement: 'top'
+    }
+  ];
+  
+  // Tour callback handler
+  const handleTourCallback = (data: CallBackProps) => {
+    const { status, type, index } = data;
+    
+    if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
+      setRunTour(false);
+      setTourStepIndex(0);
+      // Store tour completion in localStorage
+      localStorage.setItem('dailyFocusTourCompleted', 'true');
+    }
+    
+    if (type === 'step:after') {
+      setTourStepIndex(index + 1);
+    }
+  };
+  
+  // Check if tour should run on mount
+  useEffect(() => {
+    const tourCompleted = localStorage.getItem('dailyFocusTourCompleted');
+    if (!tourCompleted) {
+      // Start tour after a short delay to ensure all elements are rendered
+      setTimeout(() => {
+        setRunTour(true);
+      }, 1000);
+    }
+  }, []);
+  
+  // Function to restart tour
+  const restartTour = () => {
+    setTourStepIndex(0);
+    setRunTour(true);
+  };
+  
   // Status update mutation
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -942,7 +1023,7 @@ export default function DailyFocusPage() {
         {/* Controls */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           {/* User Filter */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" data-tour="user-filter">
             <User className="h-4 w-4 text-gray-500" />
             <Select value={selectedUserId} onValueChange={setSelectedUserId}>
               <SelectTrigger className="w-full sm:w-48">
@@ -985,7 +1066,7 @@ export default function DailyFocusPage() {
         </div>
       )}
       {/* Overview Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4" data-tour="overview-cards">
         {isLoadingAllTasks || isLoadingObjectives ? (
           <>
             <Skeleton className="h-24" />
@@ -1083,7 +1164,7 @@ export default function DailyFocusPage() {
         )}
       </div>
       {/* Compact Progress & Motivation */}
-      <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
+      <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50" data-tour="progress-card">
         <CardContent className="p-3 md:p-4">
           {/* Mobile: 3-column layout */}
           <div className="block md:hidden">
@@ -1320,7 +1401,7 @@ export default function DailyFocusPage() {
         </CardContent>
       </Card>
       {/* Main Content Tabs */}
-      <Tabs defaultValue="tasks" className="w-full">
+      <Tabs defaultValue="tasks" className="w-full" data-tour="main-tabs">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="tasks">Task Prioritas</TabsTrigger>
           <TabsTrigger value="progress">Update Progress</TabsTrigger>
@@ -1341,6 +1422,7 @@ export default function DailyFocusPage() {
                   size="sm" 
                   className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 w-full sm:w-auto flex-shrink-0"
                   onClick={() => setIsTaskModalOpen(true)}
+                  data-tour="create-task"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   <span className="hidden sm:inline">Tambah Task</span>
@@ -1475,7 +1557,7 @@ export default function DailyFocusPage() {
                               <div className="flex items-center gap-2">
                                 <AlertTriangle className="h-4 w-4 text-red-600" />
                                 <div>
-                                  <Link href={`/tasks/${task.id}`} className="font-medium text-red-900 hover:text-red-600 hover:underline cursor-pointer">
+                                  <Link href={`/tasks/${task.id}`} className="font-medium text-red-900 hover:text-red-600 hover:underline cursor-pointer" data-tour="task-details">
                                     {task.title}
                                   </Link>
 
@@ -3153,6 +3235,67 @@ export default function DailyFocusPage() {
         initiativeId=""
         isAdding={!selectedTask}
       />
+      
+      {/* Guided Tour */}
+      <Joyride
+        steps={tourSteps}
+        run={runTour}
+        stepIndex={tourStepIndex}
+        callback={handleTourCallback}
+        continuous
+        showProgress
+        showSkipButton
+        disableOverlayClose
+        styles={{
+          options: {
+            primaryColor: '#ea580c',
+            textColor: '#374151',
+            backgroundColor: '#ffffff',
+            overlayColor: 'rgba(0, 0, 0, 0.5)',
+          },
+          tooltip: {
+            fontSize: 14,
+            padding: 16,
+          },
+          buttonNext: {
+            backgroundColor: '#ea580c',
+            color: '#ffffff',
+            fontSize: 14,
+            padding: '8px 16px',
+            borderRadius: '6px',
+          },
+          buttonBack: {
+            color: '#6b7280',
+            fontSize: 14,
+            padding: '8px 16px',
+          },
+          buttonSkip: {
+            color: '#6b7280',
+            fontSize: 14,
+            padding: '8px 16px',
+          },
+        }}
+        locale={{
+          back: 'Kembali',
+          close: 'Tutup',
+          last: 'Selesai',
+          next: 'Lanjut',
+          skip: 'Lewati',
+          open: 'Buka dialog',
+        }}
+      />
+      
+      {/* Tour Restart Button */}
+      <div className="fixed bottom-4 right-4 z-50">
+        <Button
+          onClick={() => setRunTour(true)}
+          className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white shadow-lg"
+          size="sm"
+        >
+          <HelpCircle className="w-4 h-4 mr-2" />
+          Bantuan
+        </Button>
+      </div>
     </div>
   );
 }
