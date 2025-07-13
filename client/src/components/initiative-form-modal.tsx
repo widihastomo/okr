@@ -446,8 +446,15 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                           onValueChange={field.onChange}
                           placeholder="Pilih angka target"
                           objectiveId={objectiveId}
+                          disabled={!!keyResultId}
                         />
                       </FormControl>
+                      <FormDescription>
+                        {keyResultId 
+                          ? "Angka target sudah dipilih sesuai dengan konteks halaman"
+                          : "Pilih angka target yang akan didukung oleh inisiatif ini"
+                        }
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}

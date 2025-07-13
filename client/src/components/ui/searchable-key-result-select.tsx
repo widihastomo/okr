@@ -14,6 +14,7 @@ interface SearchableKeyResultSelectProps {
   placeholder?: string;
   className?: string;
   objectiveId?: string; // Filter key results by objective
+  disabled?: boolean; // Disable the component when key result is pre-selected
 }
 
 export function SearchableKeyResultSelect({
@@ -22,7 +23,8 @@ export function SearchableKeyResultSelect({
   onValueChange,
   placeholder = "Pilih angka target",
   className,
-  objectiveId
+  objectiveId,
+  disabled = false
 }: SearchableKeyResultSelectProps) {
   const [open, setOpen] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -36,15 +38,27 @@ export function SearchableKeyResultSelect({
   const selectedKeyResult = filteredKeyResults.find(kr => kr.id === value);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={!disabled ? setOpen : undefined}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn("w-full justify-between", className)}
+          disabled={disabled}
+          className={cn(
+            "w-full justify-between",
+            disabled && "opacity-50 cursor-not-allowed",
+            className
+          )}
         >
-          {selectedKeyResult ? selectedKeyResult.title : placeholder}
+          {selectedKeyResult ? (
+            <div className="flex items-center gap-2">
+              <span>{selectedKeyResult.title}</span>
+              {disabled && <span className="text-xs text-gray-500">(otomatis dipilih)</span>}
+            </div>
+          ) : (
+            placeholder
+          )}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>

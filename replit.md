@@ -282,6 +282,13 @@ All email configuration now uses environment variables:
   * IMPROVED: Consistent form behavior between key-result-detail and other pages
   * RESOLVED: Form inconsistency issue between add and edit initiative from key result detail
   * RESULT: Initiative forms now display correctly with consistent UI and functionality
+- July 13, 2025. Successfully implemented disabled key result field when adding initiative from key result detail page:
+  * ADDED: Disabled prop to SearchableKeyResultSelect component for context-aware form behavior
+  * ENHANCED: Field automatically disabled when keyResultId is provided (from key result detail page)
+  * IMPROVED: Visual indicator "(otomatis dipilih)" shown when field is disabled
+  * ADDED: Contextual FormDescription that changes based on whether field is disabled
+  * PREVENTED: User confusion by pre-selecting and disabling key result field in appropriate contexts
+  * RESULT: Initiative form now provides clear UX when adding from key result detail page
 - July 13, 2025. Successfully fixed initiative status system and disabled initiative field for tasks from initiative detail:
   * FIXED: Initiative creation now properly uses "draft" status instead of "not_started" (matching database schema)
   * CORRECTED: Server-side POST /api/initiatives endpoint now sets default status to "draft" 
