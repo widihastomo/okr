@@ -254,6 +254,9 @@ All email configuration now uses environment variables:
   * REQUIRED: Made startDate and dueDate mandatory fields in initiative form with proper validation
   * ADDED: Default values for new initiatives - startDate: today, dueDate: 30 days from today
   * IMPROVED: Form validation with clear error messages for required date fields
+  * REQUIRED: Made "Penanggung Jawab" (responsible person) mandatory field with proper validation
+  * ENHANCED: Current user automatically selected as default responsible person for new initiatives
+  * ALLOWED: Back dating for start date - removed restriction preventing past dates selection
   * ADDED: MilestoneBar component with 3 stages: Perencanaan (Planning), Eksekusi (Execution), Selesai (Completed)
   * IMPLEMENTED: Smart milestone detection based on initiative status and task progress
   * ENHANCED: Visual progress line with orange color scheme and smooth transitions

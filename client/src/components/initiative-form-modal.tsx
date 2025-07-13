@@ -27,6 +27,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 import { SearchableKeyResultSelect } from "@/components/ui/searchable-key-result-select";
 import { formatNumberWithSeparator, handleNumberInputChange, getNumberValueForSubmission } from "@/lib/number-utils";
+import { useAuth } from "@/hooks/useAuth";
 import type { KeyResult, User, Initiative } from "@shared/schema";
 
 // Form schema matching the actual Initiative database schema
@@ -34,7 +35,7 @@ const initiativeFormSchema = z.object({
   title: z.string().min(1, "Judul inisiatif wajib diisi"),
   description: z.string().optional(),
   keyResultId: z.string().min(1, "Angka target wajib dipilih"),
-  picId: z.string().optional(),
+  picId: z.string().min(1, "Penanggung jawab wajib dipilih"),
   startDate: z.date({
     required_error: "Tanggal mulai wajib diisi",
     invalid_type_error: "Tanggal mulai harus berupa tanggal yang valid"
@@ -71,8 +72,12 @@ interface InitiativeFormModalProps {
 export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyResultId, initiative, objectiveId }: InitiativeFormModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   
   const isEditMode = !!initiative;
+  
+  // Get current user ID for default assignment
+  const currentUserId = user && typeof user === 'object' && 'id' in user ? (user as any).id : null;
 
   // Helper function to get score labels
   const getScoreLabel = (score: number, type: 'impact' | 'effort' | 'confidence'): string => {
@@ -172,7 +177,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
       title: "",
       description: "",
       keyResultId: keyResultId || "",
-      picId: "",
+      picId: currentUserId || "",
       startDate: new Date(),
       dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
       priority: "medium",
@@ -205,7 +210,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
         title: "",
         description: "",
         keyResultId: keyResultId || "",
-        picId: "",
+        picId: currentUserId || "",
         startDate: new Date(),
         dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
         priority: "medium",
@@ -215,7 +220,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
         confidenceScore: 5,
       });
     }
-  }, [isEditMode, initiative, keyResultId, form]);
+  }, [isEditMode, initiative, keyResultId, currentUserId, form]);
 
   const createInitiativeMutation = useMutation({
     mutationFn: async (data: InitiativeFormData) => {
@@ -430,7 +435,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-2">
-                        Penanggung Jawab
+                        Penanggung Jawab*
                         <Popover>
                           <PopoverTrigger asChild>
                             <button 
@@ -494,9 +499,8 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                               selected={field.value}
                               onSelect={field.onChange}
                               disabled={(date) => {
-                                const today = new Date();
-                                today.setHours(0, 0, 0, 0); // Reset time to start of day
-                                return date < today || date < new Date("1900-01-01");
+                                // Allow back dating for start date, only prevent very old dates
+                                return date < new Date("1900-01-01");
                               }}
                               initialFocus
                             />
