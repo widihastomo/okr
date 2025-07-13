@@ -107,11 +107,11 @@ export default function TaskModal({
       dueDate: null,
       initiativeId: initiativeId || "",
     });
-    
+
     // Close popovers
     setInitiativePopoverOpen(false);
     setStatusPopoverOpen(false);
-    
+
     // Call parent close handler
     onClose();
   };
@@ -176,8 +176,8 @@ export default function TaskModal({
   const initiativeMembers = initiativeData.members || [];
 
   // Show only active users for task assignment
-  const availableUsers = Array.isArray(usersData) 
-    ? usersData.filter((user: any) => user.isActive === true) 
+  const availableUsers = Array.isArray(usersData)
+    ? usersData.filter((user: any) => user.isActive === true)
     : [];
 
   useEffect(() => {
@@ -373,12 +373,13 @@ export default function TaskModal({
 
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    
+
     // Validate that PIC is assigned
     if (!formData.assignedTo || formData.assignedTo === "unassigned") {
       toast({
         title: "PIC harus diisi",
-        description: "Silakan pilih anggota tim yang akan bertanggung jawab atas task ini",
+        description:
+          "Silakan pilih anggota tim yang akan bertanggung jawab atas task ini",
         variant: "destructive",
       });
       return;
@@ -537,7 +538,11 @@ export default function TaskModal({
             <div>
               <Label className="flex items-center gap-2 mb-2">
                 Inisiatif Terkait {!initiativeId && "(opsional)"}
-                {initiativeId && <span className="text-xs text-gray-500">(otomatis dipilih)</span>}
+                {initiativeId && (
+                  <span className="text-xs text-gray-500">
+                    (otomatis dipilih)
+                  </span>
+                )}
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -552,96 +557,97 @@ export default function TaskModal({
                     <div className="space-y-2">
                       <h4 className="font-medium">Mengelompokkan Task</h4>
                       <p className="text-sm text-muted-foreground">
-                        {initiativeId 
+                        {initiativeId
                           ? "Task ini akan otomatis terkait dengan inisiatif yang sedang dipilih."
-                          : "Pilih initiative yang relevan untuk mengelompokkan task ini. Ini membantu dalam pelaporan progress dan koordinasi tim."
-                        }
+                          : "Pilih initiative yang relevan untuk mengelompokkan task ini. Ini membantu dalam pelaporan progress dan koordinasi tim."}
                       </p>
                     </div>
                   </PopoverContent>
                 </Popover>
               </Label>
-            <Popover
-              open={initiativePopoverOpen}
-              onOpenChange={setInitiativePopoverOpen}
-            >
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={initiativePopoverOpen}
-                  disabled={!!initiativeId} // Disable when initiativeId is provided
-                  className="w-full justify-between focus:ring-orange-500 focus:border-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {formData.initiativeId
-                    ? formData.initiativeId === "unassigned"
-                      ? "Tanpa Initiative"
-                      : initiativesData?.find(
-                            (initiative: any) =>
-                              initiative.id === formData.initiativeId,
-                          )
-                        ? initiativesData?.find(
-                            (initiative: any) =>
-                              initiative.id === formData.initiativeId,
-                          )?.title
-                        : "Pilih initiative..."
-                    : "Pilih initiative..."}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-full p-0">
-                <Command>
-                  <CommandInput placeholder="Cari initiative..." />
-                  <CommandList>
-                    <CommandEmpty>Tidak ada initiative ditemukan.</CommandEmpty>
-                    <CommandGroup>
-                      <CommandItem
-                        value="unassigned"
-                        onSelect={() => {
-                          setFormData({
-                            ...formData,
-                            initiativeId: "unassigned",
-                          });
-                          setInitiativePopoverOpen(false);
-                        }}
-                      >
-                        <Check
-                          className={`mr-2 h-4 w-4 ${
-                            formData.initiativeId === "unassigned"
-                              ? "opacity-100"
-                              : "opacity-0"
-                          }`}
-                        />
-                        Tanpa Initiative
-                      </CommandItem>
-                      {initiativesData?.map((initiative: any) => (
+              <Popover
+                open={initiativePopoverOpen}
+                onOpenChange={setInitiativePopoverOpen}
+              >
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={initiativePopoverOpen}
+                    disabled={!!initiativeId} // Disable when initiativeId is provided
+                    className="w-full justify-between focus:ring-orange-500 focus:border-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {formData.initiativeId
+                      ? formData.initiativeId === "unassigned"
+                        ? "Tanpa Initiative"
+                        : initiativesData?.find(
+                              (initiative: any) =>
+                                initiative.id === formData.initiativeId,
+                            )
+                          ? initiativesData?.find(
+                              (initiative: any) =>
+                                initiative.id === formData.initiativeId,
+                            )?.title
+                          : "Pilih initiative..."
+                      : "Pilih initiative..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0">
+                  <Command>
+                    <CommandInput placeholder="Cari initiative..." />
+                    <CommandList>
+                      <CommandEmpty>
+                        Tidak ada initiative ditemukan.
+                      </CommandEmpty>
+                      <CommandGroup>
                         <CommandItem
-                          key={initiative.id}
-                          value={initiative.title}
+                          value="unassigned"
                           onSelect={() => {
                             setFormData({
                               ...formData,
-                              initiativeId: initiative.id,
+                              initiativeId: "unassigned",
                             });
                             setInitiativePopoverOpen(false);
                           }}
                         >
                           <Check
                             className={`mr-2 h-4 w-4 ${
-                              formData.initiativeId === initiative.id
+                              formData.initiativeId === "unassigned"
                                 ? "opacity-100"
                                 : "opacity-0"
                             }`}
                           />
-                          {initiative.title}
+                          Tanpa Initiative
                         </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-          </div>
+                        {initiativesData?.map((initiative: any) => (
+                          <CommandItem
+                            key={initiative.id}
+                            value={initiative.title}
+                            onSelect={() => {
+                              setFormData({
+                                ...formData,
+                                initiativeId: initiative.id,
+                              });
+                              setInitiativePopoverOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={`mr-2 h-4 w-4 ${
+                                formData.initiativeId === initiative.id
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              }`}
+                            />
+                            {initiative.title}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
@@ -672,157 +678,163 @@ export default function TaskModal({
                     </PopoverContent>
                   </Popover>
                 </Label>
-              <Select
-                value={formData.priority}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, priority: value })
-                }
-              >
-                <SelectTrigger
-                  id="priority"
-                  className="focus:ring-orange-500 focus:border-orange-500"
+                <Select
+                  value={formData.priority}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, priority: value })
+                  }
                 >
-                  <SelectValue placeholder="Pilih tingkat prioritas" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      Rendah
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="medium">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                      Sedang
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="high">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                      Tinggi
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label
-                htmlFor="status"
-                className="text-sm font-medium mb-2 block"
-              >
-                Status
-              </Label>
-              <Popover
-                open={statusPopoverOpen}
-                onOpenChange={setStatusPopoverOpen}
-              >
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={statusPopoverOpen}
-                    className="w-full justify-between focus:ring-orange-500 focus:border-orange-500"
+                  <SelectTrigger
+                    id="priority"
+                    className="focus:ring-orange-500 focus:border-orange-500"
                   >
-                    {getStatusDisplay(formData.status)}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
-                  <Command>
-                    <CommandInput placeholder="Cari status..." />
-                    <CommandList>
-                      <CommandEmpty>Tidak ada status ditemukan.</CommandEmpty>
-                      <CommandGroup>
-                        <CommandItem
-                          value="not_started"
-                          onSelect={() => {
-                            setFormData({ ...formData, status: "not_started" });
-                            setStatusPopoverOpen(false);
-                          }}
-                        >
-                          <Check
-                            className={`mr-2 h-4 w-4 ${
-                              formData.status === "not_started"
-                                ? "opacity-100"
-                                : "opacity-0"
-                            }`}
-                          />
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                            Belum Mulai
-                          </div>
-                        </CommandItem>
-                        <CommandItem
-                          value="in_progress"
-                          onSelect={() => {
-                            setFormData({ ...formData, status: "in_progress" });
-                            setStatusPopoverOpen(false);
-                          }}
-                        >
-                          <Check
-                            className={`mr-2 h-4 w-4 ${
-                              formData.status === "in_progress"
-                                ? "opacity-100"
-                                : "opacity-0"
-                            }`}
-                          />
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                            Sedang Berjalan
-                          </div>
-                        </CommandItem>
-                        <CommandItem
-                          value="completed"
-                          onSelect={() => {
-                            setFormData({ ...formData, status: "completed" });
-                            setStatusPopoverOpen(false);
-                          }}
-                        >
-                          <Check
-                            className={`mr-2 h-4 w-4 ${
-                              formData.status === "completed"
-                                ? "opacity-100"
-                                : "opacity-0"
-                            }`}
-                          />
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            Selesai
-                          </div>
-                        </CommandItem>
-                        <CommandItem
-                          value="cancelled"
-                          onSelect={() => {
-                            setFormData({ ...formData, status: "cancelled" });
-                            setStatusPopoverOpen(false);
-                          }}
-                        >
-                          <Check
-                            className={`mr-2 h-4 w-4 ${
-                              formData.status === "cancelled"
-                                ? "opacity-100"
-                                : "opacity-0"
-                            }`}
-                          />
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                            Dibatalkan
-                          </div>
-                        </CommandItem>
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
+                    <SelectValue placeholder="Pilih tingkat prioritas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Rendah
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="medium">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                        Sedang
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="high">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                        Tinggi
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label
+                  htmlFor="status"
+                  className="text-sm font-medium mb-2 block"
+                >
+                  Status
+                </Label>
+                <Popover
+                  open={statusPopoverOpen}
+                  onOpenChange={setStatusPopoverOpen}
+                >
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={statusPopoverOpen}
+                      className="w-full justify-between focus:ring-orange-500 focus:border-orange-500"
+                    >
+                      {getStatusDisplay(formData.status)}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0">
+                    <Command>
+                      <CommandInput placeholder="Cari status..." />
+                      <CommandList>
+                        <CommandEmpty>Tidak ada status ditemukan.</CommandEmpty>
+                        <CommandGroup>
+                          <CommandItem
+                            value="not_started"
+                            onSelect={() => {
+                              setFormData({
+                                ...formData,
+                                status: "not_started",
+                              });
+                              setStatusPopoverOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={`mr-2 h-4 w-4 ${
+                                formData.status === "not_started"
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              }`}
+                            />
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                              Belum Mulai
+                            </div>
+                          </CommandItem>
+                          <CommandItem
+                            value="in_progress"
+                            onSelect={() => {
+                              setFormData({
+                                ...formData,
+                                status: "in_progress",
+                              });
+                              setStatusPopoverOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={`mr-2 h-4 w-4 ${
+                                formData.status === "in_progress"
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              }`}
+                            />
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                              Sedang Berjalan
+                            </div>
+                          </CommandItem>
+                          <CommandItem
+                            value="completed"
+                            onSelect={() => {
+                              setFormData({ ...formData, status: "completed" });
+                              setStatusPopoverOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={`mr-2 h-4 w-4 ${
+                                formData.status === "completed"
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              }`}
+                            />
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                              Selesai
+                            </div>
+                          </CommandItem>
+                          <CommandItem
+                            value="cancelled"
+                            onSelect={() => {
+                              setFormData({ ...formData, status: "cancelled" });
+                              setStatusPopoverOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={`mr-2 h-4 w-4 ${
+                                formData.status === "cancelled"
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              }`}
+                            />
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                              Dibatalkan
+                            </div>
+                          </CommandItem>
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
-          </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <Label className="flex items-center gap-2 mb-2">
-                  PIC <span className="text-red-500">*</span>
+                  PIC *
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -838,23 +850,31 @@ export default function TaskModal({
                         <h4 className="font-medium">Menentukan PIC (Wajib)</h4>
                         <p className="text-sm text-muted-foreground">
                           Pilih anggota tim yang akan bertanggung jawab
-                          menyelesaikan task ini. PIC akan menerima notifikasi dan
-                          bertanggung jawab atas progress task. Field ini wajib diisi.
+                          menyelesaikan task ini. PIC akan menerima notifikasi
+                          dan bertanggung jawab atas progress task. Field ini
+                          wajib diisi.
                         </p>
                       </div>
                     </PopoverContent>
                   </Popover>
                 </Label>
-              <SearchableUserSelect
-                users={availableUsers?.filter(user => user.isActive === true) || []}
-                value={formData.assignedTo === "unassigned" ? "" : formData.assignedTo}
-                onValueChange={(value) => {
-                  setFormData({ ...formData, assignedTo: value || "" });
-                }}
-                placeholder="Pilih anggota tim... (wajib)"
-                emptyMessage="Tidak ada anggota tim ditemukan"
-                allowUnassigned={false}
-              />
+                <SearchableUserSelect
+                  users={
+                    availableUsers?.filter((user) => user.isActive === true) ||
+                    []
+                  }
+                  value={
+                    formData.assignedTo === "unassigned"
+                      ? ""
+                      : formData.assignedTo
+                  }
+                  onValueChange={(value) => {
+                    setFormData({ ...formData, assignedTo: value || "" });
+                  }}
+                  placeholder="Pilih anggota tim... (wajib)"
+                  emptyMessage="Tidak ada anggota tim ditemukan"
+                  allowUnassigned={false}
+                />
               </div>
 
               <div>
@@ -875,8 +895,8 @@ export default function TaskModal({
                         <h4 className="font-medium">Menentukan Deadline</h4>
                         <p className="text-sm text-muted-foreground">
                           Pilih tanggal yang realistis untuk menyelesaikan task
-                          ini. Pertimbangkan kompleksitas task, workload PIC, dan
-                          dependencies lainnya.
+                          ini. Pertimbangkan kompleksitas task, workload PIC,
+                          dan dependencies lainnya.
                         </p>
                       </div>
                     </PopoverContent>
@@ -928,18 +948,27 @@ export default function TaskModal({
                 </Popover>
               </div>
             </div>
-        </CardContent>
+          </CardContent>
         </Card>
 
         <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
           <Button
             onClick={handleSubmit}
-            disabled={createMutation.isPending || updateMutation.isPending || !formData.assignedTo || formData.assignedTo === "unassigned"}
+            disabled={
+              createMutation.isPending ||
+              updateMutation.isPending ||
+              !formData.assignedTo ||
+              formData.assignedTo === "unassigned"
+            }
             className="w-full sm:w-auto bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white order-1 sm:order-2"
           >
             {isAdding ? "Tambah Task" : "Update Task"}
           </Button>
-          <Button variant="outline" onClick={onClose} className="w-full sm:w-auto order-2 sm:order-1">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="w-full sm:w-auto order-2 sm:order-1"
+          >
             Batal
           </Button>
         </DialogFooter>

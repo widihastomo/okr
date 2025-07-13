@@ -230,21 +230,29 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                                  priorityScore >= 3.0 ? 'high' : 
                                  priorityScore >= 2.0 ? 'medium' : 'low';
 
-      const payload = {
+      const basePayload = {
         ...data,
         budget: data.budget ? getNumberValueForSubmission(data.budget) : null,
         startDate: data.startDate ? new Date(data.startDate) : null,
         dueDate: data.dueDate ? new Date(data.dueDate) : null,
-        status: "draft", // Auto-set status to draft for new initiatives
         priority: calculatedPriority, // Use calculated priority instead of manual selection
         priorityScore: priorityScore.toString(), // Store the calculated score as string
-        createdBy: "550e8400-e29b-41d4-a716-446655440001", // Current user ID
       };
 
       if (isEditMode) {
-        return await apiRequest("PUT", `/api/initiatives/${initiative.id}`, payload);
+        // For updates, don't send createdBy or status
+        console.log('Updating initiative with payload:', basePayload);
+        console.log('Initiative ID:', initiative.id);
+        return await apiRequest("PUT", `/api/initiatives/${initiative.id}`, basePayload);
       } else {
-        return await apiRequest("POST", "/api/initiatives", payload);
+        // For new initiatives, include createdBy and status
+        const createPayload = {
+          ...basePayload,
+          status: "draft", // Auto-set status to draft for new initiatives
+          createdBy: currentUserId, // Current user ID
+        };
+        console.log('Creating initiative with payload:', createPayload);
+        return await apiRequest("POST", "/api/initiatives", createPayload);
       }
     },
     onSuccess: () => {
@@ -259,6 +267,14 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
       queryClient.invalidateQueries({ queryKey: ["/api/initiative-members"] });
       queryClient.invalidateQueries({ queryKey: ["/api/initiatives/objective"] });
       queryClient.invalidateQueries({ queryKey: ["/api/goals"] });
+      
+      // Invalidate specific initiative if updating
+      if (isEditMode && initiative?.id) {
+        queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}/tasks`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}/success-metrics`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}/notes`] });
+      }
       
       // Also invalidate specific objective queries if keyResultId is provided
       if (keyResultId) {
@@ -285,9 +301,18 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
       form.reset();
     },
     onError: (error: any) => {
+      console.error('Initiative mutation error:', error);
+      console.error('Error details:', {
+        message: error.message,
+        status: error.status,
+        response: error.response,
+        isEditMode,
+        initiativeId: initiative?.id,
+        currentUserId
+      });
       toast({
-        title: "Terjadi kesalahan",
-        description: error.message || "Gagal menyimpan inisiatif",
+        title: isEditMode ? "Gagal mengupdate inisiatif" : "Gagal membuat inisiatif",
+        description: error.message || "Terjadi kesalahan saat memproses inisiatif",
         variant: "destructive",
       });
     },
