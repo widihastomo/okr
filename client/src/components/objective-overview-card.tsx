@@ -103,8 +103,8 @@ export default function ObjectiveOverviewCard({
   };
 
   // Calculate statistics
-  const totalKeyResults = objective.keyResults.length;
-  const completedKeyResults = objective.keyResults.filter((kr) => {
+  const totalKeyResults = objective?.keyResults?.length || 0;
+  const completedKeyResults = objective?.keyResults?.filter((kr) => {
     const result = calculateKeyResultProgress(
       kr.currentValue,
       kr.targetValue,
@@ -112,17 +112,17 @@ export default function ObjectiveOverviewCard({
       kr.baseValue,
     );
     return result.progressPercentage >= 100;
-  }).length;
+  }).length || 0;
 
-  const totalInitiatives = initiatives.length;
-  const completedInitiatives = initiatives.filter(
+  const totalInitiatives = initiatives?.length || 0;
+  const completedInitiatives = initiatives?.filter(
     (i) => i.status === "completed",
-  ).length;
+  ).length || 0;
 
-  const totalTasks = tasks.length;
-  const completedTasks = tasks.filter((t) => t.status === "completed").length;
+  const totalTasks = tasks?.length || 0;
+  const completedTasks = tasks?.filter((t) => t.status === "completed").length || 0;
 
-  const overallProgress = calculateOverallProgress(objective.keyResults);
+  const overallProgress = calculateOverallProgress(objective?.keyResults || []);
 
   // Visual indicators for icon styling based on progress
   const getHealthColor = (progress: number) => {
