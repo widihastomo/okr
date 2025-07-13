@@ -124,6 +124,22 @@ const getTaskPriorityColor = (priority: string): string => {
   }
 };
 
+// Helper function to calculate progress stats
+const calculateProgressStats = (tasks: any[]) => {
+  const completedTasks = tasks.filter(task => task.status === 'completed').length;
+  const totalTasks = tasks.length;
+  const percentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+  
+  return {
+    completed: completedTasks,
+    total: totalTasks,
+    percentage,
+    notStarted: tasks.filter(task => task.status === 'not_started').length,
+    inProgress: tasks.filter(task => task.status === 'in_progress').length,
+    cancelled: tasks.filter(task => task.status === 'cancelled').length
+  };
+};
+
 // Milestone Component
 const MilestoneBar = ({ initiative, tasks }: { initiative: any; tasks: any[] }) => {
   // Determine current milestone based on initiative status and task progress
@@ -646,6 +662,36 @@ export default function InitiativeDetailPage() {
                       </div>
                     </div>
                   </div>
+
+                  {/* Initiative Progress Bar */}
+                  {(() => {
+                    const progressStats = calculateProgressStats(tasks || []);
+                    return (
+                      <div className="pt-4 border-t border-gray-100">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <Target className="h-4 w-4 text-orange-500" />
+                            <span className="text-sm font-medium text-gray-700">Progress Inisiatif</span>
+                          </div>
+                          <span className="text-sm text-gray-600">
+                            {progressStats.completed}/{progressStats.total} task selesai ({progressStats.percentage}%)
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div 
+                            className="bg-gradient-to-r from-orange-600 to-orange-500 h-2 rounded-full transition-all duration-500 ease-in-out"
+                            style={{ width: `${progressStats.percentage}%` }}
+                          />
+                        </div>
+                        <div className="flex justify-between text-xs text-gray-500 mt-1">
+                          <span>Belum Mulai: {progressStats.notStarted}</span>
+                          <span>Sedang Berjalan: {progressStats.inProgress}</span>
+                          <span>Selesai: {progressStats.completed}</span>
+                          <span>Dibatalkan: {progressStats.cancelled}</span>
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   {/* Key Result Information */}
                   {keyResult && (
