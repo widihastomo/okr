@@ -2301,11 +2301,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Alias for goals endpoint (compatibility)
+  app.patch("/api/goals/:id", requireAuth, async (req, res) => {
+    try {
+      const id = req.params.id;
+      const currentUser = req.user as User;
+      
+      console.log("Update goal request:", {
+        id,
+        userId: currentUser.id,
+        body: JSON.stringify(req.body, null, 2)
+      });
+      
+      // Check if payload has "objective" wrapper (from edit-objective-modal)
+      let updateData;
+      if (req.body.objective) {
+        updateData = insertObjectiveSchema.partial().parse(req.body.objective);
+      } else {
+        updateData = insertObjectiveSchema.partial().parse(req.body);
+      }
+      
+      // Add UPDATE audit trail fields
+      const updatedData = {
+        ...updateData,
+        updatedAt: new Date(),
+        lastUpdateBy: currentUser.id
+      };
+      
+      console.log("Processed goal update data:", JSON.stringify(updatedData, null, 2));
+      
+      const updated = await storage.updateObjective(id, updatedData);
+      if (!updated) {
+        console.log("Goal not found for update:", id);
+        return res.status(404).json({ message: "Goal not found" });
+      }
+      
+      console.log("Goal updated successfully:", updated.id);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating goal:", error);
+      if (error instanceof z.ZodError) {
+        console.error("Goal validation errors:", error.errors);
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update goal" });
+    }
+  });
+
   // Update objective
   app.patch("/api/objectives/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
       const currentUser = req.user as User;
+      
+      console.log("Update objective request:", {
+        id,
+        userId: currentUser.id,
+        body: JSON.stringify(req.body, null, 2)
+      });
+      
       const updateData = insertObjectiveSchema.partial().parse(req.body);
       
       // Add UPDATE audit trail fields
@@ -2315,14 +2369,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lastUpdateBy: currentUser.id
       };
       
+      console.log("Processed update data:", JSON.stringify(updatedData, null, 2));
+      
       const updated = await storage.updateObjective(id, updatedData);
       if (!updated) {
+        console.log("Objective not found for update:", id);
         return res.status(404).json({ message: "Objective not found" });
       }
       
+      console.log("Objective updated successfully:", updated.id);
       res.json(updated);
     } catch (error) {
+      console.error("Error updating objective:", error);
       if (error instanceof z.ZodError) {
+        console.error("Validation errors:", error.errors);
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
       res.status(500).json({ message: "Failed to update objective" });
