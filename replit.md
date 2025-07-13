@@ -251,6 +251,9 @@ All email configuration now uses environment variables:
   * CORRECTED: Initiatives now have startDate set to cycleStartDate and dueDate set to cycleEndDate from onboarding data
   * RESOLVED: Initiative date consistency issue where dates didn't match selected cycle duration
   * ENHANCED: Console logging to show proper date assignment for initiatives created during onboarding
+  * REQUIRED: Made startDate and dueDate mandatory fields in initiative form with proper validation
+  * ADDED: Default values for new initiatives - startDate: today, dueDate: 30 days from today
+  * IMPROVED: Form validation with clear error messages for required date fields
   * ADDED: MilestoneBar component with 3 stages: Perencanaan (Planning), Eksekusi (Execution), Selesai (Completed)
   * IMPLEMENTED: Smart milestone detection based on initiative status and task progress
   * ENHANCED: Visual progress line with orange color scheme and smooth transitions

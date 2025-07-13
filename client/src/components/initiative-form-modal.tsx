@@ -35,8 +35,14 @@ const initiativeFormSchema = z.object({
   description: z.string().optional(),
   keyResultId: z.string().min(1, "Angka target wajib dipilih"),
   picId: z.string().optional(),
-  startDate: z.date().optional(),
-  dueDate: z.date().optional(),
+  startDate: z.date({
+    required_error: "Tanggal mulai wajib diisi",
+    invalid_type_error: "Tanggal mulai harus berupa tanggal yang valid"
+  }),
+  dueDate: z.date({
+    required_error: "Tanggal selesai wajib diisi", 
+    invalid_type_error: "Tanggal selesai harus berupa tanggal yang valid"
+  }),
   priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
   budget: z.string().optional(),
   // Priority calculation inputs
@@ -45,10 +51,7 @@ const initiativeFormSchema = z.object({
   confidenceScore: z.number().min(1).max(5).default(3),
 }).refine((data) => {
   // Validate that start date is not greater than end date
-  if (data.startDate && data.dueDate) {
-    return data.startDate <= data.dueDate;
-  }
-  return true;
+  return data.startDate <= data.dueDate;
 }, {
   message: "Tanggal mulai tidak boleh lebih besar dari tanggal selesai",
   path: ["startDate"], // Show error on startDate field
@@ -170,8 +173,8 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
       description: "",
       keyResultId: keyResultId || "",
       picId: "",
-      startDate: undefined,
-      dueDate: undefined,
+      startDate: new Date(),
+      dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
       priority: "medium",
       budget: "",
       impactScore: 5,
@@ -203,8 +206,8 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
         description: "",
         keyResultId: keyResultId || "",
         picId: "",
-        startDate: undefined,
-        dueDate: undefined,
+        startDate: new Date(),
+        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
         priority: "medium",
         budget: "",
         impactScore: 5,
@@ -465,7 +468,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                     name="startDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tanggal Mulai</FormLabel>
+                        <FormLabel>Tanggal Mulai*</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>
@@ -510,7 +513,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                     name="dueDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tanggal Selesai</FormLabel>
+                        <FormLabel>Tanggal Selesai*</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>
