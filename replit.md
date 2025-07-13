@@ -263,6 +263,9 @@ All email configuration now uses environment variables:
   * ADDED: Mission UI with green completion state, orange pending state, and actionable buttons
   * INTEGRATED: Mission actions directly connected to add metric and add task functionality
   * STYLED: Responsive design with consistent orange theme and proper spacing
+  * UPDATED: MissionCard design to match existing patterns from daily-focus and objective-detail pages
+  * ENHANCED: Consistent dashed orange border, gradient background, expandable content with chevron icon
+  * IMPROVED: Rocket icon header, Sparkles accent, progress bar, and completion percentage display
   * VERIFIED: All components update automatically based on initiative and task status changes
 - July 13, 2025. Successfully implemented resend invitation functionality and removed redundant member invitation page:
   * ADDED: Resend invitation feature for users with pending status in user management
