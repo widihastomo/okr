@@ -212,10 +212,15 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
     enabled: isOpen && !!objectiveId,
   });
 
-  // Fetch cycle data for date validation
+  // Get current objective from the objectives array
+  const currentObjective = Array.isArray(objective) ? 
+    objective.find(obj => obj.id === objectiveId) : 
+    objective;
+
+  // Fetch cycle data for date validation using the current objective's cycleId
   const { data: cycle } = useQuery({
-    queryKey: ["/api/cycles", objective?.cycleId],
-    enabled: isOpen && !!objective?.cycleId,
+    queryKey: ["/api/cycles", currentObjective?.cycleId],
+    enabled: isOpen && !!currentObjective?.cycleId,
   });
 
   // Create form with dynamic schema based on cycle data
@@ -292,7 +297,23 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
       console.log('🔍 Objective data during submission:', objective);
       
       // Get cycle data from objective if cycle is null
-      const cycleData = cycle || (objective && objective.cycle) || null;
+      let cycleData = cycle;
+      if (!cycleData && currentObjective) {
+        // Try to get cycle data from the current objective
+        if (currentObjective.cycle) {
+          cycleData = currentObjective.cycle;
+        } else {
+          // Create cycle data structure from objective's cycle properties
+          cycleData = {
+            id: currentObjective.cycleId,
+            startDate: currentObjective.cycleStartDate,
+            endDate: currentObjective.cycleEndDate,
+            name: currentObjective.cycleName || 'Current Cycle',
+            type: currentObjective.cycleType || 'monthly',
+            status: currentObjective.cycleStatus || 'active'
+          };
+        }
+      }
       console.log('🔍 Final cycle data for validation:', cycleData);
       
       // Validate dates against cycle before submission
