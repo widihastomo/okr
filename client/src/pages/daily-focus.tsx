@@ -140,16 +140,16 @@ const iconMapping = {
 
 // Mission action functions
 const missionActions = {
-  addMember: () => window.location.href = "/client-users",
-  createTeam: () => window.location.href = "/teams", 
-  createObjective: () => window.location.href = "/",
-  addKeyResult: () => window.location.href = "/",
-  addInitiative: () => window.location.href = "/",
-  addTask: () => window.location.href = "/daily-focus",
-  updateKeyResult: () => window.location.href = "/",
-  updateMetrics: () => window.location.href = "/",
-  updateTaskStatus: () => window.location.href = "/daily-focus",
-  dailyUpdate: () => window.location.href = "/daily-focus",
+  addMember: () => (window.location.href = "/client-users"),
+  createTeam: () => (window.location.href = "/teams"),
+  createObjective: () => (window.location.href = "/"),
+  addKeyResult: () => (window.location.href = "/"),
+  addInitiative: () => (window.location.href = "/"),
+  addTask: () => (window.location.href = "/daily-focus"),
+  updateKeyResult: () => (window.location.href = "/"),
+  updateMetrics: () => (window.location.href = "/"),
+  updateTaskStatus: () => (window.location.href = "/daily-focus"),
+  dailyUpdate: () => (window.location.href = "/daily-focus"),
 };
 
 // Mission Card Component
@@ -166,15 +166,20 @@ interface MissionCardProps {
   className?: string;
 }
 
-function MissionCard({ missions, title, description, className }: MissionCardProps) {
-  const completedMissions = missions.filter(m => m.unlocked).length;
+function MissionCard({
+  missions,
+  title,
+  description,
+  className,
+}: MissionCardProps) {
+  const completedMissions = missions.filter((m) => m.unlocked).length;
   const totalMissions = missions.length;
   const [isExpanded, setIsExpanded] = useState(false);
-  
+
   return (
     <div className={className}>
       <Card className="border-2 border-dashed border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50 shadow-lg">
-        <CardHeader 
+        <CardHeader
           className="pb-3 cursor-pointer"
           onClick={() => setIsExpanded(!isExpanded)}
         >
@@ -186,14 +191,17 @@ function MissionCard({ missions, title, description, className }: MissionCardPro
               <CardTitle className="text-base font-bold text-orange-800 flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-yellow-500" />
                 {title}
-                <Badge variant="outline" className="text-xs bg-orange-100 text-orange-700 border-orange-300">
+                <Badge
+                  variant="outline"
+                  className="text-xs bg-orange-100 text-orange-700 border-orange-300"
+                >
                   {completedMissions}/{totalMissions}
                 </Badge>
               </CardTitle>
               <p className="text-sm text-orange-600 mt-1">{description}</p>
               <div className="flex items-center gap-3 mt-2">
-                <Progress 
-                  value={(completedMissions / totalMissions) * 100} 
+                <Progress
+                  value={(completedMissions / totalMissions) * 100}
                   className="h-1.5 bg-orange-100 flex-1"
                 />
                 <span className="text-xs text-orange-600 font-medium">
@@ -201,71 +209,101 @@ function MissionCard({ missions, title, description, className }: MissionCardPro
                 </span>
               </div>
             </div>
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="sm"
               className="text-orange-600 hover:bg-orange-100 p-1"
             >
-              {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+              {isExpanded ? (
+                <ChevronDown className="h-4 w-4" />
+              ) : (
+                <ChevronRight className="h-4 w-4" />
+              )}
             </Button>
           </div>
         </CardHeader>
-        
+
         {isExpanded && (
           <CardContent className="space-y-3 pt-0">
             {missions.map((mission, index) => {
               const IconComponent = iconMapping[mission.icon] || Target;
-              const missionKey = mission.name.includes("Tambah Pengguna") || mission.name.includes("Menambahkan Member") ? "addMember" :
-                                mission.name.includes("Buat Tim") || mission.name.includes("Membuat Tim") ? "createTeam" :
-                                mission.name.includes("Buat Objective") || mission.name.includes("Membuat Objective") ? "createObjective" :
-                                mission.name.includes("Tambah Key Result") || mission.name.includes("Menambahkan Key Result") ? "addKeyResult" :
-                                mission.name.includes("Buat Inisiatif") || mission.name.includes("Menambahkan Inisiatif") ? "addInitiative" :
-                                mission.name.includes("Tambah Task") || mission.name.includes("Menambahkan Task") ? "addTask" :
-                                mission.name.includes("Update Capaian Key Result") ? "updateKeyResult" :
-                                mission.name.includes("Update Capaian Metrik") ? "updateMetrics" :
-                                mission.name.includes("Update Status Task") ? "updateTaskStatus" :
-                                mission.name.includes("Update Harian") ? "dailyUpdate" :
-                                "addMember";
-              
+              const missionKey =
+                mission.name.includes("Tambah Pengguna") ||
+                mission.name.includes("Menambahkan Member")
+                  ? "addMember"
+                  : mission.name.includes("Buat Tim") ||
+                      mission.name.includes("Membuat Tim")
+                    ? "createTeam"
+                    : mission.name.includes("Buat Objective") ||
+                        mission.name.includes("Membuat Objective")
+                      ? "createObjective"
+                      : mission.name.includes("Tambah Key Result") ||
+                          mission.name.includes("Menambahkan Key Result")
+                        ? "addKeyResult"
+                        : mission.name.includes("Buat Inisiatif") ||
+                            mission.name.includes("Menambahkan Inisiatif")
+                          ? "addInitiative"
+                          : mission.name.includes("Tambah Task") ||
+                              mission.name.includes("Menambahkan Task")
+                            ? "addTask"
+                            : mission.name.includes("Update Capaian Key Result")
+                              ? "updateKeyResult"
+                              : mission.name.includes("Update Capaian Metrik")
+                                ? "updateMetrics"
+                                : mission.name.includes("Update Status Task")
+                                  ? "updateTaskStatus"
+                                  : mission.name.includes("Update Harian")
+                                    ? "dailyUpdate"
+                                    : "addMember";
+
               return (
                 <div
                   key={mission.id}
                   className={`p-3 rounded-lg border transition-all duration-200 hover:shadow-sm ${
-                    mission.unlocked 
-                      ? "bg-green-50 border-green-200 opacity-75" 
+                    mission.unlocked
+                      ? "bg-green-50 border-green-200 opacity-75"
                       : "bg-white border-orange-200 hover:border-orange-300"
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`p-1.5 rounded-full flex-shrink-0 ${
-                      mission.unlocked 
-                        ? "bg-green-100 text-green-600" 
-                        : "bg-orange-100 text-orange-600"
-                    }`}>
+                    <div
+                      className={`p-1.5 rounded-full flex-shrink-0 ${
+                        mission.unlocked
+                          ? "bg-green-100 text-green-600"
+                          : "bg-orange-100 text-orange-600"
+                      }`}
+                    >
                       {mission.unlocked ? (
                         <CheckCircle2 className="h-4 w-4" />
                       ) : (
                         <IconComponent className="h-4 w-4" />
                       )}
                     </div>
-                    
+
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-xs font-bold text-orange-600 min-w-[20px]">
                           {index + 1}.
                         </span>
-                        <h4 className={`font-medium text-sm ${
-                          mission.unlocked ? "text-green-700 line-through" : "text-gray-800"
-                        }`}>
-                          {mission.name.replace(/🎯 Misi: |📊 Misi: |💡 Misi: |✅ Misi: |🔄 Misi: |📈 Misi: |⚡ Misi: |🎖️ Misi: /g, "")}
+                        <h4
+                          className={`font-medium text-sm ${
+                            mission.unlocked
+                              ? "text-green-700 line-through"
+                              : "text-gray-800"
+                          }`}
+                        >
+                          {mission.name.replace(
+                            /🎯 Misi: |📊 Misi: |💡 Misi: |✅ Misi: |🔄 Misi: |📈 Misi: |⚡ Misi: |🎖️ Misi: /g,
+                            "",
+                          )}
                         </h4>
                       </div>
                       <p className="text-xs text-gray-600 mb-2">
                         {mission.description}
                       </p>
                       {!mission.unlocked && (
-                        <Button 
-                          size="sm" 
+                        <Button
+                          size="sm"
                           className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white text-xs h-7"
                           onClick={() => missionActions[missionKey]()}
                         >
@@ -302,76 +340,79 @@ export default function DailyFocusPage() {
   const [taskToDelete, setTaskToDelete] = useState<any>(null);
   const [selectedTask, setSelectedTask] = useState<any>(null);
 
-  
   // Goal creation modal state
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
 
   // Tour state
   const [runTour, setRunTour] = useState(false);
   const [tourStepIndex, setTourStepIndex] = useState(0);
-  
 
-
-  
   // Tour steps configuration
   const tourSteps: Step[] = [
     {
       target: '[data-tour="overview-cards"]',
-      content: 'Ini adalah ringkasan aktivitas harian Anda. Lihat jumlah task hari ini, task terlambat, target aktif, dan level progress Anda.',
+      content:
+        "Ini adalah ringkasan aktivitas harian Anda. Lihat jumlah task hari ini, task terlambat, target aktif, dan level progress Anda.",
       disableBeacon: true,
-      placement: 'bottom'
+      placement: "bottom",
     },
     {
       target: '[data-tour="user-filter"]',
-      content: 'Gunakan filter ini untuk melihat task dan target berdasarkan anggota tim tertentu atau semua anggota.',
-      placement: 'bottom'
+      content:
+        "Gunakan filter ini untuk melihat task dan target berdasarkan anggota tim tertentu atau semua anggota.",
+      placement: "bottom",
     },
     {
       target: '[data-tour="progress-card"]',
-      content: 'Kartu progress menampilkan pencapaian hari ini dan motivasi. Klik untuk melihat detail lebih lanjut.',
-      placement: 'bottom'
+      content:
+        "Kartu progress menampilkan pencapaian hari ini dan motivasi. Klik untuk melihat detail lebih lanjut.",
+      placement: "bottom",
     },
     {
       target: '[data-tour="main-tabs"]',
-      content: 'Navigasi utama Daily Focus. Gunakan tab ini untuk beralih antara task hari ini, semua task, target, dan inisiatif.',
-      placement: 'bottom'
+      content:
+        "Navigasi utama Daily Focus. Gunakan tab ini untuk beralih antara task hari ini, semua task, target, dan inisiatif.",
+      placement: "bottom",
     },
     {
       target: '[data-tour="create-task"]',
-      content: 'Klik tombol ini untuk membuat task baru. Anda dapat menambahkan detail seperti judul, deskripsi, prioritas, dan deadline.',
-      placement: 'left'
+      content:
+        "Klik tombol ini untuk membuat task baru. Anda dapat menambahkan detail seperti judul, deskripsi, prioritas, dan deadline.",
+      placement: "left",
     },
     {
       target: '[data-tour="task-actions"]',
-      content: 'Setiap task memiliki tombol aksi untuk update status. Gunakan tombol ini untuk mengubah status task menjadi Sedang Berjalan, Selesai, atau Dibatalkan.',
-      placement: 'top'
+      content:
+        "Setiap task memiliki tombol aksi untuk update status. Gunakan tombol ini untuk mengubah status task menjadi Sedang Berjalan, Selesai, atau Dibatalkan.",
+      placement: "top",
     },
     {
       target: '[data-tour="task-details"]',
-      content: 'Klik pada task untuk melihat detail lengkap termasuk deskripsi, prioritas, deadline, dan opsi edit atau hapus.',
-      placement: 'top'
-    }
+      content:
+        "Klik pada task untuk melihat detail lengkap termasuk deskripsi, prioritas, deadline, dan opsi edit atau hapus.",
+      placement: "top",
+    },
   ];
-  
+
   // Tour callback handler
   const handleTourCallback = (data: CallBackProps) => {
     const { status, type, index } = data;
-    
+
     if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
       setRunTour(false);
       setTourStepIndex(0);
       // Store tour completion in localStorage
-      localStorage.setItem('dailyFocusTourCompleted', 'true');
+      localStorage.setItem("dailyFocusTourCompleted", "true");
     }
-    
-    if (type === 'step:after') {
+
+    if (type === "step:after") {
       setTourStepIndex(index + 1);
     }
   };
-  
+
   // Check if tour should run on mount
   useEffect(() => {
-    const tourCompleted = localStorage.getItem('dailyFocusTourCompleted');
+    const tourCompleted = localStorage.getItem("dailyFocusTourCompleted");
     if (!tourCompleted) {
       // Start tour after a short delay to ensure all elements are rendered
       setTimeout(() => {
@@ -379,19 +420,25 @@ export default function DailyFocusPage() {
       }, 1000);
     }
   }, []);
-  
+
   // Function to restart tour
   const restartTour = () => {
     setTourStepIndex(0);
     setRunTour(true);
   };
-  
+
   // Status update mutation
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const statusUpdateMutation = useMutation({
-    mutationFn: async ({ taskId, newStatus }: { taskId: string; newStatus: string }) => {
+    mutationFn: async ({
+      taskId,
+      newStatus,
+    }: {
+      taskId: string;
+      newStatus: string;
+    }) => {
       const response = await apiRequest("PATCH", `/api/tasks/${taskId}`, {
         status: newStatus,
       });
@@ -399,7 +446,9 @@ export default function DailyFocusPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
-      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
+      queryClient.invalidateQueries({
+        queryKey: [`/api/users/${userId}/tasks`],
+      });
       toast({
         title: "Status berhasil diupdate",
         description: "Status task telah diperbarui",
@@ -448,16 +497,17 @@ export default function DailyFocusPage() {
   const { data: users = [], isLoading: isLoadingUsers } = useQuery({
     queryKey: ["/api/users"],
   });
-  
+
   const { data: cycles = [], isLoading: isLoadingCycles } = useQuery({
     queryKey: ["/api/cycles"],
   });
 
   // Trial achievements query for missions
-  const { data: achievements = [], isLoading: isLoadingAchievements } = useQuery({
-    queryKey: ["/api/trial/achievements"],
-    enabled: !!userId,
-  });
+  const { data: achievements = [], isLoading: isLoadingAchievements } =
+    useQuery({
+      queryKey: ["/api/trial/achievements"],
+      enabled: !!userId,
+    });
 
   // Custom hook to get comment count for a specific task
   const useTaskCommentCount = (taskId: string) => {
@@ -472,11 +522,11 @@ export default function DailyFocusPage() {
   // Task Comment Count Component
   const TaskCommentCount = ({ taskId }: { taskId: string }) => {
     const commentCount = useTaskCommentCount(taskId);
-    
+
     if (commentCount === 0) {
       return null;
     }
-    
+
     return (
       <TooltipProvider>
         <Tooltip>
@@ -496,25 +546,70 @@ export default function DailyFocusPage() {
 
   // Specific 10-step sequential missions configuration
   const missionSequence = [
-    { name: "Menambahkan Member", icon: "UserPlus", description: "Tambahkan anggota baru ke tim Anda untuk memulai kolaborasi" },
-    { name: "Membuat Tim", icon: "Users", description: "Buat tim dengan struktur yang jelas untuk mengelola proyek" },
-    { name: "Membuat Objective", icon: "Target", description: "Definisikan tujuan utama yang ingin dicapai tim Anda" },
-    { name: "Menambahkan Key Result", icon: "BarChart3", description: "Tentukan indikator pencapaian yang dapat diukur secara kuantitatif" },
-    { name: "Menambahkan Inisiatif", icon: "Lightbulb", description: "Buat rencana aksi konkret untuk mencapai tujuan" },
-    { name: "Menambahkan Task", icon: "CheckSquare", description: "Breakdown inisiatif menjadi tugas-tugas yang dapat dikerjakan" },
-    { name: "Update Capaian Key Result", icon: "TrendingUp", description: "Pantau dan update progress pencapaian target angka" },
-    { name: "Update Capaian Metrik Inisiatif", icon: "LineChart", description: "Evaluasi kemajuan pelaksanaan inisiatif secara berkala" },
-    { name: "Update Status Task", icon: "CheckCircle2", description: "Pantau dan update status penyelesaian tugas harian" },
-    { name: "Update Harian Instan", icon: "Zap", description: "Lakukan review harian untuk memastikan kemajuan yang konsisten" },
+    {
+      name: "Menambahkan Member",
+      icon: "UserPlus",
+      description:
+        "Tambahkan anggota baru ke tim Anda untuk memulai kolaborasi",
+    },
+    {
+      name: "Membuat Tim",
+      icon: "Users",
+      description: "Buat tim dengan struktur yang jelas untuk mengelola proyek",
+    },
+    {
+      name: "Membuat Objective",
+      icon: "Target",
+      description: "Definisikan tujuan utama yang ingin dicapai tim Anda",
+    },
+    {
+      name: "Menambahkan Key Result",
+      icon: "BarChart3",
+      description:
+        "Tentukan indikator pencapaian yang dapat diukur secara kuantitatif",
+    },
+    {
+      name: "Menambahkan Inisiatif",
+      icon: "Lightbulb",
+      description: "Buat rencana aksi konkret untuk mencapai tujuan",
+    },
+    {
+      name: "Menambahkan Task",
+      icon: "CheckSquare",
+      description:
+        "Breakdown inisiatif menjadi tugas-tugas yang dapat dikerjakan",
+    },
+    {
+      name: "Update Capaian Key Result",
+      icon: "TrendingUp",
+      description: "Pantau dan update progress pencapaian target angka",
+    },
+    {
+      name: "Update Capaian Metrik Inisiatif",
+      icon: "LineChart",
+      description: "Evaluasi kemajuan pelaksanaan inisiatif secara berkala",
+    },
+    {
+      name: "Update Status Task",
+      icon: "CheckCircle2",
+      description: "Pantau dan update status penyelesaian tugas harian",
+    },
+    {
+      name: "Update Harian Instan",
+      icon: "Zap",
+      description:
+        "Lakukan review harian untuk memastikan kemajuan yang konsisten",
+    },
   ];
 
   // Transform achievements to match mission sequence order
   const orderlyMissions = missionSequence.map((mission, index) => {
-    const achievement = achievements.find(a => 
-      a.name.includes(mission.name) || 
-      a.description.includes(mission.name.toLowerCase())
+    const achievement = achievements.find(
+      (a) =>
+        a.name.includes(mission.name) ||
+        a.description.includes(mission.name.toLowerCase()),
     );
-    
+
     return {
       id: `mission-${index + 1}`,
       name: mission.name,
@@ -532,13 +627,15 @@ export default function DailyFocusPage() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
-      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
-      
+      queryClient.invalidateQueries({
+        queryKey: [`/api/users/${userId}/tasks`],
+      });
+
       // Force refetch to ensure data is updated
       setTimeout(() => {
         queryClient.refetchQueries({ queryKey: ["/api/tasks"] });
       }, 100);
-      
+
       toast({
         title: "Task berhasil dibuat",
         description: "Task baru telah ditambahkan",
@@ -564,7 +661,9 @@ export default function DailyFocusPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
-      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/tasks`] });
+      queryClient.invalidateQueries({
+        queryKey: [`/api/users/${userId}/tasks`],
+      });
       toast({
         title: "Task berhasil dihapus",
         description: "Task telah dihapus dari sistem",
@@ -580,15 +679,12 @@ export default function DailyFocusPage() {
     },
   });
 
-
-
   // Handle opening goal modal
   const handleOpenGoalModal = () => {
     setIsGoalModalOpen(true);
   };
 
   // Task action handlers
-
 
   const handleEditTask = (task: any) => {
     setSelectedTask(task);
@@ -608,14 +704,10 @@ export default function DailyFocusPage() {
     }
   };
 
-
-
   const { data: stats } = useQuery({
     queryKey: [`/api/gamification/stats/${userId}`],
     enabled: !!userId,
   });
-
-
 
   // Update task status mutation
   const updateTaskMutation = useMutation({
@@ -649,11 +741,14 @@ export default function DailyFocusPage() {
 
   // Get today's date info using GMT+7 timezone
   const today = new Date();
-  const utc = today.getTime() + (today.getTimezoneOffset() * 60000);
-  const gmt7Date = new Date(utc + (7 * 3600000)); // GMT+7
-  const todayStr = gmt7Date.getFullYear() + '-' + 
-    String(gmt7Date.getMonth() + 1).padStart(2, '0') + '-' + 
-    String(gmt7Date.getDate()).padStart(2, '0');
+  const utc = today.getTime() + today.getTimezoneOffset() * 60000;
+  const gmt7Date = new Date(utc + 7 * 3600000); // GMT+7
+  const todayStr =
+    gmt7Date.getFullYear() +
+    "-" +
+    String(gmt7Date.getMonth() + 1).padStart(2, "0") +
+    "-" +
+    String(gmt7Date.getDate()).padStart(2, "0");
 
   // Helper function for key result type icons
   const getKeyResultTypeIcon = (type: string) => {
@@ -661,22 +756,26 @@ export default function DailyFocusPage() {
       case "increase_to":
         return {
           icon: TrendingUp,
-          tooltip: "Target Peningkatan - Progress dihitung dari nilai awal ke target",
+          tooltip:
+            "Target Peningkatan - Progress dihitung dari nilai awal ke target",
         };
       case "decrease_to":
         return {
           icon: TrendingDown,
-          tooltip: "Target Penurunan - Progress dihitung mundur dari nilai awal ke target",
+          tooltip:
+            "Target Penurunan - Progress dihitung mundur dari nilai awal ke target",
         };
       case "should_stay_above":
         return {
           icon: MoveUp,
-          tooltip: "Tetap Di Atas - Nilai harus tetap berada di atas ambang batas target",
+          tooltip:
+            "Tetap Di Atas - Nilai harus tetap berada di atas ambang batas target",
         };
       case "should_stay_below":
         return {
           icon: MoveDown,
-          tooltip: "Tetap Di Bawah - Nilai harus tetap berada di bawah ambang batas target",
+          tooltip:
+            "Tetap Di Bawah - Nilai harus tetap berada di bawah ambang batas target",
         };
       case "achieve_or_not":
         return {
@@ -802,22 +901,22 @@ export default function DailyFocusPage() {
   const getUserName = (userId: string): string => {
     if (!users || !userId) return "Tidak ditentukan";
     const user = users.find((u: any) => u.id === userId);
-    
+
     // Check if firstName and lastName are both present and non-empty
     if (user?.firstName && user?.lastName && user.lastName.trim() !== "") {
       return `${user.firstName} ${user.lastName}`;
     }
-    
+
     // Fallback to firstName only if available and non-empty
     if (user?.firstName && user.firstName.trim() !== "") {
       return user.firstName;
     }
-    
+
     // Fallback to lastName only if available and non-empty
     if (user?.lastName && user.lastName.trim() !== "") {
       return user.lastName;
     }
-    
+
     return "Pengguna";
   };
 
@@ -825,28 +924,29 @@ export default function DailyFocusPage() {
   const getUserInitials = (userId: string): string => {
     if (!users || !userId) return "?";
     const user = users.find((u: any) => u.id === userId);
-    
+
     // Check if firstName and lastName are both present and non-empty
     if (user?.firstName && user?.lastName && user.lastName.trim() !== "") {
       return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
     }
-    
+
     // Fallback to firstName only if available and non-empty
     if (user?.firstName && user.firstName.trim() !== "") {
       return user.firstName.charAt(0).toUpperCase();
     }
-    
+
     // Fallback to lastName only if available and non-empty
     if (user?.lastName && user.lastName.trim() !== "") {
       return user.lastName.charAt(0).toUpperCase();
     }
-    
+
     return "U";
   };
 
   // Helper function to get initiative count for a key result
   const getInitiativeCount = (keyResultId: string): number => {
-    return initiatives.filter((init: any) => init.keyResultId === keyResultId).length;
+    return initiatives.filter((init: any) => init.keyResultId === keyResultId)
+      .length;
   };
 
   // Early return check - must be AFTER all hooks are called
@@ -859,26 +959,32 @@ export default function DailyFocusPage() {
   }
 
   // Apply user filter to tasks and key results
-  const filteredTasks = selectedUserId === "all" 
-    ? (allTasks as any[])
-    : (allTasks as any[]).filter((task: any) => task.assignedTo === selectedUserId);
+  const filteredTasks =
+    selectedUserId === "all"
+      ? (allTasks as any[])
+      : (allTasks as any[]).filter(
+          (task: any) => task.assignedTo === selectedUserId,
+        );
 
-  const filteredKeyResults = selectedUserId === "all"
-    ? (keyResults as any[])
-    : (keyResults as any[]).filter((kr: any) => kr.assignedTo === selectedUserId);
+  const filteredKeyResults =
+    selectedUserId === "all"
+      ? (keyResults as any[])
+      : (keyResults as any[]).filter(
+          (kr: any) => kr.assignedTo === selectedUserId,
+        );
 
-  const filteredInitiatives = selectedUserId === "all"
-    ? (initiatives as any[])
-    : (initiatives as any[]).filter((init: any) => init.picId === selectedUserId);
+  const filteredInitiatives =
+    selectedUserId === "all"
+      ? (initiatives as any[])
+      : (initiatives as any[]).filter(
+          (init: any) => init.picId === selectedUserId,
+        );
 
   // Filter data for today's focus
   const todayTasks = filteredTasks.filter((task: any) => {
     const dueDate = task.dueDate ? task.dueDate.split("T")[0] : null;
     // Include tasks due today or in progress tasks
-    return (
-      dueDate === todayStr ||
-      task.status === "in_progress"
-    );
+    return dueDate === todayStr || task.status === "in_progress";
   });
 
   const overdueTasks = filteredTasks.filter((task: any) => {
@@ -897,12 +1003,16 @@ export default function DailyFocusPage() {
     const dueDate = task.dueDate ? task.dueDate.split("T")[0] : null;
     // Calculate tomorrow's date using GMT+7 timezone
     const tomorrow = new Date();
-    const utcTomorrow = tomorrow.getTime() + (tomorrow.getTimezoneOffset() * 60000);
-    const gmt7Tomorrow = new Date(utcTomorrow + (7 * 3600000)); // GMT+7
+    const utcTomorrow =
+      tomorrow.getTime() + tomorrow.getTimezoneOffset() * 60000;
+    const gmt7Tomorrow = new Date(utcTomorrow + 7 * 3600000); // GMT+7
     gmt7Tomorrow.setDate(gmt7Tomorrow.getDate() + 1);
-    const tomorrowStr = gmt7Tomorrow.getFullYear() + '-' + 
-      String(gmt7Tomorrow.getMonth() + 1).padStart(2, '0') + '-' + 
-      String(gmt7Tomorrow.getDate()).padStart(2, '0');
+    const tomorrowStr =
+      gmt7Tomorrow.getFullYear() +
+      "-" +
+      String(gmt7Tomorrow.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(gmt7Tomorrow.getDate()).padStart(2, "0");
     return (
       dueDate === tomorrowStr &&
       task.status !== "completed" &&
@@ -957,12 +1067,14 @@ export default function DailyFocusPage() {
         if (obj.ownerId === selectedUserId) {
           return true;
         }
-        
+
         // Include objective if any of its key results are assigned to the selected user
         const objectiveKeyResults = (keyResults as any[]).filter(
-          (kr: any) => kr.objectiveId === obj.id
+          (kr: any) => kr.objectiveId === obj.id,
         );
-        return objectiveKeyResults.some((kr: any) => kr.assignedTo === selectedUserId);
+        return objectiveKeyResults.some(
+          (kr: any) => kr.assignedTo === selectedUserId,
+        );
       });
     }
 
@@ -972,13 +1084,15 @@ export default function DailyFocusPage() {
   const relatedObjectives = getRelatedObjectives();
 
   return (
-    <div className="space-y-4 md:space-y-6">
+    <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center justify-between sm:block">
-              <h1 className="text-xl md:text-2xl font-bold text-gray-900">Daily Focus</h1>
+              <h1 className="text-xl md:text-2xl font-bold text-gray-900">
+                Daily Focus
+              </h1>
               {/* Date display - top-right on mobile, positioned at title level */}
               <div className="flex items-center gap-2 text-sm text-gray-500 sm:hidden">
                 <Calendar className="h-4 w-4" />
@@ -991,9 +1105,11 @@ export default function DailyFocusPage() {
                 </span>
               </div>
             </div>
-            <p className="text-sm md:text-base text-gray-600">Kelola aktivitas harian Anda hari ini</p>
+            <p className="text-sm md:text-base text-gray-600">
+              Kelola aktivitas harian Anda hari ini
+            </p>
           </div>
-          
+
           {/* Date display - desktop only */}
           <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500">
             <Calendar className="h-4 w-4" />
@@ -1033,7 +1149,7 @@ export default function DailyFocusPage() {
                 <SelectItem value="all">Semua Anggota Tim</SelectItem>
                 {users?.map((user: any) => (
                   <SelectItem key={user.id} value={user.id}>
-                    {user.firstName && user.lastName 
+                    {user.firstName && user.lastName
                       ? `${user.firstName} ${user.lastName}`
                       : user.email || user.username || "Unknown"}
                   </SelectItem>
@@ -1041,7 +1157,7 @@ export default function DailyFocusPage() {
               </SelectContent>
             </Select>
           </div>
-          
+
           {/* Action buttons */}
           <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <DailyUpdateSimple />
@@ -1054,10 +1170,10 @@ export default function DailyFocusPage() {
           <div className="flex items-center gap-2 text-sm text-blue-800">
             <User className="h-4 w-4" />
             <span>
-              Menampilkan objective, task, dan aktivitas untuk: {" "}
+              Menampilkan objective, task, dan aktivitas untuk:{" "}
               <span className="font-medium">
-                {users?.find((u: any) => u.id === selectedUserId)?.firstName && 
-                 users?.find((u: any) => u.id === selectedUserId)?.lastName
+                {users?.find((u: any) => u.id === selectedUserId)?.firstName &&
+                users?.find((u: any) => u.id === selectedUserId)?.lastName
                   ? `${users.find((u: any) => u.id === selectedUserId)?.firstName} ${users.find((u: any) => u.id === selectedUserId)?.lastName}`
                   : "Unknown"}
               </span>
@@ -1066,7 +1182,10 @@ export default function DailyFocusPage() {
         </div>
       )}
       {/* Overview Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4" data-tour="overview-cards">
+      <div
+        className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4"
+        data-tour="overview-cards"
+      >
         {isLoadingAllTasks || isLoadingObjectives ? (
           <>
             <Skeleton className="h-24" />
@@ -1079,7 +1198,9 @@ export default function DailyFocusPage() {
             {/* Task Hari Ini */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Task Hari Ini</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Task Hari Ini
+                </CardTitle>
                 <CheckCircle className="h-4 w-4 text-blue-500" />
               </CardHeader>
               <CardContent>
@@ -1089,8 +1210,8 @@ export default function DailyFocusPage() {
                     0 && (
                     <div className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
                       +
-                      {todayTasks.filter((t) => t.status === "completed").length *
-                        10}{" "}
+                      {todayTasks.filter((t) => t.status === "completed")
+                        .length * 10}{" "}
                       poin
                     </div>
                   )}
@@ -1129,7 +1250,9 @@ export default function DailyFocusPage() {
                 <Target className="h-4 w-4 text-green-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{activeKeyResults.length}</div>
+                <div className="text-2xl font-bold">
+                  {activeKeyResults.length}
+                </div>
                 <p className="text-xs text-muted-foreground">
                   Belum mencapai target
                 </p>
@@ -1164,15 +1287,20 @@ export default function DailyFocusPage() {
         )}
       </div>
       {/* Compact Progress & Motivation */}
-      <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50" data-tour="progress-card">
+      <Card
+        className="border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50"
+        data-tour="progress-card"
+      >
         <CardContent className="p-3 md:p-4">
           {/* Mobile: 3-column layout */}
           <div className="block md:hidden">
             <div className="flex items-center gap-2 mb-3">
               <TrendingUp className="h-5 w-5 text-blue-600" />
-              <span className="font-medium text-blue-900">Progress Hari Ini</span>
+              <span className="font-medium text-blue-900">
+                Progress Hari Ini
+              </span>
             </div>
-            
+
             <div className="grid grid-cols-3 gap-3">
               {/* Task Selesai */}
               <div className="text-center p-3 bg-white/50 rounded-lg border border-green-200">
@@ -1180,16 +1308,20 @@ export default function DailyFocusPage() {
                   <CheckCircle className="h-4 w-4 text-green-500" />
                 </div>
                 <div className="text-lg font-semibold text-green-700">
-                  {todayTasks.filter(t => t.status === 'completed').length}
+                  {todayTasks.filter((t) => t.status === "completed").length}
                 </div>
                 <div className="text-xs text-green-600">Task Selesai</div>
-                {todayTasks.filter(t => t.status === 'completed').length > 0 && (
+                {todayTasks.filter((t) => t.status === "completed").length >
+                  0 && (
                   <div className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full mt-1">
-                    +{todayTasks.filter(t => t.status === 'completed').length * 10} poin
+                    +
+                    {todayTasks.filter((t) => t.status === "completed").length *
+                      10}{" "}
+                    poin
                   </div>
                 )}
               </div>
-              
+
               {/* Target Aktif */}
               <div className="text-center p-3 bg-white/50 rounded-lg border border-blue-200">
                 <div className="flex items-center justify-center gap-1 mb-1">
@@ -1200,7 +1332,7 @@ export default function DailyFocusPage() {
                 </div>
                 <div className="text-xs text-blue-600">Target Aktif</div>
               </div>
-              
+
               {/* Streak */}
               <div className="text-center p-3 bg-white/50 rounded-lg border border-orange-200">
                 <div className="flex items-center justify-center gap-1 mb-1">
@@ -1220,38 +1352,58 @@ export default function DailyFocusPage() {
               <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-6">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-blue-600" />
-                  <span className="font-medium text-blue-900">Progress Hari Ini</span>
+                  <span className="font-medium text-blue-900">
+                    Progress Hari Ini
+                  </span>
                 </div>
-                
+
                 <div className="flex flex-col gap-2 text-sm md:flex-row md:items-center md:gap-4">
                   <div className="flex items-center gap-1">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span className="text-green-700">{todayTasks.filter(t => t.status === 'completed').length} task selesai</span>
+                    <span className="text-green-700">
+                      {
+                        todayTasks.filter((t) => t.status === "completed")
+                          .length
+                      }{" "}
+                      task selesai
+                    </span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Target className="h-4 w-4 text-blue-500" />
-                    <span className="text-blue-700">{activeKeyResults.length} target aktif</span>
+                    <span className="text-blue-700">
+                      {activeKeyResults.length} target aktif
+                    </span>
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex flex-wrap items-center gap-2">
-                {(stats as any)?.currentStreak && (stats as any).currentStreak > 0 && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="flex items-center gap-1 text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full cursor-help">
-                        <span>🔥</span>
-                        <span>{(stats as any).currentStreak} hari berturut</span>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Jumlah hari berturut-turut Anda menyelesaikan setidaknya satu task</p>
-                    </TooltipContent>
-                  </Tooltip>
-                )}
-                {todayTasks.filter(t => t.status === 'completed').length > 0 && (
+                {(stats as any)?.currentStreak &&
+                  (stats as any).currentStreak > 0 && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex items-center gap-1 text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full cursor-help">
+                          <span>🔥</span>
+                          <span>
+                            {(stats as any).currentStreak} hari berturut
+                          </span>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>
+                          Jumlah hari berturut-turut Anda menyelesaikan
+                          setidaknya satu task
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                {todayTasks.filter((t) => t.status === "completed").length >
+                  0 && (
                   <div className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                    +{todayTasks.filter(t => t.status === 'completed').length * 10} poin hari ini
+                    +
+                    {todayTasks.filter((t) => t.status === "completed").length *
+                      10}{" "}
+                    poin hari ini
                   </div>
                 )}
               </div>
@@ -1266,18 +1418,19 @@ export default function DailyFocusPage() {
             <div className="flex-1 min-w-0">
               <CardTitle className="text-blue-900 flex items-center gap-2 text-base sm:text-lg">
                 <Target className="h-5 w-5 flex-shrink-0" />
-                <span className="truncate">Goal Terkait Aktivitas Hari Ini</span>
+                <span className="truncate">
+                  Goal Terkait Aktivitas Hari Ini
+                </span>
               </CardTitle>
               <CardDescription className="text-blue-700 text-sm mt-1">
-                {relatedObjectives.length > 0 
+                {relatedObjectives.length > 0
                   ? "Tetap ingat tujuan utama yang mendorong aktivitas harian Anda"
-                  : "Mulai dengan menetapkan goal utama untuk mengarahkan aktivitas harian Anda"
-                }
+                  : "Mulai dengan menetapkan goal utama untuk mengarahkan aktivitas harian Anda"}
               </CardDescription>
             </div>
             {relatedObjectives.length > 0 && (
-              <Button 
-                size="sm" 
+              <Button
+                size="sm"
                 className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 w-full sm:w-auto flex-shrink-0"
                 onClick={handleOpenGoalModal}
               >
@@ -1294,83 +1447,84 @@ export default function DailyFocusPage() {
               <div className="overflow-x-auto">
                 <div className="flex gap-4 pb-2 min-w-max">
                   {relatedObjectives.map((obj: any) => {
-                  const objKeyResults = (keyResults as any[]).filter(
-                    (kr) => kr.objectiveId === obj.id,
-                  );
-                  const objProgress =
-                    objKeyResults.length > 0
-                      ? objKeyResults.reduce(
-                          (sum, kr) => sum + calculateKeyResultProgress(kr),
-                          0,
-                        ) / objKeyResults.length
-                      : 0;
+                    const objKeyResults = (keyResults as any[]).filter(
+                      (kr) => kr.objectiveId === obj.id,
+                    );
+                    const objProgress =
+                      objKeyResults.length > 0
+                        ? objKeyResults.reduce(
+                            (sum, kr) => sum + calculateKeyResultProgress(kr),
+                            0,
+                          ) / objKeyResults.length
+                        : 0;
 
-                  return (
-                    <div
-                      key={obj.id}
-                      className="p-4 bg-white border border-blue-200 rounded-lg flex-shrink-0 w-80 sm:w-72"
-                    >
-                      <div className="space-y-3">
-                        <div>
-                          <Link href={`/objectives/${obj.id}`} className="font-medium text-blue-900 hover:text-blue-600 hover:underline cursor-pointer">
-                            <h3 className="line-clamp-2">
-                              {obj.title}
-                            </h3>
-                          </Link>
-                          
-                        </div>
-
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-sm">
-                            <span className="text-blue-700">Progress</span>
-                            <span className="font-medium text-blue-900">
-                              {objProgress.toFixed(0)}%
-                            </span>
+                    return (
+                      <div
+                        key={obj.id}
+                        className="p-4 bg-white border border-blue-200 rounded-lg flex-shrink-0 w-80 sm:w-72"
+                      >
+                        <div className="space-y-3">
+                          <div>
+                            <Link
+                              href={`/objectives/${obj.id}`}
+                              className="font-medium text-blue-900 hover:text-blue-600 hover:underline cursor-pointer"
+                            >
+                              <h3 className="line-clamp-2">{obj.title}</h3>
+                            </Link>
                           </div>
-                          <Progress value={objProgress} className="h-2" />
-                        </div>
 
-                        {/* Target Ideal Information */}
-                        <div className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
-                          Target Ideal: {obj.targetIdeal || "70"}% pada periode ini
-                        </div>
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-blue-700">Progress</span>
+                              <span className="font-medium text-blue-900">
+                                {objProgress.toFixed(0)}%
+                              </span>
+                            </div>
+                            <Progress value={objProgress} className="h-2" />
+                          </div>
 
-                        <div className="flex items-center justify-between">
-                          <Badge
-                            variant="outline"
-                            className={
-                              obj.status === "on_track"
-                                ? "border-green-300 text-green-700 bg-green-50"
+                          {/* Target Ideal Information */}
+                          <div className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                            Target Ideal: {obj.targetIdeal || "70"}% pada
+                            periode ini
+                          </div>
+
+                          <div className="flex items-center justify-between">
+                            <Badge
+                              variant="outline"
+                              className={
+                                obj.status === "on_track"
+                                  ? "border-green-300 text-green-700 bg-green-50"
+                                  : obj.status === "at_risk"
+                                    ? "border-yellow-300 text-yellow-700 bg-yellow-50"
+                                    : obj.status === "behind"
+                                      ? "border-red-300 text-red-700 bg-red-50"
+                                      : obj.status === "not_started"
+                                        ? "border-gray-300 text-gray-700 bg-gray-50"
+                                        : "border-blue-300 text-blue-700 bg-blue-50"
+                              }
+                            >
+                              {obj.status === "on_track"
+                                ? "On Track"
                                 : obj.status === "at_risk"
-                                  ? "border-yellow-300 text-yellow-700 bg-yellow-50"
+                                  ? "At Risk"
                                   : obj.status === "behind"
-                                    ? "border-red-300 text-red-700 bg-red-50"
+                                    ? "Behind"
                                     : obj.status === "not_started"
-                                      ? "border-gray-300 text-gray-700 bg-gray-50"
-                                      : "border-blue-300 text-blue-700 bg-blue-50"
-                            }
-                          >
-                            {obj.status === "on_track"
-                              ? "On Track"
-                              : obj.status === "at_risk"
-                                ? "At Risk"
-                                : obj.status === "behind"
-                                  ? "Behind"
-                                  : obj.status === "not_started"
-                                    ? "Belum Mulai"
-                                    : obj.status === "in_progress"
-                                      ? "Sedang Berjalan"
-                                      : obj.status}
-                          </Badge>
+                                      ? "Belum Mulai"
+                                      : obj.status === "in_progress"
+                                        ? "Sedang Berjalan"
+                                        : obj.status}
+                            </Badge>
 
-                          <div className="text-xs text-blue-600">
-                            {objKeyResults.length} Angka Target
+                            <div className="text-xs text-blue-600">
+                              {objKeyResults.length} Angka Target
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -1385,11 +1539,14 @@ export default function DailyFocusPage() {
           ) : (
             <div className="text-center py-8 px-4">
               <Target className="h-12 w-12 text-blue-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-blue-900 mb-2">Belum Ada Goal</h3>
+              <h3 className="text-lg font-medium text-blue-900 mb-2">
+                Belum Ada Goal
+              </h3>
               <p className="text-sm text-blue-600 mb-4 max-w-md mx-auto">
-                Buat goal pertama Anda untuk mengarahkan aktivitas harian dan mencapai target yang jelas
+                Buat goal pertama Anda untuk mengarahkan aktivitas harian dan
+                mencapai target yang jelas
               </p>
-              <Button 
+              <Button
                 className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 w-full sm:w-auto"
                 onClick={handleOpenGoalModal}
               >
@@ -1413,13 +1570,15 @@ export default function DailyFocusPage() {
             <CardHeader>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex-1 min-w-0">
-                  <CardTitle className="text-base sm:text-lg">Task Prioritas Hari Ini</CardTitle>
+                  <CardTitle className="text-base sm:text-lg">
+                    Task Prioritas Hari Ini
+                  </CardTitle>
                   <CardDescription className="text-sm mt-1">
                     Fokus pada task yang perlu diselesaikan hari ini
                   </CardDescription>
                 </div>
-                <Button 
-                  size="sm" 
+                <Button
+                  size="sm"
                   className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 w-full sm:w-auto flex-shrink-0"
                   onClick={() => setIsTaskModalOpen(true)}
                   data-tour="create-task"
@@ -1438,12 +1597,24 @@ export default function DailyFocusPage() {
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Task</th>
-                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Prioritas</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tenggat</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PIC</th>
-                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Task
+                          </th>
+                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Prioritas
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Tenggat
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            PIC
+                          </th>
+                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Aksi
+                          </th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
@@ -1481,7 +1652,7 @@ export default function DailyFocusPage() {
                       </tbody>
                     </table>
                   </div>
-                  
+
                   {/* Mobile Card Skeleton */}
                   <div className="md:hidden space-y-3">
                     {Array.from({ length: 3 }).map((_, i) => (
@@ -1507,7 +1678,9 @@ export default function DailyFocusPage() {
                     ))}
                   </div>
                 </div>
-              ) : overdueTasks.length === 0 && todayTasks.length === 0 && tomorrowTasks.length === 0 ? (
+              ) : overdueTasks.length === 0 &&
+                todayTasks.length === 0 &&
+                tomorrowTasks.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <CheckCircle className="h-12 w-12 mx-auto mb-3 text-gray-300" />
                   <p>Tidak ada task untuk hari ini dan besok</p>
@@ -1543,21 +1716,33 @@ export default function DailyFocusPage() {
                         {/* Overdue Tasks Section */}
                         {overdueTasks.length > 0 && (
                           <tr>
-                            <td colSpan={6} className="px-4 py-3 bg-red-50 border-b-2 border-red-200">
+                            <td
+                              colSpan={6}
+                              className="px-4 py-3 bg-red-50 border-b-2 border-red-200"
+                            >
                               <div className="flex items-center gap-2 font-semibold text-red-800">
                                 <AlertTriangle className="h-4 w-4" />
-                                <span>Task Terlambat ({overdueTasks.length})</span>
+                                <span>
+                                  Task Terlambat ({overdueTasks.length})
+                                </span>
                               </div>
                             </td>
                           </tr>
                         )}
                         {overdueTasks.map((task: any) => (
-                          <tr key={task.id} className="hover:bg-gray-50 bg-red-50">
+                          <tr
+                            key={task.id}
+                            className="hover:bg-gray-50 bg-red-50"
+                          >
                             <td className="px-4 py-4">
                               <div className="flex items-center gap-2">
                                 <AlertTriangle className="h-4 w-4 text-red-600" />
                                 <div>
-                                  <Link href={`/tasks/${task.id}`} className="font-medium text-red-900 hover:text-red-600 hover:underline cursor-pointer" data-tour="task-details">
+                                  <Link
+                                    href={`/tasks/${task.id}`}
+                                    className="font-medium text-red-900 hover:text-red-600 hover:underline cursor-pointer"
+                                    data-tour="task-details"
+                                  >
                                     {task.title}
                                   </Link>
 
@@ -1573,14 +1758,20 @@ export default function DailyFocusPage() {
                               </div>
                             </td>
                             <td className="px-4 py-4 text-center">
-                              <Badge className={getTaskPriorityColor(task.priority || "medium")}>
-                                {getTaskPriorityLabel(task.priority || "medium")}
+                              <Badge
+                                className={getTaskPriorityColor(
+                                  task.priority || "medium",
+                                )}
+                              >
+                                {getTaskPriorityLabel(
+                                  task.priority || "medium",
+                                )}
                               </Badge>
                             </td>
                             <td className="px-4 py-4">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <button 
+                                  <button
                                     className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
                                     data-tour="task-actions"
                                   >
@@ -1590,38 +1781,54 @@ export default function DailyFocusPage() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'not_started')}
+                                    onClick={() =>
+                                      handleStatusUpdate(task.id, "not_started")
+                                    }
                                     className="cursor-pointer"
                                   >
                                     <div className="flex items-center gap-2">
-                                      {task.status === 'not_started' && <Check className="h-3 w-3" />}
+                                      {task.status === "not_started" && (
+                                        <Check className="h-3 w-3" />
+                                      )}
                                       <span>Belum Mulai</span>
                                     </div>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'in_progress')}
+                                    onClick={() =>
+                                      handleStatusUpdate(task.id, "in_progress")
+                                    }
                                     className="cursor-pointer"
                                   >
                                     <div className="flex items-center gap-2">
-                                      {task.status === 'in_progress' && <Check className="h-3 w-3" />}
+                                      {task.status === "in_progress" && (
+                                        <Check className="h-3 w-3" />
+                                      )}
                                       <span>Sedang Berjalan</span>
                                     </div>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'completed')}
+                                    onClick={() =>
+                                      handleStatusUpdate(task.id, "completed")
+                                    }
                                     className="cursor-pointer"
                                   >
                                     <div className="flex items-center gap-2">
-                                      {task.status === 'completed' && <Check className="h-3 w-3" />}
+                                      {task.status === "completed" && (
+                                        <Check className="h-3 w-3" />
+                                      )}
                                       <span>Selesai</span>
                                     </div>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'cancelled')}
+                                    onClick={() =>
+                                      handleStatusUpdate(task.id, "cancelled")
+                                    }
                                     className="cursor-pointer"
                                   >
                                     <div className="flex items-center gap-2">
-                                      {task.status === 'cancelled' && <Check className="h-3 w-3" />}
+                                      {task.status === "cancelled" && (
+                                        <Check className="h-3 w-3" />
+                                      )}
                                       <span>Dibatalkan</span>
                                     </div>
                                   </DropdownMenuItem>
@@ -1631,7 +1838,9 @@ export default function DailyFocusPage() {
                             <td className="px-4 py-4">
                               <div className="text-sm text-red-600 font-medium">
                                 {task.dueDate
-                                  ? new Date(task.dueDate).toLocaleDateString("id-ID")
+                                  ? new Date(task.dueDate).toLocaleDateString(
+                                      "id-ID",
+                                    )
                                   : "Tidak ada"}
                               </div>
                             </td>
@@ -1639,7 +1848,9 @@ export default function DailyFocusPage() {
                               <div className="flex items-center gap-2">
                                 {task.assignedTo ? (
                                   <Avatar className="w-6 h-6">
-                                    <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`} />
+                                    <AvatarImage
+                                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
+                                    />
                                     <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
                                       {getUserInitials(task.assignedTo)}
                                     </AvatarFallback>
@@ -1648,20 +1859,29 @@ export default function DailyFocusPage() {
                                   <User className="w-4 h-4" />
                                 )}
                                 <span className="text-sm text-gray-600">
-                                  {task.assignedTo ? getUserName(task.assignedTo) : "Belum ditentukan"}
+                                  {task.assignedTo
+                                    ? getUserName(task.assignedTo)
+                                    : "Belum ditentukan"}
                                 </span>
                               </div>
                             </td>
                             <td className="px-4 py-4 text-center">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0"
+                                  >
                                     <MoreVertical className="h-4 w-4" />
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem asChild>
-                                    <Link href={`/tasks/${task.id}`} className="cursor-pointer flex items-center">
+                                    <Link
+                                      href={`/tasks/${task.id}`}
+                                      className="cursor-pointer flex items-center"
+                                    >
                                       <Eye className="w-4 h-4 mr-2" />
                                       Lihat Detail
                                     </Link>
@@ -1685,11 +1905,14 @@ export default function DailyFocusPage() {
                             </td>
                           </tr>
                         ))}
-                        
+
                         {/* Today's Tasks Section */}
                         {todayTasks.length > 0 && (
                           <tr>
-                            <td colSpan={6} className="px-4 py-3 bg-blue-50 border-b-2 border-blue-200">
+                            <td
+                              colSpan={6}
+                              className="px-4 py-3 bg-blue-50 border-b-2 border-blue-200"
+                            >
                               <div className="flex items-center gap-2 font-semibold text-blue-800">
                                 <Calendar className="h-4 w-4" />
                                 <span>Task Hari Ini ({todayTasks.length})</span>
@@ -1703,7 +1926,10 @@ export default function DailyFocusPage() {
                               <div className="flex items-center gap-2">
                                 <Clock className="h-4 w-4 text-blue-600" />
                                 <div>
-                                  <Link href={`/tasks/${task.id}`} className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer">
+                                  <Link
+                                    href={`/tasks/${task.id}`}
+                                    className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
+                                  >
                                     {task.title}
                                   </Link>
 
@@ -1719,14 +1945,20 @@ export default function DailyFocusPage() {
                               </div>
                             </td>
                             <td className="px-4 py-4 text-center">
-                              <Badge className={getTaskPriorityColor(task.priority || "medium")}>
-                                {getTaskPriorityLabel(task.priority || "medium")}
+                              <Badge
+                                className={getTaskPriorityColor(
+                                  task.priority || "medium",
+                                )}
+                              >
+                                {getTaskPriorityLabel(
+                                  task.priority || "medium",
+                                )}
                               </Badge>
                             </td>
                             <td className="px-4 py-4">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <button 
+                                  <button
                                     className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
                                   >
                                     {getTaskStatusLabel(task.status)}
@@ -1735,38 +1967,54 @@ export default function DailyFocusPage() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'not_started')}
+                                    onClick={() =>
+                                      handleStatusUpdate(task.id, "not_started")
+                                    }
                                     className="cursor-pointer"
                                   >
                                     <div className="flex items-center gap-2">
-                                      {task.status === 'not_started' && <Check className="h-3 w-3" />}
+                                      {task.status === "not_started" && (
+                                        <Check className="h-3 w-3" />
+                                      )}
                                       <span>Belum Mulai</span>
                                     </div>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'in_progress')}
+                                    onClick={() =>
+                                      handleStatusUpdate(task.id, "in_progress")
+                                    }
                                     className="cursor-pointer"
                                   >
                                     <div className="flex items-center gap-2">
-                                      {task.status === 'in_progress' && <Check className="h-3 w-3" />}
+                                      {task.status === "in_progress" && (
+                                        <Check className="h-3 w-3" />
+                                      )}
                                       <span>Sedang Berjalan</span>
                                     </div>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'completed')}
+                                    onClick={() =>
+                                      handleStatusUpdate(task.id, "completed")
+                                    }
                                     className="cursor-pointer"
                                   >
                                     <div className="flex items-center gap-2">
-                                      {task.status === 'completed' && <Check className="h-3 w-3" />}
+                                      {task.status === "completed" && (
+                                        <Check className="h-3 w-3" />
+                                      )}
                                       <span>Selesai</span>
                                     </div>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'cancelled')}
+                                    onClick={() =>
+                                      handleStatusUpdate(task.id, "cancelled")
+                                    }
                                     className="cursor-pointer"
                                   >
                                     <div className="flex items-center gap-2">
-                                      {task.status === 'cancelled' && <Check className="h-3 w-3" />}
+                                      {task.status === "cancelled" && (
+                                        <Check className="h-3 w-3" />
+                                      )}
                                       <span>Dibatalkan</span>
                                     </div>
                                   </DropdownMenuItem>
@@ -1776,7 +2024,9 @@ export default function DailyFocusPage() {
                             <td className="px-4 py-4">
                               <div className="text-sm text-gray-600">
                                 {task.dueDate
-                                  ? new Date(task.dueDate).toLocaleDateString("id-ID")
+                                  ? new Date(task.dueDate).toLocaleDateString(
+                                      "id-ID",
+                                    )
                                   : "Tidak ada tenggat"}
                               </div>
                             </td>
@@ -1784,7 +2034,9 @@ export default function DailyFocusPage() {
                               <div className="flex items-center gap-2">
                                 {task.assignedTo ? (
                                   <Avatar className="w-6 h-6">
-                                    <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`} />
+                                    <AvatarImage
+                                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
+                                    />
                                     <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
                                       {getUserInitials(task.assignedTo)}
                                     </AvatarFallback>
@@ -1793,20 +2045,29 @@ export default function DailyFocusPage() {
                                   <User className="w-4 h-4" />
                                 )}
                                 <span className="text-sm text-gray-600">
-                                  {task.assignedTo ? getUserName(task.assignedTo) : "Belum ditentukan"}
+                                  {task.assignedTo
+                                    ? getUserName(task.assignedTo)
+                                    : "Belum ditentukan"}
                                 </span>
                               </div>
                             </td>
                             <td className="px-4 py-4 text-center">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0"
+                                  >
                                     <MoreVertical className="h-4 w-4" />
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem asChild>
-                                    <Link href={`/tasks/${task.id}`} className="cursor-pointer flex items-center">
+                                    <Link
+                                      href={`/tasks/${task.id}`}
+                                      className="cursor-pointer flex items-center"
+                                    >
                                       <Eye className="w-4 h-4 mr-2" />
                                       Lihat Detail
                                     </Link>
@@ -1830,11 +2091,14 @@ export default function DailyFocusPage() {
                             </td>
                           </tr>
                         ))}
-                        
+
                         {/* Tomorrow's Tasks Section */}
                         {tomorrowTasks.length > 0 && (
                           <tr>
-                            <td colSpan={6} className="px-4 py-3 bg-green-50 border-b-2 border-green-200">
+                            <td
+                              colSpan={6}
+                              className="px-4 py-3 bg-green-50 border-b-2 border-green-200"
+                            >
                               <div className="flex items-center gap-2 font-semibold text-green-800">
                                 <Clock className="h-4 w-4" />
                                 <span>Task Besok ({tomorrowTasks.length})</span>
@@ -1843,12 +2107,18 @@ export default function DailyFocusPage() {
                           </tr>
                         )}
                         {tomorrowTasks.map((task: any) => (
-                          <tr key={task.id} className="hover:bg-gray-50 bg-green-50">
+                          <tr
+                            key={task.id}
+                            className="hover:bg-gray-50 bg-green-50"
+                          >
                             <td className="px-4 py-4">
                               <div className="flex items-center gap-2">
                                 <Clock className="h-4 w-4 text-green-600" />
                                 <div>
-                                  <Link href={`/tasks/${task.id}`} className="font-medium text-green-900 hover:text-green-600 hover:underline cursor-pointer">
+                                  <Link
+                                    href={`/tasks/${task.id}`}
+                                    className="font-medium text-green-900 hover:text-green-600 hover:underline cursor-pointer"
+                                  >
                                     {task.title}
                                   </Link>
 
@@ -1864,14 +2134,20 @@ export default function DailyFocusPage() {
                               </div>
                             </td>
                             <td className="px-4 py-4 text-center">
-                              <Badge className={getTaskPriorityColor(task.priority || "medium")}>
-                                {getTaskPriorityLabel(task.priority || "medium")}
+                              <Badge
+                                className={getTaskPriorityColor(
+                                  task.priority || "medium",
+                                )}
+                              >
+                                {getTaskPriorityLabel(
+                                  task.priority || "medium",
+                                )}
                               </Badge>
                             </td>
                             <td className="px-4 py-4">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <button 
+                                  <button
                                     className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
                                   >
                                     {getTaskStatusLabel(task.status)}
@@ -1880,38 +2156,54 @@ export default function DailyFocusPage() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'not_started')}
+                                    onClick={() =>
+                                      handleStatusUpdate(task.id, "not_started")
+                                    }
                                     className="cursor-pointer"
                                   >
                                     <div className="flex items-center gap-2">
-                                      {task.status === 'not_started' && <Check className="h-3 w-3" />}
+                                      {task.status === "not_started" && (
+                                        <Check className="h-3 w-3" />
+                                      )}
                                       <span>Belum Mulai</span>
                                     </div>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'in_progress')}
+                                    onClick={() =>
+                                      handleStatusUpdate(task.id, "in_progress")
+                                    }
                                     className="cursor-pointer"
                                   >
                                     <div className="flex items-center gap-2">
-                                      {task.status === 'in_progress' && <Check className="h-3 w-3" />}
+                                      {task.status === "in_progress" && (
+                                        <Check className="h-3 w-3" />
+                                      )}
                                       <span>Sedang Berjalan</span>
                                     </div>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'completed')}
+                                    onClick={() =>
+                                      handleStatusUpdate(task.id, "completed")
+                                    }
                                     className="cursor-pointer"
                                   >
                                     <div className="flex items-center gap-2">
-                                      {task.status === 'completed' && <Check className="h-3 w-3" />}
+                                      {task.status === "completed" && (
+                                        <Check className="h-3 w-3" />
+                                      )}
                                       <span>Selesai</span>
                                     </div>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'cancelled')}
+                                    onClick={() =>
+                                      handleStatusUpdate(task.id, "cancelled")
+                                    }
                                     className="cursor-pointer"
                                   >
                                     <div className="flex items-center gap-2">
-                                      {task.status === 'cancelled' && <Check className="h-3 w-3" />}
+                                      {task.status === "cancelled" && (
+                                        <Check className="h-3 w-3" />
+                                      )}
                                       <span>Dibatalkan</span>
                                     </div>
                                   </DropdownMenuItem>
@@ -1921,7 +2213,9 @@ export default function DailyFocusPage() {
                             <td className="px-4 py-4">
                               <div className="text-sm text-green-600 font-medium">
                                 {task.dueDate
-                                  ? new Date(task.dueDate).toLocaleDateString("id-ID")
+                                  ? new Date(task.dueDate).toLocaleDateString(
+                                      "id-ID",
+                                    )
                                   : "Tidak ada"}
                               </div>
                             </td>
@@ -1929,7 +2223,9 @@ export default function DailyFocusPage() {
                               <div className="flex items-center gap-2">
                                 {task.assignedTo ? (
                                   <Avatar className="w-6 h-6">
-                                    <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`} />
+                                    <AvatarImage
+                                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
+                                    />
                                     <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
                                       {getUserInitials(task.assignedTo)}
                                     </AvatarFallback>
@@ -1938,7 +2234,9 @@ export default function DailyFocusPage() {
                                   <User className="w-4 h-4" />
                                 )}
                                 <span className="text-sm text-gray-600">
-                                  {task.assignedTo ? getUserName(task.assignedTo) : "Belum ditugaskan"}
+                                  {task.assignedTo
+                                    ? getUserName(task.assignedTo)
+                                    : "Belum ditugaskan"}
                                 </span>
                               </div>
                             </td>
@@ -1951,7 +2249,10 @@ export default function DailyFocusPage() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem asChild>
-                                    <Link href={`/tasks/${task.id}`} className="cursor-pointer flex items-center">
+                                    <Link
+                                      href={`/tasks/${task.id}`}
+                                      className="cursor-pointer flex items-center"
+                                    >
                                       <Eye className="w-4 h-4 mr-2" />
                                       Lihat Detail
                                     </Link>
@@ -1995,7 +2296,10 @@ export default function DailyFocusPage() {
                           >
                             <div className="flex items-center justify-between">
                               <div className="flex-1">
-                                <Link href={`/tasks/${task.id}`} className="font-medium text-red-900 hover:text-red-600 hover:underline cursor-pointer">
+                                <Link
+                                  href={`/tasks/${task.id}`}
+                                  className="font-medium text-red-900 hover:text-red-600 hover:underline cursor-pointer"
+                                >
                                   {task.title}
                                 </Link>
                                 {task.initiative && (
@@ -2004,15 +2308,21 @@ export default function DailyFocusPage() {
                                   </div>
                                 )}
                                 <div className="flex items-center gap-2 mt-1">
-                                  <Badge className={getTaskPriorityColor(task.priority || "medium")}>
-                                    {getTaskPriorityLabel(task.priority || "medium")}
+                                  <Badge
+                                    className={getTaskPriorityColor(
+                                      task.priority || "medium",
+                                    )}
+                                  >
+                                    {getTaskPriorityLabel(
+                                      task.priority || "medium",
+                                    )}
                                   </Badge>
                                   <TaskCommentCount taskId={task.id} />
                                 </div>
                               </div>
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <button 
+                                  <button
                                     className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
                                   >
                                     {getTaskStatusLabel(task.status)}
@@ -2021,38 +2331,54 @@ export default function DailyFocusPage() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'not_started')}
+                                    onClick={() =>
+                                      handleStatusUpdate(task.id, "not_started")
+                                    }
                                     className="cursor-pointer"
                                   >
                                     <div className="flex items-center gap-2">
-                                      {task.status === 'not_started' && <Check className="h-3 w-3" />}
+                                      {task.status === "not_started" && (
+                                        <Check className="h-3 w-3" />
+                                      )}
                                       <span>Belum Mulai</span>
                                     </div>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'in_progress')}
+                                    onClick={() =>
+                                      handleStatusUpdate(task.id, "in_progress")
+                                    }
                                     className="cursor-pointer"
                                   >
                                     <div className="flex items-center gap-2">
-                                      {task.status === 'in_progress' && <Check className="h-3 w-3" />}
+                                      {task.status === "in_progress" && (
+                                        <Check className="h-3 w-3" />
+                                      )}
                                       <span>Sedang Berjalan</span>
                                     </div>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'completed')}
+                                    onClick={() =>
+                                      handleStatusUpdate(task.id, "completed")
+                                    }
                                     className="cursor-pointer"
                                   >
                                     <div className="flex items-center gap-2">
-                                      {task.status === 'completed' && <Check className="h-3 w-3" />}
+                                      {task.status === "completed" && (
+                                        <Check className="h-3 w-3" />
+                                      )}
                                       <span>Selesai</span>
                                     </div>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'cancelled')}
+                                    onClick={() =>
+                                      handleStatusUpdate(task.id, "cancelled")
+                                    }
                                     className="cursor-pointer"
                                   >
                                     <div className="flex items-center gap-2">
-                                      {task.status === 'cancelled' && <Check className="h-3 w-3" />}
+                                      {task.status === "cancelled" && (
+                                        <Check className="h-3 w-3" />
+                                      )}
                                       <span>Dibatalkan</span>
                                     </div>
                                   </DropdownMenuItem>
@@ -2060,15 +2386,20 @@ export default function DailyFocusPage() {
                               </DropdownMenu>
                             </div>
                             <div className="text-sm text-red-600">
-                              Tenggat: {task.dueDate
-                                ? new Date(task.dueDate).toLocaleDateString("id-ID")
+                              Tenggat:{" "}
+                              {task.dueDate
+                                ? new Date(task.dueDate).toLocaleDateString(
+                                    "id-ID",
+                                  )
                                 : "Tidak ada"}
                             </div>
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
                                 {task.assignedTo ? (
                                   <Avatar className="w-5 h-5">
-                                    <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`} />
+                                    <AvatarImage
+                                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
+                                    />
                                     <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
                                       {getUserInitials(task.assignedTo)}
                                     </AvatarFallback>
@@ -2077,7 +2408,9 @@ export default function DailyFocusPage() {
                                   <User className="w-4 h-4" />
                                 )}
                                 <span className="text-xs text-gray-600">
-                                  {task.assignedTo ? getUserName(task.assignedTo) : "Belum ditentukan"}
+                                  {task.assignedTo
+                                    ? getUserName(task.assignedTo)
+                                    : "Belum ditentukan"}
                                 </span>
                               </div>
                               <DropdownMenu>
@@ -2092,7 +2425,10 @@ export default function DailyFocusPage() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem asChild>
-                                    <Link href={`/tasks/${task.id}`} className="cursor-pointer flex items-center">
+                                    <Link
+                                      href={`/tasks/${task.id}`}
+                                      className="cursor-pointer flex items-center"
+                                    >
                                       <Eye className="w-3 h-3 mr-2" />
                                       Lihat Detail
                                     </Link>
@@ -2133,7 +2469,10 @@ export default function DailyFocusPage() {
                           >
                             <div className="flex items-center justify-between">
                               <div className="flex-1">
-                                <Link href={`/tasks/${task.id}`} className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer">
+                                <Link
+                                  href={`/tasks/${task.id}`}
+                                  className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
+                                >
                                   {task.title}
                                 </Link>
                                 {task.initiative && (
@@ -2142,15 +2481,21 @@ export default function DailyFocusPage() {
                                   </div>
                                 )}
                                 <div className="flex items-center gap-2 mt-1">
-                                  <Badge className={getTaskPriorityColor(task.priority || "medium")}>
-                                    {getTaskPriorityLabel(task.priority || "medium")}
+                                  <Badge
+                                    className={getTaskPriorityColor(
+                                      task.priority || "medium",
+                                    )}
+                                  >
+                                    {getTaskPriorityLabel(
+                                      task.priority || "medium",
+                                    )}
                                   </Badge>
                                   <TaskCommentCount taskId={task.id} />
                                 </div>
                               </div>
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <button 
+                                  <button
                                     className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
                                   >
                                     {getTaskStatusLabel(task.status)}
@@ -2159,38 +2504,54 @@ export default function DailyFocusPage() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'not_started')}
+                                    onClick={() =>
+                                      handleStatusUpdate(task.id, "not_started")
+                                    }
                                     className="cursor-pointer"
                                   >
                                     <div className="flex items-center gap-2">
-                                      {task.status === 'not_started' && <Check className="h-3 w-3" />}
+                                      {task.status === "not_started" && (
+                                        <Check className="h-3 w-3" />
+                                      )}
                                       <span>Belum Mulai</span>
                                     </div>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'in_progress')}
+                                    onClick={() =>
+                                      handleStatusUpdate(task.id, "in_progress")
+                                    }
                                     className="cursor-pointer"
                                   >
                                     <div className="flex items-center gap-2">
-                                      {task.status === 'in_progress' && <Check className="h-3 w-3" />}
+                                      {task.status === "in_progress" && (
+                                        <Check className="h-3 w-3" />
+                                      )}
                                       <span>Sedang Berjalan</span>
                                     </div>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'completed')}
+                                    onClick={() =>
+                                      handleStatusUpdate(task.id, "completed")
+                                    }
                                     className="cursor-pointer"
                                   >
                                     <div className="flex items-center gap-2">
-                                      {task.status === 'completed' && <Check className="h-3 w-3" />}
+                                      {task.status === "completed" && (
+                                        <Check className="h-3 w-3" />
+                                      )}
                                       <span>Selesai</span>
                                     </div>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'cancelled')}
+                                    onClick={() =>
+                                      handleStatusUpdate(task.id, "cancelled")
+                                    }
                                     className="cursor-pointer"
                                   >
                                     <div className="flex items-center gap-2">
-                                      {task.status === 'cancelled' && <Check className="h-3 w-3" />}
+                                      {task.status === "cancelled" && (
+                                        <Check className="h-3 w-3" />
+                                      )}
                                       <span>Dibatalkan</span>
                                     </div>
                                   </DropdownMenuItem>
@@ -2199,14 +2560,18 @@ export default function DailyFocusPage() {
                             </div>
                             <div className="text-sm text-gray-600">
                               {task.dueDate
-                                ? new Date(task.dueDate).toLocaleDateString("id-ID")
+                                ? new Date(task.dueDate).toLocaleDateString(
+                                    "id-ID",
+                                  )
                                 : "Tidak ada tenggat"}
                             </div>
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
                                 {task.assignedTo ? (
                                   <Avatar className="w-5 h-5">
-                                    <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`} />
+                                    <AvatarImage
+                                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
+                                    />
                                     <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
                                       {getUserInitials(task.assignedTo)}
                                     </AvatarFallback>
@@ -2215,7 +2580,9 @@ export default function DailyFocusPage() {
                                   <User className="w-4 h-4" />
                                 )}
                                 <span className="text-xs text-gray-600">
-                                  {task.assignedTo ? getUserName(task.assignedTo) : "Belum ditentukan"}
+                                  {task.assignedTo
+                                    ? getUserName(task.assignedTo)
+                                    : "Belum ditentukan"}
                                 </span>
                               </div>
                               <DropdownMenu>
@@ -2230,7 +2597,10 @@ export default function DailyFocusPage() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem asChild>
-                                    <Link href={`/tasks/${task.id}`} className="cursor-pointer flex items-center">
+                                    <Link
+                                      href={`/tasks/${task.id}`}
+                                      className="cursor-pointer flex items-center"
+                                    >
                                       <Eye className="w-3 h-3 mr-2" />
                                       Lihat Detail
                                     </Link>
@@ -2265,132 +2635,174 @@ export default function DailyFocusPage() {
                       </h3>
                       {tomorrowTasks.length > 0 ? (
                         <>
-                        {tomorrowTasks.map((task: any) => (
-                          <div
-                            key={task.id}
-                            className="p-3 bg-green-50 border border-green-200 rounded-lg space-y-2"
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex-1">
-                                <Link href={`/tasks/${task.id}`} className="font-medium text-green-900 hover:text-green-600 hover:underline cursor-pointer">
-                                  {task.title}
-                                </Link>
-                                {task.initiative && (
-                                  <div className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded mt-1 inline-block">
-                                    Inisiatif: {task.initiative.title}
+                          {tomorrowTasks.map((task: any) => (
+                            <div
+                              key={task.id}
+                              className="p-3 bg-green-50 border border-green-200 rounded-lg space-y-2"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex-1">
+                                  <Link
+                                    href={`/tasks/${task.id}`}
+                                    className="font-medium text-green-900 hover:text-green-600 hover:underline cursor-pointer"
+                                  >
+                                    {task.title}
+                                  </Link>
+                                  {task.initiative && (
+                                    <div className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded mt-1 inline-block">
+                                      Inisiatif: {task.initiative.title}
+                                    </div>
+                                  )}
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <Badge
+                                      className={getTaskPriorityColor(
+                                        task.priority || "medium",
+                                      )}
+                                    >
+                                      {getTaskPriorityLabel(
+                                        task.priority || "medium",
+                                      )}
+                                    </Badge>
+                                    <TaskCommentCount taskId={task.id} />
                                   </div>
-                                )}
-                                <div className="flex items-center gap-2 mt-1">
-                                  <Badge className={getTaskPriorityColor(task.priority || "medium")}>
-                                    {getTaskPriorityLabel(task.priority || "medium")}
-                                  </Badge>
-                                  <TaskCommentCount taskId={task.id} />
+                                </div>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <button
+                                      className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
+                                    >
+                                      {getTaskStatusLabel(task.status)}
+                                      <ChevronDown className="h-3 w-3" />
+                                    </button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        handleStatusUpdate(
+                                          task.id,
+                                          "not_started",
+                                        )
+                                      }
+                                      className="cursor-pointer"
+                                    >
+                                      <div className="flex items-center gap-2">
+                                        {task.status === "not_started" && (
+                                          <Check className="h-3 w-3" />
+                                        )}
+                                        <span>Belum Mulai</span>
+                                      </div>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        handleStatusUpdate(
+                                          task.id,
+                                          "in_progress",
+                                        )
+                                      }
+                                      className="cursor-pointer"
+                                    >
+                                      <div className="flex items-center gap-2">
+                                        {task.status === "in_progress" && (
+                                          <Check className="h-3 w-3" />
+                                        )}
+                                        <span>Sedang Berjalan</span>
+                                      </div>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        handleStatusUpdate(task.id, "completed")
+                                      }
+                                      className="cursor-pointer"
+                                    >
+                                      <div className="flex items-center gap-2">
+                                        {task.status === "completed" && (
+                                          <Check className="h-3 w-3" />
+                                        )}
+                                        <span>Selesai</span>
+                                      </div>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        handleStatusUpdate(task.id, "cancelled")
+                                      }
+                                      className="cursor-pointer"
+                                    >
+                                      <div className="flex items-center gap-2">
+                                        {task.status === "cancelled" && (
+                                          <Check className="h-3 w-3" />
+                                        )}
+                                        <span>Dibatalkan</span>
+                                      </div>
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
+                              <div className="text-xs text-green-600 mt-2">
+                                <span className="font-medium">Tenggat:</span>{" "}
+                                {task.dueDate
+                                  ? new Date(task.dueDate).toLocaleDateString(
+                                      "id-ID",
+                                    )
+                                  : "Tidak ada"}
+                              </div>
+                              <div className="text-xs text-gray-600 flex items-center gap-1">
+                                <span className="font-medium">PIC:</span>
+                                <div className="flex items-center gap-1">
+                                  {task.assignedTo ? (
+                                    <Avatar className="w-4 h-4">
+                                      <AvatarImage
+                                        src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
+                                      />
+                                      <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
+                                        {getUserInitials(task.assignedTo)}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                  ) : (
+                                    <User className="w-3 h-3" />
+                                  )}
+                                  <span>
+                                    {task.assignedTo
+                                      ? getUserName(task.assignedTo)
+                                      : "Belum ditugaskan"}
+                                  </span>
                                 </div>
                               </div>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <button 
-                                    className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
-                                  >
-                                    {getTaskStatusLabel(task.status)}
-                                    <ChevronDown className="h-3 w-3" />
-                                  </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'not_started')}
-                                    className="cursor-pointer"
-                                  >
-                                    <div className="flex items-center gap-2">
-                                      {task.status === 'not_started' && <Check className="h-3 w-3" />}
-                                      <span>Belum Mulai</span>
-                                    </div>
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'in_progress')}
-                                    className="cursor-pointer"
-                                  >
-                                    <div className="flex items-center gap-2">
-                                      {task.status === 'in_progress' && <Check className="h-3 w-3" />}
-                                      <span>Sedang Berjalan</span>
-                                    </div>
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'completed')}
-                                    className="cursor-pointer"
-                                  >
-                                    <div className="flex items-center gap-2">
-                                      {task.status === 'completed' && <Check className="h-3 w-3" />}
-                                      <span>Selesai</span>
-                                    </div>
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    onClick={() => handleStatusUpdate(task.id, 'cancelled')}
-                                    className="cursor-pointer"
-                                  >
-                                    <div className="flex items-center gap-2">
-                                      {task.status === 'cancelled' && <Check className="h-3 w-3" />}
-                                      <span>Dibatalkan</span>
-                                    </div>
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                            <div className="text-xs text-green-600 mt-2">
-                              <span className="font-medium">Tenggat:</span>{" "}
-                              {task.dueDate
-                                ? new Date(task.dueDate).toLocaleDateString("id-ID")
-                                : "Tidak ada"}
-                            </div>
-                            <div className="text-xs text-gray-600 flex items-center gap-1">
-                              <span className="font-medium">PIC:</span>
-                              <div className="flex items-center gap-1">
-                                {task.assignedTo ? (
-                                  <Avatar className="w-4 h-4">
-                                    <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`} />
-                                    <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
-                                      {getUserInitials(task.assignedTo)}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                ) : (
-                                  <User className="w-3 h-3" />
-                                )}
-                                <span>{task.assignedTo ? getUserName(task.assignedTo) : "Belum ditugaskan"}</span>
+                              <div className="flex justify-end pt-2 border-t border-green-100">
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <button className="p-1 hover:bg-green-100 rounded-full">
+                                      <MoreVertical className="h-4 w-4" />
+                                    </button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem asChild>
+                                      <Link
+                                        href={`/tasks/${task.id}`}
+                                        className="cursor-pointer flex items-center"
+                                      >
+                                        <Eye className="w-3 h-3 mr-2" />
+                                        Lihat Detail
+                                      </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() => handleEditTask(task)}
+                                      className="cursor-pointer"
+                                    >
+                                      <Edit className="w-3 h-3 mr-2" />
+                                      Edit
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() => handleDeleteTask(task)}
+                                      className="cursor-pointer text-red-600"
+                                    >
+                                      <Trash2 className="w-3 h-3 mr-2" />
+                                      Hapus
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                               </div>
                             </div>
-                            <div className="flex justify-end pt-2 border-t border-green-100">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <button className="p-1 hover:bg-green-100 rounded-full">
-                                    <MoreVertical className="h-4 w-4" />
-                                  </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem asChild>
-                                    <Link href={`/tasks/${task.id}`} className="cursor-pointer flex items-center">
-                                      <Eye className="w-3 h-3 mr-2" />
-                                      Lihat Detail
-                                    </Link>
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    onClick={() => handleEditTask(task)}
-                                    className="cursor-pointer"
-                                  >
-                                    <Edit className="w-3 h-3 mr-2" />
-                                    Edit
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    onClick={() => handleDeleteTask(task)}
-                                    className="cursor-pointer text-red-600"
-                                  >
-                                    <Trash2 className="w-3 h-3 mr-2" />
-                                    Hapus
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                          </div>
-                        ))}
+                          ))}
                         </>
                       ) : (
                         <div className="text-center py-4 text-gray-500">
@@ -2418,7 +2830,10 @@ export default function DailyFocusPage() {
               {isLoadingObjectives ? (
                 <div className="space-y-4">
                   {Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="p-3 sm:p-4 bg-white border border-gray-200 rounded-lg space-y-2 sm:space-y-3">
+                    <div
+                      key={i}
+                      className="p-3 sm:p-4 bg-white border border-gray-200 rounded-lg space-y-2 sm:space-y-3"
+                    >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0 space-y-2">
                           <div className="flex items-center gap-2">
@@ -2455,7 +2870,7 @@ export default function DailyFocusPage() {
                   const progress = calculateKeyResultProgress(kr);
                   const typeConfig = getKeyResultTypeIcon(kr.keyResultType);
                   const IconComponent = typeConfig.icon;
-                  
+
                   return (
                     <div
                       key={kr.id}
@@ -2464,10 +2879,11 @@ export default function DailyFocusPage() {
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <Link href={`/key-results/${kr.id}`} className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer text-left">
-                              <h3>
-                                {kr.title}
-                              </h3>
+                            <Link
+                              href={`/key-results/${kr.id}`}
+                              className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer text-left"
+                            >
+                              <h3>{kr.title}</h3>
                             </Link>
                             <div className="relative group">
                               <IconComponent className="w-4 h-4 text-gray-500 hover:text-gray-700 cursor-help" />
@@ -2570,7 +2986,9 @@ export default function DailyFocusPage() {
                             <SimpleProgressStatus
                               status={kr.status}
                               progressPercentage={progress}
-                              timeProgressPercentage={kr.timeProgressPercentage || 0}
+                              timeProgressPercentage={
+                                kr.timeProgressPercentage || 0
+                              }
                               dueDate={null}
                               startDate="2025-07-01"
                               compact={true}
@@ -2580,7 +2998,9 @@ export default function DailyFocusPage() {
                             <SimpleProgressStatus
                               status={kr.status}
                               progressPercentage={progress}
-                              timeProgressPercentage={kr.timeProgressPercentage || 0}
+                              timeProgressPercentage={
+                                kr.timeProgressPercentage || 0
+                              }
                               dueDate={null}
                               startDate="2025-07-01"
                               compact={false}
@@ -2596,7 +3016,9 @@ export default function DailyFocusPage() {
                           <div className="flex items-center gap-2 text-gray-500">
                             {kr.assignedTo ? (
                               <Avatar className="w-6 h-6">
-                                <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(kr.assignedTo)}`} />
+                                <AvatarImage
+                                  src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(kr.assignedTo)}`}
+                                />
                                 <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
                                   {getUserInitials(kr.assignedTo)}
                                 </AvatarFallback>
@@ -2610,7 +3032,7 @@ export default function DailyFocusPage() {
                                 : "Belum ditentukan"}
                             </span>
                           </div>
-                          
+
                           {/* Tooltip for assignee info */}
                           <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap">
                             {kr.assignedTo
@@ -2642,7 +3064,10 @@ export default function DailyFocusPage() {
                 Kelola Inisiatif Aktif
               </CardTitle>
               <CardDescription>
-                Update metrics dan kelola inisiatif aktif{selectedUserId === "all" ? " semua anggota tim" : " yang ditanggung jawabi"}
+                Update metrics dan kelola inisiatif aktif
+                {selectedUserId === "all"
+                  ? " semua anggota tim"
+                  : " yang ditanggung jawabi"}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -2653,14 +3078,30 @@ export default function DailyFocusPage() {
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Inisiatif</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Prioritas</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tenggat</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PIC</th>
-                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Update</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Inisiatif
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                          </th>
+                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Prioritas
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Progress
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Tenggat
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            PIC
+                          </th>
+                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Update
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Aksi
+                          </th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
@@ -2704,7 +3145,7 @@ export default function DailyFocusPage() {
                       </tbody>
                     </table>
                   </div>
-                  
+
                   {/* Mobile Card Skeleton */}
                   <div className="md:hidden space-y-4">
                     {Array.from({ length: 3 }).map((_, i) => (
@@ -2734,12 +3175,12 @@ export default function DailyFocusPage() {
                 <div className="text-center py-8 text-gray-500">
                   <BarChart3 className="h-12 w-12 mx-auto mb-3 text-gray-300" />
                   <p>
-                    {selectedUserId === "all" 
-                      ? "Tidak ada inisiatif aktif dari tim" 
+                    {selectedUserId === "all"
+                      ? "Tidak ada inisiatif aktif dari tim"
                       : `Tidak ada inisiatif aktif untuk ${getUserName(selectedUserId)}`}
                   </p>
                   <p className="text-sm mt-2">
-                    {selectedUserId === "all" 
+                    {selectedUserId === "all"
                       ? "Semua anggota tim tidak memiliki inisiatif aktif"
                       : "Gunakan filter pengguna untuk melihat inisiatif anggota tim lainnya"}
                   </p>
@@ -2777,218 +3218,242 @@ export default function DailyFocusPage() {
                           </th>
                         </tr>
                       </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {activeInitiatives
-                        .sort((a, b) => {
-                          const scoreA = parseFloat(a.priorityScore || "0");
-                          const scoreB = parseFloat(b.priorityScore || "0");
-                          return scoreB - scoreA; // Sort by priority score descending
-                        })
-                        .map((initiative: any) => {
-                          const rawScore = initiative.priorityScore;
-                          const score = parseFloat(rawScore || "0");
-                          
-                          let priorityColor: string;
-                          let priorityLabel: string;
-                          
-                          if (score >= 4.0) {
-                            priorityColor = "bg-red-100 text-red-800";
-                            priorityLabel = "Kritis";
-                          } else if (score >= 3.0) {
-                            priorityColor = "bg-orange-100 text-orange-800";
-                            priorityLabel = "Tinggi";
-                          } else if (score >= 2.0) {
-                            priorityColor = "bg-yellow-100 text-yellow-800";
-                            priorityLabel = "Sedang";
-                          } else {
-                            priorityColor = "bg-green-100 text-green-800";
-                            priorityLabel = "Rendah";
-                          }
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {activeInitiatives
+                          .sort((a, b) => {
+                            const scoreA = parseFloat(a.priorityScore || "0");
+                            const scoreB = parseFloat(b.priorityScore || "0");
+                            return scoreB - scoreA; // Sort by priority score descending
+                          })
+                          .map((initiative: any) => {
+                            const rawScore = initiative.priorityScore;
+                            const score = parseFloat(rawScore || "0");
 
-                          const status = initiative.status || "draft";
-                          const getStatusInfo = (status: string) => {
-                            const statusMap = {
-                              'draft': {
-                                label: 'Draft',
-                                bgColor: 'bg-gray-100',
-                                textColor: 'text-gray-800',
-                              },
-                              'sedang_berjalan': {
-                                label: 'Sedang Berjalan',
-                                bgColor: 'bg-blue-100',
-                                textColor: 'text-blue-800',
-                              },
-                              'selesai': {
-                                label: 'Selesai',
-                                bgColor: 'bg-green-100',
-                                textColor: 'text-green-800',
-                              },
-                              'dibatalkan': {
-                                label: 'Dibatalkan',
-                                bgColor: 'bg-red-100',
-                                textColor: 'text-red-800',
-                              },
+                            let priorityColor: string;
+                            let priorityLabel: string;
+
+                            if (score >= 4.0) {
+                              priorityColor = "bg-red-100 text-red-800";
+                              priorityLabel = "Kritis";
+                            } else if (score >= 3.0) {
+                              priorityColor = "bg-orange-100 text-orange-800";
+                              priorityLabel = "Tinggi";
+                            } else if (score >= 2.0) {
+                              priorityColor = "bg-yellow-100 text-yellow-800";
+                              priorityLabel = "Sedang";
+                            } else {
+                              priorityColor = "bg-green-100 text-green-800";
+                              priorityLabel = "Rendah";
+                            }
+
+                            const status = initiative.status || "draft";
+                            const getStatusInfo = (status: string) => {
+                              const statusMap = {
+                                draft: {
+                                  label: "Draft",
+                                  bgColor: "bg-gray-100",
+                                  textColor: "text-gray-800",
+                                },
+                                sedang_berjalan: {
+                                  label: "Sedang Berjalan",
+                                  bgColor: "bg-blue-100",
+                                  textColor: "text-blue-800",
+                                },
+                                selesai: {
+                                  label: "Selesai",
+                                  bgColor: "bg-green-100",
+                                  textColor: "text-green-800",
+                                },
+                                dibatalkan: {
+                                  label: "Dibatalkan",
+                                  bgColor: "bg-red-100",
+                                  textColor: "text-red-800",
+                                },
+                              };
+                              return (
+                                statusMap[status as keyof typeof statusMap] ||
+                                statusMap.draft
+                              );
                             };
-                            return statusMap[status as keyof typeof statusMap] || statusMap.draft;
-                          };
 
-                          const statusInfo = getStatusInfo(status);
+                            const statusInfo = getStatusInfo(status);
 
-                          return (
-                            <tr
-                              key={initiative.id}
-                              className="hover:bg-gray-50"
-                            >
-                              <td className="px-4 py-4">
-                                <div>
-                                  <Link href={`/initiatives/${initiative.id}`}>
-                                    <div className="font-medium text-gray-900 hover:text-blue-600 cursor-pointer">
-                                      {initiative.title}
-                                    </div>
-                                  </Link>
-                                  
-                                  {initiative.keyResultId && (
-                                    <div className="flex items-center gap-1 mt-1">
-                                      <TooltipProvider>
-                                        <Tooltip>
-                                          <TooltipTrigger>
-                                            <Target className="w-3 h-3 text-blue-600" />
-                                          </TooltipTrigger>
-                                          <TooltipContent>
-                                            <p>Angka Target</p>
-                                          </TooltipContent>
-                                        </Tooltip>
-                                      </TooltipProvider>
-                                      <span className="text-xs text-blue-600 font-medium">
-                                        {keyResults.find((kr: any) => kr.id === initiative.keyResultId)?.title || 'Unknown'}
-                                      </span>
-                                    </div>
-                                  )}
-                                  {initiative.budget && (
-                                    <div className="text-sm text-gray-500 mt-1">
-                                      Budget: Rp{" "}
-                                      {parseFloat(
-                                        initiative.budget,
-                                      ).toLocaleString("id-ID")}
-                                    </div>
-                                  )}
-                                </div>
-                              </td>
-                              <td className="px-4 py-4">
-                                <Badge
-                                  className={`${statusInfo.bgColor} ${statusInfo.textColor} text-xs px-2 py-1`}
-                                >
-                                  {statusInfo.label}
-                                </Badge>
-                              </td>
-                              <td className="px-4 py-4 text-center">
-                                <div className="flex flex-col items-center gap-1">
-                                  <Badge className={`${priorityColor} text-xs px-2 py-0.5`}>
-                                    {priorityLabel}
-                                  </Badge>
-                                  <span className="text-xs text-gray-400">
-                                    {score.toFixed(1)}/5.0
-                                  </span>
-                                </div>
-                              </td>
-                              <td className="px-4 py-4">
-                                <div className="flex items-center gap-2">
-                                  <div className="flex-1">
-                                    <div className="w-full bg-gray-200 rounded-full h-2">
-                                      <div
-                                        className={`h-2 rounded-full ${(() => {
-                                          const progress = initiative.progressPercentage || 0;
-                                          if (progress >= 100) return "bg-green-600";
-                                          if (progress >= 80) return "bg-green-500";
-                                          if (progress >= 60) return "bg-orange-500";
-                                          return "bg-red-500";
-                                        })()}`}
-                                        style={{
-                                          width: `${initiative.progressPercentage || 0}%`,
-                                        }}
-                                      ></div>
-                                    </div>
-                                  </div>
-                                  <span className="text-sm font-medium text-gray-900 min-w-0">
-                                    {initiative.progressPercentage || 0}%
-                                  </span>
-                                </div>
-                              </td>
-                              <td className="px-4 py-4">
-                                <div className="text-sm">
-                                  {initiative.startDate && (
-                                    <div className="text-gray-500">
-                                      Mulai: {new Date(initiative.startDate).toLocaleDateString("id-ID", {
-                                        day: "numeric",
-                                        month: "short",
-                                      })}
-                                    </div>
-                                  )}
-                                  {initiative.dueDate ? (
-                                    <div
-                                      className={`text-sm ${
-                                        new Date(initiative.dueDate) < new Date()
-                                          ? "text-red-600 font-medium"
-                                          : "text-gray-900"
-                                      }`}
+                            return (
+                              <tr
+                                key={initiative.id}
+                                className="hover:bg-gray-50"
+                              >
+                                <td className="px-4 py-4">
+                                  <div>
+                                    <Link
+                                      href={`/initiatives/${initiative.id}`}
                                     >
-                                      Selesai: {new Date(initiative.dueDate).toLocaleDateString("id-ID", {
-                                        day: "numeric",
-                                        month: "short",
-                                      })}
-                                    </div>
-                                  ) : (
-                                    <div className="text-gray-400 text-sm">
-                                      Selesai: -
-                                    </div>
-                                  )}
-                                </div>
-                              </td>
-                              <td className="px-4 py-4">
-                                <div className="flex items-center gap-2">
-                                  {initiative.picId ? (
-                                    <>
-                                      <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                                        {getUserName(initiative.picId)
-                                          ?.split(" ")
-                                          .map((n) => n[0])
-                                          .join("")
-                                          .toUpperCase() || "?"}
+                                      <div className="font-medium text-gray-900 hover:text-blue-600 cursor-pointer">
+                                        {initiative.title}
                                       </div>
-                                      <span className="text-sm text-gray-900 truncate">
-                                        {getUserName(initiative.picId)}
-                                      </span>
-                                    </>
-                                  ) : (
-                                    <span className="text-sm text-gray-400">
-                                      Tidak ditugaskan
-                                    </span>
-                                  )}
-                                </div>
-                              </td>
-                              <td className="px-4 py-4 text-center">
-                                <Button
-                                  onClick={() => handleUpdateMetrics(initiative)}
-                                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-3 py-1 rounded-md text-sm font-medium"
-                                >
-                                  Update
-                                </Button>
-                              </td>
-                              <td className="px-4 py-4 text-center">
-                                <Link href={`/initiatives/${initiative.id}`}>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 w-8 p-0"
-                                    title="Lihat Detail"
+                                    </Link>
+
+                                    {initiative.keyResultId && (
+                                      <div className="flex items-center gap-1 mt-1">
+                                        <TooltipProvider>
+                                          <Tooltip>
+                                            <TooltipTrigger>
+                                              <Target className="w-3 h-3 text-blue-600" />
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                              <p>Angka Target</p>
+                                            </TooltipContent>
+                                          </Tooltip>
+                                        </TooltipProvider>
+                                        <span className="text-xs text-blue-600 font-medium">
+                                          {keyResults.find(
+                                            (kr: any) =>
+                                              kr.id === initiative.keyResultId,
+                                          )?.title || "Unknown"}
+                                        </span>
+                                      </div>
+                                    )}
+                                    {initiative.budget && (
+                                      <div className="text-sm text-gray-500 mt-1">
+                                        Budget: Rp{" "}
+                                        {parseFloat(
+                                          initiative.budget,
+                                        ).toLocaleString("id-ID")}
+                                      </div>
+                                    )}
+                                  </div>
+                                </td>
+                                <td className="px-4 py-4">
+                                  <Badge
+                                    className={`${statusInfo.bgColor} ${statusInfo.textColor} text-xs px-2 py-1`}
                                   >
-                                    <Eye className="h-4 w-4" />
+                                    {statusInfo.label}
+                                  </Badge>
+                                </td>
+                                <td className="px-4 py-4 text-center">
+                                  <div className="flex flex-col items-center gap-1">
+                                    <Badge
+                                      className={`${priorityColor} text-xs px-2 py-0.5`}
+                                    >
+                                      {priorityLabel}
+                                    </Badge>
+                                    <span className="text-xs text-gray-400">
+                                      {score.toFixed(1)}/5.0
+                                    </span>
+                                  </div>
+                                </td>
+                                <td className="px-4 py-4">
+                                  <div className="flex items-center gap-2">
+                                    <div className="flex-1">
+                                      <div className="w-full bg-gray-200 rounded-full h-2">
+                                        <div
+                                          className={`h-2 rounded-full ${(() => {
+                                            const progress =
+                                              initiative.progressPercentage ||
+                                              0;
+                                            if (progress >= 100)
+                                              return "bg-green-600";
+                                            if (progress >= 80)
+                                              return "bg-green-500";
+                                            if (progress >= 60)
+                                              return "bg-orange-500";
+                                            return "bg-red-500";
+                                          })()}`}
+                                          style={{
+                                            width: `${initiative.progressPercentage || 0}%`,
+                                          }}
+                                        ></div>
+                                      </div>
+                                    </div>
+                                    <span className="text-sm font-medium text-gray-900 min-w-0">
+                                      {initiative.progressPercentage || 0}%
+                                    </span>
+                                  </div>
+                                </td>
+                                <td className="px-4 py-4">
+                                  <div className="text-sm">
+                                    {initiative.startDate && (
+                                      <div className="text-gray-500">
+                                        Mulai:{" "}
+                                        {new Date(
+                                          initiative.startDate,
+                                        ).toLocaleDateString("id-ID", {
+                                          day: "numeric",
+                                          month: "short",
+                                        })}
+                                      </div>
+                                    )}
+                                    {initiative.dueDate ? (
+                                      <div
+                                        className={`text-sm ${
+                                          new Date(initiative.dueDate) <
+                                          new Date()
+                                            ? "text-red-600 font-medium"
+                                            : "text-gray-900"
+                                        }`}
+                                      >
+                                        Selesai:{" "}
+                                        {new Date(
+                                          initiative.dueDate,
+                                        ).toLocaleDateString("id-ID", {
+                                          day: "numeric",
+                                          month: "short",
+                                        })}
+                                      </div>
+                                    ) : (
+                                      <div className="text-gray-400 text-sm">
+                                        Selesai: -
+                                      </div>
+                                    )}
+                                  </div>
+                                </td>
+                                <td className="px-4 py-4">
+                                  <div className="flex items-center gap-2">
+                                    {initiative.picId ? (
+                                      <>
+                                        <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                                          {getUserName(initiative.picId)
+                                            ?.split(" ")
+                                            .map((n) => n[0])
+                                            .join("")
+                                            .toUpperCase() || "?"}
+                                        </div>
+                                        <span className="text-sm text-gray-900 truncate">
+                                          {getUserName(initiative.picId)}
+                                        </span>
+                                      </>
+                                    ) : (
+                                      <span className="text-sm text-gray-400">
+                                        Tidak ditugaskan
+                                      </span>
+                                    )}
+                                  </div>
+                                </td>
+                                <td className="px-4 py-4 text-center">
+                                  <Button
+                                    onClick={() =>
+                                      handleUpdateMetrics(initiative)
+                                    }
+                                    className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-3 py-1 rounded-md text-sm font-medium"
+                                  >
+                                    Update
                                   </Button>
-                                </Link>
-                              </td>
-                            </tr>
-                          );
-                        })}
+                                </td>
+                                <td className="px-4 py-4 text-center">
+                                  <Link href={`/initiatives/${initiative.id}`}>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-8 w-8 p-0"
+                                      title="Lihat Detail"
+                                    >
+                                      <Eye className="h-4 w-4" />
+                                    </Button>
+                                  </Link>
+                                </td>
+                              </tr>
+                            );
+                          })}
                       </tbody>
                     </table>
                   </div>
@@ -3004,10 +3469,10 @@ export default function DailyFocusPage() {
                       .map((initiative: any) => {
                         const rawScore = initiative.priorityScore;
                         const score = parseFloat(rawScore || "0");
-                        
+
                         let priorityColor: string;
                         let priorityLabel: string;
-                        
+
                         if (score >= 4.0) {
                           priorityColor = "bg-red-100 text-red-800";
                           priorityLabel = "Kritis";
@@ -3025,28 +3490,31 @@ export default function DailyFocusPage() {
                         const status = initiative.status || "draft";
                         const getStatusInfo = (status: string) => {
                           const statusMap = {
-                            'draft': {
-                              label: 'Draft',
-                              bgColor: 'bg-gray-100',
-                              textColor: 'text-gray-800',
+                            draft: {
+                              label: "Draft",
+                              bgColor: "bg-gray-100",
+                              textColor: "text-gray-800",
                             },
-                            'sedang_berjalan': {
-                              label: 'Sedang Berjalan',
-                              bgColor: 'bg-blue-100',
-                              textColor: 'text-blue-800',
+                            sedang_berjalan: {
+                              label: "Sedang Berjalan",
+                              bgColor: "bg-blue-100",
+                              textColor: "text-blue-800",
                             },
-                            'selesai': {
-                              label: 'Selesai',
-                              bgColor: 'bg-green-100',
-                              textColor: 'text-green-800',
+                            selesai: {
+                              label: "Selesai",
+                              bgColor: "bg-green-100",
+                              textColor: "text-green-800",
                             },
-                            'dibatalkan': {
-                              label: 'Dibatalkan',
-                              bgColor: 'bg-red-100',
-                              textColor: 'text-red-800',
+                            dibatalkan: {
+                              label: "Dibatalkan",
+                              bgColor: "bg-red-100",
+                              textColor: "text-red-800",
                             },
                           };
-                          return statusMap[status as keyof typeof statusMap] || statusMap.draft;
+                          return (
+                            statusMap[status as keyof typeof statusMap] ||
+                            statusMap.draft
+                          );
                         };
 
                         const statusInfo = getStatusInfo(status);
@@ -3063,20 +3531,25 @@ export default function DailyFocusPage() {
                                   {initiative.title}
                                 </h3>
                               </Link>
-                              
+
                               {initiative.keyResultId && (
                                 <div className="flex items-center gap-1">
                                   <Target className="w-3 h-3 text-blue-600" />
                                   <span className="text-xs text-blue-600 font-medium">
-                                    {keyResults.find((kr: any) => kr.id === initiative.keyResultId)?.title || 'Unknown'}
+                                    {keyResults.find(
+                                      (kr: any) =>
+                                        kr.id === initiative.keyResultId,
+                                    )?.title || "Unknown"}
                                   </span>
                                 </div>
                               )}
-                              
+
                               {initiative.budget && (
                                 <div className="text-sm text-gray-500">
                                   Budget: Rp{" "}
-                                  {parseFloat(initiative.budget).toLocaleString("id-ID")}
+                                  {parseFloat(initiative.budget).toLocaleString(
+                                    "id-ID",
+                                  )}
                                 </div>
                               )}
                             </div>
@@ -3088,7 +3561,9 @@ export default function DailyFocusPage() {
                               >
                                 {statusInfo.label}
                               </Badge>
-                              <Badge className={`${priorityColor} text-xs px-2 py-1`}>
+                              <Badge
+                                className={`${priorityColor} text-xs px-2 py-1`}
+                              >
                                 {priorityLabel} ({score.toFixed(1)}/5.0)
                               </Badge>
                             </div>
@@ -3104,7 +3579,8 @@ export default function DailyFocusPage() {
                               <div className="w-full bg-gray-200 rounded-full h-2">
                                 <div
                                   className={`h-2 rounded-full ${(() => {
-                                    const progress = initiative.progressPercentage || 0;
+                                    const progress =
+                                      initiative.progressPercentage || 0;
                                     if (progress >= 100) return "bg-green-600";
                                     if (progress >= 80) return "bg-green-500";
                                     if (progress >= 60) return "bg-orange-500";
@@ -3121,8 +3597,22 @@ export default function DailyFocusPage() {
                             <div className="space-y-2 text-sm">
                               <div className="flex justify-between">
                                 <span className="text-gray-600">Tenggat:</span>
-                                <span className={initiative.dueDate && new Date(initiative.dueDate) < new Date() ? "text-red-600 font-medium" : "text-gray-900"}>
-                                  {initiative.dueDate ? new Date(initiative.dueDate).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : "-"}
+                                <span
+                                  className={
+                                    initiative.dueDate &&
+                                    new Date(initiative.dueDate) < new Date()
+                                      ? "text-red-600 font-medium"
+                                      : "text-gray-900"
+                                  }
+                                >
+                                  {initiative.dueDate
+                                    ? new Date(
+                                        initiative.dueDate,
+                                      ).toLocaleDateString("id-ID", {
+                                        day: "numeric",
+                                        month: "short",
+                                      })
+                                    : "-"}
                                 </span>
                               </div>
                               <div className="flex justify-between">
@@ -3159,7 +3649,11 @@ export default function DailyFocusPage() {
                                 Update Metrics
                               </Button>
                               <Link href={`/initiatives/${initiative.id}`}>
-                                <Button variant="outline" size="sm" title="Lihat Detail">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  title="Lihat Detail"
+                                >
                                   <Eye className="h-4 w-4" />
                                 </Button>
                               </Link>
@@ -3195,12 +3689,15 @@ export default function DailyFocusPage() {
         />
       )}
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Hapus Task</AlertDialogTitle>
             <AlertDialogDescription>
-              Apakah Anda yakin ingin menghapus task "{taskToDelete?.title}"? 
+              Apakah Anda yakin ingin menghapus task "{taskToDelete?.title}"?
               Tindakan ini tidak dapat dibatalkan.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -3220,10 +3717,7 @@ export default function DailyFocusPage() {
       </AlertDialog>
 
       {/* Goal Creation Modal using existing OKRFormModal */}
-      <OKRFormModal
-        open={isGoalModalOpen}
-        onOpenChange={setIsGoalModalOpen}
-      />
+      <OKRFormModal open={isGoalModalOpen} onOpenChange={setIsGoalModalOpen} />
 
       {/* Task Modal */}
       <TaskModal
@@ -3236,7 +3730,7 @@ export default function DailyFocusPage() {
         initiativeId=""
         isAdding={!selectedTask}
       />
-      
+
       {/* Guided Tour */}
       <Joyride
         steps={tourSteps}
@@ -3249,48 +3743,48 @@ export default function DailyFocusPage() {
         disableOverlayClose
         styles={{
           options: {
-            primaryColor: '#ea580c',
-            textColor: '#374151',
-            backgroundColor: '#ffffff',
-            overlayColor: 'rgba(0, 0, 0, 0.5)',
+            primaryColor: "#ea580c",
+            textColor: "#374151",
+            backgroundColor: "#ffffff",
+            overlayColor: "rgba(0, 0, 0, 0.5)",
           },
           tooltip: {
             fontSize: 14,
             padding: 16,
           },
           buttonNext: {
-            backgroundColor: '#ea580c',
-            color: '#ffffff',
+            backgroundColor: "#ea580c",
+            color: "#ffffff",
             fontSize: 14,
-            padding: '8px 16px',
-            borderRadius: '6px',
+            padding: "8px 16px",
+            borderRadius: "6px",
           },
           buttonBack: {
-            color: '#6b7280',
+            color: "#6b7280",
             fontSize: 14,
-            padding: '8px 16px',
+            padding: "8px 16px",
           },
           buttonSkip: {
-            color: '#6b7280',
+            color: "#6b7280",
             fontSize: 14,
-            padding: '8px 16px',
+            padding: "8px 16px",
           },
         }}
         locale={{
-          back: 'Kembali',
-          close: 'Tutup',
-          last: 'Selesai',
-          next: 'Lanjut',
-          skip: 'Lewati',
-          open: 'Buka dialog',
+          back: "Kembali",
+          close: "Tutup",
+          last: "Selesai",
+          next: "Lanjut",
+          skip: "Lewati",
+          open: "Buka dialog",
         }}
       />
-      
+
       {/* Tour Restart Button */}
       <div className="fixed bottom-4 right-4 z-[9999]">
         <Button
           onClick={() => {
-            console.log('Help button clicked');
+            console.log("Help button clicked");
             setRunTour(true);
           }}
           className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white shadow-lg"
