@@ -259,6 +259,8 @@ All email configuration now uses environment variables:
   * ENHANCED: User display now shows email or "User" fallback when firstName/lastName are null
   * ADDED: Default user assignment to current signed-in user when creating new tasks
   * IMPROVED: Task form now automatically assigns tasks to current user for better workflow
+  * FILTERED: User selection now only shows active users (isActive === true) for task assignment
+  * ENHANCED: Prevents assignment to pending/inactive users in task creation workflow
   * RESULT: Initiative status system now consistent throughout application with proper filtering and form behavior
 - July 13, 2025. Successfully fixed initiative onboarding date alignment and implemented milestone bar, progress bar, and mission card in initiative detail page with comprehensive progress tracking:
   * FIXED: Initiative creation during onboarding now properly uses cycle start/end dates instead of random dates

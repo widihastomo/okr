@@ -176,8 +176,10 @@ export default function TaskModal({
   const picId = initiativeData.picId;
   const initiativeMembers = initiativeData.members || [];
 
-  // Show all users for task assignment
-  const availableUsers = Array.isArray(usersData) ? usersData : [];
+  // Show only active users for task assignment
+  const availableUsers = Array.isArray(usersData) 
+    ? usersData.filter((user: any) => user.isActive === true) 
+    : [];
 
   useEffect(() => {
     if (task && !isAdding) {
