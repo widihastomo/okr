@@ -328,6 +328,22 @@ export default function Dashboard() {
       }
     }
 
+    // Debug logging to help identify filtering issues
+    console.log('Goal filtering debug:', {
+      goalId: goal.id,
+      goalTitle: goal.title,
+      statusMatch,
+      cycleMatch,
+      userMatch,
+      finalResult: statusMatch && cycleMatch && userMatch,
+      statusFilter,
+      cycleFilter,
+      userFilter,
+      goalStatus: goal.status,
+      goalCycleId: goal.cycleId,
+      goalOwnerId: goal.ownerId
+    });
+
     return statusMatch && cycleMatch && userMatch;
   });
 
