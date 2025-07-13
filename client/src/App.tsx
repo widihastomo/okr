@@ -58,7 +58,6 @@ import DummyClientExamples from "@/pages/dummy-client-examples";
 import ReferralCodes from "@/pages/referral-codes";
 
 import CompanyOnboarding from "@/pages/company-onboarding";
-import MemberInvitations from "@/pages/member-invitations";
 
 import ClientStatusMapping from "@/pages/client-status-mapping";
 import ApplicationSettings from "@/pages/system-admin/application-settings";
@@ -250,7 +249,6 @@ function Router() {
                 component={SystemOrganizationManagement}
               />
               <Route path="/client-users" component={ClientUserManagement} />
-              <Route path="/member-invitations" component={MemberInvitations} />
               <Route
                 path="/notification-settings"
                 component={NotificationSettings}

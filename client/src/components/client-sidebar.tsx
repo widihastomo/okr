@@ -211,12 +211,6 @@ export default function Sidebar({
       path: "/client-users",
       active: location === "/client-users",
     });
-    regularUserMenuItems.push({
-      label: "Undangan Member",
-      icon: Mail,
-      path: "/member-invitations",
-      active: location === "/member-invitations",
-    });
   }
 
   // Choose menu items based on user type
