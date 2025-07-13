@@ -260,6 +260,10 @@ All email configuration now uses environment variables:
   * IMPROVED: Delete metric process now uses proper confirmation modal with "Hapus Metrik Keberhasilan" title
   * FIXED: Delete confirmation includes metric name and proper destructive action button styling
   * STANDARDIZED: All delete operations in initiative detail now use consistent AlertDialog pattern
+  * FIXED: Removed black focus border on all AlertDialog buttons by changing focus ring to orange color
+  * ENHANCED: Updated global ring color variable to orange (hsl(25, 95%, 53%)) in both light and dark themes
+  * IMPROVED: All buttons now use consistent orange focus state throughout the application
+  * RESULT: Clean, professional button styling with orange focus states matching application theme
 - July 13, 2025. Successfully completed comprehensive active user filtering implementation and task modal consistency upgrade:
   * IMPLEMENTED: Active user filtering (isActive === true) across all SearchableUserSelect components throughout the application
   * UPDATED: Task modal, edit objective modal, goal form modal, and key result modal with active user filtering

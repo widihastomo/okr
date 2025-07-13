@@ -46,7 +46,7 @@
   --destructive-foreground: hsl(60, 9.1%, 97.8%);
   --success: hsl(142, 76%, 36%);
   --success-foreground: hsl(140, 100%, 95%);
-  --ring: hsl(20, 14.3%, 4.1%);
+  --ring: hsl(25, 95%, 53%);
   --radius: 0.5rem;
 }
 
@@ -71,7 +71,7 @@
   --destructive-foreground: hsl(0, 0%, 98%);
   --success: hsl(142, 76%, 36%);
   --success-foreground: hsl(140, 100%, 95%);
-  --ring: hsl(240, 4.9%, 83.9%);
+  --ring: hsl(25, 95%, 53%);
   --radius: 0.5rem;
 }
 

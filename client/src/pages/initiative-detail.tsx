@@ -1573,13 +1573,16 @@ export default function InitiativeDetailPage() {
             />
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setCancelReason("")}>
+            <AlertDialogCancel 
+              onClick={() => setCancelReason("")}
+              className="focus:ring-orange-500"
+            >
               Batal
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleCancelInitiative}
               disabled={!cancelReason.trim() || cancelInitiativeMutation.isPending}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 focus:ring-orange-500"
             >
               {cancelInitiativeMutation.isPending ? "Membatalkan..." : "Batalkan Inisiatif"}
             </AlertDialogAction>
@@ -1597,10 +1600,13 @@ export default function InitiativeDetailPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => {
-              setIsDeleteMetricModalOpen(false);
-              setMetricToDelete(null);
-            }}>
+            <AlertDialogCancel 
+              onClick={() => {
+                setIsDeleteMetricModalOpen(false);
+                setMetricToDelete(null);
+              }}
+              className="focus:ring-orange-500"
+            >
               Batal
             </AlertDialogCancel>
             <AlertDialogAction
@@ -1610,7 +1616,7 @@ export default function InitiativeDetailPage() {
                 }
               }}
               disabled={deleteSuccessMetricMutation.isPending}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 focus:ring-orange-500"
             >
               {deleteSuccessMetricMutation.isPending ? "Menghapus..." : "Hapus Metrik"}
             </AlertDialogAction>
