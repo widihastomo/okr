@@ -3355,6 +3355,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (updatedTask.initiativeId) {
         try {
           await storage.updateInitiativeProgress(updatedTask.initiativeId);
+          
+          // Update initiative status to "sedang_berjalan" when task starts
+          if (status === 'in_progress') {
+            const initiative = await storage.getInitiative(updatedTask.initiativeId);
+            if (initiative && initiative.status === 'draft') {
+              await storage.updateInitiative(updatedTask.initiativeId, {
+                status: 'sedang_berjalan',
+                updatedAt: new Date(),
+                lastUpdateBy: currentUser.id
+              });
+              console.log(`🚀 Initiative ${updatedTask.initiativeId} status updated to "sedang_berjalan" due to task progress`);
+            }
+          }
         } catch (error) {
           console.error("Error updating initiative progress:", error);
         }
@@ -4434,6 +4447,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update initiative progress after updating task
       if (updatedTask.initiativeId && typeof updatedTask.initiativeId === 'string') {
         await storage.updateInitiativeProgress(updatedTask.initiativeId);
+        
+        // Update initiative status to "sedang_berjalan" when task status changes to in_progress
+        if (req.body.status === 'in_progress') {
+          try {
+            const initiative = await storage.getInitiative(updatedTask.initiativeId);
+            if (initiative && initiative.status === 'draft') {
+              await storage.updateInitiative(updatedTask.initiativeId, {
+                status: 'sedang_berjalan',
+                updatedAt: new Date(),
+                lastUpdateBy: currentUser.id
+              });
+              console.log(`🚀 Initiative ${updatedTask.initiativeId} status updated to "sedang_berjalan" due to task progress`);
+            }
+          } catch (error) {
+            console.error("Error updating initiative status:", error);
+          }
+        }
       }
       
       res.json({ task: updatedTask, addedAsMember, removedAsMember });
@@ -4486,6 +4516,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
           newValue: req.body.status,
           changeDescription
         });
+      }
+      
+      // Update initiative status to "sedang_berjalan" when task status changes to in_progress
+      if (updatedTask.initiativeId && req.body.status === 'in_progress') {
+        try {
+          const initiative = await storage.getInitiative(updatedTask.initiativeId);
+          if (initiative && initiative.status === 'draft') {
+            await storage.updateInitiative(updatedTask.initiativeId, {
+              status: 'sedang_berjalan',
+              updatedAt: new Date(),
+              lastUpdateBy: currentUser.id
+            });
+            console.log(`🚀 Initiative ${updatedTask.initiativeId} status updated to "sedang_berjalan" due to task progress`);
+          }
+        } catch (error) {
+          console.error("Error updating initiative status:", error);
+        }
       }
       
       res.json(updatedTask);
