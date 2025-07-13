@@ -346,7 +346,7 @@ export default function EditObjectiveModal({ objective, open, onOpenChange }: Ed
                     </Label>
                     {ownerType === "user" ? (
                       <SearchableUserSelect
-                        users={users || []}
+                        users={users?.filter(user => user.isActive === true) || []}
                         value={form.watch("ownerId")}
                         onValueChange={(value) => {
                           form.setValue("ownerId", value);

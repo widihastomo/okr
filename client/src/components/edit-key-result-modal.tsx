@@ -363,7 +363,7 @@ export default function EditKeyResultModal({
                           </Popover>
                         </FormLabel>
                         <SearchableUserSelect
-                          users={users || []}
+                          users={users?.filter(user => user.isActive === true) || []}
                           value={field.value}
                           onValueChange={field.onChange}
                           placeholder="Pilih penanggung jawab"

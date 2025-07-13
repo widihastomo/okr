@@ -627,7 +627,7 @@ export default function Dashboard() {
             </Select>
 
             <SearchableUserSelect
-              users={users}
+              users={users?.filter(user => user.isActive === true) || []}
               value={userFilter}
               onValueChange={handleUserFilterChange}
               placeholder="Pilih User"

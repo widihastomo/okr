@@ -489,7 +489,7 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
                       </FormLabel>
                       <FormControl>
                         <SearchableUserSelect
-                          users={users}
+                          users={users?.filter(user => user.isActive === true) || []}
                           value={field.value === "none" ? "unassigned" : field.value}
                           onValueChange={(value) => field.onChange(value === "unassigned" ? "none" : value)}
                           placeholder="Pilih PIC"

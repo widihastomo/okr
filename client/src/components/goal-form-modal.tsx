@@ -661,7 +661,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                         ) : (
                           <FormControl>
                             <SearchableUserSelect
-                              users={users || []}
+                              users={users?.filter(user => user.isActive === true) || []}
                               value={field.value}
                               onValueChange={field.onChange}
                               placeholder="Pilih pemilik"
@@ -1392,7 +1392,7 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
                   </FormLabel>
                   <FormControl>
                     <SearchableUserSelect
-                      users={users || []}
+                      users={users?.filter(user => user.isActive === true) || []}
                       value={field.value}
                       onValueChange={field.onChange}
                       placeholder="Pilih penanggung jawab..."

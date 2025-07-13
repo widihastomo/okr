@@ -305,7 +305,7 @@ export default function QuickTaskFAB() {
                     </FormLabel>
                     <FormControl>
                       <SearchableUserSelect
-                        users={users as any[]}
+                        users={(users as any[])?.filter(user => user.isActive === true) || []}
                         value={field.value}
                         onValueChange={field.onChange}
                         placeholder="Pilih user"

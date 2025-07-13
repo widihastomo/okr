@@ -209,7 +209,7 @@ export default function StandaloneTaskModal({ open, onOpenChange, onSuccess }: S
                     </FormLabel>
                     <FormControl>
                       <SearchableUserSelect
-                        users={users.filter((user: any) => user && user.id)}
+                        users={users.filter((user: any) => user && user.id && user.isActive === true)}
                         value={field.value || userId}
                         onValueChange={field.onChange}
                         placeholder="Pilih PIC"

@@ -454,7 +454,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                       </FormLabel>
                       <FormControl>
                         <SearchableUserSelect
-                          users={users}
+                          users={users?.filter(user => user.isActive === true) || []}
                           value={field.value || ""}
                           onValueChange={field.onChange}
                           placeholder="Pilih penanggung jawab"
