@@ -980,6 +980,19 @@ export default function DailyFocusPage() {
           (init: any) => init.picId === selectedUserId,
         );
 
+  // Debug logging for initiatives
+  console.log("🔍 Daily Focus Initiative Debug:", {
+    selectedUserId,
+    totalInitiatives: initiatives.length,
+    filteredInitiatives: filteredInitiatives.length,
+    initiatives: initiatives.map((init: any) => ({
+      id: init.id,
+      title: init.title,
+      picId: init.picId,
+      status: init.status
+    }))
+  });
+
   // Filter data for today's focus
   const todayTasks = filteredTasks.filter((task: any) => {
     const dueDate = task.dueDate ? task.dueDate.split("T")[0] : null;
@@ -1028,8 +1041,20 @@ export default function DailyFocusPage() {
   });
 
   const activeInitiatives = filteredInitiatives.filter(
-    (init: any) => init.status === "sedang_berjalan" || init.status === "draft",
+    (init: any) => init.status === "sedang_berjalan" || init.status === "draft" || init.status === "not_started",
   );
+
+  // Debug logging for active initiatives
+  console.log("🔍 Active Initiatives Debug:", {
+    filteredInitiatives: filteredInitiatives.length,
+    activeInitiatives: activeInitiatives.length,
+    activeInitiativesData: activeInitiatives.map((init: any) => ({
+      id: init.id,
+      title: init.title,
+      status: init.status,
+      picId: init.picId
+    }))
+  });
 
   // Get related objectives for today's activities
   const getRelatedObjectives = () => {
