@@ -3358,7 +3358,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Update initiative status to "sedang_berjalan" when task starts
           if (status === 'in_progress') {
-            const initiative = await storage.getInitiative(updatedTask.initiativeId);
+            const initiative = await storage.getInitiativeWithDetails(updatedTask.initiativeId);
             if (initiative && initiative.status === 'draft') {
               await storage.updateInitiative(updatedTask.initiativeId, {
                 status: 'sedang_berjalan',
@@ -4451,7 +4451,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Update initiative status to "sedang_berjalan" when task status changes to in_progress
         if (req.body.status === 'in_progress') {
           try {
-            const initiative = await storage.getInitiative(updatedTask.initiativeId);
+            const initiative = await storage.getInitiativeWithDetails(updatedTask.initiativeId);
             if (initiative && initiative.status === 'draft') {
               await storage.updateInitiative(updatedTask.initiativeId, {
                 status: 'sedang_berjalan',
@@ -4521,7 +4521,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update initiative status to "sedang_berjalan" when task status changes to in_progress
       if (updatedTask.initiativeId && req.body.status === 'in_progress') {
         try {
-          const initiative = await storage.getInitiative(updatedTask.initiativeId);
+          const initiative = await storage.getInitiativeWithDetails(updatedTask.initiativeId);
           if (initiative && initiative.status === 'draft') {
             await storage.updateInitiative(updatedTask.initiativeId, {
               status: 'sedang_berjalan',
