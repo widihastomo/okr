@@ -252,7 +252,7 @@ All email configuration now uses environment variables:
   * RESOLVED: Initiative date consistency issue where dates didn't match selected cycle duration
   * ENHANCED: Console logging to show proper date assignment for initiatives created during onboarding
   * REQUIRED: Made startDate and dueDate mandatory fields in initiative form with proper validation
-  * ADDED: Default values for new initiatives - startDate: today, dueDate: 30 days from today
+  * ADDED: Default values for new initiatives - startDate: today, dueDate: today
   * IMPROVED: Form validation with clear error messages for required date fields
   * REQUIRED: Made "Penanggung Jawab" (responsible person) mandatory field with proper validation
   * ENHANCED: Current user automatically selected as default responsible person for new initiatives

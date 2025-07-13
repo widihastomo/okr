@@ -179,7 +179,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
       keyResultId: keyResultId || "",
       picId: currentUserId || "",
       startDate: new Date(),
-      dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+      dueDate: new Date(), // Today
       priority: "medium",
       budget: "",
       impactScore: 5,
@@ -212,7 +212,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
         keyResultId: keyResultId || "",
         picId: currentUserId || "",
         startDate: new Date(),
-        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+        dueDate: new Date(), // Today
         priority: "medium",
         budget: "",
         impactScore: 5,
@@ -507,9 +507,6 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                           </PopoverContent>
                         </Popover>
                         <FormMessage />
-                        <FormDescription>
-                          Tanggal dimulainya inisiatif ini (bisa memilih tanggal sebelumnya)
-                        </FormDescription>
                       </FormItem>
                     )}
                   />
@@ -555,9 +552,6 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                           </PopoverContent>
                         </Popover>
                         <FormMessage />
-                        <FormDescription>
-                          Target tanggal selesai inisiatif ini (minimal hari ini)
-                        </FormDescription>
                       </FormItem>
                     )}
                   />
