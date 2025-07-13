@@ -1941,16 +1941,6 @@ export default function GoalDetail() {
                                   </td>
                                   <td className="px-4 py-4">
                                     <div className="flex items-center gap-1">
-                                      <Link href={`/initiatives/${initiative.id}`}>
-                                        <Button
-                                          variant="ghost"
-                                          size="icon"
-                                          className="h-8 w-8 p-0"
-                                          title="Lihat Detail"
-                                        >
-                                          <Eye className="h-4 w-4" />
-                                        </Button>
-                                      </Link>
                                       <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                           <Button
@@ -1962,6 +1952,12 @@ export default function GoalDetail() {
                                           </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
+                                          <DropdownMenuItem
+                                            onClick={() => window.location.href = `/initiatives/${initiative.id}`}
+                                          >
+                                            <Eye className="mr-2 h-4 w-4" />
+                                            Lihat Detail
+                                          </DropdownMenuItem>
                                           <DropdownMenuItem
                                             onClick={() => {
                                               setEditingInitiative(initiative);
@@ -2053,15 +2049,6 @@ export default function GoalDetail() {
                               )}
                             </div>
                             <div className="flex items-center gap-1 ml-2">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => (window.location.href = `/initiatives/${initiative.id}`)}
-                                className="h-6 w-6 p-0 flex-shrink-0"
-                                title="Lihat Detail"
-                              >
-                                <Eye className="h-3 w-3" />
-                              </Button>
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <Button
@@ -2073,6 +2060,12 @@ export default function GoalDetail() {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
+                                  <DropdownMenuItem
+                                    onClick={() => window.location.href = `/initiatives/${initiative.id}`}
+                                  >
+                                    <Eye className="mr-2 h-4 w-4" />
+                                    Lihat Detail
+                                  </DropdownMenuItem>
                                   <DropdownMenuItem
                                     onClick={() => {
                                       setEditingInitiative(initiative);

@@ -307,6 +307,14 @@ All email configuration now uses environment variables:
   * CLEANED: Removed excessive debug logging and limited development-only console output
   * IMPROVED: Complete UI consistency across all detail pages for professional appearance
   * VERIFIED: Cycle data successfully loads and displays with proper name, dates, and progress calculations
+- July 13, 2025. Successfully improved initiative form UX with better default values and UI consistency:
+  * CHANGED: Default value untuk tanggal selesai dari "30 hari dari sekarang" menjadi "hari ini"
+  * CONSISTENT: Kedua field tanggal (mulai dan selesai) sekarang default ke tanggal hari ini
+  * ENHANCED: Validasi tanggal selesai tetap mempertahankan minimal hari ini untuk mencegah tanggal lampau
+  * IMPROVED: UI consistency dengan memindahkan tombol "Lihat Detail" ke dropdown menu 3 titik
+  * STREAMLINED: Dropdown menu sekarang memiliki 3 opsi: "Lihat Detail", "Ubah", dan "Hapus"
+  * APPLIED: Perubahan UI konsisten untuk desktop dan mobile view
+  * FIXED: FormDescription import error yang menyebabkan error pada hint text
 - July 13, 2025. Successfully fixed goal update refresh issue and enhanced cache invalidation system:
   * FIXED: Added comprehensive cache invalidation in edit-objective-modal.tsx for both `/api/goals` and `/api/objectives` endpoints
   * ENHANCED: Cache invalidation now includes activity log, initiatives, and tasks for updated objectives
