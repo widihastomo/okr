@@ -144,20 +144,7 @@ const translatePriority = (priority: string): string => {
   return translations[priority?.toLowerCase()] || priority;
 };
 
-// Helper functions for task management (reuse from daily focus)
-const getUserName = (userId: string): string => {
-  // Get user name from users data
-  const user = users?.find(u => u.id === userId);
-  return user ? `${user.firstName || ""} ${user.lastName || ""}`.trim() || user.email || "Unknown" : "Unknown";
-};
-
-const getUserInitials = (userId: string): string => {
-  const user = users?.find(u => u.id === userId);
-  if (!user) return "U";
-  const firstName = user.firstName || "";
-  const lastName = user.lastName || "";
-  return firstName.charAt(0) + lastName.charAt(0);
-};
+// Helper functions for task management (reuse from daily focus) - moved inside component
 
 // Helper function to calculate progress stats
 const calculateProgressStats = (tasks: any[]) => {
@@ -506,6 +493,20 @@ export default function InitiativeDetailPage() {
     queryKey: ['/api/organization/users'],
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  // Helper functions that need users data
+  const getUserName = (userId: string): string => {
+    const user = users?.find(u => u.id === userId);
+    return user ? `${user.firstName || ""} ${user.lastName || ""}`.trim() || user.email || "Unknown" : "Unknown";
+  };
+
+  const getUserInitials = (userId: string): string => {
+    const user = users?.find(u => u.id === userId);
+    if (!user) return "U";
+    const firstName = user.firstName || "";
+    const lastName = user.lastName || "";
+    return firstName.charAt(0) + lastName.charAt(0);
+  };
 
   const { data: relatedInitiatives } = useQuery({
     queryKey: ['/api/initiatives'],
