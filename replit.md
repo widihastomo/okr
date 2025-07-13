@@ -289,6 +289,12 @@ All email configuration now uses environment variables:
   * ADDED: Contextual FormDescription that changes based on whether field is disabled
   * PREVENTED: User confusion by pre-selecting and disabling key result field in appropriate contexts
   * RESULT: Initiative form now provides clear UX when adding from key result detail page
+- July 13, 2025. Successfully added help popover for success metrics explanation in initiative detail page:
+  * ADDED: HelpCircle icon with popover trigger next to "Metrik Keberhasilan" title
+  * IMPLEMENTED: Comprehensive explanation of success metrics purpose and benefits
+  * ENHANCED: User education with practical examples and use cases
+  * IMPROVED: Better user understanding of success metrics functionality
+  * RESULT: Users now have clear guidance on how to use success metrics effectively
 - July 13, 2025. Successfully fixed initiative status system and disabled initiative field for tasks from initiative detail:
   * FIXED: Initiative creation now properly uses "draft" status instead of "not_started" (matching database schema)
   * CORRECTED: Server-side POST /api/initiatives endpoint now sets default status to "draft" 
