@@ -8,7 +8,6 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Calendar, Target, TrendingUp, Users, Clock, BarChart3, Edit, Trash2, ChevronRight, Home, ChevronDown, User, Check, CheckCircle2, MoreHorizontal, RefreshCw, MessageSquare, Paperclip, Send, AtSign, Plus } from "lucide-react";
 import { CheckInModal } from "@/components/check-in-modal";
-import InitiativeModal from "@/components/initiative-modal";
 import InitiativeFormModal from "@/components/initiative-form-modal";
 import { ProgressStatus } from "@/components/progress-status";
 import { format } from "date-fns";
@@ -1544,10 +1543,16 @@ export default function KeyResultDetailPage() {
     
     {/* Edit Initiative Modal */}
     {editingInitiative && (
-      <InitiativeModal 
-        keyResultId={keyResultId}
-        editingInitiative={editingInitiative}
+      <InitiativeFormModal 
+        initiative={editingInitiative}
+        isOpen={true}
         onClose={() => setEditingInitiative(null)}
+        keyResultId={keyResultId}
+        objectiveId={keyResult?.objectiveId}
+        onSuccess={() => {
+          setEditingInitiative(null);
+          queryClient.invalidateQueries({ queryKey: [`/api/key-results/${keyResultId}/initiatives`] });
+        }}
       />
     )}
 
@@ -1557,6 +1562,10 @@ export default function KeyResultDetailPage() {
       onClose={() => setShowInitiativeFormModal(false)}
       keyResultId={keyResultId}
       objectiveId={keyResult?.objectiveId}
+      onSuccess={() => {
+        setShowInitiativeFormModal(false);
+        queryClient.invalidateQueries({ queryKey: [`/api/key-results/${keyResultId}/initiatives`] });
+      }}
     />
 
     {/* Edit Task Modal */}

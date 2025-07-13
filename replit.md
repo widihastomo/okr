@@ -275,6 +275,13 @@ All email configuration now uses environment variables:
   * RESOLVED: End date now displays properly in initiative detail page overview section
   * IMPROVED: Better error handling for missing date fields
   * RESULT: Initiative dates now display correctly with proper Indonesian formatting
+- July 13, 2025. Successfully unified initiative form modal usage in key-result-detail page:
+  * FIXED: Replaced old InitiativeModal with InitiativeFormModal for edit operations 
+  * UNIFIED: Both add and edit initiatives now use the same InitiativeFormModal component
+  * ENHANCED: Added proper cache invalidation for both add and edit operations
+  * IMPROVED: Consistent form behavior between key-result-detail and other pages
+  * RESOLVED: Form inconsistency issue between add and edit initiative from key result detail
+  * RESULT: Initiative forms now display correctly with consistent UI and functionality
 - July 13, 2025. Successfully fixed initiative status system and disabled initiative field for tasks from initiative detail:
   * FIXED: Initiative creation now properly uses "draft" status instead of "not_started" (matching database schema)
   * CORRECTED: Server-side POST /api/initiatives endpoint now sets default status to "draft" 
