@@ -3357,16 +3357,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await storage.updateInitiativeProgress(updatedTask.initiativeId);
           
           // Update initiative status to "sedang_berjalan" when task starts
+          console.log(`🔍 Debug: Task status changed to "${status}", initiative ID: ${updatedTask.initiativeId}`);
           if (status === 'in_progress') {
+            console.log(`✅ Task status is in_progress, checking initiative...`);
             const initiative = await storage.getInitiativeWithDetails(updatedTask.initiativeId);
+            console.log(`📋 Initiative found: ${initiative ? 'YES' : 'NO'}, current status: ${initiative?.status}`);
             if (initiative && initiative.status === 'draft') {
+              console.log(`🔄 Updating initiative status from "draft" to "sedang_berjalan"...`);
               await storage.updateInitiative(updatedTask.initiativeId, {
                 status: 'sedang_berjalan',
                 updatedAt: new Date(),
                 lastUpdateBy: currentUser.id
               });
               console.log(`🚀 Initiative ${updatedTask.initiativeId} status updated to "sedang_berjalan" due to task progress`);
+            } else if (initiative) {
+              console.log(`ℹ️ Initiative status is already "${initiative.status}", no update needed`);
             }
+          } else {
+            console.log(`ℹ️ Task status "${status}" is not in_progress, no initiative update needed`);
           }
         } catch (error) {
           console.error("Error updating initiative progress:", error);
@@ -4449,20 +4457,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updateInitiativeProgress(updatedTask.initiativeId);
         
         // Update initiative status to "sedang_berjalan" when task status changes to in_progress
+        console.log(`🔍 Debug: Task status changed to "${req.body.status}", initiative ID: ${updatedTask.initiativeId}`);
         if (req.body.status === 'in_progress') {
           try {
+            console.log(`✅ Task status is in_progress, checking initiative...`);
             const initiative = await storage.getInitiativeWithDetails(updatedTask.initiativeId);
+            console.log(`📋 Initiative found: ${initiative ? 'YES' : 'NO'}, current status: ${initiative?.status}`);
             if (initiative && initiative.status === 'draft') {
+              console.log(`🔄 Updating initiative status from "draft" to "sedang_berjalan"...`);
               await storage.updateInitiative(updatedTask.initiativeId, {
                 status: 'sedang_berjalan',
                 updatedAt: new Date(),
                 lastUpdateBy: currentUser.id
               });
               console.log(`🚀 Initiative ${updatedTask.initiativeId} status updated to "sedang_berjalan" due to task progress`);
+            } else if (initiative) {
+              console.log(`ℹ️ Initiative status is already "${initiative.status}", no update needed`);
             }
           } catch (error) {
             console.error("Error updating initiative status:", error);
           }
+        } else {
+          console.log(`ℹ️ Task status "${req.body.status}" is not in_progress, no initiative update needed`);
         }
       }
       
@@ -4519,19 +4535,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Update initiative status to "sedang_berjalan" when task status changes to in_progress
-      if (updatedTask.initiativeId && req.body.status === 'in_progress') {
-        try {
-          const initiative = await storage.getInitiativeWithDetails(updatedTask.initiativeId);
-          if (initiative && initiative.status === 'draft') {
-            await storage.updateInitiative(updatedTask.initiativeId, {
-              status: 'sedang_berjalan',
-              updatedAt: new Date(),
-              lastUpdateBy: currentUser.id
-            });
-            console.log(`🚀 Initiative ${updatedTask.initiativeId} status updated to "sedang_berjalan" due to task progress`);
+      if (updatedTask.initiativeId) {
+        console.log(`🔍 Debug: Task status changed to "${req.body.status}", initiative ID: ${updatedTask.initiativeId}`);
+        if (req.body.status === 'in_progress') {
+          try {
+            console.log(`✅ Task status is in_progress, checking initiative...`);
+            const initiative = await storage.getInitiativeWithDetails(updatedTask.initiativeId);
+            console.log(`📋 Initiative found: ${initiative ? 'YES' : 'NO'}, current status: ${initiative?.status}`);
+            if (initiative && initiative.status === 'draft') {
+              console.log(`🔄 Updating initiative status from "draft" to "sedang_berjalan"...`);
+              await storage.updateInitiative(updatedTask.initiativeId, {
+                status: 'sedang_berjalan',
+                updatedAt: new Date(),
+                lastUpdateBy: currentUser.id
+              });
+              console.log(`🚀 Initiative ${updatedTask.initiativeId} status updated to "sedang_berjalan" due to task progress`);
+            } else if (initiative) {
+              console.log(`ℹ️ Initiative status is already "${initiative.status}", no update needed`);
+            }
+          } catch (error) {
+            console.error("Error updating initiative status:", error);
           }
-        } catch (error) {
-          console.error("Error updating initiative status:", error);
+        } else {
+          console.log(`ℹ️ Task status "${req.body.status}" is not in_progress, no initiative update needed`);
         }
       }
       
