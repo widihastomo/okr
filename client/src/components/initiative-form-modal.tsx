@@ -29,35 +29,57 @@ import { SearchableKeyResultSelect } from "@/components/ui/searchable-key-result
 import { formatNumberWithSeparator, handleNumberInputChange, getNumberValueForSubmission } from "@/lib/number-utils";
 import type { KeyResult, User, Initiative } from "@shared/schema";
 
-// Form schema matching the actual Initiative database schema
-const initiativeFormSchema = z.object({
-  title: z.string().min(1, "Judul inisiatif wajib diisi"),
-  description: z.string().optional(),
-  keyResultId: z.string().min(1, "Angka target wajib dipilih"),
-  picId: z.string().optional(),
-  startDate: z.date({
-    required_error: "Tanggal mulai wajib diisi",
-    invalid_type_error: "Tanggal mulai harus berupa tanggal yang valid"
-  }),
-  dueDate: z.date({
-    required_error: "Tanggal selesai wajib diisi", 
-    invalid_type_error: "Tanggal selesai harus berupa tanggal yang valid"
-  }),
-  priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
-  budget: z.string().optional(),
-  // Priority calculation inputs
-  impactScore: z.number().min(1).max(5).default(3),
-  effortScore: z.number().min(1).max(5).default(3),
-  confidenceScore: z.number().min(1).max(5).default(3),
-}).refine((data) => {
-  // Validate that start date is not greater than end date
-  return data.startDate <= data.dueDate;
-}, {
-  message: "Tanggal mulai tidak boleh lebih besar dari tanggal selesai",
-  path: ["startDate"], // Show error on startDate field
-});
+// Create a dynamic schema function to include cycle date validation
+const createInitiativeFormSchema = (cycle?: any) => {
+  return z.object({
+    title: z.string().min(1, "Judul inisiatif wajib diisi"),
+    description: z.string().optional(),
+    keyResultId: z.string().min(1, "Angka target wajib dipilih"),
+    picId: z.string().optional(),
+    startDate: z.date({
+      required_error: "Tanggal mulai wajib diisi",
+      invalid_type_error: "Tanggal mulai harus berupa tanggal yang valid"
+    }),
+    dueDate: z.date({
+      required_error: "Tanggal selesai wajib diisi", 
+      invalid_type_error: "Tanggal selesai harus berupa tanggal yang valid"
+    }),
+    priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
+    budget: z.string().optional(),
+    // Priority calculation inputs
+    impactScore: z.number().min(1).max(5).default(3),
+    effortScore: z.number().min(1).max(5).default(3),
+    confidenceScore: z.number().min(1).max(5).default(3),
+  }).refine((data) => {
+    // Validate that start date is not greater than end date
+    return data.startDate <= data.dueDate;
+  }, {
+    message: "Tanggal mulai tidak boleh lebih besar dari tanggal selesai",
+    path: ["startDate"], // Show error on startDate field
+  }).refine((data) => {
+    // Validate that dates are within cycle range if cycle data is available
+    if (cycle && cycle.startDate && cycle.endDate) {
+      const cycleStart = new Date(cycle.startDate);
+      const cycleEnd = new Date(cycle.endDate);
+      
+      // Check if start date is within cycle range
+      if (data.startDate < cycleStart || data.startDate > cycleEnd) {
+        return false;
+      }
+      
+      // Check if due date is within cycle range
+      if (data.dueDate < cycleStart || data.dueDate > cycleEnd) {
+        return false;
+      }
+    }
+    return true;
+  }, {
+    message: cycle ? `Tanggal inisiatif harus berada dalam rentang siklus (${new Date(cycle.startDate).toLocaleDateString('id-ID')} - ${new Date(cycle.endDate).toLocaleDateString('id-ID')})` : "Tanggal inisiatif harus berada dalam rentang siklus",
+    path: ["startDate"], // Show error on startDate field
+  });
+};
 
-type InitiativeFormData = z.infer<typeof initiativeFormSchema>;
+type InitiativeFormData = z.infer<ReturnType<typeof createInitiativeFormSchema>>;
 
 interface InitiativeFormModalProps {
   isOpen: boolean;
@@ -166,8 +188,20 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
     enabled: isOpen,
   });
 
+  // Fetch objective data to get cycle information
+  const { data: objective } = useQuery({
+    queryKey: ["/api/objectives", objectiveId],
+    enabled: isOpen && !!objectiveId,
+  });
+
+  // Fetch cycle data for date validation
+  const { data: cycle } = useQuery({
+    queryKey: ["/api/cycles", objective?.cycleId],
+    enabled: isOpen && !!objective?.cycleId,
+  });
+
   const form = useForm<InitiativeFormData>({
-    resolver: zodResolver(initiativeFormSchema),
+    resolver: zodResolver(createInitiativeFormSchema()),
     defaultValues: {
       title: "",
       description: "",
@@ -182,6 +216,24 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
       confidenceScore: 5,
     },
   });
+
+  // Update form resolver when cycle data changes
+  useEffect(() => {
+    if (cycle) {
+      form.clearErrors();
+      const currentFormData = form.getValues();
+      const newSchema = createInitiativeFormSchema(cycle);
+      
+      // Update the form with new schema
+      form.reset(currentFormData, {
+        keepDirty: true,
+        keepErrors: false,
+      });
+      
+      // Update resolver
+      form.resolver = zodResolver(newSchema);
+    }
+  }, [cycle, form]);
 
   // Reset form with initiative data when editing
   useEffect(() => {
@@ -496,7 +548,25 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                               disabled={(date) => {
                                 const today = new Date();
                                 today.setHours(0, 0, 0, 0); // Reset time to start of day
-                                return date < today || date < new Date("1900-01-01");
+                                
+                                // Basic date validation
+                                if (date < today || date < new Date("1900-01-01")) {
+                                  return true;
+                                }
+                                
+                                // Cycle date validation for start date
+                                if (cycle && cycle.startDate && cycle.endDate) {
+                                  const cycleStart = new Date(cycle.startDate);
+                                  const cycleEnd = new Date(cycle.endDate);
+                                  cycleStart.setHours(0, 0, 0, 0);
+                                  cycleEnd.setHours(0, 0, 0, 0);
+                                  
+                                  if (date < cycleStart || date > cycleEnd) {
+                                    return true;
+                                  }
+                                }
+                                
+                                return false;
                               }}
                               initialFocus
                             />
@@ -541,7 +611,25 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
                               disabled={(date) => {
                                 const today = new Date();
                                 today.setHours(0, 0, 0, 0); // Reset time to start of day
-                                return date < today || date < new Date("1900-01-01");
+                                
+                                // Basic date validation
+                                if (date < today || date < new Date("1900-01-01")) {
+                                  return true;
+                                }
+                                
+                                // Cycle date validation for due date
+                                if (cycle && cycle.startDate && cycle.endDate) {
+                                  const cycleStart = new Date(cycle.startDate);
+                                  const cycleEnd = new Date(cycle.endDate);
+                                  cycleStart.setHours(0, 0, 0, 0);
+                                  cycleEnd.setHours(0, 0, 0, 0);
+                                  
+                                  if (date < cycleStart || date > cycleEnd) {
+                                    return true;
+                                  }
+                                }
+                                
+                                return false;
                               }}
                               initialFocus
                             />
