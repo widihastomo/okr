@@ -266,6 +266,7 @@ All email configuration now uses environment variables:
   * UPDATED: MissionCard design to match existing patterns from daily-focus and objective-detail pages
   * ENHANCED: Consistent dashed orange border, gradient background, expandable content with chevron icon
   * IMPROVED: Rocket icon header, Sparkles accent, progress bar, and completion percentage display
+  * RELOCATED: MissionCard positioned after milestone bar instead of sidebar for better user flow
   * VERIFIED: All components update automatically based on initiative and task status changes
 - July 13, 2025. Successfully implemented resend invitation functionality and removed redundant member invitation page:
   * ADDED: Resend invitation feature for users with pending status in user management

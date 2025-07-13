@@ -742,6 +742,35 @@ export default function InitiativeDetailPage() {
       {/* Milestone Bar */}
       <MilestoneBar initiative={initiativeData} tasks={tasks || []} />
       
+      {/* Mission Card */}
+      <MissionCard 
+        missions={[
+          {
+            id: 'metrics',
+            title: 'Tambahkan Ukuran Keberhasilan',
+            description: 'Setiap inisiatif harus memiliki minimal 1 ukuran keberhasilan untuk mengukur pencapaian',
+            icon: <Target className="h-4 w-4" />,
+            action: () => {
+              setEditingMetric(null);
+              setIsSuccessMetricsModalOpen(true);
+            },
+            isCompleted: successMetrics.length > 0,
+            points: 50,
+            difficulty: 'medium' as const
+          },
+          {
+            id: 'tasks',
+            title: 'Buat Task Pertama',
+            description: 'Setiap inisiatif harus memiliki minimal 1 task untuk memulai eksekusi',
+            icon: <FileText className="h-4 w-4" />,
+            action: () => setIsAddTaskModalOpen(true),
+            isCompleted: tasks.length > 0,
+            points: 30,
+            difficulty: 'easy' as const
+          }
+        ]}
+      />
+      
       {/* Main Content Grid */}
       <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6 mb-6">
           {/* Main Content */}
@@ -1188,35 +1217,6 @@ export default function InitiativeDetailPage() {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Mission Card */}
-          <MissionCard 
-            missions={[
-              {
-                id: 'metrics',
-                title: 'Tambahkan Ukuran Keberhasilan',
-                description: 'Setiap inisiatif harus memiliki minimal 1 ukuran keberhasilan untuk mengukur pencapaian',
-                icon: <Target className="h-4 w-4" />,
-                action: () => {
-                  setEditingMetric(null);
-                  setIsSuccessMetricsModalOpen(true);
-                },
-                isCompleted: successMetrics.length > 0,
-                points: 50,
-                difficulty: 'medium' as const
-              },
-              {
-                id: 'tasks',
-                title: 'Buat Task Pertama',
-                description: 'Setiap inisiatif harus memiliki minimal 1 task untuk memulai eksekusi',
-                icon: <FileText className="h-4 w-4" />,
-                action: () => setIsAddTaskModalOpen(true),
-                isCompleted: tasks.length > 0,
-                points: 30,
-                difficulty: 'easy' as const
-              }
-            ]}
-          />
-
           {/* Team Information */}
           <Card className="border-gray-200 shadow-sm">
             <CardHeader>
