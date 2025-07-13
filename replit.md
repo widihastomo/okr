@@ -253,6 +253,9 @@ All email configuration now uses environment variables:
   * ADDED: Check icons for completed milestones and numbered circles for pending ones
   * INTEGRATED: Milestone logic - Planning (default), Execution (has running/completed tasks), Completed (initiative closed)
   * POSITIONED: Milestone bar placed prominently between header and main content in initiative detail page
+  * REDESIGNED: Milestone bar to horizontal step design with orange gradient bars instead of vertical timeline
+  * ENHANCED: Step bars with rounded corners, gradient backgrounds, and "Saat ini" indicator for current step
+  * IMPROVED: Connector arrows between steps and better visual hierarchy with step descriptions
   * ADDED: Initiative progress bar in overview card showing task completion percentage
   * IMPLEMENTED: Progress bar with orange gradient showing completed/total tasks ratio
   * ENHANCED: Task status breakdown showing counts for each status (Belum Mulai, Sedang Berjalan, Selesai, Dibatalkan)

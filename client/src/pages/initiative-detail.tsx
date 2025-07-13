@@ -277,7 +277,7 @@ function MissionCard({ missions, className }: MissionCardProps) {
   );
 }
 
-// Milestone Component
+// Milestone Component - Horizontal Bar Design
 const MilestoneBar = ({ initiative, tasks }: { initiative: any; tasks: any[] }) => {
   // Determine current milestone based on initiative status and task progress
   const getCurrentMilestone = () => {
@@ -308,47 +308,63 @@ const MilestoneBar = ({ initiative, tasks }: { initiative: any; tasks: any[] }) 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
       <h3 className="text-sm font-medium text-gray-900 mb-4">Progress Milestone</h3>
-      <div className="relative">
-        {/* Progress Line */}
-        <div className="absolute top-4 left-4 right-4 h-0.5 bg-gray-200">
-          <div 
-            className="h-full bg-orange-500 transition-all duration-500 ease-in-out"
-            style={{ 
-              width: `${((currentMilestone - 1) / (milestones.length - 1)) * 100}%` 
-            }}
-          />
-        </div>
-        
-        {/* Milestone Points */}
-        <div className="relative flex justify-between">
-          {milestones.map((milestone) => (
-            <div key={milestone.id} className="flex flex-col items-center">
-              <div 
-                className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-medium transition-all duration-300 ${
-                  milestone.id <= currentMilestone
-                    ? 'bg-orange-500 border-orange-500 text-white'
-                    : 'bg-white border-gray-300 text-gray-500'
-                }`}
-              >
-                {milestone.id <= currentMilestone ? (
-                  <Check className="w-4 h-4" />
-                ) : (
-                  milestone.id
-                )}
-              </div>
-              <div className="mt-2 text-center">
-                <div className={`text-xs font-medium ${
-                  milestone.id <= currentMilestone ? 'text-orange-600' : 'text-gray-500'
-                }`}>
-                  {milestone.name}
+      <div className="flex items-center gap-2">
+        {milestones.map((milestone, index) => (
+          <div key={milestone.id} className="flex items-center flex-1">
+            {/* Step Bar */}
+            <div 
+              className={`flex-1 h-12 rounded-l-lg rounded-r-lg flex items-center justify-between px-4 transition-all duration-300 ${
+                milestone.id <= currentMilestone
+                  ? 'bg-gradient-to-r from-orange-500 to-orange-400 text-white'
+                  : 'bg-gray-100 text-gray-500'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div 
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
+                    milestone.id <= currentMilestone
+                      ? 'bg-white/20 text-white'
+                      : 'bg-gray-300 text-gray-600'
+                  }`}
+                >
+                  {milestone.id <= currentMilestone ? (
+                    <Check className="w-3 h-3" />
+                  ) : (
+                    milestone.id
+                  )}
                 </div>
-                <div className="text-xs text-gray-400 mt-1 max-w-20 leading-tight">
-                  {milestone.description}
+                <div>
+                  <div className="text-sm font-medium">{milestone.name}</div>
+                  <div className={`text-xs ${
+                    milestone.id <= currentMilestone ? 'text-orange-100' : 'text-gray-400'
+                  }`}>
+                    {milestone.description}
+                  </div>
                 </div>
               </div>
+              
+              {/* Progress indicator for current step */}
+              {milestone.id === currentMilestone && milestone.id < 3 && (
+                <div className="text-xs font-medium bg-white/20 px-2 py-1 rounded-full">
+                  Saat ini
+                </div>
+              )}
             </div>
-          ))}
-        </div>
+            
+            {/* Connector Arrow */}
+            {index < milestones.length - 1 && (
+              <div className="w-4 h-4 mx-1 flex items-center justify-center">
+                <div 
+                  className={`w-0 h-0 border-l-4 border-t-2 border-b-2 border-t-transparent border-b-transparent transition-all duration-300 ${
+                    milestone.id < currentMilestone
+                      ? 'border-l-orange-400'
+                      : 'border-l-gray-300'
+                  }`}
+                />
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
