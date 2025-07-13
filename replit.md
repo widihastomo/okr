@@ -246,6 +246,16 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 13, 2025. Successfully fixed initiative status system and disabled initiative field for tasks from initiative detail:
+  * FIXED: Initiative creation now properly uses "draft" status instead of "not_started" (matching database schema)
+  * CORRECTED: Server-side POST /api/initiatives endpoint now sets default status to "draft" 
+  * UPDATED: Client-side initiative form now sends status "draft" instead of hardcoded "not_started"
+  * MIGRATED: Updated existing initiatives in database from "not_started" to "draft" status
+  * ENHANCED: Daily focus page filter now properly shows initiatives with "draft" and "sedang_berjalan" status
+  * IMPROVED: Task modal now disables "Inisiatif Terkait" field when task is created from initiative detail page
+  * ADDED: Visual indicator "(otomatis dipilih)" when initiative field is disabled
+  * UPDATED: Help text contextually changes based on whether initiative is pre-selected or not
+  * RESULT: Initiative status system now consistent throughout application with proper filtering and form behavior
 - July 13, 2025. Successfully fixed initiative onboarding date alignment and implemented milestone bar, progress bar, and mission card in initiative detail page with comprehensive progress tracking:
   * FIXED: Initiative creation during onboarding now properly uses cycle start/end dates instead of random dates
   * CORRECTED: Initiatives now have startDate set to cycleStartDate and dueDate set to cycleEndDate from onboarding data

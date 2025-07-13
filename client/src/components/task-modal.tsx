@@ -522,7 +522,8 @@ export default function TaskModal({
 
             <div>
               <Label className="flex items-center gap-2 mb-2">
-                Inisiatif Terkait (opsional)
+                Inisiatif Terkait {!initiativeId && "(opsional)"}
+                {initiativeId && <span className="text-xs text-gray-500">(otomatis dipilih)</span>}
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -537,9 +538,10 @@ export default function TaskModal({
                     <div className="space-y-2">
                       <h4 className="font-medium">Mengelompokkan Task</h4>
                       <p className="text-sm text-muted-foreground">
-                        Pilih initiative yang relevan untuk mengelompokkan task
-                        ini. Ini membantu dalam pelaporan progress dan koordinasi
-                        tim.
+                        {initiativeId 
+                          ? "Task ini akan otomatis terkait dengan inisiatif yang sedang dipilih."
+                          : "Pilih initiative yang relevan untuk mengelompokkan task ini. Ini membantu dalam pelaporan progress dan koordinasi tim."
+                        }
                       </p>
                     </div>
                   </PopoverContent>
@@ -554,7 +556,8 @@ export default function TaskModal({
                   variant="outline"
                   role="combobox"
                   aria-expanded={initiativePopoverOpen}
-                  className="w-full justify-between focus:ring-orange-500 focus:border-orange-500"
+                  disabled={!!initiativeId} // Disable when initiativeId is provided
+                  className="w-full justify-between focus:ring-orange-500 focus:border-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {formData.initiativeId
                     ? formData.initiativeId === "unassigned"
