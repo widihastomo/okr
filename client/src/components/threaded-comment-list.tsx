@@ -93,7 +93,7 @@ export function ThreadedCommentList({
                 <span className="font-medium text-gray-900 text-sm">
                   {comment.user?.firstName && comment.user?.lastName
                     ? `${comment.user.firstName} ${comment.user.lastName}`
-                    : comment.user?.email || 'User'}
+                    : comment.user?.firstName || 'User'}
                 </span>
                 <span className="text-xs text-gray-500">
                   {formatDistanceToNow(new Date(comment.createdAt || ''), { 
