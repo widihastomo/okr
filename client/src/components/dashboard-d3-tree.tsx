@@ -118,7 +118,7 @@ export default function DashboardD3Tree({
         const nodeWidth = 320;
         const nodeHeight = 140;
         const horizontalSpacing = 400;
-        const verticalSpacing = 200;
+        const verticalSpacing = 180; // Increased for better child node spacing
 
         // Clear previous content
         d3.select(svgRef.current).selectAll("*").remove();
@@ -176,19 +176,37 @@ export default function DashboardD3Tree({
       })
     );
 
-    // Create tree layout
+    // Create tree layout with adjusted spacing for child nodes
     const treeLayout = d3.tree<TreeNode>()
-      .nodeSize([verticalSpacing, horizontalSpacing]);
+      .nodeSize([verticalSpacing, horizontalSpacing])
+      .separation((a, b) => {
+        // Increase separation between sibling nodes
+        return a.parent === b.parent ? 1.2 : 2;
+      });
 
-    // Layout each root hierarchy separately
+    // Layout each root hierarchy separately with better spacing for expanded nodes
     rootHierarchies.forEach((root, index) => {
       treeLayout(root);
       
-      // Offset each tree vertically with minimal spacing
-      const offsetY = index * (nodeHeight + 20); // Small gap between nodes
+      // Calculate spacing based on expanded state
+      let cumulativeOffset = 0;
+      for (let i = 0; i < index; i++) {
+        const prevRoot = rootHierarchies[i];
+        const prevRootData = treeData[i];
+        
+        // Check if previous tree has expanded children
+        const hasExpandedChildren = prevRootData.children && prevRootData.children.length > 0 && 
+                                  expandedNodes.has(prevRootData.id);
+        
+        // Use larger spacing if previous tree is expanded
+        const spacingForTree = hasExpandedChildren ? (nodeHeight + 100) : (nodeHeight + 20);
+        cumulativeOffset += spacingForTree;
+      }
+      
+      // Apply calculated offset
       root.descendants().forEach(d => {
         if (d.x !== undefined) {
-          d.x += offsetY;
+          d.x += cumulativeOffset;
         }
       });
     });

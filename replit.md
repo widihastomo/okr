@@ -255,7 +255,10 @@ All email configuration now uses environment variables:
   * VERIFIED: Debug logging shows 2 goals with vertical offsets (0, 160) for clean vertical arrangement
   * FIXED: Overlap issue between goal titles and expand/collapse buttons by limiting title length
   * OPTIMIZED: Dynamic title truncation - 28 chars for nodes with children, 35 chars for leaf nodes
-  * RESULT: Clean dashboard hierarchy without artificial containers, goals displayed vertically with minimal spacing and no UI overlap
+  * ENHANCED: Improved vertical spacing for expanded child nodes to prevent overlap between different tree hierarchies
+  * IMPLEMENTED: Smart spacing calculation - collapsed trees use minimal spacing (nodeHeight + 20), expanded trees use larger spacing (nodeHeight + 100)
+  * ADDED: Tree separation function with 1.2x spacing between sibling nodes and 2x spacing between different branches
+  * RESULT: Clean dashboard hierarchy without artificial containers, goals displayed vertically with adaptive spacing and no UI overlap
 - July 14, 2025. Successfully enhanced Tasks filter section with improved UI layout and team filtering functionality:
   * ENHANCED: Redesigned filter section with grid layout and proper labels for better organization
   * IMPROVED: Search field positioned separately at top with responsive max-width
