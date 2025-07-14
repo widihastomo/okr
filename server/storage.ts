@@ -1,7 +1,7 @@
 import { 
   cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives, tasks, taskComments, taskAuditTrail,
   initiativeMembers, initiativeDocuments, initiativeNotes, initiativeComments, initiativeSuccessMetrics, successMetricUpdates,
-  notifications, notificationPreferences, userOnboardingProgress, organizations, applicationSettings,
+  notifications, notificationPreferences, userOnboardingProgress, organizations, applicationSettings, auditTrail,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
   type CheckIn, type Initiative, type Task, type TaskComment, type TaskAuditTrail, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
   type InitiativeNote, type InitiativeComment, type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
@@ -211,6 +211,16 @@ export interface IStorage {
   updateApplicationSetting(key: string, setting: UpdateApplicationSetting): Promise<ApplicationSetting | undefined>;
   deleteApplicationSetting(key: string): Promise<boolean>;
   getPublicApplicationSettings(): Promise<ApplicationSetting[]>;
+  
+  // Audit Trail
+  createAuditTrail(auditData: {
+    entityType: string;
+    entityId: string;
+    userId: string;
+    organizationId: string;
+    action: string;
+    changeDescription: string;
+  }): Promise<any>;
 }
 
 // Helper function to calculate and update status automatically
@@ -2522,6 +2532,46 @@ export class DatabaseStorage implements IStorage {
         }
       });
 
+      // Get audit trail entries for this initiative
+      const auditEntries = await db
+        .select({
+          id: auditTrail.id,
+          action: auditTrail.action,
+          changeDescription: auditTrail.changeDescription,
+          createdAt: auditTrail.createdAt,
+          user: {
+            id: users.id,
+            email: users.email,
+            firstName: users.firstName,
+            lastName: users.lastName,
+            role: users.role
+          }
+        })
+        .from(auditTrail)
+        .innerJoin(users, eq(users.id, auditTrail.userId))
+        .where(and(
+          eq(auditTrail.entityType, 'initiative'),
+          eq(auditTrail.entityId, initiativeId)
+        ))
+        .orderBy(auditTrail.createdAt);
+
+      // Add audit trail entries
+      for (const entry of auditEntries) {
+        history.push({
+          id: entry.id,
+          action: entry.action,
+          description: entry.changeDescription,
+          timestamp: entry.createdAt,
+          user: {
+            id: entry.user.id,
+            email: entry.user.email,
+            firstName: entry.user.firstName || '',
+            lastName: entry.user.lastName || '',
+            role: entry.user.role || 'member'
+          }
+        });
+      }
+
       // Get success metrics updates for this initiative
       const successMetricsData = await db
         .select()
@@ -2567,6 +2617,48 @@ export class DatabaseStorage implements IStorage {
         }
       }
 
+      // Get audit trail entries for this initiative
+      const auditTrail = await db
+        .select({
+          id: auditTrails.id,
+          action: auditTrails.action,
+          changeDescription: auditTrails.changeDescription,
+          createdAt: auditTrails.createdAt,
+          user: {
+            id: users.id,
+            email: users.email,
+            firstName: users.firstName,
+            lastName: users.lastName,
+            role: users.role
+          }
+        })
+        .from(auditTrails)
+        .innerJoin(users, eq(users.id, auditTrails.userId))
+        .where(
+          and(
+            eq(auditTrails.entityType, 'initiative'),
+            eq(auditTrails.entityId, initiativeId)
+          )
+        )
+        .orderBy(desc(auditTrails.createdAt));
+
+      // Add audit trail entries to history
+      for (const entry of auditTrail) {
+        history.push({
+          id: entry.id,
+          action: entry.action,
+          description: entry.changeDescription,
+          timestamp: entry.createdAt,
+          user: {
+            id: entry.user.id,
+            email: entry.user.email,
+            firstName: entry.user.firstName || '',
+            lastName: entry.user.lastName || '',
+            role: entry.user.role || 'member'
+          }
+        });
+      }
+
       // Add initiative update entries if initiative was updated after creation
       if (initiativeData.updatedAt && initiativeData.updatedAt > initiativeData.createdAt) {
         history.push({
@@ -2595,6 +2687,35 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error("Error fetching initiative history:", error);
       return [];
+    }
+  }
+
+  // Audit Trail
+  async createAuditTrail(auditData: {
+    entityType: string;
+    entityId: string;
+    userId: string;
+    organizationId: string;
+    action: string;
+    changeDescription: string;
+  }): Promise<any> {
+    try {
+      const [auditEntry] = await db
+        .insert(auditTrail)
+        .values({
+          entityType: auditData.entityType,
+          entityId: auditData.entityId,
+          userId: auditData.userId,
+          organizationId: auditData.organizationId,
+          action: auditData.action,
+          changeDescription: auditData.changeDescription,
+        })
+        .returning();
+      
+      return auditEntry;
+    } catch (error) {
+      console.error("Error creating audit trail:", error);
+      throw error;
     }
   }
 }

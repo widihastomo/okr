@@ -774,11 +774,12 @@ export default function InitiativeDetailPage() {
 
   const reopenInitiativeMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("PATCH", `/api/initiatives/${id}`, { status: "sedang_berjalan" });
+      return await apiRequest("POST", `/api/initiatives/${id}/reopen`, {});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/history`] });
       setIsReopenInitiativeModalOpen(false);
       toast({
         title: "Inisiatif dibuka kembali",

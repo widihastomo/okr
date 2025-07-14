@@ -541,6 +541,18 @@ export const taskAuditTrail = pgTable("task_audit_trail", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// General Audit Trail for tracking changes across all entities
+export const auditTrail = pgTable("audit_trail", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  entityType: text("entity_type").notNull(), // "initiative", "objective", "key_result", etc.
+  entityId: uuid("entity_id").notNull(),
+  userId: uuid("user_id").references(() => users.id).notNull(),
+  organizationId: uuid("organization_id").references(() => organizations.id).notNull(),
+  action: text("action").notNull(), // "created", "updated", "deleted", "closed", "cancelled", "reopened"
+  changeDescription: text("change_description"), // Human-readable description of the change
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const insertCycleSchema = createInsertSchema(cycles).omit({
   id: true,
   createdBy: true, // Will be set by backend
@@ -593,6 +605,11 @@ export const insertTaskCommentSchema = createInsertSchema(taskComments).omit({
 });
 
 export const insertTaskAuditTrailSchema = createInsertSchema(taskAuditTrail).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAuditTrailSchema = createInsertSchema(auditTrail).omit({
   id: true,
   createdAt: true,
 });

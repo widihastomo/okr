@@ -2780,21 +2780,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (validatedData.status) {
         try {
           let changeDescription = '';
+          let actionType = 'status_change';
+          
           if (validatedData.status === 'selesai') {
             changeDescription = 'Inisiatif diselesaikan';
+            actionType = 'closed';
           } else if (validatedData.status === 'sedang_berjalan') {
             changeDescription = 'Inisiatif dibuka kembali dan statusnya diubah ke sedang berjalan';
+            actionType = 'reopened';
           } else if (validatedData.status === 'dibatalkan') {
             changeDescription = 'Inisiatif dibatalkan';
+            actionType = 'cancelled';
           } else if (validatedData.status === 'draft') {
             changeDescription = 'Inisiatif diubah ke status draft';
+            actionType = 'status_change';
           }
           
           if (changeDescription) {
             await storage.createAuditTrail({
               entityType: 'initiative',
               entityId: id,
-              action: 'status_change',
+              action: actionType,
               changeDescription: changeDescription,
               userId: currentUser.id,
               organizationId: currentUser.organizationId
@@ -4099,21 +4105,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (updateData.status) {
         try {
           let changeDescription = '';
+          let actionType = 'status_change';
+          
           if (updateData.status === 'selesai') {
             changeDescription = 'Inisiatif diselesaikan';
+            actionType = 'closed';
           } else if (updateData.status === 'sedang_berjalan') {
             changeDescription = 'Inisiatif dibuka kembali dan statusnya diubah ke sedang berjalan';
+            actionType = 'reopened';
           } else if (updateData.status === 'dibatalkan') {
             changeDescription = 'Inisiatif dibatalkan';
+            actionType = 'cancelled';
           } else if (updateData.status === 'draft') {
             changeDescription = 'Inisiatif diubah ke status draft';
+            actionType = 'status_change';
           }
           
           if (changeDescription) {
             await storage.createAuditTrail({
               entityType: 'initiative',
               entityId: id,
-              action: 'status_change',
+              action: actionType,
               changeDescription: changeDescription,
               userId: currentUser.id,
               organizationId: currentUser.organizationId
@@ -4165,21 +4177,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (result.data.status) {
         try {
           let changeDescription = '';
+          let actionType = 'status_change';
+          
           if (result.data.status === 'selesai') {
             changeDescription = 'Inisiatif diselesaikan';
+            actionType = 'closed';
           } else if (result.data.status === 'sedang_berjalan') {
             changeDescription = 'Inisiatif dibuka kembali dan statusnya diubah ke sedang berjalan';
+            actionType = 'reopened';
           } else if (result.data.status === 'dibatalkan') {
             changeDescription = 'Inisiatif dibatalkan';
+            actionType = 'cancelled';
           } else if (result.data.status === 'draft') {
             changeDescription = 'Inisiatif diubah ke status draft';
+            actionType = 'status_change';
           }
           
           if (changeDescription) {
             await storage.createAuditTrail({
               entityType: 'initiative',
               entityId: id,
-              action: 'status_change',
+              action: actionType,
               changeDescription: changeDescription,
               userId: currentUser.id,
               organizationId: currentUser.organizationId
@@ -5364,7 +5382,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.createAuditTrail({
           entityType: 'initiative',
           entityId: initiativeId,
-          action: 'close',
+          action: 'closed',
           changeDescription: `Inisiatif ditutup dengan hasil: ${validatedData.finalResult}`,
           userId: userId,
           organizationId: req.user.organizationId
@@ -5407,7 +5425,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.createAuditTrail({
           entityType: 'initiative',
           entityId: initiativeId,
-          action: 'cancel',
+          action: 'cancelled',
           changeDescription: `Inisiatif dibatalkan dengan alasan: ${cancelReason}`,
           userId: userId,
           organizationId: req.user.organizationId
@@ -5420,6 +5438,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error cancelling initiative:", error);
       res.status(500).json({ message: "Failed to cancel initiative" });
+    }
+  });
+
+  // Reopen initiative endpoint
+  app.post("/api/initiatives/:id/reopen", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const initiativeId = req.params.id;
+
+      const updatedInitiative = await storage.updateInitiative(initiativeId, {
+        status: 'sedang_berjalan',
+        closedBy: null,
+        closedAt: null,
+        completedAt: null,
+        finalResult: null,
+        learningInsights: null
+      });
+
+      // Create audit trail for initiative reopening
+      try {
+        await storage.createAuditTrail({
+          entityType: 'initiative',
+          entityId: initiativeId,
+          action: 'reopened',
+          changeDescription: `Inisiatif dibuka kembali untuk dilanjutkan`,
+          userId: userId,
+          organizationId: req.user.organizationId
+        });
+      } catch (auditError) {
+        console.error('Error creating audit trail for initiative reopening:', auditError);
+      }
+
+      res.json(updatedInitiative);
+    } catch (error) {
+      console.error("Error reopening initiative:", error);
+      res.status(500).json({ message: "Failed to reopen initiative" });
     }
   });
 
