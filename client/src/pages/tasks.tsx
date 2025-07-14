@@ -72,6 +72,7 @@ const TasksPage = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [userFilter, setUserFilter] = useState('');
+  const [teamFilter, setTeamFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -94,6 +95,12 @@ const TasksPage = () => {
   // Fetch users data for PIC display
   const { data: users = [] } = useQuery({
     queryKey: ['/api/organization/users'],
+    staleTime: 60000,
+  });
+
+  // Fetch teams data for team filter
+  const { data: teams = [] } = useQuery({
+    queryKey: ['/api/teams'],
     staleTime: 60000,
   });
 
@@ -142,6 +149,14 @@ const TasksPage = () => {
     return user.email ? user.email[0].toUpperCase() : 'U';
   };
 
+  // Helper function to get team names for a user
+  const getUserTeams = (userId: string) => {
+    return teams.filter(team => 
+      team.members?.some(member => member.userId === userId) || 
+      team.ownerId === userId
+    );
+  };
+
   // Filter active users only
   const activeUsers = users.filter(user => user.isActive === true);
 
@@ -178,11 +193,12 @@ const TasksPage = () => {
       const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
       const matchesPriority = priorityFilter === 'all' || task.priority === priorityFilter;
       const matchesUser = userFilter === 'all' || userFilter === '' || task.assignedTo === userFilter;
+      const matchesTeam = teamFilter === 'all' || (task.assignedTo && getUserTeams(task.assignedTo).some(team => team.id === teamFilter));
       const matchesSearch = searchTerm === '' || 
         task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         task.description.toLowerCase().includes(searchTerm.toLowerCase());
       
-      return matchesStatus && matchesPriority && matchesUser && matchesSearch;
+      return matchesStatus && matchesPriority && matchesUser && matchesTeam && matchesSearch;
     });
 
     // Sort tasks: overdue first, then by due date
@@ -200,7 +216,7 @@ const TasksPage = () => {
       
       return aDate.getTime() - bDate.getTime();
     });
-  }, [tasks, statusFilter, priorityFilter, userFilter, searchTerm]);
+  }, [tasks, statusFilter, priorityFilter, userFilter, teamFilter, searchTerm]);
 
   // Group tasks by date categories
   const groupedTasks = useMemo(() => {
@@ -1200,6 +1216,19 @@ const TasksPage = () => {
                 {activeUsers.map(user => (
                   <SelectItem key={user.id} value={user.id}>
                     {getUserName(user.id)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={teamFilter} onValueChange={setTeamFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter Tim" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Tim</SelectItem>
+                {teams.map(team => (
+                  <SelectItem key={team.id} value={team.id}>
+                    {team.name}
                   </SelectItem>
                 ))}
               </SelectContent>
