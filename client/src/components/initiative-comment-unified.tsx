@@ -62,7 +62,7 @@ export function InitiativeCommentList({ initiativeId }: InitiativeCommentListPro
 
   const updateCommentMutation = useMutation({
     mutationFn: async ({ commentId, content }: { commentId: string; content: string }) => {
-      const response = await apiRequest("PUT", `/api/initiatives/${initiativeId}/notes/${commentId}`, {
+      const response = await apiRequest("PATCH", `/api/initiatives/${initiativeId}/notes/${commentId}`, {
         content,
       });
       return response.json();
@@ -345,6 +345,7 @@ export function InitiativeCommentEditor({
     mutationFn: async (commentData: { content: string }) => {
       const response = await apiRequest("POST", `/api/initiatives/${initiativeId}/notes`, {
         ...commentData,
+        title: "Komentar",
         type: "update",
       });
       return response.json();
@@ -486,7 +487,7 @@ export function InitiativeCommentEditor({
 
   return (
     <div className="space-y-3">
-      <div className="border rounded-lg focus-within:ring-2 focus-within:ring-orange-500 focus-within:border-orange-500">
+      <div className="border rounded-lg focus-within:border-gray-300">
         <div className="flex items-center gap-2 px-3 py-2 border-b bg-gray-50">
           <Button
             type="button"
