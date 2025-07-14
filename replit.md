@@ -246,13 +246,15 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
-- July 14, 2025. Successfully removed step-based grouping from initiative closure modal:
-  * REMOVED: Step numbering (1-6) from all section titles in initiative closure modal
-  * CLEANED: Form sections now display with clean titles without step indicators
-  * IMPROVED: More streamlined appearance without numbered progression
-  * MAINTAINED: All functionality preserved while removing visual step grouping
-  * SECTIONS: "Hasil Inisiatif", "Alasan dan Catatan Pembelajaran", "Update Pemakaian Budget", "Update Metrik Keberhasilan", "Update Status Task yang Belum Selesai", "Catatan Tambahan (Opsional)"
-  * RESULT: Cleaner, more professional form layout without step-based UI patterns
+- July 14, 2025. Successfully unified initiative closure modal into single card layout:
+  * CONSOLIDATED: All form sections now contained within single Card component
+  * REMOVED: Multiple separate Card components replaced with single unified layout
+  * ENHANCED: Sections separated by border-t dividers for visual organization
+  * IMPROVED: Cleaner, more cohesive form presentation with consistent spacing
+  * STREAMLINED: Single card header "Form Penutupan Inisiatif" with all content in CardContent
+  * MAINTAINED: All functionality preserved while improving visual unity
+  * SECTIONS: H3 headings with icons for visual hierarchy within single card
+  * RESULT: More professional, unified form layout with better visual flow
 - July 14, 2025. Successfully improved comment layout and QuickUpdateButton input flexibility:
   * FIXED: Removed empty div element at line 976 in initiative-detail.tsx for cleaner code structure
   * REDESIGNED: Comment layout with 3-dot menu positioned in top-right corner using absolute positioning

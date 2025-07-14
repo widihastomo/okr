@@ -250,244 +250,232 @@ export default function InitiativeClosureModal({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Hasil Inisiatif */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Hasil Inisiatif</CardTitle>
+                <CardTitle className="text-lg">Form Penutupan Inisiatif</CardTitle>
               </CardHeader>
-              <CardContent>
-                <FormField
-                  control={form.control}
-                  name="result"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <RadioGroup
-                          onValueChange={field.onChange}
-                          value={field.value}
-                          className="grid grid-cols-1 md:grid-cols-3 gap-4"
-                        >
-                          <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-green-50">
-                            <RadioGroupItem value="berhasil" id="berhasil" />
-                            <Label htmlFor="berhasil" className="flex items-center gap-2 cursor-pointer">
-                              <CheckCircle className="h-4 w-4 text-green-500" />
-                              Berhasil
-                            </Label>
-                          </div>
-                          <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-red-50">
-                            <RadioGroupItem value="gagal" id="gagal" />
-                            <Label htmlFor="gagal" className="flex items-center gap-2 cursor-pointer">
-                              <XCircle className="h-4 w-4 text-red-500" />
-                              Gagal
-                            </Label>
-                          </div>
-                          <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-yellow-50">
-                            <RadioGroupItem value="perlu_diulang" id="perlu_diulang" />
-                            <Label htmlFor="perlu_diulang" className="flex items-center gap-2 cursor-pointer">
-                              <RotateCcw className="h-4 w-4 text-yellow-500" />
-                              Perlu Diulang
-                            </Label>
-                          </div>
-                        </RadioGroup>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-
-            {/* Alasan dan Catatan Pembelajaran */}
-            {selectedResult && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    {getResultIcon(selectedResult)}
-                    {getReasonLabel(selectedResult)}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
+                {/* Hasil Inisiatif */}
+                <div className="space-y-4">
+                  <h3 className="text-base font-medium flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    Hasil Inisiatif
+                  </h3>
                   <FormField
                     control={form.control}
-                    name="reason"
+                    name="result"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{getReasonLabel(selectedResult)}</FormLabel>
                         <FormControl>
-                          <Textarea
-                            placeholder={`Jelaskan ${getReasonLabel(selectedResult).toLowerCase()}...`}
-                            {...field}
-                            rows={3}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="learningNote"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{getLearningPrompt(selectedResult)}</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Bagikan pembelajaran yang bisa digunakan untuk inisiatif serupa..."
-                            {...field}
-                            rows={3}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Update Budget */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <DollarSign className="h-5 w-5 text-green-500" />
-                  Update Pemakaian Budget
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <FormField
-                  control={form.control}
-                  name="budgetUsed"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Budget yang digunakan (Rp)</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="Masukkan budget yang sudah digunakan"
-                          {...field}
-                        />
-                      </FormControl>
-                      <div className="text-sm text-gray-500">
-                        Budget awal: Rp {initiative?.budget ? Number(initiative.budget).toLocaleString('id-ID') : '0'}
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-
-            {/* Update Success Metrics */}
-            {Array.isArray(successMetrics) && successMetrics.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Target className="h-5 w-5 text-blue-500" />
-                    Update Metrik Keberhasilan
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {successMetrics.map((metric) => (
-                      <div key={metric.id} className="p-4 border rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-medium">{metric.name}</h4>
-                          <span className="text-sm text-gray-500">
-                            Target: {metric.targetValue} {metric.unit}
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <Label>Nilai Saat Ini</Label>
-                            <Input
-                              type="number"
-                              value={updatedMetrics.find(m => m.id === metric.id)?.currentValue || 0}
-                              onChange={(e) => updateMetricValue(metric.id, parseFloat(e.target.value) || 0)}
-                              placeholder="Masukkan nilai final"
-                            />
-                          </div>
-                          <div className="text-sm text-gray-500 flex items-center">
-                            Nilai sebelumnya: {metric.currentValue} {metric.unit}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Update Task Status */}
-            {incompleteTasks.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-purple-500" />
-                    Update Status Task yang Belum Selesai
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {incompleteTasks.map((task) => (
-                      <div key={task.id} className="p-4 border rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-medium">{task.title}</h4>
-                          <span className="text-sm text-gray-500">
-                            Status saat ini: {task.status === 'not_started' ? 'Belum Dimulai' : 
-                                           task.status === 'in_progress' ? 'Sedang Berjalan' : task.status}
-                          </span>
-                        </div>
-                        <div>
-                          <Label>Status Baru</Label>
-                          <Select
-                            value={taskUpdates.find(t => t.id === task.id)?.newStatus || task.status}
-                            onValueChange={(value) => updateTaskStatus(task.id, value)}
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            value={field.value}
+                            className="grid grid-cols-1 md:grid-cols-3 gap-4"
                           >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pilih status baru" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="not_started">Belum Dimulai</SelectItem>
-                              <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
-                              <SelectItem value="completed">Selesai</SelectItem>
-                              <SelectItem value="cancelled">Dibatalkan</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                            <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-green-50">
+                              <RadioGroupItem value="berhasil" id="berhasil" />
+                              <Label htmlFor="berhasil" className="flex items-center gap-2 cursor-pointer">
+                                <CheckCircle className="h-4 w-4 text-green-500" />
+                                Berhasil
+                              </Label>
+                            </div>
+                            <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-red-50">
+                              <RadioGroupItem value="gagal" id="gagal" />
+                              <Label htmlFor="gagal" className="flex items-center gap-2 cursor-pointer">
+                                <XCircle className="h-4 w-4 text-red-500" />
+                                Gagal
+                              </Label>
+                            </div>
+                            <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-yellow-50">
+                              <RadioGroupItem value="perlu_diulang" id="perlu_diulang" />
+                              <Label htmlFor="perlu_diulang" className="flex items-center gap-2 cursor-pointer">
+                                <RotateCcw className="h-4 w-4 text-yellow-500" />
+                                Perlu Diulang
+                              </Label>
+                            </div>
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-            {/* Catatan Tambahan */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <AlertCircle className="h-5 w-5 text-gray-500" />
-                  Catatan Tambahan (Opsional)
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <FormField
-                  control={form.control}
-                  name="notes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Catatan tambahan</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Tambahkan catatan tambahan jika diperlukan..."
-                          {...field}
-                          rows={4}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Alasan dan Catatan Pembelajaran */}
+                {selectedResult && (
+                  <div className="space-y-4 border-t pt-6">
+                    <h3 className="text-base font-medium flex items-center gap-2">
+                      {getResultIcon(selectedResult)}
+                      {getReasonLabel(selectedResult)}
+                    </h3>
+                    <div className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="reason"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{getReasonLabel(selectedResult)}</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder={`Jelaskan ${getReasonLabel(selectedResult).toLowerCase()}...`}
+                                {...field}
+                                rows={3}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="learningNote"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{getLearningPrompt(selectedResult)}</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder="Bagikan pembelajaran yang bisa digunakan untuk inisiatif serupa..."
+                                {...field}
+                                rows={3}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Update Budget */}
+                <div className="space-y-4 border-t pt-6">
+                  <h3 className="text-base font-medium flex items-center gap-2">
+                    <DollarSign className="h-4 w-4 text-green-500" />
+                    Update Pemakaian Budget
+                  </h3>
+                  <FormField
+                    control={form.control}
+                    name="budgetUsed"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Budget yang digunakan (Rp)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="Masukkan budget yang sudah digunakan"
+                            {...field}
+                          />
+                        </FormControl>
+                        <div className="text-sm text-gray-500">
+                          Budget awal: Rp {initiative?.budget ? Number(initiative.budget).toLocaleString('id-ID') : '0'}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Update Success Metrics */}
+                {Array.isArray(successMetrics) && successMetrics.length > 0 && (
+                  <div className="space-y-4 border-t pt-6">
+                    <h3 className="text-base font-medium flex items-center gap-2">
+                      <Target className="h-4 w-4 text-blue-500" />
+                      Update Metrik Keberhasilan
+                    </h3>
+                    <div className="space-y-4">
+                      {successMetrics.map((metric) => (
+                        <div key={metric.id} className="p-4 border rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-medium">{metric.name}</h4>
+                            <span className="text-sm text-gray-500">
+                              Target: {metric.targetValue} {metric.unit}
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <Label>Nilai Saat Ini</Label>
+                              <Input
+                                type="number"
+                                value={updatedMetrics.find(m => m.id === metric.id)?.currentValue || 0}
+                                onChange={(e) => updateMetricValue(metric.id, parseFloat(e.target.value) || 0)}
+                                placeholder="Masukkan nilai final"
+                              />
+                            </div>
+                            <div className="text-sm text-gray-500 flex items-center">
+                              Nilai sebelumnya: {metric.currentValue} {metric.unit}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Update Task Status */}
+                {incompleteTasks.length > 0 && (
+                  <div className="space-y-4 border-t pt-6">
+                    <h3 className="text-base font-medium flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-purple-500" />
+                      Update Status Task yang Belum Selesai
+                    </h3>
+                    <div className="space-y-4">
+                      {incompleteTasks.map((task) => (
+                        <div key={task.id} className="p-4 border rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-medium">{task.title}</h4>
+                            <span className="text-sm text-gray-500">
+                              Status saat ini: {task.status === 'not_started' ? 'Belum Dimulai' : 
+                                             task.status === 'in_progress' ? 'Sedang Berjalan' : task.status}
+                            </span>
+                          </div>
+                          <div>
+                            <Label>Status Baru</Label>
+                            <Select
+                              value={taskUpdates.find(t => t.id === task.id)?.newStatus || task.status}
+                              onValueChange={(value) => updateTaskStatus(task.id, value)}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih status baru" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="not_started">Belum Dimulai</SelectItem>
+                                <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
+                                <SelectItem value="completed">Selesai</SelectItem>
+                                <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Catatan Tambahan */}
+                <div className="space-y-4 border-t pt-6">
+                  <h3 className="text-base font-medium flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 text-gray-500" />
+                    Catatan Tambahan (Opsional)
+                  </h3>
+                  <FormField
+                    control={form.control}
+                    name="notes"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Catatan tambahan</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Tambahkan catatan tambahan jika diperlukan..."
+                            {...field}
+                            rows={4}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </CardContent>
             </Card>
 
