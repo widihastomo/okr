@@ -1156,6 +1156,27 @@ export default function InitiativeDetailPage() {
                           <div key={task.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
                             <div className="flex-1">
                               <div className="flex items-center gap-2">
+                                {/* Profile Image for PIC */}
+                                {task.assignedTo && (
+                                  <TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium cursor-pointer">
+                                          {(() => {
+                                            const assignedUser = users.find((u: any) => u.id === task.assignedTo);
+                                            return assignedUser ? 
+                                              `${assignedUser.firstName?.charAt(0) || ''}${assignedUser.lastName?.charAt(0) || ''}` : 
+                                              'U';
+                                          })()}
+                                        </div>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>PIC: {task.assignedTo ? getUserName(task.assignedTo) : "Belum diassign"}</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
+                                )}
+                                
                                 <TooltipProvider>
                                   <Tooltip>
                                     <TooltipTrigger asChild>
