@@ -148,24 +148,7 @@ export function HelpBubble({
     insight.type === 'warning' || (insight.type === 'suggestion' && insight.confidence > 0.8)
   ) || [];
 
-  const triggerButton = (
-    <Button
-      variant={hasInsights && highPriorityInsights.length > 0 ? "default" : "outline"}
-      size="sm"
-      className={`relative ${variant === 'floating' ? 'shadow-lg' : ''} ${className}`}
-    >
-      <Sparkles className="h-4 w-4 mr-1" />
-      AI Assistant
-      {hasInsights && highPriorityInsights.length > 0 && (
-        <Badge 
-          variant="destructive" 
-          className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center text-xs"
-        >
-          {highPriorityInsights.length}
-        </Badge>
-      )}
-    </Button>
-  );
+  
 
   return (
     <div className={variant === 'floating' ? 'fixed bottom-4 right-4 z-50' : 'relative'}>
