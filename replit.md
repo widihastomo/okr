@@ -246,6 +246,22 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 14, 2025. Successfully implemented tasks page ListView with exact daily-focus styling:
+  * REPLACED: Simple card-based ListView with comprehensive table/mobile view like daily-focus
+  * ADDED: Desktop table view with proper columns (Task, Prioritas, Status, Tenggat, PIC, Aksi)
+  * ADDED: Mobile responsive card view with same styling as daily-focus
+  * INTEGRATED: Status update dropdown functionality with proper mutations
+  * ENHANCED: Task status and priority color coding consistent with daily-focus
+  * IMPLEMENTED: Avatar display for PIC with fallback handling
+  * ADDED: Action dropdown menu (Lihat Detail, Edit, Hapus) in both desktop and mobile views
+  * CONSISTENT: Exact same styling, layout, and interaction patterns as daily-focus page
+  * RESULT: Tasks page now has unified ListView format matching daily-focus for consistent user experience
+- July 14, 2025. Successfully fixed TourLauncher clickability issue:
+  * REMOVED: disabled prop from main TourLauncher button - now always accessible
+  * ENHANCED: Individual tour items properly disabled when tour is active with visual feedback
+  * ADDED: Status message in dropdown showing "Tour sedang berjalan" when tour is active
+  * IMPROVED: User can always access tour menu but cannot start multiple tours simultaneously
+  * RESULT: TourLauncher button now clickable with proper tour management functionality
 - July 14, 2025. Successfully removed AI Assistant feature due to OpenAI quota limitations:
   * REMOVED: All AI Assistant components (help-bubble.tsx, ai-help-bubble.tsx) from client/src/components/
   * REMOVED: All AI backend services (ai-insights.ts, ai-routes.ts) from server/

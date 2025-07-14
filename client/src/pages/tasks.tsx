@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,7 +9,13 @@ import { Input } from '@/components/ui/input';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { List, Kanban, Calendar as CalendarIcon, BarChart3, Plus, Filter, Search } from 'lucide-react';
+import { List, Kanban, Calendar as CalendarIcon, BarChart3, Plus, Filter, Search, Clock, AlertTriangle, CheckCircle, ChevronDown, MoreVertical, Edit, Trash2, Eye } from 'lucide-react';
+import { Link } from 'wouter';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { apiRequest } from '@/lib/queryClient';
+import { format as formatDate } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 const locales = {
@@ -62,6 +68,86 @@ const TasksPage = () => {
       return matchesStatus && matchesPriority && matchesSearch;
     });
   }, [tasks, statusFilter, priorityFilter, searchTerm]);
+
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Status update mutation
+  const updateTaskStatusMutation = useMutation({
+    mutationFn: async ({ taskId, status }: { taskId: string; status: string }) => {
+      return await apiRequest('PATCH', `/api/tasks/${taskId}`, { status });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+      toast({
+        title: "Status berhasil diperbarui",
+        description: "Status task telah diperbarui.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Gagal memperbarui status",
+        description: "Terjadi kesalahan saat memperbarui status task.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleStatusUpdate = (taskId: string, status: string) => {
+    updateTaskStatusMutation.mutate({ taskId, status });
+  };
+
+  const getTaskStatusColor = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "in_progress":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "cancelled":
+        return "bg-red-100 text-red-800 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const getTaskStatusLabel = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "Selesai";
+      case "in_progress":
+        return "Sedang Berjalan";
+      case "cancelled":
+        return "Dibatalkan";
+      default:
+        return "Belum Dimulai";
+    }
+  };
+
+  const getTaskPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "medium":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "low":
+        return "bg-green-100 text-green-800 border-green-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const getTaskPriorityLabel = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return "Tinggi";
+      case "medium":
+        return "Sedang";
+      case "low":
+        return "Rendah";
+      default:
+        return "Sedang";
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -126,13 +212,196 @@ const TasksPage = () => {
     </Card>
   );
 
-  const ListView = () => (
-    <div className="space-y-4">
-      {filteredTasks.map(task => (
-        <TaskCard key={task.id} task={task} />
-      ))}
-    </div>
-  );
+  const ListView = () => {
+    return (
+      <Card>
+        <CardContent className="p-0">
+          {/* Desktop View */}
+          <div className="hidden md:block">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Task
+                  </th>
+                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Prioritas
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Tenggat
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    PIC
+                  </th>
+                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Aksi
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredTasks.map((task) => (
+                  <tr key={task.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-2">
+                        <div>
+                          <Link
+                            href={`/tasks/${task.id}`}
+                            className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
+                          >
+                            {task.title}
+                          </Link>
+                          {task.initiative && (
+                            <div className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded mt-1 inline-block">
+                              Inisiatif: {task.initiative.title}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <Badge className={getTaskPriorityColor(task.priority || "medium")}>
+                        {getTaskPriorityLabel(task.priority || "medium")}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-4">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
+                          >
+                            {getTaskStatusLabel(task.status)}
+                            <ChevronDown className="h-3 w-3" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "not_started")}>
+                            Belum Dimulai
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "in_progress")}>
+                            Sedang Berjalan
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "completed")}>
+                            Selesai
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "cancelled")}>
+                            Dibatalkan
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </td>
+                    <td className="px-4 py-4 text-sm text-gray-500">
+                      {task.dueDate ? formatDate(new Date(task.dueDate), 'dd/MM/yyyy') : 'Tidak ada'}
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-6 w-6">
+                          <AvatarFallback className="text-xs">
+                            {task.assignedTo?.charAt(0)?.toUpperCase() || 'U'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm text-gray-900">{task.assignedTo || 'Belum ditugaskan'}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem asChild>
+                            <Link href={`/tasks/${task.id}`} className="flex items-center">
+                              <Eye className="mr-2 h-4 w-4" />
+                              Lihat Detail
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-red-600">
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Hapus
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile View */}
+          <div className="md:hidden space-y-4 p-4">
+            {filteredTasks.map((task) => (
+              <div key={task.id} className="p-3 bg-gray-50 border border-gray-200 rounded-lg space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <Link
+                      href={`/tasks/${task.id}`}
+                      className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
+                    >
+                      {task.title}
+                    </Link>
+                    {task.initiative && (
+                      <div className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded mt-1 inline-block">
+                        Inisiatif: {task.initiative.title}
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge className={getTaskPriorityColor(task.priority || "medium")}>
+                        {getTaskPriorityLabel(task.priority || "medium")}
+                      </Badge>
+                    </div>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
+                      >
+                        {getTaskStatusLabel(task.status)}
+                        <ChevronDown className="h-3 w-3" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "not_started")}>
+                        Belum Dimulai
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "in_progress")}>
+                        Sedang Berjalan
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "completed")}>
+                        Selesai
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "cancelled")}>
+                        Dibatalkan
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+                <div className="flex items-center justify-between text-sm text-gray-500">
+                  <div className="flex items-center gap-2">
+                    <Avatar className="h-5 w-5">
+                      <AvatarFallback className="text-xs">
+                        {task.assignedTo?.charAt(0)?.toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span>{task.assignedTo || 'Belum ditugaskan'}</span>
+                  </div>
+                  <span>{task.dueDate ? formatDate(new Date(task.dueDate), 'dd/MM/yyyy') : 'Tidak ada tenggat'}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
 
   const KanbanView = () => {
     const columns = [
