@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { MessageCircle, Send, Edit2, Trash2, MoreHorizontal, Plus } from 'lucide-react';
+import { MessageCircle, Send, Edit2, Trash2, MoreVertical, Plus } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { formatDistanceToNow } from 'date-fns';
+import { id } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -247,7 +250,7 @@ export function InitiativeCommentUnified({ initiativeId }: InitiativeCommentUnif
                 size="sm"
                 onClick={handleCreateComment}
                 disabled={!newComment.trim() || createCommentMutation.isPending}
-                className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600"
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
               >
                 <Send className="w-4 h-4 mr-2" />
                 {createCommentMutation.isPending ? 'Mengirim...' : 'Kirim'}
@@ -265,127 +268,137 @@ export function InitiativeCommentUnified({ initiativeId }: InitiativeCommentUnif
               <p className="text-sm">Jadilah yang pertama untuk memberikan komentar!</p>
             </div>
           ) : (
-            comments.map((comment) => (
-              <div key={comment.id} className="flex gap-3 p-3 bg-white rounded-lg border">
-                <Avatar className="w-8 h-8">
-                  <AvatarImage src={comment.user.profileImageUrl || ''} />
-                  <AvatarFallback className="text-xs">
-                    {getUserInitials(comment.user)}
-                  </AvatarFallback>
-                </Avatar>
-                
-                <div className="flex-1 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-sm">
-                        {getUserDisplayName(comment.user)}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        {formatTimestamp(comment.createdAt)}
-                      </span>
-                      {comment.isEdited && (
-                        <Badge variant="secondary" className="text-xs">
-                          Diedit
-                        </Badge>
-                      )}
-                    </div>
-                    
-                    {comment.userId === user?.id && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => startEditing(comment)}>
-                            <Edit2 className="w-4 h-4 mr-2" />
-                            Ubah
-                          </DropdownMenuItem>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <DropdownMenuItem 
-                                className="text-red-600 focus:text-red-600"
-                                onSelect={(e) => e.preventDefault()}
-                              >
-                                <Trash2 className="w-4 h-4 mr-2" />
-                                Hapus
-                              </DropdownMenuItem>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Hapus Komentar</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Apakah Anda yakin ingin menghapus komentar ini? Tindakan ini tidak dapat dibatalkan.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Batal</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleDeleteComment(comment.id)}
-                                  className="bg-red-600 hover:bg-red-700"
-                                >
-                                  Hapus
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                  </div>
-                  
-                  {/* Comment Content */}
-                  <div className="text-sm">
-                    {editingCommentId === comment.id ? (
-                      <div className="space-y-2">
-                        <Textarea
-                          value={editingContent}
-                          onChange={(e) => setEditingContent(e.target.value)}
-                          placeholder="Ubah komentar..."
-                          className="min-h-[80px] resize-none"
-                        />
-                        <div className="flex gap-2 justify-end">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={cancelEditing}
-                          >
-                            Batal
-                          </Button>
-                          <Button
-                            size="sm"
-                            onClick={() => handleUpdateComment(comment.id)}
-                            disabled={!editingContent.trim() || updateCommentMutation.isPending}
-                            className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600"
-                          >
-                            {updateCommentMutation.isPending ? 'Menyimpan...' : 'Simpan'}
-                          </Button>
-                        </div>
+            <AnimatePresence>
+              {comments.map((comment) => (
+                <motion.div
+                  key={comment.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="flex gap-3 group"
+                >
+                  <Avatar className="w-8 h-8 flex-shrink-0">
+                    <AvatarImage src={comment.user.profileImageUrl || ''} />
+                    <AvatarFallback className="bg-orange-100 text-orange-700 text-xs">
+                      {getUserInitials(comment.user)}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="bg-gray-50 rounded-lg px-3 py-2 relative">
+                      <div className="flex items-center gap-2 mb-1 pr-8">
+                        <span className="font-medium text-sm text-gray-900">
+                          {getUserDisplayName(comment.user)}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {formatDistanceToNow(comment.createdAt ? new Date(comment.createdAt) : new Date(), {
+                            addSuffix: true,
+                            locale: id,
+                          })}
+                        </span>
+                        {comment.isEdited && (
+                          <span className="text-xs text-gray-400">(diedit)</span>
+                        )}
                       </div>
-                    ) : (
-                      <div>
+
+                      {/* Action menu - positioned inside bubble at top-right */}
+                      {user?.id === comment.userId && editingCommentId !== comment.id && (
+                        <div className="absolute top-2 right-2">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600">
+                                <MoreVertical className="h-3 w-3" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => startEditing(comment)}
+                                className="text-sm"
+                              >
+                                <Edit2 className="mr-2 h-3 w-3" />
+                                Edit
+                              </DropdownMenuItem>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <DropdownMenuItem 
+                                    className="text-sm text-red-600 focus:text-red-600"
+                                    onSelect={(e) => e.preventDefault()}
+                                  >
+                                    <Trash2 className="mr-2 h-3 w-3" />
+                                    Hapus
+                                  </DropdownMenuItem>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Hapus Komentar</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Apakah Anda yakin ingin menghapus komentar ini? Tindakan ini tidak dapat dibatalkan.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Batal</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => handleDeleteComment(comment.id)}
+                                      className="bg-red-600 hover:bg-red-700"
+                                    >
+                                      Hapus
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      )}
+
+                      {editingCommentId === comment.id ? (
+                        <div className="space-y-2 mt-2">
+                          <Textarea
+                            value={editingContent}
+                            onChange={(e) => setEditingContent(e.target.value)}
+                            placeholder="Edit komentar..."
+                            className="min-h-[80px] resize-none"
+                          />
+                          <div className="flex gap-2 justify-end">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={cancelEditing}
+                            >
+                              Batal
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={() => handleUpdateComment(comment.id)}
+                              disabled={!editingContent.trim() || updateCommentMutation.isPending}
+                              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+                            >
+                              {updateCommentMutation.isPending ? 'Menyimpan...' : 'Simpan'}
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
                         <div className="text-sm text-gray-700 whitespace-pre-wrap">
                           {shouldTruncate(comment.content) && !isCommentExpanded(comment.id)
                             ? truncateContent(comment.content)
                             : comment.content}
+                          {shouldTruncate(comment.content) && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => toggleCommentExpansion(comment.id)}
+                              className="mt-2 text-orange-600 hover:text-orange-700 p-0 h-auto"
+                            >
+                              {isCommentExpanded(comment.id) ? 'Tampilkan lebih sedikit' : 'Tampilkan lebih banyak'}
+                            </Button>
+                          )}
                         </div>
-                        {shouldTruncate(comment.content) && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => toggleCommentExpansion(comment.id)}
-                            className="mt-2 text-blue-600 hover:text-blue-700 p-0 h-auto"
-                          >
-                            {isCommentExpanded(comment.id) ? 'Tampilkan lebih sedikit' : 'Tampilkan lebih banyak'}
-                          </Button>
-                        )}
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
-                </div>
-              </div>
-            ))
+                </motion.div>
+              ))}
+            </AnimatePresence>
           )}
         </div>
       </CardContent>
