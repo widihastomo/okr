@@ -3291,12 +3291,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
         
-        await storage.createAuditTrail({
-          entityType: "initiative",
-          entityId: currentMetric.initiativeId,
-          action: "update_metric",
-          changeDescription,
-          userId: currentUser.id
+        // Create audit trail for success metric update
+        // Note: Using task audit trail structure for success metrics
+        await storage.createTaskAuditTrail({
+          taskId: currentMetric.initiativeId, // Using initiativeId as reference
+          userId: currentUser.id,
+          action: "metric_updated",
+          oldValue: null,
+          newValue: null,
+          changeDescription
         });
         
         console.log("Audit trail created for metric update:", changeDescription);
