@@ -1035,6 +1035,11 @@ export default function DailyFocusPage() {
       return true;
     }
     
+    // Include cancelled initiatives - they can be reopened
+    if (init.status === "dibatalkan") {
+      return true;
+    }
+    
     // Include completed initiatives if they are still within today's timeline
     if (init.status === "selesai") {
       const dueDate = init.dueDate ? init.dueDate.split("T")[0] : null;
@@ -3465,14 +3470,23 @@ export default function DailyFocusPage() {
                                   </div>
                                 </td>
                                 <td className="px-4 py-4 text-center">
-                                  <Button
-                                    onClick={() =>
-                                      handleUpdateMetrics(initiative)
-                                    }
-                                    className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-3 py-1 rounded-md text-sm font-medium"
-                                  >
-                                    Update
-                                  </Button>
+                                  {initiative.status === "dibatalkan" ? (
+                                    <Button
+                                      onClick={() => window.location.href = `/initiatives/${initiative.id}`}
+                                      className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-3 py-1 rounded-md text-sm font-medium"
+                                    >
+                                      Buka Kembali
+                                    </Button>
+                                  ) : (
+                                    <Button
+                                      onClick={() =>
+                                        handleUpdateMetrics(initiative)
+                                      }
+                                      className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-3 py-1 rounded-md text-sm font-medium"
+                                    >
+                                      Update
+                                    </Button>
+                                  )}
                                 </td>
                                 <td className="px-4 py-4 text-center">
                                   <Link href={`/initiatives/${initiative.id}`}>
@@ -3677,12 +3691,21 @@ export default function DailyFocusPage() {
 
                             {/* Actions */}
                             <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-                              <Button
-                                onClick={() => handleUpdateMetrics(initiative)}
-                                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium flex-1 mr-2"
-                              >
-                                Update Metrics
-                              </Button>
+                              {initiative.status === "dibatalkan" ? (
+                                <Button
+                                  onClick={() => window.location.href = `/initiatives/${initiative.id}`}
+                                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium flex-1 mr-2"
+                                >
+                                  Buka Kembali
+                                </Button>
+                              ) : (
+                                <Button
+                                  onClick={() => handleUpdateMetrics(initiative)}
+                                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium flex-1 mr-2"
+                                >
+                                  Update Metrics
+                                </Button>
+                              )}
                               <Link href={`/initiatives/${initiative.id}`}>
                                 <Button
                                   variant="outline"

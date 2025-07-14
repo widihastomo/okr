@@ -246,6 +246,16 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 14, 2025. Successfully implemented comprehensive reopen functionality for cancelled initiatives with key result reassignment:
+  * ADDED: Reopen initiative functionality for cancelled initiatives ("dibatalkan" status) with optional key result reassignment
+  * ENHANCED: Modal dialog with SearchableKeyResultSelect component for choosing new key result when reopening
+  * UPDATED: Backend endpoint to accept keyResultId parameter and handle key result reassignment during reopen
+  * IMPROVED: Audit trail system to track key result changes during reopen operations
+  * DISPLAYED: "Buka Kembali" button in dropdown menu for cancelled initiatives in initiative detail page
+  * INTEGRATED: Cancelled initiatives now visible in daily-focus page with "Buka Kembali" button for quick access
+  * ENHANCED: Help popover explaining key result reassignment options during reopen process
+  * COMPLETED: Full initiative lifecycle management - cancel, reopen with optional reassignment, and delete capabilities
+  * RESULT: Cancelled initiatives can now be effectively managed and reopened with improved workflow flexibility
 - July 14, 2025. Successfully fixed initiative cancellation API parameter mismatch and resolved modal background issues:
   * FIXED: Parameter mismatch in cancel initiative endpoint - changed backend from "cancelReason" to "reason" to match frontend
   * RESOLVED: 400 Bad Request error when canceling initiatives - backend now correctly expects "reason" parameter
