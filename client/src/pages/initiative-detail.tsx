@@ -1289,7 +1289,7 @@ export default function InitiativeDetailPage() {
                         key={task.id}
                         className="p-3 bg-white border border-gray-200 rounded-lg space-y-2"
                       >
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <Link
                               href={`/tasks/${task.id}`}
@@ -1307,62 +1307,96 @@ export default function InitiativeDetailPage() {
                               <TaskCommentCount taskId={task.id} />
                             </div>
                           </div>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <button
-                                className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
-                              >
-                                {getTaskStatusLabel(task.status)}
-                                <ChevronDown className="h-3 w-3" />
-                              </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                onClick={() => handleStatusUpdate(task.id, "not_started")}
-                                className="cursor-pointer"
-                              >
-                                <div className="flex items-center gap-2">
-                                  {task.status === "not_started" && (
-                                    <Check className="h-3 w-3" />
-                                  )}
-                                  <span>Belum Mulai</span>
-                                </div>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => handleStatusUpdate(task.id, "in_progress")}
-                                className="cursor-pointer"
-                              >
-                                <div className="flex items-center gap-2">
-                                  {task.status === "in_progress" && (
-                                    <Check className="h-3 w-3" />
-                                  )}
-                                  <span>Sedang Berjalan</span>
-                                </div>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => handleStatusUpdate(task.id, "completed")}
-                                className="cursor-pointer"
-                              >
-                                <div className="flex items-center gap-2">
-                                  {task.status === "completed" && (
-                                    <Check className="h-3 w-3" />
-                                  )}
-                                  <span>Selesai</span>
-                                </div>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => handleStatusUpdate(task.id, "cancelled")}
-                                className="cursor-pointer"
-                              >
-                                <div className="flex items-center gap-2">
-                                  {task.status === "cancelled" && (
-                                    <Check className="h-3 w-3" />
-                                  )}
-                                  <span>Dibatalkan</span>
-                                </div>
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <div className="flex items-center gap-2">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <button
+                                  className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
+                                >
+                                  {getTaskStatusLabel(task.status)}
+                                  <ChevronDown className="h-3 w-3" />
+                                </button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  onClick={() => handleStatusUpdate(task.id, "not_started")}
+                                  className="cursor-pointer"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    {task.status === "not_started" && (
+                                      <Check className="h-3 w-3" />
+                                    )}
+                                    <span>Belum Mulai</span>
+                                  </div>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleStatusUpdate(task.id, "in_progress")}
+                                  className="cursor-pointer"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    {task.status === "in_progress" && (
+                                      <Check className="h-3 w-3" />
+                                    )}
+                                    <span>Sedang Berjalan</span>
+                                  </div>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleStatusUpdate(task.id, "completed")}
+                                  className="cursor-pointer"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    {task.status === "completed" && (
+                                      <Check className="h-3 w-3" />
+                                    )}
+                                    <span>Selesai</span>
+                                  </div>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleStatusUpdate(task.id, "cancelled")}
+                                  className="cursor-pointer"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    {task.status === "cancelled" && (
+                                      <Check className="h-3 w-3" />
+                                    )}
+                                    <span>Dibatalkan</span>
+                                  </div>
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="hover:bg-gray-100 h-8 w-8 p-0">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem asChild>
+                                  <Link
+                                    href={`/tasks/${task.id}`}
+                                    className="cursor-pointer flex items-center"
+                                  >
+                                    <Eye className="w-4 h-4 mr-2" />
+                                    Lihat Detail
+                                  </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleEditTask(task)}
+                                  className="cursor-pointer"
+                                >
+                                  <Edit className="w-4 h-4 mr-2" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleDeleteTask(task.id)}
+                                  className="cursor-pointer text-red-600"
+                                >
+                                  <Trash2 className="w-4 h-4 mr-2" />
+                                  Hapus
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </div>
                         <div className="flex justify-between items-center pt-2 border-t border-gray-200">
                           <div className="flex items-center gap-2">
@@ -1386,40 +1420,7 @@ export default function InitiativeDetailPage() {
                             {task.dueDate ? formatDate(task.dueDate) : "Belum diatur"}
                           </span>
                         </div>
-                        <div className="flex justify-end">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm" className="hover:bg-gray-100">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem asChild>
-                                <Link
-                                  href={`/tasks/${task.id}`}
-                                  className="cursor-pointer flex items-center"
-                                >
-                                  <Eye className="w-4 h-4 mr-2" />
-                                  Lihat Detail
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => handleEditTask(task)}
-                                className="cursor-pointer"
-                              >
-                                <Edit className="w-4 h-4 mr-2" />
-                                Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => handleDeleteTask(task.id)}
-                                className="cursor-pointer text-red-600"
-                              >
-                                <Trash2 className="w-4 h-4 mr-2" />
-                                Hapus
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
+
                       </div>
                     ))}
                   </div>
