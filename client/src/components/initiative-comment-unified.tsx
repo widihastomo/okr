@@ -63,11 +63,14 @@ export function InitiativeCommentUnified({ initiativeId }: InitiativeCommentUnif
   const { user } = useAuth();
 
   // Fetch comments
-  const { data: comments = [], isLoading } = useQuery<InitiativeComment[]>({
+  const { data: commentsData = [], isLoading } = useQuery<InitiativeComment[]>({
     queryKey: ['/api/initiatives', initiativeId, 'comments'],
     queryFn: () => apiRequest('GET', `/api/initiatives/${initiativeId}/comments`),
     enabled: !!initiativeId
   });
+
+  // Ensure comments is always an array
+  const comments = Array.isArray(commentsData) ? commentsData : [];
 
   // Create comment mutation
   const createCommentMutation = useMutation({
