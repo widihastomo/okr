@@ -246,6 +246,12 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 14, 2025. Successfully changed initiative progress bar color from orange to blue:
+  * UPDATED: Progress bar gradient changed from orange (from-orange-600 to-orange-500) to blue (from-blue-600 to-blue-500)
+  * ENHANCED: Better visual contrast and professional appearance with blue gradient
+  * MAINTAINED: All progress calculation logic and transition animations preserved
+  * IMPROVED: Consistent blue color scheme that matches other UI elements in the application
+  * RESULT: More cohesive design with blue progress indicators throughout the initiative detail page
 - July 14, 2025. Successfully changed task priority icons from complex shapes to simple colored circles:
   * UPDATED: Priority icons now use simple colored circles instead of AlertTriangle/Minus/Flag icons
   * ENHANCED: High priority = red circle, medium priority = yellow circle, low priority = green circle

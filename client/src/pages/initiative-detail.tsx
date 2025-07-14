@@ -970,7 +970,7 @@ export default function InitiativeDetailPage() {
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div 
-                            className="bg-gradient-to-r from-orange-600 to-orange-500 h-2 rounded-full transition-all duration-500 ease-in-out"
+                            className="bg-gradient-to-r from-blue-600 to-blue-500 h-2 rounded-full transition-all duration-500 ease-in-out"
                             style={{ width: `${progressStats.percentage}%` }}
                           />
                         </div>
