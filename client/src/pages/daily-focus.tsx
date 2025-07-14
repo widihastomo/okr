@@ -497,6 +497,9 @@ export default function DailyFocusPage() {
   const { data: users = [], isLoading: isLoadingUsers } = useQuery({
     queryKey: ["/api/users"],
   });
+  
+  // Filter active users for better performance
+  const activeUsers = users.filter((user: any) => user.isActive === true);
 
   const { data: cycles = [], isLoading: isLoadingCycles } = useQuery({
     queryKey: ["/api/cycles"],
@@ -1187,7 +1190,7 @@ export default function DailyFocusPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Semua Anggota Tim</SelectItem>
-                {users?.map((user: any) => (
+                {activeUsers?.map((user: any) => (
                   <SelectItem key={user.id} value={user.id}>
                     {user.firstName && user.lastName
                       ? `${user.firstName} ${user.lastName}`
@@ -1212,9 +1215,9 @@ export default function DailyFocusPage() {
             <span>
               Menampilkan objective, task, dan aktivitas untuk:{" "}
               <span className="font-medium">
-                {users?.find((u: any) => u.id === selectedUserId)?.firstName &&
-                users?.find((u: any) => u.id === selectedUserId)?.lastName
-                  ? `${users.find((u: any) => u.id === selectedUserId)?.firstName} ${users.find((u: any) => u.id === selectedUserId)?.lastName}`
+                {activeUsers?.find((u: any) => u.id === selectedUserId)?.firstName &&
+                activeUsers?.find((u: any) => u.id === selectedUserId)?.lastName
+                  ? `${activeUsers.find((u: any) => u.id === selectedUserId)?.firstName} ${activeUsers.find((u: any) => u.id === selectedUserId)?.lastName}`
                   : "Unknown"}
               </span>
             </span>

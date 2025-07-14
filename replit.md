@@ -262,6 +262,12 @@ All email configuration now uses environment variables:
   * ENHANCED: Added redirect to dashboard after successful initiative deletion using wouter navigate
   * IMPROVED: 1-second delay before redirect to allow user to see success message
   * RESULT: Clean initiative deletion with proper cascade handling and user-friendly redirect experience
+- July 14, 2025. Successfully implemented active user filtering in daily-focus page:
+  * ADDED: Active user filtering (isActive === true) for user selection dropdown in daily-focus page
+  * ENHANCED: Created activeUsers variable for better performance and code optimization
+  * UPDATED: User filter indicator to use activeUsers instead of filtering users multiple times
+  * IMPROVED: Consistent user filtering across all user selection interfaces
+  * RESULT: Daily-focus page now shows only active users in user filter dropdown
 - July 14, 2025. Successfully implemented comprehensive reopen functionality for cancelled initiatives with key result reassignment:
   * ADDED: Reopen initiative functionality for cancelled initiatives ("dibatalkan" status) with optional key result reassignment
   * ENHANCED: Modal dialog with SearchableKeyResultSelect component for choosing new key result when reopening
