@@ -71,6 +71,26 @@ const TasksPage = () => {
     return dueDate < today && task.status !== 'completed' && task.status !== 'cancelled';
   };
 
+  // Helper function to categorize tasks by due date
+  const categorizeTaskByDate = (task: Task): 'overdue' | 'today' | 'upcoming' => {
+    if (!task.dueDate) return 'upcoming';
+    
+    const today = new Date();
+    const dueDate = new Date(task.dueDate);
+    
+    // Reset time to compare only dates
+    today.setHours(0, 0, 0, 0);
+    dueDate.setHours(0, 0, 0, 0);
+    
+    if (dueDate < today && task.status !== 'completed' && task.status !== 'cancelled') {
+      return 'overdue';
+    } else if (dueDate.getTime() === today.getTime()) {
+      return 'today';
+    } else {
+      return 'upcoming';
+    }
+  };
+
   const filteredTasks = useMemo(() => {
     const filtered = tasks.filter(task => {
       const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
@@ -98,6 +118,19 @@ const TasksPage = () => {
       return aDate.getTime() - bDate.getTime();
     });
   }, [tasks, statusFilter, priorityFilter, searchTerm]);
+
+  // Group tasks by date categories
+  const groupedTasks = useMemo(() => {
+    const overdueTasks = filteredTasks.filter(task => categorizeTaskByDate(task) === 'overdue');
+    const todayTasks = filteredTasks.filter(task => categorizeTaskByDate(task) === 'today');
+    const upcomingTasks = filteredTasks.filter(task => categorizeTaskByDate(task) === 'upcoming');
+    
+    return {
+      overdue: overdueTasks,
+      today: todayTasks,
+      upcoming: upcomingTasks
+    };
+  }, [filteredTasks]);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -298,230 +331,251 @@ const TasksPage = () => {
     </Card>
   );
 
-  const ListView = () => {
-    return (
-      <Card>
-        <CardContent className="p-0">
-          {/* Desktop View */}
-          <div className="hidden md:block">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Task
-                  </th>
-                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Prioritas
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Tenggat
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    PIC
-                  </th>
-                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Aksi
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredTasks.map((task) => (
-                  <tr key={task.id} className={`hover:bg-gray-50 ${isTaskOverdue(task) ? 'bg-red-50 border-l-4 border-red-400' : ''}`}>
-                    <td className="px-4 py-4">
-                      <div className="flex items-center gap-2">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <Link
-                              href={`/tasks/${task.id}`}
-                              className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
-                            >
-                              {task.title}
-                            </Link>
-                            {isTaskOverdue(task) && (
-                              <Badge variant="destructive" className="text-xs">
-                                Overdue
-                              </Badge>
-                            )}
-                          </div>
-                          {task.initiative && (
-                            <div className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded mt-1 inline-block">
-                              Inisiatif: {task.initiative.title}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                      <Badge className={getTaskPriorityColor(task.priority || "medium")}>
-                        {getTaskPriorityLabel(task.priority || "medium")}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-4">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button
-                            className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
-                          >
-                            {getTaskStatusLabel(task.status)}
-                            <ChevronDown className="h-3 w-3" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "not_started")}>
-                            Belum Dimulai
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "in_progress")}>
-                            Sedang Berjalan
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "completed")}>
-                            Selesai
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "cancelled")}>
-                            Dibatalkan
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </td>
-                    <td className="px-4 py-4 text-sm text-gray-500">
-                      {task.dueDate ? formatDate(new Date(task.dueDate), 'dd/MM/yyyy') : 'Tidak ada'}
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="flex items-center gap-2">
-                        {task.assignedTo ? (
-                          <Avatar className="w-6 h-6">
-                            <AvatarImage
-                              src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
-                            />
-                            <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
-                              {getUserInitials(task.assignedTo)}
-                            </AvatarFallback>
-                          </Avatar>
-                        ) : (
-                          <User className="w-4 h-4" />
-                        )}
-                        <span className="text-sm text-gray-600">
-                          {task.assignedTo
-                            ? getUserName(task.assignedTo)
-                            : "Belum ditentukan"}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem asChild>
-                            <Link href={`/tasks/${task.id}`} className="flex items-center">
-                              <Eye className="mr-2 h-4 w-4" />
-                              Lihat Detail
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-red-600">
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Hapus
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Mobile View */}
-          <div className="md:hidden space-y-4 p-4">
-            {filteredTasks.map((task) => (
-              <div key={task.id} className={`p-3 bg-gray-50 border border-gray-200 rounded-lg space-y-2 ${isTaskOverdue(task) ? 'bg-red-50 border-red-300 border-l-4 border-l-red-400' : ''}`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href={`/tasks/${task.id}`}
-                        className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
-                      >
-                        {task.title}
-                      </Link>
-                      {isTaskOverdue(task) && (
-                        <Badge variant="destructive" className="text-xs">
-                          Overdue
-                        </Badge>
-                      )}
-                    </div>
-                    {task.initiative && (
-                      <div className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded mt-1 inline-block">
-                        Inisiatif: {task.initiative.title}
-                      </div>
-                    )}
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge className={getTaskPriorityColor(task.priority || "medium")}>
-                        {getTaskPriorityLabel(task.priority || "medium")}
-                      </Badge>
-                    </div>
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button
-                        className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
-                      >
-                        {getTaskStatusLabel(task.status)}
-                        <ChevronDown className="h-3 w-3" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "not_started")}>
-                        Belum Dimulai
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "in_progress")}>
-                        Sedang Berjalan
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "completed")}>
-                        Selesai
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "cancelled")}>
-                        Dibatalkan
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-                <div className="flex items-center justify-between text-sm text-gray-500">
-                  <div className="flex items-center gap-2">
-                    {task.assignedTo ? (
-                      <Avatar className="w-5 h-5">
-                        <AvatarImage
-                          src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
-                        />
-                        <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
-                          {getUserInitials(task.assignedTo)}
-                        </AvatarFallback>
-                      </Avatar>
-                    ) : (
-                      <User className="w-4 h-4" />
-                    )}
-                    <span className="text-xs text-gray-600">
-                      {task.assignedTo
-                        ? getUserName(task.assignedTo)
-                        : "Belum ditentukan"}
-                    </span>
-                  </div>
-                  <span>{task.dueDate ? formatDate(new Date(task.dueDate), 'dd/MM/yyyy') : 'Tidak ada tenggat'}</span>
-                </div>
+  const renderTaskRow = (task: Task) => (
+    <tr key={task.id} className={`hover:bg-gray-50 ${isTaskOverdue(task) ? 'bg-red-50 border-l-4 border-red-400' : ''}`}>
+      <td className="px-4 py-4">
+        <div className="flex items-center gap-2">
+          <div>
+            <div className="flex items-center gap-2">
+              <Link
+                href={`/tasks/${task.id}`}
+                className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
+              >
+                {task.title}
+              </Link>
+              {isTaskOverdue(task) && (
+                <Badge variant="destructive" className="text-xs">
+                  Overdue
+                </Badge>
+              )}
+            </div>
+            {task.initiative && (
+              <div className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded mt-1 inline-block">
+                Inisiatif: {task.initiative.title}
               </div>
-            ))}
+            )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </td>
+      <td className="px-4 py-4 text-center">
+        <Badge className={getTaskPriorityColor(task.priority || "medium")}>
+          {getTaskPriorityLabel(task.priority || "medium")}
+        </Badge>
+      </td>
+      <td className="px-4 py-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
+            >
+              {getTaskStatusLabel(task.status)}
+              <ChevronDown className="h-3 w-3" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "not_started")}>
+              Belum Dimulai
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "in_progress")}>
+              Sedang Berjalan
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "completed")}>
+              Selesai
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "cancelled")}>
+              Dibatalkan
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </td>
+      <td className="px-4 py-4 text-sm text-gray-500">
+        {task.dueDate ? formatDate(new Date(task.dueDate), 'dd/MM/yyyy') : 'Tidak ada'}
+      </td>
+      <td className="px-4 py-4">
+        <div className="flex items-center gap-2">
+          {task.assignedTo ? (
+            <Avatar className="w-6 h-6">
+              <AvatarImage
+                src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
+              />
+              <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
+                {getUserInitials(task.assignedTo)}
+              </AvatarFallback>
+            </Avatar>
+          ) : (
+            <User className="w-4 h-4" />
+          )}
+          <span className="text-sm text-gray-600">
+            {task.assignedTo
+              ? getUserName(task.assignedTo)
+              : "Belum ditentukan"}
+          </span>
+        </div>
+      </td>
+      <td className="px-4 py-4 text-center">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem asChild>
+              <Link href={`/tasks/${task.id}`} className="flex items-center">
+                <Eye className="mr-2 h-4 w-4" />
+                Lihat Detail
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Edit className="mr-2 h-4 w-4" />
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-red-600">
+              <Trash2 className="mr-2 h-4 w-4" />
+              Hapus
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </td>
+    </tr>
+  );
+
+  const renderTaskCard = (task: Task) => (
+    <div key={task.id} className={`p-3 bg-gray-50 border border-gray-200 rounded-lg space-y-2 ${isTaskOverdue(task) ? 'bg-red-50 border-red-300 border-l-4 border-l-red-400' : ''}`}>
+      <div className="flex items-center justify-between">
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/tasks/${task.id}`}
+              className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
+            >
+              {task.title}
+            </Link>
+            {isTaskOverdue(task) && (
+              <Badge variant="destructive" className="text-xs">
+                Overdue
+              </Badge>
+            )}
+          </div>
+          {task.initiative && (
+            <div className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded mt-1 inline-block">
+              Inisiatif: {task.initiative.title}
+            </div>
+          )}
+          <div className="flex items-center gap-2 mt-1">
+            <Badge className={getTaskPriorityColor(task.priority || "medium")}>
+              {getTaskPriorityLabel(task.priority || "medium")}
+            </Badge>
+          </div>
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
+            >
+              {getTaskStatusLabel(task.status)}
+              <ChevronDown className="h-3 w-3" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "not_started")}>
+              Belum Dimulai
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "in_progress")}>
+              Sedang Berjalan
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "completed")}>
+              Selesai
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleStatusUpdate(task.id, "cancelled")}>
+              Dibatalkan
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      <div className="flex items-center justify-between text-sm text-gray-500">
+        <div className="flex items-center gap-2">
+          {task.assignedTo ? (
+            <Avatar className="w-5 h-5">
+              <AvatarImage
+                src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
+              />
+              <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
+                {getUserInitials(task.assignedTo)}
+              </AvatarFallback>
+            </Avatar>
+          ) : (
+            <User className="w-4 h-4" />
+          )}
+          <span className="text-xs text-gray-600">
+            {task.assignedTo
+              ? getUserName(task.assignedTo)
+              : "Belum ditentukan"}
+          </span>
+        </div>
+        <span>{task.dueDate ? formatDate(new Date(task.dueDate), 'dd/MM/yyyy') : 'Tidak ada tenggat'}</span>
+      </div>
+    </div>
+  );
+
+  const ListView = () => {
+    const categories = [
+      { key: 'overdue', title: 'Terlambat', tasks: groupedTasks.overdue, color: 'text-red-600' },
+      { key: 'today', title: 'Hari Ini', tasks: groupedTasks.today, color: 'text-blue-600' },
+      { key: 'upcoming', title: 'Akan Datang', tasks: groupedTasks.upcoming, color: 'text-gray-600' }
+    ];
+
+    return (
+      <div className="space-y-6">
+        {categories.map(category => (
+          category.tasks.length > 0 && (
+            <Card key={category.key}>
+              <CardHeader className="pb-3">
+                <CardTitle className={`text-lg ${category.color}`}>
+                  {category.title} ({category.tasks.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                {/* Desktop View */}
+                <div className="hidden md:block">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Task
+                        </th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Prioritas
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Tenggat
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          PIC
+                        </th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Aksi
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {category.tasks.map(renderTaskRow)}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile View */}
+                <div className="md:hidden space-y-4 p-4">
+                  {category.tasks.map(renderTaskCard)}
+                </div>
+              </CardContent>
+            </Card>
+          )
+        ))}
+      </div>
     );
   };
 
@@ -778,6 +832,18 @@ const TasksPage = () => {
             <div className="text-gray-500 text-center">
               <List className="w-12 h-12 mx-auto mb-4 text-gray-300" />
               <h3 className="text-lg font-medium mb-2">Tidak ada task ditemukan</h3>
+              <p>Coba ubah filter atau tambah task baru</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+      
+      {filteredTasks.length > 0 && groupedTasks.overdue.length === 0 && groupedTasks.today.length === 0 && groupedTasks.upcoming.length === 0 && (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <div className="text-gray-500 text-center">
+              <List className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+              <h3 className="text-lg font-medium mb-2">Tidak ada task dalam kategori yang dipilih</h3>
               <p>Coba ubah filter atau tambah task baru</p>
             </div>
           </CardContent>

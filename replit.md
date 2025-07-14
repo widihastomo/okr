@@ -261,6 +261,8 @@ All email configuration now uses environment variables:
   * ENHANCED: Smart task sorting with overdue tasks prioritized at the top
   * ADDED: Visual overdue indicators with red background, red border, and "Overdue" badge
   * IMPLEMENTED: Overdue detection logic excluding completed and cancelled tasks
+  * ADDED: Task grouping by time categories: "Terlambat", "Hari Ini", "Akan Datang" matching daily-focus page structure
+  * ENHANCED: Task visual identification with overdue detection logic for incomplete tasks past due date
   * CONSISTENT: Exact same styling, layout, and interaction patterns as daily-focus page
   * RESULT: Tasks page now has unified ListView format matching daily-focus with proper user profile integration and contextual feedback
 - July 14, 2025. Successfully fixed TourLauncher clickability issue:
