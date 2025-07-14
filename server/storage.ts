@@ -125,6 +125,9 @@ export interface IStorage {
   updateInitiativeComment(id: string, comment: Partial<InsertInitiativeComment>): Promise<InitiativeComment | undefined>;
   deleteInitiativeComment(id: string): Promise<boolean>;
   
+  // Initiative History
+  getInitiativeHistory(initiativeId: string): Promise<any[]>;
+  
   // Success Metrics
   getSuccessMetricsByInitiativeId(initiativeId: string): Promise<SuccessMetric[]>;
   createSuccessMetric(metric: InsertSuccessMetric): Promise<SuccessMetric>;
@@ -2439,6 +2442,67 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error("Error fetching public application settings:", error);
       throw error;
+    }
+  }
+
+  async getInitiativeHistory(initiativeId: string): Promise<any[]> {
+    try {
+      // Get initiative details for creation info
+      const initiative = await db
+        .select({
+          id: initiatives.id,
+          title: initiatives.title,
+          createdAt: initiatives.createdAt,
+          createdBy: initiatives.createdBy,
+          updatedAt: initiatives.updatedAt,
+          creator: {
+            id: users.id,
+            email: users.email,
+            firstName: users.firstName,
+            lastName: users.lastName,
+            role: users.role
+          }
+        })
+        .from(initiatives)
+        .innerJoin(users, eq(users.id, initiatives.createdBy))
+        .where(eq(initiatives.id, initiativeId))
+        .limit(1);
+
+      if (!initiative || initiative.length === 0) {
+        return [];
+      }
+
+      const initiativeData = initiative[0];
+      
+      // Build history array with creation entry
+      const history = [];
+      
+      // Add initiative creation entry
+      history.push({
+        id: `${initiativeData.id}-created`,
+        action: 'created',
+        description: 'Inisiatif dibuat',
+        timestamp: initiativeData.createdAt,
+        user: {
+          id: initiativeData.creator.id,
+          email: initiativeData.creator.email,
+          firstName: initiativeData.creator.firstName,
+          lastName: initiativeData.creator.lastName,
+          role: initiativeData.creator.role
+        }
+      });
+
+      // Sort by timestamp descending (newest first)
+      history.sort((a, b) => {
+        const timeA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+        const timeB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+        return timeB - timeA;
+      });
+
+      return history;
+    } catch (error) {
+      console.error("Error fetching initiative history:", error);
+      return [];
     }
   }
 }

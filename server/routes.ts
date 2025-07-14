@@ -2919,27 +2919,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get initiative notes
-  app.get("/api/initiatives/:initiativeId/notes", async (req, res) => {
+  // Get initiative history from audit trail
+  app.get("/api/initiatives/:initiativeId/history", requireAuth, async (req, res) => {
     try {
       const { initiativeId } = req.params;
-      const notes = await storage.getInitiativeNotes(initiativeId);
+      const currentUser = req.user as User;
       
-      // Get user information for each note
-      const notesWithUsers = await Promise.all(
-        notes.map(async (note) => {
-          const user = await storage.getUser(note.createdBy);
-          return {
-            ...note,
-            createdByUser: user || null
-          };
-        })
-      );
+      // Verify user has access to this initiative
+      const initiative = await storage.getInitiativeWithDetails(initiativeId);
+      if (!initiative) {
+        return res.status(404).json({ message: "Initiative not found" });
+      }
       
-      res.json(notesWithUsers);
+      if (!currentUser.isSystemOwner) {
+        const initiativeCreator = await storage.getUser(initiative.createdBy);
+        if (!initiativeCreator || initiativeCreator.organizationId !== currentUser.organizationId) {
+          return res.status(403).json({ message: "Access denied to this initiative" });
+        }
+      }
+      
+      // Get initiative history
+      const historyEntries = await storage.getInitiativeHistory(initiativeId);
+      
+      res.json(historyEntries);
     } catch (error) {
-      console.error("Error fetching initiative notes:", error);
-      res.status(500).json({ message: "Failed to fetch initiative notes" });
+      console.error("Error fetching initiative history:", error);
+      res.status(500).json({ message: "Failed to fetch initiative history" });
     }
   });
 

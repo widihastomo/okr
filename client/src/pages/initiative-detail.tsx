@@ -74,7 +74,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import TaskModal from "@/components/task-modal";
 import InitiativeFormModal from "@/components/initiative-form-modal";
-import { InitiativeNotes } from "@/components/initiative-notes";
+import { InitiativeHistory } from "@/components/initiative-history";
 import SuccessMetricsModal from "@/components/success-metrics-modal-simple";
 import InitiativeClosureModal from "@/components/initiative-closure-modal";
 import { InitiativeCommentUnified } from "@/components/initiative-comment-unified";
@@ -1490,8 +1490,8 @@ export default function InitiativeDetailPage() {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Initiative Notes */}
-          <InitiativeNotes initiativeId={id!} />
+          {/* Initiative History */}
+          <InitiativeHistory initiativeId={id!} />
           
           {/* Initiative Comments */}
           <InitiativeCommentUnified initiativeId={id!} />
