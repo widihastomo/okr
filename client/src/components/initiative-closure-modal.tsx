@@ -331,19 +331,20 @@ export default function InitiativeClosureModal({
 
                 {/* Alasan dan Catatan Pembelajaran */}
                 {selectedResult && (
-                  <div className="space-y-3 border-t pt-4">
+                  <div className="space-y-3 border-t border-gray-200 pt-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
                         name="reason"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{getReasonLabel(selectedResult)}</FormLabel>
+                            <FormLabel className="text-sm font-medium text-gray-700">{getReasonLabel(selectedResult)}</FormLabel>
                             <FormControl>
                               <Textarea
                                 placeholder={`Jelaskan ${getReasonLabel(selectedResult).toLowerCase()}...`}
                                 {...field}
                                 rows={2}
+                                className="border-gray-300 text-sm"
                               />
                             </FormControl>
                             <FormMessage />
@@ -356,12 +357,13 @@ export default function InitiativeClosureModal({
                         name="learningNote"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{getLearningPrompt(selectedResult)}</FormLabel>
+                            <FormLabel className="text-sm font-medium text-gray-700">{getLearningPrompt(selectedResult)}</FormLabel>
                             <FormControl>
                               <Textarea
                                 placeholder="Bagikan pembelajaran yang bisa digunakan untuk inisiatif serupa..."
                                 {...field}
                                 rows={2}
+                                className="border-gray-300 text-sm"
                               />
                             </FormControl>
                             <FormMessage />
@@ -373,14 +375,14 @@ export default function InitiativeClosureModal({
                 )}
 
                 {/* Update Budget */}
-                <div className="border-t pt-4">
+                <div className="border-t border-gray-200 pt-4">
                   <FormField
                     control={form.control}
                     name="budgetUsed"
                     render={({ field }) => (
                       <FormItem>
                         <div className="flex items-center gap-2">
-                          <FormLabel>Budget yang digunakan (Rp)</FormLabel>
+                          <FormLabel className="text-sm font-medium text-gray-700">Budget yang digunakan (Rp)</FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
                               <button type="button">
@@ -405,9 +407,10 @@ export default function InitiativeClosureModal({
                             type="number"
                             placeholder="Masukkan budget yang sudah digunakan"
                             {...field}
+                            className="border-gray-300"
                           />
                         </FormControl>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-gray-500 mt-1">
                           Budget awal: Rp {initiative?.budget ? Number(initiative.budget).toLocaleString('id-ID') : '0'}
                         </div>
                         <FormMessage />
@@ -418,7 +421,7 @@ export default function InitiativeClosureModal({
 
                 {/* Update Success Metrics */}
                 {Array.isArray(successMetrics) && successMetrics.length > 0 && (
-                  <div className="border-t pt-4">
+                  <div className="border-t border-gray-200 pt-4">
                     <div className="mb-3 flex items-center gap-2">
                       <h3 className="text-sm font-medium text-gray-700">Update Metrik Keberhasilan</h3>
                       <Popover>
@@ -440,28 +443,30 @@ export default function InitiativeClosureModal({
                         </PopoverContent>
                       </Popover>
                     </div>
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {successMetrics.map((metric) => (
-                        <div key={metric.id} className="p-3 border rounded-lg">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="text-sm font-medium">{metric.name}</h4>
-                            <span className="text-xs text-gray-500">
-                              Target: {metric.targetValue} {metric.unit}
-                            </span>
-                          </div>
-                          <div className="grid grid-cols-2 gap-3">
-                            <div>
-                              <Label className="text-xs">Nilai Final</Label>
+                        <div key={metric.id} className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-sm font-medium text-gray-900 truncate">{metric.name}</h4>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-xs text-gray-500">
+                                  Target: {metric.targetValue} {metric.unit}
+                                </span>
+                                <span className="text-xs text-gray-400">•</span>
+                                <span className="text-xs text-gray-500">
+                                  Sekarang: {metric.currentValue} {metric.unit}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex-shrink-0 w-24">
                               <Input
                                 type="number"
                                 value={updatedMetrics.find(m => m.id === metric.id)?.currentValue || 0}
                                 onChange={(e) => updateMetricValue(metric.id, parseFloat(e.target.value) || 0)}
-                                placeholder="Nilai final"
-                                className="text-sm"
+                                placeholder="Final"
+                                className="text-xs h-8 border-blue-300"
                               />
-                            </div>
-                            <div className="text-xs text-gray-500 flex items-center">
-                              Sebelumnya: {metric.currentValue} {metric.unit}
                             </div>
                           </div>
                         </div>
@@ -472,7 +477,7 @@ export default function InitiativeClosureModal({
 
                 {/* Update Task Status */}
                 {incompleteTasks.length > 0 && (
-                  <div className="border-t pt-4">
+                  <div className="border-t border-gray-200 pt-4">
                     <div className="mb-3 flex items-center gap-2">
                       <h3 className="text-sm font-medium text-gray-700">Update Status Task</h3>
                       <Popover>
@@ -495,32 +500,33 @@ export default function InitiativeClosureModal({
                         </PopoverContent>
                       </Popover>
                     </div>
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {incompleteTasks.map((task) => (
-                        <div key={task.id} className="p-3 border rounded-lg">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="text-sm font-medium">{task.title}</h4>
-                            <span className="text-xs text-gray-500">
-                              {task.status === 'not_started' ? 'Belum Dimulai' : 
-                               task.status === 'in_progress' ? 'Sedang Berjalan' : task.status}
-                            </span>
-                          </div>
-                          <div>
-                            <Label className="text-xs">Status Baru</Label>
-                            <Select
-                              value={taskUpdates.find(t => t.id === task.id)?.newStatus || task.status}
-                              onValueChange={(value) => updateTaskStatus(task.id, value)}
-                            >
-                              <SelectTrigger className="text-sm">
-                                <SelectValue placeholder="Pilih status baru" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="not_started">Belum Dimulai</SelectItem>
-                                <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
-                                <SelectItem value="completed">Selesai</SelectItem>
-                                <SelectItem value="cancelled">Dibatalkan</SelectItem>
-                              </SelectContent>
-                            </Select>
+                        <div key={task.id} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-sm font-medium text-gray-900 truncate">{task.title}</h4>
+                              <span className="text-xs text-gray-500 mt-1 block">
+                                Saat ini: {task.status === 'not_started' ? 'Belum Dimulai' : 
+                                         task.status === 'in_progress' ? 'Sedang Berjalan' : task.status}
+                              </span>
+                            </div>
+                            <div className="flex-shrink-0 w-32">
+                              <Select
+                                value={taskUpdates.find(t => t.id === task.id)?.newStatus || task.status}
+                                onValueChange={(value) => updateTaskStatus(task.id, value)}
+                              >
+                                <SelectTrigger className="text-xs h-8 border-gray-300">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="not_started">Belum Dimulai</SelectItem>
+                                  <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
+                                  <SelectItem value="completed">Selesai</SelectItem>
+                                  <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -529,14 +535,14 @@ export default function InitiativeClosureModal({
                 )}
 
                 {/* Catatan Tambahan */}
-                <div className="border-t pt-4">
+                <div className="border-t border-gray-200 pt-4">
                   <FormField
                     control={form.control}
                     name="notes"
                     render={({ field }) => (
                       <FormItem>
                         <div className="flex items-center gap-2">
-                          <FormLabel>Catatan Tambahan (Opsional)</FormLabel>
+                          <FormLabel className="text-sm font-medium text-gray-700">Catatan Tambahan (Opsional)</FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
                               <button type="button">
@@ -561,6 +567,7 @@ export default function InitiativeClosureModal({
                             placeholder="Tambahkan catatan tambahan jika diperlukan..."
                             {...field}
                             rows={3}
+                            className="border-gray-300"
                           />
                         </FormControl>
                         <FormMessage />
@@ -572,20 +579,21 @@ export default function InitiativeClosureModal({
             </Card>
 
             {/* Action Buttons */}
-            <div className="flex justify-end gap-3 pt-4 border-t">
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 bg-gray-50 -mx-6 px-6 py-4 rounded-b-lg">
               <Button 
                 type="button" 
                 variant="outline" 
                 onClick={handleClose}
                 disabled={closeInitiativeMutation.isPending}
                 size="sm"
+                className="border-gray-300 text-gray-700 hover:bg-gray-100"
               >
                 Batal
               </Button>
               <Button 
                 type="submit" 
                 disabled={closeInitiativeMutation.isPending}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-green-600 hover:bg-green-700 text-white shadow-sm"
                 size="sm"
               >
                 {closeInitiativeMutation.isPending ? "Menutup..." : "Tutup Inisiatif"}
