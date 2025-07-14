@@ -1523,8 +1523,8 @@ export default function InitiativeDetailPage() {
         isOpen={isCloseInitiativeModalOpen}
         onClose={() => setIsCloseInitiativeModalOpen(false)}
         initiative={initiativeData}
-        successMetrics={successMetrics}
-        tasks={tasks}
+        successMetrics={successMetrics || []}
+        tasks={tasks || []}
         onSuccess={() => {
           // Additional success actions if needed
         }}

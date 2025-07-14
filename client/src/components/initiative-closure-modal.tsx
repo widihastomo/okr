@@ -51,8 +51,8 @@ export default function InitiativeClosureModal({
   isOpen,
   onClose,
   initiative,
-  successMetrics,
-  tasks,
+  successMetrics = [],
+  tasks = [],
   onSuccess
 }: InitiativeClosureModalProps) {
   const { toast } = useToast();
@@ -76,13 +76,13 @@ export default function InitiativeClosureModal({
   // Initialize metrics and tasks when modal opens
   useEffect(() => {
     if (isOpen) {
-      setUpdatedMetrics(successMetrics.map(metric => ({
+      setUpdatedMetrics((successMetrics || []).map(metric => ({
         id: metric.id,
         currentValue: metric.currentValue,
         isCompleted: metric.isCompleted || false
       })));
       
-      setTaskUpdates(tasks.filter(task => task.status !== 'completed' && task.status !== 'cancelled').map(task => ({
+      setTaskUpdates((tasks || []).filter(task => task.status !== 'completed' && task.status !== 'cancelled').map(task => ({
         id: task.id,
         title: task.title,
         status: task.status,
@@ -179,14 +179,14 @@ export default function InitiativeClosureModal({
       });
 
       // Update success metrics
-      for (const metric of updatedMetrics) {
+      for (const metric of updatedMetrics || []) {
         await apiRequest("PATCH", `/api/success-metrics/${metric.id}`, {
           currentValue: metric.currentValue
         });
       }
 
       // Update task statuses
-      for (const task of taskUpdates) {
+      for (const task of taskUpdates || []) {
         if (task.newStatus !== task.status) {
           await apiRequest("PATCH", `/api/tasks/${task.id}`, {
             status: task.newStatus
@@ -230,7 +230,7 @@ export default function InitiativeClosureModal({
     onClose();
   };
 
-  const incompleteTasks = tasks.filter(task => task.status !== 'completed' && task.status !== 'cancelled');
+  const incompleteTasks = (tasks || []).filter(task => task.status !== 'completed' && task.status !== 'cancelled');
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -373,7 +373,7 @@ export default function InitiativeClosureModal({
             </Card>
 
             {/* Update Success Metrics */}
-            {successMetrics.length > 0 && (
+            {successMetrics && successMetrics.length > 0 && (
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
