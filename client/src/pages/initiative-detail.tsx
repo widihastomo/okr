@@ -1833,28 +1833,26 @@ export default function InitiativeDetailPage() {
               <XCircle className="w-5 h-5 text-yellow-600" />
               Batalkan Inisiatif
             </AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div>
-                <p className="mb-4">
-                  Apakah Anda yakin ingin membatalkan inisiatif <strong>"{initiativeData.title}"</strong>?
-                </p>
-                <div className="space-y-2 mb-4">
-                  <Label htmlFor="cancel-reason">Alasan pembatalan:</Label>
-                  <textarea
-                    id="cancel-reason"
-                    value={cancelReason}
-                    onChange={(e) => setCancelReason(e.target.value)}
-                    placeholder="Jelaskan alasan mengapa inisiatif ini dibatalkan..."
-                    className="w-full p-2 border border-gray-300 rounded-md resize-none"
-                    rows={3}
-                  />
-                </div>
-                <p className="text-yellow-600 font-medium">
-                  Inisiatif yang dibatalkan akan diubah statusnya menjadi "Dibatalkan" dan tidak dapat diaktifkan kembali.
-                </p>
-              </div>
+            <AlertDialogDescription className="text-gray-600">
+              Apakah Anda yakin ingin membatalkan inisiatif <strong>"{initiativeData.title}"</strong>?
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="cancel-reason">Alasan pembatalan:</Label>
+              <textarea
+                id="cancel-reason"
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                placeholder="Jelaskan alasan mengapa inisiatif ini dibatalkan..."
+                className="w-full p-2 border border-gray-300 rounded-md resize-none"
+                rows={3}
+              />
+            </div>
+            <p className="text-yellow-600 font-medium text-sm">
+              Inisiatif yang dibatalkan akan diubah statusnya menjadi "Dibatalkan" dan tidak dapat diaktifkan kembali.
+            </p>
+          </div>
           <AlertDialogFooter>
             <AlertDialogCancel>Batal</AlertDialogCancel>
             <AlertDialogAction
@@ -1876,20 +1874,18 @@ export default function InitiativeDetailPage() {
               <RotateCcw className="w-5 h-5 text-orange-600" />
               Buka Kembali Inisiatif
             </AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div>
-                <p className="mb-4">
-                  Apakah Anda yakin ingin membuka kembali inisiatif <strong>"{initiativeData.title}"</strong>?
-                </p>
-                <p className="text-orange-600 font-medium mb-4">
-                  Inisiatif akan diubah statusnya menjadi "Sedang Berjalan" dan dapat dilanjutkan kembali.
-                </p>
-                <p className="text-gray-600 text-sm">
-                  Anda dapat melanjutkan pekerjaan pada inisiatif ini, menambah task baru, dan memperbarui metrik keberhasilan.
-                </p>
-              </div>
+            <AlertDialogDescription className="text-gray-600">
+              Apakah Anda yakin ingin membuka kembali inisiatif <strong>"{initiativeData.title}"</strong>?
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="space-y-4 py-4">
+            <p className="text-orange-600 font-medium">
+              Inisiatif akan diubah statusnya menjadi "Sedang Berjalan" dan dapat dilanjutkan kembali.
+            </p>
+            <p className="text-gray-600 text-sm">
+              Anda dapat melanjutkan pekerjaan pada inisiatif ini, menambah task baru, dan memperbarui metrik keberhasilan.
+            </p>
+          </div>
           <AlertDialogFooter>
             <AlertDialogCancel>Batal</AlertDialogCancel>
             <AlertDialogAction
@@ -1911,28 +1907,26 @@ export default function InitiativeDetailPage() {
               <Trash2 className="w-5 h-5 text-red-600" />
               Hapus Inisiatif
             </AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div>
-                <p className="mb-4">
-                  Apakah Anda yakin ingin menghapus inisiatif <strong>"{initiativeData.title}"</strong>?
-                </p>
-                <div className="mb-4">
-                  <p className="text-red-600 font-medium mb-2">
-                    Peringatan: Tindakan ini akan menghapus secara permanen:
-                  </p>
-                  <ul className="text-sm text-gray-600 list-disc list-inside space-y-1">
-                    <li>Inisiatif dan semua datanya</li>
-                    <li>Semua task yang terkait ({tasks?.length || 0} task)</li>
-                    <li>Semua metrik keberhasilan ({successMetrics?.length || 0} metrik)</li>
-                    <li>Semua komentar dan riwayat aktivitas</li>
-                  </ul>
-                </div>
-                <p className="text-red-600 font-medium">
-                  Tindakan ini tidak dapat dibatalkan.
-                </p>
-              </div>
+            <AlertDialogDescription className="text-gray-600">
+              Apakah Anda yakin ingin menghapus inisiatif <strong>"{initiativeData.title}"</strong>?
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <p className="text-red-600 font-medium mb-2">
+                Peringatan: Tindakan ini akan menghapus secara permanen:
+              </p>
+              <ul className="text-sm text-gray-600 list-disc list-inside space-y-1">
+                <li>Inisiatif dan semua datanya</li>
+                <li>Semua task yang terkait ({tasks?.length || 0} task)</li>
+                <li>Semua metrik keberhasilan ({successMetrics?.length || 0} metrik)</li>
+                <li>Semua komentar dan riwayat aktivitas</li>
+              </ul>
+            </div>
+            <p className="text-red-600 font-medium">
+              Tindakan ini tidak dapat dibatalkan.
+            </p>
+          </div>
           <AlertDialogFooter>
             <AlertDialogCancel>Batal</AlertDialogCancel>
             <AlertDialogAction
