@@ -1371,8 +1371,8 @@ export default function InitiativeDetailPage() {
           isOpen={isClosureModalOpen}
           onClose={() => setIsClosureModalOpen(false)}
           initiative={initiativeData}
-          successMetrics={successMetricsData || []}
-          tasks={tasksData || []}
+          successMetrics={successMetrics || []}
+          tasks={tasks || []}
           onSuccess={() => {
             // Refresh data after successful closure
             queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
@@ -1533,7 +1533,8 @@ export default function InitiativeDetailPage() {
         successMetrics={successMetrics || []}
         tasks={tasks || []}
         onSuccess={() => {
-          // Additional success actions if needed
+          queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
+          queryClient.invalidateQueries({ queryKey: [`/api/initiatives`] });
         }}
       />
     </div>
