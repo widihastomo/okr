@@ -1028,7 +1028,7 @@ export default function InitiativeDetailPage() {
                 variant="outline" 
                 size="sm"
                 onClick={() => setIsReopenInitiativeModalOpen(true)}
-                className="border-blue-300 text-blue-600 hover:bg-blue-50 hover:border-blue-400"
+                className="border-orange-300 text-orange-600 hover:bg-orange-50 hover:border-orange-400"
               >
                 <RotateCcw className="w-4 h-4 mr-2" />
                 Buka Kembali
@@ -1700,7 +1700,7 @@ export default function InitiativeDetailPage() {
             <AlertDialogAction
               onClick={() => reopenInitiativeMutation.mutate()}
               disabled={reopenInitiativeMutation.isPending}
-              className="bg-blue-600 hover:bg-blue-700 focus:ring-orange-500"
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white focus:ring-orange-500"
             >
               {reopenInitiativeMutation.isPending ? "Membuka..." : "Buka Kembali"}
             </AlertDialogAction>
