@@ -884,9 +884,9 @@ export default function TaskModal({
                 />
               </div>
 
-              <div className="col-span-2">
+              <div>
                 <Label className="flex items-center gap-2 mb-2">
-                  Periode Pengerjaan
+                  Periode Task
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -901,120 +901,81 @@ export default function TaskModal({
                       <div className="space-y-2">
                         <h4 className="font-medium">Menentukan Periode Task</h4>
                         <p className="text-sm text-muted-foreground">
-                          Pilih tanggal mulai dan selesai untuk task ini. Tanggal mulai bisa dikosongkan jika task belum ada jadwal pasti untuk dimulai.
+                          Pilih tanggal untuk task ini. Jika Anda memilih 1 tanggal, maka itu akan menjadi tanggal selesai. Jika Anda memilih 2 tanggal, maka akan menjadi periode mulai dan selesai.
                         </p>
                       </div>
                     </PopoverContent>
                   </Popover>
                 </Label>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-sm text-gray-600 mb-1 block">Tanggal Mulai</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start text-left font-normal focus:ring-orange-500 focus:border-orange-500"
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {formData.startDate
-                            ? formData.startDate.toLocaleDateString("id-ID")
-                            : "Pilih tanggal mulai"}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={formData.startDate}
-                          onSelect={(date) => {
-                            if (date) {
-                              // Adjust for GMT+7 timezone to prevent date shifting
-                              const adjustedDate = new Date(date);
-                              adjustedDate.setHours(adjustedDate.getHours() + 7);
-                              setFormData({ ...formData, startDate: adjustedDate });
-                            } else {
-                              setFormData({ ...formData, startDate: date });
-                            }
-                          }}
-                          disabled={(date) => {
-                            // Use GMT+7 timezone for date comparison
-                            const now = new Date();
-                            const utc =
-                              now.getTime() + now.getTimezoneOffset() * 60000;
-                            const gmt7Date = new Date(utc + 7 * 3600000);
-                            const today = new Date(
-                              gmt7Date.getFullYear(),
-                              gmt7Date.getMonth(),
-                              gmt7Date.getDate(),
-                            );
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal focus:ring-orange-500 focus:border-orange-500"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {formData.startDate && formData.dueDate
+                        ? `${formData.startDate.toLocaleDateString("id-ID")} - ${formData.dueDate.toLocaleDateString("id-ID")}`
+                        : formData.dueDate
+                        ? formData.dueDate.toLocaleDateString("id-ID")
+                        : "Pilih tanggal"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="range"
+                      selected={{
+                        from: formData.startDate,
+                        to: formData.dueDate,
+                      }}
+                      onSelect={(range) => {
+                        if (range?.from && range?.to) {
+                          // Range selected - set both dates
+                          const adjustedStartDate = new Date(range.from);
+                          adjustedStartDate.setHours(adjustedStartDate.getHours() + 7);
+                          const adjustedEndDate = new Date(range.to);
+                          adjustedEndDate.setHours(adjustedEndDate.getHours() + 7);
+                          setFormData({
+                            ...formData,
+                            startDate: adjustedStartDate,
+                            dueDate: adjustedEndDate,
+                          });
+                        } else if (range?.from) {
+                          // Single date selected - set as due date only
+                          const adjustedDate = new Date(range.from);
+                          adjustedDate.setHours(adjustedDate.getHours() + 7);
+                          setFormData({
+                            ...formData,
+                            startDate: null,
+                            dueDate: adjustedDate,
+                          });
+                        } else {
+                          // Nothing selected - clear both dates
+                          setFormData({
+                            ...formData,
+                            startDate: null,
+                            dueDate: null,
+                          });
+                        }
+                      }}
+                      disabled={(date) => {
+                        // Use GMT+7 timezone for date comparison
+                        const now = new Date();
+                        const utc =
+                          now.getTime() + now.getTimezoneOffset() * 60000;
+                        const gmt7Date = new Date(utc + 7 * 3600000);
+                        const today = new Date(
+                          gmt7Date.getFullYear(),
+                          gmt7Date.getMonth(),
+                          gmt7Date.getDate(),
+                        );
 
-                            // Don't allow start date after due date if due date is set
-                            if (formData.dueDate && date > formData.dueDate) {
-                              return true;
-                            }
-
-                            return date < today;
-                          }}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-
-                  <div>
-                    <Label className="text-sm text-gray-600 mb-1 block">Tanggal Selesai</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start text-left font-normal focus:ring-orange-500 focus:border-orange-500"
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {formData.dueDate
-                            ? formData.dueDate.toLocaleDateString("id-ID")
-                            : "Pilih tanggal selesai"}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={formData.dueDate}
-                          onSelect={(date) => {
-                            if (date) {
-                              // Adjust for GMT+7 timezone to prevent date shifting
-                              const adjustedDate = new Date(date);
-                              adjustedDate.setHours(adjustedDate.getHours() + 7);
-                              setFormData({ ...formData, dueDate: adjustedDate });
-                            } else {
-                              setFormData({ ...formData, dueDate: date });
-                            }
-                          }}
-                          disabled={(date) => {
-                            // Use GMT+7 timezone for date comparison
-                            const now = new Date();
-                            const utc =
-                              now.getTime() + now.getTimezoneOffset() * 60000;
-                            const gmt7Date = new Date(utc + 7 * 3600000);
-                            const today = new Date(
-                              gmt7Date.getFullYear(),
-                              gmt7Date.getMonth(),
-                              gmt7Date.getDate(),
-                            );
-
-                            // Don't allow due date before start date if start date is set
-                            if (formData.startDate && date < formData.startDate) {
-                              return true;
-                            }
-
-                            return date < today;
-                          }}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                </div>
+                        return date < today;
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
           </CardContent>
