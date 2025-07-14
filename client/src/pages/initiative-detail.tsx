@@ -1088,122 +1088,89 @@ export default function InitiativeDetailPage() {
                       )}
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
 
-            {/* Initiative Comments Section */}
-            <InitiativeCommentsCard initiativeId={id!} />
-
-          {/* Task Management Section */}
-          <Card className="border-gray-200 shadow-sm">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900">
-                  <FileText className="h-5 w-5 text-orange-500" />
-                  Manajemen Task
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <button 
-                        type="button" 
-                        className="inline-flex items-center justify-center ml-1"
-                      >
-                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent side="right" className="max-w-sm">
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-sm">Manajemen Task</h4>
-                        <p className="text-sm text-gray-600">
-                          Task adalah aktivitas spesifik yang harus diselesaikan untuk mencapai tujuan inisiatif. 
-                          Sistem task management membantu Anda:
-                        </p>
-                        <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
-                          <li>Memecah inisiatif besar menjadi langkah-langkah yang dapat dilakukan</li>
-                          <li>Menetapkan prioritas dan tenggat waktu untuk setiap aktivitas</li>
-                          <li>Melacak progress dan status penyelesaian task</li>
-                          <li>Mengassign tanggung jawab kepada anggota tim</li>
-                          <li>Mengidentifikasi bottleneck dan hambatan dalam eksekusi</li>
-                        </ul>
-                        <p className="text-sm text-gray-600 mt-2">
-                          <strong>Status Task:</strong> Belum (Not Started), Jalan (In Progress), Selesai (Completed), Batal (Cancelled)
-                        </p>
+                  {/* Task Management Section */}
+                  <div className="pt-4 border-t border-gray-100">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-orange-500" />
+                        <span className="text-sm font-medium text-gray-700">Manajemen Task</span>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button 
+                              type="button" 
+                              className="inline-flex items-center justify-center ml-1"
+                            >
+                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent side="right" className="max-w-sm">
+                            <div className="space-y-2">
+                              <h4 className="font-medium text-sm">Manajemen Task</h4>
+                              <p className="text-sm text-gray-600">
+                                Task adalah aktivitas spesifik yang harus diselesaikan untuk mencapai tujuan inisiatif. 
+                                Sistem task management membantu Anda:
+                              </p>
+                              <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                                <li>Memecah inisiatif besar menjadi langkah-langkah yang dapat dilakukan</li>
+                                <li>Menetapkan prioritas dan tenggat waktu untuk setiap aktivitas</li>
+                                <li>Melacak progress dan status penyelesaian task</li>
+                                <li>Mengassign tanggung jawab kepada anggota tim</li>
+                                <li>Mengidentifikasi bottleneck dan hambatan dalam eksekusi</li>
+                              </ul>
+                              <p className="text-sm text-gray-600 mt-2">
+                                <strong>Status Task:</strong> Belum (Not Started), Jalan (In Progress), Selesai (Completed), Batal (Cancelled)
+                              </p>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
                       </div>
-                    </PopoverContent>
-                  </Popover>
-                </CardTitle>
-                <Button 
-                  onClick={() => setIsAddTaskModalOpen(true)}
-                  size="sm"
-                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">Tambah Task</span>
-                  <span className="sm:hidden">Tambah</span>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              {tasks.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <FileText className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                  <p className="text-sm">Belum ada task</p>
-                </div>
-              ) : (
-                <>
-                  {/* Desktop Table View */}
-                  <div className="hidden md:block overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Task
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Status
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Tenggat
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            PIC
-                          </th>
-                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Aksi
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {tasks.map((task: any) => (
-                          <tr key={task.id} className="hover:bg-gray-50">
-                            <td className="px-4 py-4">
-                              <div>
-                                <div className="flex items-center gap-2">
-                                  <TooltipProvider>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <div className={`inline-flex items-center justify-center cursor-pointer ${getTaskPriorityIcon(task.priority || "medium").color}`}>
-                                          {getTaskPriorityIcon(task.priority || "medium").icon}
-                                        </div>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p>{getTaskPriorityIcon(task.priority || "medium").label}</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>
-                                  <Link
-                                    href={`/tasks/${task.id}`}
-                                    className="font-medium text-gray-900 hover:text-orange-600 hover:underline cursor-pointer"
-                                  >
-                                    {task.title}
-                                  </Link>
-                                </div>
-                                <div className="mt-1">
-                                  <TaskCommentCount taskId={task.id} />
-                                </div>
+                      <Button 
+                        onClick={() => setIsAddTaskModalOpen(true)}
+                        size="sm"
+                        className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        <span className="hidden sm:inline">Tambah Task</span>
+                        <span className="sm:hidden">Tambah</span>
+                      </Button>
+                    </div>
+                    
+                    {/* Task List */}
+                    <div className="space-y-2">
+                      {tasks.length === 0 ? (
+                        <p className="text-sm text-gray-500 text-center py-2">
+                          Belum ada task. Tambahkan task pertama untuk memulai.
+                        </p>
+                      ) : (
+                        tasks.map((task: any) => (
+                          <div key={task.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <div className={`inline-flex items-center justify-center cursor-pointer ${getTaskPriorityIcon(task.priority || "medium").color}`}>
+                                        {getTaskPriorityIcon(task.priority || "medium").icon}
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>{getTaskPriorityIcon(task.priority || "medium").label}</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                                <Link
+                                  href={`/tasks/${task.id}`}
+                                  className="font-medium text-gray-900 hover:text-orange-600 hover:underline cursor-pointer text-sm"
+                                >
+                                  {task.title}
+                                </Link>
                               </div>
-                            </td>
-                            <td className="px-4 py-4">
+                              <div className="text-xs text-gray-600 mt-1">
+                                {task.assignedTo ? getUserName(task.assignedTo) : "Belum diassign"} • {task.dueDate ? formatDate(task.dueDate) : "Belum diatur"}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <button
@@ -1260,241 +1227,55 @@ export default function InitiativeDetailPage() {
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
-                            </td>
-                            <td className="px-4 py-4">
-                              <span className="text-sm text-gray-600">
-                                {task.dueDate ? formatDate(task.dueDate) : "Belum diatur"}
-                              </span>
-                            </td>
-                            <td className="px-4 py-4">
-                              <div className="flex items-center gap-2">
-                                {task.assignedTo ? (
-                                  <Avatar className="h-6 w-6">
-                                    <AvatarImage
-                                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
-                                    />
-                                    <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
-                                      {getUserInitials(task.assignedTo)}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                ) : (
-                                  <User className="w-4 h-4" />
-                                )}
-                                <span className="text-sm text-gray-600">
-                                  {task.assignedTo ? getUserName(task.assignedTo) : "Belum ditentukan"}
-                                </span>
-                              </div>
-                            </td>
-                            <td className="px-4 py-4 text-center">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 w-8 p-0"
-                                  >
-                                    <MoreVertical className="h-4 w-4" />
+                                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                    <MoreVertical className="w-3 h-3" />
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem asChild>
-                                    <Link
-                                      href={`/tasks/${task.id}`}
-                                      className="cursor-pointer flex items-center"
-                                    >
+                                    <Link href={`/tasks/${task.id}`}>
                                       <Eye className="w-4 h-4 mr-2" />
                                       Lihat Detail
                                     </Link>
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    onClick={() => handleEditTask(task)}
-                                    className="cursor-pointer"
-                                  >
+                                  <DropdownMenuItem onClick={() => {
+                                    setSelectedTask(task);
+                                    setIsEditTaskModalOpen(true);
+                                  }}>
                                     <Edit className="w-4 h-4 mr-2" />
-                                    Edit
+                                    Ubah
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     onClick={() => handleDeleteTask(task.id)}
-                                    className="cursor-pointer text-red-600"
+                                    className="text-red-600 hover:text-red-700"
                                   >
                                     <Trash2 className="w-4 h-4 mr-2" />
                                     Hapus
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Mobile Card View */}
-                  <div className="md:hidden space-y-4">
-                    {tasks.map((task: any) => (
-                      <div
-                        key={task.id}
-                        className="p-3 bg-white border border-gray-200 rounded-lg space-y-2"
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <div className={`inline-flex items-center justify-center cursor-pointer ${getTaskPriorityIcon(task.priority || "medium").color}`}>
-                                      {getTaskPriorityIcon(task.priority || "medium").icon}
-                                    </div>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>{getTaskPriorityIcon(task.priority || "medium").label}</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                              <Link
-                                href={`/tasks/${task.id}`}
-                                className="font-medium text-gray-900 hover:text-orange-600 hover:underline cursor-pointer"
-                              >
-                                {task.title}
-                              </Link>
-                            </div>
-                            {task.description && (
-                              <div className="text-sm text-gray-600 mt-1">{task.description}</div>
-                            )}
-                            <div className="flex items-center gap-2 mt-1">
-                              <TaskCommentCount taskId={task.id} />
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <button
-                                  className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
-                                >
-                                  {getTaskStatusLabel(task.status)}
-                                  <ChevronDown className="h-3 w-3" />
-                                </button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                  onClick={() => handleStatusUpdate(task.id, "not_started")}
-                                  className="cursor-pointer"
-                                >
-                                  <div className="flex items-center gap-2">
-                                    {task.status === "not_started" && (
-                                      <Check className="h-3 w-3" />
-                                    )}
-                                    <span>Belum Mulai</span>
-                                  </div>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => handleStatusUpdate(task.id, "in_progress")}
-                                  className="cursor-pointer"
-                                >
-                                  <div className="flex items-center gap-2">
-                                    {task.status === "in_progress" && (
-                                      <Check className="h-3 w-3" />
-                                    )}
-                                    <span>Sedang Berjalan</span>
-                                  </div>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => handleStatusUpdate(task.id, "completed")}
-                                  className="cursor-pointer"
-                                >
-                                  <div className="flex items-center gap-2">
-                                    {task.status === "completed" && (
-                                      <Check className="h-3 w-3" />
-                                    )}
-                                    <span>Selesai</span>
-                                  </div>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => handleStatusUpdate(task.id, "cancelled")}
-                                  className="cursor-pointer"
-                                >
-                                  <div className="flex items-center gap-2">
-                                    {task.status === "cancelled" && (
-                                      <Check className="h-3 w-3" />
-                                    )}
-                                    <span>Dibatalkan</span>
-                                  </div>
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="hover:bg-gray-100 h-8 w-8 p-0">
-                                  <MoreVertical className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem asChild>
-                                  <Link
-                                    href={`/tasks/${task.id}`}
-                                    className="cursor-pointer flex items-center"
-                                  >
-                                    <Eye className="w-4 h-4 mr-2" />
-                                    Lihat Detail
-                                  </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => handleEditTask(task)}
-                                  className="cursor-pointer"
-                                >
-                                  <Edit className="w-4 h-4 mr-2" />
-                                  Edit
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => handleDeleteTask(task.id)}
-                                  className="cursor-pointer text-red-600"
-                                >
-                                  <Trash2 className="w-4 h-4 mr-2" />
-                                  Hapus
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
-                        </div>
-                        <div className="flex justify-between items-center pt-2 border-t border-gray-200">
-                          <div className="flex items-center gap-2">
-                            {task.assignedTo ? (
-                              <Avatar className="h-6 w-6">
-                                <AvatarImage
-                                  src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
-                                />
-                                <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
-                                  {getUserInitials(task.assignedTo)}
-                                </AvatarFallback>
-                              </Avatar>
-                            ) : (
-                              <User className="w-4 h-4" />
-                            )}
-                            <span className="text-sm text-gray-600">
-                              {task.assignedTo ? getUserName(task.assignedTo) : "Belum ditentukan"}
-                            </span>
-                          </div>
-                          <span className="text-sm text-gray-600">
-                            {task.dueDate ? formatDate(task.dueDate) : "Belum diatur"}
-                          </span>
-                        </div>
-
-                      </div>
-                    ))}
+                        ))
+                      )}
+                    </div>
                   </div>
-                </>
-              
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                </div>
+              </CardContent>
+            </Card>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Initiative History */}
-          <InitiativeHistory initiativeId={id!} />
+            {/* Initiative Comments Section */}
+            <InitiativeCommentsCard initiativeId={id!} />
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Initiative History */}
+            <InitiativeHistory initiativeId={id!} />
+          </div>
         </div>
-      </div>
 
       {/* Modals */}
       <TaskModal
