@@ -97,7 +97,6 @@ export default function TourLauncher() {
           variant="outline" 
           size="sm"
           className="relative"
-          disabled={isOnboardingActive}
         >
           <HelpCircle className="w-4 h-4 mr-2" />
           Panduan
@@ -112,7 +111,13 @@ export default function TourLauncher() {
           Tutorial Interaktif
         </DropdownMenuLabel>
         <div className="px-2 pb-2 text-xs text-gray-500">
-          Pilih tutorial yang ingin Anda pelajari
+          {isOnboardingActive ? (
+            <span className="text-orange-600 font-medium">
+              Tour sedang berjalan - selesaikan dulu untuk memulai tour lain
+            </span>
+          ) : (
+            "Pilih tutorial yang ingin Anda pelajari"
+          )}
         </div>
         <DropdownMenuSeparator />
         
@@ -124,7 +129,9 @@ export default function TourLauncher() {
             <DropdownMenuItem
               key={tour.id}
               onClick={() => !isOnboardingActive && startTour(tour.id)}
-              className="flex items-start p-3 cursor-pointer hover:bg-gray-50"
+              className={`flex items-start p-3 cursor-pointer hover:bg-gray-50 ${
+                isOnboardingActive ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
               disabled={isOnboardingActive}
             >
               <div className="flex items-center w-full">
