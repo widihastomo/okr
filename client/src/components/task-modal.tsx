@@ -91,6 +91,7 @@ export default function TaskModal({
     status: "not_started",
     priority: "medium",
     assignedTo: user?.id || "",
+    startDate: null as Date | null,
     dueDate: null as Date | null,
     initiativeId: "",
   });
@@ -104,6 +105,7 @@ export default function TaskModal({
       status: "not_started",
       priority: "medium",
       assignedTo: user?.id || "",
+      startDate: null,
       dueDate: null,
       initiativeId: initiativeId || "",
     });
@@ -188,6 +190,7 @@ export default function TaskModal({
         status: task.status || "not_started",
         priority: task.priority || "medium",
         assignedTo: task.assignedTo?.id || task.assignedTo || "",
+        startDate: task.startDate ? new Date(task.startDate) : null,
         dueDate: task.dueDate ? new Date(task.dueDate) : null,
         initiativeId: task.initiativeId || "",
       });
@@ -198,6 +201,7 @@ export default function TaskModal({
         status: "not_started",
         priority: "medium",
         assignedTo: user?.id || "",
+        startDate: null,
         dueDate: null,
         initiativeId: initiativeId || "",
       });
@@ -391,6 +395,9 @@ export default function TaskModal({
         formData.assignedTo === "unassigned"
           ? null
           : formData.assignedTo || null,
+      startDate: formData.startDate
+        ? formData.startDate.toISOString().split("T")[0]
+        : null,
       dueDate: formData.dueDate
         ? formData.dueDate.toISOString().split("T")[0]
         : null,
@@ -877,9 +884,9 @@ export default function TaskModal({
                 />
               </div>
 
-              <div>
+              <div className="col-span-2">
                 <Label className="flex items-center gap-2 mb-2">
-                  Tenggat Waktu
+                  Periode Pengerjaan
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -892,60 +899,122 @@ export default function TaskModal({
                     </PopoverTrigger>
                     <PopoverContent className="w-80" side="top" sideOffset={5}>
                       <div className="space-y-2">
-                        <h4 className="font-medium">Menentukan Deadline</h4>
+                        <h4 className="font-medium">Menentukan Periode Task</h4>
                         <p className="text-sm text-muted-foreground">
-                          Pilih tanggal yang realistis untuk menyelesaikan task
-                          ini. Pertimbangkan kompleksitas task, workload PIC,
-                          dan dependencies lainnya.
+                          Pilih tanggal mulai dan selesai untuk task ini. Tanggal mulai bisa dikosongkan jika task belum ada jadwal pasti untuk dimulai.
                         </p>
                       </div>
                     </PopoverContent>
                   </Popover>
                 </Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start text-left font-normal focus:ring-orange-500 focus:border-orange-500"
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {formData.dueDate
-                        ? formData.dueDate.toLocaleDateString("id-ID")
-                        : "Pilih tanggal"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={formData.dueDate}
-                      onSelect={(date) => {
-                        if (date) {
-                          // Adjust for GMT+7 timezone to prevent date shifting
-                          const adjustedDate = new Date(date);
-                          adjustedDate.setHours(adjustedDate.getHours() + 7);
-                          setFormData({ ...formData, dueDate: adjustedDate });
-                        } else {
-                          setFormData({ ...formData, dueDate: date });
-                        }
-                      }}
-                      disabled={(date) => {
-                        // Use GMT+7 timezone for date comparison
-                        const now = new Date();
-                        const utc =
-                          now.getTime() + now.getTimezoneOffset() * 60000;
-                        const gmt7Date = new Date(utc + 7 * 3600000);
-                        const today = new Date(
-                          gmt7Date.getFullYear(),
-                          gmt7Date.getMonth(),
-                          gmt7Date.getDate(),
-                        );
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-sm text-gray-600 mb-1 block">Tanggal Mulai</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start text-left font-normal focus:ring-orange-500 focus:border-orange-500"
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {formData.startDate
+                            ? formData.startDate.toLocaleDateString("id-ID")
+                            : "Pilih tanggal mulai"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={formData.startDate}
+                          onSelect={(date) => {
+                            if (date) {
+                              // Adjust for GMT+7 timezone to prevent date shifting
+                              const adjustedDate = new Date(date);
+                              adjustedDate.setHours(adjustedDate.getHours() + 7);
+                              setFormData({ ...formData, startDate: adjustedDate });
+                            } else {
+                              setFormData({ ...formData, startDate: date });
+                            }
+                          }}
+                          disabled={(date) => {
+                            // Use GMT+7 timezone for date comparison
+                            const now = new Date();
+                            const utc =
+                              now.getTime() + now.getTimezoneOffset() * 60000;
+                            const gmt7Date = new Date(utc + 7 * 3600000);
+                            const today = new Date(
+                              gmt7Date.getFullYear(),
+                              gmt7Date.getMonth(),
+                              gmt7Date.getDate(),
+                            );
 
-                        return date < today;
-                      }}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                            // Don't allow start date after due date if due date is set
+                            if (formData.dueDate && date > formData.dueDate) {
+                              return true;
+                            }
+
+                            return date < today;
+                          }}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
+                  <div>
+                    <Label className="text-sm text-gray-600 mb-1 block">Tanggal Selesai</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start text-left font-normal focus:ring-orange-500 focus:border-orange-500"
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {formData.dueDate
+                            ? formData.dueDate.toLocaleDateString("id-ID")
+                            : "Pilih tanggal selesai"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={formData.dueDate}
+                          onSelect={(date) => {
+                            if (date) {
+                              // Adjust for GMT+7 timezone to prevent date shifting
+                              const adjustedDate = new Date(date);
+                              adjustedDate.setHours(adjustedDate.getHours() + 7);
+                              setFormData({ ...formData, dueDate: adjustedDate });
+                            } else {
+                              setFormData({ ...formData, dueDate: date });
+                            }
+                          }}
+                          disabled={(date) => {
+                            // Use GMT+7 timezone for date comparison
+                            const now = new Date();
+                            const utc =
+                              now.getTime() + now.getTimezoneOffset() * 60000;
+                            const gmt7Date = new Date(utc + 7 * 3600000);
+                            const today = new Date(
+                              gmt7Date.getFullYear(),
+                              gmt7Date.getMonth(),
+                              gmt7Date.getDate(),
+                            );
+
+                            // Don't allow due date before start date if start date is set
+                            if (formData.startDate && date < formData.startDate) {
+                              return true;
+                            }
+
+                            return date < today;
+                          }}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </div>
               </div>
             </div>
           </CardContent>

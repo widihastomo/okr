@@ -246,6 +246,17 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 14, 2025. Successfully implemented date range picker functionality for task creation and editing:
+  * ADDED: startDate field to tasks table schema and UI components
+  * ENHANCED: Task modal now supports date range selection with start and end dates
+  * IMPROVED: Date picker layout with two-column design for start/end date selection
+  * IMPLEMENTED: Date validation logic preventing invalid date ranges (start date cannot be after end date)
+  * INTEGRATED: Date range picker with proper timezone handling (GMT+7) for accurate date selection
+  * ADDED: Comprehensive help popover explaining date range functionality and optional start date
+  * UPDATED: Backend schema to include startDate field for proper task duration tracking
+  * ENHANCED: Gantt chart now uses proper startDate and dueDate for accurate timeline visualization
+  * IMPROVED: Task form UI with better visual hierarchy for date selection fields
+  * RESULT: Complete date range functionality allowing users to specify task duration and improve project planning
 - July 14, 2025. Successfully integrated TaskModal with orange gradient button styling and task grouping implementation:
   * INTEGRATED: TaskModal component properly connected to "Tambah Task" button with orange gradient styling
   * ENHANCED: Button styling with orange gradient (from-orange-600 to-orange-500) matching application theme

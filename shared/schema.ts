@@ -507,6 +507,7 @@ export const tasks = pgTable("tasks", {
   status: text("status").notNull().default("not_started"), // "not_started", "in_progress", "completed", "cancelled"
   priority: text("priority").notNull().default("medium"), // "low", "medium", "high"
   assignedTo: uuid("assigned_to"), // user ID
+  startDate: timestamp("start_date"),
   dueDate: timestamp("due_date"),
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow(),
