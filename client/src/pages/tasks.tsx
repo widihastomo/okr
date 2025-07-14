@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { List, Kanban, Calendar as CalendarIcon, BarChart3, Plus, Filter, Search, Clock, AlertTriangle, CheckCircle, ChevronDown, MoreVertical, Edit, Trash2, Eye, User } from 'lucide-react';
+import { List, Kanban, Calendar as CalendarIcon, BarChart3, Plus, Filter, Search, Clock, AlertTriangle, CheckCircle, ChevronDown, ChevronUp, MoreVertical, Edit, Trash2, Eye, User } from 'lucide-react';
 import { Link } from 'wouter';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -77,6 +77,8 @@ const TasksPage = () => {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
+  const [isFilterCollapsed, setIsFilterCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -110,6 +112,22 @@ const TasksPage = () => {
       setUserFilter(user.id);
     }
   }, [user, userFilter]);
+
+  // Mobile detection and default collapse state
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      // Default to collapsed on mobile
+      if (mobile && !isFilterCollapsed) {
+        setIsFilterCollapsed(true);
+      }
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, [isFilterCollapsed]);
 
   // Helper function to get user name
   const getUserName = (userId: string) => {
@@ -1172,9 +1190,21 @@ const TasksPage = () => {
             <div className="flex items-center">
               <Filter className="w-5 h-5 mr-2" />
               Filter & Pencarian
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsFilterCollapsed(!isFilterCollapsed)}
+                className="ml-2 p-1 h-6 w-6"
+              >
+                {isFilterCollapsed ? (
+                  <ChevronDown className="w-4 h-4" />
+                ) : (
+                  <ChevronUp className="w-4 h-4" />
+                )}
+              </Button>
             </div>
             {/* Filter indicators */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 flex-wrap">
               {statusFilter !== 'all' && (
                 <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">
                   Status: {statusFilter === 'not_started' ? 'Belum Mulai' : statusFilter === 'in_progress' ? 'Sedang Berjalan' : statusFilter === 'completed' ? 'Selesai' : 'Dibatalkan'}
@@ -1198,86 +1228,88 @@ const TasksPage = () => {
             </div>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Search Row */}
-          <div className="flex items-center space-x-2">
-            <Search className="w-4 h-4 text-gray-500" />
-            <Input
-              placeholder="Cari task..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-md"
-            />
-          </div>
-          
-          {/* Filters Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Status</label>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Filter Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua Status</SelectItem>
-                  <SelectItem value="not_started">Belum Mulai</SelectItem>
-                  <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
-                  <SelectItem value="completed">Selesai</SelectItem>
-                  <SelectItem value="cancelled">Dibatalkan</SelectItem>
-                </SelectContent>
-              </Select>
+        <div className={`transition-all duration-300 ease-in-out ${isFilterCollapsed ? 'max-h-0 opacity-0' : 'max-h-96 opacity-100'} overflow-hidden`}>
+          <CardContent className="space-y-4">
+            {/* Search Row */}
+            <div className="flex items-center space-x-2">
+              <Search className="w-4 h-4 text-gray-500" />
+              <Input
+                placeholder="Cari task..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="max-w-md"
+              />
             </div>
             
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Prioritas</label>
-              <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Filter Prioritas" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua Prioritas</SelectItem>
-                  <SelectItem value="low">Rendah</SelectItem>
-                  <SelectItem value="medium">Sedang</SelectItem>
-                  <SelectItem value="high">Tinggi</SelectItem>
-                </SelectContent>
-              </Select>
+            {/* Filters Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Status</label>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Filter Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Status</SelectItem>
+                    <SelectItem value="not_started">Belum Mulai</SelectItem>
+                    <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
+                    <SelectItem value="completed">Selesai</SelectItem>
+                    <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Prioritas</label>
+                <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Filter Prioritas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Prioritas</SelectItem>
+                    <SelectItem value="low">Rendah</SelectItem>
+                    <SelectItem value="medium">Sedang</SelectItem>
+                    <SelectItem value="high">Tinggi</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">PIC</label>
+                <Select value={userFilter} onValueChange={setUserFilter}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Filter PIC" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua PIC</SelectItem>
+                    {activeUsers.map(user => (
+                      <SelectItem key={user.id} value={user.id}>
+                        {getUserName(user.id)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Tim</label>
+                <Select value={teamFilter} onValueChange={setTeamFilter}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Filter Tim" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Tim</SelectItem>
+                    {teams.map(team => (
+                      <SelectItem key={team.id} value={team.id}>
+                        {team.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">PIC</label>
-              <Select value={userFilter} onValueChange={setUserFilter}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Filter PIC" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua PIC</SelectItem>
-                  {activeUsers.map(user => (
-                    <SelectItem key={user.id} value={user.id}>
-                      {getUserName(user.id)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Tim</label>
-              <Select value={teamFilter} onValueChange={setTeamFilter}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Filter Tim" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua Tim</SelectItem>
-                  {teams.map(team => (
-                    <SelectItem key={team.id} value={team.id}>
-                      {team.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
+          </CardContent>
+        </div>
       </Card>
 
       {/* Task Views */}
