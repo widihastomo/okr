@@ -2532,13 +2532,10 @@ export class DatabaseStorage implements IStorage {
           unit: initiativeSuccessMetrics.unit,
           updatedAt: initiativeSuccessMetrics.updatedAt,
           lastUpdateBy: initiativeSuccessMetrics.lastUpdateBy,
-          updater: {
-            id: users.id,
-            email: users.email,
-            firstName: users.firstName,
-            lastName: users.lastName,
-            role: users.role
-          }
+          updaterEmail: users.email,
+          updaterFirstName: users.firstName,
+          updaterLastName: users.lastName,
+          updaterRole: users.role
         })
         .from(initiativeSuccessMetrics)
         .leftJoin(users, eq(users.id, initiativeSuccessMetrics.lastUpdateBy))
