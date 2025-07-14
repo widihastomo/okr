@@ -71,7 +71,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import TaskModal from "@/components/task-modal";
 import InitiativeFormModal from "@/components/initiative-form-modal";
 import { InitiativeNotes } from "@/components/initiative-notes";
@@ -919,13 +919,13 @@ export default function InitiativeDetailPage() {
                               <span className="text-xs font-medium">{pic.firstName} {pic.lastName}</span>
                             </div>
                           )}
-                          {members.length > 0 && (
+                          {members.filter((member: any) => member.userId !== pic?.id).length > 0 && (
                             <div className="flex items-center gap-1">
                               <span 
                                 className="text-xs text-gray-500 hover:text-orange-600 cursor-pointer underline"
                                 onClick={() => setIsTeamModalOpen(true)}
                               >
-                                +{members.length} anggota
+                                +{members.filter((member: any) => member.userId !== pic?.id).length} anggota
                               </span>
                             </div>
                           )}
@@ -1644,6 +1644,9 @@ export default function InitiativeDetailPage() {
               <Users className="h-5 w-5 text-orange-500" />
               Anggota Tim Inisiatif
             </DialogTitle>
+            <DialogDescription>
+              Detail informasi anggota tim yang terlibat dalam inisiatif ini
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             {/* PIC Section */}
@@ -1667,13 +1670,13 @@ export default function InitiativeDetailPage() {
             )}
 
             {/* Team Members Section */}
-            {members.length > 0 && (
+            {members.filter((member: any) => member.userId !== pic?.id).length > 0 && (
               <div>
                 <h4 className="text-sm font-medium text-gray-700 mb-2">
-                  Anggota Tim ({members.length})
+                  Anggota Tim ({members.filter((member: any) => member.userId !== pic?.id).length})
                 </h4>
                 <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {members.map((member: any) => (
+                  {members.filter((member: any) => member.userId !== pic?.id).map((member: any) => (
                     <div key={member.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                       <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center text-white font-medium">
                         {member.user?.firstName?.charAt(0)}{member.user?.lastName?.charAt(0)}
@@ -1696,7 +1699,7 @@ export default function InitiativeDetailPage() {
             )}
 
             {/* Empty State */}
-            {!pic && members.length === 0 && (
+            {!pic && members.filter((member: any) => member.userId !== pic?.id).length === 0 && (
               <div className="text-center py-8 text-gray-500">
                 <Users className="h-12 w-12 mx-auto mb-3 text-gray-300" />
                 <p className="text-sm">Belum ada anggota tim</p>
