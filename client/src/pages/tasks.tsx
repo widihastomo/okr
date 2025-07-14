@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { List, Kanban, Calendar as CalendarIcon, BarChart3, Plus, Filter, Search, Clock, AlertTriangle, CheckCircle, ChevronDown, MoreVertical, Edit, Trash2, Eye } from 'lucide-react';
+import { List, Kanban, Calendar as CalendarIcon, BarChart3, Plus, Filter, Search, Clock, AlertTriangle, CheckCircle, ChevronDown, MoreVertical, Edit, Trash2, Eye, User } from 'lucide-react';
 import { Link } from 'wouter';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -57,6 +57,12 @@ const TasksPage = () => {
     staleTime: 30000,
   });
 
+  // Fetch users data for PIC display
+  const { data: users = [] } = useQuery({
+    queryKey: ['/api/organization/users'],
+    staleTime: 60000,
+  });
+
   const filteredTasks = useMemo(() => {
     return tasks.filter(task => {
       const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
@@ -71,6 +77,52 @@ const TasksPage = () => {
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Helper function to get user name by ID (matching daily-focus page format)
+  const getUserName = (userId: string): string => {
+    if (!users || !userId) return "Tidak ditentukan";
+    const user = users.find((u: any) => u.id === userId);
+
+    // Check if firstName and lastName are both present and non-empty
+    if (user?.firstName && user?.lastName && user.lastName.trim() !== "") {
+      return `${user.firstName} ${user.lastName}`;
+    }
+
+    // Fallback to firstName only if available and non-empty
+    if (user?.firstName && user.firstName.trim() !== "") {
+      return user.firstName;
+    }
+
+    // Fallback to lastName only if available and non-empty
+    if (user?.lastName && user.lastName.trim() !== "") {
+      return user.lastName;
+    }
+
+    return "Pengguna";
+  };
+
+  // Helper function to get user initials by ID (matching daily-focus page format)
+  const getUserInitials = (userId: string): string => {
+    if (!users || !userId) return "?";
+    const user = users.find((u: any) => u.id === userId);
+
+    // Check if firstName and lastName are both present and non-empty
+    if (user?.firstName && user?.lastName && user.lastName.trim() !== "") {
+      return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
+    }
+
+    // Fallback to firstName only if available and non-empty
+    if (user?.firstName && user.firstName.trim() !== "") {
+      return user.firstName.charAt(0).toUpperCase();
+    }
+
+    // Fallback to lastName only if available and non-empty
+    if (user?.lastName && user.lastName.trim() !== "") {
+      return user.lastName.charAt(0).toUpperCase();
+    }
+
+    return "U";
+  };
 
   // Status update mutation
   const updateTaskStatusMutation = useMutation({
@@ -297,12 +349,23 @@ const TasksPage = () => {
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-2">
-                        <Avatar className="h-6 w-6">
-                          <AvatarFallback className="text-xs">
-                            {task.assignedTo?.charAt(0)?.toUpperCase() || 'U'}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="text-sm text-gray-900">{task.assignedTo || 'Belum ditugaskan'}</span>
+                        {task.assignedTo ? (
+                          <Avatar className="w-6 h-6">
+                            <AvatarImage
+                              src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
+                            />
+                            <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
+                              {getUserInitials(task.assignedTo)}
+                            </AvatarFallback>
+                          </Avatar>
+                        ) : (
+                          <User className="w-4 h-4" />
+                        )}
+                        <span className="text-sm text-gray-600">
+                          {task.assignedTo
+                            ? getUserName(task.assignedTo)
+                            : "Belum ditentukan"}
+                        </span>
                       </div>
                     </td>
                     <td className="px-4 py-4 text-center">
@@ -386,12 +449,23 @@ const TasksPage = () => {
                 </div>
                 <div className="flex items-center justify-between text-sm text-gray-500">
                   <div className="flex items-center gap-2">
-                    <Avatar className="h-5 w-5">
-                      <AvatarFallback className="text-xs">
-                        {task.assignedTo?.charAt(0)?.toUpperCase() || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span>{task.assignedTo || 'Belum ditugaskan'}</span>
+                    {task.assignedTo ? (
+                      <Avatar className="w-5 h-5">
+                        <AvatarImage
+                          src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
+                        />
+                        <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
+                          {getUserInitials(task.assignedTo)}
+                        </AvatarFallback>
+                      </Avatar>
+                    ) : (
+                      <User className="w-4 h-4" />
+                    )}
+                    <span className="text-xs text-gray-600">
+                      {task.assignedTo
+                        ? getUserName(task.assignedTo)
+                        : "Belum ditentukan"}
+                    </span>
                   </div>
                   <span>{task.dueDate ? formatDate(new Date(task.dueDate), 'dd/MM/yyyy') : 'Tidak ada tenggat'}</span>
                 </div>
