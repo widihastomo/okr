@@ -84,6 +84,7 @@ export function InitiativeCommentEditor({
       toast({
         title: "Komentar berhasil ditambahkan",
         description: "Komentar Anda telah berhasil disimpan.",
+        variant: "success",
       });
     },
     onError: (error) => {

@@ -61,6 +61,7 @@ export function InitiativeCommentsCard({ initiativeId }: InitiativeCommentsCardP
       toast({
         title: "Komentar berhasil diperbarui",
         description: "Perubahan komentar telah disimpan.",
+        variant: "success",
       });
     },
     onError: (error) => {
