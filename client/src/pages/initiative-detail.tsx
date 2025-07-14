@@ -500,16 +500,16 @@ const ClosureSummary = ({ initiative }: { initiative: any }) => {
   };
 
   return (
-    <div className="mb-6 bg-gradient-to-r from-slate-50 to-gray-50 border border-gray-200 rounded-lg p-4">
+    <div className="mb-6 border-2 border-dashed border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50 shadow-lg rounded-lg p-4">
       <div className="flex items-center gap-2 mb-3">
-        <FileText className="h-4 w-4 text-slate-600" />
-        <h3 className="text-sm font-semibold text-slate-900">Resume Penutupan</h3>
+        <FileText className="h-4 w-4 text-orange-600" />
+        <h3 className="text-sm font-semibold text-orange-900">Resume Penutupan</h3>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
         {/* Result Status */}
         <div className="flex items-center gap-2">
-          <span className="text-slate-600 font-medium">Hasil:</span>
+          <span className="text-orange-700 font-medium">Hasil:</span>
           <div className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${getResultColor(closureData.result)}`}>
             {getResultIcon(closureData.result)}
             {getResultLabel(closureData.result)}
@@ -518,8 +518,8 @@ const ClosureSummary = ({ initiative }: { initiative: any }) => {
 
         {/* Closure Date */}
         <div className="flex items-center gap-2">
-          <span className="text-slate-600 font-medium">Ditutup:</span>
-          <span className="text-slate-800">
+          <span className="text-orange-700 font-medium">Ditutup:</span>
+          <span className="text-orange-900">
             {formatDate(closureData.closedAt || initiative.completedAt)}
           </span>
         </div>
@@ -527,8 +527,8 @@ const ClosureSummary = ({ initiative }: { initiative: any }) => {
         {/* Budget Usage */}
         {closureData.budgetUsed && (
           <div className="flex items-center gap-2">
-            <span className="text-slate-600 font-medium">Budget:</span>
-            <span className="text-slate-800">
+            <span className="text-orange-700 font-medium">Budget:</span>
+            <span className="text-orange-900">
               Rp {Number(closureData.budgetUsed).toLocaleString('id-ID')}
             </span>
           </div>
@@ -537,23 +537,23 @@ const ClosureSummary = ({ initiative }: { initiative: any }) => {
 
       {/* Notes - Compact format */}
       {(closureData.reason || closureData.learningNote || closureData.notes) && (
-        <div className="mt-3 pt-3 border-t border-gray-200">
+        <div className="mt-3 pt-3 border-t border-orange-200">
           {closureData.reason && (
             <div className="mb-2">
-              <span className="text-xs font-medium text-slate-600">Alasan: </span>
-              <span className="text-xs text-slate-700">{closureData.reason}</span>
+              <span className="text-xs font-medium text-orange-700">Alasan: </span>
+              <span className="text-xs text-orange-800">{closureData.reason}</span>
             </div>
           )}
           {closureData.learningNote && (
             <div className="mb-2">
-              <span className="text-xs font-medium text-slate-600">Pembelajaran: </span>
-              <span className="text-xs text-slate-700">{closureData.learningNote}</span>
+              <span className="text-xs font-medium text-orange-700">Pembelajaran: </span>
+              <span className="text-xs text-orange-800">{closureData.learningNote}</span>
             </div>
           )}
           {closureData.notes && (
             <div>
-              <span className="text-xs font-medium text-slate-600">Catatan: </span>
-              <span className="text-xs text-slate-700">{closureData.notes}</span>
+              <span className="text-xs font-medium text-orange-700">Catatan: </span>
+              <span className="text-xs text-orange-800">{closureData.notes}</span>
             </div>
           )}
         </div>

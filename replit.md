@@ -269,6 +269,8 @@ All email configuration now uses environment variables:
   * OPTIMIZED: Better initiative visibility for tracking recent completions within current timeline
   * FIXED: Completed initiatives now properly display when they have no due date by showing initiatives completed within last 7 days
   * ENHANCED: More inclusive filtering logic for completed initiatives - shows if due date is today/future, started today, or completed within last week
+  * UPDATED: Closure summary background and border styling to match mission card design (orange dashed border with orange-amber gradient background)
+  * IMPROVED: Closure summary text colors changed to orange theme for better consistency with mission card styling
 - July 14, 2025. Successfully added comprehensive help popovers to initiative closure modal:
   * ADDED: Help popover for "Hasil Inisiatif" explaining each result option (Berhasil, Gagal, Perlu Diulang)
   * ADDED: Help popover for "Budget yang digunakan" with guidance on input format and usage
