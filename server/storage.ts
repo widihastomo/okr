@@ -2544,30 +2544,18 @@ export class DatabaseStorage implements IStorage {
 
       // Add success metrics updates to history
       for (const metric of successMetricsData) {
-        if (metric.updatedAt && metric.lastUpdateBy && metric.updater) {
-          const formattedAchievement = metric.unit === 'currency' 
-            ? `Rp ${Number(metric.achievement || 0).toLocaleString()}`
-            : metric.unit === 'percentage' 
-            ? `${metric.achievement || 0}%`
-            : `${metric.achievement || 0}`;
-          
-          const formattedTarget = metric.unit === 'currency' 
-            ? `Rp ${Number(metric.target || 0).toLocaleString()}`
-            : metric.unit === 'percentage' 
-            ? `${metric.target || 0}%`
-            : `${metric.target || 0}`;
-
+        if (metric.updatedAt && metric.lastUpdateBy && metric.updaterEmail) {
           history.push({
             id: `${metric.id}-updated-${metric.updatedAt}`,
             action: 'metric_updated',
-            description: `Metrik "${metric.name}" diupdate: ${formattedAchievement} dari target ${formattedTarget}`,
+            description: `Metrik "${metric.name}" diupdate: ${metric.achievement || '0'} dari target ${metric.target || '0'}`,
             timestamp: metric.updatedAt,
             user: {
-              id: metric.updater.id,
-              email: metric.updater.email,
-              firstName: metric.updater.firstName,
-              lastName: metric.updater.lastName,
-              role: metric.updater.role
+              id: metric.lastUpdateBy,
+              email: metric.updaterEmail,
+              firstName: metric.updaterFirstName || '',
+              lastName: metric.updaterLastName || '',
+              role: metric.updaterRole || 'member'
             }
           });
         }
