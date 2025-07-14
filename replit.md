@@ -246,6 +246,16 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 14, 2025. Successfully implemented comprehensive disable system for cancelled initiatives across entire UI:
+  * DISABLED: All buttons (Tambah Metrik, Tambah Task, task status dropdowns, success metrics actions) when initiative status is "dibatalkan"
+  * DISABLED: All dropdown menus (3-dot menus) for task actions and success metrics when initiative status is "dibatalkan"
+  * DISABLED: Task status change dropdowns with chevron icons hidden when initiative status is "dibatalkan"
+  * DISABLED: QuickUpdateButton for success metrics when initiative status is "dibatalkan"
+  * DISABLED: Comment system completely disabled (add/edit/delete/reply) when initiative status is "dibatalkan"
+  * DISABLED: All modals (TaskModal, InitiativeFormModal, SuccessMetricsModal) when initiative status is "dibatalkan"
+  * MAINTAINED: Only "Buka Kembali" button remains active for cancelled initiatives as standalone action
+  * ENHANCED: Complete UI consistency - all interactive elements disabled except reopen functionality
+  * RESULT: Comprehensive disable system ensuring cancelled initiatives cannot be modified except through reopen process
 - July 14, 2025. Successfully implemented comprehensive reopen functionality for cancelled initiatives with key result reassignment:
   * ADDED: Reopen initiative functionality for cancelled initiatives ("dibatalkan" status) with optional key result reassignment
   * ENHANCED: Modal dialog with SearchableKeyResultSelect component for choosing new key result when reopening
