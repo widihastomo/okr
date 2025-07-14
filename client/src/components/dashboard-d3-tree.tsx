@@ -156,34 +156,43 @@ export default function DashboardD3Tree({
 
     // Build tree data
     const treeData = buildTree(goals);
+    console.log('Dashboard D3 Tree Data:', {
+      totalGoals: goals.length,
+      treeDataLength: treeData.length,
+      rootNodes: treeData.map(node => ({
+        id: node.id,
+        title: node.data.title,
+        childrenCount: node.children.length
+      }))
+    });
     if (treeData.length === 0) return;
 
-    // Create hierarchy and tree layout - handle multiple roots or single root
-    let root;
-    if (treeData.length === 1) {
-      // Single root node
-      root = d3.hierarchy(treeData[0], d => {
+    // Create hierarchy and tree layout - handle multiple roots as separate trees
+    const rootHierarchies = treeData.map(rootData => 
+      d3.hierarchy(rootData, d => {
         const isExpanded = expandedNodes.has(d.id);
         return isExpanded ? d.children : [];
-      });
-    } else {
-      // Multiple root nodes - create artificial root
-      const artificialRoot: TreeNode = {
-        id: 'artificial-root',
-        data: { id: 'root', title: 'Dashboard Goals', keyResults: [] } as any,
-        children: treeData
-      };
-      root = d3.hierarchy(artificialRoot, d => 
-        d.id === 'artificial-root' ? d.children : (expandedNodes.has(d.id) ? d.children : [])
-      );
-    }
+      })
+    );
 
+    // Create tree layout
     const treeLayout = d3.tree<TreeNode>()
       .nodeSize([verticalSpacing, horizontalSpacing]);
 
-    treeLayout(root);
+    // Layout each root hierarchy separately
+    rootHierarchies.forEach((root, index) => {
+      treeLayout(root);
+      
+      // Offset each tree horizontally so they don't overlap
+      const offsetX = index * (horizontalSpacing * 2);
+      root.descendants().forEach(d => {
+        if (d.y !== undefined) {
+          d.y += offsetX;
+        }
+      });
+    });
     
-    // Center the tree
+    // Center the tree - calculate bounds for all hierarchies
     const bounds = {
       minX: Infinity,
       maxX: -Infinity,
@@ -191,11 +200,13 @@ export default function DashboardD3Tree({
       maxY: -Infinity
     };
 
-    root.descendants().forEach(d => {
-      bounds.minX = Math.min(bounds.minX, d.y || 0);
-      bounds.maxX = Math.max(bounds.maxX, d.y || 0);
-      bounds.minY = Math.min(bounds.minY, d.x || 0);
-      bounds.maxY = Math.max(bounds.maxY, d.x || 0);
+    rootHierarchies.forEach(root => {
+      root.descendants().forEach(d => {
+        bounds.minX = Math.min(bounds.minX, d.y || 0);
+        bounds.maxX = Math.max(bounds.maxX, d.y || 0);
+        bounds.minY = Math.min(bounds.minY, d.x || 0);
+        bounds.maxY = Math.max(bounds.maxY, d.x || 0);
+      });
     });
 
     const treeWidth = bounds.maxX - bounds.minX + nodeWidth;
@@ -215,9 +226,10 @@ export default function DashboardD3Tree({
 
     svg.call(zoom.transform, initialTransform);
 
-    // Create links
+    // Create links for all hierarchies
+    const allLinks = rootHierarchies.flatMap(root => root.links());
     const link = g.selectAll(".link")
-      .data(root.links())
+      .data(allLinks)
       .enter()
       .append("g")
       .attr("class", "link");
@@ -242,11 +254,11 @@ export default function DashboardD3Tree({
         return `M ${startX},${startY} C ${midX},${startY} ${midX},${endY} ${endX},${endY}`;
       });
 
-    // Create node groups
-    const descendants = root.descendants();
+    // Create node groups for all hierarchies
+    const allDescendants = rootHierarchies.flatMap(root => root.descendants());
     
     const node = g.selectAll(".node")
-      .data(descendants)
+      .data(allDescendants)
       .enter()
       .append("g")
       .attr("class", "node")
@@ -264,13 +276,11 @@ export default function DashboardD3Tree({
       .attr("filter", "url(#shadow)")
       .style("cursor", "pointer")
       .on("click", function(event, d) {
-        if (d.data.id !== 'artificial-root') {
-          onNodeClick?.(d.data.data);
-        }
+        onNodeClick?.(d.data.data);
       });
 
     // Add expand/collapse buttons for nodes with children
-    node.filter(d => d.data.children.length > 0 && d.data.id !== 'artificial-root')
+    node.filter(d => d.data.children.length > 0)
       .append("circle")
       .attr("cx", nodeWidth - 20)
       .attr("cy", 20)
@@ -285,7 +295,7 @@ export default function DashboardD3Tree({
       });
 
     // Add expand/collapse icons
-    node.filter(d => d.data.children.length > 0 && d.data.id !== 'artificial-root')
+    node.filter(d => d.data.children.length > 0)
       .append("text")
       .attr("x", nodeWidth - 20)
       .attr("y", 20)
@@ -300,8 +310,8 @@ export default function DashboardD3Tree({
         onToggleExpand(d.data.id);
       });
 
-    // Add node content (only for non-artificial nodes)
-    const contentNodes = node.filter(d => d.data.id !== 'artificial-root');
+    // Add node content
+    const contentNodes = node;
 
     // Add goal icon
     contentNodes.append("text")
