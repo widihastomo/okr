@@ -1525,7 +1525,9 @@ export class DatabaseStorage implements IStorage {
 
   // Initiative Comments
   async getInitiativeComments(initiativeId: string): Promise<(InitiativeComment & { user: User })[]> {
-    return await db
+    console.log('🔍 getInitiativeComments called with initiativeId:', initiativeId);
+    
+    const result = await db
       .select({
         id: initiativeComments.id,
         initiativeId: initiativeComments.initiativeId,
@@ -1554,6 +1556,9 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(users, eq(initiativeComments.userId, users.id))
       .where(eq(initiativeComments.initiativeId, initiativeId))
       .orderBy(desc(initiativeComments.createdAt));
+    
+    console.log('📝 getInitiativeComments result:', JSON.stringify(result, null, 2));
+    return result;
   }
 
   async createInitiativeComment(comment: InsertInitiativeComment): Promise<InitiativeComment> {
