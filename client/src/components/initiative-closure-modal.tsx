@@ -332,8 +332,8 @@ export default function InitiativeClosureModal({
                         <FormLabel>Hasil Inisiatif</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
-                            <button type="button">
-                              <HelpCircle className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                            <button type="button" className="inline-flex items-center justify-center">
+                              <HelpCircle className="h-4 w-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                             </button>
                           </PopoverTrigger>
                           <PopoverContent className="w-80">
@@ -454,8 +454,8 @@ export default function InitiativeClosureModal({
                           <FormLabel className="text-sm font-medium text-gray-700">Budget yang digunakan (Rp)</FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
-                              <button type="button">
-                                <HelpCircle className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                              <button type="button" className="inline-flex items-center justify-center">
+                                <HelpCircle className="h-4 w-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                               </button>
                             </PopoverTrigger>
                             <PopoverContent className="w-80">
@@ -495,8 +495,8 @@ export default function InitiativeClosureModal({
                       <h3 className="text-sm font-medium text-gray-700">Update Metrik Keberhasilan</h3>
                       <Popover>
                         <PopoverTrigger asChild>
-                          <button type="button">
-                            <HelpCircle className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                          <button type="button" className="inline-flex items-center justify-center">
+                            <HelpCircle className="h-4 w-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                           </button>
                         </PopoverTrigger>
                         <PopoverContent className="w-80">
@@ -551,8 +551,8 @@ export default function InitiativeClosureModal({
                       <h3 className="text-sm font-medium text-gray-700">Update Status Task</h3>
                       <Popover>
                         <PopoverTrigger asChild>
-                          <button type="button">
-                            <HelpCircle className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                          <button type="button" className="inline-flex items-center justify-center">
+                            <HelpCircle className="h-4 w-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                           </button>
                         </PopoverTrigger>
                         <PopoverContent className="w-80">
@@ -614,8 +614,8 @@ export default function InitiativeClosureModal({
                           <FormLabel className="text-sm font-medium text-gray-700">Catatan Tambahan (Opsional)</FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
-                              <button type="button">
-                                <HelpCircle className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                              <button type="button" className="inline-flex items-center justify-center">
+                                <HelpCircle className="h-4 w-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
                               </button>
                             </PopoverTrigger>
                             <PopoverContent className="w-80">
