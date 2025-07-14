@@ -30,6 +30,7 @@ import {
   Eye,
   AlertTriangle,
   Minus,
+  RotateCcw,
 } from "lucide-react";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
@@ -451,6 +452,125 @@ const MilestoneBar = ({ initiative, tasks }: { initiative: any; tasks: any[] }) 
   );
 };
 
+// Closure Summary Component
+const ClosureSummary = ({ initiative }: { initiative: any }) => {
+  const closureData = initiative.closureData;
+  
+  if (!closureData || initiative.status !== 'selesai') {
+    return null;
+  }
+
+  const getResultIcon = (result: string) => {
+    switch (result) {
+      case 'berhasil':
+        return <CheckCircle className="h-5 w-5 text-green-500" />;
+      case 'gagal':
+        return <XCircle className="h-5 w-5 text-red-500" />;
+      case 'perlu_diulang':
+        return <RotateCcw className="h-5 w-5 text-yellow-500" />;
+      default:
+        return null;
+    }
+  };
+
+  const getResultLabel = (result: string) => {
+    switch (result) {
+      case 'berhasil':
+        return 'Berhasil';
+      case 'gagal':
+        return 'Gagal';
+      case 'perlu_diulang':
+        return 'Perlu Diulang';
+      default:
+        return '';
+    }
+  };
+
+  const getResultColor = (result: string) => {
+    switch (result) {
+      case 'berhasil':
+        return 'bg-green-50 border-green-200 text-green-800';
+      case 'gagal':
+        return 'bg-red-50 border-red-200 text-red-800';
+      case 'perlu_diulang':
+        return 'bg-yellow-50 border-yellow-200 text-yellow-800';
+      default:
+        return 'bg-gray-50 border-gray-200 text-gray-800';
+    }
+  };
+
+  return (
+    <Card className="mb-6 border-gray-200 shadow-sm">
+      <CardHeader className="pb-3">
+        <div className="flex items-center gap-2">
+          <FileText className="h-5 w-5 text-gray-600" />
+          <CardTitle className="text-lg font-semibold text-gray-900">
+            Resume Penutupan Inisiatif
+          </CardTitle>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Result Status */}
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-medium text-gray-600 w-20">Hasil:</span>
+          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${getResultColor(closureData.result)}`}>
+            {getResultIcon(closureData.result)}
+            <span className="text-sm font-medium">{getResultLabel(closureData.result)}</span>
+          </div>
+        </div>
+
+        {/* Closure Date */}
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-medium text-gray-600 w-20">Ditutup:</span>
+          <span className="text-sm text-gray-800">
+            {formatDate(closureData.closedAt || initiative.completedAt)}
+          </span>
+        </div>
+
+        {/* Budget Usage */}
+        {closureData.budgetUsed && (
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-gray-600 w-20">Budget:</span>
+            <span className="text-sm text-gray-800">
+              Rp {Number(closureData.budgetUsed).toLocaleString('id-ID')}
+            </span>
+          </div>
+        )}
+
+        {/* Reason */}
+        {closureData.reason && (
+          <div className="space-y-2">
+            <span className="text-sm font-medium text-gray-600">Alasan:</span>
+            <p className="text-sm text-gray-800 bg-gray-50 p-3 rounded-lg border border-gray-200">
+              {closureData.reason}
+            </p>
+          </div>
+        )}
+
+        {/* Learning Notes */}
+        {closureData.learningNote && (
+          <div className="space-y-2">
+            <span className="text-sm font-medium text-gray-600">Pembelajaran:</span>
+            <p className="text-sm text-gray-800 bg-blue-50 p-3 rounded-lg border border-blue-200">
+              {closureData.learningNote}
+            </p>
+          </div>
+        )}
+
+        {/* Additional Notes */}
+        {closureData.notes && (
+          <div className="space-y-2">
+            <span className="text-sm font-medium text-gray-600">Catatan Tambahan:</span>
+            <p className="text-sm text-gray-800 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+              {closureData.notes}
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
 // getUserInitials and getUserName are already defined above
 
 const formatDate = (dateString: string): string => {
@@ -832,6 +952,9 @@ export default function InitiativeDetailPage() {
       
       {/* Milestone Bar */}
       <MilestoneBar initiative={initiativeData} tasks={tasks || []} />
+      
+      {/* Closure Summary - Only show for completed initiatives */}
+      <ClosureSummary initiative={initiativeData} />
       
       {/* Mission Card */}
       {/* Only show MissionCard if not all missions are completed */}
