@@ -703,6 +703,7 @@ export default function InitiativeDetailPage() {
   const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
   const [isCloseInitiativeModalOpen, setIsCloseInitiativeModalOpen] = useState(false);
   const [isReopenInitiativeModalOpen, setIsReopenInitiativeModalOpen] = useState(false);
+  const [isDeleteInitiativeModalOpen, setIsDeleteInitiativeModalOpen] = useState(false);
 
   // All queries declared at the top level
   const { data: initiative, isLoading: initiativeLoading } = useQuery({
@@ -816,6 +817,29 @@ export default function InitiativeDetailPage() {
       toast({
         title: "Gagal membatalkan inisiatif",
         description: error.message || "Terjadi kesalahan saat membatalkan inisiatif",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteInitiativeMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("DELETE", `/api/initiatives/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives`] });
+      toast({
+        title: "Inisiatif dihapus",
+        description: "Inisiatif dan semua data terkait telah dihapus secara permanen",
+        className: "border-red-200 bg-red-50 text-red-800",
+      });
+      // Redirect to initiatives page or dashboard
+      window.location.href = "/dashboard";
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal menghapus inisiatif",
+        description: error.message || "Terjadi kesalahan saat menghapus inisiatif",
         variant: "destructive",
       });
     },
@@ -1046,7 +1070,10 @@ export default function InitiativeDetailPage() {
                   <FileText className="w-4 h-4 mr-2" />
                   Duplikat Inisiatif
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-red-600 hover:text-red-700">
+                <DropdownMenuItem 
+                  className="text-red-600 hover:text-red-700"
+                  onClick={() => setIsDeleteInitiativeModalOpen(true)}
+                >
                   <Trash2 className="w-4 h-4 mr-2" />
                   Hapus Inisiatif
                 </DropdownMenuItem>
@@ -1794,6 +1821,45 @@ export default function InitiativeDetailPage() {
           queryClient.invalidateQueries({ queryKey: [`/api/initiatives`] });
         }}
       />
+
+      {/* Delete Initiative Confirmation Modal */}
+      <AlertDialog open={isDeleteInitiativeModalOpen} onOpenChange={setIsDeleteInitiativeModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Trash2 className="w-5 h-5 text-red-600" />
+              Hapus Inisiatif
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus inisiatif <strong>"{initiativeData.title}"</strong>?
+              <br /><br />
+              <span className="text-red-600 font-medium">
+                Peringatan: Tindakan ini akan menghapus secara permanen:
+              </span>
+              <ul className="mt-2 text-sm text-gray-600 list-disc list-inside space-y-1">
+                <li>Inisiatif dan semua datanya</li>
+                <li>Semua task yang terkait ({tasks?.length || 0} task)</li>
+                <li>Semua metrik keberhasilan ({successMetrics?.length || 0} metrik)</li>
+                <li>Semua komentar dan riwayat aktivitas</li>
+              </ul>
+              <br />
+              <span className="text-red-600 font-medium">
+                Tindakan ini tidak dapat dibatalkan.
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteInitiativeMutation.mutate()}
+              className="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white"
+              disabled={deleteInitiativeMutation.isPending}
+            >
+              {deleteInitiativeMutation.isPending ? "Menghapus..." : "Hapus Inisiatif"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
