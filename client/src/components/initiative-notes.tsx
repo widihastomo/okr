@@ -122,7 +122,7 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
   // Create note mutation
   const createNoteMutation = useMutation({
     mutationFn: (data: any) => 
-      apiRequest(`/api/initiatives/${initiativeId}/notes`, "POST", data),
+      apiRequest("POST", `/api/initiatives/${initiativeId}/notes`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/notes`] });
       toast({
@@ -145,7 +145,7 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
   // Update note mutation
   const updateNoteMutation = useMutation({
     mutationFn: ({ noteId, data }: { noteId: string; data: any }) =>
-      apiRequest(`/api/initiatives/${initiativeId}/notes/${noteId}`, "PATCH", data),
+      apiRequest("PATCH", `/api/initiatives/${initiativeId}/notes/${noteId}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/notes`] });
       toast({
@@ -168,7 +168,7 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
   // Delete note mutation
   const deleteNoteMutation = useMutation({
     mutationFn: (noteId: string) =>
-      apiRequest(`/api/initiatives/${initiativeId}/notes/${noteId}`, "DELETE"),
+      apiRequest("DELETE", `/api/initiatives/${initiativeId}/notes/${noteId}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/notes`] });
       toast({

@@ -246,6 +246,15 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 14, 2025. Successfully standardized key result progress calculation system and fixed initiative notes API error:
+  * FIXED: Standardized all key result progress calculations to use shared/progress-calculator.ts function
+  * UPDATED: All backend storage functions (getKeyResult, getKeyResults, getKeyResultsByOrganization, getKeyResultsByObjectiveId) now include consistent progress calculation with shared function
+  * REMOVED: Duplicate calculateKeyResultProgress functions from frontend components and replaced with unified shared import
+  * ENHANCED: All key result data now returns consistent progress, isCompleted, and isValid fields across all API endpoints
+  * FIXED: Initiative notes API error - corrected apiRequest parameter order from (url, method, data) to (method, url, data)
+  * RESOLVED: "not a valid HTTP method" error in createNoteMutation, updateNoteMutation, and deleteNoteMutation
+  * CLEANED: Removed unnecessary "Kemajuan" text label from key result progress display in initiative detail page
+  * RESULT: Consistent progress calculation across all components with working note creation functionality
 - July 14, 2025. Successfully changed initiative progress bar color from orange to blue:
   * UPDATED: Progress bar gradient changed from orange (from-orange-600 to-orange-500) to blue (from-blue-600 to-blue-500)
   * ENHANCED: Better visual contrast and professional appearance with blue gradient

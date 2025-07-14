@@ -976,7 +976,9 @@ export default function InitiativeDetailPage() {
                             <span className="text-sm font-semibold text-blue-900">
                               Target Terkait: {keyResult.title}
                             </span>
-                            
+                            <div className="text-xs text-blue-700 mt-1">
+                              {keyResult.description}
+                            </div>
                           </div>
                         </Link>
                         <div className="text-right">
