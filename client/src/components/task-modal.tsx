@@ -36,7 +36,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Calendar } from "@/components/ui/calendar";
+import { DayPicker } from "react-day-picker";
 import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 import {
   CheckCircle2,
@@ -922,7 +922,7 @@ export default function TaskModal({
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
+                    <DayPicker
                       mode="range"
                       selected={{
                         from: formData.startDate,
@@ -972,7 +972,7 @@ export default function TaskModal({
 
                         return date < today;
                       }}
-                      initialFocus
+                      className="p-3"
                     />
                   </PopoverContent>
                 </Popover>
