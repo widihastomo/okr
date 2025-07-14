@@ -1,4 +1,4 @@
-import { useParams } from "wouter";
+import { useParams, useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import {
@@ -686,6 +686,7 @@ const TaskCommentCount = ({ taskId }: { taskId: string }) => {
 
 export default function InitiativeDetailPage() {
   const { id } = useParams();
+  const [, navigate] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -840,8 +841,10 @@ export default function InitiativeDetailPage() {
         description: "Inisiatif dan semua data terkait telah dihapus secara permanen",
         className: "border-red-200 bg-red-50 text-red-800",
       });
-      // Redirect to initiatives page or dashboard
-      window.location.href = "/dashboard";
+      // Redirect to dashboard
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1000);
     },
     onError: (error: any) => {
       toast({

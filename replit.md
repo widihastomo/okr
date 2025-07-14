@@ -256,6 +256,12 @@ All email configuration now uses environment variables:
   * MAINTAINED: Only "Buka Kembali" button remains active for cancelled initiatives as standalone action
   * ENHANCED: Complete UI consistency - all interactive elements disabled except reopen functionality
   * RESULT: Comprehensive disable system ensuring cancelled initiatives cannot be modified except through reopen process
+- July 14, 2025. Successfully fixed initiative deletion cascade issue and added redirect after deletion:
+  * FIXED: Proper cascade deletion order - task comments → audit trail → tasks → initiative data → initiative
+  * RESOLVED: Foreign key constraint error when deleting initiatives with associated task comments
+  * ENHANCED: Added redirect to dashboard after successful initiative deletion using wouter navigate
+  * IMPROVED: 1-second delay before redirect to allow user to see success message
+  * RESULT: Clean initiative deletion with proper cascade handling and user-friendly redirect experience
 - July 14, 2025. Successfully implemented comprehensive reopen functionality for cancelled initiatives with key result reassignment:
   * ADDED: Reopen initiative functionality for cancelled initiatives ("dibatalkan" status) with optional key result reassignment
   * ENHANCED: Modal dialog with SearchableKeyResultSelect component for choosing new key result when reopening
