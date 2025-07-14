@@ -255,6 +255,7 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
       if (actualEditingInitiative) {
         queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${actualEditingInitiative.id}`] });
         queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${actualEditingInitiative.id}/tasks`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${actualEditingInitiative.id}/history`] });
       }
       setOpen(false);
       onClose?.();

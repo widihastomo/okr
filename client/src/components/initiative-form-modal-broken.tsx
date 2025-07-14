@@ -116,6 +116,11 @@ export default function InitiativeFormModal({ isOpen, onClose, keyResultId, init
         queryClient.invalidateQueries({ queryKey: ["/api/initiatives/objective"] });
       }
       
+      // Invalidate history for edited initiatives
+      if (isEditMode && initiative?.id) {
+        queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}/history`] });
+      }
+      
       onClose();
       form.reset();
     },

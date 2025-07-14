@@ -727,6 +727,8 @@ export default function InitiativeDetailPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/history`] });
       setIsCancelModalOpen(false);
       setCancelReason("");
       toast({

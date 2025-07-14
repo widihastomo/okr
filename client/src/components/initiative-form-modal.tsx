@@ -274,6 +274,7 @@ export default function InitiativeFormModal({ isOpen, onClose, onSuccess, keyRes
         queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}/tasks`] });
         queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}/success-metrics`] });
         queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}/notes`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}/history`] });
       }
       
       // Also invalidate specific objective queries if keyResultId is provided

@@ -240,6 +240,7 @@ export default function InitiativeClosureModal({
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives`] });
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}/success-metrics`] });
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}/tasks`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}/history`] });
       
       toast({
         title: "Inisiatif berhasil ditutup",
