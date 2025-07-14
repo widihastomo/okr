@@ -1092,10 +1092,36 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteInitiative(id: string): Promise<boolean> {
-    // First delete related records
+    // First get all task IDs from this initiative
+    const initiativeTasks = await db.select({ id: tasks.id }).from(tasks).where(eq(tasks.initiativeId, id));
+    const taskIds = initiativeTasks.map(task => task.id);
+    
+    // Delete task comments first (to avoid foreign key constraint)
+    if (taskIds.length > 0) {
+      await db.delete(taskComments).where(inArray(taskComments.taskId, taskIds));
+    }
+    
+    // Delete audit trail entries for tasks
+    if (taskIds.length > 0) {
+      await db.delete(auditTrail).where(
+        and(
+          eq(auditTrail.entityType, 'task'),
+          inArray(auditTrail.entityId, taskIds)
+        )
+      );
+    }
+    
+    // Delete tasks
     await db.delete(tasks).where(eq(tasks.initiativeId, id));
+    
+    // Delete initiative members
     await db.delete(initiativeMembers).where(eq(initiativeMembers.initiativeId, id));
+    
+    // Delete initiative documents
     await db.delete(initiativeDocuments).where(eq(initiativeDocuments.initiativeId, id));
+    
+    // Delete initiative comments
+    await db.delete(initiativeComments).where(eq(initiativeComments.initiativeId, id));
     
     // Delete success metrics and their updates
     await db.delete(successMetricUpdates).where(
@@ -1107,7 +1133,15 @@ export class DatabaseStorage implements IStorage {
     );
     await db.delete(initiativeSuccessMetrics).where(eq(initiativeSuccessMetrics.initiativeId, id));
     
-    // Then delete the initiative
+    // Delete audit trail entries for initiative
+    await db.delete(auditTrail).where(
+      and(
+        eq(auditTrail.entityType, 'initiative'),
+        eq(auditTrail.entityId, id)
+      )
+    );
+    
+    // Finally delete the initiative itself
     const result = await db.delete(initiatives).where(eq(initiatives.id, id));
     return result.rowCount > 0;
   }
