@@ -6,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -17,7 +16,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { apiRequest } from '@/lib/queryClient';
 import { format as formatDate } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/useAuth';
 import TaskModal from '@/components/task-modal';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
@@ -56,9 +54,6 @@ const TasksPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
-  const [showMyTasksOnly, setShowMyTasksOnly] = useState(false);
-  
-  const { user } = useAuth();
 
   const { data: tasks = [], isLoading } = useQuery<Task[]>({
     queryKey: ['/api/tasks'],
@@ -106,9 +101,8 @@ const TasksPage = () => {
       const matchesSearch = searchTerm === '' || 
         task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         task.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesUser = !showMyTasksOnly || (user && task.assignedTo === user.id);
       
-      return matchesStatus && matchesPriority && matchesSearch && matchesUser;
+      return matchesStatus && matchesPriority && matchesSearch;
     });
 
     // Sort tasks: overdue first, then by due date
@@ -126,7 +120,7 @@ const TasksPage = () => {
       
       return aDate.getTime() - bDate.getTime();
     });
-  }, [tasks, statusFilter, priorityFilter, searchTerm, showMyTasksOnly, user]);
+  }, [tasks, statusFilter, priorityFilter, searchTerm]);
 
   // Group tasks by date categories
   const groupedTasks = useMemo(() => {
@@ -862,19 +856,6 @@ const TasksPage = () => {
                 <SelectItem value="high">Tinggi</SelectItem>
               </SelectContent>
             </Select>
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="my-tasks"
-                checked={showMyTasksOnly}
-                onCheckedChange={setShowMyTasksOnly}
-              />
-              <label 
-                htmlFor="my-tasks" 
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Hanya task saya
-              </label>
-            </div>
           </div>
         </CardContent>
       </Card>

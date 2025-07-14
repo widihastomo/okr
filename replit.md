@@ -261,11 +261,6 @@ All email configuration now uses environment variables:
   * IMPLEMENTED: Delete task confirmation with proper mutation and cache invalidation
   * IMPROVED: Task actions available in both desktop (3-dot menu) and mobile (integrated dropdown) views
   * RESULT: Complete CRUD operations for tasks with consistent UI patterns across all view modes
-  * ADDED: User filtering functionality with "Hanya task saya" checkbox in filter section
-  * ENHANCED: Task filtering now includes option to show only tasks assigned to current signed-in user
-  * INTEGRATED: useAuth hook to get current user information for filtering
-  * IMPROVED: Filter section now includes checkbox for user-specific task filtering alongside existing status and priority filters
-  * RESULT: Complete task filtering system with user-specific task display option
 - July 14, 2025. Successfully implemented tasks page ListView with exact daily-focus styling and proper user data integration:
   * REPLACED: Simple card-based ListView with comprehensive table/mobile view like daily-focus
   * ADDED: Desktop table view with proper columns (Task, Prioritas, Status, Tenggat, PIC, Aksi)
