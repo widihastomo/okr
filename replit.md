@@ -265,6 +265,13 @@ All email configuration now uses environment variables:
   * OPTIMIZED: Only active users displayed in filter dropdown for better user experience
   * INTEGRATED: User filter properly connected to filteredTasks useMemo with dependency tracking
   * RESULT: Complete user filtering capability allowing users to filter tasks by assigned person
+- July 14, 2025. Successfully set default user filter to signed-in user:
+  * ADDED: useAuth hook import and user authentication data
+  * IMPLEMENTED: useEffect to automatically set userFilter to signed-in user's ID when component loads
+  * ENHANCED: Filter logic to handle both 'all' and empty string states for proper user filtering
+  * IMPROVED: Better user experience with tasks automatically filtered to show current user's tasks by default
+  * MAINTAINED: Users can still select "Semua PIC" to see all tasks or filter by other users
+  * RESULT: Tasks page now defaults to showing only tasks assigned to the signed-in user
 - July 14, 2025. Successfully integrated TaskModal with orange gradient button styling and task grouping implementation:
   * INTEGRATED: TaskModal component properly connected to "Tambah Task" button with orange gradient styling
   * ENHANCED: Button styling with orange gradient (from-orange-600 to-orange-500) matching application theme

@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/useAuth';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -66,10 +67,11 @@ interface Task {
 }
 
 const TasksPage = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('list');
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
-  const [userFilter, setUserFilter] = useState('all');
+  const [userFilter, setUserFilter] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -94,6 +96,13 @@ const TasksPage = () => {
     queryKey: ['/api/organization/users'],
     staleTime: 60000,
   });
+
+  // Set default user filter to signed in user
+  useEffect(() => {
+    if (user && user.id && userFilter === '') {
+      setUserFilter(user.id);
+    }
+  }, [user, userFilter]);
 
   // Helper function to get user name
   const getUserName = (userId: string) => {
@@ -168,7 +177,7 @@ const TasksPage = () => {
     const filtered = tasks.filter(task => {
       const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
       const matchesPriority = priorityFilter === 'all' || task.priority === priorityFilter;
-      const matchesUser = userFilter === 'all' || task.assignedTo === userFilter;
+      const matchesUser = userFilter === 'all' || userFilter === '' || task.assignedTo === userFilter;
       const matchesSearch = searchTerm === '' || 
         task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         task.description.toLowerCase().includes(searchTerm.toLowerCase());
