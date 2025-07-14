@@ -514,6 +514,7 @@ export default function InitiativeDetailPage() {
   const [isDeleteMetricModalOpen, setIsDeleteMetricModalOpen] = useState(false);
   const [metricToDelete, setMetricToDelete] = useState<any>(null);
   const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
+  const [isCloseInitiativeModalOpen, setIsCloseInitiativeModalOpen] = useState(false);
 
   // All queries declared at the top level
   const { data: initiative, isLoading: initiativeLoading } = useQuery({
@@ -625,6 +626,29 @@ export default function InitiativeDetailPage() {
       toast({
         title: "Gagal membatalkan inisiatif",
         description: error.message || "Terjadi kesalahan saat membatalkan inisiatif",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const closeInitiativeMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("PATCH", `/api/initiatives/${id}`, { status: "selesai" });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives`] });
+      setIsCloseInitiativeModalOpen(false);
+      toast({
+        title: "Inisiatif ditutup",
+        description: "Inisiatif telah berhasil ditutup",
+        variant: "success",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal menutup inisiatif",
+        description: error.message || "Terjadi kesalahan saat menutup inisiatif",
         variant: "destructive",
       });
     },
@@ -791,6 +815,20 @@ export default function InitiativeDetailPage() {
               <Edit className="w-4 h-4 mr-2" />
               Edit
             </Button>
+            
+            {/* Close Initiative Button - Only show when status is sedang_berjalan */}
+            {initiativeData.status === 'sedang_berjalan' && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setIsCloseInitiativeModalOpen(true)}
+                className="border-green-300 text-green-600 hover:bg-green-50 hover:border-green-400"
+              >
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Tutup Inisiatif
+              </Button>
+            )}
+            
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
@@ -1500,6 +1538,36 @@ export default function InitiativeDetailPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Close Initiative Confirmation Modal */}
+      <AlertDialog open={isCloseInitiativeModalOpen} onOpenChange={setIsCloseInitiativeModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-green-500" />
+              Tutup Inisiatif
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menutup inisiatif ini? Inisiatif akan ditandai sebagai "Selesai" dan tidak dapat diubah lagi.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel 
+              onClick={() => setIsCloseInitiativeModalOpen(false)}
+              className="focus:ring-orange-500"
+            >
+              Batal
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => closeInitiativeMutation.mutate()}
+              disabled={closeInitiativeMutation.isPending}
+              className="bg-green-600 hover:bg-green-700 focus:ring-orange-500"
+            >
+              {closeInitiativeMutation.isPending ? "Menutup..." : "Tutup Inisiatif"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
