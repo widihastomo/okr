@@ -130,6 +130,7 @@ export interface IStorage {
   
   // Success Metrics
   getSuccessMetricsByInitiativeId(initiativeId: string): Promise<SuccessMetric[]>;
+  getSuccessMetric(id: string): Promise<SuccessMetric | undefined>;
   createSuccessMetric(metric: InsertSuccessMetric): Promise<SuccessMetric>;
   updateSuccessMetric(id: string, metric: Partial<InsertSuccessMetric>): Promise<SuccessMetric | undefined>;
   deleteSuccessMetric(id: string): Promise<boolean>;
@@ -1634,6 +1635,14 @@ export class DatabaseStorage implements IStorage {
       .from(initiativeSuccessMetrics)
       .where(eq(initiativeSuccessMetrics.initiativeId, initiativeId))
       .orderBy(desc(initiativeSuccessMetrics.createdAt));
+  }
+
+  async getSuccessMetric(id: string): Promise<SuccessMetric | undefined> {
+    const [metric] = await db
+      .select()
+      .from(initiativeSuccessMetrics)
+      .where(eq(initiativeSuccessMetrics.id, id));
+    return metric || undefined;
   }
 
   async createSuccessMetric(metric: InsertSuccessMetric): Promise<SuccessMetric> {

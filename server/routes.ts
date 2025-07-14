@@ -3240,6 +3240,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = req.params.id;
       const currentUser = req.user as User;
       
+      // Get current metric data before update for audit trail
+      const currentMetric = await storage.getSuccessMetric(id);
+      if (!currentMetric) {
+        return res.status(404).json({ message: "Success metric not found" });
+      }
+      
       // Add UPDATE audit trail fields
       const updateDataWithAuditTrail = {
         ...req.body,
@@ -3251,6 +3257,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!updatedMetric) {
         return res.status(404).json({ message: "Success metric not found" });
+      }
+      
+      // Create audit trail entry for metric update
+      try {
+        let changeDescription = "Metrik keberhasilan diupdate";
+        const changes = [];
+        
+        if (currentMetric.name !== req.body.name) {
+          changes.push(`nama: "${currentMetric.name}" → "${req.body.name}"`);
+        }
+        if (currentMetric.target !== req.body.target) {
+          changes.push(`target: "${currentMetric.target}" → "${req.body.target}"`);
+        }
+        if (currentMetric.achievement !== req.body.achievement) {
+          changes.push(`capaian: "${currentMetric.achievement || 0}" → "${req.body.achievement}"`);
+        }
+        
+        if (changes.length > 0) {
+          changeDescription = `Metrik keberhasilan "${currentMetric.name}" diupdate: ${changes.join(", ")}`;
+        }
+        
+        await storage.createAuditTrail({
+          entityType: "initiative",
+          entityId: currentMetric.initiativeId,
+          action: "update_metric",
+          changeDescription,
+          userId: currentUser.id
+        });
+        
+        console.log("Audit trail created for metric update:", changeDescription);
+      } catch (auditError) {
+        console.error("Error creating audit trail for metric update:", auditError);
+        // Don't fail the main operation if audit trail fails
       }
       
       res.json(updatedMetric);
