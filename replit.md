@@ -271,6 +271,7 @@ All email configuration now uses environment variables:
   * IMPROVED: Moved 3-dots menu to top-right corner in mobile view for better accessibility
   * ENHANCED: Combined status dropdown and actions menu in same row for more efficient layout
   * OPTIMIZED: Eliminated redundant bottom menu section in mobile task cards for cleaner design
+  * RESPONSIVE: Updated button text for mobile - "Tambah Metrik"/"Tambah Task" becomes "Tambah" on mobile screens for better space utilization
 - July 13, 2025. Successfully completed comprehensive active user filtering implementation and task modal consistency upgrade:
   * IMPLEMENTED: Active user filtering (isActive === true) across all SearchableUserSelect components throughout the application
   * UPDATED: Task modal, edit objective modal, goal form modal, and key result modal with active user filtering

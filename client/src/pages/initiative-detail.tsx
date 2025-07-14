@@ -995,7 +995,8 @@ export default function InitiativeDetailPage() {
                   className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Tambah Metrik
+                  <span className="hidden sm:inline">Tambah Metrik</span>
+                  <span className="sm:hidden">Tambah</span>
                 </Button>
               </div>
             </CardHeader>
@@ -1095,7 +1096,8 @@ export default function InitiativeDetailPage() {
                   className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Tambah Task
+                  <span className="hidden sm:inline">Tambah Task</span>
+                  <span className="sm:hidden">Tambah</span>
                 </Button>
               </div>
             </CardHeader>
