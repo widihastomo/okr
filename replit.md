@@ -254,6 +254,14 @@ All email configuration now uses environment variables:
   * CONSISTENT: Same priority icon integration applied to both desktop and mobile views
   * STREAMLINED: Table layout now has one fewer column while maintaining all functionality
   * RESULT: More intuitive task display with priority context immediately visible next to task names
+- July 14, 2025. Successfully moved team information from sidebar to overview card for better information hierarchy:
+  * RELOCATED: PIC and team member information moved from sidebar to overview card
+  * INTEGRATED: Team information now appears in overview card below progress bar with proper sectioning
+  * OPTIMIZED: Sidebar simplified to only contain Initiative Notes for focused content
+  * ENHANCED: Team information displayed with smaller avatars and compact layout in overview
+  * IMPROVED: Better information hierarchy with team context directly in main overview section
+  * STREAMLINED: Reduced sidebar complexity while maintaining all team information accessibility
+  * RESULT: More logical information flow with team details integrated into main initiative overview
 - July 13, 2025. Successfully implemented bi-directional auto-update status initiative system based on task status changes:
   * IMPLEMENTED: Auto-update logic - task "in_progress" → initiative "sedang_berjalan" 
   * IMPLEMENTED: Reverse auto-update logic - all tasks "not_started" → initiative "draft"

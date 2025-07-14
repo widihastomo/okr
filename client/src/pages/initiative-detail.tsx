@@ -955,6 +955,66 @@ export default function InitiativeDetailPage() {
                     );
                   })()}
 
+                  {/* Team Information */}
+                  <div className="pt-4 border-t border-gray-100">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Users className="h-4 w-4 text-orange-500" />
+                      <span className="text-sm font-medium text-gray-700">Tim</span>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      {/* PIC */}
+                      {pic && (
+                        <div>
+                          <div className="text-xs text-gray-500 mb-1">PIC (Person in Charge)</div>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                              {pic.firstName?.charAt(0)}{pic.lastName?.charAt(0)}
+                            </div>
+                            <div>
+                              <div className="text-sm font-medium text-gray-900">
+                                {pic.firstName} {pic.lastName}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {pic.email}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Members */}
+                      {members.length > 0 && (
+                        <div>
+                          <div className="text-xs text-gray-500 mb-1">Anggota Tim ({members.length})</div>
+                          <div className="flex flex-wrap gap-2">
+                            {members.map((member: any) => (
+                              <div key={member.id} className="flex items-center space-x-2">
+                                <div className="w-6 h-6 bg-gray-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                                  {member.user?.firstName?.charAt(0)}{member.user?.lastName?.charAt(0)}
+                                </div>
+                                <div>
+                                  <div className="text-sm font-medium text-gray-900">
+                                    {member.user?.firstName} {member.user?.lastName}
+                                  </div>
+                                  <div className="text-xs text-gray-500">
+                                    {member.user?.email}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {!pic && members.length === 0 && (
+                        <div className="text-xs text-gray-500">
+                          Belum ada anggota tim
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
                   {/* Key Result Information */}
                   {keyResult && (
                     <div className="border border-blue-200 bg-blue-50 p-4 rounded-lg mt-4">
@@ -1481,71 +1541,6 @@ export default function InitiativeDetailPage() {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Team Information */}
-          <Card className="border-gray-200 shadow-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900">
-                <Users className="h-5 w-5 text-orange-500" />
-                Tim
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              {/* PIC */}
-              {pic && (
-                <div className="mb-4">
-                  <div className="text-sm font-medium text-gray-700 mb-2">
-                    PIC (Person in Charge)
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                      {pic.firstName?.charAt(0)}{pic.lastName?.charAt(0)}
-                    </div>
-                    <div>
-                      <div className="font-medium text-gray-900">
-                        {pic.firstName} {pic.lastName}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {pic.email}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Members */}
-              {members.length > 0 && (
-                <div>
-                  <div className="text-sm font-medium text-gray-700 mb-2">
-                    Anggota Tim ({members.length})
-                  </div>
-                  <div className="space-y-2">
-                    {members.map((member: any) => (
-                      <div key={member.id} className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                          {member.user?.firstName?.charAt(0)}{member.user?.lastName?.charAt(0)}
-                        </div>
-                        <div>
-                          <div className="font-medium text-gray-900">
-                            {member.user?.firstName} {member.user?.lastName}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {member.user?.email}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {!pic && members.length === 0 && (
-                <div className="text-center py-4 text-gray-500">
-                  <p className="text-sm">Belum ada anggota tim</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
           {/* Initiative Notes */}
           <InitiativeNotes initiativeId={id!} />
         </div>
