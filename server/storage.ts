@@ -2532,46 +2532,7 @@ export class DatabaseStorage implements IStorage {
         }
       });
 
-      // Get audit trail entries for this initiative using alias
-      const auditTable = auditTrail;
-      const auditEntries = await db
-        .select({
-          id: auditTable.id,
-          action: auditTable.action,
-          changeDescription: auditTable.changeDescription,
-          createdAt: auditTable.createdAt,
-          user: {
-            id: users.id,
-            email: users.email,
-            firstName: users.firstName,
-            lastName: users.lastName,
-            role: users.role
-          }
-        })
-        .from(auditTable)
-        .innerJoin(users, eq(users.id, auditTable.userId))
-        .where(and(
-          eq(auditTable.entityType, 'initiative'),
-          eq(auditTable.entityId, initiativeId)
-        ))
-        .orderBy(auditTable.createdAt);
-
-      // Add audit trail entries
-      for (const entry of auditEntries) {
-        history.push({
-          id: entry.id,
-          action: entry.action,
-          description: entry.changeDescription,
-          timestamp: entry.createdAt,
-          user: {
-            id: entry.user.id,
-            email: entry.user.email,
-            firstName: entry.user.firstName || '',
-            lastName: entry.user.lastName || '',
-            role: entry.user.role || 'member'
-          }
-        });
-      }
+      // Skip first audit trail attempt to avoid conflicts
 
       // Get success metrics updates for this initiative
       const successMetricsData = await db
@@ -2619,12 +2580,12 @@ export class DatabaseStorage implements IStorage {
       }
 
       // Get audit trail entries for this initiative
-      const auditTrail = await db
+      const auditTrailEntries = await db
         .select({
-          id: auditTrails.id,
-          action: auditTrails.action,
-          changeDescription: auditTrails.changeDescription,
-          createdAt: auditTrails.createdAt,
+          id: auditTrail.id,
+          action: auditTrail.action,
+          changeDescription: auditTrail.changeDescription,
+          createdAt: auditTrail.createdAt,
           user: {
             id: users.id,
             email: users.email,
@@ -2633,18 +2594,18 @@ export class DatabaseStorage implements IStorage {
             role: users.role
           }
         })
-        .from(auditTrails)
-        .innerJoin(users, eq(users.id, auditTrails.userId))
+        .from(auditTrail)
+        .innerJoin(users, eq(users.id, auditTrail.userId))
         .where(
           and(
-            eq(auditTrails.entityType, 'initiative'),
-            eq(auditTrails.entityId, initiativeId)
+            eq(auditTrail.entityType, 'initiative'),
+            eq(auditTrail.entityId, initiativeId)
           )
         )
-        .orderBy(desc(auditTrails.createdAt));
+        .orderBy(desc(auditTrail.createdAt));
 
       // Add audit trail entries to history
-      for (const entry of auditTrail) {
+      for (const entry of auditTrailEntries) {
         history.push({
           id: entry.id,
           action: entry.action,
