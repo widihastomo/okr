@@ -190,6 +190,7 @@ export function InitiativeCommentsCard({ initiativeId }: InitiativeCommentsCardP
             onReply={handleReply}
             onToggleReplies={handleToggleReplies}
             expandedReplies={expandedReplies}
+            editingCommentId={editingComment?.id || null}
           />
         </CardContent>
       )}

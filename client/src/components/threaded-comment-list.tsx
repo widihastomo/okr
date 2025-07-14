@@ -16,6 +16,7 @@ interface ThreadedCommentListProps {
   onReply: (parentId: string) => void;
   onToggleReplies?: (commentId: string) => void;
   expandedReplies?: Set<string>;
+  editingCommentId?: string | null;
 }
 
 interface ThreadedComment extends InitiativeComment {
@@ -30,7 +31,8 @@ export function ThreadedCommentList({
   onDelete, 
   onReply,
   onToggleReplies,
-  expandedReplies = new Set()
+  expandedReplies = new Set(),
+  editingCommentId = null
 }: ThreadedCommentListProps) {
   const { user } = useAuth();
 
@@ -163,10 +165,12 @@ export function ThreadedCommentList({
               </div>
             </div>
             
-            <div 
-              className="mt-2 text-sm text-gray-700 prose prose-sm max-w-none"
-              dangerouslySetInnerHTML={{ __html: comment.content }}
-            />
+            {editingCommentId !== comment.id && (
+              <div 
+                className="mt-2 text-sm text-gray-700 prose prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ __html: comment.content }}
+              />
+            )}
             
             {hasReplies && (
               <div className="mt-3">
