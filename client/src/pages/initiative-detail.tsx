@@ -627,6 +627,7 @@ export default function InitiativeDetailPage() {
   const [metricToDelete, setMetricToDelete] = useState<any>(null);
   const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
   const [isCloseInitiativeModalOpen, setIsCloseInitiativeModalOpen] = useState(false);
+  const [isReopenInitiativeModalOpen, setIsReopenInitiativeModalOpen] = useState(false);
 
   // All queries declared at the top level
   const { data: initiative, isLoading: initiativeLoading } = useQuery({
@@ -766,6 +767,29 @@ export default function InitiativeDetailPage() {
       toast({
         title: "Gagal memperbarui status",
         description: error.message || "Terjadi kesalahan saat memperbarui status task",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const reopenInitiativeMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("PATCH", `/api/initiatives/${id}`, { status: "sedang_berjalan" });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives`] });
+      setIsReopenInitiativeModalOpen(false);
+      toast({
+        title: "Inisiatif dibuka kembali",
+        description: "Inisiatif berhasil dibuka kembali dan statusnya diubah ke sedang berjalan",
+        variant: "success",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal membuka kembali inisiatif",
+        description: error.message || "Terjadi kesalahan saat membuka kembali inisiatif",
         variant: "destructive",
       });
     },
@@ -917,6 +941,19 @@ export default function InitiativeDetailPage() {
               >
                 <CheckCircle className="w-4 h-4 mr-2" />
                 Tutup Inisiatif
+              </Button>
+            )}
+            
+            {/* Reopen Initiative Button - Only show when status is selesai */}
+            {initiativeData.status === 'selesai' && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setIsReopenInitiativeModalOpen(true)}
+                className="border-blue-300 text-blue-600 hover:bg-blue-50 hover:border-blue-400"
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Buka Kembali
               </Button>
             )}
             
@@ -1564,6 +1601,30 @@ export default function InitiativeDetailPage() {
               className="bg-red-600 hover:bg-red-700 focus:ring-orange-500"
             >
               {deleteSuccessMetricMutation.isPending ? "Menghapus..." : "Hapus Metrik"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Reopen Initiative Modal */}
+      <AlertDialog open={isReopenInitiativeModalOpen} onOpenChange={setIsReopenInitiativeModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Buka Kembali Inisiatif</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin membuka kembali inisiatif ini? Status inisiatif akan diubah menjadi "Sedang Berjalan" dan semua fitur editing akan diaktifkan kembali.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="focus:ring-orange-500">
+              Batal
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => reopenInitiativeMutation.mutate()}
+              disabled={reopenInitiativeMutation.isPending}
+              className="bg-blue-600 hover:bg-blue-700 focus:ring-orange-500"
+            >
+              {reopenInitiativeMutation.isPending ? "Membuka..." : "Buka Kembali"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

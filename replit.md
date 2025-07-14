@@ -246,6 +246,20 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 14, 2025. Successfully implemented comprehensive disable system for completed initiatives and added reopen functionality:
+  * COMPLETED: All editing capabilities comprehensively disabled when initiative status is "selesai"
+  * DISABLED: Tombol "Tambah Task" and "Tambah Metrik" disabled for completed initiatives
+  * DISABLED: All dropdown edit/delete actions for tasks and success metrics disabled
+  * DISABLED: Task status dropdown disabled with visual chevron removal
+  * DISABLED: QuickUpdateButton for success metrics disabled
+  * DISABLED: Comment system completely disabled (add/edit/delete/reply) for completed initiatives
+  * DISABLED: Modal access for editing tasks, success metrics, and initiative details when completed
+  * ADDED: "Buka Kembali" button for completed initiatives with blue styling
+  * IMPLEMENTED: Confirmation modal for reopening initiatives with detailed description
+  * CREATED: reopenInitiativeMutation to change status back to "sedang_berjalan"
+  * ENHANCED: Complete cache invalidation system for reopened initiatives
+  * IMPROVED: All disabled states provide proper visual feedback and prevent accidental modifications
+  * RESULT: Robust system preventing edits to completed initiatives while allowing controlled reopening when needed
 - July 14, 2025. Successfully implemented contextual placeholder system, fixed success metrics display, and added task validation in initiative closure modal:
   * ENHANCED: Replaced static placeholders with dynamic examples that change based on initiative result type (berhasil/gagal/perlu_diulang)
   * IMPLEMENTED: Contextual examples for all form sections - reason, learning, budget, and additional notes
