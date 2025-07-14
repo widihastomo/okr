@@ -246,6 +246,14 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 14, 2025. Successfully fixed initiative cancellation API parameter mismatch and resolved modal background issues:
+  * FIXED: Parameter mismatch in cancel initiative endpoint - changed backend from "cancelReason" to "reason" to match frontend
+  * RESOLVED: 400 Bad Request error when canceling initiatives - backend now correctly expects "reason" parameter
+  * FIXED: Modal background consistency issues by removing problematic AlertDialogDescription asChild approach
+  * CLEANED: Removed duplicate code and syntax errors in initiative-detail.tsx file
+  * STABILIZED: All cancel/reopen/delete initiative modals now have proper background and functionality
+  * ENHANCED: Proper error handling and audit trail logging for initiative cancellation operations
+  * RESULT: Initiative cancellation now works correctly with proper modal display and API communication
 - July 14, 2025. Successfully fixed initiative update audit trail integration and resolved variable naming conflicts:
   * FIXED: Resolved "auditTrail2 before initialization" error by eliminating duplicate variable references in getInitiativeHistory function
   * ENHANCED: Added comprehensive audit trail tracking for all initiative updates in both PATCH and PUT endpoints

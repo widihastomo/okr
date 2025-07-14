@@ -5443,15 +5443,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const initiativeId = req.params.id;
-      const { cancelReason } = req.body;
+      const { reason } = req.body;
 
-      if (!cancelReason) {
+      if (!reason) {
         return res.status(400).json({ message: "Cancel reason is required" });
       }
 
       const updatedInitiative = await storage.updateInitiative(initiativeId, {
         status: 'dibatalkan',
-        closureNotes: cancelReason,
+        closureNotes: reason,
         closedBy: userId,
         closedAt: new Date()
       });
@@ -5462,7 +5462,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           entityType: 'initiative',
           entityId: initiativeId,
           action: 'cancelled',
-          changeDescription: `Inisiatif dibatalkan dengan alasan: ${cancelReason}`,
+          changeDescription: `Inisiatif dibatalkan dengan alasan: ${reason}`,
           userId: userId,
           organizationId: req.user.organizationId
         });
