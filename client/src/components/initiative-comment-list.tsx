@@ -57,7 +57,7 @@ export function InitiativeCommentList({ initiativeId }: InitiativeCommentListPro
 
   const updateCommentMutation = useMutation({
     mutationFn: async ({ commentId, content }: { commentId: string; content: string }) => {
-      const response = await apiRequest("PUT", `/api/initiatives/${initiativeId}/comments/${commentId}`, {
+      const response = await apiRequest("PATCH", `/api/initiatives/${initiativeId}/comments/${commentId}`, {
         content,
         mentionedUsers: [], // Simple implementation - could be enhanced
       });
