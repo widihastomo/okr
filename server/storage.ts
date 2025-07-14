@@ -1576,8 +1576,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteInitiativeComment(id: string): Promise<boolean> {
-    const result = await db.delete(initiativeComments).where(eq(initiativeComments.id, id));
-    return result.rowCount > 0;
+    console.log('🗑️ Deleting initiative comment:', id);
+    
+    // First, delete all child comments (replies) that reference this comment as parent
+    const childDeleteResult = await db
+      .delete(initiativeComments)
+      .where(eq(initiativeComments.parentId, id));
+    
+    console.log('🗑️ Deleted child comments:', childDeleteResult.rowCount || 0);
+    
+    // Then delete the parent comment
+    const parentDeleteResult = await db
+      .delete(initiativeComments)
+      .where(eq(initiativeComments.id, id));
+    
+    console.log('🗑️ Deleted parent comment:', parentDeleteResult.rowCount || 0);
+    
+    return (parentDeleteResult.rowCount || 0) > 0;
   }
 
   async getTasksByUserId(userId: string): Promise<Task[]> {
