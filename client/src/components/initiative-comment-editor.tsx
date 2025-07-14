@@ -75,7 +75,7 @@ export function InitiativeCommentEditor({
       }
       
       // Invalidate comments cache
-      queryClient.invalidateQueries({ queryKey: ['/api/initiatives', initiativeId, 'comments'] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/comments`] });
       
       if (onCommentAdded) {
         onCommentAdded();
