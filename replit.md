@@ -255,6 +255,7 @@ All email configuration now uses environment variables:
   * FIXED: Success metric update error by removing audit trail functionality due to foreign key constraint
   * RESOLVED: Database constraint violation error when updating success metrics
   * FIXED: "initiativeId not defined" error in initiative-detail.tsx by using correct variable name `id` from useParams
+  * ENHANCED: Added success metrics updates to initiative history by integrating metrics data into getInitiativeHistory function
   * OPTIMIZED: Comment cards now use relative positioning with clean avatar and content layout
   * RESPONSIVE: Maintained mobile-friendly design with proper spacing and button positioning
   * RESULT: Improved comment threading system with better visual hierarchy and user interaction patterns

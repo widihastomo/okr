@@ -2522,6 +2522,60 @@ export class DatabaseStorage implements IStorage {
         }
       });
 
+      // Get success metrics updates for this initiative
+      const successMetricsData = await db
+        .select({
+          id: initiativeSuccessMetrics.id,
+          name: initiativeSuccessMetrics.name,
+          achievement: initiativeSuccessMetrics.achievement,
+          target: initiativeSuccessMetrics.target,
+          unit: initiativeSuccessMetrics.unit,
+          updatedAt: initiativeSuccessMetrics.updatedAt,
+          lastUpdateBy: initiativeSuccessMetrics.lastUpdateBy,
+          updater: {
+            id: users.id,
+            email: users.email,
+            firstName: users.firstName,
+            lastName: users.lastName,
+            role: users.role
+          }
+        })
+        .from(initiativeSuccessMetrics)
+        .leftJoin(users, eq(users.id, initiativeSuccessMetrics.lastUpdateBy))
+        .where(eq(initiativeSuccessMetrics.initiativeId, initiativeId))
+        .orderBy(desc(initiativeSuccessMetrics.updatedAt));
+
+      // Add success metrics updates to history
+      for (const metric of successMetricsData) {
+        if (metric.updatedAt && metric.lastUpdateBy && metric.updater) {
+          const formattedAchievement = metric.unit === 'currency' 
+            ? `Rp ${Number(metric.achievement || 0).toLocaleString()}`
+            : metric.unit === 'percentage' 
+            ? `${metric.achievement || 0}%`
+            : `${metric.achievement || 0}`;
+          
+          const formattedTarget = metric.unit === 'currency' 
+            ? `Rp ${Number(metric.target || 0).toLocaleString()}`
+            : metric.unit === 'percentage' 
+            ? `${metric.target || 0}%`
+            : `${metric.target || 0}`;
+
+          history.push({
+            id: `${metric.id}-updated-${metric.updatedAt}`,
+            action: 'metric_updated',
+            description: `Metrik "${metric.name}" diupdate: ${formattedAchievement} dari target ${formattedTarget}`,
+            timestamp: metric.updatedAt,
+            user: {
+              id: metric.updater.id,
+              email: metric.updater.email,
+              firstName: metric.updater.firstName,
+              lastName: metric.updater.lastName,
+              role: metric.updater.role
+            }
+          });
+        }
+      }
+
       // Sort by timestamp descending (newest first)
       history.sort((a, b) => {
         const timeA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
