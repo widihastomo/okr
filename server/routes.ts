@@ -5486,23 +5486,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const initiativeId = req.params.id;
+      const { keyResultId } = req.body;
 
-      const updatedInitiative = await storage.updateInitiative(initiativeId, {
+      // Prepare update data
+      const updateData: any = {
         status: 'sedang_berjalan',
         closedBy: null,
         closedAt: null,
         completedAt: null,
         finalResult: null,
         learningInsights: null
-      });
+      };
+
+      // If keyResultId is provided, update the key result assignment
+      if (keyResultId) {
+        updateData.keyResultId = keyResultId;
+      }
+
+      const updatedInitiative = await storage.updateInitiative(initiativeId, updateData);
 
       // Create audit trail for initiative reopening
       try {
+        const changeDescription = keyResultId 
+          ? `Inisiatif dibuka kembali untuk dilanjutkan dan dipindahkan ke angka target baru`
+          : `Inisiatif dibuka kembali untuk dilanjutkan`;
+        
         await storage.createAuditTrail({
           entityType: 'initiative',
           entityId: initiativeId,
           action: 'reopened',
-          changeDescription: `Inisiatif dibuka kembali untuk dilanjutkan`,
+          changeDescription,
           userId: userId,
           organizationId: req.user.organizationId
         });

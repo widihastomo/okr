@@ -80,6 +80,7 @@ import { InitiativeHistory } from "@/components/initiative-history";
 import SuccessMetricsModal from "@/components/success-metrics-modal-simple";
 import InitiativeClosureModal from "@/components/initiative-closure-modal";
 import { InitiativeCommentsCard } from "@/components/initiative-comments-card";
+import { SearchableKeyResultSelect } from "@/components/ui/searchable-key-result-select";
 import { calculateKeyResultProgress } from "@shared/progress-calculator";
 import type { SuccessMetricWithUpdates } from "@shared/schema";
 
@@ -704,6 +705,7 @@ export default function InitiativeDetailPage() {
   const [isCloseInitiativeModalOpen, setIsCloseInitiativeModalOpen] = useState(false);
   const [isReopenInitiativeModalOpen, setIsReopenInitiativeModalOpen] = useState(false);
   const [isDeleteInitiativeModalOpen, setIsDeleteInitiativeModalOpen] = useState(false);
+  const [selectedKeyResultForReopen, setSelectedKeyResultForReopen] = useState<string>("");
 
   // All queries declared at the top level
   const { data: initiative, isLoading: initiativeLoading } = useQuery({
@@ -723,6 +725,11 @@ export default function InitiativeDetailPage() {
 
   const { data: users = [] } = useQuery<any[]>({
     queryKey: ['/api/organization/users'],
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  const { data: keyResults = [] } = useQuery<any[]>({
+    queryKey: ['/api/key-results'],
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
@@ -874,14 +881,15 @@ export default function InitiativeDetailPage() {
   });
 
   const reopenInitiativeMutation = useMutation({
-    mutationFn: async () => {
-      return await apiRequest("POST", `/api/initiatives/${id}/reopen`, {});
+    mutationFn: async ({ keyResultId }: { keyResultId?: string }) => {
+      return await apiRequest("POST", `/api/initiatives/${id}/reopen`, { keyResultId });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives`] });
       queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/history`] });
       setIsReopenInitiativeModalOpen(false);
+      setSelectedKeyResultForReopen("");
       toast({
         title: "Inisiatif dibuka kembali",
         description: "Inisiatif berhasil dibuka kembali dan statusnya diubah ke sedang berjalan",
@@ -1071,6 +1079,16 @@ export default function InitiativeDetailPage() {
                   >
                     <XCircle className="w-4 h-4 mr-2" />
                     Batalkan Inisiatif
+                  </DropdownMenuItem>
+                )}
+                {/* Reopen Initiative - Only show when status is dibatalkan */}
+                {initiativeData.status === 'dibatalkan' && (
+                  <DropdownMenuItem 
+                    className="text-orange-600 hover:text-orange-700"
+                    onClick={() => setIsReopenInitiativeModalOpen(true)}
+                  >
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    Buka Kembali
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem 
@@ -1868,7 +1886,7 @@ export default function InitiativeDetailPage() {
 
       {/* Reopen Initiative Modal */}
       <AlertDialog open={isReopenInitiativeModalOpen} onOpenChange={setIsReopenInitiativeModalOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <RotateCcw className="w-5 h-5 text-orange-600" />
@@ -1885,11 +1903,39 @@ export default function InitiativeDetailPage() {
             <p className="text-gray-600 text-sm">
               Anda dapat melanjutkan pekerjaan pada inisiatif ini, menambah task baru, dan memperbarui metrik keberhasilan.
             </p>
+            
+            {/* Key Result Selection */}
+            <div className="space-y-3 pt-4 border-t">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="keyResultSelect" className="text-sm font-medium">
+                  Pindah ke Angka Target lain (Opsional)
+                </Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button type="button" className="inline-flex">
+                      <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
+                    <div className="text-sm">
+                      <p className="font-medium mb-2">Pindah Angka Target</p>
+                      <p>Jika ingin memindahkan inisiatif ini ke angka target yang berbeda, pilih angka target baru. Jika tidak, inisiatif akan tetap pada angka target yang sama.</p>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <SearchableKeyResultSelect
+                keyResults={keyResults}
+                value={selectedKeyResultForReopen}
+                onValueChange={setSelectedKeyResultForReopen}
+                placeholder="Pilih angka target baru (kosongkan jika tidak ingin mengubah)"
+              />
+            </div>
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel>Batal</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => reopenInitiativeMutation.mutate()}
+              onClick={() => reopenInitiativeMutation.mutate({ keyResultId: selectedKeyResultForReopen || undefined })}
               className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
               disabled={reopenInitiativeMutation.isPending}
             >
