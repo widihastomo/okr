@@ -63,8 +63,16 @@ const TasksPage = () => {
     staleTime: 60000,
   });
 
+  // Helper function to check if task is overdue
+  const isTaskOverdue = (task: Task): boolean => {
+    if (!task.dueDate) return false;
+    const today = new Date();
+    const dueDate = new Date(task.dueDate);
+    return dueDate < today && task.status !== 'completed' && task.status !== 'cancelled';
+  };
+
   const filteredTasks = useMemo(() => {
-    return tasks.filter(task => {
+    const filtered = tasks.filter(task => {
       const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
       const matchesPriority = priorityFilter === 'all' || task.priority === priorityFilter;
       const matchesSearch = searchTerm === '' || 
@@ -72,6 +80,22 @@ const TasksPage = () => {
         task.description.toLowerCase().includes(searchTerm.toLowerCase());
       
       return matchesStatus && matchesPriority && matchesSearch;
+    });
+
+    // Sort tasks: overdue first, then by due date
+    return filtered.sort((a, b) => {
+      const aOverdue = isTaskOverdue(a);
+      const bOverdue = isTaskOverdue(b);
+      
+      // If one is overdue and the other is not, overdue comes first
+      if (aOverdue && !bOverdue) return -1;
+      if (!aOverdue && bOverdue) return 1;
+      
+      // If both are overdue or both are not overdue, sort by due date
+      const aDate = a.dueDate ? new Date(a.dueDate) : new Date('9999-12-31');
+      const bDate = b.dueDate ? new Date(b.dueDate) : new Date('9999-12-31');
+      
+      return aDate.getTime() - bDate.getTime();
     });
   }, [tasks, statusFilter, priorityFilter, searchTerm]);
 
@@ -305,16 +329,23 @@ const TasksPage = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredTasks.map((task) => (
-                  <tr key={task.id} className="hover:bg-gray-50">
+                  <tr key={task.id} className={`hover:bg-gray-50 ${isTaskOverdue(task) ? 'bg-red-50 border-l-4 border-red-400' : ''}`}>
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-2">
                         <div>
-                          <Link
-                            href={`/tasks/${task.id}`}
-                            className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
-                          >
-                            {task.title}
-                          </Link>
+                          <div className="flex items-center gap-2">
+                            <Link
+                              href={`/tasks/${task.id}`}
+                              className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
+                            >
+                              {task.title}
+                            </Link>
+                            {isTaskOverdue(task) && (
+                              <Badge variant="destructive" className="text-xs">
+                                Overdue
+                              </Badge>
+                            )}
+                          </div>
                           {task.initiative && (
                             <div className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded mt-1 inline-block">
                               Inisiatif: {task.initiative.title}
@@ -412,15 +443,22 @@ const TasksPage = () => {
           {/* Mobile View */}
           <div className="md:hidden space-y-4 p-4">
             {filteredTasks.map((task) => (
-              <div key={task.id} className="p-3 bg-gray-50 border border-gray-200 rounded-lg space-y-2">
+              <div key={task.id} className={`p-3 bg-gray-50 border border-gray-200 rounded-lg space-y-2 ${isTaskOverdue(task) ? 'bg-red-50 border-red-300 border-l-4 border-l-red-400' : ''}`}>
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <Link
-                      href={`/tasks/${task.id}`}
-                      className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
-                    >
-                      {task.title}
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/tasks/${task.id}`}
+                        className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
+                      >
+                        {task.title}
+                      </Link>
+                      {isTaskOverdue(task) && (
+                        <Badge variant="destructive" className="text-xs">
+                          Overdue
+                        </Badge>
+                      )}
+                    </div>
                     {task.initiative && (
                       <div className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded mt-1 inline-block">
                         Inisiatif: {task.initiative.title}
