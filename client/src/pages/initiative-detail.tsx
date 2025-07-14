@@ -1041,12 +1041,12 @@ export default function InitiativeDetailPage() {
                         successMetrics.map((metric: any) => (
                           <div key={metric.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
                             <div className="flex-1">
-                              <div className="text-sm font-medium text-gray-900">{metric.title}</div>
-                              <div className="text-xs text-gray-600">{metric.description}</div>
+                              <div className="text-sm font-medium text-gray-900">{metric.name}</div>
+                              <div className="text-xs text-gray-600">Target: {metric.target}</div>
                             </div>
                             <div className="flex items-center gap-2">
                               <div className="text-sm font-medium text-orange-600">
-                                {metric.currentValue || 0}/{metric.targetValue} {metric.unit}
+                                Saat ini: {metric.achievement || 0}
                               </div>
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -1056,7 +1056,14 @@ export default function InitiativeDetailPage() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem onClick={() => {
-                                    setEditingMetric(metric);
+                                    // Map the metric fields to the form structure
+                                    const formattedMetric = {
+                                      id: metric.id,
+                                      name: metric.name,
+                                      target: metric.target,
+                                      achievement: metric.achievement || "0"
+                                    };
+                                    setEditingMetric(formattedMetric);
                                     setIsSuccessMetricsModalOpen(true);
                                   }}>
                                     <Edit className="w-4 h-4 mr-2" />
