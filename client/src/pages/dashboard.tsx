@@ -61,7 +61,7 @@ export default function Dashboard() {
   const [location, setLocation] = useLocation();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [cycleFilter, setCycleFilter] = useState<string>("all");
-  const [userFilter, setUserFilter] = useState<string>("");
+  const [userFilter, setUserFilter] = useState<string>("all");
   const [hasAutoSelected, setHasAutoSelected] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("list");
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
@@ -628,6 +628,7 @@ export default function Dashboard() {
               placeholder="Pilih User"
               emptyMessage="Tidak ada user ditemukan"
               allowAll={true}
+              defaultValue="all"
               className="w-full sm:w-[150px] md:w-[180px] text-xs sm:text-sm h-8 sm:h-10"
             />
           </div>

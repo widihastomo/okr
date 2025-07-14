@@ -34,6 +34,7 @@ interface SearchableUserSelectProps {
   allowAll?: boolean;
   disabled?: boolean;
   className?: string;
+  defaultValue?: string;
 }
 
 export function SearchableUserSelect({
@@ -46,16 +47,19 @@ export function SearchableUserSelect({
   allowAll = false,
   disabled = false,
   className,
+  defaultValue,
 }: SearchableUserSelectProps) {
   const [open, setOpen] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const scrollState = useScrollProgress(scrollContainerRef);
 
-  const selectedUser = users.find(user => user.id === value);
+  // Use defaultValue if value is not provided and defaultValue is set
+  const effectiveValue = value || defaultValue;
+  const selectedUser = users.find(user => user.id === effectiveValue);
 
   const getDisplayText = () => {
-    if (value === "all") return "Semua User";
-    if (value === "unassigned") return "Belum Ditugaskan";
+    if (effectiveValue === "all") return "Semua User";
+    if (effectiveValue === "unassigned") return "Belum Ditugaskan";
     if (selectedUser) {
       const name = `${selectedUser.firstName || ''} ${selectedUser.lastName || ''}`.trim();
       return name || selectedUser.email;
@@ -74,9 +78,9 @@ export function SearchableUserSelect({
           className={cn("w-full justify-between", className)}
         >
           <div className="flex items-center">
-            {value === "all" ? (
+            {effectiveValue === "all" ? (
               <Users className="mr-2 h-4 w-4 text-green-600" />
-            ) : value === "unassigned" ? (
+            ) : effectiveValue === "unassigned" ? (
               <User className="mr-2 h-4 w-4 text-gray-600" />
             ) : selectedUser ? (
               <User className="mr-2 h-4 w-4 text-blue-600" />
@@ -121,25 +125,25 @@ export function SearchableUserSelect({
                       }}
                       className={cn(
                         "flex items-center py-2 pr-6 cursor-pointer",
-                        value === "all" 
+                        effectiveValue === "all" 
                           ? "bg-green-50 border-l-2 border-green-500" 
                           : "hover:bg-gray-50"
                       )}
                     >
                       <Users className={cn(
                         "mr-3 h-4 w-4 flex-shrink-0",
-                        value === "all" ? "text-green-600" : "text-gray-400"
+                        effectiveValue === "all" ? "text-green-600" : "text-gray-400"
                       )} />
                       <span className={cn(
                         "font-medium",
-                        value === "all" ? "text-green-900" : "text-gray-900"
+                        effectiveValue === "all" ? "text-green-900" : "text-gray-900"
                       )}>
                         Semua User
                       </span>
                       <Check
                         className={cn(
                           "ml-auto h-4 w-4",
-                          value === "all" ? "opacity-100 text-green-600" : "opacity-0"
+                          effectiveValue === "all" ? "opacity-100 text-green-600" : "opacity-0"
                         )}
                       />
                     </CommandItem>
@@ -153,25 +157,25 @@ export function SearchableUserSelect({
                       }}
                       className={cn(
                         "flex items-center py-2 pr-6 cursor-pointer",
-                        value === "unassigned" 
+                        effectiveValue === "unassigned" 
                           ? "bg-gray-50 border-l-2 border-gray-500" 
                           : "hover:bg-gray-50"
                       )}
                     >
                       <User className={cn(
                         "mr-3 h-4 w-4 flex-shrink-0",
-                        value === "unassigned" ? "text-gray-600" : "text-gray-400"
+                        effectiveValue === "unassigned" ? "text-gray-600" : "text-gray-400"
                       )} />
                       <span className={cn(
                         "font-medium",
-                        value === "unassigned" ? "text-gray-900" : "text-gray-900"
+                        effectiveValue === "unassigned" ? "text-gray-900" : "text-gray-900"
                       )}>
                         Belum Ditugaskan
                       </span>
                       <Check
                         className={cn(
                           "ml-auto h-4 w-4",
-                          value === "unassigned" ? "opacity-100 text-gray-600" : "opacity-0"
+                          effectiveValue === "unassigned" ? "opacity-100 text-gray-600" : "opacity-0"
                         )}
                       />
                     </CommandItem>
@@ -186,25 +190,25 @@ export function SearchableUserSelect({
                       }}
                       className={cn(
                         "flex items-center py-2 pr-6 cursor-pointer",
-                        value === user.id 
+                        effectiveValue === user.id 
                           ? "bg-blue-50 border-l-2 border-blue-500" 
                           : "hover:bg-gray-50"
                       )}
                     >
                       <User className={cn(
                         "mr-3 h-4 w-4 flex-shrink-0",
-                        value === user.id ? "text-blue-600" : "text-gray-400"
+                        effectiveValue === user.id ? "text-blue-600" : "text-gray-400"
                       )} />
                       <div className="flex flex-col min-w-0 flex-1">
                         <span className={cn(
                           "font-medium truncate",
-                          value === user.id ? "text-blue-900" : "text-gray-900"
+                          effectiveValue === user.id ? "text-blue-900" : "text-gray-900"
                         )}>
                           {`${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email}
                         </span>
                         <span className={cn(
                           "text-sm truncate",
-                          value === user.id ? "text-blue-600" : "text-gray-500"
+                          effectiveValue === user.id ? "text-blue-600" : "text-gray-500"
                         )}>
                           {user.email}
                         </span>
@@ -212,7 +216,7 @@ export function SearchableUserSelect({
                       <Check
                         className={cn(
                           "ml-3 h-4 w-4 flex-shrink-0",
-                          value === user.id ? "opacity-100 text-blue-600" : "opacity-0"
+                          effectiveValue === user.id ? "opacity-100 text-blue-600" : "opacity-0"
                         )}
                       />
                     </CommandItem>
