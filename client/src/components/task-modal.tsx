@@ -951,7 +951,7 @@ export default function TaskModal({
           </CardContent>
         </Card>
 
-        <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
+        <DialogFooter className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <Button
             onClick={handleSubmit}
             disabled={
