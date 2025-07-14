@@ -232,7 +232,7 @@ export function getInitiativeStatusInfo(status: string) {
       borderColor: 'border-gray-200'
     },
     'sedang_berjalan': {
-      label: 'Sedang Berjalan',
+      label: 'On Progress',
       description: 'Minimal 1 task dimulai atau metrik diupdate',
       color: 'blue',
       bgColor: 'bg-blue-100',

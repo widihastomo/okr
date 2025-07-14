@@ -279,7 +279,7 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
   const getStatusLabel = (status: string) => {
     switch (status) {
       case "not_started": return "Belum Dimulai";
-      case "in_progress": return "Sedang Berjalan";
+      case "in_progress": return "On Progress";
       case "completed": return "Selesai";
       case "on_hold": return "Ditahan";
       case "cancelled": return "Dibatalkan";
@@ -370,7 +370,7 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="not_started">Belum Dimulai</SelectItem>
-                            <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
+                            <SelectItem value="in_progress">On Progress</SelectItem>
                             <SelectItem value="completed">Selesai</SelectItem>
                             <SelectItem value="on_hold">Ditahan</SelectItem>
                             <SelectItem value="cancelled">Dibatalkan</SelectItem>

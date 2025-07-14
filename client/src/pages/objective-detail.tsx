@@ -1855,8 +1855,8 @@ export default function GoalDetail() {
                                             bgColor: 'bg-gray-100',
                                             textColor: 'text-gray-800',
                                           },
-                                          'sedang_berjalan': {
-                                            label: 'Sedang Berjalan',
+                                          'in_progress': {
+                                            label: 'On Progress',
                                             bgColor: 'bg-blue-100',
                                             textColor: 'text-blue-800',
                                           },

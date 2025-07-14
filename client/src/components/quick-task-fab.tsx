@@ -143,7 +143,7 @@ export default function QuickTaskFAB() {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case "not_started": return "Belum Dimulai";
-      case "in_progress": return "Sedang Berjalan";
+      case "in_progress": return "On Progress";
       case "completed": return "Selesai";
       default: return status;
     }

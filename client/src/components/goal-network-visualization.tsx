@@ -216,7 +216,7 @@ export default function GoalNetworkVisualization() {
                (node.progress || 0) >= 70 ? '#3b82f6' :
                (node.progress || 0) >= 40 ? '#f59e0b' : '#ef4444';
       case 'initiative':
-        return node.status === 'sedang_berjalan' ? '#8b5cf6' :
+        return node.status === 'in_progress' ? '#8b5cf6' :
                node.status === 'selesai' ? '#10b981' :
                node.status === 'dibatalkan' ? '#ef4444' : '#6b7280';
       case 'user':
@@ -529,7 +529,7 @@ export default function GoalNetworkVisualization() {
                   <Badge 
                     variant="outline"
                     className={
-                      selectedNode.status === 'on_track' || selectedNode.status === 'sedang_berjalan' ? 'border-green-300 text-green-700' :
+                      selectedNode.status === 'on_track' || selectedNode.status === 'in_progress' ? 'border-green-300 text-green-700' :
                       selectedNode.status === 'at_risk' ? 'border-yellow-300 text-yellow-700' :
                       selectedNode.status === 'behind' || selectedNode.status === 'dibatalkan' ? 'border-red-300 text-red-700' :
                       'border-gray-300 text-gray-700'

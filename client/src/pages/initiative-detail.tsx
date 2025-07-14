@@ -663,8 +663,8 @@ export default function InitiativeDetailPage() {
         label: 'Draft', 
         className: 'bg-gray-100 text-gray-800 border-gray-200' 
       },
-      'sedang_berjalan': { 
-        label: 'Sedang Berjalan', 
+      'in_progress': { 
+        label: 'On Progress', 
         className: 'bg-blue-100 text-blue-800 border-blue-200' 
       },
       'selesai': { 
@@ -682,9 +682,9 @@ export default function InitiativeDetailPage() {
   };
 
   // Helper function to check permissions based on status
-  const canEdit = (status: string) => status === 'draft' || status === 'sedang_berjalan';
-  const canClose = (status: string) => status === 'sedang_berjalan';
-  const canCancel = (status: string) => status === 'draft' || status === 'sedang_berjalan';
+  const canEdit = (status: string) => status === 'draft' || status === 'in_progress';
+  const canClose = (status: string) => status === 'in_progress';
+  const canCancel = (status: string) => status === 'draft' || status === 'in_progress';
 
   // Helper functions
   const calculateMetricProgress = (metric: any): number => {

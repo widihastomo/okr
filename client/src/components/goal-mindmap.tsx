@@ -165,7 +165,7 @@ export default function GoalMindmap() {
                (node.progress || 0) >= 70 ? '#3b82f6' :
                (node.progress || 0) >= 40 ? '#f59e0b' : '#ef4444';
       case 'initiative':
-        return node.status === 'sedang_berjalan' ? '#8b5cf6' :
+        return node.status === 'in_progress' ? '#8b5cf6' :
                node.status === 'selesai' ? '#10b981' :
                node.status === 'dibatalkan' ? '#ef4444' : '#6b7280';
       default:

@@ -86,7 +86,7 @@ const StatusBadge = ({ status, type }: { status: string; type: "objective" | "ke
       case "at_risk": return "Berisiko";
       case "behind": return "Terlambat";
       case "completed": return "Selesai";
-      case "in_progress": return "Berlangsung";
+      case "in_progress": return "On Progress";
       case "not_started": return "Belum Dimulai";
       case "on_hold": return "Ditunda";
       case "pending": return "Menunggu";

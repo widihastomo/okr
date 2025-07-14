@@ -245,7 +245,7 @@ export default function InitiativeModal({ keyResultId, onSuccess, editingInitiat
   const getStatusLabel = (status: string) => {
     switch (status) {
       case "not_started": return "Belum Dimulai";
-      case "in_progress": return "Sedang Berjalan";
+      case "in_progress": return "On Progress";
       case "completed": return "Selesai";
       case "on_hold": return "Ditahan";
       case "cancelled": return "Dibatalkan";

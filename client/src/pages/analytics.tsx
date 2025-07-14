@@ -326,7 +326,7 @@ export default function AnalyticsPage() {
       canceled: "Dibatalkan",
       partially_achieved: "Tercapai Sebagian",
       not_achieved: "Tidak Tercapai",
-      in_progress: "Sedang Berjalan",
+      in_progress: "On Progress",
     };
     return labels[status] || status;
   };
