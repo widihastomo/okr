@@ -1063,10 +1063,6 @@ export default function InitiativeDetailPage() {
                   <Edit className="w-4 h-4 mr-2" />
                   Edit Inisiatif
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <FileText className="w-4 h-4 mr-2" />
-                  Duplikat Inisiatif
-                </DropdownMenuItem>
                 {/* Cancel Initiative - Only show when status is sedang_berjalan */}
                 {initiativeData.status === 'sedang_berjalan' && (
                   <DropdownMenuItem 
