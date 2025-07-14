@@ -405,6 +405,9 @@ export const initiatives = pgTable("initiatives", {
   attachmentUrls: text("attachment_urls").array(), // Array of file URLs for attachments
   closedBy: uuid("closed_by").references(() => users.id), // Who closed the initiative
   closedAt: timestamp("closed_at"), // When it was closed
+  
+  // Comprehensive closure data (JSON format)
+  closureData: jsonb("closure_data"), // Complete closure information including result, reason, learning notes, etc.
 
   // Priority calculation fields (1-5 scale, simplified)
   impactScore: integer("impact_score").default(3), // Business impact: 1=very low, 5=very high

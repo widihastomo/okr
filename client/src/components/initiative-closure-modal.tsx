@@ -1,370 +1,506 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import { CheckCircle, XCircle, RotateCcw, Upload } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { 
+  CheckCircle, 
+  XCircle, 
+  RotateCcw, 
+  DollarSign, 
+  Target, 
+  FileText,
+  AlertCircle
+} from "lucide-react";
 
-// Form schema for closing initiative
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 const closureSchema = z.object({
-  finalResult: z.enum(['berhasil', 'tidak_berhasil', 'ulangi'], {
-    required_error: "Hasil akhir wajib dipilih"
+  result: z.enum(['berhasil', 'gagal', 'perlu_diulang'], {
+    required_error: "Pilih hasil inisiatif",
   }),
-  learningInsights: z.string().min(10, "Minimal 10 karakter untuk catatan pembelajaran"),
-  closureNotes: z.string().min(5, "Minimal 5 karakter untuk catatan penutupan"),
+  reason: z.string().min(10, "Alasan minimal 10 karakter"),
+  learningNote: z.string().min(10, "Catatan pembelajaran minimal 10 karakter"),
   budgetUsed: z.string().optional(),
-  finalMetrics: z.array(z.object({
-    metricId: z.string(),
-    finalAchievement: z.string().min(1, "Capaian akhir wajib diisi")
-  }))
+  notes: z.string().optional(),
 });
 
 type ClosureFormData = z.infer<typeof closureSchema>;
 
 interface InitiativeClosureModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  initiativeId: string;
-  initiativeTitle: string;
+  isOpen: boolean;
+  onClose: () => void;
+  initiative: any;
+  successMetrics: any[];
+  tasks: any[];
+  onSuccess?: () => void;
 }
 
 export default function InitiativeClosureModal({
-  open,
-  onOpenChange,
-  initiativeId,
-  initiativeTitle
+  isOpen,
+  onClose,
+  initiative,
+  successMetrics,
+  tasks,
+  onSuccess
 }: InitiativeClosureModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [attachmentFiles, setAttachmentFiles] = useState<FileList | null>(null);
-
-  // Get initiative details and success metrics
-  const { data: initiative } = useQuery({
-    queryKey: [`/api/initiatives/${initiativeId}`],
-    enabled: open
-  });
-
-  const { data: successMetrics = [] } = useQuery({
-    queryKey: [`/api/initiatives/${initiativeId}/success-metrics`],
-    enabled: open
-  });
+  const [updatedMetrics, setUpdatedMetrics] = useState<any[]>([]);
+  const [taskUpdates, setTaskUpdates] = useState<any[]>([]);
 
   const form = useForm<ClosureFormData>({
     resolver: zodResolver(closureSchema),
     defaultValues: {
-      finalResult: undefined,
-      learningInsights: "",
-      closureNotes: "",
-      budgetUsed: "",
-      finalMetrics: []
-    }
+      result: undefined,
+      reason: "",
+      learningNote: "",
+      budgetUsed: initiative?.budget?.toString() || "",
+      notes: "",
+    },
   });
 
-  // Initialize final metrics when success metrics are loaded
-  useEffect(() => {
-    if (successMetrics.length > 0) {
-      const initialMetrics = successMetrics.map((metric: any) => ({
-        metricId: metric.id,
-        finalAchievement: metric.achievement || "0"
-      }));
-      form.setValue('finalMetrics', initialMetrics);
-    }
-  }, [successMetrics, form]);
+  const selectedResult = form.watch("result");
 
-  const closeMutation = useMutation({
+  // Initialize metrics and tasks when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setUpdatedMetrics(successMetrics.map(metric => ({
+        id: metric.id,
+        currentValue: metric.currentValue,
+        isCompleted: metric.isCompleted || false
+      })));
+      
+      setTaskUpdates(tasks.filter(task => task.status !== 'completed' && task.status !== 'cancelled').map(task => ({
+        id: task.id,
+        title: task.title,
+        status: task.status,
+        newStatus: task.status
+      })));
+    }
+  }, [isOpen, successMetrics, tasks]);
+
+  const getResultIcon = (result: string) => {
+    switch (result) {
+      case 'berhasil':
+        return <CheckCircle className="h-5 w-5 text-green-500" />;
+      case 'gagal':
+        return <XCircle className="h-5 w-5 text-red-500" />;
+      case 'perlu_diulang':
+        return <RotateCcw className="h-5 w-5 text-yellow-500" />;
+      default:
+        return null;
+    }
+  };
+
+  const getResultLabel = (result: string) => {
+    switch (result) {
+      case 'berhasil':
+        return 'Berhasil';
+      case 'gagal':
+        return 'Gagal';
+      case 'perlu_diulang':
+        return 'Perlu Diulang';
+      default:
+        return '';
+    }
+  };
+
+  const getLearningPrompt = (result: string) => {
+    switch (result) {
+      case 'berhasil':
+        return 'Apa hal yang bisa digunakan lagi untuk inisiatif serupa?';
+      case 'gagal':
+        return 'Apa hal yang sebaiknya dihindari untuk inisiatif serupa?';
+      case 'perlu_diulang':
+        return 'Apa hal yang bisa dilakukan secara berbeda untuk pengulangan?';
+      default:
+        return 'Catatan pembelajaran';
+    }
+  };
+
+  const getReasonLabel = (result: string) => {
+    switch (result) {
+      case 'berhasil':
+        return 'Alasan keberhasilan';
+      case 'gagal':
+        return 'Alasan kegagalan';
+      case 'perlu_diulang':
+        return 'Alasan perlu pengulangan';
+      default:
+        return 'Alasan';
+    }
+  };
+
+  const updateMetricValue = (metricId: string, value: number) => {
+    setUpdatedMetrics(prev => 
+      prev.map(metric => 
+        metric.id === metricId 
+          ? { ...metric, currentValue: value }
+          : metric
+      )
+    );
+  };
+
+  const updateTaskStatus = (taskId: string, newStatus: string) => {
+    setTaskUpdates(prev => 
+      prev.map(task => 
+        task.id === taskId 
+          ? { ...task, newStatus }
+          : task
+      )
+    );
+  };
+
+  const closeInitiativeMutation = useMutation({
     mutationFn: async (data: ClosureFormData) => {
-      // First handle file uploads if any
-      let attachmentUrls: string[] = [];
-      if (attachmentFiles && attachmentFiles.length > 0) {
-        // In a real app, you'd upload files to a storage service
-        // For now, we'll simulate this
-        attachmentUrls = Array.from(attachmentFiles).map(file => 
-          `uploads/${initiativeId}/${file.name}`
-        );
+      // Update initiative with closure data
+      await apiRequest("PATCH", `/api/initiatives/${initiative.id}`, {
+        status: "selesai",
+        closureData: {
+          result: data.result,
+          reason: data.reason,
+          learningNote: data.learningNote,
+          budgetUsed: data.budgetUsed ? parseFloat(data.budgetUsed) : null,
+          notes: data.notes,
+          closedAt: new Date().toISOString(),
+        }
+      });
+
+      // Update success metrics
+      for (const metric of updatedMetrics) {
+        await apiRequest("PATCH", `/api/success-metrics/${metric.id}`, {
+          currentValue: metric.currentValue
+        });
       }
 
-      const closureData = {
-        ...data,
-        budgetUsed: data.budgetUsed ? parseFloat(data.budgetUsed.replace(/\./g, '').replace(',', '.')) : undefined,
-        attachmentUrls
-      };
+      // Update task statuses
+      for (const task of taskUpdates) {
+        if (task.newStatus !== task.status) {
+          await apiRequest("PATCH", `/api/tasks/${task.id}`, {
+            status: task.newStatus
+          });
+        }
+      }
 
-      return apiRequest("POST", `/api/initiatives/${initiativeId}/close`, closureData);
+      return { success: true };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}`] });
-      queryClient.invalidateQueries({ queryKey: ['/api/initiatives'] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}/success-metrics`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiative.id}/tasks`] });
+      
       toast({
-        title: "Berhasil",
-        description: "Inisiatif berhasil ditutup",
-        className: "border-green-200 bg-green-50 text-green-800",
+        title: "Inisiatif berhasil ditutup",
+        description: "Inisiatif telah ditutup dengan semua data terupdate",
+        variant: "success",
       });
-      onOpenChange(false);
+      
+      form.reset();
+      onClose();
+      onSuccess?.();
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Gagal menutup inisiatif",
+        title: "Gagal menutup inisiatif",
+        description: error.message || "Terjadi kesalahan saat menutup inisiatif",
         variant: "destructive",
       });
     },
   });
 
   const onSubmit = (data: ClosureFormData) => {
-    closeMutation.mutate(data);
+    closeInitiativeMutation.mutate(data);
   };
 
-  const getResultIcon = (result: string) => {
-    switch (result) {
-      case 'berhasil':
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case 'tidak_berhasil':
-        return <XCircle className="h-4 w-4 text-red-600" />;
-      case 'ulangi':
-        return <RotateCcw className="h-4 w-4 text-orange-600" />;
-      default:
-        return null;
-    }
+  const handleClose = () => {
+    form.reset();
+    onClose();
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAttachmentFiles(event.target.files);
-  };
+  const incompleteTasks = tasks.filter(task => task.status !== 'completed' && task.status !== 'cancelled');
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Tutup Inisiatif: {initiativeTitle}</DialogTitle>
-          <DialogDescription>
-            Lengkapi informasi penutupan inisiatif termasuk hasil akhir, capaian metrik, dan pembelajaran
-          </DialogDescription>
+          <DialogTitle className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5 text-green-500" />
+            Tutup Inisiatif: {initiative?.title}
+          </DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            
-            {/* Hasil Akhir */}
-            <FormField
-              control={form.control}
-              name="finalResult"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Hasil Akhir Inisiatif</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih hasil akhir inisiatif" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="berhasil">
-                        <div className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
-                          Berhasil
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="tidak_berhasil">
-                        <div className="flex items-center gap-2">
-                          <XCircle className="h-4 w-4 text-red-600" />
-                          Tidak Berhasil
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="ulangi">
-                        <div className="flex items-center gap-2">
-                          <RotateCcw className="h-4 w-4 text-orange-600" />
-                          Perlu Diulangi
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Hasil Inisiatif */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">1. Hasil Inisiatif</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <FormField
+                  control={form.control}
+                  name="result"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          className="grid grid-cols-1 md:grid-cols-3 gap-4"
+                        >
+                          <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-green-50">
+                            <RadioGroupItem value="berhasil" id="berhasil" />
+                            <Label htmlFor="berhasil" className="flex items-center gap-2 cursor-pointer">
+                              <CheckCircle className="h-4 w-4 text-green-500" />
+                              Berhasil
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-red-50">
+                            <RadioGroupItem value="gagal" id="gagal" />
+                            <Label htmlFor="gagal" className="flex items-center gap-2 cursor-pointer">
+                              <XCircle className="h-4 w-4 text-red-500" />
+                              Gagal
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-yellow-50">
+                            <RadioGroupItem value="perlu_diulang" id="perlu_diulang" />
+                            <Label htmlFor="perlu_diulang" className="flex items-center gap-2 cursor-pointer">
+                              <RotateCcw className="h-4 w-4 text-yellow-500" />
+                              Perlu Diulang
+                            </Label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
 
-            {/* Final Success Metrics */}
-            {successMetrics.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Capaian Akhir Metrik Keberhasilan</h3>
-                <div className="border rounded-lg overflow-hidden">
-                  <table className="w-full">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Metrik</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Target</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Capaian Sebelumnya</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Capaian Akhir</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      {successMetrics.map((metric: any, index: number) => (
-                        <tr key={metric.id} className="hover:bg-gray-50">
-                          <td className="px-4 py-3">
-                            <div className="font-medium text-gray-900">{metric.name}</div>
-                          </td>
-                          <td className="px-4 py-3 text-sm text-gray-600">
-                            {metric.target}
-                          </td>
-                          <td className="px-4 py-3 text-sm text-gray-600">
-                            {metric.achievement || "-"}
-                          </td>
-                          <td className="px-4 py-3">
-                            <FormField
-                              control={form.control}
-                              name={`finalMetrics.${index}.finalAchievement`}
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormControl>
-                                    <Input
-                                      placeholder="Masukkan capaian akhir"
-                                      className="w-full"
-                                      {...field}
-                                    />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+            {/* Alasan dan Catatan Pembelajaran */}
+            {selectedResult && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    {getResultIcon(selectedResult)}
+                    2. {getReasonLabel(selectedResult)}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="reason"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{getReasonLabel(selectedResult)}</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder={`Jelaskan ${getReasonLabel(selectedResult).toLowerCase()}...`}
+                            {...field}
+                            rows={3}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="learningNote"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{getLearningPrompt(selectedResult)}</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Bagikan pembelajaran yang bisa digunakan untuk inisiatif serupa..."
+                            {...field}
+                            rows={3}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
             )}
 
-            {/* Budget Used */}
-            <FormField
-              control={form.control}
-              name="budgetUsed"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Budget Terpakai (Optional)</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Contoh: 250.000.000"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Update Budget */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <DollarSign className="h-5 w-5 text-green-500" />
+                  3. Update Pemakaian Budget
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <FormField
+                  control={form.control}
+                  name="budgetUsed"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Budget yang digunakan (Rp)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Masukkan budget yang sudah digunakan"
+                          {...field}
+                        />
+                      </FormControl>
+                      <div className="text-sm text-gray-500">
+                        Budget awal: Rp {initiative?.budget ? Number(initiative.budget).toLocaleString('id-ID') : '0'}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
 
-            {/* Learning Insights */}
-            <FormField
-              control={form.control}
-              name="learningInsights"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Catatan Pembelajaran & Insight</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Tuliskan pembelajaran penting, insight, dan hal-hal yang bisa diperbaiki di masa depan..."
-                      rows={4}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Update Success Metrics */}
+            {successMetrics.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Target className="h-5 w-5 text-blue-500" />
+                    4. Update Metrik Keberhasilan
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {successMetrics.map((metric) => (
+                      <div key={metric.id} className="p-4 border rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-medium">{metric.name}</h4>
+                          <span className="text-sm text-gray-500">
+                            Target: {metric.targetValue} {metric.unit}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label>Nilai Saat Ini</Label>
+                            <Input
+                              type="number"
+                              value={updatedMetrics.find(m => m.id === metric.id)?.currentValue || 0}
+                              onChange={(e) => updateMetricValue(metric.id, parseFloat(e.target.value) || 0)}
+                              placeholder="Masukkan nilai final"
+                            />
+                          </div>
+                          <div className="text-sm text-gray-500 flex items-center">
+                            Nilai sebelumnya: {metric.currentValue} {metric.unit}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
-            {/* Closure Notes */}
-            <FormField
-              control={form.control}
-              name="closureNotes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Catatan Penutupan</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Ringkasan akhir, kondisi inisiatif saat ditutup, dan informasi penting lainnya..."
-                      rows={3}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Update Task Status */}
+            {incompleteTasks.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-purple-500" />
+                    5. Update Status Task yang Belum Selesai
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {incompleteTasks.map((task) => (
+                      <div key={task.id} className="p-4 border rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-medium">{task.title}</h4>
+                          <span className="text-sm text-gray-500">
+                            Status saat ini: {task.status === 'not_started' ? 'Belum Dimulai' : 
+                                           task.status === 'in_progress' ? 'Sedang Berjalan' : task.status}
+                          </span>
+                        </div>
+                        <div>
+                          <Label>Status Baru</Label>
+                          <Select
+                            value={taskUpdates.find(t => t.id === task.id)?.newStatus || task.status}
+                            onValueChange={(value) => updateTaskStatus(task.id, value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih status baru" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="not_started">Belum Dimulai</SelectItem>
+                              <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
+                              <SelectItem value="completed">Selesai</SelectItem>
+                              <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
-            {/* File Attachments */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Lampiran (Optional)</label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-                <div className="text-center">
-                  <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-                  <input
-                    type="file"
-                    multiple
-                    onChange={handleFileChange}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Upload dokumen, gambar, atau file pendukung lainnya
-                  </p>
-                </div>
-              </div>
-              {attachmentFiles && attachmentFiles.length > 0 && (
-                <div className="mt-2">
-                  <p className="text-sm font-medium mb-1">File yang akan diupload:</p>
-                  {Array.from(attachmentFiles).map((file, index) => (
-                    <Badge key={index} variant="secondary" className="mr-1 mb-1">
-                      {file.name}
-                    </Badge>
-                  ))}
-                </div>
-              )}
-            </div>
+            {/* Catatan Tambahan */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <AlertCircle className="h-5 w-5 text-gray-500" />
+                  6. Catatan Tambahan (Opsional)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Catatan tambahan</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Tambahkan catatan tambahan jika diperlukan..."
+                          {...field}
+                          rows={4}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
 
-            {/* Submit Buttons */}
-            <div className="flex justify-end gap-3 pt-4 border-t">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={closeMutation.isPending}
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-4 pt-6 border-t">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={handleClose}
+                disabled={closeInitiativeMutation.isPending}
               >
                 Batal
               </Button>
-              <Button
-                type="submit"
-                disabled={closeMutation.isPending}
+              <Button 
+                type="submit" 
+                disabled={closeInitiativeMutation.isPending}
                 className="bg-green-600 hover:bg-green-700"
               >
-                {closeMutation.isPending ? "Menutup..." : "Tutup Inisiatif"}
+                {closeInitiativeMutation.isPending ? "Menutup..." : "Tutup Inisiatif"}
               </Button>
             </div>
           </form>

@@ -631,28 +631,7 @@ export default function InitiativeDetailPage() {
     },
   });
 
-  const closeInitiativeMutation = useMutation({
-    mutationFn: async () => {
-      return await apiRequest("PATCH", `/api/initiatives/${id}`, { status: "selesai" });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
-      queryClient.invalidateQueries({ queryKey: [`/api/initiatives`] });
-      setIsCloseInitiativeModalOpen(false);
-      toast({
-        title: "Inisiatif ditutup",
-        description: "Inisiatif telah berhasil ditutup",
-        variant: "success",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Gagal menutup inisiatif",
-        description: error.message || "Terjadi kesalahan saat menutup inisiatif",
-        variant: "destructive",
-      });
-    },
-  });
+
 
   const updateTaskStatusMutation = useMutation({
     mutationFn: async ({ taskId, status }: { taskId: string; status: string }) => {
@@ -1539,35 +1518,17 @@ export default function InitiativeDetailPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Close Initiative Confirmation Modal */}
-      <AlertDialog open={isCloseInitiativeModalOpen} onOpenChange={setIsCloseInitiativeModalOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-green-500" />
-              Tutup Inisiatif
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              Apakah Anda yakin ingin menutup inisiatif ini? Inisiatif akan ditandai sebagai "Selesai" dan tidak dapat diubah lagi.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel 
-              onClick={() => setIsCloseInitiativeModalOpen(false)}
-              className="focus:ring-orange-500"
-            >
-              Batal
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => closeInitiativeMutation.mutate()}
-              disabled={closeInitiativeMutation.isPending}
-              className="bg-green-600 hover:bg-green-700 focus:ring-orange-500"
-            >
-              {closeInitiativeMutation.isPending ? "Menutup..." : "Tutup Inisiatif"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Initiative Closure Modal */}
+      <InitiativeClosureModal
+        isOpen={isCloseInitiativeModalOpen}
+        onClose={() => setIsCloseInitiativeModalOpen(false)}
+        initiative={initiativeData}
+        successMetrics={successMetrics}
+        tasks={tasks}
+        onSuccess={() => {
+          // Additional success actions if needed
+        }}
+      />
     </div>
   );
 }
