@@ -1158,6 +1158,7 @@ export default function InitiativeDetailPage() {
                         }}
                         size="sm"
                         className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                        disabled={initiativeData.status === 'selesai'}
                       >
                         <Plus className="h-4 w-4 mr-2" />
                         <span className="hidden sm:inline">Tambah Metrik</span>
@@ -1189,10 +1190,11 @@ export default function InitiativeDetailPage() {
                                   queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/history`] });
                                   queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
                                 }}
+                                disabled={initiativeData.status === 'selesai'}
                               />
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0" disabled={initiativeData.status === 'selesai'}>
                                     <MoreVertical className="w-3 h-3" />
                                   </Button>
                                 </DropdownMenuTrigger>
@@ -1270,6 +1272,7 @@ export default function InitiativeDetailPage() {
                         onClick={() => setIsAddTaskModalOpen(true)}
                         size="sm"
                         className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                        disabled={initiativeData.status === 'selesai'}
                       >
                         <Plus className="h-4 w-4 mr-2" />
                         <span className="hidden sm:inline">Tambah Task</span>
@@ -1316,9 +1319,10 @@ export default function InitiativeDetailPage() {
                                 <DropdownMenuTrigger asChild>
                                   <button
                                     className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
+                                    disabled={initiativeData.status === 'selesai'}
                                   >
                                     {getTaskStatusLabel(task.status)}
-                                    <ChevronDown className="h-3 w-3" />
+                                    {initiativeData.status !== 'selesai' && <ChevronDown className="h-3 w-3" />}
                                   </button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
@@ -1392,7 +1396,7 @@ export default function InitiativeDetailPage() {
                               
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0" disabled={initiativeData.status === 'selesai'}>
                                     <MoreVertical className="w-3 h-3" />
                                   </Button>
                                 </DropdownMenuTrigger>
@@ -1430,7 +1434,7 @@ export default function InitiativeDetailPage() {
             </Card>
 
             {/* Initiative Comments Section */}
-            <InitiativeCommentsCard initiativeId={id!} />
+            <InitiativeCommentsCard initiativeId={id!} disabled={initiativeData.status === 'selesai'} />
           </div>
 
           {/* Sidebar */}
@@ -1442,14 +1446,14 @@ export default function InitiativeDetailPage() {
 
       {/* Modals */}
       <TaskModal
-        open={isAddTaskModalOpen}
+        open={isAddTaskModalOpen && initiativeData.status !== 'selesai'}
         onClose={() => setIsAddTaskModalOpen(false)}
         initiativeId={id!}
         isAdding={true}
       />
 
       <TaskModal
-        open={isEditTaskModalOpen}
+        open={isEditTaskModalOpen && initiativeData.status !== 'selesai'}
         onClose={() => setIsEditTaskModalOpen(false)}
         task={selectedTask}
         initiativeId={id!}
@@ -1459,7 +1463,7 @@ export default function InitiativeDetailPage() {
       {initiative && (
         <InitiativeFormModal
           initiative={initiative}
-          isOpen={isEditInitiativeModalOpen}
+          isOpen={isEditInitiativeModalOpen && initiativeData.status !== 'selesai'}
           onClose={() => setIsEditInitiativeModalOpen(false)}
           onSuccess={() => {
             setIsEditInitiativeModalOpen(false);
@@ -1469,7 +1473,7 @@ export default function InitiativeDetailPage() {
       )}
 
       <SuccessMetricsModal
-        open={isSuccessMetricsModalOpen}
+        open={isSuccessMetricsModalOpen && initiativeData.status !== 'selesai'}
         onOpenChange={(open) => {
           setIsSuccessMetricsModalOpen(open);
           if (!open) {

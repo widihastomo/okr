@@ -11,9 +11,10 @@ import { useToast } from "@/hooks/use-toast";
 
 interface InitiativeCommentsCardProps {
   initiativeId: string;
+  disabled?: boolean;
 }
 
-export function InitiativeCommentsCard({ initiativeId }: InitiativeCommentsCardProps) {
+export function InitiativeCommentsCard({ initiativeId, disabled = false }: InitiativeCommentsCardProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [editingComment, setEditingComment] = useState<(InitiativeComment & { user: any }) | null>(null);
@@ -132,7 +133,7 @@ export function InitiativeCommentsCard({ initiativeId }: InitiativeCommentsCardP
       </CardHeader>
       {isExpanded && (
         <CardContent className="pt-0 space-y-4">
-          <InitiativeCommentEditor initiativeId={initiativeId} />
+          <InitiativeCommentEditor initiativeId={initiativeId} disabled={disabled} />
           
           {replyingTo && (
             <div className="pl-4 border-l-2 border-orange-200 bg-orange-50 p-3 rounded-lg">
@@ -153,6 +154,7 @@ export function InitiativeCommentsCard({ initiativeId }: InitiativeCommentsCardP
                 placeholder="Tulis balasan..."
                 submitButtonText="Balas"
                 onCommentAdded={() => setReplyingTo(null)}
+                disabled={disabled}
               />
             </div>
           )}
@@ -179,6 +181,7 @@ export function InitiativeCommentsCard({ initiativeId }: InitiativeCommentsCardP
                 onSave={handleSaveEdit}
                 showCancelButton={true}
                 onCancel={handleCancelEdit}
+                disabled={disabled}
               />
             </div>
           )}
@@ -191,6 +194,7 @@ export function InitiativeCommentsCard({ initiativeId }: InitiativeCommentsCardP
             onToggleReplies={handleToggleReplies}
             expandedReplies={expandedReplies}
             editingCommentId={editingComment?.id || null}
+            disabled={disabled}
           />
         </CardContent>
       )}

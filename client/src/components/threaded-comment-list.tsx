@@ -17,6 +17,7 @@ interface ThreadedCommentListProps {
   onToggleReplies?: (commentId: string) => void;
   expandedReplies?: Set<string>;
   editingCommentId?: string | null;
+  disabled?: boolean;
 }
 
 interface ThreadedComment extends InitiativeComment {
@@ -32,7 +33,8 @@ export function ThreadedCommentList({
   onReply,
   onToggleReplies,
   expandedReplies = new Set(),
-  editingCommentId = null
+  editingCommentId = null,
+  disabled = false
 }: ThreadedCommentListProps) {
   const { user } = useAuth();
 
@@ -83,7 +85,7 @@ export function ThreadedCommentList({
       <div key={comment.id} className={`${level > 0 ? 'ml-4 sm:ml-8 pl-2 sm:pl-4 border-l-2 border-gray-200' : ''}`}>
         <div className="relative p-3 sm:p-4 bg-white rounded-lg shadow-sm border border-gray-200">
           {/* 3 dots menu in top right corner */}
-          {user?.id === comment.userId && (
+          {user?.id === comment.userId && !disabled && (
             <div className="absolute top-2 right-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -165,15 +167,17 @@ export function ThreadedCommentList({
               
               {/* Reply button and replies toggle */}
               <div className="mt-3 flex items-center gap-2 flex-wrap">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onReply(comment.id)}
-                  className="text-gray-500 hover:text-orange-600 h-7 px-2 sm:h-8 sm:px-3"
-                >
-                  <Reply className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span className="ml-1 text-xs">Balas</span>
-                </Button>
+                {!disabled && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onReply(comment.id)}
+                    className="text-gray-500 hover:text-orange-600 h-7 px-2 sm:h-8 sm:px-3"
+                  >
+                    <Reply className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="ml-1 text-xs">Balas</span>
+                  </Button>
+                )}
                 
                 {hasReplies && (
                   <Button

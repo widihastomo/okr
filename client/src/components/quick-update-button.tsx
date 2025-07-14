@@ -24,9 +24,10 @@ interface QuickUpdateButtonProps {
     type: string;
   };
   onUpdateSuccess: () => void;
+  disabled?: boolean;
 }
 
-export function QuickUpdateButton({ metric, onUpdateSuccess }: QuickUpdateButtonProps) {
+export function QuickUpdateButton({ metric, onUpdateSuccess, disabled = false }: QuickUpdateButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [achievement, setAchievement] = useState(metric.achievement || "0");
   const { toast } = useToast();
@@ -80,6 +81,7 @@ export function QuickUpdateButton({ metric, onUpdateSuccess }: QuickUpdateButton
           variant="outline"
           size="sm"
           className="text-orange-600 border-orange-200 hover:bg-orange-50"
+          disabled={disabled}
         >
           <TrendingUp className="w-4 h-4 mr-2" />
           Update

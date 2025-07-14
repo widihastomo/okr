@@ -19,6 +19,7 @@ interface InitiativeCommentEditorProps {
   isEditing?: boolean;
   onSave?: (content: string) => void;
   parentId?: string; // For reply functionality
+  disabled?: boolean;
 }
 
 export function InitiativeCommentEditor({ 
@@ -33,7 +34,8 @@ export function InitiativeCommentEditor({
   onCancel,
   isEditing = false,
   onSave,
-  parentId
+  parentId,
+  disabled = false
 }: InitiativeCommentEditorProps) {
   const [content, setContent] = useState(initialContent);
   const [mentionedUsers, setMentionedUsers] = useState<string[]>([]);
@@ -298,7 +300,7 @@ export function InitiativeCommentEditor({
           )}
           <Button
             type="submit"
-            disabled={!content.trim() || isSubmitting || createCommentMutation.isPending}
+            disabled={!content.trim() || isSubmitting || createCommentMutation.isPending || disabled}
             className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
           >
             {(isSubmitting || createCommentMutation.isPending) ? (
