@@ -960,14 +960,14 @@ export default function TaskModal({
               !formData.assignedTo ||
               formData.assignedTo === "unassigned"
             }
-            className="w-full sm:w-auto bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white order-1 sm:order-2"
+            className="w-full sm:w-auto px-6 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white order-1 sm:order-2"
           >
             {isAdding ? "Tambah Task" : "Update Task"}
           </Button>
           <Button
             variant="outline"
             onClick={onClose}
-            className="w-full sm:w-auto order-2 sm:order-1"
+            className="w-full sm:w-auto px-6 order-2 sm:order-1"
           >
             Batal
           </Button>

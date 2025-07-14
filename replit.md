@@ -259,6 +259,7 @@ All email configuration now uses environment variables:
   * FIXED: Drizzle ORM query error by using separate queries instead of complex leftJoin for success metrics history
   * ADDED: Initiative update tracking to history system - updates now show "Inisiatif diperbarui" entries
   * ENHANCED: Added profile image avatars for PIC (Person in Charge) in task list display, positioned after status dropdown
+  * IMPROVED: Added horizontal padding (px-6) to task modal buttons for better visual spacing
   * OPTIMIZED: Comment cards now use relative positioning with clean avatar and content layout
   * RESPONSIVE: Maintained mobile-friendly design with proper spacing and button positioning
   * RESULT: Improved comment threading system with better visual hierarchy and user interaction patterns
