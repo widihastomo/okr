@@ -246,6 +246,16 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 14, 2025. Successfully enhanced Tasks filter section with improved UI layout and team filtering functionality:
+  * ENHANCED: Redesigned filter section with grid layout and proper labels for better organization
+  * IMPROVED: Search field positioned separately at top with responsive max-width
+  * ORGANIZED: Filter dropdowns arranged in responsive grid (4 columns on large screens, 2 on medium, 1 on small)
+  * ADDED: Visual filter indicators in header showing active filters with colored badges
+  * IMPLEMENTED: Team filter functionality with proper team data fetching from API
+  * ENHANCED: Filter logic to include team-based filtering through user team memberships
+  * IMPROVED: Responsive design with proper mobile layout and consistent spacing
+  * ADDED: Clear labels for each filter category (Status, Prioritas, PIC, Tim)
+  * RESULT: Professional, well-organized filter interface with comprehensive team filtering support
 - July 14, 2025. Successfully implemented modern unified date picker functionality for task creation and editing:
   * ADDED: startDate field to tasks table schema and UI components
   * ENHANCED: Task modal now supports unified date picker with intelligent date selection using react-day-picker

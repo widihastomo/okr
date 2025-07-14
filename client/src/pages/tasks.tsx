@@ -1168,71 +1168,114 @@ const TasksPage = () => {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <Filter className="w-5 h-5 mr-2" />
-            Filter & Pencarian
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center">
+              <Filter className="w-5 h-5 mr-2" />
+              Filter & Pencarian
+            </div>
+            {/* Filter indicators */}
+            <div className="flex items-center space-x-2">
+              {statusFilter !== 'all' && (
+                <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">
+                  Status: {statusFilter === 'not_started' ? 'Belum Mulai' : statusFilter === 'in_progress' ? 'Sedang Berjalan' : statusFilter === 'completed' ? 'Selesai' : 'Dibatalkan'}
+                </span>
+              )}
+              {priorityFilter !== 'all' && (
+                <span className="px-2 py-1 text-xs bg-orange-100 text-orange-700 rounded-full">
+                  Prioritas: {priorityFilter === 'low' ? 'Rendah' : priorityFilter === 'medium' ? 'Sedang' : 'Tinggi'}
+                </span>
+              )}
+              {userFilter !== 'all' && userFilter !== '' && (
+                <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full">
+                  PIC: {getUserName(userFilter)}
+                </span>
+              )}
+              {teamFilter !== 'all' && (
+                <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full">
+                  Tim: {teams.find(t => t.id === teamFilter)?.name || 'Unknown'}
+                </span>
+              )}
+            </div>
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-4">
-            <div className="flex items-center space-x-2">
-              <Search className="w-4 h-4 text-gray-500" />
-              <Input
-                placeholder="Cari task..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-64"
-              />
+        <CardContent className="space-y-4">
+          {/* Search Row */}
+          <div className="flex items-center space-x-2">
+            <Search className="w-4 h-4 text-gray-500" />
+            <Input
+              placeholder="Cari task..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="max-w-md"
+            />
+          </div>
+          
+          {/* Filters Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Status</label>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Filter Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Status</SelectItem>
+                  <SelectItem value="not_started">Belum Mulai</SelectItem>
+                  <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
+                  <SelectItem value="completed">Selesai</SelectItem>
+                  <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Status</SelectItem>
-                <SelectItem value="not_started">Belum Mulai</SelectItem>
-                <SelectItem value="in_progress">Sedang Berjalan</SelectItem>
-                <SelectItem value="completed">Selesai</SelectItem>
-                <SelectItem value="cancelled">Dibatalkan</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter Prioritas" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Prioritas</SelectItem>
-                <SelectItem value="low">Rendah</SelectItem>
-                <SelectItem value="medium">Sedang</SelectItem>
-                <SelectItem value="high">Tinggi</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={userFilter} onValueChange={setUserFilter}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter PIC" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua PIC</SelectItem>
-                {activeUsers.map(user => (
-                  <SelectItem key={user.id} value={user.id}>
-                    {getUserName(user.id)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={teamFilter} onValueChange={setTeamFilter}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter Tim" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Tim</SelectItem>
-                {teams.map(team => (
-                  <SelectItem key={team.id} value={team.id}>
-                    {team.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Prioritas</label>
+              <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Filter Prioritas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Prioritas</SelectItem>
+                  <SelectItem value="low">Rendah</SelectItem>
+                  <SelectItem value="medium">Sedang</SelectItem>
+                  <SelectItem value="high">Tinggi</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">PIC</label>
+              <Select value={userFilter} onValueChange={setUserFilter}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Filter PIC" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua PIC</SelectItem>
+                  {activeUsers.map(user => (
+                    <SelectItem key={user.id} value={user.id}>
+                      {getUserName(user.id)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Tim</label>
+              <Select value={teamFilter} onValueChange={setTeamFilter}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Filter Tim" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Tim</SelectItem>
+                  {teams.map(team => (
+                    <SelectItem key={team.id} value={team.id}>
+                      {team.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>
