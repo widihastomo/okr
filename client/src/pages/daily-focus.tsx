@@ -1029,9 +1029,25 @@ export default function DailyFocusPage() {
     );
   });
 
-  const activeInitiatives = filteredInitiatives.filter(
-    (init: any) => init.status === "sedang_berjalan" || init.status === "draft",
-  );
+  const activeInitiatives = filteredInitiatives.filter((init: any) => {
+    // Include draft and running initiatives
+    if (init.status === "sedang_berjalan" || init.status === "draft") {
+      return true;
+    }
+    
+    // Include completed initiatives if they are still within today's timeline
+    if (init.status === "selesai") {
+      const dueDate = init.dueDate ? init.dueDate.split("T")[0] : null;
+      const startDate = init.startDate ? init.startDate.split("T")[0] : null;
+      
+      // Show completed initiatives if:
+      // 1. Due date is today or later (still within timeline)
+      // 2. Or if start date is today (recently started and completed)
+      return (dueDate && dueDate >= todayStr) || (startDate && startDate === todayStr);
+    }
+    
+    return false;
+  });
 
 
 
