@@ -69,6 +69,7 @@ const TasksPage = () => {
   const [activeTab, setActiveTab] = useState('list');
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
+  const [userFilter, setUserFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -93,6 +94,28 @@ const TasksPage = () => {
     queryKey: ['/api/organization/users'],
     staleTime: 60000,
   });
+
+  // Helper function to get user name
+  const getUserName = (userId: string) => {
+    const user = users.find(u => u.id === userId);
+    if (!user) return 'User';
+    return user.firstName && user.lastName 
+      ? `${user.firstName} ${user.lastName}`
+      : user.email || 'User';
+  };
+
+  // Helper function to get user initials
+  const getUserInitials = (userId: string) => {
+    const user = users.find(u => u.id === userId);
+    if (!user) return 'U';
+    if (user.firstName && user.lastName) {
+      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+    }
+    return user.email ? user.email[0].toUpperCase() : 'U';
+  };
+
+  // Filter active users only
+  const activeUsers = users.filter(user => user.isActive === true);
 
   // Helper function to check if task is overdue
   const isTaskOverdue = (task: Task): boolean => {
@@ -126,11 +149,12 @@ const TasksPage = () => {
     const filtered = tasks.filter(task => {
       const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
       const matchesPriority = priorityFilter === 'all' || task.priority === priorityFilter;
+      const matchesUser = userFilter === 'all' || task.assignedTo === userFilter;
       const matchesSearch = searchTerm === '' || 
         task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         task.description.toLowerCase().includes(searchTerm.toLowerCase());
       
-      return matchesStatus && matchesPriority && matchesSearch;
+      return matchesStatus && matchesPriority && matchesUser && matchesSearch;
     });
 
     // Sort tasks: overdue first, then by due date
@@ -148,7 +172,7 @@ const TasksPage = () => {
       
       return aDate.getTime() - bDate.getTime();
     });
-  }, [tasks, statusFilter, priorityFilter, searchTerm]);
+  }, [tasks, statusFilter, priorityFilter, userFilter, searchTerm]);
 
   // Group tasks by date categories
   const groupedTasks = useMemo(() => {
@@ -349,51 +373,7 @@ const TasksPage = () => {
     );
   };
 
-  // Helper function to get user name by ID (matching daily-focus page format)
-  const getUserName = (userId: string): string => {
-    if (!users || !userId) return "Tidak ditentukan";
-    const user = users.find((u: any) => u.id === userId);
 
-    // Check if firstName and lastName are both present and non-empty
-    if (user?.firstName && user?.lastName && user.lastName.trim() !== "") {
-      return `${user.firstName} ${user.lastName}`;
-    }
-
-    // Fallback to firstName only if available and non-empty
-    if (user?.firstName && user.firstName.trim() !== "") {
-      return user.firstName;
-    }
-
-    // Fallback to lastName only if available and non-empty
-    if (user?.lastName && user.lastName.trim() !== "") {
-      return user.lastName;
-    }
-
-    return "Pengguna";
-  };
-
-  // Helper function to get user initials by ID (matching daily-focus page format)
-  const getUserInitials = (userId: string): string => {
-    if (!users || !userId) return "?";
-    const user = users.find((u: any) => u.id === userId);
-
-    // Check if firstName and lastName are both present and non-empty
-    if (user?.firstName && user?.lastName && user.lastName.trim() !== "") {
-      return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
-    }
-
-    // Fallback to firstName only if available and non-empty
-    if (user?.firstName && user.firstName.trim() !== "") {
-      return user.firstName.charAt(0).toUpperCase();
-    }
-
-    // Fallback to lastName only if available and non-empty
-    if (user?.lastName && user.lastName.trim() !== "") {
-      return user.lastName.charAt(0).toUpperCase();
-    }
-
-    return "U";
-  };
 
   // Status update mutation
   const updateTaskStatusMutation = useMutation({
@@ -1181,6 +1161,19 @@ const TasksPage = () => {
                 <SelectItem value="low">Rendah</SelectItem>
                 <SelectItem value="medium">Sedang</SelectItem>
                 <SelectItem value="high">Tinggi</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={userFilter} onValueChange={setUserFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter PIC" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua PIC</SelectItem>
+                {activeUsers.map(user => (
+                  <SelectItem key={user.id} value={user.id}>
+                    {getUserName(user.id)}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
