@@ -3291,21 +3291,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
         
-        // Create audit trail for success metric update
-        // Note: Using task audit trail structure for success metrics
-        await storage.createTaskAuditTrail({
-          taskId: currentMetric.initiativeId, // Using initiativeId as reference
-          userId: currentUser.id,
-          action: "metric_updated",
-          oldValue: null,
-          newValue: null,
-          changeDescription
-        });
-        
-        console.log("Audit trail created for metric update:", changeDescription);
-      } catch (auditError) {
-        console.error("Error creating audit trail for metric update:", auditError);
-        // Don't fail the main operation if audit trail fails
+        // Log metric update activity (audit trail disabled due to foreign key constraint)
+        if (changeDescription) {
+          console.log("SUCCESS METRIC UPDATE:", changeDescription);
+        }
+      } catch (logError) {
+        console.error("Error logging metric update:", logError);
+        // Don't fail the main operation if logging fails
       }
       
       res.json(updatedMetric);
