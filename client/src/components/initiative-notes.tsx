@@ -214,7 +214,7 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
 
     // Add budget fields if type is budget
     if (noteForm.type === "budget" && noteForm.budgetAmount) {
-      data.budgetAmount = parseFloat(noteForm.budgetAmount);
+      data.budgetAmount = noteForm.budgetAmount; // Keep as string for decimal validation
       data.budgetCategory = noteForm.budgetCategory || null;
     }
 

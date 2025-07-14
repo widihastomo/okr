@@ -714,15 +714,7 @@ export default function InitiativeDetailPage() {
     }
   };
 
-  const handleEditSuccessMetric = (metric: any) => {
-    setEditingMetric(metric);
-    setIsSuccessMetricsModalOpen(true);
-  };
 
-  const handleDeleteSuccessMetric = (metric: any) => {
-    setMetricToDelete(metric);
-    setIsDeleteMetricModalOpen(true);
-  };
 
   // Extract data
   const initiativeData = initiative as any;
@@ -989,112 +981,110 @@ export default function InitiativeDetailPage() {
                       </div>
                     </div>
                   )}
+
+                  {/* Success Metrics Section */}
+                  <div className="pt-4 border-t border-gray-100">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <Target className="h-4 w-4 text-orange-500" />
+                        <span className="text-sm font-medium text-gray-700">Metrik Keberhasilan</span>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button 
+                              type="button" 
+                              className="inline-flex items-center justify-center ml-1"
+                            >
+                              <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent side="right" className="max-w-sm">
+                            <div className="space-y-2">
+                              <h4 className="font-medium text-sm">Metrik Keberhasilan</h4>
+                              <p className="text-sm text-gray-600">
+                                Metrik keberhasilan adalah indikator kuantitatif yang digunakan untuk mengukur pencapaian inisiatif ini. 
+                                Dengan menetapkan target yang jelas dan melacak progress secara berkala, Anda dapat:
+                              </p>
+                              <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                                <li>Memantau kemajuan inisiatif secara objektif</li>
+                                <li>Mengevaluasi efektivitas strategi yang dijalankan</li>
+                                <li>Mengidentifikasi area yang perlu diperbaiki</li>
+                                <li>Memberikan bukti konkret pencapaian kepada stakeholder</li>
+                              </ul>
+                              <p className="text-sm text-gray-600 mt-2">
+                                <strong>Contoh:</strong> "Meningkatkan penjualan bulanan menjadi 100 unit", "Mencapai tingkat kepuasan pelanggan 85%"
+                              </p>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                      <Button 
+                        onClick={() => {
+                          setEditingMetric(null);
+                          setIsSuccessMetricsModalOpen(true);
+                        }}
+                        size="sm"
+                        className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        <span className="hidden sm:inline">Tambah Metrik</span>
+                        <span className="sm:hidden">Tambah</span>
+                      </Button>
+                    </div>
+                    
+                    {/* Success Metrics List */}
+                    <div className="space-y-2">
+                      {successMetrics.length === 0 ? (
+                        <p className="text-sm text-gray-500 text-center py-2">
+                          Belum ada metrik keberhasilan. Tambahkan metrik pertama untuk memulai.
+                        </p>
+                      ) : (
+                        successMetrics.map((metric: any) => (
+                          <div key={metric.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                            <div className="flex-1">
+                              <div className="text-sm font-medium text-gray-900">{metric.title}</div>
+                              <div className="text-xs text-gray-600">{metric.description}</div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="text-sm font-medium text-orange-600">
+                                {metric.currentValue || 0}/{metric.targetValue} {metric.unit}
+                              </div>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                    <MoreVertical className="w-3 h-3" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => {
+                                    setEditingMetric(metric);
+                                    setIsSuccessMetricsModalOpen(true);
+                                  }}>
+                                    <Edit className="w-4 h-4 mr-2" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setMetricToDelete(metric);
+                                      setIsDeleteMetricModalOpen(true);
+                                    }}
+                                    className="text-red-600 hover:text-red-700"
+                                  >
+                                    <Trash2 className="w-4 h-4 mr-2" />
+                                    Hapus
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
-          {/* Success Metrics Management Section */}
-          <Card className="border-gray-200 shadow-sm">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900">
-                  <Target className="h-5 w-5 text-orange-500" />
-                  Metrik Keberhasilan
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <button 
-                        type="button" 
-                        className="inline-flex items-center justify-center ml-1"
-                      >
-                        <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent side="right" className="max-w-sm">
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-sm">Metrik Keberhasilan</h4>
-                        <p className="text-sm text-gray-600">
-                          Metrik keberhasilan adalah indikator kuantitatif yang digunakan untuk mengukur pencapaian inisiatif ini. 
-                          Dengan menetapkan target yang jelas dan melacak progress secara berkala, Anda dapat:
-                        </p>
-                        <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
-                          <li>Memantau kemajuan inisiatif secara objektif</li>
-                          <li>Mengevaluasi efektivitas strategi yang dijalankan</li>
-                          <li>Mengidentifikasi area yang perlu diperbaiki</li>
-                          <li>Memberikan bukti konkret pencapaian kepada stakeholder</li>
-                        </ul>
-                        <p className="text-sm text-gray-600 mt-2">
-                          <strong>Contoh:</strong> "Meningkatkan penjualan bulanan menjadi 100 unit", "Mencapai tingkat kepuasan pelanggan 85%"
-                        </p>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                </CardTitle>
-                <Button 
-                  onClick={() => {
-                    setEditingMetric(null);
-                    setIsSuccessMetricsModalOpen(true);
-                  }}
-                  size="sm"
-                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">Tambah Metrik</span>
-                  <span className="sm:hidden">Tambah</span>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              {successMetrics.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <Target className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                  <p className="text-sm">Belum ada metrik keberhasilan</p>
-                  <p className="text-xs mt-1">Tambahkan metrik untuk mengukur pencapaian inisiatif</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {successMetrics.map((metric: any) => (
-                    <div key={metric.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3">
-                            <h4 className="font-medium text-gray-900">{metric.name}</h4>
-                            <span className="text-sm text-gray-600">
-                              Target: <span className="font-medium">{metric.target}</span>
-                            </span>
-                            <span className="text-sm text-gray-600">
-                              Capaian: <span className="font-medium">{metric.achievement}</span>
-                            </span>
-                          </div>
-                        </div>
 
-                        {/* Action Buttons */}
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="hover:bg-gray-100">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleEditSuccessMetric(metric)}>
-                              <Edit className="h-4 w-4 mr-2" />
-                              Edit Metrik
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => handleDeleteSuccessMetric(metric)}
-                              className="text-red-600"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Hapus Metrik
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
 
           {/* Task Management Section */}
           <Card className="border-gray-200 shadow-sm">

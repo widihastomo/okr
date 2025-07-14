@@ -253,8 +253,12 @@ All email configuration now uses environment variables:
   * ENHANCED: All key result data now returns consistent progress, isCompleted, and isValid fields across all API endpoints
   * FIXED: Initiative notes API error - corrected apiRequest parameter order from (url, method, data) to (method, url, data)
   * RESOLVED: "not a valid HTTP method" error in createNoteMutation, updateNoteMutation, and deleteNoteMutation
+  * FIXED: Initiative notes budgetAmount validation error - changed from number to string to match decimal schema
   * CLEANED: Removed unnecessary "Kemajuan" text label from key result progress display in initiative detail page
-  * RESULT: Consistent progress calculation across all components with working note creation functionality
+  * INTEGRATED: Success metrics display merged with overview card, positioned below key result information
+  * REMOVED: Separate success metrics section card and consolidated all functionality into overview card
+  * ENHANCED: Overview card now shows inline success metrics with compact display and action buttons
+  * RESULT: Consistent progress calculation across all components with working note creation functionality and integrated success metrics display
 - July 14, 2025. Successfully changed initiative progress bar color from orange to blue:
   * UPDATED: Progress bar gradient changed from orange (from-orange-600 to-orange-500) to blue (from-blue-600 to-blue-500)
   * ENHANCED: Better visual contrast and professional appearance with blue gradient
