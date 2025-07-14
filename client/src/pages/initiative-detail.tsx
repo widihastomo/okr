@@ -77,7 +77,7 @@ import InitiativeFormModal from "@/components/initiative-form-modal";
 import { InitiativeHistory } from "@/components/initiative-history";
 import SuccessMetricsModal from "@/components/success-metrics-modal-simple";
 import InitiativeClosureModal from "@/components/initiative-closure-modal";
-import { InitiativeCommentUnified } from "@/components/initiative-comment-unified";
+import { InitiativeCommentsCard } from "@/components/initiative-comments-card";
 import { calculateKeyResultProgress } from "@shared/progress-calculator";
 import type { SuccessMetricWithUpdates } from "@shared/schema";
 
@@ -1093,7 +1093,7 @@ export default function InitiativeDetailPage() {
             </Card>
 
             {/* Initiative Comments Section */}
-            <InitiativeCommentUnified initiativeId={id!} />
+            <InitiativeCommentsCard initiativeId={id!} />
 
           {/* Task Management Section */}
           <Card className="border-gray-200 shadow-sm">

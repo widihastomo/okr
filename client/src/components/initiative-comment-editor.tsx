@@ -16,6 +16,8 @@ interface InitiativeCommentEditorProps {
   isSubmitting?: boolean;
   showCancelButton?: boolean;
   onCancel?: () => void;
+  isEditing?: boolean;
+  onSave?: (content: string) => void;
 }
 
 export function InitiativeCommentEditor({ 
@@ -27,7 +29,9 @@ export function InitiativeCommentEditor({
   submitButtonText = "Kirim",
   isSubmitting = false,
   showCancelButton = false,
-  onCancel
+  onCancel,
+  isEditing = false,
+  onSave
 }: InitiativeCommentEditorProps) {
   const [content, setContent] = useState(initialContent);
   const [mentionedUsers, setMentionedUsers] = useState<string[]>([]);
@@ -97,6 +101,12 @@ export function InitiativeCommentEditor({
       return;
     }
 
+    // Handle editing mode
+    if (isEditing && onSave) {
+      onSave(content);
+      return;
+    }
+
     // Handle custom submit function
     if (onCommentSubmit) {
       onCommentSubmit(content);
@@ -105,7 +115,7 @@ export function InitiativeCommentEditor({
 
     // Default submit behavior
     createCommentMutation.mutate({ content, mentionedUsers });
-  }, [content, mentionedUsers, onCommentSubmit, createCommentMutation]);
+  }, [content, mentionedUsers, onCommentSubmit, createCommentMutation, isEditing, onSave]);
 
   const handleContentChange = useCallback((newContent: string) => {
     setContent(newContent);
@@ -291,12 +301,12 @@ export function InitiativeCommentEditor({
             {(isSubmitting || createCommentMutation.isPending) ? (
               <div className="flex items-center gap-2">
                 <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                {submitButtonText.includes("...") ? submitButtonText : "Mengirim..."}
+                {submitButtonText.includes("...") ? submitButtonText : (isEditing ? "Menyimpan..." : "Mengirim...")}
               </div>
             ) : (
               <div className="flex items-center gap-2">
                 <Send size={16} />
-                {submitButtonText}
+                {isEditing ? "Simpan" : submitButtonText}
               </div>
             )}
           </Button>

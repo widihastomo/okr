@@ -36,8 +36,8 @@ type InitiativeCommentWithUser = {
   content: string;
   createdAt: string;
   updatedAt: string;
-  createdBy: string;
-  createdByUser: User;
+  authorId: string;
+  user: User;
 };
 
 export function InitiativeCommentList({ initiativeId }: InitiativeCommentListProps) {
@@ -48,7 +48,7 @@ export function InitiativeCommentList({ initiativeId }: InitiativeCommentListPro
   const { toast } = useToast();
 
   const { data: comments = [], isLoading } = useQuery<InitiativeCommentWithUser[]>({
-    queryKey: [`/api/initiatives/${initiativeId}/notes`],
+    queryKey: [`/api/initiatives/${initiativeId}/comments`],
   });
 
   const { data: currentUser } = useQuery<User>({
@@ -57,13 +57,14 @@ export function InitiativeCommentList({ initiativeId }: InitiativeCommentListPro
 
   const updateCommentMutation = useMutation({
     mutationFn: async ({ commentId, content }: { commentId: string; content: string }) => {
-      const response = await apiRequest("PATCH", `/api/initiatives/${initiativeId}/notes/${commentId}`, {
+      const response = await apiRequest("PUT", `/api/initiatives/${initiativeId}/comments/${commentId}`, {
         content,
+        mentionedUsers: [], // Simple implementation - could be enhanced
       });
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/notes`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/comments`] });
       setEditingCommentId(null);
       setEditContent("");
       toast({
@@ -83,11 +84,10 @@ export function InitiativeCommentList({ initiativeId }: InitiativeCommentListPro
 
   const deleteCommentMutation = useMutation({
     mutationFn: async (commentId: string) => {
-      const response = await apiRequest("DELETE", `/api/initiatives/${initiativeId}/notes/${commentId}`);
-      return response.json();
+      await apiRequest("DELETE", `/api/initiatives/${initiativeId}/comments/${commentId}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/notes`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/comments`] });
       setDeleteCommentId(null);
       toast({
         title: "Berhasil",
@@ -104,61 +104,62 @@ export function InitiativeCommentList({ initiativeId }: InitiativeCommentListPro
     },
   });
 
-  const handleEdit = (comment: InitiativeCommentWithUser) => {
+  const handleEditStart = (comment: InitiativeCommentWithUser) => {
     setEditingCommentId(comment.id);
     setEditContent(comment.content);
   };
 
-  const handleCancelEdit = () => {
+  const handleEditCancel = () => {
     setEditingCommentId(null);
     setEditContent("");
   };
 
-  const handleUpdateComment = () => {
-    if (editingCommentId && editContent.trim()) {
-      updateCommentMutation.mutate({ commentId: editingCommentId, content: editContent });
+  const handleEditSave = (commentId: string, content?: string) => {
+    const contentToSave = content || editContent;
+    if (!contentToSave.trim()) return;
+    updateCommentMutation.mutate({ commentId, content: contentToSave.trim() });
+  };
+
+  const handleDeleteConfirm = () => {
+    if (deleteCommentId) {
+      deleteCommentMutation.mutate(deleteCommentId);
     }
   };
 
-  const handleDeleteComment = (commentId: string) => {
-    deleteCommentMutation.mutate(commentId);
+  const renderCommentContent = (content: string) => {
+    // Simple markdown-like rendering
+    return content
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/`(.*?)`/g, '<code class="bg-gray-100 px-1 py-0.5 rounded text-sm">$1</code>');
   };
 
   const getUserInitials = (user: User) => {
     if (user.firstName && user.lastName) {
       return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
     }
-    if (user.firstName) {
-      return user.firstName.substring(0, 2).toUpperCase();
-    }
-    if (user.email) {
-      return user.email.substring(0, 2).toUpperCase();
-    }
-    return "U";
+    return user.email[0].toUpperCase();
   };
 
   const getUserName = (user: User) => {
     if (user.firstName && user.lastName) {
       return `${user.firstName} ${user.lastName}`;
     }
-    if (user.firstName) {
-      return user.firstName;
-    }
-    if (user.email) {
-      return user.email;
-    }
-    return "Unknown User";
+    return user.email;
   };
 
   if (isLoading) {
     return (
       <div className="space-y-4">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="flex gap-3 animate-pulse">
-            <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
-            <div className="flex-1 space-y-2">
-              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+          <div key={i} className="animate-pulse">
+            <div className="flex space-x-3">
+              <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+                <div className="h-3 bg-gray-200 rounded w-full"></div>
+                <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+              </div>
             </div>
           </div>
         ))}
@@ -168,12 +169,10 @@ export function InitiativeCommentList({ initiativeId }: InitiativeCommentListPro
 
   if (comments.length === 0) {
     return (
-      <div className="text-center py-8">
-        <UserIcon className="mx-auto h-12 w-12 text-gray-400" />
-        <h3 className="mt-2 text-sm font-medium text-gray-900">Belum ada komentar</h3>
-        <p className="mt-1 text-sm text-gray-500">
-          Mulai diskusi dengan menambahkan komentar pertama.
-        </p>
+      <div className="text-center py-8 text-gray-500">
+        <MessageCircle className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+        <p>Belum ada komentar untuk inisiatif ini</p>
+        <p className="text-sm">Mulai diskusi dengan menambahkan komentar pertama</p>
       </div>
     );
   }
@@ -187,69 +186,85 @@ export function InitiativeCommentList({ initiativeId }: InitiativeCommentListPro
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="flex gap-3"
+            transition={{ duration: 0.3 }}
+            className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
           >
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="text-xs">
-                {getUserInitials(comment.createdByUser)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-sm font-medium text-gray-900">
-                  {getUserName(comment.createdByUser)}
-                </span>
-                <span className="text-xs text-gray-500">
-                  {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true, locale: id })}
-                </span>
-                {comment.createdByUser.id === currentUser?.id && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <MoreVertical className="h-3 w-3" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleEdit(comment)}>
-                        <Edit2 className="h-4 w-4 mr-2" />
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => setDeleteCommentId(comment.id)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Hapus
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
-              </div>
-              {editingCommentId === comment.id ? (
-                <InitiativeCommentEditor
-                  initiativeId={initiativeId}
-                  initialContent={editContent}
-                  onCommentSubmit={handleUpdateComment}
-                  submitButtonText="Perbarui"
-                  isSubmitting={updateCommentMutation.isPending}
-                  showCancelButton={true}
-                  onCancel={handleCancelEdit}
-                  placeholder="Edit komentar..."
-                />
-              ) : (
-                <div className="text-sm text-gray-700 whitespace-pre-wrap">
-                  {comment.content}
+            <div className="flex items-start space-x-3">
+              <Avatar className="w-8 h-8 flex-shrink-0">
+                <AvatarFallback className="bg-orange-100 text-orange-700 text-sm font-medium">
+                  {getUserInitials(comment.user)}
+                </AvatarFallback>
+              </Avatar>
+              
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <span className="font-medium text-gray-900 text-sm">
+                      {getUserName(comment.user)}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {formatDistanceToNow(new Date(comment.createdAt), { 
+                        addSuffix: true, 
+                        locale: id 
+                      })}
+                    </span>
+                    {comment.createdAt !== comment.updatedAt && (
+                      <span className="text-xs text-gray-400">(diedit)</span>
+                    )}
+                  </div>
+                  
+                  {currentUser?.id === comment.authorId && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 opacity-50 hover:opacity-100">
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleEditStart(comment)}>
+                          <Edit2 className="w-4 h-4 mr-2" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => setDeleteCommentId(comment.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Hapus
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                 </div>
-              )}
+                
+                <div className="mt-2">
+                  {editingCommentId === comment.id ? (
+                    <div className="space-y-2">
+                      <InitiativeCommentEditor
+                        initiativeId={initiativeId}
+                        initialContent={editContent}
+                        onSave={(content) => handleEditSave(comment.id, content)}
+                        onCancel={handleEditCancel}
+                        isEditing={true}
+                      />
+                    </div>
+                  ) : (
+                    <div 
+                      className="text-gray-700 text-sm leading-relaxed"
+                      dangerouslySetInnerHTML={{ 
+                        __html: renderCommentContent(comment.content) 
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
             </div>
           </motion.div>
         ))}
       </AnimatePresence>
 
-      <AlertDialog
-        open={!!deleteCommentId}
-        onOpenChange={(open) => !open && setDeleteCommentId(null)}
-      >
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteCommentId !== null} onOpenChange={() => setDeleteCommentId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Hapus Komentar</AlertDialogTitle>
@@ -258,10 +273,10 @@ export function InitiativeCommentList({ initiativeId }: InitiativeCommentListPro
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => deleteCommentId && handleDeleteComment(deleteCommentId)}
-              className="bg-red-600 hover:bg-red-700"
+            <AlertDialogCancel className="focus:ring-orange-500">Batal</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteConfirm}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-500"
             >
               Hapus
             </AlertDialogAction>
