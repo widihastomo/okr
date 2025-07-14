@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { MoreVertical, Edit2, Trash2, User as UserIcon } from "lucide-react";
+import { MoreVertical, Edit2, Trash2, User as UserIcon, Reply, MessageCircle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,6 +37,7 @@ export function TaskCommentList({ taskId }: TaskCommentListProps) {
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
   const [deleteCommentId, setDeleteCommentId] = useState<string | null>(null);
+  const [replyingToCommentId, setReplyingToCommentId] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -243,6 +244,42 @@ export function TaskCommentList({ taskId }: TaskCommentListProps) {
                   />
                 )}
               </div>
+              
+              {/* Reply and view replies section */}
+              <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setReplyingToCommentId(comment.id)}
+                  className="h-6 px-2 text-xs hover:text-gray-700"
+                >
+                  <Reply className="h-3 w-3 mr-1" />
+                  Balas
+                </Button>
+                
+                {/* TODO: Add reply count display */}
+                {/* <span className="text-xs">2 balasan</span> */}
+              </div>
+              
+              {/* Reply form */}
+              {replyingToCommentId === comment.id && (
+                <div className="ml-4 mt-2 border-l-2 border-gray-200 pl-4">
+                  <TaskCommentEditor
+                    taskId={taskId}
+                    parentId={comment.id}
+                    placeholder="Balas komentar..."
+                    submitButtonText="Kirim Balasan"
+                    onCommentAdded={() => setReplyingToCommentId(null)}
+                    showCancelButton={true}
+                    onCancel={() => setReplyingToCommentId(null)}
+                  />
+                </div>
+              )}
+              
+              {/* TODO: Add nested replies display */}
+              {/* <div className="ml-4 mt-2 space-y-3">
+                Nested replies will go here
+              </div> */}
             </div>
           </motion.div>
         ))}

@@ -519,6 +519,7 @@ export const taskComments = pgTable("task_comments", {
   userId: uuid("user_id").references(() => users.id).notNull(),
   content: text("content").notNull(), // HTML content from WYSIWYG editor
   mentionedUsers: text("mentioned_users").array().default([]), // Array of user IDs mentioned in comment
+  parentId: uuid("parent_id").references(() => taskComments.id), // For reply functionality
   isEdited: boolean("is_edited").default(false),
   editedAt: timestamp("edited_at"),
   createdAt: timestamp("created_at").defaultNow(),

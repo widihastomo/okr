@@ -21,6 +21,7 @@ interface TaskCommentEditorProps {
   isSubmitting?: boolean;
   showCancelButton?: boolean;
   onCancel?: () => void;
+  parentId?: string | null; // For reply functionality
 }
 
 export function TaskCommentEditor({ 
@@ -32,7 +33,8 @@ export function TaskCommentEditor({
   submitButtonText = "Kirim",
   isSubmitting = false,
   showCancelButton = false,
-  onCancel
+  onCancel,
+  parentId = null
 }: TaskCommentEditorProps) {
   const [content, setContent] = useState(initialContent);
   const [mentionedUsers, setMentionedUsers] = useState<string[]>([]);
@@ -62,7 +64,7 @@ export function TaskCommentEditor({
   });
 
   const createCommentMutation = useMutation({
-    mutationFn: async (commentData: { content: string; mentionedUsers: string[] }) => {
+    mutationFn: async (commentData: { content: string; mentionedUsers: string[]; parentId?: string | null }) => {
       const response = await apiRequest("POST", `/api/tasks/${taskId}/comments`, commentData);
       return response.json();
     },
@@ -200,6 +202,7 @@ export function TaskCommentEditor({
       createCommentMutation.mutate({
         content: content.trim(),
         mentionedUsers,
+        parentId
       });
     }
   };
