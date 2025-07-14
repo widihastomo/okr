@@ -379,7 +379,7 @@ function TaskHistoryCard({ taskId }: { taskId: string }) {
         <CardDescription className="text-sm">Timeline aktivitas dan perubahan</CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
-        <div className="space-y-3">
+        <div className="max-h-96 overflow-y-auto space-y-3">
           {historyItems.length > 0 ? (
             historyItems.map((item, index) => (
               <div key={item.id} className="flex gap-2">
