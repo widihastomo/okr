@@ -18,6 +18,7 @@ interface InitiativeCommentEditorProps {
   onCancel?: () => void;
   isEditing?: boolean;
   onSave?: (content: string) => void;
+  parentId?: string; // For reply functionality
 }
 
 export function InitiativeCommentEditor({ 
@@ -31,7 +32,8 @@ export function InitiativeCommentEditor({
   showCancelButton = false,
   onCancel,
   isEditing = false,
-  onSave
+  onSave,
+  parentId
 }: InitiativeCommentEditorProps) {
   const [content, setContent] = useState(initialContent);
   const [mentionedUsers, setMentionedUsers] = useState<string[]>([]);
@@ -57,7 +59,7 @@ export function InitiativeCommentEditor({
   });
 
   const createCommentMutation = useMutation({
-    mutationFn: async (commentData: { content: string; mentionedUsers: string[] }) => {
+    mutationFn: async (commentData: { content: string; mentionedUsers: string[]; parentId?: string }) => {
       const response = await apiRequest("POST", `/api/initiatives/${initiativeId}/comments`, commentData);
       return response.json();
     },
@@ -114,8 +116,8 @@ export function InitiativeCommentEditor({
     }
 
     // Default submit behavior
-    createCommentMutation.mutate({ content, mentionedUsers });
-  }, [content, mentionedUsers, onCommentSubmit, createCommentMutation, isEditing, onSave]);
+    createCommentMutation.mutate({ content, mentionedUsers, parentId });
+  }, [content, mentionedUsers, onCommentSubmit, createCommentMutation, isEditing, onSave, parentId]);
 
   const handleContentChange = useCallback((newContent: string) => {
     setContent(newContent);

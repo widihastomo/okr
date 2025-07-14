@@ -1532,6 +1532,7 @@ export class DatabaseStorage implements IStorage {
         userId: initiativeComments.userId,
         content: initiativeComments.content,
         mentionedUsers: initiativeComments.mentionedUsers,
+        parentId: initiativeComments.parentId,
         isEdited: initiativeComments.isEdited,
         editedAt: initiativeComments.editedAt,
         createdAt: initiativeComments.createdAt,
