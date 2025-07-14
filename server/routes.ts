@@ -3264,18 +3264,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         let changeDescription = "Metrik keberhasilan diupdate";
         const changes = [];
         
-        if (currentMetric.name !== req.body.name) {
-          changes.push(`nama: "${currentMetric.name}" → "${req.body.name}"`);
-        }
-        if (currentMetric.target !== req.body.target) {
-          changes.push(`target: "${currentMetric.target}" → "${req.body.target}"`);
-        }
-        if (currentMetric.achievement !== req.body.achievement) {
-          changes.push(`capaian: "${currentMetric.achievement || 0}" → "${req.body.achievement}"`);
-        }
+        // Check if this is an achievement update (from update button) or full edit
+        const isAchievementUpdate = req.body.achievement !== undefined && 
+                                  req.body.name === undefined && 
+                                  req.body.target === undefined;
         
-        if (changes.length > 0) {
-          changeDescription = `Metrik keberhasilan "${currentMetric.name}" diupdate: ${changes.join(", ")}`;
+        if (isAchievementUpdate) {
+          // Only achievement is being updated (from update button)
+          if (currentMetric.achievement !== req.body.achievement) {
+            changeDescription = `Capaian metrik "${currentMetric.name}" diupdate: ${currentMetric.achievement || 0} → ${req.body.achievement}`;
+          }
+        } else {
+          // Full edit mode - check all fields
+          if (currentMetric.name !== req.body.name) {
+            changes.push(`nama: "${currentMetric.name}" → "${req.body.name}"`);
+          }
+          if (currentMetric.target !== req.body.target) {
+            changes.push(`target: "${currentMetric.target}" → "${req.body.target}"`);
+          }
+          if (currentMetric.achievement !== req.body.achievement) {
+            changes.push(`capaian: "${currentMetric.achievement || 0}" → "${req.body.achievement}"`);
+          }
+          
+          if (changes.length > 0) {
+            changeDescription = `Metrik keberhasilan "${currentMetric.name}" diedit: ${changes.join(", ")}`;
+          }
         }
         
         await storage.createAuditTrail({

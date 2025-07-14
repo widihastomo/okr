@@ -1650,10 +1650,10 @@ export class DatabaseStorage implements IStorage {
     return newMetric;
   }
 
-  async updateSuccessMetric(id: string, metric: Partial<InsertSuccessMetric>): Promise<SuccessMetric | undefined> {
+  async updateSuccessMetric(id: string, metric: Partial<InsertSuccessMetric> & { lastUpdateBy?: string }): Promise<SuccessMetric | undefined> {
     const [updatedMetric] = await db
       .update(initiativeSuccessMetrics)
-      .set({ ...metric, updatedAt: new Date() })
+      .set({ ...metric, updatedAt: new Date(), lastUpdateBy: metric.lastUpdateBy })
       .where(eq(initiativeSuccessMetrics.id, id))
       .returning();
     return updatedMetric || undefined;

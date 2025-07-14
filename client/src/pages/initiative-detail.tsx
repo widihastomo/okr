@@ -73,6 +73,7 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import TaskModal from "@/components/task-modal";
+import { QuickUpdateButton } from "@/components/quick-update-button";
 import InitiativeFormModal from "@/components/initiative-form-modal";
 import { InitiativeHistory } from "@/components/initiative-history";
 import SuccessMetricsModal from "@/components/success-metrics-modal-simple";
@@ -196,6 +197,9 @@ const calculateProgressStats = (tasks: any[]) => {
     cancelled: tasks.filter(task => task.status === 'cancelled').length
   };
 };
+
+// QuickUpdateButton Component
+
 
 // Mission Card Component - Consistent with Daily Focus & Objective Detail
 interface MissionCardProps {
@@ -1049,25 +1053,14 @@ export default function InitiativeDetailPage() {
                               <div className="text-sm font-medium text-orange-600">
                                 Saat ini: {metric.achievement || 0}
                               </div>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                  // Map the metric fields to the form structure
-                                  const formattedMetric = {
-                                    id: metric.id,
-                                    name: metric.name,
-                                    target: metric.target,
-                                    achievement: metric.achievement || "0"
-                                  };
-                                  setEditingMetric(formattedMetric);
-                                  setIsSuccessMetricsModalOpen(true);
+                              <QuickUpdateButton 
+                                metric={metric} 
+                                onUpdateSuccess={() => {
+                                  queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/success-metrics`] });
+                                  queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/history`] });
+                                  queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}`] });
                                 }}
-                                className="h-7 px-2 text-xs border-orange-300 text-orange-700 hover:bg-orange-50 hover:border-orange-400"
-                              >
-                                <Edit className="w-3 h-3 mr-1" />
-                                Update
-                              </Button>
+                              />
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
