@@ -163,7 +163,7 @@ export default function DashboardD3Tree({
         id: node.id,
         title: node.data.title,
         childrenCount: node.children.length,
-        verticalOffset: index * (verticalSpacing * 3)
+        verticalOffset: index * (nodeHeight + 20)
       }))
     });
     if (treeData.length === 0) return;
@@ -184,8 +184,8 @@ export default function DashboardD3Tree({
     rootHierarchies.forEach((root, index) => {
       treeLayout(root);
       
-      // Offset each tree vertically so they don't overlap
-      const offsetY = index * (verticalSpacing * 3);
+      // Offset each tree vertically with minimal spacing
+      const offsetY = index * (nodeHeight + 20); // Small gap between nodes
       root.descendants().forEach(d => {
         if (d.x !== undefined) {
           d.x += offsetY;

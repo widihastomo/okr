@@ -246,14 +246,14 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
-- July 14, 2025. Successfully confirmed dashboard D3 tree hierarchy system and completed collapsible filter mobile fix:
-  * CONFIRMED: Dashboard D3 tree properly handles goals without parent as root nodes automatically
-  * VERIFIED: BuildTree function correctly identifies goals with null/undefined parentId as root nodes
-  * ENHANCED: Added debug logging to confirm hierarchy processing (2 goals → 2 root nodes)
-  * FIXED: Mobile expand functionality in tasks filter section with touch event handlers
-  * IMPROVED: State initialization for mobile devices with proper window size detection
-  * RESOLVED: Touch compatibility issues with preventDefault and stopPropagation
-  * RESULT: Both dashboard hierarchy and mobile filter functionality working correctly
+- July 14, 2025. Successfully removed artificial root nodes and implemented vertical layout for dashboard D3 tree:
+  * REMOVED: Artificial root "Dashboard Goals" node that was automatically created for multiple root nodes
+  * IMPLEMENTED: Vertical layout for multiple root nodes displayed top-to-bottom instead of side-by-side
+  * OPTIMIZED: Minimal vertical spacing between root nodes (nodeHeight + 20px) for compact display
+  * ELIMINATED: All references to "artificial-root" and "Company OKR" from D3 tree visualization
+  * ENHANCED: Multiple root hierarchies now display as independent trees with proper vertical stacking
+  * VERIFIED: Debug logging shows 2 goals with vertical offsets (0, 160) for clean vertical arrangement
+  * RESULT: Clean dashboard hierarchy without artificial containers, goals displayed vertically with minimal spacing
 - July 14, 2025. Successfully enhanced Tasks filter section with improved UI layout and team filtering functionality:
   * ENHANCED: Redesigned filter section with grid layout and proper labels for better organization
   * IMPROVED: Search field positioned separately at top with responsive max-width
