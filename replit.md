@@ -251,7 +251,7 @@ All email configuration now uses environment variables:
   * ENHANCED: Modal dialog with SearchableKeyResultSelect component for choosing new key result when reopening
   * UPDATED: Backend endpoint to accept keyResultId parameter and handle key result reassignment during reopen
   * IMPROVED: Audit trail system to track key result changes during reopen operations
-  * DISPLAYED: "Buka Kembali" button in dropdown menu for cancelled initiatives in initiative detail page
+  * DISPLAYED: "Buka Kembali" button as standalone button (outside dropdown) for cancelled initiatives in initiative detail page
   * INTEGRATED: Cancelled initiatives now visible in daily-focus page with "Buka Kembali" button for quick access
   * ENHANCED: Help popover explaining key result reassignment options during reopen process
   * COMPLETED: Full initiative lifecycle management - cancel, reopen with optional reassignment, and delete capabilities

@@ -1044,8 +1044,8 @@ export default function InitiativeDetailPage() {
               </Button>
             )}
             
-            {/* Reopen Initiative Button - Only show when status is selesai */}
-            {initiativeData.status === 'selesai' && (
+            {/* Reopen Initiative Button - Only show when status is selesai or dibatalkan */}
+            {(initiativeData.status === 'selesai' || initiativeData.status === 'dibatalkan') && (
               <Button 
                 variant="outline" 
                 size="sm"
@@ -1081,16 +1081,7 @@ export default function InitiativeDetailPage() {
                     Batalkan Inisiatif
                   </DropdownMenuItem>
                 )}
-                {/* Reopen Initiative - Only show when status is dibatalkan */}
-                {initiativeData.status === 'dibatalkan' && (
-                  <DropdownMenuItem 
-                    className="text-orange-600 hover:text-orange-700"
-                    onClick={() => setIsReopenInitiativeModalOpen(true)}
-                  >
-                    <RotateCcw className="w-4 h-4 mr-2" />
-                    Buka Kembali
-                  </DropdownMenuItem>
-                )}
+
                 <DropdownMenuItem 
                   className="text-red-600 hover:text-red-700"
                   onClick={() => setIsDeleteInitiativeModalOpen(true)}
