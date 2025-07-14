@@ -895,34 +895,168 @@ const TasksPage = () => {
       new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
     );
 
+    // Group tasks by date
+    const tasksByDate = useMemo(() => {
+      const grouped = sortedTasks.reduce((acc, task) => {
+        const dateKey = formatDate(new Date(task.dueDate), 'yyyy-MM-dd');
+        if (!acc[dateKey]) {
+          acc[dateKey] = [];
+        }
+        acc[dateKey].push(task);
+        return acc;
+      }, {} as Record<string, Task[]>);
+      
+      return Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b));
+    }, [sortedTasks]);
+
+    const getDateLabel = (dateStr: string) => {
+      const date = new Date(dateStr);
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      if (formatDate(date, 'yyyy-MM-dd') === formatDate(today, 'yyyy-MM-dd')) {
+        return 'Hari Ini';
+      } else if (formatDate(date, 'yyyy-MM-dd') === formatDate(tomorrow, 'yyyy-MM-dd')) {
+        return 'Besok';
+      } else if (formatDate(date, 'yyyy-MM-dd') === formatDate(yesterday, 'yyyy-MM-dd')) {
+        return 'Kemarin';
+      } else {
+        return formatDate(date, 'EEEE, dd MMMM yyyy', { locale: id });
+      }
+    };
+
+    const getDateColor = (dateStr: string) => {
+      const date = new Date(dateStr);
+      const today = new Date();
+      
+      if (date < today) {
+        return 'text-red-600 border-red-200 bg-red-50';
+      } else if (formatDate(date, 'yyyy-MM-dd') === formatDate(today, 'yyyy-MM-dd')) {
+        return 'text-blue-600 border-blue-200 bg-blue-50';
+      } else {
+        return 'text-gray-600 border-gray-200 bg-gray-50';
+      }
+    };
+
     return (
-      <div className="space-y-4">
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="font-semibold mb-4">Timeline Tasks</h3>
-          <div className="space-y-3">
-            {sortedTasks.map(task => (
-              <div key={task.id} className="flex items-center space-x-4">
-                <div className="w-48 truncate">
-                  <div className="font-medium">{task.title}</div>
-                  <div className="text-sm text-gray-500">{task.initiative?.title}</div>
-                </div>
-                <div className="flex-1 bg-white rounded-lg p-3 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <div className={`w-3 h-3 rounded-full ${getPriorityColor(task.priority)}`}></div>
-                      <Badge variant="outline" className={getStatusColor(task.status)}>
-                        {getStatusText(task.status)}
-                      </Badge>
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {new Date(task.dueDate).toLocaleDateString('id-ID')}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
+      <div className="space-y-6">
+        {tasksByDate.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <div className="text-4xl mb-2">📅</div>
+            <p className="text-sm">Tidak ada task dengan tanggal tenggat</p>
           </div>
-        </div>
+        ) : (
+          tasksByDate.map(([dateStr, tasks]) => (
+            <Card key={dateStr} className={`border-l-4 ${getDateColor(dateStr)}`}>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <CalendarIcon className="w-5 h-5" />
+                    {getDateLabel(dateStr)}
+                  </CardTitle>
+                  <Badge variant="outline" className="text-xs">
+                    {tasks.length} task{tasks.length > 1 ? 's' : ''}
+                  </Badge>
+                </div>
+                <CardDescription className="text-sm">
+                  {formatDate(new Date(dateStr), 'dd MMMM yyyy', { locale: id })}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {tasks.map(task => (
+                    <div key={task.id} className="flex items-center space-x-4 p-3 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <Link
+                              href={`/tasks/${task.id}`}
+                              className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer truncate"
+                            >
+                              {task.title}
+                            </Link>
+                            {isTaskOverdue(task) && (
+                              <Badge variant="destructive" className="text-xs">
+                                Overdue
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className={`w-3 h-3 rounded-full ${getPriorityColor(task.priority)}`}></div>
+                            <Badge variant="outline" className={getStatusColor(task.status)}>
+                              {getStatusText(task.status)}
+                            </Badge>
+                          </div>
+                        </div>
+                        
+                        {task.description && (
+                          <p className="text-sm text-gray-600 mb-2 line-clamp-2">{task.description}</p>
+                        )}
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            {task.initiative && (
+                              <div className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded">
+                                {task.initiative.title}
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                            {task.assignedTo ? (
+                              <div className="flex items-center gap-1">
+                                <Avatar className="w-5 h-5">
+                                  <AvatarImage
+                                    src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
+                                  />
+                                  <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
+                                    {getUserInitials(task.assignedTo)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <span className="text-xs text-gray-600">
+                                  {getUserName(task.assignedTo)}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-xs text-gray-500">Belum ditentukan</span>
+                            )}
+                            
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                  <MoreVertical className="h-3 w-3" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem asChild>
+                                  <Link href={`/tasks/${task.id}`} className="flex items-center">
+                                    <Eye className="mr-2 h-4 w-4" />
+                                    Lihat Detail
+                                  </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleEditTask(task)}>
+                                  <Edit className="mr-2 h-4 w-4" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteTask(task.id)}>
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  Hapus
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
     );
   };
