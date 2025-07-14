@@ -81,17 +81,64 @@ export function ThreadedCommentList({
     
     return (
       <div key={comment.id} className={`${level > 0 ? 'ml-4 sm:ml-8 pl-2 sm:pl-4 border-l-2 border-gray-200' : ''}`}>
-        <div className="flex items-start space-x-2 sm:space-x-3 p-3 sm:p-4 bg-white rounded-lg shadow-sm border border-gray-200">
-          <Avatar className="h-7 w-7 sm:h-8 sm:w-8 flex-shrink-0">
-            <AvatarImage src={comment.user?.profileImageUrl || ''} />
-            <AvatarFallback>
-              {comment.user?.firstName?.[0] || comment.user?.email?.[0] || 'U'}
-            </AvatarFallback>
-          </Avatar>
+        <div className="relative p-3 sm:p-4 bg-white rounded-lg shadow-sm border border-gray-200">
+          {/* 3 dots menu in top right corner */}
+          {user?.id === comment.userId && (
+            <div className="absolute top-2 right-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-gray-500 hover:text-orange-600 h-6 w-6 p-0">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => onEdit(comment)}>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Ubah
+                  </DropdownMenuItem>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <DropdownMenuItem 
+                        onSelect={(e) => e.preventDefault()}
+                        className="text-red-600 focus:text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Hapus
+                      </DropdownMenuItem>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Hapus Komentar</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Apakah Anda yakin ingin menghapus komentar ini? Aksi ini tidak dapat dibatalkan.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => onDelete(comment.id)}
+                          className="bg-red-600 hover:bg-red-700 focus:ring-red-500"
+                        >
+                          Hapus
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
           
-          <div className="flex-1 min-w-0">
-            {/* Header - Stack on mobile, flex on desktop */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+          <div className="flex items-start space-x-2 sm:space-x-3">
+            <Avatar className="h-7 w-7 sm:h-8 sm:w-8 flex-shrink-0">
+              <AvatarImage src={comment.user?.profileImageUrl || ''} />
+              <AvatarFallback>
+                {comment.user?.firstName?.[0] || comment.user?.email?.[0] || 'U'}
+              </AvatarFallback>
+            </Avatar>
+            
+            <div className="flex-1 min-w-0">
+              {/* Header with user info and timestamp */}
               <div className="flex items-center space-x-2 flex-wrap">
                 <span className="font-medium text-gray-900 text-sm">
                   {comment.user?.firstName && comment.user?.lastName
@@ -109,7 +156,15 @@ export function ThreadedCommentList({
                 )}
               </div>
               
-              <div className="flex items-center space-x-1 sm:space-x-2">
+              {editingCommentId !== comment.id && (
+                <div 
+                  className="mt-2 text-sm text-gray-700 prose prose-sm max-w-none break-words"
+                  dangerouslySetInnerHTML={{ __html: comment.content }}
+                />
+              )}
+              
+              {/* Reply button and replies toggle */}
+              <div className="mt-3 flex items-center gap-2 flex-wrap">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -117,84 +172,31 @@ export function ThreadedCommentList({
                   className="text-gray-500 hover:text-orange-600 h-7 px-2 sm:h-8 sm:px-3"
                 >
                   <Reply className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span className="ml-1 text-xs hidden sm:inline">Balas</span>
+                  <span className="ml-1 text-xs">Balas</span>
                 </Button>
                 
-                {user?.id === comment.userId && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="text-gray-500 hover:text-orange-600 h-7 px-2 sm:h-8 sm:px-3">
-                        <MoreHorizontal className="h-3 w-3 sm:h-4 sm:w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => onEdit(comment)}>
-                        <Edit className="h-4 w-4 mr-2" />
-                        Ubah
-                      </DropdownMenuItem>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <DropdownMenuItem 
-                            onSelect={(e) => e.preventDefault()}
-                            className="text-red-600 focus:text-red-600"
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Hapus
-                          </DropdownMenuItem>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Hapus Komentar</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Apakah Anda yakin ingin menghapus komentar ini? Aksi ini tidak dapat dibatalkan.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Batal</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => onDelete(comment.id)}
-                              className="bg-red-600 hover:bg-red-700 focus:ring-red-500"
-                            >
-                              Hapus
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                {hasReplies && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onToggleReplies?.(comment.id)}
+                    className="text-gray-500 hover:text-orange-600 h-7 px-2 sm:h-8 sm:px-3"
+                  >
+                    {isExpanded ? (
+                      <>
+                        <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                        <span className="text-xs">Sembunyikan {comment.replyCount} balasan</span>
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                        <span className="text-xs">Tampilkan {comment.replyCount} balasan</span>
+                      </>
+                    )}
+                  </Button>
                 )}
               </div>
             </div>
-            
-            {editingCommentId !== comment.id && (
-              <div 
-                className="mt-2 text-sm text-gray-700 prose prose-sm max-w-none break-words"
-                dangerouslySetInnerHTML={{ __html: comment.content }}
-              />
-            )}
-            
-            {hasReplies && (
-              <div className="mt-3">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onToggleReplies?.(comment.id)}
-                  className="text-gray-500 hover:text-orange-600 h-7 px-2 sm:h-8 sm:px-3"
-                >
-                  {isExpanded ? (
-                    <>
-                      <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                      <span className="text-xs">Sembunyikan {comment.replyCount} balasan</span>
-                    </>
-                  ) : (
-                    <>
-                      <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                      <span className="text-xs">Tampilkan {comment.replyCount} balasan</span>
-                    </>
-                  )}
-                </Button>
-              </div>
-            )}
           </div>
         </div>
         
