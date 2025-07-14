@@ -80,9 +80,11 @@ export default function InitiativeClosureModal({
       const metricsArray = Array.isArray(successMetrics) ? successMetrics : [];
       const tasksArray = Array.isArray(tasks) ? tasks : [];
       
+
+      
       setUpdatedMetrics(metricsArray.map(metric => ({
         id: metric.id,
-        currentValue: metric.currentValue,
+        currentValue: metric.achievement || 0,
         isCompleted: metric.isCompleted || false
       })));
       
@@ -477,18 +479,18 @@ export default function InitiativeClosureModal({
                               <h4 className="text-sm font-medium text-gray-900 truncate">{metric.name}</h4>
                               <div className="flex items-center gap-2 mt-1">
                                 <span className="text-xs text-gray-500">
-                                  Target: {metric.targetValue} {metric.unit}
+                                  Target: {metric.target || 0}
                                 </span>
                                 <span className="text-xs text-gray-400">•</span>
                                 <span className="text-xs text-gray-500">
-                                  Sekarang: {metric.currentValue} {metric.unit}
+                                  Sekarang: {metric.achievement || 0}
                                 </span>
                               </div>
                             </div>
                             <div className="flex-shrink-0 w-24">
                               <Input
                                 type="number"
-                                value={updatedMetrics.find(m => m.id === metric.id)?.currentValue || 0}
+                                value={updatedMetrics.find(m => m.id === metric.id)?.currentValue || metric.achievement || 0}
                                 onChange={(e) => updateMetricValue(metric.id, parseFloat(e.target.value) || 0)}
                                 placeholder="Final"
                                 className="text-xs h-8 border-blue-300"

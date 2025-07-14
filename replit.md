@@ -246,6 +246,13 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 14, 2025. Successfully implemented contextual placeholder system and fixed success metrics display in initiative closure modal:
+  * ENHANCED: Replaced static placeholders with dynamic examples that change based on initiative result type (berhasil/gagal/perlu_diulang)
+  * IMPLEMENTED: Contextual examples for all form sections - reason, learning, budget, and additional notes
+  * FIXED: Success metrics target and current values display issue by correcting field mapping (target/achievement instead of targetValue/currentValue)
+  * IMPROVED: Success metrics now properly show target values and current achievement values in closure modal
+  * ENHANCED: Input field for final metric values now correctly pre-populates with current achievement values
+  * RESULT: Complete form with working success metrics display and contextual guidance for better user completion
 - July 14, 2025. Successfully added comprehensive help popovers to initiative closure modal:
   * ADDED: Help popover for "Hasil Inisiatif" explaining each result option (Berhasil, Gagal, Perlu Diulang)
   * ADDED: Help popover for "Budget yang digunakan" with guidance on input format and usage
