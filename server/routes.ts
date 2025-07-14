@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { 
   insertCycleSchema, insertTemplateSchema, insertObjectiveSchema, insertKeyResultSchema, 
   insertCheckInSchema, insertInitiativeSchema, insertInitiativeMemberSchema, insertInitiativeDocumentSchema, 
-  insertTaskSchema, insertTaskCommentSchema, insertTaskAuditTrailSchema, insertInitiativeNoteSchema, updateKeyResultProgressSchema, createGoalFromTemplateSchema,
+  insertTaskSchema, insertTaskCommentSchema, insertTaskAuditTrailSchema, insertInitiativeNoteSchema, insertInitiativeCommentSchema, updateKeyResultProgressSchema, createGoalFromTemplateSchema,
   insertSuccessMetricSchema, insertSuccessMetricUpdateSchema, insertDailyReflectionSchema, updateOnboardingProgressSchema,
   subscriptionPlans, organizations, organizationSubscriptions, users, dailyReflections, companyOnboardingDataSchema,
   trialAchievements, userTrialAchievements, billingPeriods,
@@ -3058,6 +3058,130 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting initiative note:", error);
       res.status(500).json({ message: "Failed to delete initiative note" });
+    }
+  });
+
+  // Initiative Comments endpoints
+  app.get("/api/initiatives/:initiativeId/comments", requireAuth, async (req, res) => {
+    try {
+      const { initiativeId } = req.params;
+      const comments = await storage.getInitiativeComments(initiativeId);
+      res.json(comments);
+    } catch (error) {
+      console.error("Error fetching initiative comments:", error);
+      res.status(500).json({ message: "Failed to fetch initiative comments" });
+    }
+  });
+
+  app.post("/api/initiatives/:initiativeId/comments", requireAuth, async (req, res) => {
+    try {
+      const { initiativeId } = req.params;
+      const currentUser = req.user as User;
+      
+      const createCommentSchema = insertInitiativeCommentSchema.extend({
+        initiativeId: z.string().uuid(),
+        userId: z.string().uuid()
+      });
+      
+      const commentData = createCommentSchema.parse({
+        ...req.body,
+        initiativeId,
+        userId: currentUser.id
+      });
+      
+      const newComment = await storage.createInitiativeComment(commentData);
+      
+      // Get the comment with user details
+      const commentsWithUser = await storage.getInitiativeComments(initiativeId);
+      const commentWithUser = commentsWithUser.find(c => c.id === newComment.id);
+      
+      res.status(201).json(commentWithUser);
+    } catch (error) {
+      console.error("Error creating initiative comment:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create initiative comment" });
+    }
+  });
+
+  app.patch("/api/initiatives/:initiativeId/comments/:commentId", requireAuth, async (req, res) => {
+    try {
+      const { commentId, initiativeId } = req.params;
+      const currentUser = req.user as User;
+      
+      // Get existing comment to check ownership
+      const existingComments = await storage.getInitiativeComments(initiativeId);
+      const comment = existingComments.find(c => c.id === commentId);
+      
+      if (!comment) {
+        return res.status(404).json({ message: "Comment not found" });
+      }
+      
+      // Only allow creator to update their comment
+      if (comment.userId !== currentUser.id) {
+        return res.status(403).json({ message: "Unauthorized to update this comment" });
+      }
+      
+      const updateCommentSchema = insertInitiativeCommentSchema.partial();
+      const updateData = updateCommentSchema.parse(req.body);
+      
+      // Mark as edited
+      const updateDataWithEdit = {
+        ...updateData,
+        isEdited: true,
+        editedAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      const updatedComment = await storage.updateInitiativeComment(commentId, updateDataWithEdit);
+      
+      if (!updatedComment) {
+        return res.status(404).json({ message: "Comment not found" });
+      }
+      
+      // Get the updated comment with user details
+      const commentsWithUser = await storage.getInitiativeComments(initiativeId);
+      const commentWithUser = commentsWithUser.find(c => c.id === commentId);
+      
+      res.json(commentWithUser);
+    } catch (error) {
+      console.error("Error updating initiative comment:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update initiative comment" });
+    }
+  });
+
+  app.delete("/api/initiatives/:initiativeId/comments/:commentId", requireAuth, async (req, res) => {
+    try {
+      const { commentId, initiativeId } = req.params;
+      const currentUser = req.user as User;
+      
+      // Get existing comment to check ownership
+      const existingComments = await storage.getInitiativeComments(initiativeId);
+      const comment = existingComments.find(c => c.id === commentId);
+      
+      if (!comment) {
+        return res.status(404).json({ message: "Comment not found" });
+      }
+      
+      // Only allow creator to delete their comment
+      if (comment.userId !== currentUser.id) {
+        return res.status(403).json({ message: "Unauthorized to delete this comment" });
+      }
+      
+      const deleted = await storage.deleteInitiativeComment(commentId);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Comment not found" });
+      }
+      
+      res.status(200).json({ message: "Comment deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting initiative comment:", error);
+      res.status(500).json({ message: "Failed to delete initiative comment" });
     }
   });
 

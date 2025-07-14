@@ -1,13 +1,13 @@
 import { 
   cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives, tasks, taskComments, taskAuditTrail,
-  initiativeMembers, initiativeDocuments, initiativeNotes, initiativeSuccessMetrics, successMetricUpdates,
+  initiativeMembers, initiativeDocuments, initiativeNotes, initiativeComments, initiativeSuccessMetrics, successMetricUpdates,
   notifications, notificationPreferences, userOnboardingProgress, organizations, applicationSettings,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
   type CheckIn, type Initiative, type Task, type TaskComment, type TaskAuditTrail, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
-  type InitiativeNote, type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
+  type InitiativeNote, type InitiativeComment, type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
   type InsertUser, type UpsertUser, type InsertTeam, type InsertTeamMember,
   type InsertCheckIn, type InsertInitiative, type InsertInitiativeMember, type InsertInitiativeDocument, type InsertTask,
-  type InsertTaskComment, type InsertTaskAuditTrail, type InsertInitiativeNote, type OKRWithKeyResults, type CycleWithOKRs, type UpdateKeyResultProgress, type CreateOKRFromTemplate,
+  type InsertTaskComment, type InsertTaskAuditTrail, type InsertInitiativeNote, type InsertInitiativeComment, type OKRWithKeyResults, type CycleWithOKRs, type UpdateKeyResultProgress, type CreateGoalFromTemplate,
   type SuccessMetric, type InsertSuccessMetric, type SuccessMetricUpdate, type InsertSuccessMetricUpdate,
   type Notification, type InsertNotification, type NotificationPreferences, type InsertNotificationPreferences,
   type UserOnboardingProgress, type InsertUserOnboardingProgress, type UpdateOnboardingProgress,
@@ -118,6 +118,12 @@ export interface IStorage {
   createInitiativeNote(note: InsertInitiativeNote): Promise<InitiativeNote>;
   updateInitiativeNote(id: string, note: Partial<InsertInitiativeNote>): Promise<InitiativeNote | undefined>;
   deleteInitiativeNote(id: string): Promise<boolean>;
+
+  // Initiative Comments
+  getInitiativeComments(initiativeId: string): Promise<(InitiativeComment & { user: User })[]>;
+  createInitiativeComment(comment: InsertInitiativeComment): Promise<InitiativeComment>;
+  updateInitiativeComment(id: string, comment: Partial<InsertInitiativeComment>): Promise<InitiativeComment | undefined>;
+  deleteInitiativeComment(id: string): Promise<boolean>;
   
   // Success Metrics
   getSuccessMetricsByInitiativeId(initiativeId: string): Promise<SuccessMetric[]>;
@@ -1511,6 +1517,57 @@ export class DatabaseStorage implements IStorage {
 
   async deleteInitiativeNote(id: string): Promise<boolean> {
     const result = await db.delete(initiativeNotes).where(eq(initiativeNotes.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Initiative Comments
+  async getInitiativeComments(initiativeId: string): Promise<(InitiativeComment & { user: User })[]> {
+    return await db
+      .select({
+        id: initiativeComments.id,
+        initiativeId: initiativeComments.initiativeId,
+        userId: initiativeComments.userId,
+        content: initiativeComments.content,
+        mentionedUsers: initiativeComments.mentionedUsers,
+        isEdited: initiativeComments.isEdited,
+        editedAt: initiativeComments.editedAt,
+        createdAt: initiativeComments.createdAt,
+        updatedAt: initiativeComments.updatedAt,
+        user: {
+          id: users.id,
+          email: users.email,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImageUrl: users.profileImageUrl,
+          role: users.role,
+          isActive: users.isActive,
+          createdAt: users.createdAt,
+          updatedAt: users.updatedAt,
+          password: users.password
+        }
+      })
+      .from(initiativeComments)
+      .leftJoin(users, eq(initiativeComments.userId, users.id))
+      .where(eq(initiativeComments.initiativeId, initiativeId))
+      .orderBy(desc(initiativeComments.createdAt));
+  }
+
+  async createInitiativeComment(comment: InsertInitiativeComment): Promise<InitiativeComment> {
+    const [newComment] = await db.insert(initiativeComments).values(comment).returning();
+    return newComment;
+  }
+
+  async updateInitiativeComment(id: string, comment: Partial<InsertInitiativeComment>): Promise<InitiativeComment | undefined> {
+    const [updatedComment] = await db
+      .update(initiativeComments)
+      .set({ ...comment, updatedAt: new Date() })
+      .where(eq(initiativeComments.id, id))
+      .returning();
+    return updatedComment || undefined;
+  }
+
+  async deleteInitiativeComment(id: string): Promise<boolean> {
+    const result = await db.delete(initiativeComments).where(eq(initiativeComments.id, id));
     return result.rowCount > 0;
   }
 

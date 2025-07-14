@@ -480,6 +480,19 @@ export const initiativeNotes = pgTable("initiative_notes", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Initiative Comments for collaborative discussion
+export const initiativeComments = pgTable("initiative_comments", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  initiativeId: uuid("initiative_id").references(() => initiatives.id).notNull(),
+  userId: uuid("user_id").references(() => users.id).notNull(),
+  content: text("content").notNull(), // HTML content from WYSIWYG editor
+  mentionedUsers: text("mentioned_users").array().default([]), // Array of user IDs mentioned in comment
+  isEdited: boolean("is_edited").default(false),
+  editedAt: timestamp("edited_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 
 // Tasks linked to initiatives
 export const tasks = pgTable("tasks", {
@@ -588,6 +601,14 @@ export const insertInitiativeNoteSchema = createInsertSchema(initiativeNotes).om
   id: true,
   createdAt: true,
   updatedAt: true,
+});
+
+export const insertInitiativeCommentSchema = createInsertSchema(initiativeComments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  editedAt: true,
+  isEdited: true,
 });
 
 export const insertSuccessMetricSchema = createInsertSchema(initiativeSuccessMetrics).omit({
@@ -787,6 +808,7 @@ export type InsertInitiativeDocument = z.infer<typeof insertInitiativeDocumentSc
 export type InsertTask = z.infer<typeof insertTaskSchema>;
 export type InsertTaskComment = z.infer<typeof insertTaskCommentSchema>;
 export type InsertInitiativeNote = z.infer<typeof insertInitiativeNoteSchema>;
+export type InsertInitiativeComment = z.infer<typeof insertInitiativeCommentSchema>;
 export type UpdateKeyResultProgress = z.infer<typeof updateKeyResultProgressSchema>;
 export type CreateGoalFromTemplate = z.infer<typeof createGoalFromTemplateSchema>;
 
@@ -807,6 +829,7 @@ export type Initiative = typeof initiatives.$inferSelect;
 export type InitiativeMember = typeof initiativeMembers.$inferSelect;
 export type InitiativeDocument = typeof initiativeDocuments.$inferSelect;
 export type InitiativeNote = typeof initiativeNotes.$inferSelect;
+export type InitiativeComment = typeof initiativeComments.$inferSelect;
 export type Task = typeof tasks.$inferSelect;
 export type TaskComment = typeof taskComments.$inferSelect;
 export type SystemSetting = typeof systemSettings.$inferSelect;

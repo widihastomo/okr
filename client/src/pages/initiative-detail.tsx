@@ -77,7 +77,7 @@ import InitiativeFormModal from "@/components/initiative-form-modal";
 import { InitiativeNotes } from "@/components/initiative-notes";
 import SuccessMetricsModal from "@/components/success-metrics-modal-simple";
 import InitiativeClosureModal from "@/components/initiative-closure-modal";
-import { InitiativeCommentList, InitiativeCommentEditor } from "@/components/initiative-comment-unified";
+import { InitiativeCommentUnified } from "@/components/initiative-comment-unified";
 import { calculateKeyResultProgress } from "@shared/progress-calculator";
 import type { SuccessMetricWithUpdates } from "@shared/schema";
 
@@ -1506,6 +1506,9 @@ export default function InitiativeDetailPage() {
         <div className="space-y-6">
           {/* Initiative Notes */}
           <InitiativeNotes initiativeId={id!} />
+          
+          {/* Initiative Comments */}
+          <InitiativeCommentUnified initiativeId={id!} />
         </div>
       </div>
 
