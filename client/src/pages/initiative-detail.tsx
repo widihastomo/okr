@@ -1136,21 +1136,18 @@ export default function InitiativeDetailPage() {
                         {tasks.map((task: any) => (
                           <tr key={task.id} className="hover:bg-gray-50">
                             <td className="px-4 py-4">
-                              <div className="flex items-center gap-2">
-                                <CheckSquare className="h-4 w-4 text-orange-600" />
-                                <div>
-                                  <Link
-                                    href={`/tasks/${task.id}`}
-                                    className="font-medium text-gray-900 hover:text-orange-600 hover:underline cursor-pointer"
-                                  >
-                                    {task.title}
-                                  </Link>
-                                  {task.description && (
-                                    <div className="text-sm text-gray-600 mt-1">{task.description}</div>
-                                  )}
-                                  <div className="mt-1">
-                                    <TaskCommentCount taskId={task.id} />
-                                  </div>
+                              <div>
+                                <Link
+                                  href={`/tasks/${task.id}`}
+                                  className="font-medium text-gray-900 hover:text-orange-600 hover:underline cursor-pointer"
+                                >
+                                  {task.title}
+                                </Link>
+                                {task.description && (
+                                  <div className="text-sm text-gray-600 mt-1">{task.description}</div>
+                                )}
+                                <div className="mt-1">
+                                  <TaskCommentCount taskId={task.id} />
                                 </div>
                               </div>
                             </td>
