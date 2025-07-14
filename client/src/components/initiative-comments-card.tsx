@@ -35,6 +35,7 @@ export function InitiativeCommentsCard({ initiativeId }: InitiativeCommentsCardP
       toast({
         title: "Komentar berhasil dihapus",
         description: "Komentar telah dihapus dari sistem.",
+        variant: "success",
       });
     },
     onError: (error) => {
