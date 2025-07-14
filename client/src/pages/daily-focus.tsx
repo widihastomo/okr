@@ -1041,9 +1041,24 @@ export default function DailyFocusPage() {
       const startDate = init.startDate ? init.startDate.split("T")[0] : null;
       
       // Show completed initiatives if:
-      // 1. Due date is today or later (still within timeline)
-      // 2. Or if start date is today (recently started and completed)
-      return (dueDate && dueDate >= todayStr) || (startDate && startDate === todayStr);
+      // 1. Due date is today or later (still within timeline), OR
+      // 2. Start date is today (recently started and completed), OR
+      // 3. No due date but started recently (within last 7 days)
+      let shouldInclude = false;
+      
+      if (dueDate && dueDate >= todayStr) {
+        shouldInclude = true; // Due date is today or future
+      } else if (startDate && startDate === todayStr) {
+        shouldInclude = true; // Started today
+      } else if (!dueDate && startDate) {
+        // No due date - check if started recently (within last 7 days)
+        const startTime = new Date(startDate).getTime();
+        const todayTime = new Date(todayStr).getTime();
+        const daysDiff = (todayTime - startTime) / (1000 * 60 * 60 * 24);
+        shouldInclude = daysDiff <= 7; // Show if completed within last 7 days
+      }
+      
+      return shouldInclude;
     }
     
     return false;

@@ -267,6 +267,8 @@ All email configuration now uses environment variables:
   * ENHANCED: Daily focus page now shows completed initiatives that are still within today's timeline
   * IMPROVED: Completed initiatives display if due date is today or later, or if started today
   * OPTIMIZED: Better initiative visibility for tracking recent completions within current timeline
+  * FIXED: Completed initiatives now properly display when they have no due date by showing initiatives completed within last 7 days
+  * ENHANCED: More inclusive filtering logic for completed initiatives - shows if due date is today/future, started today, or completed within last week
 - July 14, 2025. Successfully added comprehensive help popovers to initiative closure modal:
   * ADDED: Help popover for "Hasil Inisiatif" explaining each result option (Berhasil, Gagal, Perlu Diulang)
   * ADDED: Help popover for "Budget yang digunakan" with guidance on input format and usage
