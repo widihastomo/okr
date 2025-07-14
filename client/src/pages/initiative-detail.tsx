@@ -1149,9 +1149,6 @@ export default function InitiativeDetailPage() {
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Task
                           </th>
-                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Prioritas
-                          </th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Status
                           </th>
@@ -1171,30 +1168,30 @@ export default function InitiativeDetailPage() {
                           <tr key={task.id} className="hover:bg-gray-50">
                             <td className="px-4 py-4">
                               <div>
-                                <Link
-                                  href={`/tasks/${task.id}`}
-                                  className="font-medium text-gray-900 hover:text-orange-600 hover:underline cursor-pointer"
-                                >
-                                  {task.title}
-                                </Link>
+                                <div className="flex items-center gap-2">
+                                  <TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <div className={`inline-flex items-center justify-center cursor-pointer ${getTaskPriorityIcon(task.priority || "medium").color}`}>
+                                          {getTaskPriorityIcon(task.priority || "medium").icon}
+                                        </div>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>{getTaskPriorityIcon(task.priority || "medium").label}</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
+                                  <Link
+                                    href={`/tasks/${task.id}`}
+                                    className="font-medium text-gray-900 hover:text-orange-600 hover:underline cursor-pointer"
+                                  >
+                                    {task.title}
+                                  </Link>
+                                </div>
                                 <div className="mt-1">
                                   <TaskCommentCount taskId={task.id} />
                                 </div>
                               </div>
-                            </td>
-                            <td className="px-4 py-4 text-center">
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <div className={`inline-flex items-center justify-center cursor-pointer ${getTaskPriorityIcon(task.priority || "medium").color}`}>
-                                      {getTaskPriorityIcon(task.priority || "medium").icon}
-                                    </div>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>{getTaskPriorityIcon(task.priority || "medium").label}</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
                             </td>
                             <td className="px-4 py-4">
                               <DropdownMenu>
@@ -1331,16 +1328,7 @@ export default function InitiativeDetailPage() {
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <Link
-                              href={`/tasks/${task.id}`}
-                              className="font-medium text-gray-900 hover:text-orange-600 hover:underline cursor-pointer"
-                            >
-                              {task.title}
-                            </Link>
-                            {task.description && (
-                              <div className="text-sm text-gray-600 mt-1">{task.description}</div>
-                            )}
-                            <div className="flex items-center gap-2 mt-1">
+                            <div className="flex items-center gap-2">
                               <TooltipProvider>
                                 <Tooltip>
                                   <TooltipTrigger asChild>
@@ -1353,6 +1341,17 @@ export default function InitiativeDetailPage() {
                                   </TooltipContent>
                                 </Tooltip>
                               </TooltipProvider>
+                              <Link
+                                href={`/tasks/${task.id}`}
+                                className="font-medium text-gray-900 hover:text-orange-600 hover:underline cursor-pointer"
+                              >
+                                {task.title}
+                              </Link>
+                            </div>
+                            {task.description && (
+                              <div className="text-sm text-gray-600 mt-1">{task.description}</div>
+                            )}
+                            <div className="flex items-center gap-2 mt-1">
                               <TaskCommentCount taskId={task.id} />
                             </div>
                           </div>

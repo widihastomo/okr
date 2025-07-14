@@ -246,6 +246,14 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 14, 2025. Successfully integrated task priority icons with task names and optimized table layout:
+  * COMBINED: Priority icons now displayed alongside task names instead of separate column
+  * ENHANCED: Both desktop table view and mobile card view show priority icons next to task titles
+  * OPTIMIZED: Removed separate "Prioritas" column from desktop table for cleaner, more compact layout
+  * IMPROVED: Priority icons (AlertTriangle/Minus/Flag) with tooltips positioned directly before task names
+  * CONSISTENT: Same priority icon integration applied to both desktop and mobile views
+  * STREAMLINED: Table layout now has one fewer column while maintaining all functionality
+  * RESULT: More intuitive task display with priority context immediately visible next to task names
 - July 13, 2025. Successfully implemented bi-directional auto-update status initiative system based on task status changes:
   * IMPLEMENTED: Auto-update logic - task "in_progress" → initiative "sedang_berjalan" 
   * IMPLEMENTED: Reverse auto-update logic - all tasks "not_started" → initiative "draft"
