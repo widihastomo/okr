@@ -256,10 +256,6 @@ export default function InitiativeClosureModal({
               <CardContent className="space-y-6">
                 {/* Hasil Inisiatif */}
                 <div className="space-y-4">
-                  <h3 className="text-base font-medium flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Hasil Inisiatif
-                  </h3>
                   <FormField
                     control={form.control}
                     name="result"
