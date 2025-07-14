@@ -53,6 +53,7 @@ const TasksPage = () => {
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showTaskModal, setShowTaskModal] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   const { data: tasks = [], isLoading } = useQuery<Task[]>({
     queryKey: ['/api/tasks'],
@@ -136,6 +137,47 @@ const TasksPage = () => {
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Delete task mutation
+  const deleteTaskMutation = useMutation({
+    mutationFn: async (taskId: string) => {
+      await apiRequest('DELETE', `/api/tasks/${taskId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+      toast({
+        title: "Berhasil",
+        description: "Task berhasil dihapus",
+        className: "bg-green-50 border-green-200 text-green-800"
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Gagal menghapus task",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Handle edit task
+  const handleEditTask = (task: Task) => {
+    setEditingTask(task);
+    setShowTaskModal(true);
+  };
+
+  // Handle delete task
+  const handleDeleteTask = (taskId: string) => {
+    if (confirm('Apakah Anda yakin ingin menghapus task ini?')) {
+      deleteTaskMutation.mutate(taskId);
+    }
+  };
+
+  // Handle add new task
+  const handleAddTask = () => {
+    setEditingTask(null);
+    setShowTaskModal(true);
+  };
 
   // Helper function to get user name by ID (matching daily-focus page format)
   const getUserName = (userId: string): string => {
@@ -428,11 +470,11 @@ const TasksPage = () => {
                 Lihat Detail
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleEditTask(task)}>
               <Edit className="mr-2 h-4 w-4" />
               Edit
             </DropdownMenuItem>
-            <DropdownMenuItem className="text-red-600">
+            <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteTask(task.id)}>
               <Trash2 className="mr-2 h-4 w-4" />
               Hapus
             </DropdownMenuItem>
@@ -515,7 +557,32 @@ const TasksPage = () => {
               : "Belum ditentukan"}
           </span>
         </div>
-        <span>{task.dueDate ? formatDate(new Date(task.dueDate), 'dd/MM/yyyy') : 'Tidak ada tenggat'}</span>
+        <div className="flex items-center gap-2">
+          <span>{task.dueDate ? formatDate(new Date(task.dueDate), 'dd/MM/yyyy') : 'Tidak ada tenggat'}</span>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                <MoreVertical className="h-3 w-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link href={`/tasks/${task.id}`} className="flex items-center">
+                  <Eye className="mr-2 h-4 w-4" />
+                  Lihat Detail
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleEditTask(task)}>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteTask(task.id)}>
+                <Trash2 className="mr-2 h-4 w-4" />
+                Hapus
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </div>
   );
@@ -739,7 +806,7 @@ const TasksPage = () => {
           <p className="text-gray-600">Kelola semua task dalam berbagai tampilan</p>
         </div>
         <Button 
-          onClick={() => setShowTaskModal(true)}
+          onClick={handleAddTask}
           className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -860,10 +927,12 @@ const TasksPage = () => {
         open={showTaskModal}
         onClose={() => {
           setShowTaskModal(false);
+          setEditingTask(null);
           // Refresh tasks after modal closes
           queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
         }}
-        isAdding={true}
+        task={editingTask}
+        isAdding={!editingTask}
       />
     </div>
   );

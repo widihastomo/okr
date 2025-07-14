@@ -255,6 +255,12 @@ All email configuration now uses environment variables:
   * ENHANCED: Each category rendered as separate Card with desktop table and mobile card views
   * INTEGRATED: Cache invalidation for task list refresh after modal operations
   * RESULT: Complete task creation workflow with grouped task display matching daily-focus page structure
+  * ADDED: Edit and delete functionality for tasks in both desktop and mobile views
+  * INTEGRATED: Dropdown menu actions (Edit, Delete) in both desktop table and mobile card views  
+  * ENHANCED: Edit task functionality opens TaskModal with pre-filled data for editing
+  * IMPLEMENTED: Delete task confirmation with proper mutation and cache invalidation
+  * IMPROVED: Task actions available in both desktop (3-dot menu) and mobile (integrated dropdown) views
+  * RESULT: Complete CRUD operations for tasks with consistent UI patterns across all view modes
 - July 14, 2025. Successfully implemented tasks page ListView with exact daily-focus styling and proper user data integration:
   * REPLACED: Simple card-based ListView with comprehensive table/mobile view like daily-focus
   * ADDED: Desktop table view with proper columns (Task, Prioritas, Status, Tenggat, PIC, Aksi)
