@@ -246,6 +246,15 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 14, 2025. Successfully improved comment layout and QuickUpdateButton input flexibility:
+  * FIXED: Removed empty div element at line 976 in initiative-detail.tsx for cleaner code structure
+  * REDESIGNED: Comment layout with 3-dot menu positioned in top-right corner using absolute positioning
+  * IMPROVED: Comment structure with "Balas" (Reply) button moved to bottom section for better user flow
+  * ENHANCED: QuickUpdateButton target field now displays raw string values instead of formatted values
+  * UPDATED: Achievement input field changed from type="number" to type="text" for greater input flexibility
+  * OPTIMIZED: Comment cards now use relative positioning with clean avatar and content layout
+  * RESPONSIVE: Maintained mobile-friendly design with proper spacing and button positioning
+  * RESULT: Improved comment threading system with better visual hierarchy and user interaction patterns
 - July 14, 2025. Successfully standardized key result progress calculation system and fixed initiative notes API error:
   * FIXED: Standardized all key result progress calculations to use shared/progress-calculator.ts function
   * UPDATED: All backend storage functions (getKeyResult, getKeyResults, getKeyResultsByOrganization, getKeyResultsByObjectiveId) now include consistent progress calculation with shared function

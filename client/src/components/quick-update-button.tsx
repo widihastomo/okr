@@ -112,8 +112,7 @@ export function QuickUpdateButton({ metric, onUpdateSuccess }: QuickUpdateButton
             <Label htmlFor="achievement">Pencapaian Saat Ini</Label>
             <Input
               id="achievement"
-              type="number"
-              step="0.01"
+              type="text"
               value={achievement}
               onChange={(e) => setAchievement(e.target.value)}
               placeholder="Masukkan pencapaian saat ini..."
