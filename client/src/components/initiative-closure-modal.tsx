@@ -241,7 +241,7 @@ export default function InitiativeClosureModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CheckCircle className="h-5 w-5 text-green-500" />
@@ -579,22 +579,19 @@ export default function InitiativeClosureModal({
             </Card>
 
             {/* Action Buttons */}
-            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 bg-gray-50 -mx-6 px-6 py-4 rounded-b-lg">
+            <div className="flex justify-end gap-2">
               <Button 
                 type="button" 
                 variant="outline" 
                 onClick={handleClose}
                 disabled={closeInitiativeMutation.isPending}
-                size="sm"
-                className="border-gray-300 text-gray-700 hover:bg-gray-100"
               >
                 Batal
               </Button>
               <Button 
                 type="submit" 
                 disabled={closeInitiativeMutation.isPending}
-                className="bg-green-600 hover:bg-green-700 text-white shadow-sm"
-                size="sm"
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
               >
                 {closeInitiativeMutation.isPending ? "Menutup..." : "Tutup Inisiatif"}
               </Button>
