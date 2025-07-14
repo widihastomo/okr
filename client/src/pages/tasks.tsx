@@ -18,6 +18,8 @@ import { format as formatDate } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import TaskModal from '@/components/task-modal';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { Gantt, Task as GanttTask, EventOption, StylingOption, ViewMode, DisplayOption } from 'gantt-task-react';
+import 'gantt-task-react/dist/index.css';
 import {
   DndContext,
   DragEndEvent,
@@ -891,172 +893,156 @@ const TasksPage = () => {
   };
 
   const GanttView = () => {
-    const sortedTasks = [...filteredTasks].sort((a, b) => 
-      new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
-    );
-
-    // Group tasks by date
-    const tasksByDate = useMemo(() => {
-      const grouped = sortedTasks.reduce((acc, task) => {
-        const dateKey = formatDate(new Date(task.dueDate), 'yyyy-MM-dd');
-        if (!acc[dateKey]) {
-          acc[dateKey] = [];
+    const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.Day);
+    
+    // Convert tasks to Gantt format
+    const ganttTasks = useMemo(() => {
+      return filteredTasks.map((task, index) => {
+        const start = new Date(task.createdAt);
+        const end = new Date(task.dueDate);
+        
+        // Ensure end date is after start date
+        if (end <= start) {
+          end.setTime(start.getTime() + 24 * 60 * 60 * 1000); // Add 1 day
         }
-        acc[dateKey].push(task);
-        return acc;
-      }, {} as Record<string, Task[]>);
-      
-      return Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b));
-    }, [sortedTasks]);
+        
+        let type: 'task' | 'milestone' | 'project' = 'task';
+        let progress = 0;
+        
+        // Calculate progress based on status
+        switch (task.status) {
+          case 'completed':
+            progress = 100;
+            break;
+          case 'in_progress':
+            progress = 50;
+            break;
+          case 'cancelled':
+            progress = 0;
+            break;
+          default:
+            progress = 0;
+        }
+        
+        return {
+          start,
+          end,
+          name: task.title,
+          id: task.id,
+          type,
+          progress,
+          isDisabled: task.status === 'cancelled',
+          styles: {
+            backgroundColor: task.status === 'completed' ? '#10b981' : 
+                           task.status === 'in_progress' ? '#3b82f6' : 
+                           task.status === 'cancelled' ? '#ef4444' : '#6b7280',
+            backgroundSelectedColor: task.status === 'completed' ? '#059669' : 
+                                   task.status === 'in_progress' ? '#2563eb' : 
+                                   task.status === 'cancelled' ? '#dc2626' : '#4b5563',
+            progressColor: '#ffffff',
+            progressSelectedColor: '#ffffff',
+          },
+          project: task.initiative?.title || 'Umum',
+          dependencies: [],
+        } as GanttTask;
+      });
+    }, [filteredTasks]);
 
-    const getDateLabel = (dateStr: string) => {
-      const date = new Date(dateStr);
-      const today = new Date();
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
+    // Gantt chart event handlers
+    const handleTaskChange = (task: GanttTask) => {
+      console.log('Task changed:', task);
+      // You can implement task update logic here
+    };
 
-      if (formatDate(date, 'yyyy-MM-dd') === formatDate(today, 'yyyy-MM-dd')) {
-        return 'Hari Ini';
-      } else if (formatDate(date, 'yyyy-MM-dd') === formatDate(tomorrow, 'yyyy-MM-dd')) {
-        return 'Besok';
-      } else if (formatDate(date, 'yyyy-MM-dd') === formatDate(yesterday, 'yyyy-MM-dd')) {
-        return 'Kemarin';
-      } else {
-        return formatDate(date, 'EEEE, dd MMMM yyyy', { locale: id });
+    const handleTaskDelete = (task: GanttTask) => {
+      handleDeleteTask(task.id);
+    };
+
+    const handleExpanderClick = (task: GanttTask) => {
+      console.log('Expander clicked:', task);
+    };
+
+    const handleDateChange = (task: GanttTask, children: GanttTask[]) => {
+      console.log('Date changed:', task, children);
+    };
+
+    const handleProgressChange = (task: GanttTask, children: GanttTask[]) => {
+      console.log('Progress changed:', task, children);
+    };
+
+    const handleDoubleClick = (task: GanttTask) => {
+      // Find the original task and open edit modal
+      const originalTask = filteredTasks.find(t => t.id === task.id);
+      if (originalTask) {
+        handleEditTask(originalTask);
       }
     };
 
-    const getDateColor = (dateStr: string) => {
-      const date = new Date(dateStr);
-      const today = new Date();
-      
-      if (date < today) {
-        return 'text-red-600 border-red-200 bg-red-50';
-      } else if (formatDate(date, 'yyyy-MM-dd') === formatDate(today, 'yyyy-MM-dd')) {
-        return 'text-blue-600 border-blue-200 bg-blue-50';
-      } else {
-        return 'text-gray-600 border-gray-200 bg-gray-50';
-      }
+    const handleSelect = (task: GanttTask, isSelected: boolean) => {
+      console.log('Task selected:', task, isSelected);
     };
+
+    if (ganttTasks.length === 0) {
+      return (
+        <div className="text-center py-8 text-gray-500">
+          <div className="text-4xl mb-2">📊</div>
+          <p className="text-sm">Tidak ada task untuk ditampilkan di Gantt chart</p>
+        </div>
+      );
+    }
 
     return (
-      <div className="space-y-6">
-        {tasksByDate.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <div className="text-4xl mb-2">📅</div>
-            <p className="text-sm">Tidak ada task dengan tanggal tenggat</p>
-          </div>
-        ) : (
-          tasksByDate.map(([dateStr, tasks]) => (
-            <Card key={dateStr} className={`border-l-4 ${getDateColor(dateStr)}`}>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <CalendarIcon className="w-5 h-5" />
-                    {getDateLabel(dateStr)}
-                  </CardTitle>
-                  <Badge variant="outline" className="text-xs">
-                    {tasks.length} task{tasks.length > 1 ? 's' : ''}
-                  </Badge>
+      <div className="space-y-4">
+        {/* View Mode Controls */}
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-sm font-medium">Tampilan:</span>
+          <Select value={viewMode} onValueChange={(value: ViewMode) => setViewMode(value)}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ViewMode.Day}>Hari</SelectItem>
+              <SelectItem value={ViewMode.Week}>Minggu</SelectItem>
+              <SelectItem value={ViewMode.Month}>Bulan</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Gantt Chart */}
+        <div className="bg-white rounded-lg border border-gray-200 p-4 overflow-hidden">
+          <Gantt
+            tasks={ganttTasks}
+            viewMode={viewMode}
+            onDateChange={handleDateChange}
+            onTaskChange={handleTaskChange}
+            onTaskDelete={handleTaskDelete}
+            onExpanderClick={handleExpanderClick}
+            onProgressChange={handleProgressChange}
+            onDoubleClick={handleDoubleClick}
+            onSelect={handleSelect}
+            locale="id"
+            listCellWidth="200px"
+            columnWidth={60}
+            rowHeight={50}
+            ganttHeight={Math.max(400, ganttTasks.length * 50 + 100)}
+            barBackgroundColor="#f3f4f6"
+            barBackgroundSelectedColor="#e5e7eb"
+            arrowColor="#6b7280"
+            arrowIndent={20}
+            todayColor="#fbbf24"
+            TooltipContent={({ task, fontSize, fontFamily }) => (
+              <div className="bg-white p-3 rounded shadow-lg border border-gray-200 max-w-xs">
+                <div className="font-medium text-sm mb-1">{task.name}</div>
+                <div className="text-xs text-gray-600 space-y-1">
+                  <div>Mulai: {formatDate(task.start, 'dd/MM/yyyy')}</div>
+                  <div>Selesai: {formatDate(task.end, 'dd/MM/yyyy')}</div>
+                  <div>Progress: {task.progress}%</div>
+                  {task.project && <div>Proyek: {task.project}</div>}
                 </div>
-                <CardDescription className="text-sm">
-                  {formatDate(new Date(dateStr), 'dd MMMM yyyy', { locale: id })}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {tasks.map(task => (
-                    <div key={task.id} className="flex items-center space-x-4 p-3 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <Link
-                              href={`/tasks/${task.id}`}
-                              className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer truncate"
-                            >
-                              {task.title}
-                            </Link>
-                            {isTaskOverdue(task) && (
-                              <Badge variant="destructive" className="text-xs">
-                                Overdue
-                              </Badge>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className={`w-3 h-3 rounded-full ${getPriorityColor(task.priority)}`}></div>
-                            <Badge variant="outline" className={getStatusColor(task.status)}>
-                              {getStatusText(task.status)}
-                            </Badge>
-                          </div>
-                        </div>
-                        
-                        {task.description && (
-                          <p className="text-sm text-gray-600 mb-2 line-clamp-2">{task.description}</p>
-                        )}
-                        
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            {task.initiative && (
-                              <div className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded">
-                                {task.initiative.title}
-                              </div>
-                            )}
-                          </div>
-                          
-                          <div className="flex items-center gap-2">
-                            {task.assignedTo ? (
-                              <div className="flex items-center gap-1">
-                                <Avatar className="w-5 h-5">
-                                  <AvatarImage
-                                    src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
-                                  />
-                                  <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
-                                    {getUserInitials(task.assignedTo)}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <span className="text-xs text-gray-600">
-                                  {getUserName(task.assignedTo)}
-                                </span>
-                              </div>
-                            ) : (
-                              <span className="text-xs text-gray-500">Belum ditentukan</span>
-                            )}
-                            
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                  <MoreVertical className="h-3 w-3" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem asChild>
-                                  <Link href={`/tasks/${task.id}`} className="flex items-center">
-                                    <Eye className="mr-2 h-4 w-4" />
-                                    Lihat Detail
-                                  </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleEditTask(task)}>
-                                  <Edit className="mr-2 h-4 w-4" />
-                                  Edit
-                                </DropdownMenuItem>
-                                <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteTask(task.id)}>
-                                  <Trash2 className="mr-2 h-4 w-4" />
-                                  Hapus
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        )}
+              </div>
+            )}
+          />
+        </div>
       </div>
     );
   };
