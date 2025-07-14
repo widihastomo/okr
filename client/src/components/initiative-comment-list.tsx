@@ -216,18 +216,25 @@ export function InitiativeCommentList({ initiativeId }: InitiativeCommentListPro
                   {currentUser?.id === comment.authorId && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 opacity-50 hover:opacity-100">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 w-8 p-0 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                        >
                           <MoreVertical className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEditStart(comment)}>
+                      <DropdownMenuContent align="end" className="min-w-[140px]">
+                        <DropdownMenuItem 
+                          onClick={() => handleEditStart(comment)}
+                          className="cursor-pointer"
+                        >
                           <Edit2 className="w-4 h-4 mr-2" />
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => setDeleteCommentId(comment.id)}
-                          className="text-red-600 hover:text-red-700"
+                          className="text-red-600 hover:text-red-700 cursor-pointer"
                         >
                           <Trash2 className="w-4 h-4 mr-2" />
                           Hapus
