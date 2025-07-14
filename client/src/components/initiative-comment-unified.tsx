@@ -29,6 +29,7 @@ import { Separator } from '@/components/ui/separator';
 import { apiRequest } from '@/lib/queryClient';
 import { useAuth } from '@/hooks/useAuth';
 import { Textarea } from '@/components/ui/textarea';
+import { InitiativeCommentEditor } from '@/components/initiative-comment-editor';
 
 interface InitiativeComment {
   id: string;
@@ -57,7 +58,6 @@ interface InitiativeCommentUnifiedProps {
 
 export function InitiativeCommentUnified({ initiativeId }: InitiativeCommentUnifiedProps) {
   const [isCommenting, setIsCommenting] = useState(false);
-  const [newComment, setNewComment] = useState('');
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState('');
   const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
@@ -74,17 +74,6 @@ export function InitiativeCommentUnified({ initiativeId }: InitiativeCommentUnif
 
   // Ensure comments is always an array
   const comments = Array.isArray(commentsData) ? commentsData : [];
-
-  // Create comment mutation
-  const createCommentMutation = useMutation({
-    mutationFn: (content: string) => 
-      apiRequest('POST', `/api/initiatives/${initiativeId}/comments`, { content }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/initiatives', initiativeId, 'comments'] });
-      setNewComment('');
-      setIsCommenting(false);
-    }
-  });
 
   // Update comment mutation
   const updateCommentMutation = useMutation({
@@ -105,12 +94,6 @@ export function InitiativeCommentUnified({ initiativeId }: InitiativeCommentUnif
       queryClient.invalidateQueries({ queryKey: ['/api/initiatives', initiativeId, 'comments'] });
     }
   });
-
-  const handleCreateComment = () => {
-    if (newComment.trim()) {
-      createCommentMutation.mutate(newComment);
-    }
-  };
 
   const handleUpdateComment = (commentId: string) => {
     if (editingContent.trim()) {
@@ -228,34 +211,18 @@ export function InitiativeCommentUnified({ initiativeId }: InitiativeCommentUnif
       <CardContent className="space-y-4">
         {/* Add Comment Section */}
         {isCommenting && (
-          <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
-            <Textarea
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
+          <div className="space-y-3">
+            <InitiativeCommentEditor
+              initiativeId={initiativeId}
+              onCommentAdded={() => {
+                setIsCommenting(false);
+              }}
               placeholder="Tulis komentar..."
-              className="min-h-[100px] resize-none"
+              showCancelButton={true}
+              onCancel={() => {
+                setIsCommenting(false);
+              }}
             />
-            <div className="flex gap-2 justify-end">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setIsCommenting(false);
-                  setNewComment('');
-                }}
-              >
-                Batal
-              </Button>
-              <Button
-                size="sm"
-                onClick={handleCreateComment}
-                disabled={!newComment.trim() || createCommentMutation.isPending}
-                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
-              >
-                <Send className="w-4 h-4 mr-2" />
-                {createCommentMutation.isPending ? 'Mengirim...' : 'Kirim'}
-              </Button>
-            </div>
           </div>
         )}
 
