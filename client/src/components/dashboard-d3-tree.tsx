@@ -156,13 +156,14 @@ export default function DashboardD3Tree({
 
     // Build tree data
     const treeData = buildTree(goals);
-    console.log('Dashboard D3 Tree Data:', {
+    console.log('Dashboard D3 Tree Data (Vertical Layout):', {
       totalGoals: goals.length,
       treeDataLength: treeData.length,
-      rootNodes: treeData.map(node => ({
+      rootNodes: treeData.map((node, index) => ({
         id: node.id,
         title: node.data.title,
-        childrenCount: node.children.length
+        childrenCount: node.children.length,
+        verticalOffset: index * (verticalSpacing * 3)
       }))
     });
     if (treeData.length === 0) return;
@@ -183,11 +184,11 @@ export default function DashboardD3Tree({
     rootHierarchies.forEach((root, index) => {
       treeLayout(root);
       
-      // Offset each tree horizontally so they don't overlap
-      const offsetX = index * (horizontalSpacing * 2);
+      // Offset each tree vertically so they don't overlap
+      const offsetY = index * (verticalSpacing * 3);
       root.descendants().forEach(d => {
-        if (d.y !== undefined) {
-          d.y += offsetX;
+        if (d.x !== undefined) {
+          d.x += offsetY;
         }
       });
     });
