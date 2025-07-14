@@ -61,7 +61,7 @@ export default function Dashboard() {
   const [location, setLocation] = useLocation();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [cycleFilter, setCycleFilter] = useState<string>("all");
-  const [userFilter, setUserFilter] = useState<string>("all");
+  const [userFilter, setUserFilter] = useState<string>("");
   const [hasAutoSelected, setHasAutoSelected] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("list");
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
@@ -232,7 +232,22 @@ export default function Dashboard() {
     }
   }, [defaultCycle?.id, hasAutoSelected]); // Only auto-select once
 
-  // Note: userFilter now defaults to "all" in useState initialization
+  // Set default user filter to current user on first load only if no URL param exists
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const userParam = urlParams.get("user");
+
+    // Only set to current user if no URL parameter exists and filter is empty
+    if (
+      currentUser &&
+      userFilter === "" &&
+      !userParam &&
+      typeof currentUser === "object" &&
+      "id" in currentUser
+    ) {
+      setUserFilter((currentUser as any).id);
+    }
+  }, [currentUser]);
 
   const {
     data: allGoals = [],

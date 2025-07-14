@@ -255,12 +255,6 @@ All email configuration now uses environment variables:
   * VERIFIED: No remaining AI Assistant references in codebase
   * BENEFIT: Eliminated OpenAI quota-related errors and improved application stability
   * RESULT: Clean codebase without AI dependencies, fully functional without OpenAI integration
-- July 14, 2025. Successfully implemented default "all users" selection in dashboard SearchableUserSelect:
-  * UPDATED: Dashboard userFilter default from empty string to "all" for consistent user experience
-  * REMOVED: useEffect that auto-selected current user as default in dashboard
-  * MAINTAINED: Daily-focus page continues to default to current user (userId || "all") as preferred
-  * ENHANCED: Dashboard now shows "Semua User" as default selection for broader data visibility
-  * RESULT: Consistent behavior where dashboard defaults to all users, daily-focus defaults to current user
 - July 14, 2025. Successfully implemented comprehensive disable system for cancelled initiatives across entire UI:
   * DISABLED: All buttons (Tambah Metrik, Tambah Task, task status dropdowns, success metrics actions) when initiative status is "dibatalkan"
   * DISABLED: All dropdown menus (3-dot menus) for task actions and success metrics when initiative status is "dibatalkan"

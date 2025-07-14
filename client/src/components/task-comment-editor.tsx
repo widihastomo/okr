@@ -136,7 +136,7 @@ export function TaskCommentEditor({
     console.log("User selected:", user);
     const beforeMention = content.substring(0, cursorPosition);
     const afterMention = content.substring(cursorPosition + mentionQuery.length + 1);
-    const newContent = `${beforeMention}@${user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : "Unknown User"} ${afterMention}`;
+    const newContent = `${beforeMention}@${user.firstName || user.email} ${afterMention}`;
     
     console.log("New content:", newContent);
     setContent(newContent);

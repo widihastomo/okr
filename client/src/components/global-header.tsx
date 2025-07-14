@@ -166,8 +166,8 @@ export default function GlobalHeader({
     if (firstName && lastName) {
       return `${firstName[0]}${lastName[0]}`.toUpperCase();
     }
-    if (firstName) {
-      return firstName[0].toUpperCase();
+    if ((user as any)?.email) {
+      return (user as any).email[0].toUpperCase();
     }
     return "U";
   };
