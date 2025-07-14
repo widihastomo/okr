@@ -733,7 +733,26 @@ export class DatabaseStorage implements IStorage {
 
   // Key Results
   async getKeyResults(): Promise<KeyResult[]> {
-    return await db.select().from(keyResults);
+    const keyResultsData = await db.select().from(keyResults);
+    
+    // Calculate progress for each key result using the shared progress calculator
+    const { calculateKeyResultProgress } = await import("../shared/progress-calculator");
+    
+    return keyResultsData.map(kr => {
+      const progressResult = calculateKeyResultProgress(
+        kr.currentValue,
+        kr.targetValue,
+        kr.keyResultType,
+        kr.baseValue
+      );
+      
+      return {
+        ...kr,
+        progress: progressResult.progressPercentage,
+        isCompleted: progressResult.isCompleted,
+        isValid: progressResult.isValid
+      };
+    });
   }
 
   async getKeyResultsByOrganization(organizationId: string): Promise<KeyResult[]> {
@@ -745,19 +764,50 @@ export class DatabaseStorage implements IStorage {
       .innerJoin(users, eq(users.id, objectives.ownerId))
       .where(eq(users.organizationId, organizationId));
     
-    return result.map(r => r.keyResult);
+    // Calculate progress for each key result using the shared progress calculator
+    const { calculateKeyResultProgress } = await import("../shared/progress-calculator");
+    
+    return result.map(r => {
+      const kr = r.keyResult;
+      const progressResult = calculateKeyResultProgress(
+        kr.currentValue,
+        kr.targetValue,
+        kr.keyResultType,
+        kr.baseValue
+      );
+      
+      return {
+        ...kr,
+        progress: progressResult.progressPercentage,
+        isCompleted: progressResult.isCompleted,
+        isValid: progressResult.isValid
+      };
+    });
   }
 
   async getKeyResultsByObjectiveId(objectiveId: string): Promise<KeyResult[]> {
     const keyResultsList = await db.select().from(keyResults).where(eq(keyResults.objectiveId, objectiveId));
+    
+    // Import the shared progress calculator
+    const { calculateKeyResultProgress } = await import("../shared/progress-calculator");
     
     // Get the objective to find the cycle for date calculation
     const objective = await this.getObjective(objectiveId);
     if (!objective || !objective.cycleId) {
       return await Promise.all(keyResultsList.map(async kr => {
         const lastCheckIn = await this.getLastCheckInForKeyResult(kr.id);
+        const progressResult = calculateKeyResultProgress(
+          kr.currentValue,
+          kr.targetValue,
+          kr.keyResultType,
+          kr.baseValue
+        );
+        
         return {
           ...kr,
+          progress: progressResult.progressPercentage,
+          isCompleted: progressResult.isCompleted,
+          isValid: progressResult.isValid,
           status: kr.status || 'on_track',
           timeProgressPercentage: 0,
           lastCheckIn
@@ -770,8 +820,18 @@ export class DatabaseStorage implements IStorage {
     if (!cycle) {
       return await Promise.all(keyResultsList.map(async kr => {
         const lastCheckIn = await this.getLastCheckInForKeyResult(kr.id);
+        const progressResult = calculateKeyResultProgress(
+          kr.currentValue,
+          kr.targetValue,
+          kr.keyResultType,
+          kr.baseValue
+        );
+        
         return {
           ...kr,
+          progress: progressResult.progressPercentage,
+          isCompleted: progressResult.isCompleted,
+          isValid: progressResult.isValid,
           status: kr.status || 'on_track',
           timeProgressPercentage: 0,
           lastCheckIn
@@ -787,9 +847,18 @@ export class DatabaseStorage implements IStorage {
         
         const progressStatus = calculateProgressStatus(kr, startDate, endDate);
         const lastCheckIn = await this.getLastCheckInForKeyResult(kr.id);
+        const progressResult = calculateKeyResultProgress(
+          kr.currentValue,
+          kr.targetValue,
+          kr.keyResultType,
+          kr.baseValue
+        );
         
         return {
           ...kr,
+          progress: progressResult.progressPercentage,
+          isCompleted: progressResult.isCompleted,
+          isValid: progressResult.isValid,
           status: progressStatus.status,
           timeProgressPercentage: progressStatus.timeProgressPercentage,
           lastCheckIn
@@ -797,9 +866,19 @@ export class DatabaseStorage implements IStorage {
       } catch (error) {
         console.error('Error calculating progress status for key result:', kr.id, error);
         const lastCheckIn = await this.getLastCheckInForKeyResult(kr.id);
+        const progressResult = calculateKeyResultProgress(
+          kr.currentValue,
+          kr.targetValue,
+          kr.keyResultType,
+          kr.baseValue
+        );
+        
         // Return key result with default values if calculation fails
         return {
           ...kr,
+          progress: progressResult.progressPercentage,
+          isCompleted: progressResult.isCompleted,
+          isValid: progressResult.isValid,
           status: kr.status || 'on_track',
           timeProgressPercentage: 0,
           lastCheckIn
@@ -810,7 +889,23 @@ export class DatabaseStorage implements IStorage {
 
   async getKeyResult(id: string): Promise<KeyResult | undefined> {
     const [keyResult] = await db.select().from(keyResults).where(eq(keyResults.id, id));
-    return keyResult;
+    if (!keyResult) return undefined;
+    
+    // Calculate progress using the shared progress calculator
+    const { calculateKeyResultProgress } = await import("../shared/progress-calculator");
+    const progressResult = calculateKeyResultProgress(
+      keyResult.currentValue,
+      keyResult.targetValue,
+      keyResult.keyResultType,
+      keyResult.baseValue
+    );
+    
+    return {
+      ...keyResult,
+      progress: progressResult.progressPercentage,
+      isCompleted: progressResult.isCompleted,
+      isValid: progressResult.isValid
+    };
   }
 
   async createKeyResult(keyResultData: InsertKeyResult): Promise<KeyResult> {
@@ -1305,11 +1400,26 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(users, eq(tasks.assignedTo, users.id))
       .where(eq(tasks.initiativeId, id));
 
-    // Get related key result
+    // Get related key result with progress calculation
     let keyResult = null;
     if (initiative.keyResultId) {
       const [kr] = await db.select().from(keyResults).where(eq(keyResults.id, initiative.keyResultId));
-      keyResult = kr;
+      if (kr) {
+        // Calculate progress using the shared progress calculator
+        const { calculateKeyResultProgress } = await import("../shared/progress-calculator");
+        const progressResult = calculateKeyResultProgress(
+          kr.currentValue,
+          kr.targetValue,
+          kr.keyResultType,
+          kr.baseValue
+        );
+        keyResult = {
+          ...kr,
+          progress: progressResult.progressPercentage,
+          isCompleted: progressResult.isCompleted,
+          isValid: progressResult.isValid
+        };
+      }
     }
 
     return {

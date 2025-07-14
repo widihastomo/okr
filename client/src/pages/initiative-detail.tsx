@@ -77,6 +77,7 @@ import InitiativeFormModal from "@/components/initiative-form-modal";
 import { InitiativeNotes } from "@/components/initiative-notes";
 import SuccessMetricsModal from "@/components/success-metrics-modal-simple";
 import InitiativeClosureModal from "@/components/initiative-closure-modal";
+import { calculateKeyResultProgress } from "@shared/progress-calculator";
 import type { SuccessMetricWithUpdates } from "@shared/schema";
 
 // Helper functions for task status and priority
@@ -686,35 +687,15 @@ export default function InitiativeDetailPage() {
   const canClose = (status: string) => status === 'sedang_berjalan';
   const canCancel = (status: string) => status === 'draft' || status === 'sedang_berjalan';
 
-  // Helper functions
+  // Helper functions - use shared progress calculator
   const calculateMetricProgress = (metric: any): number => {
-    const current = Number(metric.currentValue) || 0;
-    const target = Number(metric.targetValue) || 0;
-    const base = Number(metric.baseValue) || 0;
-
-    if (metric.type === "achieve_or_not") {
-      return current >= target ? 100 : 0;
-    }
-
-    if (metric.type === "increase_to") {
-      if (target === base) return 0;
-      return Math.min(100, Math.max(0, ((current - base) / (target - base)) * 100));
-    }
-
-    if (metric.type === "decrease_to") {
-      if (base === target) return 0;
-      return Math.min(100, Math.max(0, ((base - current) / (base - target)) * 100));
-    }
-
-    if (metric.type === "should_stay_above") {
-      return current >= target ? 100 : 0;
-    }
-
-    if (metric.type === "should_stay_below") {
-      return current <= target ? 100 : 0;
-    }
-
-    return 0;
+    const result = calculateKeyResultProgress(
+      metric.currentValue,
+      metric.targetValue,
+      metric.type,
+      metric.baseValue
+    );
+    return result.progressPercentage;
   };
 
   // Event handlers
