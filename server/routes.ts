@@ -2775,6 +2775,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!updatedInitiative) {
         return res.status(404).json({ message: "Initiative not found" });
       }
+
+      // Create audit trail for specific status changes
+      if (validatedData.status) {
+        try {
+          let changeDescription = '';
+          if (validatedData.status === 'selesai') {
+            changeDescription = 'Inisiatif diselesaikan';
+          } else if (validatedData.status === 'sedang_berjalan') {
+            changeDescription = 'Inisiatif dibuka kembali dan statusnya diubah ke sedang berjalan';
+          } else if (validatedData.status === 'dibatalkan') {
+            changeDescription = 'Inisiatif dibatalkan';
+          } else if (validatedData.status === 'draft') {
+            changeDescription = 'Inisiatif diubah ke status draft';
+          }
+          
+          if (changeDescription) {
+            await storage.createAuditTrail({
+              entityType: 'initiative',
+              entityId: id,
+              action: 'status_change',
+              changeDescription: changeDescription,
+              userId: currentUser.id,
+              organizationId: currentUser.organizationId
+            });
+          }
+        } catch (auditError) {
+          console.error('Error creating audit trail for initiative status change:', auditError);
+        }
+      }
       
       res.json(updatedInitiative);
     } catch (error) {
@@ -4065,6 +4094,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!updatedInitiative) {
         return res.status(404).json({ message: "Initiative not found" });
       }
+
+      // Create audit trail for specific status changes
+      if (updateData.status) {
+        try {
+          let changeDescription = '';
+          if (updateData.status === 'selesai') {
+            changeDescription = 'Inisiatif diselesaikan';
+          } else if (updateData.status === 'sedang_berjalan') {
+            changeDescription = 'Inisiatif dibuka kembali dan statusnya diubah ke sedang berjalan';
+          } else if (updateData.status === 'dibatalkan') {
+            changeDescription = 'Inisiatif dibatalkan';
+          } else if (updateData.status === 'draft') {
+            changeDescription = 'Inisiatif diubah ke status draft';
+          }
+          
+          if (changeDescription) {
+            await storage.createAuditTrail({
+              entityType: 'initiative',
+              entityId: id,
+              action: 'status_change',
+              changeDescription: changeDescription,
+              userId: currentUser.id,
+              organizationId: currentUser.organizationId
+            });
+          }
+        } catch (auditError) {
+          console.error('Error creating audit trail for initiative status change:', auditError);
+        }
+      }
       
       res.json(updatedInitiative);
     } catch (error) {
@@ -4101,6 +4159,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!updatedInitiative) {
         return res.status(404).json({ message: "Initiative not found" });
+      }
+
+      // Create audit trail for specific status changes
+      if (result.data.status) {
+        try {
+          let changeDescription = '';
+          if (result.data.status === 'selesai') {
+            changeDescription = 'Inisiatif diselesaikan';
+          } else if (result.data.status === 'sedang_berjalan') {
+            changeDescription = 'Inisiatif dibuka kembali dan statusnya diubah ke sedang berjalan';
+          } else if (result.data.status === 'dibatalkan') {
+            changeDescription = 'Inisiatif dibatalkan';
+          } else if (result.data.status === 'draft') {
+            changeDescription = 'Inisiatif diubah ke status draft';
+          }
+          
+          if (changeDescription) {
+            await storage.createAuditTrail({
+              entityType: 'initiative',
+              entityId: id,
+              action: 'status_change',
+              changeDescription: changeDescription,
+              userId: currentUser.id,
+              organizationId: currentUser.organizationId
+            });
+          }
+        } catch (auditError) {
+          console.error('Error creating audit trail for initiative status change:', auditError);
+        }
       }
       
       res.json(updatedInitiative);
@@ -5272,6 +5359,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         completedAt: new Date()
       });
 
+      // Create audit trail for initiative closure
+      try {
+        await storage.createAuditTrail({
+          entityType: 'initiative',
+          entityId: initiativeId,
+          action: 'close',
+          changeDescription: `Inisiatif ditutup dengan hasil: ${validatedData.finalResult}`,
+          userId: userId,
+          organizationId: req.user.organizationId
+        });
+      } catch (auditError) {
+        console.error('Error creating audit trail for initiative closure:', auditError);
+      }
+
       res.json(updatedInitiative);
     } catch (error) {
       console.error("Error closing initiative:", error);
@@ -5300,6 +5401,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         closedBy: userId,
         closedAt: new Date()
       });
+
+      // Create audit trail for initiative cancellation
+      try {
+        await storage.createAuditTrail({
+          entityType: 'initiative',
+          entityId: initiativeId,
+          action: 'cancel',
+          changeDescription: `Inisiatif dibatalkan dengan alasan: ${cancelReason}`,
+          userId: userId,
+          organizationId: req.user.organizationId
+        });
+      } catch (auditError) {
+        console.error('Error creating audit trail for initiative cancellation:', auditError);
+      }
 
       res.json(updatedInitiative);
     } catch (error) {

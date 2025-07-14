@@ -260,6 +260,7 @@ All email configuration now uses environment variables:
   * ENHANCED: Complete cache invalidation system for reopened initiatives
   * IMPROVED: All disabled states provide proper visual feedback and prevent accidental modifications
   * RESULT: Robust system preventing edits to completed initiatives while allowing controlled reopening when needed
+  * AUDIT: Added comprehensive audit trail for initiative status changes (close, cancel, reopen) with descriptive Indonesian messages
 - July 14, 2025. Successfully implemented contextual placeholder system, fixed success metrics display, and added task validation in initiative closure modal:
   * ENHANCED: Replaced static placeholders with dynamic examples that change based on initiative result type (berhasil/gagal/perlu_diulang)
   * IMPLEMENTED: Contextual examples for all form sections - reason, learning, budget, and additional notes
