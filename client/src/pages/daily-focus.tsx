@@ -333,7 +333,7 @@ export default function DailyFocusPage() {
   const [isSuccessMetricsModalOpen, setIsSuccessMetricsModalOpen] =
     useState(false);
   const [selectedInitiative, setSelectedInitiative] = useState<any>(null);
-  const [selectedUserId, setSelectedUserId] = useState<string>("all"); // Filter state - default to all users
+  const [selectedUserId, setSelectedUserId] = useState<string>(userId || "all"); // Filter state - default to current user
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
