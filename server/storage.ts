@@ -2567,6 +2567,23 @@ export class DatabaseStorage implements IStorage {
         }
       }
 
+      // Add initiative update entries if initiative was updated after creation
+      if (initiativeData.updatedAt && initiativeData.updatedAt > initiativeData.createdAt) {
+        history.push({
+          id: `${initiativeData.id}-updated`,
+          action: 'updated',
+          description: 'Inisiatif diperbarui',
+          timestamp: initiativeData.updatedAt,
+          user: {
+            id: initiativeData.creator.id,
+            email: initiativeData.creator.email,
+            firstName: initiativeData.creator.firstName,
+            lastName: initiativeData.creator.lastName,
+            role: initiativeData.creator.role
+          }
+        });
+      }
+
       // Sort by timestamp descending (newest first)
       history.sort((a, b) => {
         const timeA = a.timestamp ? new Date(a.timestamp).getTime() : 0;

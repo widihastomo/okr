@@ -257,6 +257,7 @@ All email configuration now uses environment variables:
   * FIXED: "initiativeId not defined" error in initiative-detail.tsx by using correct variable name `id` from useParams
   * ENHANCED: Added success metrics updates to initiative history by integrating metrics data into getInitiativeHistory function
   * FIXED: Drizzle ORM query error by using separate queries instead of complex leftJoin for success metrics history
+  * ADDED: Initiative update tracking to history system - updates now show "Inisiatif diperbarui" entries
   * OPTIMIZED: Comment cards now use relative positioning with clean avatar and content layout
   * RESPONSIVE: Maintained mobile-friendly design with proper spacing and button positioning
   * RESULT: Improved comment threading system with better visual hierarchy and user interaction patterns
