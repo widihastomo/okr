@@ -77,8 +77,13 @@ const TasksPage = () => {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
-  const [isFilterCollapsed, setIsFilterCollapsed] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isFilterCollapsed, setIsFilterCollapsed] = useState(() => {
+    // Initialize based on window size
+    return typeof window !== 'undefined' && window.innerWidth < 768;
+  });
+  const [isMobile, setIsMobile] = useState(() => {
+    return typeof window !== 'undefined' && window.innerWidth < 768;
+  });
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -118,16 +123,21 @@ const TasksPage = () => {
     const checkMobile = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      // Default to collapsed on mobile
-      if (mobile && !isFilterCollapsed) {
-        setIsFilterCollapsed(true);
-      }
     };
 
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
-  }, [isFilterCollapsed]);
+  }, []);
+
+  // Set initial collapse state based on mobile detection
+  useEffect(() => {
+    console.log('Mobile detection effect:', { isMobile, isFilterCollapsed });
+    if (isMobile && !isFilterCollapsed) {
+      console.log('Setting filter to collapsed for mobile');
+      setIsFilterCollapsed(true);
+    }
+  }, [isMobile]);
 
   // Helper function to get user name
   const getUserName = (userId: string) => {
@@ -1193,8 +1203,19 @@ const TasksPage = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setIsFilterCollapsed(!isFilterCollapsed)}
-                className="ml-2 p-1 h-6 w-6"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('Toggle clicked, current state:', isFilterCollapsed);
+                  setIsFilterCollapsed(!isFilterCollapsed);
+                }}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('Touch start, current state:', isFilterCollapsed);
+                  setIsFilterCollapsed(!isFilterCollapsed);
+                }}
+                className="ml-2 p-1 h-6 w-6 touch-manipulation"
               >
                 {isFilterCollapsed ? (
                   <ChevronDown className="w-4 h-4" />
@@ -1228,7 +1249,7 @@ const TasksPage = () => {
             </div>
           </CardTitle>
         </CardHeader>
-        <div className={`transition-all duration-300 ease-in-out ${isFilterCollapsed ? 'max-h-0 opacity-0' : 'max-h-96 opacity-100'} overflow-hidden`}>
+        <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isFilterCollapsed ? 'max-h-0 opacity-0' : 'max-h-[500px] opacity-100'}`}>
           <CardContent className="space-y-4">
             {/* Search Row */}
             <div className="flex items-center space-x-2">
