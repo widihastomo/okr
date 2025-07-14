@@ -71,6 +71,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import TaskModal from "@/components/task-modal";
 import InitiativeFormModal from "@/components/initiative-form-modal";
 import { InitiativeNotes } from "@/components/initiative-notes";
@@ -506,6 +507,7 @@ export default function InitiativeDetailPage() {
   const [cancelReason, setCancelReason] = useState("");
   const [isDeleteMetricModalOpen, setIsDeleteMetricModalOpen] = useState(false);
   const [metricToDelete, setMetricToDelete] = useState<any>(null);
+  const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
 
   // All queries declared at the top level
   const { data: initiative, isLoading: initiativeLoading } = useQuery({
@@ -919,7 +921,12 @@ export default function InitiativeDetailPage() {
                           )}
                           {members.length > 0 && (
                             <div className="flex items-center gap-1">
-                              <span className="text-xs text-gray-500">+{members.length} anggota</span>
+                              <span 
+                                className="text-xs text-gray-500 hover:text-orange-600 cursor-pointer underline"
+                                onClick={() => setIsTeamModalOpen(true)}
+                              >
+                                +{members.length} anggota
+                              </span>
                             </div>
                           )}
                           {!pic && members.length === 0 && (
@@ -1628,6 +1635,77 @@ export default function InitiativeDetailPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Team Members Modal */}
+      <Dialog open={isTeamModalOpen} onOpenChange={setIsTeamModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-orange-500" />
+              Anggota Tim Inisiatif
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {/* PIC Section */}
+            {pic && (
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-2">PIC (Person in Charge)</h4>
+                <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-medium">
+                    {pic.firstName?.charAt(0)}{pic.lastName?.charAt(0)}
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900">
+                      {pic.firstName} {pic.lastName}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {pic.email}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Team Members Section */}
+            {members.length > 0 && (
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-2">
+                  Anggota Tim ({members.length})
+                </h4>
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {members.map((member: any) => (
+                    <div key={member.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                      <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center text-white font-medium">
+                        {member.user?.firstName?.charAt(0)}{member.user?.lastName?.charAt(0)}
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-medium text-gray-900">
+                          {member.user?.firstName} {member.user?.lastName}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {member.user?.email}
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-500 capitalize">
+                        {member.role}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Empty State */}
+            {!pic && members.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                <Users className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                <p className="text-sm">Belum ada anggota tim</p>
+                <p className="text-xs mt-1">Tim akan ditampilkan setelah ditambahkan</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
