@@ -28,6 +28,8 @@ import {
   HelpCircle,
   CheckSquare,
   Eye,
+  AlertTriangle,
+  Minus,
 } from "lucide-react";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
@@ -126,6 +128,36 @@ const getTaskPriorityLabel = (priority: string) => {
       return "Rendah";
     default:
       return "Sedang";
+  }
+};
+
+// Helper function to get task priority icon with tooltip
+const getTaskPriorityIcon = (priority: string) => {
+  switch (priority) {
+    case "high":
+      return { 
+        icon: <AlertTriangle className="h-4 w-4" />, 
+        color: "text-red-600",
+        label: "Prioritas Tinggi"
+      };
+    case "medium":
+      return { 
+        icon: <Minus className="h-4 w-4" />, 
+        color: "text-yellow-600",
+        label: "Prioritas Sedang"
+      };
+    case "low":
+      return { 
+        icon: <Flag className="h-4 w-4" />, 
+        color: "text-green-600",
+        label: "Prioritas Rendah"
+      };
+    default:
+      return { 
+        icon: <Minus className="h-4 w-4" />, 
+        color: "text-yellow-600",
+        label: "Prioritas Sedang"
+      };
   }
 };
 
@@ -1151,9 +1183,18 @@ export default function InitiativeDetailPage() {
                               </div>
                             </td>
                             <td className="px-4 py-4 text-center">
-                              <Badge className={getTaskPriorityColor(task.priority || "medium")}>
-                                {getTaskPriorityLabel(task.priority || "medium")}
-                              </Badge>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div className={`inline-flex items-center justify-center cursor-pointer ${getTaskPriorityIcon(task.priority || "medium").color}`}>
+                                      {getTaskPriorityIcon(task.priority || "medium").icon}
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>{getTaskPriorityIcon(task.priority || "medium").label}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                             </td>
                             <td className="px-4 py-4">
                               <DropdownMenu>
@@ -1300,9 +1341,18 @@ export default function InitiativeDetailPage() {
                               <div className="text-sm text-gray-600 mt-1">{task.description}</div>
                             )}
                             <div className="flex items-center gap-2 mt-1">
-                              <Badge className={getTaskPriorityColor(task.priority || "medium")}>
-                                {getTaskPriorityLabel(task.priority || "medium")}
-                              </Badge>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div className={`inline-flex items-center justify-center cursor-pointer ${getTaskPriorityIcon(task.priority || "medium").color}`}>
+                                      {getTaskPriorityIcon(task.priority || "medium").icon}
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>{getTaskPriorityIcon(task.priority || "medium").label}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                               <TaskCommentCount taskId={task.id} />
                             </div>
                           </div>
