@@ -191,7 +191,7 @@ export default function GoalNetworkSimple() {
       }
     } else if (type === 'initiative') {
       switch (status) {
-        case 'in_progress': return 'border-blue-300 text-blue-700 bg-blue-50';
+        case 'sedang_berjalan': return 'border-blue-300 text-blue-700 bg-blue-50';
         case 'selesai': return 'border-green-300 text-green-700 bg-green-50';
         case 'dibatalkan': return 'border-red-300 text-red-700 bg-red-50';
         default: return 'border-gray-300 text-gray-700 bg-gray-50';

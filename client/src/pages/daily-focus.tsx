@@ -1030,7 +1030,7 @@ export default function DailyFocusPage() {
   });
 
   const activeInitiatives = filteredInitiatives.filter(
-    (init: any) => init.status === "in_progress" || init.status === "draft",
+    (init: any) => init.status === "sedang_berjalan" || init.status === "draft",
   );
 
 
@@ -3258,8 +3258,8 @@ export default function DailyFocusPage() {
                                   bgColor: "bg-gray-100",
                                   textColor: "text-gray-800",
                                 },
-                                in_progress: {
-                                  label: "On Progress",
+                                sedang_berjalan: {
+                                  label: "Sedang Berjalan",
                                   bgColor: "bg-blue-100",
                                   textColor: "text-blue-800",
                                 },
@@ -3499,8 +3499,8 @@ export default function DailyFocusPage() {
                               bgColor: "bg-gray-100",
                               textColor: "text-gray-800",
                             },
-                            in_progress: {
-                              label: "On Progress",
+                            sedang_berjalan: {
+                              label: "Sedang Berjalan",
                               bgColor: "bg-blue-100",
                               textColor: "text-blue-800",
                             },

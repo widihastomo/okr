@@ -246,23 +246,6 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
-- July 14, 2025. Successfully completed terminology update from "Sedang Berjalan" to "On Progress" across entire client application:
-  * UPDATED: server/initiative-status-manager.ts to use "On Progress" terminology instead of "Sedang Berjalan"
-  * UPDATED: client/src/components/initiative-modal.tsx with "On Progress" in dropdown and status label function
-  * UPDATED: client/src/pages/analytics.tsx getStatusLabel function to use "On Progress" terminology
-  * UPDATED: client/src/components/initiative-modal-old.tsx status label function for consistency
-  * UPDATED: client/src/pages/initiative-detail-old.tsx status label function for consistency
-  * UPDATED: client/src/components/okr-hierarchy-view.tsx to use "On Progress" instead of "Berlangsung"
-  * UPDATED: client/src/components/quick-task-fab.tsx status label function for consistency
-  * UPDATED: client/src/components/goal-network-simple.tsx to use 'in_progress' instead of 'sedang_berjalan'
-  * UPDATED: client/src/components/goal-network-visualization.tsx to use 'in_progress' status for consistency
-  * UPDATED: client/src/components/goal-mindmap.tsx to use 'in_progress' status for consistency
-  * UPDATED: client/src/pages/daily-focus.tsx initiative filtering and status maps to use 'in_progress'
-  * UPDATED: client/src/pages/initiative-detail.tsx status configuration and permission functions
-  * UPDATED: client/src/pages/objective-detail.tsx status mapping to use 'in_progress' status
-  * STANDARDIZED: All initiative status references now use consistent 'in_progress' value and "On Progress" display text
-  * UNIFIED: Status terminology across entire application for better consistency and user experience
-  * RESULT: Complete terminology standardization from "Sedang Berjalan" to "On Progress" throughout entire client application
 - July 14, 2025. Successfully integrated task priority icons with task names and optimized table layout:
   * COMBINED: Priority icons now displayed alongside task names instead of separate column
   * ENHANCED: Both desktop table view and mobile card view show priority icons next to task titles
