@@ -1049,6 +1049,25 @@ export default function InitiativeDetailPage() {
                               <div className="text-sm font-medium text-orange-600">
                                 Saat ini: {metric.achievement || 0}
                               </div>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  // Map the metric fields to the form structure
+                                  const formattedMetric = {
+                                    id: metric.id,
+                                    name: metric.name,
+                                    target: metric.target,
+                                    achievement: metric.achievement || "0"
+                                  };
+                                  setEditingMetric(formattedMetric);
+                                  setIsSuccessMetricsModalOpen(true);
+                                }}
+                                className="h-7 px-2 text-xs border-orange-300 text-orange-700 hover:bg-orange-50 hover:border-orange-400"
+                              >
+                                <Edit className="w-3 h-3 mr-1" />
+                                Update
+                              </Button>
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
