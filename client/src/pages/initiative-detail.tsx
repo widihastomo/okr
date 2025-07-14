@@ -499,17 +499,82 @@ const ClosureSummary = ({ initiative }: { initiative: any }) => {
     }
   };
 
+  const getClosureContainerStyle = (result: string) => {
+    switch (result) {
+      case 'berhasil':
+        return 'border-green-200 bg-gradient-to-br from-green-50 to-emerald-50';
+      case 'gagal':
+        return 'border-red-200 bg-gradient-to-br from-red-50 to-rose-50';
+      case 'perlu_diulang':
+        return 'border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50';
+      default:
+        return 'border-gray-200 bg-gradient-to-br from-gray-50 to-slate-50';
+    }
+  };
+
+  const getClosureTextColor = (result: string) => {
+    switch (result) {
+      case 'berhasil':
+        return 'text-green-600';
+      case 'gagal':
+        return 'text-red-600';
+      case 'perlu_diulang':
+        return 'text-orange-600';
+      default:
+        return 'text-gray-600';
+    }
+  };
+
+  const getClosureTextSecondary = (result: string) => {
+    switch (result) {
+      case 'berhasil':
+        return 'text-green-700';
+      case 'gagal':
+        return 'text-red-700';
+      case 'perlu_diulang':
+        return 'text-orange-700';
+      default:
+        return 'text-gray-700';
+    }
+  };
+
+  const getClosureTextMuted = (result: string) => {
+    switch (result) {
+      case 'berhasil':
+        return 'text-green-900';
+      case 'gagal':
+        return 'text-red-900';
+      case 'perlu_diulang':
+        return 'text-orange-900';
+      default:
+        return 'text-gray-900';
+    }
+  };
+
+  const getClosureBorderColor = (result: string) => {
+    switch (result) {
+      case 'berhasil':
+        return 'border-green-200';
+      case 'gagal':
+        return 'border-red-200';
+      case 'perlu_diulang':
+        return 'border-orange-200';
+      default:
+        return 'border-gray-200';
+    }
+  };
+
   return (
-    <div className="mb-6 border-2 border-dashed border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50 shadow-lg rounded-lg p-4">
+    <div className={`mb-6 border-2 border-dashed ${getClosureContainerStyle(closureData.result)} shadow-lg rounded-lg p-4`}>
       <div className="flex items-center gap-2 mb-3">
-        <FileText className="h-4 w-4 text-orange-600" />
-        <h3 className="text-sm font-semibold text-orange-900">Resume Penutupan</h3>
+        <FileText className={`h-4 w-4 ${getClosureTextColor(closureData.result)}`} />
+        <h3 className={`text-sm font-semibold ${getClosureTextMuted(closureData.result)}`}>Resume Penutupan</h3>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
         {/* Result Status */}
         <div className="flex items-center gap-2">
-          <span className="text-orange-700 font-medium">Hasil:</span>
+          <span className={`${getClosureTextSecondary(closureData.result)} font-medium`}>Hasil:</span>
           <div className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${getResultColor(closureData.result)}`}>
             {getResultIcon(closureData.result)}
             {getResultLabel(closureData.result)}
@@ -518,8 +583,8 @@ const ClosureSummary = ({ initiative }: { initiative: any }) => {
 
         {/* Closure Date */}
         <div className="flex items-center gap-2">
-          <span className="text-orange-700 font-medium">Ditutup:</span>
-          <span className="text-orange-900">
+          <span className={`${getClosureTextSecondary(closureData.result)} font-medium`}>Ditutup:</span>
+          <span className={getClosureTextMuted(closureData.result)}>
             {formatDate(closureData.closedAt || initiative.completedAt)}
           </span>
         </div>
@@ -527,8 +592,8 @@ const ClosureSummary = ({ initiative }: { initiative: any }) => {
         {/* Budget Usage */}
         {closureData.budgetUsed && (
           <div className="flex items-center gap-2">
-            <span className="text-orange-700 font-medium">Budget:</span>
-            <span className="text-orange-900">
+            <span className={`${getClosureTextSecondary(closureData.result)} font-medium`}>Budget:</span>
+            <span className={getClosureTextMuted(closureData.result)}>
               Rp {Number(closureData.budgetUsed).toLocaleString('id-ID')}
             </span>
           </div>
@@ -537,23 +602,23 @@ const ClosureSummary = ({ initiative }: { initiative: any }) => {
 
       {/* Notes - Compact format */}
       {(closureData.reason || closureData.learningNote || closureData.notes) && (
-        <div className="mt-3 pt-3 border-t border-orange-200">
+        <div className={`mt-3 pt-3 border-t ${getClosureBorderColor(closureData.result)}`}>
           {closureData.reason && (
             <div className="mb-2">
-              <span className="text-xs font-medium text-orange-700">Alasan: </span>
-              <span className="text-xs text-orange-800">{closureData.reason}</span>
+              <span className={`text-xs font-medium ${getClosureTextSecondary(closureData.result)}`}>Alasan: </span>
+              <span className={`text-xs ${getClosureTextMuted(closureData.result)}`}>{closureData.reason}</span>
             </div>
           )}
           {closureData.learningNote && (
             <div className="mb-2">
-              <span className="text-xs font-medium text-orange-700">Pembelajaran: </span>
-              <span className="text-xs text-orange-800">{closureData.learningNote}</span>
+              <span className={`text-xs font-medium ${getClosureTextSecondary(closureData.result)}`}>Pembelajaran: </span>
+              <span className={`text-xs ${getClosureTextMuted(closureData.result)}`}>{closureData.learningNote}</span>
             </div>
           )}
           {closureData.notes && (
             <div>
-              <span className="text-xs font-medium text-orange-700">Catatan: </span>
-              <span className="text-xs text-orange-800">{closureData.notes}</span>
+              <span className={`text-xs font-medium ${getClosureTextSecondary(closureData.result)}`}>Catatan: </span>
+              <span className={`text-xs ${getClosureTextMuted(closureData.result)}`}>{closureData.notes}</span>
             </div>
           )}
         </div>
