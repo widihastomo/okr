@@ -246,6 +246,15 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 14, 2025. Successfully fixed initiative update audit trail integration and resolved variable naming conflicts:
+  * FIXED: Resolved "auditTrail2 before initialization" error by eliminating duplicate variable references in getInitiativeHistory function
+  * ENHANCED: Added comprehensive audit trail tracking for all initiative updates in both PATCH and PUT endpoints
+  * IMPLEMENTED: General audit trail entries for non-status initiative updates with "Inisiatif diperbarui" description
+  * IMPROVED: Timeline-based initiative history now properly captures all update operations including form edits
+  * RESOLVED: Initiative updates now automatically refresh history display with proper cache invalidation
+  * OPTIMIZED: Simplified getInitiativeHistory function to avoid reference conflicts and improved error handling
+  * VERIFIED: All initiative operations (create, update, close, cancel, reopen) now generate proper audit trail entries
+  * RESULT: Complete initiative lifecycle tracking with real-time history updates for all user actions
 - July 14, 2025. Successfully implemented comprehensive disable system for completed initiatives and added reopen functionality:
   * COMPLETED: All editing capabilities comprehensively disabled when initiative status is "selesai"
   * DISABLED: Tombol "Tambah Task" and "Tambah Metrik" disabled for completed initiatives

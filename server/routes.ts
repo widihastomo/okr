@@ -4142,6 +4142,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } catch (auditError) {
           console.error('Error creating audit trail for initiative status change:', auditError);
         }
+      } else {
+        // Add general audit trail for any non-status initiative update
+        try {
+          await storage.createAuditTrail({
+            entityType: 'initiative',
+            entityId: id,
+            action: 'updated',
+            changeDescription: 'Inisiatif diperbarui',
+            userId: currentUser.id,
+            organizationId: currentUser.organizationId
+          });
+        } catch (auditError) {
+          console.error('Error creating audit trail for initiative update:', auditError);
+        }
       }
       
       res.json(updatedInitiative);
@@ -4213,6 +4227,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         } catch (auditError) {
           console.error('Error creating audit trail for initiative status change:', auditError);
+        }
+      } else {
+        // Add general audit trail for any non-status initiative update
+        try {
+          await storage.createAuditTrail({
+            entityType: 'initiative',
+            entityId: id,
+            action: 'updated',
+            changeDescription: 'Inisiatif diperbarui',
+            userId: currentUser.id,
+            organizationId: currentUser.organizationId
+          });
+        } catch (auditError) {
+          console.error('Error creating audit trail for initiative update:', auditError);
         }
       }
       
