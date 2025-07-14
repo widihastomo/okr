@@ -256,8 +256,9 @@ All email configuration now uses environment variables:
   * ADDED: Full name display for PIC using getUserName() and getUserInitials() helper functions
   * INTEGRATED: User data from /api/organization/users endpoint for authentic user information
   * ADDED: Action dropdown menu (Lihat Detail, Edit, Hapus) in both desktop and mobile views
+  * ENHANCED: Status update toast notifications with specific messages for each status change
   * CONSISTENT: Exact same styling, layout, and interaction patterns as daily-focus page
-  * RESULT: Tasks page now has unified ListView format matching daily-focus with proper user profile integration
+  * RESULT: Tasks page now has unified ListView format matching daily-focus with proper user profile integration and contextual feedback
 - July 14, 2025. Successfully fixed TourLauncher clickability issue:
   * REMOVED: disabled prop from main TourLauncher button - now always accessible
   * ENHANCED: Individual tour items properly disabled when tour is active with visual feedback

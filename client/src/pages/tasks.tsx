@@ -129,11 +129,19 @@ const TasksPage = () => {
     mutationFn: async ({ taskId, status }: { taskId: string; status: string }) => {
       return await apiRequest('PATCH', `/api/tasks/${taskId}`, { status });
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+      
+      const statusMessages = {
+        'not_started': 'Status task diubah menjadi "Belum Dimulai"',
+        'in_progress': 'Status task diubah menjadi "Sedang Berjalan"',
+        'completed': 'Status task diubah menjadi "Selesai"',
+        'cancelled': 'Status task diubah menjadi "Dibatalkan"'
+      };
+      
       toast({
         title: "Status berhasil diperbarui",
-        description: "Status task telah diperbarui.",
+        description: statusMessages[variables.status as keyof typeof statusMessages] || "Status task telah diperbarui.",
       });
     },
     onError: (error) => {
