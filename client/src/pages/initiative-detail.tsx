@@ -1092,7 +1092,8 @@ export default function InitiativeDetailPage() {
               </CardContent>
             </Card>
 
-
+            {/* Initiative Comments Section */}
+            <InitiativeCommentUnified initiativeId={id!} />
 
           {/* Task Management Section */}
           <Card className="border-gray-200 shadow-sm">
@@ -1492,9 +1493,6 @@ export default function InitiativeDetailPage() {
         <div className="space-y-6">
           {/* Initiative History */}
           <InitiativeHistory initiativeId={id!} />
-          
-          {/* Initiative Comments */}
-          <InitiativeCommentUnified initiativeId={id!} />
         </div>
       </div>
 
