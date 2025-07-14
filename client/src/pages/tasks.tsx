@@ -18,6 +18,22 @@ import { format as formatDate } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import TaskModal from '@/components/task-modal';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  useDroppable,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 const locales = {
   'id': id,
@@ -54,6 +70,16 @@ const TasksPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [draggedTask, setDraggedTask] = useState<Task | null>(null);
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
 
   const { data: tasks = [], isLoading } = useQuery<Task[]>({
     queryKey: ['/api/tasks'],
@@ -177,6 +203,148 @@ const TasksPage = () => {
   const handleAddTask = () => {
     setEditingTask(null);
     setShowTaskModal(true);
+  };
+
+  // Handle drag start
+  const handleDragStart = (event: DragStartEvent) => {
+    const { active } = event;
+    const task = tasks.find(t => t.id === active.id);
+    setDraggedTask(task || null);
+  };
+
+  // Handle drag end
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (!over) return;
+    
+    const taskId = active.id as string;
+    const newStatus = over.id as string;
+    
+    // Find the task and update its status
+    const task = tasks.find(t => t.id === taskId);
+    if (task && task.status !== newStatus) {
+      handleStatusUpdate(taskId, newStatus as Task['status']);
+    }
+    
+    setDraggedTask(null);
+  };
+
+  // Droppable Column Component
+  const DroppableColumn = ({ id, children, className }: { id: string; children: React.ReactNode; className?: string }) => {
+    const { setNodeRef, isOver } = useDroppable({ id });
+    
+    return (
+      <div
+        ref={setNodeRef}
+        className={`${className} ${isOver ? 'ring-2 ring-blue-400 ring-opacity-50' : ''} transition-all duration-200`}
+      >
+        {children}
+      </div>
+    );
+  };
+
+  // Draggable Task Card Component
+  const DraggableTaskCard = ({ task }: { task: Task }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ id: task.id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+      opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...listeners}
+        className={`group bg-white rounded-lg shadow-sm border border-gray-200 p-4 cursor-grab active:cursor-grabbing hover:shadow-md transition-all duration-200 ${
+          isTaskOverdue(task) ? 'border-l-4 border-l-red-400 bg-red-50' : ''
+        }`}
+      >
+        <div className="flex items-start justify-between mb-3">
+          <h4 className="font-medium text-sm text-gray-900 flex-1 pr-2">
+            {task.title}
+          </h4>
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${getTaskPriorityColor(task.priority || 'medium')}`} />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <MoreVertical className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link href={`/tasks/${task.id}`} className="flex items-center">
+                    <Eye className="mr-2 h-4 w-4" />
+                    Lihat Detail
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleEditTask(task)}>
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteTask(task.id)}>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Hapus
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+        
+        {task.description && (
+          <p className="text-xs text-gray-600 mb-3 line-clamp-2">{task.description}</p>
+        )}
+        
+        {task.initiative && (
+          <div className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded mb-3 inline-block">
+            {task.initiative.title}
+          </div>
+        )}
+        
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {task.assignedTo ? (
+              <Avatar className="w-5 h-5">
+                <AvatarImage
+                  src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
+                />
+                <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
+                  {getUserInitials(task.assignedTo)}
+                </AvatarFallback>
+              </Avatar>
+            ) : (
+              <User className="w-4 h-4 text-gray-400" />
+            )}
+            <span className="text-xs text-gray-600">
+              {task.assignedTo ? getUserName(task.assignedTo) : "Belum ditentukan"}
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            {isTaskOverdue(task) && (
+              <Badge variant="destructive" className="text-xs">
+                Overdue
+              </Badge>
+            )}
+            <div className="text-xs text-gray-500">
+              {task.dueDate ? formatDate(new Date(task.dueDate), 'dd/MM') : 'No date'}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   // Helper function to get user name by ID (matching daily-focus page format)
@@ -650,36 +818,75 @@ const TasksPage = () => {
 
   const KanbanView = () => {
     const columns = [
-      { id: 'not_started', title: 'Belum Mulai', color: 'bg-gray-50' },
-      { id: 'in_progress', title: 'Sedang Berjalan', color: 'bg-blue-50' },
-      { id: 'completed', title: 'Selesai', color: 'bg-green-50' },
-      { id: 'cancelled', title: 'Dibatalkan', color: 'bg-red-50' }
+      { id: 'not_started', title: 'Belum Mulai', color: 'bg-gray-50', borderColor: 'border-gray-200', headerColor: 'text-gray-700' },
+      { id: 'in_progress', title: 'Sedang Berjalan', color: 'bg-blue-50', borderColor: 'border-blue-200', headerColor: 'text-blue-700' },
+      { id: 'completed', title: 'Selesai', color: 'bg-green-50', borderColor: 'border-green-200', headerColor: 'text-green-700' },
+      { id: 'cancelled', title: 'Dibatalkan', color: 'bg-red-50', borderColor: 'border-red-200', headerColor: 'text-red-700' }
     ];
 
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {columns.map(column => (
-          <div key={column.id} className={`${column.color} p-4 rounded-lg`}>
-            <h3 className="font-semibold mb-4 text-center">{column.title}</h3>
-            <div className="space-y-3">
-              {filteredTasks
-                .filter(task => task.status === column.id)
-                .map(task => (
-                  <Card key={task.id} className="p-3 bg-white shadow-sm">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-medium text-sm">{task.title}</h4>
-                      <div className={`w-2 h-2 rounded-full ${getPriorityColor(task.priority)}`}></div>
-                    </div>
-                    <p className="text-xs text-gray-600 mb-2">{task.description}</p>
-                    <div className="text-xs text-gray-500">
-                      {new Date(task.dueDate).toLocaleDateString('id-ID')}
-                    </div>
-                  </Card>
-                ))}
+      <DndContext 
+        sensors={sensors} 
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {columns.map(column => {
+            const columnTasks = filteredTasks.filter(task => task.status === column.id);
+            
+            return (
+              <DroppableColumn
+                key={column.id}
+                id={column.id}
+                className={`${column.color} ${column.borderColor} border-2 rounded-lg p-4 min-h-[600px] transition-all duration-200`}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className={`font-semibold ${column.headerColor} text-center flex-1`}>
+                    {column.title}
+                  </h3>
+                  <Badge variant="outline" className="text-xs">
+                    {columnTasks.length}
+                  </Badge>
+                </div>
+                
+                <SortableContext
+                  items={columnTasks.map(task => task.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-3">
+                    {columnTasks.map(task => (
+                      <DraggableTaskCard key={task.id} task={task} />
+                    ))}
+                  </div>
+                </SortableContext>
+                
+                {columnTasks.length === 0 && (
+                  <div className="text-center py-8 text-gray-500">
+                    <div className="text-4xl mb-2">📋</div>
+                    <p className="text-sm">Tidak ada task</p>
+                  </div>
+                )}
+              </DroppableColumn>
+            );
+          })}
+        </div>
+        
+        <DragOverlay>
+          {draggedTask && (
+            <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-4 transform rotate-2">
+              <h4 className="font-medium text-sm text-gray-900 mb-2">
+                {draggedTask.title}
+              </h4>
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${getTaskPriorityColor(draggedTask.priority || 'medium')}`} />
+                <span className="text-xs text-gray-500">
+                  {draggedTask.dueDate ? formatDate(new Date(draggedTask.dueDate), 'dd/MM') : 'No date'}
+                </span>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          )}
+        </DragOverlay>
+      </DndContext>
     );
   };
 
