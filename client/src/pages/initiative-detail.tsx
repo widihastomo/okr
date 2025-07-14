@@ -589,6 +589,16 @@ const ClosureSummary = ({ initiative }: { initiative: any }) => {
           </span>
         </div>
 
+        {/* Closed By */}
+        {initiative.closedBy && (
+          <div className="flex items-center gap-2">
+            <span className={`${getClosureTextSecondary(closureData.result)} font-medium`}>Oleh:</span>
+            <span className={getClosureTextMuted(closureData.result)}>
+              {getUserName(initiative.closedBy)}
+            </span>
+          </div>
+        )}
+
         {/* Budget Usage */}
         {closureData.budgetUsed && (
           <div className="flex items-center gap-2">
