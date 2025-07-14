@@ -332,13 +332,13 @@ export default function InitiativeClosureModal({
                 {/* Alasan dan Catatan Pembelajaran */}
                 {selectedResult && (
                   <div className="space-y-3 border-t border-gray-200 pt-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                       <FormField
                         control={form.control}
                         name="reason"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-sm font-medium text-gray-700">{getReasonLabel(selectedResult)}</FormLabel>
+                            <FormLabel className="text-sm font-medium text-gray-700 h-8 flex items-center">{getReasonLabel(selectedResult)}</FormLabel>
                             <FormControl>
                               <Textarea
                                 placeholder={`Jelaskan ${getReasonLabel(selectedResult).toLowerCase()}...`}
@@ -357,7 +357,7 @@ export default function InitiativeClosureModal({
                         name="learningNote"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-sm font-medium text-gray-700">{getLearningPrompt(selectedResult)}</FormLabel>
+                            <FormLabel className="text-sm font-medium text-gray-700 h-8 flex items-center">{getLearningPrompt(selectedResult)}</FormLabel>
                             <FormControl>
                               <Textarea
                                 placeholder="Bagikan pembelajaran yang bisa digunakan untuk inisiatif serupa..."
