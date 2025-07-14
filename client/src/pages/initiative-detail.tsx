@@ -184,17 +184,18 @@ const translatePriority = (priority: string): string => {
 
 // Helper function to calculate progress stats
 const calculateProgressStats = (tasks: any[]) => {
-  const completedTasks = tasks.filter(task => task.status === 'completed').length;
-  const totalTasks = tasks.length;
+  const safeTasks = Array.isArray(tasks) ? tasks : [];
+  const completedTasks = safeTasks.filter(task => task.status === 'completed').length;
+  const totalTasks = safeTasks.length;
   const percentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
   
   return {
     completed: completedTasks,
     total: totalTasks,
     percentage,
-    notStarted: tasks.filter(task => task.status === 'not_started').length,
-    inProgress: tasks.filter(task => task.status === 'in_progress').length,
-    cancelled: tasks.filter(task => task.status === 'cancelled').length
+    notStarted: safeTasks.filter(task => task.status === 'not_started').length,
+    inProgress: safeTasks.filter(task => task.status === 'in_progress').length,
+    cancelled: safeTasks.filter(task => task.status === 'cancelled').length
   };
 };
 
@@ -834,7 +835,7 @@ export default function InitiativeDetailPage() {
       
       {/* Mission Card */}
       {/* Only show MissionCard if not all missions are completed */}
-      {(successMetrics.length === 0 || tasks.length === 0) && (
+      {((successMetrics || []).length === 0 || (tasks || []).length === 0) && (
         <MissionCard 
           missions={[
             {
@@ -846,7 +847,7 @@ export default function InitiativeDetailPage() {
                 setEditingMetric(null);
                 setIsSuccessMetricsModalOpen(true);
               },
-              isCompleted: successMetrics.length > 0,
+              isCompleted: (successMetrics || []).length > 0,
               points: 50,
               difficulty: 'medium' as const
             },
@@ -856,7 +857,7 @@ export default function InitiativeDetailPage() {
               description: 'Setiap inisiatif harus memiliki minimal 1 task untuk memulai eksekusi',
               icon: <FileText className="h-4 w-4" />,
               action: () => setIsAddTaskModalOpen(true),
-              isCompleted: tasks.length > 0,
+              isCompleted: (tasks || []).length > 0,
               points: 30,
               difficulty: 'easy' as const
             }
@@ -914,17 +915,17 @@ export default function InitiativeDetailPage() {
                               <span className="text-xs font-medium">{pic.firstName} {pic.lastName}</span>
                             </div>
                           )}
-                          {members.filter((member: any) => member.userId !== pic?.id).length > 0 && (
+                          {(members || []).filter((member: any) => member.userId !== pic?.id).length > 0 && (
                             <div className="flex items-center gap-1">
                               <span 
                                 className="text-xs text-gray-500 hover:text-orange-600 cursor-pointer underline"
                                 onClick={() => setIsTeamModalOpen(true)}
                               >
-                                +{members.filter((member: any) => member.userId !== pic?.id).length} anggota
+                                +{(members || []).filter((member: any) => member.userId !== pic?.id).length} anggota
                               </span>
                             </div>
                           )}
-                          {!pic && members.length === 0 && (
+                          {!pic && (members || []).length === 0 && (
                             <span className="text-xs text-gray-500">Belum ada anggota</span>
                           )}
                         </div>
@@ -1507,7 +1508,7 @@ export default function InitiativeDetailPage() {
             )}
 
             {/* Empty State */}
-            {!pic && members.filter((member: any) => member.userId !== pic?.id).length === 0 && (
+            {!pic && (members || []).filter((member: any) => member.userId !== pic?.id).length === 0 && (
               <div className="text-center py-8 text-gray-500">
                 <Users className="h-12 w-12 mx-auto mb-3 text-gray-300" />
                 <p className="text-sm">Belum ada anggota tim</p>

@@ -76,18 +76,18 @@ export default function InitiativeClosureModal({
   // Initialize metrics and tasks when modal opens
   useEffect(() => {
     if (isOpen) {
-      setUpdatedMetrics((successMetrics || []).map(metric => ({
+      setUpdatedMetrics(Array.isArray(successMetrics) ? successMetrics.map(metric => ({
         id: metric.id,
         currentValue: metric.currentValue,
         isCompleted: metric.isCompleted || false
-      })));
+      })) : []);
       
-      setTaskUpdates((tasks || []).filter(task => task.status !== 'completed' && task.status !== 'cancelled').map(task => ({
+      setTaskUpdates(Array.isArray(tasks) ? tasks.filter(task => task.status !== 'completed' && task.status !== 'cancelled').map(task => ({
         id: task.id,
         title: task.title,
         status: task.status,
         newStatus: task.status
-      })));
+      })) : []);
     }
   }, [isOpen, successMetrics, tasks]);
 
