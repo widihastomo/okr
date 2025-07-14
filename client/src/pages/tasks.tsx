@@ -16,6 +16,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { apiRequest } from '@/lib/queryClient';
 import { format as formatDate } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import TaskModal from '@/components/task-modal';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 const locales = {
@@ -51,6 +52,7 @@ const TasksPage = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [showTaskModal, setShowTaskModal] = useState(false);
 
   const { data: tasks = [], isLoading } = useQuery<Task[]>({
     queryKey: ['/api/tasks'],
@@ -736,7 +738,10 @@ const TasksPage = () => {
           <h1 className="text-2xl font-bold">Tasks</h1>
           <p className="text-gray-600">Kelola semua task dalam berbagai tampilan</p>
         </div>
-        <Button>
+        <Button 
+          onClick={() => setShowTaskModal(true)}
+          className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+        >
           <Plus className="w-4 h-4 mr-2" />
           Tambah Task
         </Button>
@@ -849,6 +854,17 @@ const TasksPage = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Task Modal */}
+      <TaskModal
+        open={showTaskModal}
+        onClose={() => {
+          setShowTaskModal(false);
+          // Refresh tasks after modal closes
+          queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+        }}
+        isAdding={true}
+      />
     </div>
   );
 };
