@@ -2756,9 +2756,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updateSchema = z.object({
         title: z.string().optional(),
         description: z.string().optional(),
-        status: z.enum(["not_started", "in_progress", "completed", "on_hold"]).optional(),
+        status: z.enum(["draft", "sedang_berjalan", "selesai", "dibatalkan"]).optional(),
         priority: z.enum(["low", "medium", "high"]).optional(),
         dueDate: z.string().nullable().optional(),
+        closureData: z.any().optional(),
       });
       
       const validatedData = updateSchema.parse(req.body);

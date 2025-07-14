@@ -257,6 +257,7 @@ All email configuration now uses environment variables:
   * IMPLEMENTED: AlertDialog confirmation asking user to confirm closure when tasks are still "Belum Dimulai" or "Sedang Berjalan"
   * ENHANCED: User can choose to proceed with closure or cancel to complete tasks first
   * RESULT: Complete form with working success metrics display, contextual guidance, and task completion validation for better user experience
+  * FIXED: Initiative closure status validation error by correcting status enum in server routes from English to Indonesian values (draft, sedang_berjalan, selesai, dibatalkan)
 - July 14, 2025. Successfully added comprehensive help popovers to initiative closure modal:
   * ADDED: Help popover for "Hasil Inisiatif" explaining each result option (Berhasil, Gagal, Perlu Diulang)
   * ADDED: Help popover for "Budget yang digunakan" with guidance on input format and usage
