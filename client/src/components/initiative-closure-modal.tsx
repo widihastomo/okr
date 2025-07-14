@@ -42,8 +42,8 @@ interface InitiativeClosureModalProps {
   isOpen: boolean;
   onClose: () => void;
   initiative: any;
-  successMetrics: any[];
-  tasks: any[];
+  successMetrics?: any[];
+  tasks?: any[];
   onSuccess?: () => void;
 }
 
@@ -76,18 +76,24 @@ export default function InitiativeClosureModal({
   // Initialize metrics and tasks when modal opens
   useEffect(() => {
     if (isOpen) {
-      setUpdatedMetrics(Array.isArray(successMetrics) ? successMetrics.map(metric => ({
+      const metricsArray = Array.isArray(successMetrics) ? successMetrics : [];
+      const tasksArray = Array.isArray(tasks) ? tasks : [];
+      
+      setUpdatedMetrics(metricsArray.map(metric => ({
         id: metric.id,
         currentValue: metric.currentValue,
         isCompleted: metric.isCompleted || false
-      })) : []);
+      })));
       
-      setTaskUpdates(Array.isArray(tasks) ? tasks.filter(task => task.status !== 'completed' && task.status !== 'cancelled').map(task => ({
-        id: task.id,
-        title: task.title,
-        status: task.status,
-        newStatus: task.status
-      })) : []);
+      setTaskUpdates(tasksArray
+        .filter(task => task.status !== 'completed' && task.status !== 'cancelled')
+        .map(task => ({
+          id: task.id,
+          title: task.title,
+          status: task.status,
+          newStatus: task.status
+        }))
+      );
     }
   }, [isOpen, successMetrics, tasks]);
 
@@ -230,7 +236,7 @@ export default function InitiativeClosureModal({
     onClose();
   };
 
-  const incompleteTasks = (tasks || []).filter(task => task.status !== 'completed' && task.status !== 'cancelled');
+  const incompleteTasks = Array.isArray(tasks) ? tasks.filter(task => task.status !== 'completed' && task.status !== 'cancelled') : [];
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -373,7 +379,7 @@ export default function InitiativeClosureModal({
             </Card>
 
             {/* Update Success Metrics */}
-            {successMetrics && successMetrics.length > 0 && (
+            {Array.isArray(successMetrics) && successMetrics.length > 0 && (
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
