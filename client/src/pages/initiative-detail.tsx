@@ -1145,9 +1145,6 @@ export default function InitiativeDetailPage() {
                                 >
                                   {task.title}
                                 </Link>
-                                {task.description && (
-                                  <div className="text-sm text-gray-600 mt-1">{task.description}</div>
-                                )}
                                 <div className="mt-1">
                                   <TaskCommentCount taskId={task.id} />
                                 </div>
