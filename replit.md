@@ -257,6 +257,14 @@ All email configuration now uses environment variables:
   * IMPROVED: Task form UI with single unified date input field and professional calendar styling
   * STYLED: Custom CSS for react-day-picker with orange theme matching application design
   * RESULT: Complete unified date functionality with modern, professional calendar interface
+- July 14, 2025. Successfully implemented user filter functionality in tasks page:
+  * ADDED: User filter dropdown in tasks page filter section
+  * ENHANCED: Filter shows "Filter PIC" with dropdown containing all active users
+  * IMPLEMENTED: User filtering logic integrated with existing status, priority, and search filters
+  * IMPROVED: getUserName() function with better fallback hierarchy (firstName + lastName → firstName → lastName → email username)
+  * OPTIMIZED: Only active users displayed in filter dropdown for better user experience
+  * INTEGRATED: User filter properly connected to filteredTasks useMemo with dependency tracking
+  * RESULT: Complete user filtering capability allowing users to filter tasks by assigned person
 - July 14, 2025. Successfully integrated TaskModal with orange gradient button styling and task grouping implementation:
   * INTEGRATED: TaskModal component properly connected to "Tambah Task" button with orange gradient styling
   * ENHANCED: Button styling with orange gradient (from-orange-600 to-orange-500) matching application theme

@@ -99,9 +99,28 @@ const TasksPage = () => {
   const getUserName = (userId: string) => {
     const user = users.find(u => u.id === userId);
     if (!user) return 'User';
-    return user.firstName && user.lastName 
-      ? `${user.firstName} ${user.lastName}`
-      : user.email || 'User';
+    
+    // Prioritize firstName + lastName
+    if (user.firstName && user.lastName) {
+      return `${user.firstName} ${user.lastName}`;
+    }
+    
+    // Fallback to firstName only
+    if (user.firstName) {
+      return user.firstName;
+    }
+    
+    // Fallback to lastName only
+    if (user.lastName) {
+      return user.lastName;
+    }
+    
+    // Last resort: use email without @domain
+    if (user.email) {
+      return user.email.split('@')[0];
+    }
+    
+    return 'User';
   };
 
   // Helper function to get user initials
