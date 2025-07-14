@@ -252,6 +252,7 @@ All email configuration now uses environment variables:
   * FIXED: Success metrics target and current values display issue by correcting field mapping (target/achievement instead of targetValue/currentValue)
   * IMPROVED: Success metrics now properly show target values and current achievement values in closure modal
   * ENHANCED: Input field for final metric values now correctly pre-populates with current achievement values
+  * CHANGED: Success metrics input changed from number type to text type for better flexibility and user experience
   * ADDED: Task validation with confirmation dialog when closing initiatives with incomplete tasks (sedang berjalan/belum mulai status)
   * IMPLEMENTED: AlertDialog confirmation asking user to confirm closure when tasks are still "Belum Dimulai" or "Sedang Berjalan"
   * ENHANCED: User can choose to proceed with closure or cancel to complete tasks first

@@ -88,7 +88,7 @@ export default function InitiativeClosureModal({
       
       setUpdatedMetrics(metricsArray.map(metric => ({
         id: metric.id,
-        currentValue: metric.achievement || 0,
+        currentValue: (metric.achievement || 0).toString(),
         isCompleted: metric.isCompleted || false
       })));
       
@@ -182,7 +182,7 @@ export default function InitiativeClosureModal({
     }
   };
 
-  const updateMetricValue = (metricId: string, value: number) => {
+  const updateMetricValue = (metricId: string, value: string) => {
     setUpdatedMetrics(prev => 
       prev.map(metric => 
         metric.id === metricId 
@@ -220,7 +220,7 @@ export default function InitiativeClosureModal({
       // Update success metrics
       for (const metric of updatedMetrics || []) {
         await apiRequest("PATCH", `/api/success-metrics/${metric.id}`, {
-          currentValue: metric.currentValue
+          achievement: metric.currentValue
         });
       }
 
@@ -529,9 +529,9 @@ export default function InitiativeClosureModal({
                             </div>
                             <div className="flex-shrink-0 w-24">
                               <Input
-                                type="number"
-                                value={updatedMetrics.find(m => m.id === metric.id)?.currentValue || metric.achievement || 0}
-                                onChange={(e) => updateMetricValue(metric.id, parseFloat(e.target.value) || 0)}
+                                type="text"
+                                value={updatedMetrics.find(m => m.id === metric.id)?.currentValue || (metric.achievement || 0).toString()}
+                                onChange={(e) => updateMetricValue(metric.id, e.target.value)}
                                 placeholder="Final"
                                 className="text-xs h-8 border-blue-300"
                               />
