@@ -150,6 +150,32 @@ export default function InitiativeClosureModal({
     }
   };
 
+  const getReasonPlaceholder = (result: string) => {
+    switch (result) {
+      case 'berhasil':
+        return 'Contoh: Tim berhasil berkolaborasi dengan baik, strategi pemasaran terbukti efektif, dan dukungan manajemen sangat membantu';
+      case 'gagal':
+        return 'Contoh: Anggaran terbatas, timeline terlalu ketat, kurangnya sumber daya manusia yang kompeten';
+      case 'perlu_diulang':
+        return 'Contoh: Perlu penyesuaian strategi, membutuhkan waktu lebih lama untuk implementasi, ada faktor eksternal yang belum diperhitungkan';
+      default:
+        return 'Jelaskan alasan secara detail...';
+    }
+  };
+
+  const getLearningPlaceholder = (result: string) => {
+    switch (result) {
+      case 'berhasil':
+        return 'Contoh: Komunikasi rutin dengan stakeholder kunci sangat penting, investasi pada training tim memberikan hasil yang signifikan';
+      case 'gagal':
+        return 'Contoh: Perlu analisis risiko yang lebih mendalam, pentingnya backup plan, koordinasi antar departemen harus diperbaiki';
+      case 'perlu_diulang':
+        return 'Contoh: Perlu fase pilot test terlebih dahulu, timeline harus lebih realistis, perlu melibatkan expert eksternal';
+      default:
+        return 'Bagikan pembelajaran yang bisa digunakan untuk inisiatif serupa...';
+    }
+  };
+
   const updateMetricValue = (metricId: string, value: number) => {
     setUpdatedMetrics(prev => 
       prev.map(metric => 
@@ -341,7 +367,7 @@ export default function InitiativeClosureModal({
                             <FormLabel className="text-sm font-medium text-gray-700 h-8 flex items-center">{getReasonLabel(selectedResult)}</FormLabel>
                             <FormControl>
                               <Textarea
-                                placeholder={`Jelaskan ${getReasonLabel(selectedResult).toLowerCase()}...`}
+                                placeholder={getReasonPlaceholder(selectedResult)}
                                 {...field}
                                 rows={2}
                                 className="border-gray-300 text-sm"
@@ -360,7 +386,7 @@ export default function InitiativeClosureModal({
                             <FormLabel className="text-sm font-medium text-gray-700 h-8 flex items-center">{getLearningPrompt(selectedResult)}</FormLabel>
                             <FormControl>
                               <Textarea
-                                placeholder="Bagikan pembelajaran yang bisa digunakan untuk inisiatif serupa..."
+                                placeholder={getLearningPlaceholder(selectedResult)}
                                 {...field}
                                 rows={2}
                                 className="border-gray-300 text-sm"
@@ -405,7 +431,7 @@ export default function InitiativeClosureModal({
                         <FormControl>
                           <Input
                             type="number"
-                            placeholder="Masukkan budget yang sudah digunakan"
+                            placeholder="Contoh: 5000000 (untuk Rp 5.000.000)"
                             {...field}
                             className="border-gray-300"
                           />
@@ -564,7 +590,7 @@ export default function InitiativeClosureModal({
                         </div>
                         <FormControl>
                           <Textarea
-                            placeholder="Tambahkan catatan tambahan jika diperlukan..."
+                            placeholder="Contoh: Proses implementasi berjalan lancar, namun diperlukan pelatihan tambahan untuk tim. Rekomendasi untuk inisiatif serupa: libatkan stakeholder sejak awal perencanaan."
                             {...field}
                             rows={3}
                             className="border-gray-300"
