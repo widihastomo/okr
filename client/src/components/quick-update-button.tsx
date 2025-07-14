@@ -103,7 +103,7 @@ export function QuickUpdateButton({ metric, onUpdateSuccess }: QuickUpdateButton
             <Label htmlFor="target">Target</Label>
             <Input
               id="target"
-              value={formatValue(metric.target)}
+              value={metric.target}
               disabled
               className="bg-gray-50"
             />
