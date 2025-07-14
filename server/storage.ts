@@ -2524,38 +2524,44 @@ export class DatabaseStorage implements IStorage {
 
       // Get success metrics updates for this initiative
       const successMetricsData = await db
-        .select({
-          id: initiativeSuccessMetrics.id,
-          name: initiativeSuccessMetrics.name,
-          achievement: initiativeSuccessMetrics.achievement,
-          target: initiativeSuccessMetrics.target,
-          unit: initiativeSuccessMetrics.unit,
-          updatedAt: initiativeSuccessMetrics.updatedAt,
-          lastUpdateBy: initiativeSuccessMetrics.lastUpdateBy,
-          updaterEmail: users.email,
-          updaterFirstName: users.firstName,
-          updaterLastName: users.lastName,
-          updaterRole: users.role
-        })
+        .select()
         .from(initiativeSuccessMetrics)
-        .leftJoin(users, eq(users.id, initiativeSuccessMetrics.lastUpdateBy))
         .where(eq(initiativeSuccessMetrics.initiativeId, initiativeId))
         .orderBy(desc(initiativeSuccessMetrics.updatedAt));
 
       // Add success metrics updates to history
       for (const metric of successMetricsData) {
-        if (metric.updatedAt && metric.lastUpdateBy && metric.updaterEmail) {
+        if (metric.updatedAt && metric.lastUpdateBy) {
+          // Get user info for the updater
+          let updaterUser = null;
+          try {
+            const [userResult] = await db
+              .select()
+              .from(users)
+              .where(eq(users.id, metric.lastUpdateBy))
+              .limit(1);
+            updaterUser = userResult;
+          } catch (error) {
+            console.error("Error fetching updater user:", error);
+          }
+
           history.push({
             id: `${metric.id}-updated-${metric.updatedAt}`,
             action: 'metric_updated',
             description: `Metrik "${metric.name}" diupdate: ${metric.achievement || '0'} dari target ${metric.target || '0'}`,
             timestamp: metric.updatedAt,
-            user: {
+            user: updaterUser ? {
+              id: updaterUser.id,
+              email: updaterUser.email,
+              firstName: updaterUser.firstName || '',
+              lastName: updaterUser.lastName || '',
+              role: updaterUser.role || 'member'
+            } : {
               id: metric.lastUpdateBy,
-              email: metric.updaterEmail,
-              firstName: metric.updaterFirstName || '',
-              lastName: metric.updaterLastName || '',
-              role: metric.updaterRole || 'member'
+              email: 'unknown@example.com',
+              firstName: 'Unknown',
+              lastName: 'User',
+              role: 'member'
             }
           });
         }
