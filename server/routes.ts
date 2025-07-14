@@ -2961,21 +2961,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { initiativeId } = req.params;
       const currentUser = req.user as User;
       
+      console.log(`🔍 Fetching initiative history for: ${initiativeId}`);
+      
       // Verify user has access to this initiative
       const initiative = await storage.getInitiativeWithDetails(initiativeId);
       if (!initiative) {
+        console.log(`❌ Initiative not found: ${initiativeId}`);
         return res.status(404).json({ message: "Initiative not found" });
       }
       
       if (!currentUser.isSystemOwner) {
         const initiativeCreator = await storage.getUser(initiative.createdBy);
         if (!initiativeCreator || initiativeCreator.organizationId !== currentUser.organizationId) {
+          console.log(`❌ Access denied to initiative: ${initiativeId}`);
           return res.status(403).json({ message: "Access denied to this initiative" });
         }
       }
       
+      console.log(`✅ Access granted, fetching history for initiative: ${initiativeId}`);
+      
       // Get initiative history
       const historyEntries = await storage.getInitiativeHistory(initiativeId);
+      
+      console.log(`📋 History entries found: ${historyEntries.length}`);
       
       res.json(historyEntries);
     } catch (error) {

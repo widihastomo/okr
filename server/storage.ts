@@ -2532,13 +2532,14 @@ export class DatabaseStorage implements IStorage {
         }
       });
 
-      // Get audit trail entries for this initiative
+      // Get audit trail entries for this initiative using alias
+      const auditTable = auditTrail;
       const auditEntries = await db
         .select({
-          id: auditTrail.id,
-          action: auditTrail.action,
-          changeDescription: auditTrail.changeDescription,
-          createdAt: auditTrail.createdAt,
+          id: auditTable.id,
+          action: auditTable.action,
+          changeDescription: auditTable.changeDescription,
+          createdAt: auditTable.createdAt,
           user: {
             id: users.id,
             email: users.email,
@@ -2547,13 +2548,13 @@ export class DatabaseStorage implements IStorage {
             role: users.role
           }
         })
-        .from(auditTrail)
-        .innerJoin(users, eq(users.id, auditTrail.userId))
+        .from(auditTable)
+        .innerJoin(users, eq(users.id, auditTable.userId))
         .where(and(
-          eq(auditTrail.entityType, 'initiative'),
-          eq(auditTrail.entityId, initiativeId)
+          eq(auditTable.entityType, 'initiative'),
+          eq(auditTable.entityId, initiativeId)
         ))
-        .orderBy(auditTrail.createdAt);
+        .orderBy(auditTable.createdAt);
 
       // Add audit trail entries
       for (const entry of auditEntries) {
