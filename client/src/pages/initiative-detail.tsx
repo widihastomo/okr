@@ -1053,9 +1053,9 @@ export default function InitiativeDetailPage() {
                               <QuickUpdateButton 
                                 metric={metric} 
                                 onUpdateSuccess={() => {
-                                  queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/success-metrics`] });
-                                  queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}/history`] });
-                                  queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${initiativeId}`] });
+                                  queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/success-metrics`] });
+                                  queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}/history`] });
+                                  queryClient.invalidateQueries({ queryKey: [`/api/initiatives/${id}`] });
                                 }}
                               />
                               <DropdownMenu>
