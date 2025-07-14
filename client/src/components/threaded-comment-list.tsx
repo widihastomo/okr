@@ -80,9 +80,9 @@ export function ThreadedCommentList({
     const hasReplies = comment.replies.length > 0;
     
     return (
-      <div key={comment.id} className={`${level > 0 ? 'ml-8 pl-4 border-l-2 border-gray-200' : ''}`}>
-        <div className="flex items-start space-x-3 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
-          <Avatar className="h-8 w-8 flex-shrink-0">
+      <div key={comment.id} className={`${level > 0 ? 'ml-4 sm:ml-8 pl-2 sm:pl-4 border-l-2 border-gray-200' : ''}`}>
+        <div className="flex items-start space-x-2 sm:space-x-3 p-3 sm:p-4 bg-white rounded-lg shadow-sm border border-gray-200">
+          <Avatar className="h-7 w-7 sm:h-8 sm:w-8 flex-shrink-0">
             <AvatarImage src={comment.user?.profileImageUrl || ''} />
             <AvatarFallback>
               {comment.user?.firstName?.[0] || comment.user?.email?.[0] || 'U'}
@@ -90,8 +90,9 @@ export function ThreadedCommentList({
           </Avatar>
           
           <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
+            {/* Header - Stack on mobile, flex on desktop */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+              <div className="flex items-center space-x-2 flex-wrap">
                 <span className="font-medium text-gray-900 text-sm">
                   {comment.user?.firstName && comment.user?.lastName
                     ? `${comment.user.firstName} ${comment.user.lastName}`
@@ -108,22 +109,22 @@ export function ThreadedCommentList({
                 )}
               </div>
               
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1 sm:space-x-2">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => onReply(comment.id)}
-                  className="text-gray-500 hover:text-orange-600"
+                  className="text-gray-500 hover:text-orange-600 h-7 px-2 sm:h-8 sm:px-3"
                 >
-                  <Reply className="h-4 w-4" />
-                  <span className="ml-1 text-xs">Balas</span>
+                  <Reply className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="ml-1 text-xs hidden sm:inline">Balas</span>
                 </Button>
                 
                 {user?.id === comment.userId && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="text-gray-500 hover:text-orange-600">
-                        <MoreHorizontal className="h-4 w-4" />
+                      <Button variant="ghost" size="sm" className="text-gray-500 hover:text-orange-600 h-7 px-2 sm:h-8 sm:px-3">
+                        <MoreHorizontal className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
@@ -167,7 +168,7 @@ export function ThreadedCommentList({
             
             {editingCommentId !== comment.id && (
               <div 
-                className="mt-2 text-sm text-gray-700 prose prose-sm max-w-none"
+                className="mt-2 text-sm text-gray-700 prose prose-sm max-w-none break-words"
                 dangerouslySetInnerHTML={{ __html: comment.content }}
               />
             )}
@@ -178,17 +179,17 @@ export function ThreadedCommentList({
                   variant="ghost"
                   size="sm"
                   onClick={() => onToggleReplies?.(comment.id)}
-                  className="text-gray-500 hover:text-orange-600"
+                  className="text-gray-500 hover:text-orange-600 h-7 px-2 sm:h-8 sm:px-3"
                 >
                   {isExpanded ? (
                     <>
-                      <ChevronUp className="h-4 w-4 mr-1" />
-                      Sembunyikan {comment.replyCount} balasan
+                      <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                      <span className="text-xs">Sembunyikan {comment.replyCount} balasan</span>
                     </>
                   ) : (
                     <>
-                      <ChevronDown className="h-4 w-4 mr-1" />
-                      Tampilkan {comment.replyCount} balasan
+                      <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                      <span className="text-xs">Tampilkan {comment.replyCount} balasan</span>
                     </>
                   )}
                 </Button>
@@ -199,7 +200,7 @@ export function ThreadedCommentList({
         
         {/* Render replies */}
         {hasReplies && isExpanded && (
-          <div className="mt-3 space-y-3">
+          <div className="mt-2 sm:mt-3 space-y-2 sm:space-y-3">
             {comment.replies.map(reply => renderComment(reply, level + 1))}
           </div>
         )}
@@ -216,7 +217,7 @@ export function ThreadedCommentList({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {threadedComments.map(comment => renderComment(comment))}
     </div>
   );
