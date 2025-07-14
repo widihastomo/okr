@@ -246,6 +246,14 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 14, 2025. Successfully changed task priority icons from complex shapes to simple colored circles:
+  * UPDATED: Priority icons now use simple colored circles instead of AlertTriangle/Minus/Flag icons
+  * ENHANCED: High priority = red circle, medium priority = yellow circle, low priority = green circle
+  * IMPROVED: Cleaner, more intuitive visual representation with 3px circular indicators
+  * MAINTAINED: All tooltip functionality and Indonesian labels preserved ("Prioritas Tinggi/Sedang/Rendah")
+  * CONSISTENT: Circle-based priority indicators applied to both desktop table and mobile card views
+  * SIMPLIFIED: Removed complex icon dependencies while maintaining clear priority differentiation
+  * RESULT: More professional and minimalist priority indication system with better visual clarity
 - July 14, 2025. Successfully integrated task priority icons with task names and optimized table layout:
   * COMBINED: Priority icons now displayed alongside task names instead of separate column
   * ENHANCED: Both desktop table view and mobile card view show priority icons next to task titles

@@ -137,25 +137,25 @@ const getTaskPriorityIcon = (priority: string) => {
   switch (priority) {
     case "high":
       return { 
-        icon: <AlertTriangle className="h-4 w-4" />, 
+        icon: <div className="w-3 h-3 bg-red-500 rounded-full"></div>, 
         color: "text-red-600",
         label: "Prioritas Tinggi"
       };
     case "medium":
       return { 
-        icon: <Minus className="h-4 w-4" />, 
+        icon: <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>, 
         color: "text-yellow-600",
         label: "Prioritas Sedang"
       };
     case "low":
       return { 
-        icon: <Flag className="h-4 w-4" />, 
+        icon: <div className="w-3 h-3 bg-green-500 rounded-full"></div>, 
         color: "text-green-600",
         label: "Prioritas Rendah"
       };
     default:
       return { 
-        icon: <Minus className="h-4 w-4" />, 
+        icon: <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>, 
         color: "text-yellow-600",
         label: "Prioritas Sedang"
       };
