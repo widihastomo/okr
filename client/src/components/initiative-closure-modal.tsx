@@ -253,7 +253,7 @@ export default function InitiativeClosureModal({
             {/* Hasil Inisiatif */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">1. Hasil Inisiatif</CardTitle>
+                <CardTitle className="text-lg">Hasil Inisiatif</CardTitle>
               </CardHeader>
               <CardContent>
                 <FormField
@@ -303,7 +303,7 @@ export default function InitiativeClosureModal({
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     {getResultIcon(selectedResult)}
-                    2. {getReasonLabel(selectedResult)}
+                    {getReasonLabel(selectedResult)}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -351,7 +351,7 @@ export default function InitiativeClosureModal({
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <DollarSign className="h-5 w-5 text-green-500" />
-                  3. Update Pemakaian Budget
+                  Update Pemakaian Budget
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -384,7 +384,7 @@ export default function InitiativeClosureModal({
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     <Target className="h-5 w-5 text-blue-500" />
-                    4. Update Metrik Keberhasilan
+                    Update Metrik Keberhasilan
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -424,7 +424,7 @@ export default function InitiativeClosureModal({
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     <FileText className="h-5 w-5 text-purple-500" />
-                    5. Update Status Task yang Belum Selesai
+                    Update Status Task yang Belum Selesai
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -467,7 +467,7 @@ export default function InitiativeClosureModal({
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <AlertCircle className="h-5 w-5 text-gray-500" />
-                  6. Catatan Tambahan (Opsional)
+                  Catatan Tambahan (Opsional)
                 </CardTitle>
               </CardHeader>
               <CardContent>
