@@ -246,6 +246,14 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 14, 2025. Successfully converted initiative result selection from RadioGroup to Select box:
+  * CHANGED: RadioGroup with 3 cards layout replaced with compact Select dropdown
+  * ENHANCED: Select box displays icons and labels for each result option (Berhasil, Gagal, Perlu Diulang)
+  * IMPROVED: More compact and consistent form input pattern throughout the modal
+  * MAINTAINED: All result options preserved with proper icons (CheckCircle, XCircle, RotateCcw)
+  * ADDED: FormLabel "Pilih hasil inisiatif" and placeholder "Pilih hasil inisiatif"
+  * STREAMLINED: Form now uses consistent Select components for all dropdown selections
+  * RESULT: More compact and professional form layout with consistent input patterns
 - July 14, 2025. Successfully unified initiative closure modal into single card layout:
   * CONSOLIDATED: All form sections now contained within single Card component
   * REMOVED: Multiple separate Card components replaced with single unified layout

@@ -19,11 +19,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const closureSchema = z.object({
@@ -266,35 +265,34 @@ export default function InitiativeClosureModal({
                     name="result"
                     render={({ field }) => (
                       <FormItem>
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={field.onChange}
-                            value={field.value}
-                            className="grid grid-cols-1 md:grid-cols-3 gap-4"
-                          >
-                            <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-green-50">
-                              <RadioGroupItem value="berhasil" id="berhasil" />
-                              <Label htmlFor="berhasil" className="flex items-center gap-2 cursor-pointer">
+                        <FormLabel>Pilih hasil inisiatif</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih hasil inisiatif" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="berhasil">
+                              <div className="flex items-center gap-2">
                                 <CheckCircle className="h-4 w-4 text-green-500" />
                                 Berhasil
-                              </Label>
-                            </div>
-                            <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-red-50">
-                              <RadioGroupItem value="gagal" id="gagal" />
-                              <Label htmlFor="gagal" className="flex items-center gap-2 cursor-pointer">
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="gagal">
+                              <div className="flex items-center gap-2">
                                 <XCircle className="h-4 w-4 text-red-500" />
                                 Gagal
-                              </Label>
-                            </div>
-                            <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-yellow-50">
-                              <RadioGroupItem value="perlu_diulang" id="perlu_diulang" />
-                              <Label htmlFor="perlu_diulang" className="flex items-center gap-2 cursor-pointer">
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="perlu_diulang">
+                              <div className="flex items-center gap-2">
                                 <RotateCcw className="h-4 w-4 text-yellow-500" />
                                 Perlu Diulang
-                              </Label>
-                            </div>
-                          </RadioGroup>
-                        </FormControl>
+                              </div>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
