@@ -11,13 +11,15 @@ import {
   Target, 
   FileText,
   AlertCircle,
-  HelpCircle
+  HelpCircle,
+  AlertTriangle
 } from "lucide-react";
 
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -60,6 +62,8 @@ export default function InitiativeClosureModal({
   const queryClient = useQueryClient();
   const [updatedMetrics, setUpdatedMetrics] = useState<any[]>([]);
   const [taskUpdates, setTaskUpdates] = useState<any[]>([]);
+  const [showIncompleteTasksConfirmation, setShowIncompleteTasksConfirmation] = useState(false);
+  const [pendingFormData, setPendingFormData] = useState<ClosureFormData | null>(null);
 
   const form = useForm<ClosureFormData>({
     resolver: zodResolver(closureSchema),
@@ -256,8 +260,43 @@ export default function InitiativeClosureModal({
     },
   });
 
+  // Check if there are incomplete tasks
+  const hasIncompleteTasks = () => {
+    return taskUpdates.some(task => 
+      task.newStatus === 'not_started' || task.newStatus === 'in_progress'
+    );
+  };
+
+  // Get count of incomplete tasks
+  const getIncompleteTasksCount = () => {
+    return taskUpdates.filter(task => 
+      task.newStatus === 'not_started' || task.newStatus === 'in_progress'
+    ).length;
+  };
+
+  // Handle form submission with incomplete tasks check
   const onSubmit = (data: ClosureFormData) => {
-    closeInitiativeMutation.mutate(data);
+    if (hasIncompleteTasks()) {
+      setPendingFormData(data);
+      setShowIncompleteTasksConfirmation(true);
+    } else {
+      closeInitiativeMutation.mutate(data);
+    }
+  };
+
+  // Handle confirmation to proceed with incomplete tasks
+  const handleConfirmProceed = () => {
+    if (pendingFormData) {
+      closeInitiativeMutation.mutate(pendingFormData);
+    }
+    setShowIncompleteTasksConfirmation(false);
+    setPendingFormData(null);
+  };
+
+  // Handle cancel confirmation
+  const handleCancelConfirmation = () => {
+    setShowIncompleteTasksConfirmation(false);
+    setPendingFormData(null);
   };
 
   const handleClose = () => {
@@ -268,8 +307,9 @@ export default function InitiativeClosureModal({
   const incompleteTasks = Array.isArray(tasks) ? tasks.filter(task => task.status !== 'completed' && task.status !== 'cancelled') : [];
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+    <>
+      <Dialog open={isOpen} onOpenChange={handleClose}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CheckCircle className="h-5 w-5 text-green-500" />
@@ -626,7 +666,43 @@ export default function InitiativeClosureModal({
             </div>
           </form>
         </Form>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+
+      {/* Incomplete Tasks Confirmation Dialog */}
+      <AlertDialog open={showIncompleteTasksConfirmation} onOpenChange={setShowIncompleteTasksConfirmation}>
+        <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-yellow-500" />
+            Masih Ada Task yang Belum Selesai
+          </AlertDialogTitle>
+          <AlertDialogDescription className="space-y-2">
+            <p>
+              Terdapat <strong>{getIncompleteTasksCount()} task</strong> yang masih berstatus 
+              <strong> "Belum Dimulai"</strong> atau <strong>"Sedang Berjalan"</strong>.
+            </p>
+            <p>
+              Apakah Anda yakin ingin menutup inisiatif ini? Task yang belum selesai akan tetap memiliki status saat ini.
+            </p>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel 
+            onClick={handleCancelConfirmation}
+            className="border-gray-300 text-gray-700 hover:bg-gray-50"
+          >
+            Batal
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleConfirmProceed}
+            className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+          >
+            Ya, Tutup Inisiatif
+          </AlertDialogAction>
+        </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
