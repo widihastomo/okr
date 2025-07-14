@@ -463,11 +463,11 @@ const ClosureSummary = ({ initiative }: { initiative: any }) => {
   const getResultIcon = (result: string) => {
     switch (result) {
       case 'berhasil':
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
+        return <CheckCircle className="h-3 w-3 text-green-600" />;
       case 'gagal':
-        return <XCircle className="h-5 w-5 text-red-500" />;
+        return <XCircle className="h-3 w-3 text-red-600" />;
       case 'perlu_diulang':
-        return <RotateCcw className="h-5 w-5 text-yellow-500" />;
+        return <RotateCcw className="h-3 w-3 text-yellow-600" />;
       default:
         return null;
     }
@@ -500,74 +500,65 @@ const ClosureSummary = ({ initiative }: { initiative: any }) => {
   };
 
   return (
-    <Card className="mb-6 border-gray-200 shadow-sm">
-      <CardHeader className="pb-3">
-        <div className="flex items-center gap-2">
-          <FileText className="h-5 w-5 text-gray-600" />
-          <CardTitle className="text-lg font-semibold text-gray-900">
-            Resume Penutupan Inisiatif
-          </CardTitle>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="mb-6 bg-gradient-to-r from-slate-50 to-gray-50 border border-gray-200 rounded-lg p-4">
+      <div className="flex items-center gap-2 mb-3">
+        <FileText className="h-4 w-4 text-slate-600" />
+        <h3 className="text-sm font-semibold text-slate-900">Resume Penutupan</h3>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
         {/* Result Status */}
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-medium text-gray-600 w-20">Hasil:</span>
-          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${getResultColor(closureData.result)}`}>
+        <div className="flex items-center gap-2">
+          <span className="text-slate-600 font-medium">Hasil:</span>
+          <div className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${getResultColor(closureData.result)}`}>
             {getResultIcon(closureData.result)}
-            <span className="text-sm font-medium">{getResultLabel(closureData.result)}</span>
+            {getResultLabel(closureData.result)}
           </div>
         </div>
 
         {/* Closure Date */}
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-medium text-gray-600 w-20">Ditutup:</span>
-          <span className="text-sm text-gray-800">
+        <div className="flex items-center gap-2">
+          <span className="text-slate-600 font-medium">Ditutup:</span>
+          <span className="text-slate-800">
             {formatDate(closureData.closedAt || initiative.completedAt)}
           </span>
         </div>
 
         {/* Budget Usage */}
         {closureData.budgetUsed && (
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-gray-600 w-20">Budget:</span>
-            <span className="text-sm text-gray-800">
+          <div className="flex items-center gap-2">
+            <span className="text-slate-600 font-medium">Budget:</span>
+            <span className="text-slate-800">
               Rp {Number(closureData.budgetUsed).toLocaleString('id-ID')}
             </span>
           </div>
         )}
+      </div>
 
-        {/* Reason */}
-        {closureData.reason && (
-          <div className="space-y-2">
-            <span className="text-sm font-medium text-gray-600">Alasan:</span>
-            <p className="text-sm text-gray-800 bg-gray-50 p-3 rounded-lg border border-gray-200">
-              {closureData.reason}
-            </p>
-          </div>
-        )}
-
-        {/* Learning Notes */}
-        {closureData.learningNote && (
-          <div className="space-y-2">
-            <span className="text-sm font-medium text-gray-600">Pembelajaran:</span>
-            <p className="text-sm text-gray-800 bg-blue-50 p-3 rounded-lg border border-blue-200">
-              {closureData.learningNote}
-            </p>
-          </div>
-        )}
-
-        {/* Additional Notes */}
-        {closureData.notes && (
-          <div className="space-y-2">
-            <span className="text-sm font-medium text-gray-600">Catatan Tambahan:</span>
-            <p className="text-sm text-gray-800 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
-              {closureData.notes}
-            </p>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+      {/* Notes - Compact format */}
+      {(closureData.reason || closureData.learningNote || closureData.notes) && (
+        <div className="mt-3 pt-3 border-t border-gray-200">
+          {closureData.reason && (
+            <div className="mb-2">
+              <span className="text-xs font-medium text-slate-600">Alasan: </span>
+              <span className="text-xs text-slate-700">{closureData.reason}</span>
+            </div>
+          )}
+          {closureData.learningNote && (
+            <div className="mb-2">
+              <span className="text-xs font-medium text-slate-600">Pembelajaran: </span>
+              <span className="text-xs text-slate-700">{closureData.learningNote}</span>
+            </div>
+          )}
+          {closureData.notes && (
+            <div>
+              <span className="text-xs font-medium text-slate-600">Catatan: </span>
+              <span className="text-xs text-slate-700">{closureData.notes}</span>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 };
 
