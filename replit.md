@@ -262,6 +262,10 @@ All email configuration now uses environment variables:
   * IMPROVED: Better information hierarchy with team context directly in main overview section
   * STREAMLINED: Reduced sidebar complexity while maintaining all team information accessibility
   * RESULT: More logical information flow with team details integrated into main initiative overview
+  * REPOSITIONED: Team information moved below budget field in overview card grid layout
+  * CONDENSED: Team display simplified to show PIC with avatar and "+X anggota" counter for members
+  * COMPACT: Team information now uses single line format with smaller avatars (5x5) for space efficiency
+  * CONSISTENT: Team information integrated into left column grid alongside priority and budget fields
 - July 13, 2025. Successfully implemented bi-directional auto-update status initiative system based on task status changes:
   * IMPLEMENTED: Auto-update logic - task "in_progress" → initiative "sedang_berjalan" 
   * IMPLEMENTED: Reverse auto-update logic - all tasks "not_started" → initiative "draft"

@@ -905,6 +905,28 @@ export default function InitiativeDetailPage() {
                           {initiativeData.budget ? `Rp ${Number(initiativeData.budget).toLocaleString('id-ID')}` : 'Tidak ada'}
                         </span>
                       </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Users className="h-4 w-4 text-orange-500" />
+                        <span className="text-gray-600">Tim:</span>
+                        <div className="flex items-center gap-2">
+                          {pic && (
+                            <div className="flex items-center gap-1">
+                              <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                                {pic.firstName?.charAt(0)}{pic.lastName?.charAt(0)}
+                              </div>
+                              <span className="text-xs font-medium">{pic.firstName} {pic.lastName}</span>
+                            </div>
+                          )}
+                          {members.length > 0 && (
+                            <div className="flex items-center gap-1">
+                              <span className="text-xs text-gray-500">+{members.length} anggota</span>
+                            </div>
+                          )}
+                          {!pic && members.length === 0 && (
+                            <span className="text-xs text-gray-500">Belum ada anggota</span>
+                          )}
+                        </div>
+                      </div>
                     </div>
                     
                     <div className="space-y-3">
@@ -955,65 +977,7 @@ export default function InitiativeDetailPage() {
                     );
                   })()}
 
-                  {/* Team Information */}
-                  <div className="pt-4 border-t border-gray-100">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Users className="h-4 w-4 text-orange-500" />
-                      <span className="text-sm font-medium text-gray-700">Tim</span>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      {/* PIC */}
-                      {pic && (
-                        <div>
-                          <div className="text-xs text-gray-500 mb-1">PIC (Person in Charge)</div>
-                          <div className="flex items-center space-x-2">
-                            <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                              {pic.firstName?.charAt(0)}{pic.lastName?.charAt(0)}
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium text-gray-900">
-                                {pic.firstName} {pic.lastName}
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                {pic.email}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
 
-                      {/* Members */}
-                      {members.length > 0 && (
-                        <div>
-                          <div className="text-xs text-gray-500 mb-1">Anggota Tim ({members.length})</div>
-                          <div className="flex flex-wrap gap-2">
-                            {members.map((member: any) => (
-                              <div key={member.id} className="flex items-center space-x-2">
-                                <div className="w-6 h-6 bg-gray-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                                  {member.user?.firstName?.charAt(0)}{member.user?.lastName?.charAt(0)}
-                                </div>
-                                <div>
-                                  <div className="text-sm font-medium text-gray-900">
-                                    {member.user?.firstName} {member.user?.lastName}
-                                  </div>
-                                  <div className="text-xs text-gray-500">
-                                    {member.user?.email}
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {!pic && members.length === 0 && (
-                        <div className="text-xs text-gray-500">
-                          Belum ada anggota tim
-                        </div>
-                      )}
-                    </div>
-                  </div>
 
                   {/* Key Result Information */}
                   {keyResult && (
