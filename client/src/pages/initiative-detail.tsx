@@ -1023,16 +1023,6 @@ export default function InitiativeDetailPage() {
           </Button>
 
           <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setIsEditInitiativeModalOpen(true)}
-              disabled={initiativeData.status === 'selesai'}
-            >
-              <Edit className="w-4 h-4 mr-2" />
-              Edit
-            </Button>
-            
             {/* Close Initiative Button - Only show when status is sedang_berjalan */}
             {initiativeData.status === 'sedang_berjalan' && (
               <Button 
@@ -1066,10 +1056,27 @@ export default function InitiativeDetailPage() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => setIsEditInitiativeModalOpen(true)}
+                  disabled={initiativeData.status === 'selesai'}
+                >
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit Inisiatif
+                </DropdownMenuItem>
                 <DropdownMenuItem>
                   <FileText className="w-4 h-4 mr-2" />
                   Duplikat Inisiatif
                 </DropdownMenuItem>
+                {/* Cancel Initiative - Only show when status is sedang_berjalan */}
+                {initiativeData.status === 'sedang_berjalan' && (
+                  <DropdownMenuItem 
+                    className="text-yellow-600 hover:text-yellow-700"
+                    onClick={() => setIsCancelModalOpen(true)}
+                  >
+                    <XCircle className="w-4 h-4 mr-2" />
+                    Batalkan Inisiatif
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem 
                   className="text-red-600 hover:text-red-700"
                   onClick={() => setIsDeleteInitiativeModalOpen(true)}
@@ -1821,6 +1828,80 @@ export default function InitiativeDetailPage() {
           queryClient.invalidateQueries({ queryKey: [`/api/initiatives`] });
         }}
       />
+
+      {/* Cancel Initiative Modal */}
+      <AlertDialog open={isCancelModalOpen} onOpenChange={setIsCancelModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <XCircle className="w-5 h-5 text-yellow-600" />
+              Batalkan Inisiatif
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin membatalkan inisiatif <strong>"{initiativeData.title}"</strong>?
+              <br /><br />
+              <div className="space-y-2">
+                <Label htmlFor="cancel-reason">Alasan pembatalan:</Label>
+                <textarea
+                  id="cancel-reason"
+                  value={cancelReason}
+                  onChange={(e) => setCancelReason(e.target.value)}
+                  placeholder="Jelaskan alasan mengapa inisiatif ini dibatalkan..."
+                  className="w-full p-2 border border-gray-300 rounded-md resize-none"
+                  rows={3}
+                />
+              </div>
+              <br />
+              <span className="text-yellow-600 font-medium">
+                Inisiatif yang dibatalkan akan diubah statusnya menjadi "Dibatalkan" dan tidak dapat diaktifkan kembali.
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => cancelInitiativeMutation.mutate({ reason: cancelReason })}
+              className="bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-700 hover:to-yellow-600 text-white"
+              disabled={cancelInitiativeMutation.isPending || !cancelReason.trim()}
+            >
+              {cancelInitiativeMutation.isPending ? "Membatalkan..." : "Batalkan Inisiatif"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Reopen Initiative Modal */}
+      <AlertDialog open={isReopenInitiativeModalOpen} onOpenChange={setIsReopenInitiativeModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <RotateCcw className="w-5 h-5 text-orange-600" />
+              Buka Kembali Inisiatif
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin membuka kembali inisiatif <strong>"{initiativeData.title}"</strong>?
+              <br /><br />
+              <span className="text-orange-600 font-medium">
+                Inisiatif akan diubah statusnya menjadi "Sedang Berjalan" dan dapat dilanjutkan kembali.
+              </span>
+              <br /><br />
+              <span className="text-gray-600 text-sm">
+                Anda dapat melanjutkan pekerjaan pada inisiatif ini, menambah task baru, dan memperbarui metrik keberhasilan.
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => reopenInitiativeMutation.mutate()}
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
+              disabled={reopenInitiativeMutation.isPending}
+            >
+              {reopenInitiativeMutation.isPending ? "Membuka..." : "Buka Kembali"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Delete Initiative Confirmation Modal */}
       <AlertDialog open={isDeleteInitiativeModalOpen} onOpenChange={setIsDeleteInitiativeModalOpen}>
