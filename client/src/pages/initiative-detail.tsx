@@ -983,7 +983,6 @@ export default function InitiativeDetailPage() {
                           <div className="text-lg font-bold text-blue-900">
                             {(keyResult.progress || 0).toFixed(1)}%
                           </div>
-                          <div className="text-xs text-blue-700">Kemajuan</div>
                         </div>
                       </div>
                     </div>
