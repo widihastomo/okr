@@ -58,7 +58,7 @@ export function SearchableUserSelect({
     if (value === "unassigned") return "Belum Ditugaskan";
     if (selectedUser) {
       const name = `${selectedUser.firstName || ''} ${selectedUser.lastName || ''}`.trim();
-      return name || selectedUser.email;
+      return name || "Unknown User";
     }
     return placeholder;
   };
@@ -200,13 +200,7 @@ export function SearchableUserSelect({
                           "font-medium truncate",
                           value === user.id ? "text-blue-900" : "text-gray-900"
                         )}>
-                          {`${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email}
-                        </span>
-                        <span className={cn(
-                          "text-sm truncate",
-                          value === user.id ? "text-blue-600" : "text-gray-500"
-                        )}>
-                          {user.email}
+                          {`${user.firstName || ''} ${user.lastName || ''}`.trim() || "Unknown User"}
                         </span>
                       </div>
                       <Check

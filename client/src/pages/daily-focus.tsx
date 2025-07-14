@@ -1194,7 +1194,7 @@ export default function DailyFocusPage() {
                   <SelectItem key={user.id} value={user.id}>
                     {user.firstName && user.lastName
                       ? `${user.firstName} ${user.lastName}`
-                      : user.email || user.username || "Unknown"}
+                      : "Unknown User"}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -1218,7 +1218,7 @@ export default function DailyFocusPage() {
                 {activeUsers?.find((u: any) => u.id === selectedUserId)?.firstName &&
                 activeUsers?.find((u: any) => u.id === selectedUserId)?.lastName
                   ? `${activeUsers.find((u: any) => u.id === selectedUserId)?.firstName} ${activeUsers.find((u: any) => u.id === selectedUserId)?.lastName}`
-                  : "Unknown"}
+                  : "Unknown User"}
               </span>
             </span>
           </div>

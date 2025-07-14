@@ -122,12 +122,14 @@ export function Leaderboard({ limit = 10 }: LeaderboardProps) {
                 <div className="flex items-center gap-2 mb-1">
                   {/* Avatar */}
                   <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                    {entry.user.firstName?.charAt(0)}{entry.user.lastName?.charAt(0)}
+                    {entry.user.firstName?.charAt(0) || "U"}{entry.user.lastName?.charAt(0) || ""}
                   </div>
                   
                   {/* Name */}
                   <div className="font-medium text-gray-900 truncate">
-                    {entry.user.firstName} {entry.user.lastName}
+                    {entry.user.firstName && entry.user.lastName 
+                      ? `${entry.user.firstName} ${entry.user.lastName}` 
+                      : "Unknown User"}
                   </div>
                   
                   {/* Level Badge */}

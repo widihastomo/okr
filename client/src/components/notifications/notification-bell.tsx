@@ -237,11 +237,13 @@ export function NotificationBell() {
                           <div className="flex items-center gap-1">
                             <Avatar className="h-4 w-4">
                               <AvatarFallback className="text-xs bg-blue-100 text-blue-700">
-                                {notification.actor.firstName?.charAt(0) || notification.actor.email.charAt(0).toUpperCase()}
+                                {notification.actor.firstName?.charAt(0) || "U"}
                               </AvatarFallback>
                             </Avatar>
                             <span className="text-xs text-muted-foreground">
-                              {notification.actor.firstName || notification.actor.email}
+                              {notification.actor.firstName && notification.actor.lastName 
+                                ? `${notification.actor.firstName} ${notification.actor.lastName}` 
+                                : "Unknown User"}
                             </span>
                           </div>
                         )}

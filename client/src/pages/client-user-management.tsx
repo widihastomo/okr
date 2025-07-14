@@ -391,14 +391,14 @@ export default function ClientUserManagement() {
                         <div className="flex items-center space-x-3">
                           <Avatar className="h-8 w-8">
                             <AvatarFallback className="bg-blue-100 text-blue-700">
-                              {user.firstName?.charAt(0) || user.email.charAt(0).toUpperCase()}
+                              {user.firstName?.charAt(0) || "U"}
                             </AvatarFallback>
                           </Avatar>
                           <div>
                             <div className="font-medium">
                               {user.firstName && user.lastName 
                                 ? `${user.firstName} ${user.lastName}`
-                                : user.email
+                                : "Unknown User"
                               }
                             </div>
                             <div className="text-sm text-gray-500">{user.email}</div>

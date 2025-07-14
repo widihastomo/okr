@@ -144,7 +144,7 @@ export function InitiativeCommentEditor({
     const currentContent = editorRef.current.innerHTML;
     const updatedContent = currentContent.replace(
       new RegExp(`@${mentionQuery}$`),
-      `@${user.firstName || user.email}`
+      `@${user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : "Unknown User"}`
     );
     
     editorRef.current.innerHTML = updatedContent;
