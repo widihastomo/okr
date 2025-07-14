@@ -142,6 +142,8 @@ const TasksPage = () => {
       toast({
         title: "Status berhasil diperbarui",
         description: statusMessages[variables.status as keyof typeof statusMessages] || "Status task telah diperbarui.",
+        variant: "default",
+        className: "bg-green-50 border-green-200 text-green-800",
       });
     },
     onError: (error) => {

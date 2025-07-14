@@ -257,6 +257,7 @@ All email configuration now uses environment variables:
   * INTEGRATED: User data from /api/organization/users endpoint for authentic user information
   * ADDED: Action dropdown menu (Lihat Detail, Edit, Hapus) in both desktop and mobile views
   * ENHANCED: Status update toast notifications with specific messages for each status change
+  * IMPROVED: Toast styling with green success theme (bg-green-50 border-green-200 text-green-800)
   * CONSISTENT: Exact same styling, layout, and interaction patterns as daily-focus page
   * RESULT: Tasks page now has unified ListView format matching daily-focus with proper user profile integration and contextual feedback
 - July 14, 2025. Successfully fixed TourLauncher clickability issue:
