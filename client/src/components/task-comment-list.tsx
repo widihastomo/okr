@@ -38,6 +38,7 @@ export function TaskCommentList({ taskId }: TaskCommentListProps) {
   const [editContent, setEditContent] = useState("");
   const [deleteCommentId, setDeleteCommentId] = useState<string | null>(null);
   const [replyingToCommentId, setReplyingToCommentId] = useState<string | null>(null);
+  const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -48,6 +49,35 @@ export function TaskCommentList({ taskId }: TaskCommentListProps) {
   const { data: currentUser } = useQuery<User>({
     queryKey: ['/api/auth/me'],
   });
+
+  // Organize comments into thread structure
+  const organizeComments = (comments: TaskCommentWithUser[]) => {
+    const parentComments = comments.filter(comment => !comment.parentId);
+    const childComments = comments.filter(comment => comment.parentId);
+    
+    return parentComments.map(parent => ({
+      ...parent,
+      replies: childComments.filter(child => child.parentId === parent.id)
+    }));
+  };
+
+  const threadedComments = organizeComments(comments);
+
+  const toggleReplies = (commentId: string) => {
+    const newExpanded = new Set(expandedReplies);
+    if (newExpanded.has(commentId)) {
+      newExpanded.delete(commentId);
+    } else {
+      newExpanded.add(commentId);
+    }
+    setExpandedReplies(newExpanded);
+  };
+
+  const handleReplyAdded = (parentId: string) => {
+    setReplyingToCommentId(null);
+    // Auto-expand replies when a new reply is added
+    setExpandedReplies(prev => new Set(prev).add(parentId));
+  };
 
   const updateCommentMutation = useMutation({
     mutationFn: async ({ commentId, content }: { commentId: string; content: string }) => {
@@ -157,132 +187,146 @@ export function TaskCommentList({ taskId }: TaskCommentListProps) {
     );
   }
 
+  const renderComment = (comment: TaskCommentWithUser & { replies?: TaskCommentWithUser[] }, isReply = false) => (
+    <motion.div
+      key={comment.id}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      className={`flex gap-3 group ${isReply ? 'ml-8' : ''}`}
+    >
+      <Avatar className="w-8 h-8 flex-shrink-0">
+        <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
+          {(comment.user.firstName || comment.user.email)?.charAt(0).toUpperCase()}
+        </AvatarFallback>
+      </Avatar>
+
+      <div className="flex-1 min-w-0">
+        <div className="bg-gray-50 rounded-lg px-3 py-2 relative">
+          <div className="flex items-center gap-2 mb-1 pr-8">
+            <span className="font-medium text-sm text-gray-900">
+              {comment.user.firstName || comment.user.email}
+            </span>
+            <span className="text-xs text-gray-500">
+              {formatDistanceToNow(comment.createdAt ? new Date(comment.createdAt) : new Date(), {
+                addSuffix: true,
+                locale: id,
+              })}
+            </span>
+            {comment.isEdited && (
+              <span className="text-xs text-gray-400">(diedit)</span>
+            )}
+          </div>
+
+          {/* Action menu - positioned inside bubble at top-right */}
+          {currentUser?.id === comment.userId && editingCommentId !== comment.id && (
+            <div className="absolute top-2 right-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600">
+                    <MoreVertical className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => handleEditStart(comment)}
+                    className="text-sm"
+                  >
+                    <Edit2 className="mr-2 h-3 w-3" />
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setDeleteCommentId(comment.id)}
+                    className="text-sm text-red-600"
+                  >
+                    <Trash2 className="mr-2 h-3 w-3" />
+                    Hapus
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
+
+          {editingCommentId === comment.id ? (
+            <div className="space-y-2 mt-2">
+              <TaskCommentEditor
+                taskId={taskId}
+                onCommentSubmit={(content) => {
+                  handleEditSave(comment.id, content);
+                }}
+                initialContent={editContent}
+                placeholder="Edit komentar..."
+                submitButtonText={updateCommentMutation.isPending ? "Menyimpan..." : "Simpan"}
+                isSubmitting={updateCommentMutation.isPending}
+                showCancelButton={true}
+                onCancel={handleEditCancel}
+              />
+            </div>
+          ) : (
+            <div
+              className="text-sm text-gray-700 leading-relaxed"
+              dangerouslySetInnerHTML={{
+                __html: renderCommentContent(comment.content),
+              }}
+            />
+          )}
+        </div>
+        
+        {/* Reply and view replies section */}
+        <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setReplyingToCommentId(comment.id)}
+            className="h-6 px-2 text-xs hover:text-gray-700"
+          >
+            <Reply className="h-3 w-3 mr-1" />
+            Balas
+          </Button>
+          
+          {/* Show reply count and toggle */}
+          {comment.replies && comment.replies.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => toggleReplies(comment.id)}
+              className="h-6 px-2 text-xs hover:text-gray-700"
+            >
+              <MessageCircle className="h-3 w-3 mr-1" />
+              {comment.replies.length} balasan
+            </Button>
+          )}
+        </div>
+        
+        {/* Reply form */}
+        {replyingToCommentId === comment.id && (
+          <div className="ml-4 mt-2 border-l-2 border-orange-200 pl-4">
+            <TaskCommentEditor
+              taskId={taskId}
+              parentId={comment.id}
+              placeholder="Balas komentar..."
+              submitButtonText="Kirim Balasan"
+              onCommentAdded={() => handleReplyAdded(comment.id)}
+              showCancelButton={true}
+              onCancel={() => setReplyingToCommentId(null)}
+            />
+          </div>
+        )}
+        
+        {/* Nested replies display */}
+        {comment.replies && comment.replies.length > 0 && expandedReplies.has(comment.id) && (
+          <div className="mt-3 space-y-3">
+            {comment.replies.map((reply) => renderComment(reply, true))}
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+
   return (
     <div className="space-y-4">
       <AnimatePresence>
-        {comments.map((comment) => (
-          <motion.div
-            key={comment.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="flex gap-3 group"
-          >
-            <Avatar className="w-8 h-8 flex-shrink-0">
-              <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
-                {(comment.user.firstName || comment.user.email)?.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-
-            <div className="flex-1 min-w-0">
-              <div className="bg-gray-50 rounded-lg px-3 py-2 relative">
-                <div className="flex items-center gap-2 mb-1 pr-8">
-                  <span className="font-medium text-sm text-gray-900">
-                    {comment.user.firstName || comment.user.email}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    {formatDistanceToNow(comment.createdAt ? new Date(comment.createdAt) : new Date(), {
-                      addSuffix: true,
-                      locale: id,
-                    })}
-                  </span>
-                  {comment.isEdited && (
-                    <span className="text-xs text-gray-400">(diedit)</span>
-                  )}
-                </div>
-
-                {/* Action menu - positioned inside bubble at top-right */}
-                {currentUser?.id === comment.userId && editingCommentId !== comment.id && (
-                  <div className="absolute top-2 right-2">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600">
-                          <MoreVertical className="h-3 w-3" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => handleEditStart(comment)}
-                          className="text-sm"
-                        >
-                          <Edit2 className="mr-2 h-3 w-3" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => setDeleteCommentId(comment.id)}
-                          className="text-sm text-red-600"
-                        >
-                          <Trash2 className="mr-2 h-3 w-3" />
-                          Hapus
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                )}
-
-                {editingCommentId === comment.id ? (
-                  <div className="space-y-2 mt-2">
-                    <TaskCommentEditor
-                      taskId={taskId}
-                      onCommentSubmit={(content) => {
-                        handleEditSave(comment.id, content);
-                      }}
-                      initialContent={editContent}
-                      placeholder="Edit komentar..."
-                      submitButtonText={updateCommentMutation.isPending ? "Menyimpan..." : "Simpan"}
-                      isSubmitting={updateCommentMutation.isPending}
-                      showCancelButton={true}
-                      onCancel={handleEditCancel}
-                    />
-                  </div>
-                ) : (
-                  <div
-                    className="text-sm text-gray-700 leading-relaxed"
-                    dangerouslySetInnerHTML={{
-                      __html: renderCommentContent(comment.content),
-                    }}
-                  />
-                )}
-              </div>
-              
-              {/* Reply and view replies section */}
-              <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setReplyingToCommentId(comment.id)}
-                  className="h-6 px-2 text-xs hover:text-gray-700"
-                >
-                  <Reply className="h-3 w-3 mr-1" />
-                  Balas
-                </Button>
-                
-                {/* TODO: Add reply count display */}
-                {/* <span className="text-xs">2 balasan</span> */}
-              </div>
-              
-              {/* Reply form */}
-              {replyingToCommentId === comment.id && (
-                <div className="ml-4 mt-2 border-l-2 border-gray-200 pl-4">
-                  <TaskCommentEditor
-                    taskId={taskId}
-                    parentId={comment.id}
-                    placeholder="Balas komentar..."
-                    submitButtonText="Kirim Balasan"
-                    onCommentAdded={() => setReplyingToCommentId(null)}
-                    showCancelButton={true}
-                    onCancel={() => setReplyingToCommentId(null)}
-                  />
-                </div>
-              )}
-              
-              {/* TODO: Add nested replies display */}
-              {/* <div className="ml-4 mt-2 space-y-3">
-                Nested replies will go here
-              </div> */}
-            </div>
-          </motion.div>
-        ))}
+        {threadedComments.map((comment) => renderComment(comment))}
       </AnimatePresence>
 
       {/* Delete confirmation dialog */}
