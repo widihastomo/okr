@@ -322,7 +322,7 @@ export default function DashboardD3Tree({
       .attr("font-size", "18px")
       .text("🎯");
 
-    // Add title
+    // Add title (shortened to avoid overlap with expand button)
     contentNodes.append("text")
       .attr("x", 40)
       .attr("y", 25)
@@ -331,7 +331,9 @@ export default function DashboardD3Tree({
       .attr("font-weight", "600")
       .text(d => {
         const title = d.data.data.title;
-        return title.length > 35 ? title.substring(0, 35) + "..." : title;
+        // Limit title length to prevent overlap with expand button
+        const maxLength = d.data.children.length > 0 ? 28 : 35;
+        return title.length > maxLength ? title.substring(0, maxLength) + "..." : title;
       });
 
     // Add status badge

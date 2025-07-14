@@ -253,7 +253,9 @@ All email configuration now uses environment variables:
   * ELIMINATED: All references to "artificial-root" and "Company OKR" from D3 tree visualization
   * ENHANCED: Multiple root hierarchies now display as independent trees with proper vertical stacking
   * VERIFIED: Debug logging shows 2 goals with vertical offsets (0, 160) for clean vertical arrangement
-  * RESULT: Clean dashboard hierarchy without artificial containers, goals displayed vertically with minimal spacing
+  * FIXED: Overlap issue between goal titles and expand/collapse buttons by limiting title length
+  * OPTIMIZED: Dynamic title truncation - 28 chars for nodes with children, 35 chars for leaf nodes
+  * RESULT: Clean dashboard hierarchy without artificial containers, goals displayed vertically with minimal spacing and no UI overlap
 - July 14, 2025. Successfully enhanced Tasks filter section with improved UI layout and team filtering functionality:
   * ENHANCED: Redesigned filter section with grid layout and proper labels for better organization
   * IMPROVED: Search field positioned separately at top with responsive max-width
