@@ -71,11 +71,13 @@ export default function DashboardD3Tree({
     goals.forEach(goal => {
       const node = nodeMap.get(goal.id)!;
       
+      // Check if goal has parentId and if parent exists in nodeMap
       if (goal.parentId && nodeMap.has(goal.parentId)) {
         const parent = nodeMap.get(goal.parentId)!;
         parent.children.push(node);
         node.parent = parent;
       } else {
+        // Goal without parent or with non-existent parent becomes root
         rootNodes.push(node);
       }
     });
