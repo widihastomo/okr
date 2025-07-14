@@ -47,8 +47,7 @@ import {
 } from "lucide-react";
 import TourLauncher from "@/components/onboarding/tour-launcher";
 import { useAuth } from "@/hooks/useAuth";
-import { DashboardHelpBubble } from "@/components/help-bubble";
-import AIHelpBubble from "@/components/ai-help-bubble";
+
 import { ObjectiveStatusBadge } from "@/components/objective-status-badge";
 import DashboardD3Tree from "@/components/dashboard-d3-tree";
 
@@ -574,11 +573,7 @@ export default function Dashboard() {
                   Kelola objective, angka target, dan inisiatif Anda
                 </p>
               </div>
-              {currentUser && (currentUser as any).id ? (
-                <DashboardHelpBubble
-                  userId={(currentUser as any).id as string}
-                />
-              ) : null}
+
             </div>
             <div className="flex-shrink-0 flex gap-2">
               <TourLauncher />
@@ -816,16 +811,7 @@ export default function Dashboard() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* AI Help Bubble */}
-      <AIHelpBubble
-        context="dashboard"
-        data={{
-          totalGoals: filteredGoals.length,
-          statusFilter,
-          cycleFilter,
-        }}
-        position="bottom-right"
-      />
+
     </div>
   );
 }

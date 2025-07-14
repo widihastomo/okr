@@ -237,7 +237,7 @@ All email configuration now uses environment variables:
 - **NOTIFICATION TYPES SYSTEM**: Individual toggle controls for each notification category with proper backend integration and JSON parsing error handling
 - **DAY-BASED REMINDER FILTERING**: Advanced activeDays system allowing users to specify which days of the week to receive reminders
 - **UI ENHANCEMENTS**: Added focused notification types interface with individual switch controls for precise user control
-- **AI INTEGRATION**: OpenAI API integration for contextual insights and intelligent recommendations throughout the application
+- **ACTIVE USER FILTERING**: Only users with isActive === true are displayed in user selection interfaces throughout the application
 
 ## Current Issues
 - **PERSISTENT DROPDOWN ISSUE**: Daily instant update task status dropdowns consistently fail to register clicks or onChange events despite multiple debugging approaches including native HTML select, custom buttons, visual debugging, and state management fixes. Root cause appears to be a deeper React/DOM interaction issue that requires alternative UI pattern.
@@ -246,6 +246,15 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 14, 2025. Successfully removed AI Assistant feature due to OpenAI quota limitations:
+  * REMOVED: All AI Assistant components (help-bubble.tsx, ai-help-bubble.tsx) from client/src/components/
+  * REMOVED: All AI backend services (ai-insights.ts, ai-routes.ts) from server/
+  * CLEANED: All references to DashboardHelpBubble, ObjectiveDetailHelpBubble, AIHelpBubble, and other AI components from pages
+  * UPDATED: Removed registerAIRoutes from server/routes.ts
+  * DELETED: Backup and temporary files containing AI Assistant references
+  * VERIFIED: No remaining AI Assistant references in codebase
+  * BENEFIT: Eliminated OpenAI quota-related errors and improved application stability
+  * RESULT: Clean codebase without AI dependencies, fully functional without OpenAI integration
 - July 14, 2025. Successfully implemented comprehensive disable system for cancelled initiatives across entire UI:
   * DISABLED: All buttons (Tambah Metrik, Tambah Task, task status dropdowns, success metrics actions) when initiative status is "dibatalkan"
   * DISABLED: All dropdown menus (3-dot menus) for task actions and success metrics when initiative status is "dibatalkan"

@@ -119,7 +119,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
-import AIHelpBubble from "@/components/ai-help-bubble";
+
 import ObjectiveOverviewCard from "@/components/objective-overview-card";
 import ObjectiveTimeline from "@/components/objective-timeline";
 import ActivityLogCard from "@/components/activity-log-card";
@@ -2680,17 +2680,7 @@ export default function GoalDetail() {
           setActiveTab("tasks");
         }}
       />
-      {/* AI Help Bubble */}
-      <AIHelpBubble
-        context="objective_detail"
-        data={{
-          objective: goal,
-          keyResults: goal?.keyResults || [],
-          cycleId: goal?.cycleId,
-          cycleName: cycle?.name,
-        }}
-        position="bottom-right"
-      />
+
       {/* Delete Key Result Confirmation Dialog */}
       <AlertDialog
         open={deleteKeyResultModal.open}

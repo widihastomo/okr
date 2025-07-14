@@ -22,7 +22,7 @@ import { updateObjectiveWithAutoStatus } from "./storage";
 import { updateCycleStatuses } from "./cycle-status-updater";
 import { gamificationService } from "./gamification";
 import { populateGamificationData } from "./gamification-data";
-import { registerAIRoutes } from "./ai-routes";
+
 import { NotificationService } from "./notification-service";
 import { calculateKeyResultProgress } from "@shared/progress-calculator";
 import { 
@@ -8165,8 +8165,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Register AI routes
-  registerAIRoutes(app);
+
 
   // Referral Codes Management Routes
   
