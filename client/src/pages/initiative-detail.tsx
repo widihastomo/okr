@@ -77,8 +77,7 @@ import InitiativeFormModal from "@/components/initiative-form-modal";
 import { InitiativeNotes } from "@/components/initiative-notes";
 import SuccessMetricsModal from "@/components/success-metrics-modal-simple";
 import InitiativeClosureModal from "@/components/initiative-closure-modal";
-import { InitiativeCommentList } from "@/components/initiative-comment-list";
-import { InitiativeCommentEditor } from "@/components/initiative-comment-editor";
+import { InitiativeCommentList, InitiativeCommentEditor } from "@/components/initiative-comment-unified";
 import { calculateKeyResultProgress } from "@shared/progress-calculator";
 import type { SuccessMetricWithUpdates } from "@shared/schema";
 
