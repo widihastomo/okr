@@ -10,7 +10,8 @@ import {
   DollarSign, 
   Target, 
   FileText,
-  AlertCircle
+  AlertCircle,
+  HelpCircle
 } from "lucide-react";
 
 import { apiRequest } from "@/lib/queryClient";
@@ -24,6 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const closureSchema = z.object({
   result: z.enum(['berhasil', 'gagal', 'perlu_diulang'], {
@@ -257,7 +259,44 @@ export default function InitiativeClosureModal({
                   name="result"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Hasil Inisiatif</FormLabel>
+                      <div className="flex items-center gap-2">
+                        <FormLabel>Hasil Inisiatif</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button type="button">
+                              <HelpCircle className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-80">
+                            <div className="space-y-2">
+                              <h4 className="font-medium">Panduan Hasil Inisiatif</h4>
+                              <div className="space-y-2 text-sm">
+                                <div className="flex items-start gap-2">
+                                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
+                                  <div>
+                                    <p className="font-medium">Berhasil</p>
+                                    <p className="text-gray-600">Inisiatif mencapai tujuan yang ditetapkan dengan baik</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                  <XCircle className="h-4 w-4 text-red-500 mt-0.5" />
+                                  <div>
+                                    <p className="font-medium">Gagal</p>
+                                    <p className="text-gray-600">Inisiatif tidak mencapai target yang diharapkan</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                  <RotateCcw className="h-4 w-4 text-yellow-500 mt-0.5" />
+                                  <div>
+                                    <p className="font-medium">Perlu Diulang</p>
+                                    <p className="text-gray-600">Inisiatif perlu dijalankan kembali dengan penyesuaian</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -340,7 +379,27 @@ export default function InitiativeClosureModal({
                     name="budgetUsed"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Budget yang digunakan (Rp)</FormLabel>
+                        <div className="flex items-center gap-2">
+                          <FormLabel>Budget yang digunakan (Rp)</FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button type="button">
+                                <HelpCircle className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80">
+                              <div className="space-y-2">
+                                <h4 className="font-medium">Panduan Update Budget</h4>
+                                <div className="space-y-2 text-sm">
+                                  <p>• Masukkan total budget yang sudah digunakan selama inisiatif berjalan</p>
+                                  <p>• Budget ini akan digunakan untuk evaluasi efisiensi biaya</p>
+                                  <p>• Kosongkan jika tidak ada perubahan budget</p>
+                                  <p>• Format: angka tanpa titik atau koma (contoh: 1000000)</p>
+                                </div>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        </div>
                         <FormControl>
                           <Input
                             type="number"
@@ -360,8 +419,26 @@ export default function InitiativeClosureModal({
                 {/* Update Success Metrics */}
                 {Array.isArray(successMetrics) && successMetrics.length > 0 && (
                   <div className="border-t pt-4">
-                    <div className="mb-3">
+                    <div className="mb-3 flex items-center gap-2">
                       <h3 className="text-sm font-medium text-gray-700">Update Metrik Keberhasilan</h3>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button type="button">
+                            <HelpCircle className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Panduan Update Metrik Keberhasilan</h4>
+                            <div className="space-y-2 text-sm">
+                              <p>• Masukkan nilai final yang dicapai untuk setiap metrik</p>
+                              <p>• Nilai ini akan dibandingkan dengan target yang ditetapkan</p>
+                              <p>• Digunakan untuk menghitung tingkat keberhasilan inisiatif</p>
+                              <p>• Jika tidak ada perubahan, biarkan nilai saat ini</p>
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                     <div className="space-y-3">
                       {successMetrics.map((metric) => (
@@ -396,8 +473,27 @@ export default function InitiativeClosureModal({
                 {/* Update Task Status */}
                 {incompleteTasks.length > 0 && (
                   <div className="border-t pt-4">
-                    <div className="mb-3">
+                    <div className="mb-3 flex items-center gap-2">
                       <h3 className="text-sm font-medium text-gray-700">Update Status Task</h3>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button type="button">
+                            <HelpCircle className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Panduan Update Status Task</h4>
+                            <div className="space-y-2 text-sm">
+                              <p>• <strong>Selesai:</strong> Task telah diselesaikan sepenuhnya</p>
+                              <p>• <strong>Dibatalkan:</strong> Task tidak dilanjutkan karena alasan tertentu</p>
+                              <p>• <strong>Sedang Berjalan:</strong> Task masih dalam proses pengerjaan</p>
+                              <p>• <strong>Belum Dimulai:</strong> Task belum dikerjakan</p>
+                              <p>• Update status ini untuk mencerminkan kondisi akhir task</p>
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                     <div className="space-y-3">
                       {incompleteTasks.map((task) => (
@@ -439,7 +535,27 @@ export default function InitiativeClosureModal({
                     name="notes"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Catatan Tambahan (Opsional)</FormLabel>
+                        <div className="flex items-center gap-2">
+                          <FormLabel>Catatan Tambahan (Opsional)</FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button type="button">
+                                <HelpCircle className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80">
+                              <div className="space-y-2">
+                                <h4 className="font-medium">Panduan Catatan Tambahan</h4>
+                                <div className="space-y-2 text-sm">
+                                  <p>• Tambahkan informasi penting yang belum tercakup di bagian lain</p>
+                                  <p>• Catat kendala atau tantangan yang dihadapi</p>
+                                  <p>• Dokumentasikan hal-hal yang perlu diingat untuk inisiatif serupa</p>
+                                  <p>• Berikan rekomendasi untuk perbaikan di masa depan</p>
+                                </div>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        </div>
                         <FormControl>
                           <Textarea
                             placeholder="Tambahkan catatan tambahan jika diperlukan..."

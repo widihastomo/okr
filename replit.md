@@ -246,6 +246,15 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 14, 2025. Successfully added comprehensive help popovers to initiative closure modal:
+  * ADDED: Help popover for "Hasil Inisiatif" explaining each result option (Berhasil, Gagal, Perlu Diulang)
+  * ADDED: Help popover for "Budget yang digunakan" with guidance on input format and usage
+  * ADDED: Help popover for "Update Metrik Keberhasilan" explaining final value input and comparison
+  * ADDED: Help popover for "Update Status Task" detailing each status option and their meanings
+  * ADDED: Help popover for "Catatan Tambahan" suggesting what information to include
+  * ENHANCED: HelpCircle icons positioned next to form labels for easy access
+  * IMPROVED: User education with detailed explanations and practical guidance for each form section
+  * RESULT: More user-friendly form with comprehensive help system for better completion rates
 - July 14, 2025. Successfully optimized initiative closure modal for more compact and streamlined display:
   * REDUCED: Dialog width from max-w-4xl to max-w-3xl for more focused presentation
   * REMOVED: Card header and reduced spacing between form sections from space-y-6 to space-y-4
