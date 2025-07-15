@@ -909,31 +909,31 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Ornaments - Toned Down */}
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Ornaments */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Top left ornament */}
-        <div className="absolute -top-16 -left-16 w-32 h-32 bg-slate-200 rounded-full opacity-8"></div>
+        <div className="absolute -top-16 -left-16 w-32 h-32 bg-gradient-to-br from-orange-200 to-orange-300 rounded-full opacity-20 animate-pulse"></div>
         
         {/* Top right ornament */}
-        <div className="absolute -top-8 -right-8 w-24 h-24 bg-gray-300 rounded-full opacity-6"></div>
+        <div className="absolute -top-8 -right-8 w-24 h-24 bg-gradient-to-br from-blue-200 to-blue-300 rounded-full opacity-15"></div>
         
         {/* Bottom left ornament */}
-        <div className="absolute -bottom-12 -left-12 w-28 h-28 bg-slate-300 rounded-full opacity-4"></div>
+        <div className="absolute -bottom-12 -left-12 w-28 h-28 bg-gradient-to-br from-purple-200 to-purple-300 rounded-full opacity-10"></div>
         
         {/* Bottom right ornament */}
-        <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-gray-200 rounded-full opacity-5"></div>
+        <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-gradient-to-br from-orange-300 to-orange-400 rounded-full opacity-15 animate-pulse"></div>
         
-        {/* Minimal geometric shapes */}
-        <div className="absolute top-1/4 left-1/4 w-6 h-6 bg-slate-400 opacity-6 rotate-45"></div>
-        <div className="absolute top-3/4 right-1/4 w-8 h-8 bg-gray-400 opacity-4 rotate-12"></div>
-        <div className="absolute top-1/2 left-1/6 w-4 h-4 bg-slate-300 opacity-3 rounded-full"></div>
+        {/* Floating geometric shapes */}
+        <div className="absolute top-1/4 left-1/4 w-6 h-6 bg-orange-300 opacity-20 rotate-45 animate-bounce"></div>
+        <div className="absolute top-3/4 right-1/4 w-8 h-8 bg-blue-300 opacity-15 rotate-12"></div>
+        <div className="absolute top-1/2 left-1/6 w-4 h-4 bg-purple-300 opacity-10 rounded-full animate-pulse"></div>
         
         {/* Subtle pattern overlay */}
         <div 
-          className="absolute inset-0 opacity-2"
+          className="absolute inset-0 opacity-5"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23475569' fill-opacity='0.05' fill-rule='evenodd'%3E%3Cpath d='m0 40l40-40h-40v40zm40 0v-40h-40l40 40z'/%3E%3C/g%3E%3C/svg%3E")`
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23f97316' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='m0 40l40-40h-40v40zm40 0v-40h-40l40 40z'/%3E%3C/g%3E%3C/svg%3E")`
           }}
         />
       </div>
@@ -947,11 +947,11 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
           />
         </div>
         
-        <Card className="border shadow-xl bg-white/98 backdrop-blur-sm relative overflow-hidden">
-          {/* Card ornaments - Subtle */}
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-slate-300 via-gray-400 to-slate-500"></div>
-          <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-slate-100 to-transparent rounded-bl-full opacity-20"></div>
-          <div className="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-tr from-gray-50 to-transparent rounded-tr-full opacity-15"></div>
+        <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm relative overflow-hidden">
+          {/* Card ornaments */}
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600"></div>
+          <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-orange-100 to-transparent rounded-bl-full opacity-50"></div>
+          <div className="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-tr from-orange-50 to-transparent rounded-tr-full opacity-30"></div>
           
           <CardHeader className="text-center pb-8 pt-8 relative">
             <CardTitle className="text-2xl font-bold text-gray-900">
