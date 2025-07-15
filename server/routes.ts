@@ -1745,13 +1745,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const currentUser = req.user as User;
       
+      // Extract memberIds from request body
+      const { memberIds, ...teamData } = req.body;
+      
       // Ensure team is created within user's organization
-      const teamData = {
-        ...req.body,
+      const teamWithOrg = {
+        ...teamData,
         organizationId: currentUser.organizationId
       };
       
-      const newTeam = await storage.createTeam(teamData);
+      const newTeam = await storage.createTeam(teamWithOrg);
+      
+      // Add team members if memberIds is provided
+      if (memberIds && memberIds.length > 0) {
+        for (const userId of memberIds) {
+          await storage.addTeamMember({
+            teamId: newTeam.id,
+            userId: userId,
+            role: 'member'
+          });
+        }
+      }
+      
       res.json(newTeam);
     } catch (error) {
       console.error("Error creating team:", error);
@@ -1776,10 +1791,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      const updatedTeam = await storage.updateTeam(teamId, req.body);
+      // Extract memberIds from request body
+      const { memberIds, ...teamData } = req.body;
+      
+      // Update team basic information
+      const updatedTeam = await storage.updateTeam(teamId, teamData);
       if (!updatedTeam) {
         return res.status(404).json({ message: "Team not found" });
       }
+      
+      // Handle team member updates if memberIds is provided
+      if (memberIds !== undefined) {
+        // Get current team members
+        const currentMembers = await storage.getTeamMembers(teamId);
+        const currentMemberIds = currentMembers.map(m => m.userId);
+        
+        // Find members to add and remove
+        const membersToAdd = memberIds.filter((id: string) => !currentMemberIds.includes(id));
+        const membersToRemove = currentMemberIds.filter(id => !memberIds.includes(id));
+        
+        // Add new members
+        for (const userId of membersToAdd) {
+          await storage.addTeamMember({
+            teamId: teamId,
+            userId: userId,
+            role: 'member'
+          });
+        }
+        
+        // Remove members
+        for (const userId of membersToRemove) {
+          await storage.removeTeamMember(teamId, userId);
+        }
+      }
+      
       res.json(updatedTeam);
     } catch (error) {
       console.error("Error updating team:", error);
