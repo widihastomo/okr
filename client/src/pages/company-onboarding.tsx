@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
 import refokusLogo from "@assets/refokus_1751810711179.png";
@@ -1854,24 +1854,74 @@ export default function CompanyOnboarding() {
             <RadioGroup
               value={onboardingData.cadence}
               onValueChange={(value) =>
-                setOnboardingData({
-                  ...onboardingData,
-                  cadence: value as "harian" | "mingguan",
-                })
+                setOnboardingData({ ...onboardingData, cadence: value })
               }
               className="space-y-4"
             >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="harian" id="harian" />
-                <Label htmlFor="harian" className="cursor-pointer">
-                  Harian - Check-in setiap hari
-                </Label>
+              <div
+                className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                  onboardingData.cadence === "harian"
+                    ? "border-orange-500 bg-orange-50 shadow-md"
+                    : "border-gray-200 bg-white hover:border-orange-300"
+                }`}
+                onClick={() =>
+                  setOnboardingData({ ...onboardingData, cadence: "harian" })
+                }
+              >
+                <div className="flex items-start space-x-3">
+                  <RadioGroupItem value="harian" id="harian" className="mt-1" />
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Clock className="w-5 h-5 text-orange-600" />
+                      <Label
+                        htmlFor="harian"
+                        className="text-lg font-medium text-gray-800 cursor-pointer"
+                      >
+                        Harian
+                      </Label>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Check-in setiap hari untuk tracking progress yang konsisten
+                    </p>
+                    <div className="flex items-center space-x-2 text-xs text-gray-500">
+                      <span>💡</span>
+                      <span>Cocok untuk goal yang membutuhkan monitoring ketat</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="mingguan" id="mingguan" />
-                <Label htmlFor="mingguan" className="cursor-pointer">
-                  Mingguan - Check-in setiap minggu
-                </Label>
+
+              <div
+                className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] ${
+                  onboardingData.cadence === "mingguan"
+                    ? "border-orange-500 bg-orange-50 shadow-md"
+                    : "border-gray-200 bg-white hover:border-orange-300"
+                }`}
+                onClick={() =>
+                  setOnboardingData({ ...onboardingData, cadence: "mingguan" })
+                }
+              >
+                <div className="flex items-start space-x-3">
+                  <RadioGroupItem value="mingguan" id="mingguan" className="mt-1" />
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Calendar className="w-5 h-5 text-orange-600" />
+                      <Label
+                        htmlFor="mingguan"
+                        className="text-lg font-medium text-gray-800 cursor-pointer"
+                      >
+                        Mingguan
+                      </Label>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Check-in setiap minggu untuk review progress berkala
+                    </p>
+                    <div className="flex items-center space-x-2 text-xs text-gray-500">
+                      <span>📅</span>
+                      <span>Cocok untuk goal dengan milestone jangka menengah</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </RadioGroup>
             
