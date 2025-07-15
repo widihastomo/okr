@@ -629,14 +629,14 @@ export default function ClientUserManagement() {
                         <div className="flex items-center space-x-3">
                           <Avatar className="h-8 w-8">
                             <AvatarFallback className="bg-blue-100 text-blue-700">
-                              {user.firstName?.charAt(0) || user.email.charAt(0).toUpperCase()}
+                              {user.name?.charAt(0) || user.email.charAt(0).toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                           <div>
                             <div className="font-medium">
-                              {user.firstName && user.lastName 
-                                ? `${user.firstName} ${user.lastName}`
-                                : user.email
+                              {user.name && user.name.trim() !== ''
+                                ? user.name.trim()
+                                : user.email.split('@')[0]
                               }
                             </div>
                             <div className="text-sm text-gray-500">{user.email}</div>

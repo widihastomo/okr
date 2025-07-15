@@ -271,6 +271,7 @@ All email configuration now uses environment variables:
   * FIXED: Backend storage getInitiativeHistory function now uses consolidated name field in all database queries
   * FIXED: Searchable user select component value field now uses consolidated name field
   * FIXED: Profile page now uses consolidated name field instead of firstName/lastName fields
+  * FIXED: Client user management page avatars and display names now use consolidated name field
   * IMPROVED: Better fallback logic for name extraction from consolidated name field
   * RESULT: Complete migration from firstName/lastName to consolidated name field with proper initials extraction and filtering
 - July 15, 2025. **COMPLETE TOUR SYSTEM REMOVAL** - Successfully removed entire onboarding tour system for cleaner interface:
