@@ -19,8 +19,7 @@ import { ScrollProgressIndicator, useScrollProgress } from "@/components/ui/scro
 
 interface User {
   id: string;
-  firstName: string | null;
-  lastName: string | null;
+  name: string | null;
   email: string;
 }
 
@@ -61,8 +60,9 @@ export function SearchableUserSelect({
     if (effectiveValue === "all") return "Semua User";
     if (effectiveValue === "unassigned") return "Belum Ditugaskan";
     if (selectedUser) {
-      const name = `${selectedUser.firstName || ''} ${selectedUser.lastName || ''}`.trim();
-      return name || selectedUser.email;
+      return selectedUser.name && selectedUser.name.trim() !== '' 
+        ? selectedUser.name.trim() 
+        : selectedUser.email.split('@')[0];
     }
     return placeholder;
   };
