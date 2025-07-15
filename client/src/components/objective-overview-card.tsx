@@ -64,22 +64,17 @@ export default function ObjectiveOverviewCard({
       // Handle team owner - check if owner has name property (Team type)
       return (owner as any)?.name || "Tim tidak ditemukan";
     } else {
-      // Handle user owner - check if owner has firstName/lastName properties (User type)
+      // Handle user owner - use consolidated name field
       const userOwner = owner as any;
       
-      // Check if firstName and lastName are both present and non-empty
-      if (userOwner?.firstName && userOwner?.lastName && userOwner.lastName.trim() !== "") {
-        return `${userOwner.firstName} ${userOwner.lastName}`;
+      // Use consolidated name field
+      if (userOwner?.name && userOwner.name.trim() !== '') {
+        return userOwner.name.trim();
       }
       
-      // Fallback to firstName only if available and non-empty
-      if (userOwner?.firstName && userOwner.firstName.trim() !== "") {
-        return userOwner.firstName;
-      }
-      
-      // Fallback to lastName only if available and non-empty
-      if (userOwner?.lastName && userOwner.lastName.trim() !== "") {
-        return userOwner.lastName;
+      // Fallback to email username
+      if (userOwner?.email) {
+        return userOwner.email.split('@')[0];
       }
       
       // Final fallback if no name data available
