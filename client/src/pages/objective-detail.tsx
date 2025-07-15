@@ -123,7 +123,7 @@ import { z } from "zod";
 import ObjectiveOverviewCard from "@/components/objective-overview-card";
 import ObjectiveTimeline from "@/components/objective-timeline";
 import ActivityLogCard from "@/components/activity-log-card";
-import SimpleTaskModal from "@/components/simple-task-modal";
+import TaskModal from "@/components/task-modal";
 import type {
   GoalWithKeyResults,
   KeyResult,
@@ -2681,13 +2681,12 @@ export default function GoalDetail() {
         />
       )}
       {/* Task Modal */}
-      <SimpleTaskModal
+      <TaskModal
         open={showTaskModal}
         onClose={() => setShowTaskModal(false)}
-        onSuccess={() => {
-          // Switch to tasks tab after successful creation
-          setActiveTab("tasks");
-        }}
+        task={undefined}
+        initiativeId={undefined}
+        isAdding={true}
       />
 
       {/* Delete Key Result Confirmation Dialog */}

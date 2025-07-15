@@ -280,11 +280,12 @@ All email configuration now uses environment variables:
   * RESULT: Complete migration from firstName/lastName to consolidated name field with proper initials extraction and filtering
 - July 15, 2025. **TASK CREATION BUTTON IMPLEMENTATION** - Successfully added task creation functionality to objective detail page:
   * ADDED: "Tambah Task" button to tasks tab section in objective-detail.tsx
-  * INTEGRATED: Button opens existing SimpleTaskModal for task creation
+  * INTEGRATED: Button opens TaskModal (same as initiative detail page) for task creation
+  * UPGRADED: Changed from SimpleTaskModal to TaskModal for consistency with initiative detail page
   * STYLED: Button uses orange gradient theme matching application design
   * POSITIONED: Button placed in header section alongside task description for easy access
-  * ENHANCED: Task creation workflow now accessible directly from objective detail page
-  * RESULT: Complete task creation functionality using existing forms and modals
+  * ENHANCED: Task creation workflow now accessible directly from objective detail page with full TaskModal functionality
+  * RESULT: Complete task creation functionality using unified TaskModal component
 - July 15, 2025. **COMPLETE TOUR SYSTEM REMOVAL** - Successfully removed entire onboarding tour system for cleaner interface:
   * REMOVED: All tour-related components (tour-tooltip, tour-launcher, onboarding-overlay, welcome-wizard)
   * REMOVED: All tour-related contexts, hooks, and TypeScript interfaces
