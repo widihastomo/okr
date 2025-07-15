@@ -19,7 +19,7 @@ export class GamificationService {
   /**
    * Initialize user stats when a new user is created
    */
-  async initializeUserStats(userId: string): Promise<UserStats> {
+  async initializeUserStats(userId: string, organizationId?: string): Promise<UserStats> {
     const [existingStats] = await db
       .select()
       .from(userStats)
@@ -29,10 +29,23 @@ export class GamificationService {
       return existingStats;
     }
 
+    // Get user's organization ID if not provided
+    if (!organizationId) {
+      const [user] = await db
+        .select({ organizationId: users.organizationId })
+        .from(users)
+        .where(eq(users.id, userId));
+      
+      if (user?.organizationId) {
+        organizationId = user.organizationId;
+      }
+    }
+
     const [newStats] = await db
       .insert(userStats)
       .values({
         userId,
+        organizationId,
         totalPoints: 0,
         level: 1,
         currentStreak: 0,
@@ -335,8 +348,7 @@ export class GamificationService {
       SELECT 
         us.*,
         u.id as user_id,
-        u.first_name as user_first_name,
-        u.last_name as user_last_name,
+        u.name as user_name,
         u.email as user_email
       FROM user_stats us
       JOIN users u ON us.user_id = u.id
@@ -360,8 +372,7 @@ export class GamificationService {
       updatedAt: row.updated_at,
       user: {
         id: row.user_id,
-        firstName: row.user_first_name,
-        lastName: row.user_last_name,
+        name: row.user_name,
         email: row.user_email,
       },
     }));

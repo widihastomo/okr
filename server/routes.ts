@@ -229,8 +229,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = crypto.randomUUID();
       const newUser = await storage.createUser({
         id: userId,
-        firstName: name.split(' ')[0],
-        lastName: name.split(' ').slice(1).join(' ') || '',
+        name: name, // Use the consolidated name field
         email: email,
         password: hashedPassword,
         role: "organization_admin",
@@ -3597,8 +3596,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (updateData.assignedTo && updateData.assignedTo !== existingTask.assignedTo) {
           const oldAssignee = existingTask.assignedTo ? await storage.getUser(existingTask.assignedTo) : null;
           const newAssignee = updateData.assignedTo ? await storage.getUser(updateData.assignedTo) : null;
-          const oldName = oldAssignee ? (oldAssignee.firstName || oldAssignee.email) : "Tidak ada";
-          const newName = newAssignee ? (newAssignee.firstName || newAssignee.email) : "Tidak ada";
+          const oldName = oldAssignee ? (oldAssignee.name || oldAssignee.email) : "Tidak ada";
+          const newName = newAssignee ? (newAssignee.name || newAssignee.email) : "Tidak ada";
           changes.push(`Penugasan diubah dari "${oldName}" menjadi "${newName}"`);
         }
         
@@ -3616,10 +3615,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await storage.createTaskAuditTrail({
             taskId: id,
             userId: currentUser.id,
+            organizationId: currentUser.organizationId,
             action: "task_updated",
             oldValue: null,
             newValue: null,
-            changeDescription: `Task diperbarui oleh ${currentUser.firstName || currentUser.email}: ${changes.join(", ")}`
+            changeDescription: `Task diperbarui oleh ${currentUser.name || currentUser.email}: ${changes.join(", ")}`
           });
         }
       } catch (auditError) {
@@ -3699,6 +3699,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.createTaskAuditTrail({
           taskId: id,
           userId: currentUser.id,
+          organizationId: currentUser.organizationId,
           action: 'status_changed',
           oldValue: oldStatus,
           newValue: status,
@@ -3787,10 +3788,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.createTaskAuditTrail({
           taskId: id,
           userId: currentUser.id,
+          organizationId: currentUser.organizationId,
           action: "task_deleted",
           oldValue: existingTask.title,
           newValue: null,
-          changeDescription: `Task "${existingTask.title}" dihapus oleh ${currentUser.firstName || currentUser.email}`
+          changeDescription: `Task "${existingTask.title}" dihapus oleh ${currentUser.name || currentUser.email}`
         });
       } catch (auditError) {
         console.error("Error creating task deletion audit trail:", auditError);
@@ -4813,8 +4815,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (req.body.assignedTo && req.body.assignedTo !== originalTask.assignedTo) {
           const oldAssignee = originalTask.assignedTo ? await storage.getUser(originalTask.assignedTo) : null;
           const newAssignee = req.body.assignedTo ? await storage.getUser(req.body.assignedTo) : null;
-          const oldName = oldAssignee ? (oldAssignee.firstName || oldAssignee.email) : "Tidak ada";
-          const newName = newAssignee ? (newAssignee.firstName || newAssignee.email) : "Tidak ada";
+          const oldName = oldAssignee ? (oldAssignee.name || oldAssignee.email) : "Tidak ada";
+          const newName = newAssignee ? (newAssignee.name || newAssignee.email) : "Tidak ada";
           changes.push(`Penugasan diubah dari "${oldName}" menjadi "${newName}"`);
         }
         
@@ -4832,10 +4834,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await storage.createTaskAuditTrail({
             taskId: id,
             userId: currentUser.id,
+            organizationId: currentUser.organizationId,
             action: "task_updated",
             oldValue: null,
             newValue: null,
-            changeDescription: `Task diperbarui oleh ${currentUser.firstName || currentUser.email}: ${changes.join(", ")}`
+            changeDescription: `Task diperbarui oleh ${currentUser.name || currentUser.email}: ${changes.join(", ")}`
           });
         }
       } catch (auditError) {
@@ -5002,6 +5005,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.createTaskAuditTrail({
           taskId: id,
           userId: currentUser.id,
+          organizationId: currentUser.organizationId,
           action: "status_changed",
           oldValue: existingTask.status,
           newValue: req.body.status,
@@ -5321,8 +5325,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const stats = await gamificationService.getUserStats(userId);
       
       if (!stats) {
-        // Initialize stats for new user
-        const newStats = await gamificationService.initializeUserStats(userId);
+        // Initialize stats for new user with organization ID
+        const newStats = await gamificationService.initializeUserStats(userId, req.user.organizationId);
         return res.json(newStats);
       }
       
