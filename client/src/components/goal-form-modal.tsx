@@ -23,7 +23,6 @@ import { apiRequest } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 import { formatNumberWithSeparator, handleNumberInputChange, getNumberValueForSubmission } from "@/lib/number-utils";
-
 import type { GoalWithKeyResults, Cycle, User, Objective, Team } from "@shared/schema";
 
 // Unit options for Key Results
@@ -140,7 +139,6 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
   const [currentStep, setCurrentStep] = useState(1);
   const [keyResultModalOpen, setKeyResultModalOpen] = useState(false);
   const [editingKeyResultIndex, setEditingKeyResultIndex] = useState<number | null>(null);
-
   const isEditMode = !!goal;
 
   // Fetch data yang diperlukan
@@ -1114,6 +1112,15 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
         </Form>
       </DialogContent>
 
+      {/* Key Result Modal */}
+      <KeyResultModal 
+        open={keyResultModalOpen} 
+        onOpenChange={setKeyResultModalOpen}
+        onSubmit={handleAddKeyResult}
+        editingKeyResult={editingKeyResultIndex !== null ? keyResults[editingKeyResultIndex] : undefined}
+        isEditing={editingKeyResultIndex !== null}
+        users={users}
+      />
     </Dialog>
   );
 }
