@@ -20,7 +20,8 @@ import { requireAuth, hashPassword } from "./emailAuth";
 import { calculateProgressStatus } from "./progress-tracker";
 import { updateObjectiveWithAutoStatus } from "./storage";
 
-
+import { gamificationService } from "./gamification";
+import { populateGamificationData } from "./gamification-data";
 
 import { NotificationService } from "./notification-service";
 import { calculateKeyResultProgress } from "@shared/progress-calculator";
@@ -8797,14 +8798,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get referral code usage analytics (simplified)
+  // Get referral code usage analytics
   app.get("/api/referral-codes/:id/analytics", requireAuth, async (req, res) => {
     try {
       const user = req.user as User;
       const { id } = req.params;
       const { db } = await import("./db");
-      const { referralCodes } = await import("@shared/schema");
-      const { eq } = await import("drizzle-orm");
+      const { referralCodes, referralUsage, organizations, users } = await import("@shared/schema");
+      const { eq, and, desc } = await import("drizzle-orm");
 
       // Only system owners can view analytics
       if (!user.isSystemOwner) {
@@ -8820,12 +8821,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Referral code not found" });
       }
 
+      // Get usage details
+      const usageDetails = await db.select({
+        id: referralUsage.id,
+        usedByOrganization: organizations.name,
+        usedByUser: users.firstName,
+        usedByEmail: users.email,
+        discountApplied: referralUsage.discountApplied,
+        status: referralUsage.status,
+        appliedAt: referralUsage.appliedAt,
+        expiresAt: referralUsage.expiresAt,
+      })
+      .from(referralUsage)
+      .leftJoin(organizations, eq(referralUsage.usedByOrganizationId, organizations.id))
+      .leftJoin(users, eq(referralUsage.usedByUserId, users.id))
+      .where(eq(referralUsage.referralCodeId, id))
+      .orderBy(desc(referralUsage.appliedAt));
+
+      // Calculate analytics
+      const totalUsages = usageDetails.length;
+      const totalDiscountGiven = usageDetails.reduce((sum, usage) => 
+        sum + parseFloat(usage.discountApplied || "0"), 0
+      );
+
       const analytics = {
         code: code[0],
-        totalUsages: code[0].currentUses,
-        totalDiscountGiven: 0,
+        totalUsages,
+        totalDiscountGiven,
         remainingUses: code[0].maxUses ? Math.max(0, code[0].maxUses - code[0].currentUses) : null,
-        usageDetails: [],
+        usageDetails,
       };
 
       res.json(analytics);
@@ -8890,7 +8914,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = req.user as User;
       const { code, subscriptionId } = req.body;
       const { db } = await import("./db");
-      const { referralCodes, organizations } = await import("@shared/schema");
+      const { referralCodes, referralUsage, organizations } = await import("@shared/schema");
       const { eq, and } = await import("drizzle-orm");
 
       if (!code) {
@@ -8928,7 +8952,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Referral code usage limit exceeded" });
       }
 
-      // Simplified check - skip usage tracking for now
+      // Check if organization has already used this code
+      const existingUsage = await db.select()
+        .from(referralUsage)
+        .where(and(
+          eq(referralUsage.referralCodeId, codeData.id),
+          eq(referralUsage.usedByOrganizationId, userOrg[0].id)
+        ))
+        .limit(1);
+
+      if (existingUsage.length > 0) {
+        return res.status(400).json({ message: "This organization has already used this referral code" });
+      }
 
       // Calculate discount applied
       let discountApplied = "0";
@@ -8948,7 +8983,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         discountApplied = "0"; // No immediate discount, but subscription extends
       }
 
-      // Simplified usage tracking - just update the usage count
+      // Create usage record
+      await db.insert(referralUsage).values({
+        referralCodeId: codeData.id,
+        usedByOrganizationId: userOrg[0].id,
+        usedByUserId: user.id,
+        discountApplied,
+        subscriptionId: subscriptionId || null,
+        status: "applied",
+        expiresAt,
+      });
 
       // Update referral code usage count
       await db.update(referralCodes)
@@ -8971,9 +9015,168 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Role Management API Routes
+  const { roleManagementService } = await import("./role-management");
 
+  // Get user permissions
+  app.get("/api/users/:id/permissions", requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const userWithPermissions = await roleManagementService.getUserPermissions(userId);
+      res.json(userWithPermissions);
+    } catch (error) {
+      console.error("Error fetching user permissions:", error);
+      res.status(500).json({ message: "Failed to fetch user permissions" });
+    }
+  });
 
+  // Grant permission to user
+  app.post("/api/users/:id/permissions", requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const { permission, resource, expiresAt } = req.body;
+      const grantedBy = req.session.userId;
 
+      await roleManagementService.grantPermission(userId, permission, grantedBy, resource, expiresAt);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error granting permission:", error);
+      res.status(500).json({ message: "Failed to grant permission" });
+    }
+  });
+
+  // Revoke permission from user
+  app.delete("/api/users/:id/permissions/:permission", requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const permission = req.params.permission;
+      const { resource } = req.body;
+      const performedBy = req.session.userId;
+
+      await roleManagementService.revokePermission(userId, permission as any, performedBy, resource);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error revoking permission:", error);
+      res.status(500).json({ message: "Failed to revoke permission" });
+    }
+  });
+
+  // Update user role and permissions
+  app.put("/api/users/:id/role", requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const { role, permissions } = req.body;
+      const performedBy = req.session.userId;
+
+      await roleManagementService.updateUserRole(userId, role, permissions, performedBy);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating user role:", error);
+      res.status(500).json({ message: "Failed to update user role" });
+    }
+  });
+
+  // Get organization users with permissions
+  app.get("/api/organizations/:id/users", requireAuth, async (req, res) => {
+    try {
+      const organizationId = req.params.id;
+      const users = await roleManagementService.getOrganizationUsers(organizationId);
+      res.json(users);
+    } catch (error) {
+      console.error("Error fetching organization users:", error);
+      res.status(500).json({ message: "Failed to fetch organization users" });
+    }
+  });
+
+  // Get role templates
+  app.get("/api/role-templates", requireAuth, async (req, res) => {
+    try {
+      const organizationId = req.query.organizationId as string;
+      const templates = await roleManagementService.getRoleTemplates(organizationId);
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching role templates:", error);
+      res.status(500).json({ message: "Failed to fetch role templates" });
+    }
+  });
+
+  // Create role template
+  app.post("/api/role-templates", requireAuth, async (req, res) => {
+    try {
+      const templateData = {
+        ...req.body,
+        createdBy: req.session.userId,
+      };
+      const templateId = await roleManagementService.createRoleTemplate(templateData);
+      res.json({ id: templateId, success: true });
+    } catch (error) {
+      console.error("Error creating role template:", error);
+      res.status(500).json({ message: "Failed to create role template" });
+    }
+  });
+
+  // Apply role template to user
+  app.post("/api/users/:id/apply-role-template", requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const { templateId } = req.body;
+      const performedBy = req.session.userId;
+
+      await roleManagementService.applyRoleTemplate(userId, templateId, performedBy);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error applying role template:", error);
+      res.status(500).json({ message: "Failed to apply role template" });
+    }
+  });
+
+  // Get user activity log
+  app.get("/api/users/:id/activity", requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const limit = parseInt(req.query.limit as string) || 50;
+      const activityLog = await roleManagementService.getUserActivityLog(userId, limit);
+      res.json(activityLog);
+    } catch (error) {
+      console.error("Error fetching user activity:", error);
+      res.status(500).json({ message: "Failed to fetch user activity" });
+    }
+  });
+
+  // Deactivate/Reactivate user
+  app.patch("/api/users/:id/status", requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const { isActive } = req.body;
+      const performedBy = req.session.userId;
+
+      if (isActive) {
+        await roleManagementService.reactivateUser(userId, performedBy);
+      } else {
+        await roleManagementService.deactivateUser(userId, performedBy);
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating user status:", error);
+      res.status(500).json({ message: "Failed to update user status" });
+    }
+  });
+
+  // Check if user has specific permission
+  app.get("/api/users/:id/has-permission/:permission", requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const permission = req.params.permission;
+      const resource = req.query.resource as string;
+
+      const hasPermission = await roleManagementService.hasPermission(userId, permission as any, resource);
+      res.json({ hasPermission });
+    } catch (error) {
+      console.error("Error checking permission:", error);
+      res.status(500).json({ message: "Failed to check permission" });
+    }
+  });
 
   // Daily Reflections API routes
   app.post("/api/daily-reflections", requireAuth, async (req, res) => {
@@ -10106,8 +10309,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid subscription plan or billing period" });
       }
       
-      // Get addon packages (simplified for now)
-      const selectedAddons = [];
+      // Get addon packages
+      const { addonPackages } = await import("@shared/schema");
+      const selectedAddons = packageData.addonIds.length > 0 
+        ? await db.select()
+            .from(addonPackages)
+            .where(eq(addonPackages.id, packageData.addonIds[0])) // Simple approach for now
+        : [];
       
       // Create organization
       const [newOrganization] = await db.insert(organizations).values({

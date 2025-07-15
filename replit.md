@@ -255,16 +255,6 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
-- July 15, 2025. **FINAL DATABASE CLEANUP COMPLETED** - Successfully completed comprehensive database cleanup and optimization:
-  * REMOVED: 14 additional unused tables including all gamification system tables (achievements, userAchievements, userStats, levelRewards, activityLogs)
-  * REMOVED: All role management system tables (userPermissions, roleTemplates, userActivityLog, notificationPreferences)
-  * REMOVED: Unused member/document tables (initiativeMembers, initiativeDocuments) 
-  * CLEANED: All orphaned insert schemas, relations, and type definitions from schema.ts
-  * DELETED: Associated service files (gamification.ts, gamification-data.ts, role-management.ts)
-  * SIMPLIFIED: Referral system endpoints to work without usage tracking tables
-  * OPTIMIZED: Database from 45+ tables down to 31 essential tables for maximum performance
-  * VERIFIED: All imports updated and application runs without errors after cleanup
-  * RESULT: Streamlined database architecture with only essential tables for core OKR functionality
 - July 15, 2025. **VALIDATION ENHANCEMENT** - Successfully implemented mandatory cycle and owner field requirements for goal creation:
   * REMOVED: "Tanpa Siklus" option from cycle selection dropdown
   * UPDATED: Goal form modal validation schema to require cycle selection (z.string().min(1, "Siklus wajib dipilih"))

@@ -270,7 +270,41 @@ export const users = pgTable("users", {
 
 
 
+// User Permissions table for granular access control
+export const userPermissions = pgTable("user_permissions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  permission: text("permission").notNull(), // e.g., "create_objectives", "manage_users", "view_analytics"
+  resource: text("resource"), // Optional: specific resource ID for fine-grained control
+  grantedBy: uuid("granted_by").notNull().references(() => users.id),
+  grantedAt: timestamp("granted_at").defaultNow(),
+  expiresAt: timestamp("expires_at"), // Optional: temporary permissions
+});
 
+// Role Templates for predefined permission sets
+export const roleTemplates = pgTable("role_templates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(), // e.g., "Project Manager", "Team Lead", "HR Admin"
+  description: text("description"),
+  permissions: jsonb("permissions").notNull(), // Array of permission strings
+  organizationId: uuid("organization_id").references(() => organizations.id), // null for system-wide templates
+  isSystem: boolean("is_system").default(false), // System-defined vs organization-defined
+  createdBy: uuid("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User Activity Log for audit trail
+export const userActivityLog = pgTable("user_activity_log", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  action: text("action").notNull(), // e.g., "login", "permission_changed", "role_updated"
+  details: jsonb("details"), // Additional context about the action
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  performedBy: uuid("performed_by").references(() => users.id), // null for self-actions
+  createdAt: timestamp("created_at").defaultNow(),
+});
 
 // User Onboarding Progress for tracking interactive tour completion
 export const userOnboardingProgress = pgTable("user_onboarding_progress", {
@@ -615,7 +649,67 @@ export const insertSuccessMetricUpdateSchema = createInsertSchema(successMetricU
   createdAt: true,
 });
 
+// Gamification Tables
+export const achievements = pgTable("achievements", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  category: text("category").notNull(), // "progress", "streak", "milestone", "collaboration"
+  badgeIcon: text("badge_icon").notNull(), // icon name for the badge
+  badgeColor: text("badge_color").notNull(), // color scheme for the badge
+  points: integer("points").notNull().default(0),
+  condition: jsonb("condition").notNull(), // JSON defining achievement conditions
+  isActive: boolean("is_active").notNull().default(true),
+  rarity: text("rarity").notNull().default("common"), // "common", "rare", "epic", "legendary"
+  createdAt: timestamp("created_at").defaultNow(),
+});
 
+export const userAchievements = pgTable("user_achievements", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  achievementId: uuid("achievement_id").notNull().references(() => achievements.id),
+  unlockedAt: timestamp("unlocked_at").defaultNow(),
+  progress: integer("progress").notNull().default(0), // current progress towards achievement
+  isCompleted: boolean("is_completed").notNull().default(false),
+});
+
+export const userStats = pgTable("user_stats", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull().references(() => users.id).unique(),
+  totalPoints: integer("total_points").notNull().default(0),
+  level: integer("level").notNull().default(1),
+  currentStreak: integer("current_streak").notNull().default(0), // days of consecutive activity
+  longestStreak: integer("longest_streak").notNull().default(0),
+  lastActivityDate: text("last_activity_date"),
+  objectivesCompleted: integer("objectives_completed").notNull().default(0),
+  keyResultsCompleted: integer("key_results_completed").notNull().default(0),
+  checkInsCreated: integer("check_ins_created").notNull().default(0),
+  initiativesCreated: integer("initiatives_created").notNull().default(0),
+  collaborationScore: integer("collaboration_score").notNull().default(0),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const levelRewards = pgTable("level_rewards", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  level: integer("level").notNull().unique(),
+  title: text("title").notNull(), // "Goal Setter", "Progress Tracker", etc.
+  description: text("description").notNull(),
+  badgeIcon: text("badge_icon").notNull(),
+  badgeColor: text("badge_color").notNull(),
+  pointsRequired: integer("points_required").notNull(),
+  unlockMessage: text("unlock_message").notNull(),
+});
+
+export const activityLogs = pgTable("activity_logs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  action: text("action").notNull(), // "check_in_created", "objective_completed", etc.
+  entityType: text("entity_type").notNull(), // "objective", "key_result", "initiative"
+  entityId: uuid("entity_id").notNull(),
+  pointsEarned: integer("points_earned").notNull().default(0),
+  metadata: jsonb("metadata"), // additional context about the action
+  createdAt: timestamp("created_at").defaultNow(),
+});
 
 export const updateKeyResultProgressSchema = z.object({
   id: z.string(),
@@ -628,7 +722,30 @@ export const createGoalFromTemplateSchema = z.object({
   templateId: z.string(),
 });
 
+// Gamification Insert Schemas
+export const insertAchievementSchema = createInsertSchema(achievements).omit({
+  id: true,
+  createdAt: true,
+});
 
+export const insertUserAchievementSchema = createInsertSchema(userAchievements).omit({
+  id: true,
+  unlockedAt: true,
+});
+
+export const insertUserStatsSchema = createInsertSchema(userStats).omit({
+  id: true,
+  updatedAt: true,
+});
+
+export const insertLevelRewardSchema = createInsertSchema(levelRewards).omit({
+  id: true,
+});
+
+export const insertActivityLogSchema = createInsertSchema(activityLogs).omit({
+  id: true,
+  createdAt: true,
+});
 
 // SaaS Insert Schemas
 export const insertSubscriptionPlanSchema = createInsertSchema(subscriptionPlans).omit({
@@ -900,7 +1017,35 @@ export const trialProgress = pgTable("trial_progress", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Gamification Relations
+export const achievementsRelations = relations(achievements, ({ many }) => ({
+  userAchievements: many(userAchievements),
+}));
 
+export const userAchievementsRelations = relations(userAchievements, ({ one }) => ({
+  user: one(users, {
+    fields: [userAchievements.userId],
+    references: [users.id],
+  }),
+  achievement: one(achievements, {
+    fields: [userAchievements.achievementId],
+    references: [achievements.id],
+  }),
+}));
+
+export const userStatsRelations = relations(userStats, ({ one }) => ({
+  user: one(users, {
+    fields: [userStats.userId],
+    references: [users.id],
+  }),
+}));
+
+export const activityLogsRelations = relations(activityLogs, ({ one }) => ({
+  user: one(users, {
+    fields: [activityLogs.userId],
+    references: [users.id],
+  }),
+}));
 
 // Trial Achievement Relations
 export const trialAchievementsRelations = relations(trialAchievements, ({ many }) => ({
@@ -1119,7 +1264,49 @@ export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 export type NotificationPreferences = typeof notificationPreferences.$inferSelect;
 export type InsertNotificationPreferences = z.infer<typeof insertNotificationPreferencesSchema>;
 
+// Role Management Schemas
+export const insertUserPermissionSchema = createInsertSchema(userPermissions).omit({
+  id: true,
+  grantedAt: true,
+});
 
+export const insertRoleTemplateSchema = createInsertSchema(roleTemplates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertUserActivityLogSchema = createInsertSchema(userActivityLog).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Enhanced User Schema with additional fields
+export const updateUserSchema = createInsertSchema(users).omit({
+  id: true,
+  password: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  permissions: z.array(z.string()).optional(),
+  roleTemplateId: z.string().uuid().optional(),
+});
+
+// Role Management Types
+export type UserPermission = typeof userPermissions.$inferSelect;
+export type InsertUserPermission = z.infer<typeof insertUserPermissionSchema>;
+export type RoleTemplate = typeof roleTemplates.$inferSelect;
+export type InsertRoleTemplate = z.infer<typeof insertRoleTemplateSchema>;
+export type UserActivityLog = typeof userActivityLog.$inferSelect;
+export type InsertUserActivityLog = z.infer<typeof insertUserActivityLogSchema>;
+export type UpdateUser = z.infer<typeof updateUserSchema>;
+
+// Enhanced User type with permissions
+export type UserWithPermissions = User & {
+  permissions: UserPermission[];
+  roleTemplate?: RoleTemplate | null;
+  activityLog?: UserActivityLog[];
+};
 
 // Permission constants
 export const PERMISSIONS = {
