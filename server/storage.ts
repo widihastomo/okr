@@ -2099,42 +2099,38 @@ export class DatabaseStorage implements IStorage {
       const quarterlyResults = await Promise.all(quarterlyPromises);
       console.log("✅ Quarterly cycles created:", quarterlyResults.length);
       
-      // 3. Create 12 Monthly Cycles
-      const monthlyPromises = [];
+      // 3. Create Only Current Month's Cycle
       const monthNames = [
         'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
         'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
       ];
       
-      for (let month = 1; month <= 12; month++) {
-        const monthStartDate = new Date(year, month - 1, 1);
-        const monthEndDate = new Date(year, month, 0); // Last day of month
-        monthEndDate.setHours(23, 59, 59, 999);
-        
-        const monthlyCycle = {
-          name: `${monthNames[month - 1]} ${year}`,
-          type: 'monthly',
-          startDate: monthStartDate.toISOString(),
-          endDate: monthEndDate.toISOString(),
-          organizationId: user.organizationId,
-          createdBy: userId,
-          lastUpdateBy: userId,
-          description: `Siklus bulanan ${monthNames[month - 1]} ${year} - ${onboardingData.teamFocus || 'General'}`
-        };
-        
-        monthlyPromises.push(db.insert(cycles).values(monthlyCycle).returning());
-      }
-      
-      const monthlyResults = await Promise.all(monthlyPromises);
-      console.log("✅ Monthly cycles created:", monthlyResults.length);
-      
-      // 4. Find the current month's cycle for the objective
       const currentMonth = onboardingDate.getMonth() + 1;
-      const currentMonthlyCycle = monthlyResults[currentMonth - 1][0];
+      const monthStartDate = new Date(year, currentMonth - 1, 1);
+      const monthEndDate = new Date(year, currentMonth, 0); // Last day of current month
+      monthEndDate.setHours(23, 59, 59, 999);
       
-      console.log(`✅ Using monthly cycle for objective: ${currentMonthlyCycle.name}`);
+      const currentMonthlyCycle = {
+        name: `${monthNames[currentMonth - 1]} ${year}`,
+        type: 'monthly',
+        startDate: monthStartDate.toISOString(),
+        endDate: monthEndDate.toISOString(),
+        organizationId: user.organizationId,
+        createdBy: userId,
+        lastUpdateBy: userId,
+        description: `Siklus bulanan ${monthNames[currentMonth - 1]} ${year} - ${onboardingData.teamFocus || 'General'}`
+      };
       
-      const activeCycle = [currentMonthlyCycle];
+      console.log("🔄 Creating current month cycle:", currentMonthlyCycle);
+      const [newMonthlyCycle] = await db.insert(cycles).values(currentMonthlyCycle).returning();
+      console.log("✅ Current month cycle created:", newMonthlyCycle);
+      
+      // 4. Use the current month's cycle for the objective
+      const currentMonthCycle = newMonthlyCycle;
+      
+      console.log(`✅ Using monthly cycle for objective: ${currentMonthCycle.name}`);
+      
+      const activeCycle = [currentMonthCycle];
       
       // Create objective from onboarding data
       const objectiveData = {
