@@ -135,7 +135,9 @@ export function ThreadedCommentList({
             <Avatar className="h-7 w-7 sm:h-8 sm:w-8 flex-shrink-0">
               <AvatarImage src={comment.user?.profileImageUrl || ''} />
               <AvatarFallback>
-                {comment.user?.firstName?.[0] || comment.user?.email?.[0] || 'U'}
+                {comment.user?.name 
+                  ? comment.user.name.trim().split(' ').map(n => n[0]).join('').toUpperCase()
+                  : comment.user?.email?.[0]?.toUpperCase() || 'U'}
               </AvatarFallback>
             </Avatar>
             
@@ -143,9 +145,9 @@ export function ThreadedCommentList({
               {/* Header with user info and timestamp */}
               <div className="flex items-center space-x-2 flex-wrap">
                 <span className="font-medium text-gray-900 text-sm">
-                  {comment.user?.firstName && comment.user?.lastName
-                    ? `${comment.user.firstName} ${comment.user.lastName}`
-                    : comment.user?.firstName || 'User'}
+                  {comment.user?.name && comment.user.name.trim() !== ""
+                    ? comment.user.name.trim()
+                    : comment.user?.email?.split('@')[0] || 'User'}
                 </span>
                 <span className="text-xs text-gray-500">
                   {formatDistanceToNow(new Date(comment.createdAt || ''), { 

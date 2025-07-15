@@ -98,16 +98,12 @@ function TaskOverviewCard({ task, assignedUser, initiative }: any) {
       // Check if creator is same as assigned user
       if (task.assignedUser && task.createdBy === task.assignedUser.id) {
         // Use assignedUser data for creator name
-        if (task.assignedUser.firstName && task.assignedUser.lastName && task.assignedUser.lastName.trim() !== "") {
-          return `${task.assignedUser.firstName} ${task.assignedUser.lastName}`;
+        if (task.assignedUser.name && task.assignedUser.name.trim() !== "") {
+          return task.assignedUser.name.trim();
         }
         
-        if (task.assignedUser.firstName && task.assignedUser.firstName.trim() !== "") {
-          return task.assignedUser.firstName;
-        }
-        
-        if (task.assignedUser.lastName && task.assignedUser.lastName.trim() !== "") {
-          return task.assignedUser.lastName;
+        if (task.assignedUser.email) {
+          return task.assignedUser.email.split('@')[0];
         }
       }
       
@@ -117,16 +113,12 @@ function TaskOverviewCard({ task, assignedUser, initiative }: any) {
     }
     
     // If createdBy is an object with user data
-    if (task.createdBy.firstName && task.createdBy.lastName && task.createdBy.lastName.trim() !== "") {
-      return `${task.createdBy.firstName} ${task.createdBy.lastName}`;
+    if (task.createdBy.name && task.createdBy.name.trim() !== "") {
+      return task.createdBy.name.trim();
     }
     
-    if (task.createdBy.firstName && task.createdBy.firstName.trim() !== "") {
-      return task.createdBy.firstName;
-    }
-    
-    if (task.createdBy.lastName && task.createdBy.lastName.trim() !== "") {
-      return task.createdBy.lastName;
+    if (task.createdBy.email) {
+      return task.createdBy.email.split('@')[0];
     }
     
     return "System";
@@ -259,13 +251,11 @@ function TaskOverviewCard({ task, assignedUser, initiative }: any) {
               <p className="text-xs font-medium text-gray-900">PIC</p>
               {assignedUser ? (
                 <p className="text-xs text-gray-700 break-words">
-                  {assignedUser.firstName && assignedUser.lastName && assignedUser.lastName.trim() !== ""
-                    ? `${assignedUser.firstName} ${assignedUser.lastName}`
-                    : assignedUser.firstName && assignedUser.firstName.trim() !== ""
-                      ? assignedUser.firstName
-                      : assignedUser.lastName && assignedUser.lastName.trim() !== ""
-                        ? assignedUser.lastName
-                        : "Pengguna"
+                  {assignedUser.name && assignedUser.name.trim() !== ""
+                    ? assignedUser.name.trim()
+                    : assignedUser.email
+                      ? assignedUser.email.split('@')[0]
+                      : "Pengguna"
                   }
                 </p>
               ) : (

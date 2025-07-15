@@ -182,18 +182,24 @@ export default function KanbanView({ tasks, onEditTask, onDeleteTask, userId }: 
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                              {task.assignedUser.firstName?.charAt(0)}{task.assignedUser.lastName?.charAt(0)}
+                              {task.assignedUser.name 
+                                ? task.assignedUser.name.trim().split(' ').map(n => n[0]).join('').toUpperCase()
+                                : task.assignedUser.email ? task.assignedUser.email[0].toUpperCase() : 'U'}
                             </div>
                           </TooltipTrigger>
                           <TooltipContent>
                             <div className="text-xs">
-                              {task.assignedUser.firstName} {task.assignedUser.lastName}
+                              {task.assignedUser.name && task.assignedUser.name.trim() !== ""
+                                ? task.assignedUser.name.trim()
+                                : task.assignedUser.email?.split('@')[0] || 'User'}
                             </div>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                       <span className="text-xs text-gray-600">
-                        {task.assignedUser.firstName} {task.assignedUser.lastName}
+                        {task.assignedUser.name && task.assignedUser.name.trim() !== ""
+                          ? task.assignedUser.name.trim()
+                          : task.assignedUser.email?.split('@')[0] || 'User'}
                       </span>
                     </div>
                   )}
