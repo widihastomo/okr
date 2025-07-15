@@ -1195,24 +1195,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = req.params.id;
       const { transferToCycleId } = req.body;
+      const user = req.user as User;
+      
+      console.log(`🗑️ Deleting cycle ${id}, transfer to: ${transferToCycleId || 'none'}`);
+      
+      // Check if cycle exists and belongs to user's organization
+      const existingCycle = await storage.getCycle(id);
+      if (!existingCycle) {
+        return res.status(404).json({ message: "Cycle not found" });
+      }
+      
+      // System owners can delete any cycle, regular users only their organization's cycles
+      if (!user.isSystemOwner && existingCycle.organizationId !== user.organizationId) {
+        return res.status(403).json({ message: "Access denied - cycle belongs to different organization" });
+      }
       
       // If transferToCycleId is provided, move objectives to the new cycle
       if (transferToCycleId) {
+        console.log(`📋 Getting objectives for cycle ${id}`);
         const objectives = await storage.getObjectivesByCycleId(id);
+        console.log(`📋 Found ${objectives.length} objectives to transfer`);
+        
         for (const objective of objectives) {
+          console.log(`📋 Transferring objective ${objective.id} to cycle ${transferToCycleId}`);
           await storage.updateObjective(objective.id, { cycleId: transferToCycleId });
         }
       }
       
+      console.log(`🗑️ Deleting cycle ${id}`);
       const deleted = await storage.deleteCycle(id);
       
       if (!deleted) {
-        return res.status(404).json({ message: "Cycle not found" });
+        console.log(`❌ Failed to delete cycle ${id}`);
+        return res.status(500).json({ message: "Failed to delete cycle from database" });
       }
       
+      console.log(`✅ Cycle ${id} deleted successfully`);
       res.status(204).send();
     } catch (error) {
-      res.status(500).json({ message: "Failed to delete cycle" });
+      console.error(`❌ Error deleting cycle ${req.params.id}:`, error);
+      res.status(500).json({ 
+        message: "Failed to delete cycle", 
+        error: error instanceof Error ? error.message : "Unknown error" 
+      });
     }
   });
 
