@@ -361,9 +361,7 @@ export default function CyclesContent() {
                           <Badge variant="secondary" className="text-xs">
                             {objective.priority || 'Medium'}
                           </Badge>
-                          <span className="text-xs text-gray-500">
-                            ID: {objective.id.slice(0, 8)}...
-                          </span>
+                          
                         </div>
                         <div className="text-xs text-gray-500">
                           {objective.ownerId && `Owner: ${objective.ownerId.slice(0, 8)}...`}
