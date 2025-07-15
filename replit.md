@@ -255,6 +255,29 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 15, 2025. **ONBOARDING SAVE BUTTON ANIMATION ENHANCEMENT** - Successfully added comprehensive animations to onboarding completion button:
+  * ADDED: Loader2 spinner icon that rotates during save process
+  * IMPLEMENTED: Dynamic text states "Menyimpan..." → "Menuju Dashboard..." → "Selesai"
+  * ENHANCED: Smooth 300ms transitions for all text and state changes
+  * ADDED: Animated background overlay with pulsing gradient during loading states
+  * FIXED: Button width consistency with min-w-[140px] to prevent size jumping
+  * IMPROVED: Enhanced disabled states with proper opacity and hover restrictions
+  * STYLED: Professional loading feedback with orange-themed animations
+  * RESULT: Complete loading animation system providing clear visual feedback during onboarding completion process
+- July 15, 2025. **COMPREHENSIVE CYCLE CREATION SYSTEM** - Successfully implemented automatic cycle creation during onboarding completion:
+  * IMPLEMENTED: Annual cycle creation for full year (2025-01-01 to 2025-12-31)
+  * ADDED: 4 quarterly cycles (Q1, Q2, Q3, Q4) with proper date ranges
+  * CREATED: 12 monthly cycles (Januari to Desember) aligned with onboarding date
+  * ENHANCED: Objectives now use current month's cycle instead of generic cycle
+  * SECURED: All cycles include proper organizationId and audit trail fields (createdBy, lastUpdateBy)
+  * OPTIMIZED: Cycle dates calculated from current date for accurate time alignment
+  * IMPROVED: Initiative and task deadlines now use monthly cycle dates for proper timeline
+  * RESULT: Complete cycle hierarchy automatically created during onboarding with proper multi-tenant security
+- July 15, 2025. **REACT HOOKS COMPLIANCE FIX** - Successfully resolved React hooks error "Rendered more hooks than during the previous render":
+  * FIXED: Replaced problematic useMemo hook with IIFE (Immediately Invoked Function Expression)
+  * ELIMINATED: Conditional hook calls that were causing render inconsistencies
+  * MAINTAINED: All existing functionality while ensuring React rules compliance
+  * RESULT: Stable onboarding flow without React warnings and consistent hook execution
 - July 15, 2025. **ONBOARDING SYNTAX ERROR RESOLUTION** - Successfully fixed critical syntax errors in company-onboarding.tsx:
   * FIXED: Duplicate case statements (case 5, 6, 7) causing switch statement conflicts
   * REMOVED: Duplicate handleNext function declarations causing identifier conflicts

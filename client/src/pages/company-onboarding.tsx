@@ -51,6 +51,7 @@ import {
   MessageSquare,
   Zap,
   CalendarIcon,
+  Loader2,
 } from "lucide-react";
 import { ReminderSettings } from "@/components/ReminderSettings";
 import { type CompanyOnboardingData } from "@shared/schema";
@@ -2369,8 +2370,8 @@ export default function CompanyOnboarding() {
 
       case 10: // Dashboard Ringkas
         return (
-          <div className="space-y-6">
-            <div className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+          <div className="space-y-4">
+            <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
               <h3 className="font-semibold text-lg mb-4 text-blue-900">
                 📊 Rekap Data Onboarding Anda
               </h3>
@@ -2410,32 +2411,12 @@ export default function CompanyOnboarding() {
                   <p className="text-gray-700">
                     {onboardingData.objective || "Belum diisi"}
                   </p>
-                  <div className="mt-2 text-sm text-gray-500">
-                    <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                      Fokus: {onboardingData.teamFocus || "General"}
-                    </span>
-                    <span className="inline-block bg-green-100 text-green-800 px-2 py-1 rounded ml-2">
-                      Check-in: {onboardingData.cadence || "Belum dipilih"}
-                    </span>
-                    <span className="inline-block bg-purple-100 text-purple-800 px-2 py-1 rounded ml-2">
-                      Periode:{" "}
-                      {onboardingData.cycleDuration === "1_bulan"
-                        ? "1 bulan"
-                        : onboardingData.cycleDuration === "3_bulan"
-                          ? "3 bulan"
-                          : onboardingData.cycleDuration === "6_bulan"
-                            ? "6 bulan"
-                            : onboardingData.cycleDuration === "1_tahun"
-                              ? "1 tahun"
-                              : onboardingData.cycleDuration || "Belum dipilih"}
-                    </span>
-                  </div>
                 </div>
 
                 {onboardingData.keyResults.length > 0 && (
                   <div className="bg-white p-4 rounded-lg border border-gray-200">
                     <h4 className="font-semibold text-green-800 mb-3">
-                      📏 Angka Target & Hierarki Pelaksanaan
+                      Angka Target & Rencana Eksekusi
                     </h4>
                     <div className="space-y-4">
                       {onboardingData.keyResults
@@ -2696,37 +2677,9 @@ export default function CompanyOnboarding() {
 
                 <div className="bg-white p-4 rounded-lg border border-gray-200">
                   <h4 className="font-semibold text-gray-800 mb-3">
-                    📅 Pengaturan Tenggat Waktu & Monitoring
+                    📅 Ritme Update Capaian
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700">
-                    <div className="space-y-2">
-                      <p>
-                        <strong>Periode Goal:</strong>{" "}
-                        <span className="inline-block bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-xs">
-                          {onboardingData.cycleDuration === "1_bulan"
-                            ? "1 Bulan"
-                            : onboardingData.cycleDuration === "3_bulan"
-                              ? "3 Bulan"
-                              : onboardingData.cycleDuration === "6_bulan"
-                                ? "6 Bulan"
-                                : onboardingData.cycleDuration === "1_tahun"
-                                  ? "1 Tahun"
-                                  : "Belum dipilih"}
-                        </span>
-                      </p>
-                      <p>
-                        <strong>Tanggal Mulai:</strong>{" "}
-                        <span className="text-gray-900">
-                          {onboardingData.cycleStartDate || "Belum diatur"}
-                        </span>
-                      </p>
-                      <p>
-                        <strong>Tanggal Selesai:</strong>{" "}
-                        <span className="text-gray-900">
-                          {onboardingData.cycleEndDate || "Belum diatur"}
-                        </span>
-                      </p>
-                    </div>
                     <div className="space-y-2">
                       <p>
                         <strong>Frekuensi Check-in:</strong>{" "}
@@ -2830,32 +2783,12 @@ export default function CompanyOnboarding() {
                   <p className="text-gray-700">
                     {onboardingData.objective || "Belum diisi"}
                   </p>
-                  <div className="mt-2 text-sm text-gray-500">
-                    <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                      Fokus: {onboardingData.teamFocus || "General"}
-                    </span>
-                    <span className="inline-block bg-green-100 text-green-800 px-2 py-1 rounded ml-2">
-                      Check-in: {onboardingData.cadence || "Belum dipilih"}
-                    </span>
-                    <span className="inline-block bg-purple-100 text-purple-800 px-2 py-1 rounded ml-2">
-                      Periode:{" "}
-                      {onboardingData.cycleDuration === "1_bulan"
-                        ? "1 bulan"
-                        : onboardingData.cycleDuration === "3_bulan"
-                          ? "3 bulan"
-                          : onboardingData.cycleDuration === "6_bulan"
-                            ? "6 bulan"
-                            : onboardingData.cycleDuration === "1_tahun"
-                              ? "1 tahun"
-                              : onboardingData.cycleDuration || "Belum dipilih"}
-                    </span>
-                  </div>
                 </div>
 
                 {onboardingData.keyResults.length > 0 && (
                   <div className="bg-white p-4 rounded-lg border border-gray-200">
                     <h4 className="font-semibold text-green-800 mb-3">
-                      📏 Angka Target & Hierarki Pelaksanaan
+                      Angka Target & Rencana Eksekusi
                     </h4>
                     <div className="space-y-4">
                       {onboardingData.keyResults
@@ -2979,37 +2912,9 @@ export default function CompanyOnboarding() {
 
                 <div className="bg-white p-4 rounded-lg border border-gray-200">
                   <h4 className="font-semibold text-gray-800 mb-3">
-                    📅 Pengaturan Tenggat Waktu & Monitoring
+                    📅 Ritme Update Capaian
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700">
-                    <div className="space-y-2">
-                      <p>
-                        <strong>Periode Goal:</strong>{" "}
-                        <span className="inline-block bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-xs">
-                          {onboardingData.cycleDuration === "1_bulan"
-                            ? "1 Bulan"
-                            : onboardingData.cycleDuration === "3_bulan"
-                              ? "3 Bulan"
-                              : onboardingData.cycleDuration === "6_bulan"
-                                ? "6 Bulan"
-                                : onboardingData.cycleDuration === "1_tahun"
-                                  ? "1 Tahun"
-                                  : "Belum dipilih"}
-                        </span>
-                      </p>
-                      <p>
-                        <strong>Tanggal Mulai:</strong>{" "}
-                        <span className="text-gray-900">
-                          {onboardingData.cycleStartDate || "Belum diatur"}
-                        </span>
-                      </p>
-                      <p>
-                        <strong>Tanggal Selesai:</strong>{" "}
-                        <span className="text-gray-900">
-                          {onboardingData.cycleEndDate || "Belum diatur"}
-                        </span>
-                      </p>
-                    </div>
                     <div className="space-y-2">
                       <p>
                         <strong>Frekuensi Check-in:</strong>{" "}
@@ -3049,7 +2954,6 @@ export default function CompanyOnboarding() {
                   • Goal pertama akan dibuat otomatis di sistem berdasarkan
                   pilihan anda
                 </li>
-                <li>• Anggota tim akan diundang untuk berkolaborasi</li>
                 <li>
                   • Reminder otomatis akan dimulai sesuai ketentuan yang sudah
                   dimasukkan
@@ -3319,9 +3223,24 @@ export default function CompanyOnboarding() {
                     disabled={
                       completeOnboardingMutation.isPending || isRedirecting
                     }
-                    className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:hover:scale-100 disabled:hover:shadow-none"
+                    className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:hover:scale-100 disabled:hover:shadow-none disabled:opacity-70 min-w-[140px] relative overflow-hidden"
                   >
-                    {isRedirecting ? "Menuju Dashboard..." : "Selesai"}
+                    <div className="flex items-center justify-center gap-2">
+                      {(completeOnboardingMutation.isPending || isRedirecting) && (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      )}
+                      <span className="transition-all duration-300">
+                        {completeOnboardingMutation.isPending
+                          ? "Menyimpan..."
+                          : isRedirecting
+                          ? "Menuju Dashboard..."
+                          : "Selesai"}
+                      </span>
+                    </div>
+                    {/* Animated background overlay during loading */}
+                    {(completeOnboardingMutation.isPending || isRedirecting) && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-orange-700 to-orange-600 animate-pulse" />
+                    )}
                   </Button>
                 ) : (
                   <Button
