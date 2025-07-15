@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { X, ArrowLeft, ArrowRight, SkipForward, CheckCircle } from "lucide-react";
+import { X, ArrowLeft, ArrowRight, SkipForward, CheckCircle, Sparkles, Target, Zap, Play, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface TooltipPosition {
@@ -92,11 +92,15 @@ export const OnboardingOverlay: React.FC = () => {
   // Render center modal for steps without target
   if (!currentStep.target || !tooltipPosition) {
     return (
-      <div className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-4">
-        <Card className="w-full max-w-md mx-auto shadow-2xl">
-          <CardHeader className="pb-4">
+      <div className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-4 animate-in fade-in-0 duration-300">
+        <Card className="w-full max-w-md mx-auto shadow-2xl border-2 border-orange-200 animate-in slide-in-from-bottom-4 duration-500">
+          <CardHeader className="pb-4 relative">
+            {/* Animated sparkles */}
+            <div className="absolute -top-2 -right-2 animate-pulse">
+              <Sparkles className="w-6 h-6 text-orange-500" />
+            </div>
             <div className="flex items-center justify-between">
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-800 animate-pulse">
                 {currentTour.name}
               </Badge>
               <Button
@@ -108,7 +112,10 @@ export const OnboardingOverlay: React.FC = () => {
                 <X className="w-4 h-4" />
               </Button>
             </div>
-            <CardTitle className="text-lg">{currentStep.title}</CardTitle>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Target className="w-5 h-5 text-orange-600 animate-bounce" />
+              {currentStep.title}
+            </CardTitle>
             <CardDescription>{currentStep.description}</CardDescription>
           </CardHeader>
           

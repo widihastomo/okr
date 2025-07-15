@@ -12,7 +12,11 @@ import {
   Info,
   CheckCircle,
   SkipForward,
-  Play
+  Play,
+  Sparkles,
+  Zap,
+  MousePointer,
+  Eye
 } from "lucide-react";
 
 interface TourTooltipProps {
@@ -93,26 +97,34 @@ export default function TourTooltip({ onClose }: TourTooltipProps) {
 
   return (
     <div 
-      className={`fixed z-50 transition-all duration-300 ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+      className={`fixed z-50 transition-all duration-500 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}
       style={{
         top: `${tooltipPosition.top}px`,
         left: `${tooltipPosition.left}px`,
         transform: 'translateX(-50%)'
       }}
     >
-      <Card className="w-96 shadow-2xl border-2 border-orange-200 bg-white">
+      <Card className="w-96 shadow-2xl border-2 border-orange-200 bg-white relative animate-in slide-in-from-bottom-2 duration-300">
+        {/* Animated sparkles */}
+        <div className="absolute -top-3 -right-3 animate-pulse">
+          <Sparkles className="w-6 h-6 text-orange-500" />
+        </div>
+        <div className="absolute -bottom-3 -left-3 animate-bounce">
+          <Zap className="w-5 h-5 text-blue-500" />
+        </div>
+        
         <CardContent className="p-6">
           {/* Header */}
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-orange-100 rounded-lg">
+              <div className="p-1.5 bg-orange-100 rounded-lg animate-pulse">
                 <Target className="w-4 h-4 text-orange-600" />
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900 text-sm">
                   {currentTour.name}
                 </h3>
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="secondary" className="text-xs bg-orange-50 text-orange-700 animate-pulse">
                   {currentStepIndex + 1} dari {currentTour.steps.length}
                 </Badge>
               </div>
@@ -139,10 +151,16 @@ export default function TourTooltip({ onClose }: TourTooltipProps) {
           <div className="mb-6">
             <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
               {currentStep.action === 'click' && (
-                <Play className="w-4 h-4 text-blue-500" />
+                <MousePointer className="w-4 h-4 text-blue-500 animate-pulse" />
               )}
               {currentStep.action === 'observe' && (
-                <Info className="w-4 h-4 text-green-500" />
+                <Eye className="w-4 h-4 text-green-500 animate-pulse" />
+              )}
+              {currentStep.action === 'input' && (
+                <Play className="w-4 h-4 text-purple-500 animate-pulse" />
+              )}
+              {currentStep.action === 'navigate' && (
+                <Target className="w-4 h-4 text-orange-500 animate-pulse" />
               )}
               {currentStep.title}
             </h4>
@@ -151,8 +169,29 @@ export default function TourTooltip({ onClose }: TourTooltipProps) {
             </p>
             
             {currentStep.action === 'click' && (
-              <div className="mt-3 p-2 bg-blue-50 rounded text-xs text-blue-700">
-                💡 Klik elemen yang disorot untuk melanjutkan
+              <div className="mt-3 p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg text-sm text-blue-700 border border-blue-200">
+                <div className="flex items-center gap-2">
+                  <MousePointer className="w-4 h-4 animate-bounce" />
+                  <span className="font-medium">Klik elemen yang disorot untuk melanjutkan</span>
+                </div>
+              </div>
+            )}
+            
+            {currentStep.action === 'observe' && (
+              <div className="mt-3 p-3 bg-gradient-to-r from-green-50 to-green-100 rounded-lg text-sm text-green-700 border border-green-200">
+                <div className="flex items-center gap-2">
+                  <Eye className="w-4 h-4 animate-pulse" />
+                  <span className="font-medium">Perhatikan elemen yang disorot</span>
+                </div>
+              </div>
+            )}
+            
+            {currentStep.action === 'input' && (
+              <div className="mt-3 p-3 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg text-sm text-purple-700 border border-purple-200">
+                <div className="flex items-center gap-2">
+                  <Play className="w-4 h-4 animate-pulse" />
+                  <span className="font-medium">Isi form atau masukkan data</span>
+                </div>
               </div>
             )}
           </div>
@@ -165,7 +204,7 @@ export default function TourTooltip({ onClose }: TourTooltipProps) {
                   variant="outline"
                   size="sm"
                   onClick={prevStep}
-                  className="text-xs"
+                  className="text-xs tour-button"
                 >
                   <ArrowLeft className="w-3 h-3 mr-1" />
                   Kembali
@@ -177,7 +216,7 @@ export default function TourTooltip({ onClose }: TourTooltipProps) {
                   variant="ghost"
                   size="sm"
                   onClick={handleSkip}
-                  className="text-xs text-gray-500"
+                  className="text-xs text-gray-500 tour-button"
                 >
                   <SkipForward className="w-3 h-3 mr-1" />
                   Lewati
@@ -190,19 +229,28 @@ export default function TourTooltip({ onClose }: TourTooltipProps) {
                 <Button
                   onClick={completeTour}
                   size="sm"
-                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-xs"
+                  className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-xs tour-button"
                 >
-                  <CheckCircle className="w-3 h-3 mr-1" />
+                  <CheckCircle className="w-3 h-3 mr-1 animate-pulse" />
                   Selesai
                 </Button>
               ) : (
                 <Button
                   onClick={handleNext}
                   size="sm"
-                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-xs"
+                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-xs tour-button"
                 >
-                  {currentStep.action === 'click' ? 'Klik & Lanjut' : 'Lanjut'}
-                  <ArrowRight className="w-3 h-3 ml-1" />
+                  {currentStep.action === 'click' ? (
+                    <>
+                      Klik & Lanjut
+                      <MousePointer className="w-3 h-3 ml-1 animate-pulse" />
+                    </>
+                  ) : (
+                    <>
+                      Lanjut
+                      <ArrowRight className="w-3 h-3 ml-1" />
+                    </>
+                  )}
                 </Button>
               )}
             </div>

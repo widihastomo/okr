@@ -13,7 +13,9 @@ import {
   ArrowRight,
   Calendar,
   BarChart3,
-  Globe
+  Globe,
+  Sparkles,
+  Zap
 } from "lucide-react";
 
 interface WizardStep {
@@ -212,11 +214,19 @@ export const WelcomeWizard: React.FC = () => {
   const step = wizardSteps[currentStep];
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-[9999] flex items-center justify-center p-4">
-      <Card className="w-full max-w-lg mx-auto shadow-2xl">
+    <div className="fixed inset-0 bg-black/60 z-[9999] flex items-center justify-center p-4 onboarding-overlay">
+      <Card className="w-full max-w-lg mx-auto shadow-2xl welcome-wizard-step border-2 border-orange-200 relative">
+        {/* Animated decorative elements */}
+        <div className="absolute -top-2 -right-2 animate-pulse">
+          <Sparkles className="w-6 h-6 text-orange-500" />
+        </div>
+        <div className="absolute -bottom-2 -left-2 animate-bounce">
+          <Target className="w-5 h-5 text-blue-500" />
+        </div>
+        
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between mb-2">
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="secondary" className="text-xs bg-orange-50 text-orange-700 border-orange-300 animate-pulse">
               Welcome Wizard
             </Badge>
             <Button
@@ -235,7 +245,7 @@ export const WelcomeWizard: React.FC = () => {
               <span>Progress</span>
               <span>{currentStep + 1} dari {wizardSteps.length}</span>
             </div>
-            <Progress value={progress} className="h-2" />
+            <Progress value={progress} className="h-2 enhanced-progress" />
           </div>
         </CardHeader>
         
@@ -251,19 +261,19 @@ export const WelcomeWizard: React.FC = () => {
               variant="outline"
               onClick={handlePrev}
               disabled={currentStep === 0}
-              className="flex items-center gap-1"
+              className="flex items-center gap-1 tour-button"
             >
               ← Kembali
             </Button>
 
             <Button
               onClick={handleNext}
-              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 flex items-center gap-1"
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 flex items-center gap-1 tour-button"
             >
               {currentStep === wizardSteps.length - 1 ? (
                 <>
                   Mulai Tour
-                  <Rocket className="w-4 h-4" />
+                  <Rocket className="w-4 h-4 animate-pulse" />
                 </>
               ) : (
                 <>
