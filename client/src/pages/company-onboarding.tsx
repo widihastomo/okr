@@ -72,21 +72,22 @@ const ONBOARDING_STEPS = [
   },
   {
     id: 3,
-    title: "Angka Target",
+    title: "Ukur Dengan Angka Target",
     description: "Bagaimana Anda tahu bahwa tujuan tadi benar-benar tercapai?",
     icon: TrendingUp,
   },
   {
     id: 4,
-    title: "Pilih Inisiatif Prioritas",
+    title: "Rancang Aksinya (Inisiatif)",
     description:
-      "Tentukan langkah-langkah strategis untuk mencapai angka target",
+      "Tentukan strategi yang tepat untuk bisa mencapai angka target",
     icon: CheckCircle,
   },
   {
     id: 5,
-    title: "Tugas untuk Inisiatif",
-    description: "Tentukan tugas-tugas yang harus dikerjakan",
+    title: "Pecah Jadi Tugas Harian (Task)",
+    description:
+      "Jadikan beberapa langkah kecil yang jelas agar strategi tidak hanya tertulis, namun benar - benar ter-eksekusi dengan maksimal",
     icon: BarChart,
   },
   {
@@ -982,7 +983,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 6: // Pilih Cadence
+      case 5: // Pilih Cadence
         return (
           <div className="space-y-6">
             <div className="space-y-2">
@@ -1383,7 +1384,7 @@ export default function CompanyOnboarding() {
         const initiativeMapping = {
           // Penjualan - Omzet
           "Mencapai target penjualan Rp 500 juta per bulan": [
-            "Menjalankan kampanye promosi bulanan dengan diskon 20%",
+            "Menjalankan kampanye promosi bulanan",
             "Melatih sales team untuk closing technique",
             "Mengimplementasikan CRM untuk follow-up lead",
           ],
@@ -1724,11 +1725,11 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 5: // Task untuk Inisiatif
+      case 6: // Task untuk Inisiatif (step 6)
         // Define taskMapping outside functions so it can be reused
         const taskMapping = {
           // Penjualan & Marketing Tasks
-          "Menjalankan kampanye promosi bulanan dengan diskon 20%": [
+          "Menjalankan kampanye promosi bulanan": [
             "Buat creative design untuk promosi diskon",
             "Setup campaign di Facebook Ads dan Google Ads",
             "Siapkan landing page untuk campaign",
@@ -2367,7 +2368,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 10: // Dashboard Ringkas
+      case 7: // Dashboard Ringkas
         return (
           <div className="space-y-6">
             <div className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
@@ -2646,22 +2647,64 @@ export default function CompanyOnboarding() {
 
                                     {/* Tasks for this Initiative */}
                                     {selectedTasksForThisInit.map(
-                                      (task, taskIndex) => (
-                                        <div
-                                          key={taskIndex}
-                                          className="ml-4 flex items-start space-x-2"
-                                        >
-                                          <div className="w-1 h-1 bg-orange-500 rounded-full mt-2"></div>
-                                          <div>
-                                            <span className="text-xs font-medium text-orange-600">
-                                              Task {taskIndex + 1}
-                                            </span>
-                                            <p className="text-xs text-orange-700">
-                                              {task}
-                                            </p>
+                                      (task, taskIndex) => {
+                                        // Generate sequential dates from today to H+7
+                                        const baseDate = new Date();
+                                        const taskDate = new Date(baseDate);
+                                        const totalTasksBeforeThis = onboardingData.tasks?.slice(0, onboardingData.tasks.indexOf(task)).length || 0;
+                                        taskDate.setDate(baseDate.getDate() + totalTasksBeforeThis);
+                                        
+                                        // Format date
+                                        const formattedDate = taskDate.toLocaleDateString('id-ID', {
+                                          day: 'numeric',
+                                          month: 'short',
+                                          year: 'numeric'
+                                        });
+                                        
+                                        // Generate PIC assignment (cycling through common roles)
+                                        const picRoles = ['Project Manager', 'Developer', 'Designer', 'Marketing Lead', 'Sales Lead', 'Analyst', 'QA Lead', 'Content Writer'];
+                                        const assignedPIC = picRoles[totalTasksBeforeThis % picRoles.length];
+                                        
+                                        return (
+                                          <div
+                                            key={taskIndex}
+                                            className="ml-4 space-y-2"
+                                          >
+                                            <div className="flex items-start space-x-2">
+                                              <div className="w-1 h-1 bg-orange-500 rounded-full mt-2"></div>
+                                              <div className="flex-1">
+                                                <span className="text-xs font-medium text-orange-600">
+                                                  Task {taskIndex + 1}
+                                                </span>
+                                                <p className="text-xs text-orange-700 mb-2">
+                                                  {task}
+                                                </p>
+                                                
+                                                {/* Task Planning Information */}
+                                                <div className="bg-orange-50 p-2 rounded-md border border-orange-200">
+                                                  <div className="flex items-center justify-between mb-1">
+                                                    <div className="flex items-center space-x-2">
+                                                      <span className="text-xs font-medium text-orange-800">📅 Target:</span>
+                                                      <span className="text-xs text-orange-700 font-mono bg-white px-1 py-0.5 rounded">
+                                                        {formattedDate}
+                                                      </span>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2">
+                                                      <span className="text-xs font-medium text-orange-800">👤 PIC:</span>
+                                                      <span className="text-xs text-orange-700 bg-white px-1 py-0.5 rounded">
+                                                        {assignedPIC}
+                                                      </span>
+                                                    </div>
+                                                  </div>
+                                                  <div className="text-xs text-orange-600">
+                                                    <span className="font-medium">Prioritas:</span> {taskIndex < 2 ? 'Tinggi' : taskIndex < 4 ? 'Sedang' : 'Rendah'}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
                                           </div>
-                                        </div>
-                                      ),
+                                        );
+                                      }
                                     )}
                                   </div>
                                 );
@@ -2780,16 +2823,9 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 7: // Ringkasan & Reminder
+      case 7: // Dashboard Ringkas
         return (
           <div className="space-y-6">
-            {/* Success Message */}
-            <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-              <h3 className="font-semibold text-green-800 mb-2">🎉 Selamat!</h3>
-              <p className="text-sm text-green-700 mb-3">
-                Anda telah menyelesaikan semua langkah onboarding.
-              </p>
-            </div>
             <div className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
               <h3 className="font-semibold text-lg mb-4 text-blue-900">
                 📊 Rekap Data Onboarding Anda
@@ -2929,22 +2965,64 @@ export default function CompanyOnboarding() {
 
                                     {/* Tasks for this Initiative */}
                                     {selectedTasksForThisInit.map(
-                                      (task, taskIndex) => (
-                                        <div
-                                          key={taskIndex}
-                                          className="ml-4 flex items-start space-x-2"
-                                        >
-                                          <div className="w-1 h-1 bg-orange-500 rounded-full mt-2"></div>
-                                          <div>
-                                            <span className="text-xs font-medium text-orange-600">
-                                              Task {taskIndex + 1}
-                                            </span>
-                                            <p className="text-xs text-orange-700">
-                                              {task}
-                                            </p>
+                                      (task, taskIndex) => {
+                                        // Generate sequential dates from today to H+7
+                                        const baseDate = new Date();
+                                        const taskDate = new Date(baseDate);
+                                        const totalTasksBeforeThis = onboardingData.tasks?.slice(0, onboardingData.tasks.indexOf(task)).length || 0;
+                                        taskDate.setDate(baseDate.getDate() + totalTasksBeforeThis);
+                                        
+                                        // Format date
+                                        const formattedDate = taskDate.toLocaleDateString('id-ID', {
+                                          day: 'numeric',
+                                          month: 'short',
+                                          year: 'numeric'
+                                        });
+                                        
+                                        // Generate PIC assignment (cycling through common roles)
+                                        const picRoles = ['Project Manager', 'Developer', 'Designer', 'Marketing Lead', 'Sales Lead', 'Analyst', 'QA Lead', 'Content Writer'];
+                                        const assignedPIC = picRoles[totalTasksBeforeThis % picRoles.length];
+                                        
+                                        return (
+                                          <div
+                                            key={taskIndex}
+                                            className="ml-4 space-y-2"
+                                          >
+                                            <div className="flex items-start space-x-2">
+                                              <div className="w-1 h-1 bg-orange-500 rounded-full mt-2"></div>
+                                              <div className="flex-1">
+                                                <span className="text-xs font-medium text-orange-600">
+                                                  Task {taskIndex + 1}
+                                                </span>
+                                                <p className="text-xs text-orange-700 mb-2">
+                                                  {task}
+                                                </p>
+                                                
+                                                {/* Task Planning Information */}
+                                                <div className="bg-orange-50 p-2 rounded-md border border-orange-200">
+                                                  <div className="flex items-center justify-between mb-1">
+                                                    <div className="flex items-center space-x-2">
+                                                      <span className="text-xs font-medium text-orange-800">📅 Target:</span>
+                                                      <span className="text-xs text-orange-700 font-mono bg-white px-1 py-0.5 rounded">
+                                                        {formattedDate}
+                                                      </span>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2">
+                                                      <span className="text-xs font-medium text-orange-800">👤 PIC:</span>
+                                                      <span className="text-xs text-orange-700 bg-white px-1 py-0.5 rounded">
+                                                        {assignedPIC}
+                                                      </span>
+                                                    </div>
+                                                  </div>
+                                                  <div className="text-xs text-orange-600">
+                                                    <span className="font-medium">Prioritas:</span> {taskIndex < 2 ? 'Tinggi' : taskIndex < 4 ? 'Sedang' : 'Rendah'}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
                                           </div>
-                                        </div>
-                                      ),
+                                        );
+                                      }
                                     )}
                                   </div>
                                 );
