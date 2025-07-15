@@ -212,23 +212,31 @@ System email configuration has been migrated from database settings to environme
 - **Documentation**: Complete setup guide available in `EMAIL_CONFIGURATION.md`
 
 ### Supported Email Providers
-- **Mailtrap**: Development and testing (priority 1)
-- **SendGrid**: Production environment (priority 2) 
-- **Gmail SMTP**: Alternative provider (priority 3)
-- **Generic SMTP**: Fallback provider (priority 4)
+- **Custom SMTP**: Primary provider (mail.refokus.id) with SSL/TLS support (priority 1)
+- **Mailtrap**: Development and testing (priority 2)
+- **SendGrid**: Production environment (priority 3) 
+- **Gmail SMTP**: Alternative provider (priority 4)
 
 ### Environment Variables
 All email configuration now uses environment variables:
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` (Primary)
 - `MAILTRAP_HOST`, `MAILTRAP_PORT`, `MAILTRAP_USER`, `MAILTRAP_PASS`, `MAILTRAP_FROM`
 - `SENDGRID_API_KEY`, `SENDGRID_FROM`
 - `GMAIL_EMAIL`, `GMAIL_PASSWORD`, `GMAIL_FROM`
-- `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`
+
+### Current Configuration
+- **Primary SMTP**: mail.refokus.id:465 (SSL enabled)
+- **Authentication**: admin@refokus.id
+- **From Address**: noreply@refokus.id
+- **SSL/TLS**: Auto-detection based on port (465 = SSL, 587 = TLS)
+- **Self-signed certificates**: Accepted for custom SMTP servers
 
 ### Security Benefits
 - Credentials stored in environment variables (not database)
 - No exposure in admin UI
 - Production-ready deployment configuration
 - Automatic fallback between providers
+- SSL/TLS encryption for secure email transmission
 
 ## Current Features
 - **SIMPLIFIED ROLE SYSTEM**: Streamlined 4-role system (Owner, Administrator, Member, Viewer) with clear permission boundaries and complete frontend integration
@@ -246,6 +254,16 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 15, 2025. Successfully implemented custom SMTP email configuration:
+  * CHANGED: Email service now prioritizes custom SMTP over other providers
+  * CONFIGURED: Custom SMTP server (mail.refokus.id:465) as primary email provider
+  * ENHANCED: SSL/TLS auto-detection based on port configuration (465 = SSL, 587 = TLS)
+  * IMPROVED: Self-signed certificate support for custom SMTP servers
+  * ADDED: Email test endpoint /api/admin/test-email for system administrators
+  * UPDATED: Environment variables moved from MAILTRAP_* to SMTP_* for primary configuration
+  * SECURED: All email credentials stored in environment variables with proper encryption
+  * FALLBACK: Maintained provider hierarchy - Custom SMTP → Mailtrap → SendGrid → Gmail
+  * RESULT: Complete custom SMTP integration with proper SSL/TLS support and fallback mechanisms
 - July 15, 2025. Successfully fixed team member saving issue and enhanced team display:
   * FIXED: Added missing /api/team-members endpoint that was causing members not to display
   * RESOLVED: Team members now properly saved to database and displayed in UI

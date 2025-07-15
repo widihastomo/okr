@@ -10845,6 +10845,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Test email configuration endpoint (for admins)
+  app.post("/api/admin/test-email", requireAuth, requireSystemOwner, async (req, res) => {
+    try {
+      const { email } = req.body;
+      if (!email) {
+        return res.status(400).json({ message: "Email address is required" });
+      }
+
+      const testResult = await emailService.sendEmail({
+        from: "test@refokus.id",
+        to: email,
+        subject: "Test Email Configuration - Refokus OKR System",
+        html: `
+          <h2>Test Email Configuration</h2>
+          <p>This is a test email to verify your custom SMTP configuration is working correctly.</p>
+          <p><strong>Provider:</strong> Custom SMTP (mail.refokus.id)</p>
+          <p><strong>Port:</strong> 465 (SSL)</p>
+          <p><strong>Sent at:</strong> ${new Date().toLocaleString()}</p>
+          <p>If you received this email, your SMTP configuration is working properly!</p>
+        `
+      });
+
+      res.json({ 
+        success: testResult.success,
+        provider: testResult.provider,
+        message: testResult.success ? "Test email sent successfully" : "Failed to send test email",
+        error: testResult.error
+      });
+    } catch (error) {
+      console.error("Error testing email configuration:", error);
+      res.status(500).json({ message: "Failed to test email configuration" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

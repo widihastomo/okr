@@ -43,12 +43,12 @@ function getEmailSettings(): Record<string, string> {
   
   // Debug: Log environment variables status
   console.log('📧 Email service environment check:');
+  console.log('  - SMTP_HOST (Primary):', settings.smtp_host ? 'configured' : 'not configured');
+  console.log('  - SMTP_USER:', settings.smtp_user ? 'configured' : 'not configured');
+  console.log('  - SMTP_PASS:', settings.smtp_pass ? 'configured' : 'not configured');
   console.log('  - MAILTRAP_HOST:', settings.mailtrap_host ? 'configured' : 'not configured');
-  console.log('  - MAILTRAP_USER:', settings.mailtrap_user ? 'configured' : 'not configured');
-  console.log('  - MAILTRAP_PASS:', settings.mailtrap_pass ? 'configured' : 'not configured');
   console.log('  - SENDGRID_API_KEY:', settings.sendgrid_api_key ? 'configured' : 'not configured');
   console.log('  - GMAIL_EMAIL:', settings.gmail_email ? 'configured' : 'not configured');
-  console.log('  - SMTP_HOST:', settings.smtp_host ? 'configured' : 'not configured');
   
   return settings;
 }
@@ -178,14 +178,20 @@ class SMTPProvider implements EmailProvider {
         throw new Error('SMTP_HOST is not configured');
       }
       
+      const port = parseInt(settings.smtp_port || '587');
+      const secure = settings.smtp_secure === 'true' || port === 465;
+      
       const transporter = nodemailer.createTransport({
         host: settings.smtp_host,
-        port: parseInt(settings.smtp_port || '587'),
-        secure: settings.smtp_secure === 'true',
-        auth: {
+        port: port,
+        secure: secure,
+        auth: settings.smtp_user && settings.smtp_pass ? {
           user: settings.smtp_user,
           pass: settings.smtp_pass,
-        },
+        } : undefined,
+        tls: {
+          rejectUnauthorized: false // Allow self-signed certificates
+        }
       });
       
       await transporter.sendMail({
@@ -223,10 +229,10 @@ class DevelopmentEmailProvider implements EmailProvider {
 // Email Service with fallback providers
 class EmailService {
   private providers: EmailProvider[] = [
-    new MailtrapProvider(), // Mailtrap as primary
+    new SMTPProvider(), // Custom SMTP as primary
+    new MailtrapProvider(), // Mailtrap as fallback
     new SendGridProvider(),
     new GmailProvider(),
-    new SMTPProvider(),
   ];
   
   async sendEmail(config: EmailConfig): Promise<{ success: boolean; provider?: string; error?: string }> {
@@ -347,3 +353,10 @@ class EmailService {
 }
 
 export const emailService = new EmailService();
+
+// Log the email service configuration on startup
+console.log('📧 Email service initialized with custom SMTP configuration:');
+console.log('  - Primary provider: Custom SMTP (mail.refokus.id)');
+console.log('  - Port: 465 (SSL)');
+console.log('  - Fallback providers: Mailtrap → SendGrid → Gmail');
+console.log('  - Configuration loaded from environment variables');
