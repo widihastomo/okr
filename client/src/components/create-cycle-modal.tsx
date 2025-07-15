@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -27,6 +27,7 @@ interface CreateCycleModalProps {
 
 export default function CreateCycleModal({ open, onOpenChange, onSuccess }: CreateCycleModalProps) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   const form = useForm<CreateCycleFormData>({
     resolver: zodResolver(createCycleFormSchema),
@@ -44,9 +45,12 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
       return apiRequest('POST', '/api/cycles', data);
     },
     onSuccess: () => {
+      // Invalidate cache to refresh the cycles list
+      queryClient.invalidateQueries({ queryKey: ["/api/cycles"] });
       toast({
-        title: "Success",
-        description: "Cycle created successfully",
+        title: "Siklus berhasil dibuat",
+        description: "Siklus baru telah berhasil dibuat",
+        className: "border-green-200 bg-green-50 text-green-800",
       });
       form.reset();
       onSuccess();
@@ -54,7 +58,7 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to create cycle",
+        description: error.message || "Gagal membuat siklus",
         variant: "destructive",
       });
     },
