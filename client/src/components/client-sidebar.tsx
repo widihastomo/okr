@@ -182,12 +182,6 @@ export default function Sidebar({
       path: "/analytics",
       active: location === "/analytics",
     },
-    {
-      label: "Pengaturan Organisasi",
-      icon: Settings,
-      path: "/organization-settings",
-      active: location === "/organization-settings",
-    },
   ];
 
   // Add organization management items for organization owners
@@ -199,6 +193,14 @@ export default function Sidebar({
       active: location === "/client-users",
     });
   }
+
+  // Add organization settings as the last item
+  regularUserMenuItems.push({
+    label: "Pengaturan Organisasi",
+    icon: Settings,
+    path: "/organization-settings",
+    active: location === "/organization-settings",
+  });
 
   // Choose menu items based on user type
   const menuItems = isSystemOwner ? systemOwnerMenuItems : regularUserMenuItems;

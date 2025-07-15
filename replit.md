@@ -255,6 +255,25 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 15, 2025. **SIDEBAR MENU REORGANIZATION** - Successfully moved "Kelola Pengguna" menu item to appear above "Pengaturan Organisasi":
+  * REORGANIZED: Changed regularUserMenuItems array structure to use dynamic push method for proper ordering
+  * MOVED: "Kelola Pengguna" now appears before "Pengaturan Organisasi" in sidebar menu
+  * ENHANCED: Menu hierarchy now flows logically from core features to user management to organization settings
+  * IMPROVED: Better information architecture with user management positioned above organization settings
+  * RESULT: Cleaner menu structure with logical flow from content management to user management to system settings
+- July 15, 2025. **AUTOMATIC CYCLE SELECTION IMPLEMENTATION** - Successfully implemented automatic cycle selection based on closest dates to today:
+  * ADDED: findClosestCycle() function to automatically select cycle with dates closest to today
+  * ENHANCED: Goal form modal now auto-selects closest cycle when creating new goals
+  * IMPROVED: If today falls within a cycle's date range, that cycle is selected immediately
+  * CALCULATED: Minimum distance to each cycle (start/end dates) to select the closest one
+  * UPDATED: Both defaultValues and form reset logic to use closest cycle selection
+  * CONSISTENT: Applied same logic to edit-objective-form-modal.tsx for consistency
+  * RESULT: Users no longer need to manually select cycles - system intelligently chooses the most relevant cycle
+- July 15, 2025. **TEMPLATE MENU REMOVAL** - Successfully removed unused Template menu from sidebar:
+  * REMOVED: Template menu item from regularUserMenuItems array in client-sidebar.tsx
+  * CLEANED: Sidebar now shows only active/used menu items for cleaner interface
+  * IMPROVED: Reduced menu clutter by removing non-functional template feature
+  * RESULT: Cleaner sidebar interface with only functional menu items displayed
 - July 15, 2025. **FIXED DAILY FOCUS OVERDUE DETECTION LOGIC** - Successfully resolved incorrect overdue task categorization in daily-focus page:
   * IDENTIFIED: Tasks due today were incorrectly showing as overdue due to timezone and string comparison issues
   * FIXED: Replaced string-based date comparison with proper Date object comparison matching Tasks page logic
