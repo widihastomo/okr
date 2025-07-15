@@ -157,8 +157,10 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
                             variant="outline"
                             className="w-full justify-start text-left font-normal focus:ring-orange-500 focus:border-orange-500"
                           >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {field.value ? format(field.value, "PPP", { locale: id }) : "Pilih tanggal mulai"}
+                            <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
+                            <span className="truncate">
+                              {field.value ? format(field.value, "PPP", { locale: id }) : "Pilih tanggal mulai"}
+                            </span>
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
@@ -209,8 +211,10 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
                             variant="outline"
                             className="w-full justify-start text-left font-normal focus:ring-orange-500 focus:border-orange-500"
                           >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {field.value ? format(field.value, "PPP", { locale: id }) : "Pilih tanggal berakhir"}
+                            <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
+                            <span className="truncate">
+                              {field.value ? format(field.value, "PPP", { locale: id }) : "Pilih tanggal berakhir"}
+                            </span>
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
