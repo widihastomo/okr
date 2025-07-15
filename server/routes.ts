@@ -8345,6 +8345,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const [org] = await db.select().from(organizations).where(eq(organizations.id, currentUser.organizationId));
         
         if (org && org.subscriptionStatus === 'trial') {
+          // Calculate days remaining for organization trial
+          let daysRemaining = 0;
+          if (org.trialEndsAt) {
+            const now = new Date();
+            const trialEnd = new Date(org.trialEndsAt);
+            daysRemaining = Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+            daysRemaining = Math.max(0, daysRemaining);
+          }
+          
           return res.json({
             id: null,
             planId: null,
@@ -8352,7 +8361,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             status: "trialing",
             currentPeriodEnd: org.trialEndsAt,
             isTrialActive: true,
-            trialEndsAt: org.trialEndsAt
+            trialEndsAt: org.trialEndsAt,
+            daysRemaining: daysRemaining
           });
         }
         
@@ -8365,10 +8375,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
                            now >= new Date(subscription.trialStart) && 
                            now <= new Date(subscription.trialEnd);
       
+      // Calculate days remaining for trial
+      let daysRemaining = 0;
+      if (isTrialActive && subscription.trialEnd) {
+        const trialEnd = new Date(subscription.trialEnd);
+        daysRemaining = Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        daysRemaining = Math.max(0, daysRemaining);
+      }
+      
       const response = {
         ...subscription,
         isTrialActive: isTrialActive || false,
-        trialEndsAt: subscription.trialEnd
+        trialEndsAt: subscription.trialEnd,
+        daysRemaining: daysRemaining
       };
       
       res.json(response);

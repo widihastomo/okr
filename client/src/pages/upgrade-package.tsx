@@ -35,6 +35,7 @@ interface OrganizationSubscription {
   currentPeriodEnd: string;
   isTrialActive: boolean;
   trialEndsAt: string;
+  daysRemaining?: number;
 }
 
 export default function UpgradePackage() {
@@ -201,6 +202,11 @@ export default function UpgradePackage() {
                   <div>
                     <p className="font-medium text-gray-900">Paket Saat Ini</p>
                     <p className="text-sm text-gray-600">{currentSubscription.planName}</p>
+                    {currentSubscription.isTrialActive && currentSubscription.daysRemaining !== undefined && (
+                      <p className="text-xs text-orange-600 font-medium">
+                        {currentSubscription.daysRemaining} hari tersisa
+                      </p>
+                    )}
                   </div>
                 </div>
                 {currentSubscription.isTrialActive && (
