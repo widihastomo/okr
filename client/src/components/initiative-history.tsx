@@ -12,8 +12,7 @@ interface InitiativeHistoryEntry {
   user: {
     id: string;
     email: string;
-    firstName: string | null;
-    lastName: string | null;
+    name: string | null;
     role: string;
   };
   metadata?: {
@@ -50,10 +49,10 @@ export function InitiativeHistory({ initiativeId }: InitiativeHistoryProps) {
   };
 
   const getUserDisplayName = (user: InitiativeHistoryEntry['user']) => {
-    if (user.firstName || user.lastName) {
-      return `${user.firstName || ''} ${user.lastName || ''}`.trim();
+    if (user.name && user.name.trim() !== '') {
+      return user.name.trim();
     }
-    return user.email || 'Unknown User';
+    return user.email?.split('@')[0] || 'Unknown User';
   };
 
   const formatTimestamp = (timestamp: Date) => {
