@@ -1210,11 +1210,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied - cycle belongs to different organization" });
       }
       
+      // Check if cycle has objectives
+      console.log(`📋 Checking objectives for cycle ${id}`);
+      const objectives = await storage.getObjectivesByCycleId(id);
+      console.log(`📋 Found ${objectives.length} objectives in cycle`);
+      
+      // If cycle has objectives, transferToCycleId is required
+      if (objectives.length > 0 && !transferToCycleId) {
+        console.log(`❌ Cannot delete cycle with objectives - transfer required`);
+        return res.status(400).json({ 
+          message: "Cannot delete cycle with objectives. Please transfer objectives to another cycle first.",
+          objectiveCount: objectives.length
+        });
+      }
+      
       // If transferToCycleId is provided, move objectives to the new cycle
-      if (transferToCycleId) {
-        console.log(`📋 Getting objectives for cycle ${id}`);
-        const objectives = await storage.getObjectivesByCycleId(id);
-        console.log(`📋 Found ${objectives.length} objectives to transfer`);
+      if (transferToCycleId && objectives.length > 0) {
+        console.log(`📋 Transferring ${objectives.length} objectives to cycle ${transferToCycleId}`);
         
         for (const objective of objectives) {
           console.log(`📋 Transferring objective ${objective.id} to cycle ${transferToCycleId}`);

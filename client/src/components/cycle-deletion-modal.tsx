@@ -87,9 +87,20 @@ export default function CycleDeletionModal({ open, onOpenChange, cycle, onSucces
       onSuccess();
     },
     onError: (error: any) => {
+      let errorMessage = "Gagal menghapus siklus";
+      
+      // Handle specific error for objectives that need transfer
+      if (error.message?.includes("Cannot delete cycle with objectives")) {
+        errorMessage = "Siklus memiliki goal yang terkait. Pilih siklus tujuan untuk memindahkan goal terlebih dahulu.";
+      } else if (error.message?.includes("violates foreign key constraint")) {
+        errorMessage = "Siklus memiliki data terkait yang harus dipindahkan terlebih dahulu.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Error",
-        description: error.message || "Gagal menghapus siklus",
+        description: errorMessage,
         variant: "destructive",
       });
     },
@@ -122,10 +133,15 @@ export default function CycleDeletionModal({ open, onOpenChange, cycle, onSucces
   // Reset state when modal opens
   useEffect(() => {
     if (open) {
-      setDeleteOption("force");
+      // If cycle has objectives, force transfer option
+      if (dependencies?.hasObjectives) {
+        setDeleteOption("transfer");
+      } else {
+        setDeleteOption("force");
+      }
       setSelectedTargetCycle("");
     }
-  }, [open]);
+  }, [open, dependencies?.hasObjectives]);
 
   if (!cycle) return null;
 
@@ -194,8 +210,8 @@ export default function CycleDeletionModal({ open, onOpenChange, cycle, onSucces
                     <RadioGroup value={deleteOption} onValueChange={(value) => setDeleteOption(value as "force" | "transfer")}>
                       <div className="space-y-3">
                         <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="force" id="force" />
-                          <Label htmlFor="force" className="text-sm">
+                          <RadioGroupItem value="force" id="force" disabled={dependencies?.hasObjectives} />
+                          <Label htmlFor="force" className={`text-sm ${dependencies?.hasObjectives ? 'opacity-50 cursor-not-allowed' : ''}`}>
                             Hapus siklus dan semua goal (permanen)
                           </Label>
                           <Popover>
@@ -208,8 +224,10 @@ export default function CycleDeletionModal({ open, onOpenChange, cycle, onSucces
                               <div className="space-y-2">
                                 <p className="text-sm font-medium">Hapus Permanen</p>
                                 <p className="text-sm text-gray-600">
-                                  Semua goal dalam siklus ini akan dihapus secara permanen beserta 
-                                  key results, initiatives, dan data terkait lainnya.
+                                  {dependencies?.hasObjectives ? 
+                                    "Opsi ini dinonaktifkan karena siklus memiliki goal terkait. Gunakan opsi pindah goal untuk menghapus siklus dengan aman." :
+                                    "Semua goal dalam siklus ini akan dihapus secara permanen beserta key results, initiatives, dan data terkait lainnya."
+                                  }
                                 </p>
                               </div>
                             </PopoverContent>
