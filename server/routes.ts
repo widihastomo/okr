@@ -9,6 +9,7 @@ import {
   subscriptionPlans, organizations, organizationSubscriptions, users, dailyReflections, companyOnboardingDataSchema,
   trialAchievements, userTrialAchievements, billingPeriods,
   applicationSettings, insertApplicationSettingSchema, updateApplicationSettingSchema,
+  insertTimelineCommentSchema, insertTimelineReactionSchema,
   type User, type SubscriptionPlan, type Organization, type OrganizationSubscription, type UserOnboardingProgress, type UpdateOnboardingProgress, type CompanyOnboardingData,
   type InsertUser, type ApplicationSetting, type InsertApplicationSetting, type UpdateApplicationSetting,
   type TaskAuditTrail, type InsertTaskAuditTrail
@@ -4024,6 +4025,108 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error creating check-in:", error);
       res.status(500).json({ message: "Failed to create check-in" });
+    }
+  });
+
+  // Timeline API routes
+  app.get("/api/timeline", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as User;
+      const timelineData = await storage.getTimelineCheckIns(user.organizationId);
+      res.json(timelineData);
+    } catch (error) {
+      console.error("Error fetching timeline:", error);
+      res.status(500).json({ message: "Failed to fetch timeline" });
+    }
+  });
+
+  app.get("/api/timeline/:checkInId/comments", requireAuth, async (req, res) => {
+    try {
+      const { checkInId } = req.params;
+      const comments = await storage.getTimelineComments(checkInId);
+      res.json(comments);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+      res.status(500).json({ message: "Failed to fetch comments" });
+    }
+  });
+
+  app.post("/api/timeline/:checkInId/comments", requireAuth, async (req, res) => {
+    try {
+      const { checkInId } = req.params;
+      const user = req.user as User;
+      const { content } = req.body;
+
+      if (!content?.trim()) {
+        return res.status(400).json({ message: "Comment content is required" });
+      }
+
+      const comment = await storage.createTimelineComment({
+        checkInId,
+        organizationId: user.organizationId,
+        content: content.trim(),
+        createdBy: user.id,
+      });
+      res.status(201).json(comment);
+    } catch (error) {
+      console.error("Error creating comment:", error);
+      res.status(500).json({ message: "Failed to create comment" });
+    }
+  });
+
+  app.get("/api/timeline/:checkInId/reactions", requireAuth, async (req, res) => {
+    try {
+      const { checkInId } = req.params;
+      const reactions = await storage.getTimelineReactions(checkInId);
+      res.json(reactions);
+    } catch (error) {
+      console.error("Error fetching reactions:", error);
+      res.status(500).json({ message: "Failed to fetch reactions" });
+    }
+  });
+
+  app.post("/api/timeline/:checkInId/reactions", requireAuth, async (req, res) => {
+    try {
+      const { checkInId } = req.params;
+      const user = req.user as User;
+      const { type } = req.body;
+
+      if (!type || !["like", "love", "support", "celebrate"].includes(type)) {
+        return res.status(400).json({ message: "Invalid reaction type" });
+      }
+
+      const reaction = await storage.createTimelineReaction({
+        checkInId,
+        organizationId: user.organizationId,
+        type,
+        createdBy: user.id,
+      });
+      res.status(201).json(reaction);
+    } catch (error) {
+      console.error("Error creating reaction:", error);
+      res.status(500).json({ message: "Failed to create reaction" });
+    }
+  });
+
+  app.delete("/api/timeline/comments/:commentId", requireAuth, async (req, res) => {
+    try {
+      const { commentId } = req.params;
+      await storage.deleteTimelineComment(commentId);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      res.status(500).json({ message: "Failed to delete comment" });
+    }
+  });
+
+  app.delete("/api/timeline/reactions/:reactionId", requireAuth, async (req, res) => {
+    try {
+      const { reactionId } = req.params;
+      await storage.deleteTimelineReaction(reactionId);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting reaction:", error);
+      res.status(500).json({ message: "Failed to delete reaction" });
     }
   });
 

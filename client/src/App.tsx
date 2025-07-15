@@ -36,6 +36,7 @@ import AchievementsPage from "@/pages/achievements";
 
 import DailyFocusPage from "@/pages/daily-focus";
 import TasksPage from "@/pages/tasks";
+import TimelinePage from "@/pages/timeline";
 
 import OrganizationSettings from "@/pages/organization-settings";
 import SystemAdmin from "@/pages/system-admin";
@@ -222,6 +223,7 @@ function Router() {
               <Route path="/" component={DailyFocusPage} />
               <Route path="/daily-focus" component={DailyFocusPage} />
               <Route path="/tasks" component={TasksPage} />
+              <Route path="/timeline" component={TimelinePage} />
               <Route path="/dashboard" component={Dashboard} />
               <Route path="/home" component={Home} />
               <Route path="/profile" component={Profile} />

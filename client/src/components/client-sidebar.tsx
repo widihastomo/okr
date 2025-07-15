@@ -158,6 +158,12 @@ export default function Sidebar({
       active: location === "/tasks",
     },
     {
+      label: "Timeline",
+      icon: Clock,
+      path: "/timeline",
+      active: location === "/timeline",
+    },
+    {
       label: "Goals",
       icon: Target,
       path: "/dashboard",

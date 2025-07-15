@@ -2,7 +2,7 @@ import {
   cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives, tasks, taskComments, taskAuditTrail,
   initiativeMembers, initiativeDocuments, initiativeNotes, initiativeComments, initiativeSuccessMetrics, successMetricUpdates,
   notifications, notificationPreferences, userOnboardingProgress, organizations, applicationSettings, auditTrail,
-  subscriptionPlans, billingPeriods, organizationSubscriptions,
+  subscriptionPlans, billingPeriods, organizationSubscriptions, timelineComments, timelineReactions,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
   type CheckIn, type Initiative, type Task, type TaskComment, type TaskAuditTrail, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
   type InitiativeNote, type InitiativeComment, type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
@@ -13,10 +13,10 @@ import {
   type Notification, type InsertNotification, type NotificationPreferences, type InsertNotificationPreferences,
   type UserOnboardingProgress, type InsertUserOnboardingProgress, type UpdateOnboardingProgress,
   type ApplicationSetting, type InsertApplicationSetting, type UpdateApplicationSetting,
-  type Organization
+  type Organization, type TimelineComment, type TimelineReaction, type InsertTimelineComment, type InsertTimelineReaction
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, inArray, count } from "drizzle-orm";
+import { eq, and, desc, asc, inArray, count } from "drizzle-orm";
 import { calculateProgressStatus } from "./progress-tracker";
 import { calculateObjectiveStatus } from "./objective-status-tracker";
 
@@ -97,6 +97,15 @@ export interface IStorage {
   getCheckIns(): Promise<CheckIn[]>;
   getCheckInsByKeyResultId(keyResultId: string): Promise<CheckIn[]>;
   createCheckIn(checkIn: InsertCheckIn): Promise<CheckIn>;
+  
+  // Timeline functionality
+  getTimelineCheckIns(organizationId: string): Promise<(CheckIn & { creator: User, keyResult: KeyResult })[]>;
+  getTimelineComments(checkInId: string): Promise<(TimelineComment & { creator: User })[]>;
+  getTimelineReactions(checkInId: string): Promise<(TimelineReaction & { creator: User })[]>;
+  createTimelineComment(comment: InsertTimelineComment): Promise<TimelineComment>;
+  createTimelineReaction(reaction: InsertTimelineReaction): Promise<TimelineReaction>;
+  deleteTimelineComment(commentId: string): Promise<void>;
+  deleteTimelineReaction(reactionId: string): Promise<void>;
   
   // Initiatives
   getInitiatives(): Promise<Initiative[]>;
@@ -1011,6 +1020,79 @@ export class DatabaseStorage implements IStorage {
   async createCheckIn(checkInData: InsertCheckIn): Promise<CheckIn> {
     const [checkIn] = await db.insert(checkIns).values(checkInData).returning();
     return checkIn;
+  }
+
+  // Timeline functionality
+  async getTimelineCheckIns(organizationId: string): Promise<(CheckIn & { creator: User, keyResult: KeyResult })[]> {
+    const result = await db
+      .select({
+        checkIn: checkIns,
+        creator: users,
+        keyResult: keyResults,
+      })
+      .from(checkIns)
+      .innerJoin(users, eq(checkIns.createdBy, users.id))
+      .innerJoin(keyResults, eq(checkIns.keyResultId, keyResults.id))
+      .where(eq(checkIns.organizationId, organizationId))
+      .orderBy(desc(checkIns.createdAt));
+
+    return result.map(row => ({
+      ...row.checkIn,
+      creator: row.creator,
+      keyResult: row.keyResult,
+    }));
+  }
+
+  async getTimelineComments(checkInId: string): Promise<(TimelineComment & { creator: User })[]> {
+    const result = await db
+      .select({
+        comment: timelineComments,
+        creator: users,
+      })
+      .from(timelineComments)
+      .innerJoin(users, eq(timelineComments.createdBy, users.id))
+      .where(eq(timelineComments.checkInId, checkInId))
+      .orderBy(asc(timelineComments.createdAt));
+
+    return result.map(row => ({
+      ...row.comment,
+      creator: row.creator,
+    }));
+  }
+
+  async getTimelineReactions(checkInId: string): Promise<(TimelineReaction & { creator: User })[]> {
+    const result = await db
+      .select({
+        reaction: timelineReactions,
+        creator: users,
+      })
+      .from(timelineReactions)
+      .innerJoin(users, eq(timelineReactions.createdBy, users.id))
+      .where(eq(timelineReactions.checkInId, checkInId))
+      .orderBy(asc(timelineReactions.createdAt));
+
+    return result.map(row => ({
+      ...row.reaction,
+      creator: row.creator,
+    }));
+  }
+
+  async createTimelineComment(commentData: InsertTimelineComment): Promise<TimelineComment> {
+    const [comment] = await db.insert(timelineComments).values(commentData).returning();
+    return comment;
+  }
+
+  async createTimelineReaction(reactionData: InsertTimelineReaction): Promise<TimelineReaction> {
+    const [reaction] = await db.insert(timelineReactions).values(reactionData).returning();
+    return reaction;
+  }
+
+  async deleteTimelineComment(commentId: string): Promise<void> {
+    await db.delete(timelineComments).where(eq(timelineComments.id, commentId));
+  }
+
+  async deleteTimelineReaction(reactionId: string): Promise<void> {
+    await db.delete(timelineReactions).where(eq(timelineReactions.id, reactionId));
   }
 
   // Initiatives

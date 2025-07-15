@@ -599,6 +599,8 @@ export const insertCheckInSchema = createInsertSchema(checkIns).omit({
   createdAt: true,
 });
 
+// This will be defined after the table definitions
+
 export const insertInitiativeSchema = createInsertSchema(initiatives).omit({
   id: true,
   createdAt: true,
@@ -848,6 +850,8 @@ export type InsertTemplate = z.infer<typeof insertTemplateSchema>;
 export type InsertObjective = z.infer<typeof insertObjectiveSchema>;
 export type InsertKeyResult = z.infer<typeof insertKeyResultSchema>;
 export type InsertCheckIn = z.infer<typeof insertCheckInSchema>;
+export type InsertTimelineComment = z.infer<typeof insertTimelineCommentSchema>;
+export type InsertTimelineReaction = z.infer<typeof insertTimelineReactionSchema>;
 export type InsertInitiative = z.infer<typeof insertInitiativeSchema>;
 export type InsertInitiativeMember = z.infer<typeof insertInitiativeMemberSchema>;
 export type InsertInitiativeDocument = z.infer<typeof insertInitiativeDocumentSchema>;
@@ -877,6 +881,8 @@ export type InitiativeDocument = typeof initiativeDocuments.$inferSelect;
 export type InitiativeNote = typeof initiativeNotes.$inferSelect;
 export type InitiativeComment = typeof initiativeComments.$inferSelect;
 export type Task = typeof tasks.$inferSelect;
+export type TimelineComment = typeof timelineComments.$inferSelect;
+export type TimelineReaction = typeof timelineReactions.$inferSelect;
 export type TaskComment = typeof taskComments.$inferSelect;
 export type SystemSetting = typeof systemSettings.$inferSelect;
 export type DailyReflection = typeof dailyReflections.$inferSelect;
@@ -947,6 +953,63 @@ export const checkInsRelations = relations(checkIns, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+// Timeline Comments table for interactive timeline feature
+export const timelineComments = pgTable("timeline_comments", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  checkInId: uuid("check_in_id").references(() => checkIns.id).notNull(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
+  content: text("content").notNull(),
+  createdBy: uuid("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Timeline Reactions table for interactive timeline feature
+export const timelineReactions = pgTable("timeline_reactions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  checkInId: uuid("check_in_id").references(() => checkIns.id).notNull(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
+  type: text("type").notNull(), // "like", "love", "support", "celebrate"
+  createdBy: uuid("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Timeline Comments Relations
+export const timelineCommentsRelations = relations(timelineComments, ({ one }) => ({
+  checkIn: one(checkIns, {
+    fields: [timelineComments.checkInId],
+    references: [checkIns.id],
+  }),
+  creator: one(users, {
+    fields: [timelineComments.createdBy],
+    references: [users.id],
+  }),
+}));
+
+// Timeline Reactions Relations
+export const timelineReactionsRelations = relations(timelineReactions, ({ one }) => ({
+  checkIn: one(checkIns, {
+    fields: [timelineReactions.checkInId],
+    references: [checkIns.id],
+  }),
+  creator: one(users, {
+    fields: [timelineReactions.createdBy],
+    references: [users.id],
+  }),
+}));
+
+// Insert schemas for timeline tables
+export const insertTimelineCommentSchema = createInsertSchema(timelineComments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertTimelineReactionSchema = createInsertSchema(timelineReactions).omit({
+  id: true,
+  createdAt: true,
+});
 
 export const initiativesRelations = relations(initiatives, ({ one, many }) => ({
   keyResult: one(keyResults, {
