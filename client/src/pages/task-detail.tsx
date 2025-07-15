@@ -386,7 +386,7 @@ function TaskHistoryCard({ taskId }: { taskId: string }) {
                     {item.changeDescription || item.action}
                   </p>
                   <div className="flex items-center gap-1 mt-1">
-                    <span className="text-xs text-gray-500">{item.user?.firstName || item.user?.email || "System"}</span>
+                    <span className="text-xs text-gray-500">{item.user?.name && item.user.name.trim() !== "" ? item.user.name.trim() : item.user?.email?.split('@')[0] || "System"}</span>
                     <span className="text-xs text-gray-400">•</span>
                     <span className="text-xs text-gray-500">
                       {new Date(item.createdAt).toLocaleString('id-ID', {
