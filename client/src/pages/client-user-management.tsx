@@ -117,6 +117,21 @@ export default function ClientUserManagement() {
   // Active users for team management
   const activeUsers = users.filter(user => user.isActive === true);
 
+  // Helper function to get user display name
+  const getUserDisplayName = (user: User) => {
+    if (user.firstName && user.lastName) {
+      return `${user.firstName} ${user.lastName}`;
+    } else if (user.firstName) {
+      return user.firstName;
+    } else if (user.lastName) {
+      return user.lastName;
+    } else {
+      // Extract name from email if available
+      const emailName = user.email.split('@')[0];
+      return emailName || user.email;
+    }
+  };
+
   // Fetch teams in the current organization
   const { data: teams = [], isLoading: teamsLoading } = useQuery<Team[]>({
     queryKey: ["/api/teams"],
@@ -684,9 +699,7 @@ export default function ClientUserManagement() {
                             <SelectContent>
                               {activeUsers.map((user) => (
                                 <SelectItem key={user.id} value={user.id}>
-                                  {user.firstName && user.lastName 
-                                    ? `${user.firstName} ${user.lastName}` 
-                                    : user.email}
+                                  {getUserDisplayName(user)}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -725,16 +738,13 @@ export default function ClientUserManagement() {
                                     <CommandGroup>
                                       {activeUsers
                                         .filter(user => {
-                                          const name = user.firstName && user.lastName 
-                                            ? `${user.firstName} ${user.lastName}` 
-                                            : user.email;
-                                          return name.toLowerCase().includes(memberSearchValue.toLowerCase());
+                                          const displayName = getUserDisplayName(user);
+                                          return displayName.toLowerCase().includes(memberSearchValue.toLowerCase()) ||
+                                                 user.email.toLowerCase().includes(memberSearchValue.toLowerCase());
                                         })
                                         .map((user) => {
                                           const isSelected = selectedMembers.includes(user.id);
-                                          const displayName = user.firstName && user.lastName 
-                                            ? `${user.firstName} ${user.lastName}` 
-                                            : user.email;
+                                          const displayName = getUserDisplayName(user);
                                           
                                           return (
                                             <CommandItem
@@ -782,9 +792,7 @@ export default function ClientUserManagement() {
                                   {selectedMembers.map((memberId) => {
                                     const member = activeUsers.find(u => u.id === memberId);
                                     if (!member) return null;
-                                    const displayName = member.firstName && member.lastName 
-                                      ? `${member.firstName} ${member.lastName}` 
-                                      : member.email;
+                                    const displayName = getUserDisplayName(member);
                                     
                                     return (
                                       <Badge key={memberId} variant="secondary" className="bg-orange-100 text-orange-800 border-orange-300 flex items-center gap-1">
@@ -923,11 +931,11 @@ export default function ClientUserManagement() {
                               <div className="flex items-center space-x-2">
                                 <Avatar className="h-6 w-6">
                                   <AvatarFallback className="text-xs">
-                                    {owner ? `${owner.firstName?.[0]}${owner.lastName?.[0]}` : '?'}
+                                    {owner ? getUserDisplayName(owner).charAt(0).toUpperCase() : '?'}
                                   </AvatarFallback>
                                 </Avatar>
                                 <span className="text-sm font-medium">
-                                  {owner ? `${owner.firstName} ${owner.lastName}` : 'Unknown'}
+                                  {owner ? getUserDisplayName(owner) : 'Unknown'}
                                 </span>
                               </div>
                             </div>
