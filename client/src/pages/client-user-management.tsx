@@ -114,6 +114,9 @@ export default function ClientUserManagement() {
     queryKey: ["/api/organization/users"],
   });
 
+  // Active users for team management
+  const activeUsers = users.filter(user => user.isActive === true);
+
   // Fetch teams in the current organization
   const { data: teams = [], isLoading: teamsLoading } = useQuery<Team[]>({
     queryKey: ["/api/teams"],
@@ -679,9 +682,11 @@ export default function ClientUserManagement() {
                               <SelectValue placeholder="Pilih pimpinan tim" />
                             </SelectTrigger>
                             <SelectContent>
-                              {users.map((user) => (
+                              {activeUsers.map((user) => (
                                 <SelectItem key={user.id} value={user.id}>
-                                  {user.firstName} {user.lastName}
+                                  {user.firstName && user.lastName 
+                                    ? `${user.firstName} ${user.lastName}` 
+                                    : user.email}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -718,7 +723,7 @@ export default function ClientUserManagement() {
                                   <CommandList>
                                     <CommandEmpty>Tidak ada anggota ditemukan.</CommandEmpty>
                                     <CommandGroup>
-                                      {users
+                                      {activeUsers
                                         .filter(user => {
                                           const name = user.firstName && user.lastName 
                                             ? `${user.firstName} ${user.lastName}` 
@@ -775,7 +780,7 @@ export default function ClientUserManagement() {
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                   {selectedMembers.map((memberId) => {
-                                    const member = users.find(u => u.id === memberId);
+                                    const member = activeUsers.find(u => u.id === memberId);
                                     if (!member) return null;
                                     const displayName = member.firstName && member.lastName 
                                       ? `${member.firstName} ${member.lastName}` 
@@ -851,7 +856,7 @@ export default function ClientUserManagement() {
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {filteredTeams.map((team) => {
                     const teamMembersForTeam = allTeamMembers.filter(tm => tm.teamId === team.id);
-                    const owner = users.find(u => u.id === team.ownerId);
+                    const owner = activeUsers.find(u => u.id === team.ownerId);
                     
                     return (
                       <Card key={team.id}>
