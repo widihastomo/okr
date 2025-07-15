@@ -3850,20 +3850,7 @@ export default function DailyFocusPage() {
         }}
       />
 
-      {/* Tour Restart Button */}
-      <div className="fixed bottom-4 right-4 z-[9999]">
-        <Button
-          onClick={() => {
-            console.log("Help button clicked");
-            setRunTour(true);
-          }}
-          className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white shadow-lg"
-          size="sm"
-        >
-          <HelpCircle className="w-4 h-4 mr-2" />
-          Bantuan
-        </Button>
-      </div>
+      
     </div>
   );
 }
