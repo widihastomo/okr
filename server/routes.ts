@@ -8231,6 +8231,203 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== UPGRADE PACKAGE ENDPOINTS ====================
+
+  // Get subscription plans for upgrade
+  app.get("/api/subscription-plans", requireAuth, async (req, res) => {
+    try {
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      const { subscriptionPlans, billingPeriods } = await import("@shared/schema");
+      
+      const plansWithBilling = await db.select()
+        .from(subscriptionPlans)
+        .leftJoin(billingPeriods, eq(subscriptionPlans.id, billingPeriods.planId))
+        .where(eq(subscriptionPlans.isActive, true));
+
+      // Group billing periods by plan
+      const groupedPlans = plansWithBilling.reduce((acc: any, row) => {
+        const plan = row.subscription_plans;
+        const billing = row.billing_periods;
+        
+        if (!acc[plan.id]) {
+          acc[plan.id] = {
+            ...plan,
+            billingPeriods: []
+          };
+        }
+        
+        if (billing && billing.isActive) {
+          acc[plan.id].billingPeriods.push(billing);
+        }
+        
+        return acc;
+      }, {});
+
+      const result = Object.values(groupedPlans).filter((plan: any) => plan.billingPeriods.length > 0);
+      res.json(result);
+    } catch (error) {
+      console.error("Error fetching subscription plans:", error);
+      res.status(500).json({ message: "Failed to fetch subscription plans" });
+    }
+  });
+
+  // Get current organization subscription
+  app.get("/api/organization/subscription", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      
+      if (!currentUser.organizationId) {
+        return res.status(400).json({ message: "User not associated with an organization" });
+      }
+      
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      const { organizationSubscriptions, subscriptionPlans } = await import("@shared/schema");
+      
+      const [subscription] = await db.select({
+        id: organizationSubscriptions.id,
+        planId: organizationSubscriptions.planId,
+        planName: subscriptionPlans.name,
+        status: organizationSubscriptions.status,
+        currentPeriodEnd: organizationSubscriptions.currentPeriodEnd,
+        isTrialActive: organizationSubscriptions.isTrialActive,
+        trialEndsAt: organizationSubscriptions.trialEndsAt
+      })
+      .from(organizationSubscriptions)
+      .innerJoin(subscriptionPlans, eq(organizationSubscriptions.planId, subscriptionPlans.id))
+      .where(eq(organizationSubscriptions.organizationId, currentUser.organizationId));
+      
+      if (!subscription) {
+        return res.status(404).json({ message: "No subscription found" });
+      }
+      
+      res.json(subscription);
+    } catch (error) {
+      console.error("Error fetching organization subscription:", error);
+      res.status(500).json({ message: "Failed to fetch subscription" });
+    }
+  });
+
+  // Create upgrade payment with Midtrans
+  app.post("/api/upgrade/create-payment", requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      const { planId, billingPeriodId } = req.body;
+      
+      if (!currentUser.organizationId) {
+        return res.status(400).json({ message: "User not associated with an organization" });
+      }
+      
+      if (!planId || !billingPeriodId) {
+        return res.status(400).json({ message: "Plan ID and billing period ID are required" });
+      }
+      
+      const { db } = await import("./db");
+      const { eq, and } = await import("drizzle-orm");
+      const { subscriptionPlans, billingPeriods, organizations } = await import("@shared/schema");
+      
+      // Get plan and billing period details
+      const [plan] = await db.select()
+        .from(subscriptionPlans)
+        .where(eq(subscriptionPlans.id, planId));
+      
+      const [billing] = await db.select()
+        .from(billingPeriods)
+        .where(and(
+          eq(billingPeriods.id, billingPeriodId),
+          eq(billingPeriods.planId, planId)
+        ));
+      
+      if (!plan || !billing) {
+        return res.status(404).json({ message: "Plan or billing period not found" });
+      }
+      
+      // Get organization details
+      const [organization] = await db.select()
+        .from(organizations)
+        .where(eq(organizations.id, currentUser.organizationId));
+      
+      if (!organization) {
+        return res.status(404).json({ message: "Organization not found" });
+      }
+      
+      // Create Midtrans payment
+      const { createSnapTransaction } = await import("./midtrans");
+      const orderId = `upgrade-${currentUser.organizationId}-${Date.now()}`;
+      
+      const paymentData = {
+        orderId,
+        grossAmount: parseInt(billing.price),
+        customerDetails: {
+          first_name: currentUser.firstName || "User",
+          last_name: currentUser.lastName || "",
+          email: currentUser.email,
+          phone: currentUser.phone || ""
+        },
+        itemDetails: [
+          {
+            id: plan.id,
+            price: parseInt(billing.price),
+            quantity: 1,
+            name: `${plan.name} - ${billing.periodType === 'monthly' ? 'Bulanan' : 
+                   billing.periodType === 'quarterly' ? 'Triwulan' : 'Tahunan'}`
+          }
+        ]
+      };
+      
+      const baseUrl = process.env.NODE_ENV === 'production' 
+        ? `https://${process.env.REPLIT_DOMAIN}` 
+        : 'http://localhost:5000';
+      
+      const transaction = await createSnapTransaction(paymentData, baseUrl, 'upgrade');
+      
+      // Store pending upgrade info in database for later processing
+      // You might want to create a separate table for upgrade transactions
+      
+      res.json({
+        snapToken: transaction.token,
+        redirectUrl: transaction.redirect_url,
+        orderId
+      });
+    } catch (error) {
+      console.error("Error creating upgrade payment:", error);
+      res.status(500).json({ message: "Failed to create payment" });
+    }
+  });
+
+  // Handle Midtrans payment notification (webhook)
+  app.post("/api/upgrade/payment-notification", async (req, res) => {
+    try {
+      const { coreApi } = await import("./midtrans");
+      const { order_id, transaction_status, payment_type } = req.body;
+      
+      // Verify notification authenticity
+      const statusResponse = await coreApi.transaction.status(order_id);
+      
+      if (statusResponse.transaction_status === 'settlement' || 
+          statusResponse.transaction_status === 'capture') {
+        
+        // Extract organization ID from order ID
+        const orgId = order_id.split('-')[1];
+        
+        // Update organization subscription
+        // Implementation depends on your specific upgrade logic
+        console.log(`Payment successful for organization ${orgId}`);
+        
+        // TODO: Update organization subscription plan
+        // This would involve updating the organizationSubscriptions table
+        
+        res.json({ status: 'success' });
+      } else {
+        res.json({ status: 'pending' });
+      }
+    } catch (error) {
+      console.error("Error handling payment notification:", error);
+      res.status(500).json({ message: "Failed to process payment notification" });
+    }
+  });
+
   // Get system stats (system admin)
   app.get("/api/admin/stats", requireSystemOwner, async (req, res) => {
     try {

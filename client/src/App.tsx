@@ -64,6 +64,7 @@ import ClientStatusMapping from "@/pages/client-status-mapping";
 import ApplicationSettings from "@/pages/system-admin/application-settings";
 import AcceptInvitation from "@/pages/accept-invitation";
 import TestToast from "@/pages/test-toast";
+import UpgradePackage from "@/pages/upgrade-package";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -240,6 +241,8 @@ function Router() {
               <Route path="/achievements" component={AchievementsPage} />
 
               <Route path="/analytics" component={AnalyticsPage} />
+
+              <Route path="/upgrade-package" component={UpgradePackage} />
 
               <Route
                 path="/organization-settings"

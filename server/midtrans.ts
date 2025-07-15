@@ -28,17 +28,19 @@ export interface MidtransPaymentRequest {
   grossAmount: number;
   customerDetails: {
     first_name: string;
-    last_name?: string;
+    last_name: string;
     email: string;
-    phone?: string;
+    phone: string;
   };
-  itemDetails: Array<{
+  itemDetails: {
     id: string;
     price: number;
     quantity: number;
     name: string;
-  }>;
+  }[];
 }
+
+
 
 export interface MidtransTransactionStatus {
   transaction_status: string;
@@ -51,9 +53,9 @@ export interface MidtransTransactionStatus {
 }
 
 /**
- * Membuat transaksi Snap untuk pembayaran invoice
+ * Membuat transaksi Snap untuk pembayaran (invoice atau upgrade)
  */
-export async function createSnapTransaction(paymentData: MidtransPaymentRequest, baseUrl?: string) {
+export async function createSnapTransaction(paymentData: MidtransPaymentRequest, baseUrl?: string, transactionType: 'invoice' | 'upgrade' = 'invoice') {
   try {
     const parameter = {
       transaction_details: {
@@ -65,7 +67,11 @@ export async function createSnapTransaction(paymentData: MidtransPaymentRequest,
       },
       customer_details: paymentData.customerDetails,
       item_details: paymentData.itemDetails,
-      callbacks: {
+      callbacks: transactionType === 'upgrade' ? {
+        finish: `${baseUrl}/upgrade-package?status=success`,
+        unfinish: `${baseUrl}/upgrade-package?status=pending`,
+        error: `${baseUrl}/upgrade-package?status=error`
+      } : {
         finish: `${baseUrl}/invoice-payment-finish?order_id=${paymentData.orderId}`,
         unfinish: `${baseUrl}/invoices`,
         error: `${baseUrl}/invoices`
