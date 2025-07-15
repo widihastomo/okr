@@ -144,22 +144,12 @@ const TasksPage = () => {
     const user = users.find(u => u.id === userId);
     if (!user) return 'User';
     
-    // Prioritize firstName + lastName
-    if (user.firstName && user.lastName) {
-      return `${user.firstName} ${user.lastName}`;
+    // Use consolidated name field
+    if (user.name && user.name.trim() !== '') {
+      return user.name.trim();
     }
     
-    // Fallback to firstName only
-    if (user.firstName) {
-      return user.firstName;
-    }
-    
-    // Fallback to lastName only
-    if (user.lastName) {
-      return user.lastName;
-    }
-    
-    // Last resort: use email without @domain
+    // Fallback to email without @domain
     if (user.email) {
       return user.email.split('@')[0];
     }

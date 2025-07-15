@@ -206,16 +206,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton>
               <Avatar className="h-6 w-6">
-                <AvatarImage src={(user as any)?.profileImageUrl} alt={user?.firstName || ""} />
+                <AvatarImage src={(user as any)?.profileImageUrl} alt={(user as any)?.name || ""} />
                 <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
-                  {user?.firstName ? user.firstName.charAt(0).toUpperCase() : <User className="h-3 w-3" />}
+                  {(user as any)?.name ? (user as any).name.charAt(0).toUpperCase() : <User className="h-3 w-3" />}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">
-                  {user?.firstName && user?.lastName 
-                    ? `${user.firstName} ${user.lastName}` 
-                    : user?.email}
+                  {(user as any)?.name && (user as any).name.trim() !== ''
+                    ? (user as any).name.trim()
+                    : (user as any)?.email}
                 </span>
                 <span className="truncate text-xs text-muted-foreground">
                   {user?.email}

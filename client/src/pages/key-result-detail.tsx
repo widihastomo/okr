@@ -556,7 +556,18 @@ export default function KeyResultDetailPage() {
     if (!userId || !users) return 'Unknown User';
     const user = users.find((u: any) => u.id === userId);
     if (!user) return 'Unknown User';
-    return `${user.firstName} ${user.lastName}`;
+    
+    // Use consolidated name field
+    if (user.name && user.name.trim() !== '') {
+      return user.name.trim();
+    }
+    
+    // Fallback to email username
+    if (user.email) {
+      return user.email.split('@')[0];
+    }
+    
+    return 'Unknown User';
   };
 
   // Helper function to get user initials safely

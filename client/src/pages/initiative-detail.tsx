@@ -737,7 +737,19 @@ export default function InitiativeDetailPage() {
   // Helper functions that need users data
   const getUserName = (userId: string): string => {
     const user = users?.find(u => u.id === userId);
-    return user ? `${user.firstName || ""} ${user.lastName || ""}`.trim() || user.email || "Unknown" : "Unknown";
+    if (!user) return "Unknown";
+    
+    // Use consolidated name field
+    if (user.name && user.name.trim() !== '') {
+      return user.name.trim();
+    }
+    
+    // Fallback to email username
+    if (user.email) {
+      return user.email.split('@')[0];
+    }
+    
+    return "Unknown";
   };
 
   const getUserInitials = (userId: string): string => {

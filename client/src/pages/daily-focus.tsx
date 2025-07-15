@@ -900,47 +900,44 @@ export default function DailyFocusPage() {
     setIsSuccessMetricsModalOpen(true);
   };
 
-  // Helper function to get user name by ID (matching objective detail page format)
+  // Helper function to get user name by ID (using consolidated name field)
   const getUserName = (userId: string): string => {
     if (!users || !userId) return "Tidak ditentukan";
     const user = users.find((u: any) => u.id === userId);
 
-    // Check if firstName and lastName are both present and non-empty
-    if (user?.firstName && user?.lastName && user.lastName.trim() !== "") {
-      return `${user.firstName} ${user.lastName}`;
+    // Use the consolidated name field
+    if (user?.name && user.name.trim() !== "") {
+      return user.name.trim();
     }
 
-    // Fallback to firstName only if available and non-empty
-    if (user?.firstName && user.firstName.trim() !== "") {
-      return user.firstName;
-    }
-
-    // Fallback to lastName only if available and non-empty
-    if (user?.lastName && user.lastName.trim() !== "") {
-      return user.lastName;
+    // Fallback to email username if name is not available
+    if (user?.email) {
+      return user.email.split('@')[0];
     }
 
     return "Pengguna";
   };
 
-  // Helper function to get user initials for avatar
+  // Helper function to get user initials for avatar (using consolidated name field)
   const getUserInitials = (userId: string): string => {
     if (!users || !userId) return "?";
     const user = users.find((u: any) => u.id === userId);
 
-    // Check if firstName and lastName are both present and non-empty
-    if (user?.firstName && user?.lastName && user.lastName.trim() !== "") {
-      return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
+    // Use the consolidated name field
+    if (user?.name && user.name.trim() !== "") {
+      const nameParts = user.name.trim().split(' ');
+      if (nameParts.length >= 2) {
+        // Get first letter of first name and first letter of last name
+        return `${nameParts[0].charAt(0)}${nameParts[nameParts.length - 1].charAt(0)}`.toUpperCase();
+      } else {
+        // Just use first letter of single name
+        return nameParts[0].charAt(0).toUpperCase();
+      }
     }
 
-    // Fallback to firstName only if available and non-empty
-    if (user?.firstName && user.firstName.trim() !== "") {
-      return user.firstName.charAt(0).toUpperCase();
-    }
-
-    // Fallback to lastName only if available and non-empty
-    if (user?.lastName && user.lastName.trim() !== "") {
-      return user.lastName.charAt(0).toUpperCase();
+    // Fallback to email first letter
+    if (user?.email) {
+      return user.email.charAt(0).toUpperCase();
     }
 
     return "U";

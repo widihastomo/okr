@@ -595,12 +595,15 @@ export default function UsersPage() {
                             <Avatar className="h-8 w-8">
                               <AvatarImage src={user.profileImageUrl || undefined} />
                               <AvatarFallback className="text-sm">
-                                {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
+                                {user.name ? (user.name.trim().split(' ').length >= 2 ? 
+                                  `${user.name.trim().split(' ')[0][0]}${user.name.trim().split(' ')[user.name.trim().split(' ').length - 1][0]}` : 
+                                  user.name.trim()[0]) : 
+                                  user.email?.[0] || 'U'}
                               </AvatarFallback>
                             </Avatar>
                             <div>
                               <div className="font-medium text-gray-900">
-                                {user.firstName} {user.lastName}
+                                {user.name && user.name.trim() !== '' ? user.name.trim() : user.email?.split('@')[0] || 'User'}
                               </div>
                               <div className="text-sm text-gray-500">
                                 ID: {user.id.substring(0, 8)}...

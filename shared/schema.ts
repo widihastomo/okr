@@ -243,8 +243,7 @@ export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: varchar("email", { length: 255 }).unique().notNull(),
   password: varchar("password", { length: 255 }), // Can be null for invited users who haven't registered yet
-  firstName: varchar("first_name", { length: 100 }),
-  lastName: varchar("last_name", { length: 100 }),
+  name: varchar("name", { length: 200 }), // Consolidated firstName + lastName into single name field
   profileImageUrl: varchar("profile_image_url", { length: 500 }),
   role: text("role").notNull().default("member"), // "owner", "administrator", "member", "viewer"
   isSystemOwner: boolean("is_system_owner").default(false).notNull(), // Super admin for entire system

@@ -452,15 +452,17 @@ export default function GoalDetail() {
   const getUserName = (userId: string): string => {
     if (!users) return "Pengguna";
     const user = users.find((u: any) => u.id === userId);
-    if (user && user.firstName && user.lastName) {
-      return `${user.firstName} ${user.lastName}`;
+    
+    // Use consolidated name field
+    if (user?.name && user.name.trim() !== "") {
+      return user.name.trim();
     }
-    if (user?.firstName) {
-      return user.firstName;
+    
+    // Fallback to email username
+    if (user?.email) {
+      return user.email.split('@')[0];
     }
-    if (user?.lastName) {
-      return user.lastName;
-    }
+    
     return "Pengguna";
   };
 

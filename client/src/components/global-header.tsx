@@ -161,10 +161,13 @@ export default function GlobalHeader({
   };
 
   const getUserInitials = () => {
-    const firstName = (user as any)?.firstName || "";
-    const lastName = (user as any)?.lastName || "";
-    if (firstName && lastName) {
-      return `${firstName[0]}${lastName[0]}`.toUpperCase();
+    const name = (user as any)?.name || "";
+    if (name && name.trim() !== '') {
+      const nameParts = name.trim().split(' ');
+      if (nameParts.length >= 2) {
+        return `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase();
+      }
+      return nameParts[0][0].toUpperCase();
     }
     if ((user as any)?.email) {
       return (user as any).email[0].toUpperCase();
