@@ -255,13 +255,14 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
-- July 15, 2025. **VALIDATION ENHANCEMENT** - Successfully implemented mandatory cycle field requirement for goal creation:
+- July 15, 2025. **VALIDATION ENHANCEMENT** - Successfully implemented mandatory cycle and owner field requirements for goal creation:
   * REMOVED: "Tanpa Siklus" option from cycle selection dropdown
   * UPDATED: Goal form modal validation schema to require cycle selection (z.string().min(1, "Siklus wajib dipilih"))
   * ENHANCED: Form step validation to include cycleId as mandatory field before proceeding to next step
   * IMPROVED: Added asterisk (*) indicator to Siklus field label to show it's required
+  * ENHANCED: Added asterisk (*) indicator to owner field labels (Tim*/Pemilik*) to show it's required
   * FIXED: Form reset logic to handle null cycleId values properly in edit mode
-  * RESULT: Users must now select a cycle when creating goals, ensuring proper time-based organization
+  * RESULT: Users must now select both a cycle and owner when creating goals, ensuring proper time-based organization and accountability
 - July 15, 2025. **CRITICAL SECURITY ENHANCEMENT** - Successfully completed comprehensive multi-tenant security implementation:
   * ADDED: organizationId columns to all entity tables (objectives, keyResults, initiatives, tasks)
   * MIGRATED: Existing data properly associated with correct organizations via SQL migration

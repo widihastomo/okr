@@ -626,7 +626,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="flex items-center gap-2">
-                          {ownerType === "team" ? "Tim" : "Pemilik"}
+                          {ownerType === "team" ? "Tim*" : "Pemilik*"}
                           
                             <Popover>
                               <PopoverTrigger asChild>
