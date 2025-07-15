@@ -9444,6 +9444,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/organization/users", requireAuth, async (req, res) => {
     try {
       const user = req.user as any;
+      console.log("✅ User authenticated:", user.id, user.email);
+      
       if (!user.organizationId) {
         return res.status(400).json({ error: "User not associated with an organization" });
       }
@@ -9459,18 +9461,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "Access denied. Only organization owners can manage users." });
       }
 
-      // Get all users in the organization
-      const orgUsers = await db.select({
-        id: users.id,
-        email: users.email,
-        firstName: users.firstName,
-        lastName: users.lastName,
-        role: users.role,
-        isActive: users.isActive,
-        organizationId: users.organizationId,
-        createdAt: users.createdAt,
-        invitationStatus: users.invitationStatus
-      }).from(users).where(eq(users.organizationId, user.organizationId));
+      // Get all users in the organization using storage method
+      const orgUsers = await storage.getUsersByOrganization(user.organizationId);
 
       res.json(orgUsers);
     } catch (error) {

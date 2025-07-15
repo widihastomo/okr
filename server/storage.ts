@@ -410,16 +410,31 @@ export class DatabaseStorage implements IStorage {
         userId: teamMembers.userId,
         role: teamMembers.role,
         joinedAt: teamMembers.joinedAt,
-        // User fields - properly structured
+        // User fields - use actual schema fields
         user: {
           id: users.id,
           email: users.email,
           password: users.password,
-          firstName: users.firstName,
-          lastName: users.lastName,
-          role: users.role,
+          name: users.name, // Updated from firstName/lastName
           profileImageUrl: users.profileImageUrl,
+          role: users.role,
+          isSystemOwner: users.isSystemOwner,
+          organizationId: users.organizationId,
           isActive: users.isActive,
+          department: users.department,
+          jobTitle: users.jobTitle,
+          phone: users.phone,
+          verificationCode: users.verificationCode,
+          verificationCodeExpiry: users.verificationCodeExpiry,
+          isEmailVerified: users.isEmailVerified,
+          reminderConfig: users.reminderConfig,
+          lastLoginAt: users.lastLoginAt,
+          invitedBy: users.invitedBy,
+          invitedAt: users.invitedAt,
+          invitationToken: users.invitationToken,
+          invitationStatus: users.invitationStatus,
+          invitationExpiresAt: users.invitationExpiresAt,
+          invitationAcceptedAt: users.invitationAcceptedAt,
           createdAt: users.createdAt,
           updatedAt: users.updatedAt,
         }
@@ -1377,8 +1392,7 @@ export class DatabaseStorage implements IStorage {
         joinedAt: initiativeMembers.joinedAt,
         user: {
           id: users.id,
-          firstName: users.firstName,
-          lastName: users.lastName,
+          name: users.name,
           email: users.email,
         },
       })
@@ -1400,8 +1414,7 @@ export class DatabaseStorage implements IStorage {
         uploadedAt: initiativeDocuments.uploadedAt,
         uploadedBy: {
           id: users.id,
-          firstName: users.firstName,
-          lastName: users.lastName,
+          name: users.name,
           email: users.email,
         },
       })
@@ -1422,8 +1435,7 @@ export class DatabaseStorage implements IStorage {
         createdAt: tasks.createdAt,
         assignedTo: {
           id: users.id,
-          firstName: users.firstName,
-          lastName: users.lastName,
+          name: users.name,
           email: users.email,
         },
       })
@@ -1564,8 +1576,7 @@ export class DatabaseStorage implements IStorage {
         user: {
           id: users.id,
           email: users.email,
-          firstName: users.firstName,
-          lastName: users.lastName,
+          name: users.name,
           profileImageUrl: users.profileImageUrl,
           role: users.role,
           isActive: users.isActive,
@@ -2298,14 +2309,13 @@ export class DatabaseStorage implements IStorage {
     }
   }
   
-  async acceptMemberInvitation(token: string, userData: { password: string; firstName?: string; lastName?: string }): Promise<User | undefined> {
+  async acceptMemberInvitation(token: string, userData: { password: string; name?: string }): Promise<User | undefined> {
     try {
       console.log("🔍 acceptMemberInvitation called with:", {
         token,
         userData: {
           password: userData.password ? '[PROVIDED]' : '[MISSING]',
-          firstName: userData.firstName || '[MISSING]',
-          lastName: userData.lastName || '[MISSING]'
+          name: userData.name || '[MISSING]'
         }
       });
       
@@ -2338,8 +2348,7 @@ export class DatabaseStorage implements IStorage {
       // Update the user with password and acceptance info
       const updateData = {
         password: userData.password, // Add password
-        firstName: userData.firstName || invitation.firstName,
-        lastName: userData.lastName || invitation.lastName,
+        name: userData.name || invitation.name,
         invitationStatus: "accepted",
         invitationAcceptedAt: new Date(),
         isActive: true,
@@ -2361,8 +2370,7 @@ export class DatabaseStorage implements IStorage {
       console.log("✅ User updated successfully:", {
         id: updatedUser.id,
         email: updatedUser.email,
-        firstName: updatedUser.firstName,
-        lastName: updatedUser.lastName,
+        name: updatedUser.name,
         isActive: updatedUser.isActive
       });
       
@@ -2394,7 +2402,7 @@ export class DatabaseStorage implements IStorage {
           invitationAcceptedAt: new Date(),
           isActive: false, // Set as inactive
           isEmailVerified: false, // Not verified since they haven't registered
-          firstName: invitation.firstName || invitation.email.split('@')[0], // Use email prefix as temporary name
+          name: invitation.name || invitation.email.split('@')[0], // Use email prefix as temporary name
           updatedAt: new Date(),
         })
         .where(eq(users.id, invitationId))
@@ -2537,8 +2545,7 @@ export class DatabaseStorage implements IStorage {
         user: {
           id: initiativeData.creator.id,
           email: initiativeData.creator.email,
-          firstName: initiativeData.creator.firstName,
-          lastName: initiativeData.creator.lastName,
+          name: initiativeData.creator.name,
           role: initiativeData.creator.role
         }
       });
