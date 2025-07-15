@@ -263,6 +263,9 @@ All email configuration now uses environment variables:
   * VERIFIED: System now properly upgrades subscription plan and billing period in database after successful payment
   * IMPROVED: Subscription data properly refreshed in UI after successful upgrade
   * SIMPLIFIED: Removed Type field from create cycle modal - cycles now default to "monthly" type for cleaner UX
+  * ENHANCED: Removed description field from cycle creation form and database schema for streamlined cycle management
+  * FIXED: Date picker placeholder overlap issue by adding flex-shrink-0 to calendar icons and span wrappers
+  * IMPROVED: Streamlined placeholder text by removing "Pilih" prefix - now shows "Tanggal mulai" and "Tanggal berakhir" directly
   * RESULT: Complete subscription upgrade workflow with proper database updates and user feedback
 - July 15, 2025. Successfully implemented comprehensive add-on system with quantity support and fixed payment processing:
   * ADDED: "Additional Users" add-on with quantity selection (1-50 users) at Rp 15,000/user/month
