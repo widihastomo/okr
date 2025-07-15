@@ -111,48 +111,72 @@ export default function UpgradePackage() {
       return response.json();
     },
     onSuccess: (data) => {
+      console.log('Payment API response:', data);
       setIsProcessing(false);
       if (data.snapToken) {
-        // Handle Midtrans Snap payment
-        if (typeof window !== 'undefined' && (window as any).snap) {
-          (window as any).snap.pay(data.snapToken, {
-            onSuccess: function(result: any) {
-              toast({
-                title: "Pembayaran Berhasil",
-                description: "Upgrade paket berhasil diproses!",
-                variant: "default",
+        console.log('Received snapToken:', data.snapToken);
+        
+        // Check if Midtrans script is loaded
+        console.log('Checking window.snap:', typeof (window as any).snap);
+        
+        // Handle Midtrans Snap payment with timeout to ensure script is loaded
+        const initPayment = () => {
+          if (typeof window !== 'undefined' && (window as any).snap) {
+            console.log('Initializing Midtrans payment...');
+            try {
+              (window as any).snap.pay(data.snapToken, {
+                onSuccess: function(result: any) {
+                  console.log('Payment successful:', result);
+                  toast({
+                    title: "Pembayaran Berhasil",
+                    description: "Upgrade paket berhasil diproses!",
+                    variant: "default",
+                  });
+                  setShowPaymentModal(false);
+                  // Refresh the page to show updated subscription
+                  window.location.reload();
+                },
+                onPending: function(result: any) {
+                  console.log('Payment pending:', result);
+                  toast({
+                    title: "Pembayaran Pending",
+                    description: "Pembayaran sedang diproses. Kami akan memberitahu Anda setelah selesai.",
+                    variant: "default",
+                  });
+                  setShowPaymentModal(false);
+                },
+                onError: function(result: any) {
+                  console.log('Payment error:', result);
+                  toast({
+                    title: "Pembayaran Gagal",
+                    description: "Terjadi kesalahan saat memproses pembayaran. Silakan coba lagi.",
+                    variant: "destructive",
+                  });
+                  setIsProcessing(false);
+                },
+                onClose: function() {
+                  console.log('Payment modal closed');
+                  setIsProcessing(false);
+                }
               });
-              setShowPaymentModal(false);
-              // Refresh the page to show updated subscription
-              window.location.reload();
-            },
-            onPending: function(result: any) {
+            } catch (error) {
+              console.error('Error calling snap.pay:', error);
               toast({
-                title: "Pembayaran Pending",
-                description: "Pembayaran sedang diproses. Kami akan memberitahu Anda setelah selesai.",
-                variant: "default",
-              });
-              setShowPaymentModal(false);
-            },
-            onError: function(result: any) {
-              toast({
-                title: "Pembayaran Gagal",
-                description: "Terjadi kesalahan saat memproses pembayaran. Silakan coba lagi.",
+                title: "Error",
+                description: "Terjadi kesalahan saat membuka modal pembayaran. Silakan coba lagi.",
                 variant: "destructive",
               });
               setIsProcessing(false);
-            },
-            onClose: function() {
-              setIsProcessing(false);
             }
-          });
-        } else {
-          toast({
-            title: "Error",
-            description: "Midtrans Snap belum dimuat. Silakan refresh halaman dan coba lagi.",
-            variant: "destructive",
-          });
-        }
+          } else {
+            console.log('Midtrans snap not available, retrying...');
+            setTimeout(initPayment, 1000);
+          }
+        };
+        
+        // Try to initialize payment immediately, then retry if needed
+        initPayment();
+        
       } else if (data.redirectUrl) {
         window.location.href = data.redirectUrl;
       }
