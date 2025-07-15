@@ -2046,53 +2046,107 @@ export class DatabaseStorage implements IStorage {
         throw new Error("User not found");
       }
       
-      // Always create a new cycle from onboarding data to ensure it matches user input
-      const startDate = onboardingData.cycleStartDate ? new Date(onboardingData.cycleStartDate) : new Date();
-      const endDate = onboardingData.cycleEndDate ? new Date(onboardingData.cycleEndDate) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      if (!user.organizationId) {
+        throw new Error("User must be associated with an organization");
+      }
       
-      console.log(`🔄 Creating cycle from onboarding data:`, {
-        cycleStartDate: onboardingData.cycleStartDate,
-        cycleEndDate: onboardingData.cycleEndDate,
-        cycleDuration: onboardingData.cycleDuration,
-        calculatedStartDate: startDate.toISOString(),
-        calculatedEndDate: endDate.toISOString()
-      });
+      // Use current date as onboarding start date
+      const onboardingDate = new Date();
+      const year = onboardingDate.getFullYear();
       
-      // Generate cycle name based on dates and duration
-      const cycleName = onboardingData.cycleDuration === '1_bulan' ? 
-        `Bulanan - ${startDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}` :
-        onboardingData.cycleDuration === '3_bulan' ? 
-        `Triwulanan - ${startDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}` :
-        onboardingData.cycleDuration === '6_bulan' ? 
-        `Semester - ${startDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}` :
-        `Tahunan - ${startDate.getFullYear()}`;
+      console.log(`🔄 Creating cycle structure for onboarding date: ${onboardingDate.toISOString()}`);
       
-      const cycleData = {
-        name: cycleName,
-        type: onboardingData.cycleDuration === '1_bulan' ? 'monthly' : 
-              onboardingData.cycleDuration === '3_bulan' ? 'quarterly' :
-              onboardingData.cycleDuration === '6_bulan' ? 'biannual' : 'annual',
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
-        status: 'active',
-        description: `Siklus dari hasil onboarding perusahaan - ${onboardingData.teamFocus || 'General'}`
+      // 1. Create Annual Cycle
+      const annualCycle = {
+        name: `Tahunan ${year}`,
+        type: 'annual',
+        startDate: `${year}-01-01T00:00:00.000Z`,
+        endDate: `${year}-12-31T23:59:59.999Z`,
+        organizationId: user.organizationId,
+        createdBy: userId,
+        lastUpdateBy: userId,
+        description: `Siklus tahunan ${year} - ${onboardingData.teamFocus || 'General'}`
       };
       
-      console.log(`🔄 Creating cycle from onboarding: ${cycleName} (${cycleData.startDate} to ${cycleData.endDate})`);
+      console.log("🔄 Creating annual cycle:", annualCycle);
+      const [newAnnualCycle] = await db.insert(cycles).values(annualCycle).returning();
+      console.log("✅ Annual cycle created:", newAnnualCycle);
       
-      console.log("🔄 Inserting cycle data:", cycleData);
-      const [newCycle] = await db.insert(cycles).values(cycleData).returning();
-      console.log("✅ Cycle created successfully:", newCycle);
-      const activeCycle = [newCycle];
+      // 2. Create 4 Quarterly Cycles
+      const quarterlyPromises = [];
+      for (let quarter = 1; quarter <= 4; quarter++) {
+        const quarterStartMonth = (quarter - 1) * 3 + 1;
+        const quarterEndMonth = quarter * 3;
+        
+        const quarterStartDate = new Date(year, quarterStartMonth - 1, 1);
+        const quarterEndDate = new Date(year, quarterEndMonth, 0); // Last day of quarter
+        quarterEndDate.setHours(23, 59, 59, 999);
+        
+        const quarterlyCycle = {
+          name: `Q${quarter} ${year}`,
+          type: 'quarterly',
+          startDate: quarterStartDate.toISOString(),
+          endDate: quarterEndDate.toISOString(),
+          organizationId: user.organizationId,
+          createdBy: userId,
+          lastUpdateBy: userId,
+          description: `Kuartal ${quarter} ${year} - ${onboardingData.teamFocus || 'General'}`
+        };
+        
+        quarterlyPromises.push(db.insert(cycles).values(quarterlyCycle).returning());
+      }
+      
+      const quarterlyResults = await Promise.all(quarterlyPromises);
+      console.log("✅ Quarterly cycles created:", quarterlyResults.length);
+      
+      // 3. Create 12 Monthly Cycles
+      const monthlyPromises = [];
+      const monthNames = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      ];
+      
+      for (let month = 1; month <= 12; month++) {
+        const monthStartDate = new Date(year, month - 1, 1);
+        const monthEndDate = new Date(year, month, 0); // Last day of month
+        monthEndDate.setHours(23, 59, 59, 999);
+        
+        const monthlyCycle = {
+          name: `${monthNames[month - 1]} ${year}`,
+          type: 'monthly',
+          startDate: monthStartDate.toISOString(),
+          endDate: monthEndDate.toISOString(),
+          organizationId: user.organizationId,
+          createdBy: userId,
+          lastUpdateBy: userId,
+          description: `Siklus bulanan ${monthNames[month - 1]} ${year} - ${onboardingData.teamFocus || 'General'}`
+        };
+        
+        monthlyPromises.push(db.insert(cycles).values(monthlyCycle).returning());
+      }
+      
+      const monthlyResults = await Promise.all(monthlyPromises);
+      console.log("✅ Monthly cycles created:", monthlyResults.length);
+      
+      // 4. Find the current month's cycle for the objective
+      const currentMonth = onboardingDate.getMonth() + 1;
+      const currentMonthlyCycle = monthlyResults[currentMonth - 1][0];
+      
+      console.log(`✅ Using monthly cycle for objective: ${currentMonthlyCycle.name}`);
+      
+      const activeCycle = [currentMonthlyCycle];
       
       // Create objective from onboarding data
       const objectiveData = {
         cycleId: activeCycle[0].id,
+        organizationId: user.organizationId,
         title: onboardingData.objective,
         description: `Objective pertama dari hasil onboarding (${onboardingData.teamFocus || 'General'})`,
         owner: user.firstName || user.email,
         ownerType: 'user',
         ownerId: userId,
+        createdBy: userId,
+        lastUpdateBy: userId,
         status: 'not_started'
       };
       
@@ -2108,6 +2162,7 @@ export class DatabaseStorage implements IStorage {
           .filter((kr: string) => kr && kr.trim() !== '' && kr !== 'custom')
           .map((kr: string) => ({
             objectiveId: newObjective.id,
+            organizationId: user.organizationId,
             title: kr,
             description: `Key result dari hasil onboarding`,
             currentValue: "0",
@@ -2115,7 +2170,9 @@ export class DatabaseStorage implements IStorage {
             unit: "percentage",
             keyResultType: "increase_to",
             status: "on_track",
-            assignedTo: userId
+            assignedTo: userId,
+            createdBy: userId,
+            lastUpdateBy: userId
           }));
         
         if (keyResultsData.length > 0) {
@@ -2146,14 +2203,15 @@ export class DatabaseStorage implements IStorage {
             return new Date(randomTime);
           };
 
-          // Use cycle dates from onboarding data or create default range
-          const cycleStartDate = onboardingData.cycleStartDate || new Date().toISOString().split('T')[0];
-          const cycleEndDate = onboardingData.cycleEndDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+          // Use the current monthly cycle dates for initiatives and tasks
+          const cycleStartDate = activeCycle[0].startDate.split('T')[0];
+          const cycleEndDate = activeCycle[0].endDate.split('T')[0];
           
           const initiativesData = onboardingData.initiatives
             .filter((init: string) => init && init.trim() !== '' && init !== 'custom')
             .map((init: string) => ({
               keyResultId: objectiveKeyResults[0].id, // Link to first key result
+              organizationId: user.organizationId,
               title: init,
               description: `Inisiatif dari hasil onboarding`,
               status: 'draft',
@@ -2164,6 +2222,7 @@ export class DatabaseStorage implements IStorage {
               confidenceScore: 3,
               priorityScore: "3.00",
               createdBy: userId,
+              lastUpdateBy: userId,
               startDate: new Date(cycleStartDate),
               dueDate: new Date(cycleEndDate)
             }));
@@ -2177,12 +2236,14 @@ export class DatabaseStorage implements IStorage {
                 .filter((task: string) => task && task.trim() !== '' && task !== 'custom')
                 .map((task: string, index: number) => ({
                   initiativeId: createdInitiatives[0].id, // Link to first initiative
+                  organizationId: user.organizationId,
                   title: task,
                   description: `Task dari hasil onboarding`,
                   status: 'not_started',
                   priority: 'medium',
                   assignedTo: userId,
                   createdBy: userId,
+                  lastUpdateBy: userId,
                   dueDate: generateRandomDeadline(cycleStartDate, cycleEndDate, index)
                 }));
               
