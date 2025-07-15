@@ -1757,7 +1757,7 @@ export default function CompanyOnboarding() {
                           >
                             <Checkbox
                               id={`initiative-${groupIndex}-${initIndex}`}
-                              checked={selectedInitiatives.includes(initiative)}
+                              checked={onboardingData.initiatives.includes(initiative)}
                               onCheckedChange={(checked) => {
                                 let newInitiatives = [
                                   ...onboardingData.initiatives,
@@ -1790,16 +1790,16 @@ export default function CompanyOnboarding() {
               </div>
             )}
 
-            {selectedInitiatives.length > 0 && (
+            {onboardingData.initiatives.length > 0 && (
               <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                 <h4 className="font-semibold text-green-800 mb-3">
-                  🎯 Inisiatif yang Dipilih ({selectedInitiatives.length})
+                  🎯 Inisiatif yang Dipilih ({onboardingData.initiatives.length})
                 </h4>
                 <div className="space-y-2">
                   {Object.entries(initiativesByKeyResult).map(
                     ([keyResult, initiatives]) => {
                       const selectedInThisKR = initiatives.filter((init) =>
-                        selectedInitiatives.includes(init),
+                        onboardingData.initiatives.includes(init),
                       );
                       if (selectedInThisKR.length === 0) return null;
 
@@ -1831,7 +1831,7 @@ export default function CompanyOnboarding() {
                 </div>
                 <p className="text-sm text-green-700 mt-3">
                   <strong>
-                    Total: {selectedInitiatives.length} inisiatif terpilih
+                    Total: {onboardingData.initiatives.length} inisiatif terpilih
                   </strong>
                 </p>
               </div>
