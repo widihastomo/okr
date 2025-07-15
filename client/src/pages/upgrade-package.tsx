@@ -6,9 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Check, Crown, Users, Zap, Shield, Star, CreditCard, Clock, ArrowRight } from "lucide-react";
+import { Check, Crown, Users, Zap, Shield, Star, CreditCard, Clock, ArrowRight, X, Sparkles } from "lucide-react";
 
 interface SubscriptionPlan {
   id: string;
@@ -45,6 +52,7 @@ export default function UpgradePackage() {
   const [selectedPlanId, setSelectedPlanId] = useState<string>("");
   const [selectedBillingPeriodId, setSelectedBillingPeriodId] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   // Fetch subscription plans
   const { data: plans, isLoading: isLoadingPlans, error: plansError } = useQuery<SubscriptionPlan[]>({
@@ -293,15 +301,17 @@ export default function UpgradePackage() {
                 
                 <div className="pt-2">
                   <Button 
-                    variant={selectedPlanId === plan.id ? "default" : "outline"}
-                    className={`w-full ${selectedPlanId === plan.id ? 'bg-orange-500 hover:bg-orange-600' : 'border-orange-200 text-orange-600 hover:bg-orange-50'}`}
+                    variant="default"
+                    className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium"
                     onClick={(e) => {
                       e.stopPropagation();
                       setSelectedPlanId(plan.id);
                       setSelectedBillingPeriodId(plan.billingPeriods[0]?.id || "");
+                      setShowPaymentModal(true);
                     }}
                   >
-                    {selectedPlanId === plan.id ? 'Dipilih' : 'Pilih Paket'}
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Pilih Paket
                   </Button>
                 </div>
               </CardContent>
@@ -310,115 +320,175 @@ export default function UpgradePackage() {
         </div>
       </div>
 
-      {/* Billing Period Selection */}
-      {selectedPlan && (
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900">Pilih Periode Pembayaran</h3>
-          
-          <RadioGroup value={selectedBillingPeriodId} onValueChange={setSelectedBillingPeriodId}>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {selectedPlan.billingPeriods.map((period) => (
-                <div key={period.id} className="flex items-center space-x-3">
-                  <RadioGroupItem value={period.id} id={period.id} />
-                  <Label 
-                    htmlFor={period.id} 
-                    className="flex-1 cursor-pointer"
-                  >
-                    <Card className="p-4 hover:bg-gray-50">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <div className="font-medium">
-                            {getBillingPeriodLabel(period.periodMonths, period.periodType)}
-                          </div>
-                          <div className="text-lg font-bold text-orange-600">
-                            {formatPrice(period.price)}
-                          </div>
-                          <div className="text-sm text-gray-600">
-                            {formatPrice((parseFloat(period.price) / period.periodMonths).toString())}/bulan
-                          </div>
-                        </div>
-                        {period.discountPercentage > 0 && (
-                          <Badge variant="secondary" className="bg-green-100 text-green-800">
-                            Hemat {period.discountPercentage}%
-                          </Badge>
-                        )}
-                      </div>
-                    </Card>
-                  </Label>
-                </div>
-              ))}
-            </div>
-          </RadioGroup>
-        </div>
-      )}
+      {/* Payment Modal */}
+      <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-3 text-2xl">
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <CreditCard className="w-6 h-6 text-orange-600" />
+              </div>
+              <span className="bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent">
+                Pilih Paket Pembayaran
+              </span>
+            </DialogTitle>
+            <DialogDescription className="text-gray-600">
+              Pilih periode pembayaran yang sesuai dengan kebutuhan Anda
+            </DialogDescription>
+          </DialogHeader>
 
-      {/* Order Summary */}
-      {selectedPlan && selectedBillingPeriod && (
-        <Card className="max-w-md mx-auto">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <CreditCard className="w-5 h-5" />
-              <span>Ringkasan Pesanan</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Paket:</span>
-                <span className="font-medium">{selectedPlan.name}</span>
+          {selectedPlan && (
+            <div className="space-y-6">
+              {/* Selected Plan Info */}
+              <Card className="border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="p-3 bg-orange-100 rounded-full">
+                        {getPlanIcon(selectedPlan.slug)}
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-semibold text-gray-900">{selectedPlan.name}</h3>
+                        <p className="text-gray-600">
+                          {selectedPlan.maxUsers ? `Hingga ${selectedPlan.maxUsers} pengguna` : 'Unlimited pengguna'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-orange-600">
+                        {formatPrice(selectedPlan.price)}
+                        <span className="text-sm font-normal text-gray-600">/bulan</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Billing Period Selection */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">Pilih Periode Pembayaran</h3>
+                
+                <RadioGroup value={selectedBillingPeriodId} onValueChange={setSelectedBillingPeriodId}>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {selectedPlan.billingPeriods.map((period) => (
+                      <div key={period.id} className="flex items-center space-x-3">
+                        <RadioGroupItem value={period.id} id={period.id} />
+                        <Label 
+                          htmlFor={period.id} 
+                          className="flex-1 cursor-pointer"
+                        >
+                          <Card className={`p-4 transition-all border-2 ${
+                            selectedBillingPeriodId === period.id 
+                              ? 'border-orange-500 bg-orange-50 shadow-lg' 
+                              : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                          }`}>
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <div className="font-medium text-gray-900">
+                                  {getBillingPeriodLabel(period.periodMonths, period.periodType)}
+                                </div>
+                                <div className="text-lg font-bold text-orange-600">
+                                  {formatPrice(period.price)}
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  {formatPrice((parseFloat(period.price) / period.periodMonths).toString())}/bulan
+                                </div>
+                              </div>
+                              {period.discountPercentage > 0 && (
+                                <Badge variant="secondary" className="bg-green-100 text-green-800">
+                                  Hemat {period.discountPercentage}%
+                                </Badge>
+                              )}
+                            </div>
+                          </Card>
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </RadioGroup>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Periode:</span>
-                <span className="font-medium">
-                  {getBillingPeriodLabel(selectedBillingPeriod.periodMonths, selectedBillingPeriod.periodType)}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Pengguna:</span>
-                <span className="font-medium">
-                  {selectedPlan.maxUsers ? `Hingga ${selectedPlan.maxUsers}` : 'Unlimited'}
-                </span>
-              </div>
-            </div>
-            
-            <Separator />
-            
-            <div className="space-y-2">
-              <div className="flex justify-between text-lg font-semibold">
-                <span>Total:</span>
-                <span className="text-orange-600">{formatPrice(selectedBillingPeriod.price)}</span>
-              </div>
-              {selectedBillingPeriod.discountPercentage > 0 && (
-                <div className="text-sm text-green-600">
-                  Hemat {selectedBillingPeriod.discountPercentage}% dari harga bulanan
-                </div>
+
+              {/* Order Summary */}
+              {selectedBillingPeriod && (
+                <Card className="border-2 border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50">
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2 text-orange-900">
+                      <Sparkles className="w-5 h-5" />
+                      <span>Ringkasan Pesanan</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-700">Paket:</span>
+                        <span className="font-medium text-gray-900">{selectedPlan.name}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-700">Periode:</span>
+                        <span className="font-medium text-gray-900">
+                          {getBillingPeriodLabel(selectedBillingPeriod.periodMonths, selectedBillingPeriod.periodType)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-700">Pengguna:</span>
+                        <span className="font-medium text-gray-900">
+                          {selectedPlan.maxUsers ? `Hingga ${selectedPlan.maxUsers}` : 'Unlimited'}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center text-xl font-semibold">
+                        <span className="text-gray-900">Total:</span>
+                        <span className="text-orange-600">{formatPrice(selectedBillingPeriod.price)}</span>
+                      </div>
+                      {selectedBillingPeriod.discountPercentage > 0 && (
+                        <div className="text-sm text-green-600 font-medium">
+                          🎉 Hemat {selectedBillingPeriod.discountPercentage}% dari harga bulanan
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="flex space-x-3 pt-4">
+                      <Button 
+                        variant="outline"
+                        onClick={() => setShowPaymentModal(false)}
+                        className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
+                      >
+                        <X className="w-4 h-4 mr-2" />
+                        Batal
+                      </Button>
+                      <Button 
+                        onClick={handleUpgrade}
+                        disabled={isProcessing || createUpgradePayment.isPending}
+                        className="flex-1 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white shadow-lg"
+                      >
+                        {isProcessing || createUpgradePayment.isPending ? (
+                          <>
+                            <Clock className="w-4 h-4 mr-2 animate-spin" />
+                            Memproses...
+                          </>
+                        ) : (
+                          <>
+                            <ArrowRight className="w-4 h-4 mr-2" />
+                            Upgrade Sekarang
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    
+                    <div className="text-xs text-gray-500 text-center pt-2">
+                      🔒 Pembayaran aman dan terenkripsi melalui Midtrans
+                    </div>
+                  </CardContent>
+                </Card>
               )}
             </div>
-            
-            <Button 
-              onClick={handleUpgrade}
-              disabled={isProcessing || createUpgradePayment.isPending}
-              className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
-            >
-              {isProcessing || createUpgradePayment.isPending ? (
-                <>
-                  <Clock className="w-4 h-4 mr-2 animate-spin" />
-                  Memproses...
-                </>
-              ) : (
-                <>
-                  <ArrowRight className="w-4 h-4 mr-2" />
-                  Upgrade Sekarang
-                </>
-              )}
-            </Button>
-            
-            <div className="text-xs text-gray-500 text-center">
-              Pembayaran aman melalui Midtrans
-            </div>
-          </CardContent>
-        </Card>
-      )}
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

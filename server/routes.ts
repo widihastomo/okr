@@ -8442,7 +8442,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create Midtrans payment
       const { createSnapTransaction } = await import("./midtrans");
-      const orderId = `upgrade-${currentUser.organizationId}-${Date.now()}`;
+      const orderId = `upg-${currentUser.organizationId.slice(0, 8)}-${Date.now()}`;
       
       const paymentData = {
         orderId,
