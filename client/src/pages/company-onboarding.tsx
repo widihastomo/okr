@@ -1032,6 +1032,10 @@ export default function CompanyOnboarding() {
           ],
         };
         
+        const selectedInitiatives = onboardingData.initiatives.filter(
+          (init) => init && init.trim() !== "",
+        );
+        
         const selectedTasks = useMemo(() => {
           const tasks: string[] = [];
           selectedInitiatives.forEach((initiative) => {
@@ -1701,10 +1705,6 @@ export default function CompanyOnboarding() {
         const initiativeOptions = getInitiativeOptions(
           selectedKeyResultsForInitiatives,
         );
-        const selectedInitiatives = onboardingData.initiatives.filter(
-          (init) => init && init.trim() !== "",
-        );
-
         // Use the same mapping as the one defined above
         const initiativeKeyResultMapping = initiativeMapping;
 
