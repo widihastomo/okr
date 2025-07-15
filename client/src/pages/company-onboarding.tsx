@@ -485,6 +485,15 @@ export default function CompanyOnboarding() {
     return "from-green-50 to-emerald-50 border-green-200"; // 100% - Green
   };
 
+  const canProceedToNext = () => {
+    // Allow proceeding from welcome screen (step 0) without validation
+    if (onboardingData.currentStep === 0) return true;
+    
+    // Validate current step
+    const validation = validateStep(onboardingData.currentStep, onboardingData);
+    return validation.isValid;
+  };
+
   const handleNext = () => {
     // Validate current step before proceeding (skip validation for welcome screen)
     if (onboardingData.currentStep > 0) {
