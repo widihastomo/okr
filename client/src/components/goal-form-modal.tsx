@@ -1125,15 +1125,6 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
         </Form>
       </DialogContent>
 
-      {/* Key Result Modal */}
-      <KeyResultModal 
-        open={keyResultModalOpen} 
-        onOpenChange={setKeyResultModalOpen}
-        onSubmit={handleAddKeyResult}
-        editingKeyResult={editingKeyResultIndex !== null ? keyResults[editingKeyResultIndex] : undefined}
-        isEditing={editingKeyResultIndex !== null}
-        users={users}
-      />
     </Dialog>
   );
 }
@@ -1858,21 +1849,6 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
           </form>
         </Form>
       </DialogContent>
-      
-      {/* Create Cycle Modal */}
-      <CreateCycleModal 
-        open={showCreateCycleModal}
-        onOpenChange={setShowCreateCycleModal}
-        onSuccess={() => {
-          // Refresh cycles data
-          queryClient.invalidateQueries({ queryKey: ["/api/cycles"] });
-          toast({
-            title: "Siklus berhasil dibuat",
-            description: "Siklus baru telah berhasil dibuat dan dapat dipilih",
-            className: "border-green-200 bg-green-50 text-green-800",
-          });
-        }}
-      />
     </Dialog>
   );
 }
