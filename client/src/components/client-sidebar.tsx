@@ -30,6 +30,7 @@ import {
   MapPin,
   Gift,
   Mail,
+  Rss,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -159,7 +160,7 @@ export default function Sidebar({
     },
     {
       label: "Timeline",
-      icon: Clock,
+      icon: Rss,
       path: "/timeline",
       active: location === "/timeline",
     },
