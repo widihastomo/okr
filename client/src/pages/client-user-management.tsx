@@ -159,7 +159,7 @@ export default function ClientUserManagement() {
       toast({
         title: "Berhasil",
         description: "Undangan telah dikirim ke pengguna",
-        variant: "default",
+        variant: "success",
       });
       setShowInviteModal(false);
       setInviteEmail("");
@@ -185,7 +185,7 @@ export default function ClientUserManagement() {
       toast({
         title: "Berhasil",
         description: "Status pengguna berhasil diperbarui",
-        variant: "default",
+        variant: "success",
       });
     },
     onError: () => {
@@ -208,7 +208,7 @@ export default function ClientUserManagement() {
       toast({
         title: "Berhasil",
         description: "Pengguna berhasil dihapus dari organisasi",
-        variant: "default",
+        variant: "success",
       });
     },
     onError: () => {
@@ -261,7 +261,8 @@ export default function ClientUserManagement() {
       resetTeamForm(); // Reset form and close modal
       toast({
         title: "Berhasil",
-        description: "Tim berhasil dibuat"
+        description: "Tim berhasil dibuat",
+        variant: "success"
       });
     },
     onError: () => {
@@ -283,7 +284,8 @@ export default function ClientUserManagement() {
       queryClient.invalidateQueries({ queryKey: ["/api/team-members"] });
       toast({
         title: "Berhasil",
-        description: "Tim berhasil dihapus"
+        description: "Tim berhasil dihapus",
+        variant: "success"
       });
     },
     onError: () => {
