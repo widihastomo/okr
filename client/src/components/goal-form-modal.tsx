@@ -23,6 +23,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
 import { formatNumberWithSeparator, handleNumberInputChange, getNumberValueForSubmission } from "@/lib/number-utils";
+import CreateCycleModal from "@/components/create-cycle-modal";
 import type { GoalWithKeyResults, Cycle, User, Objective, Team } from "@shared/schema";
 
 // Unit options for Key Results
@@ -139,6 +140,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
   const [currentStep, setCurrentStep] = useState(1);
   const [keyResultModalOpen, setKeyResultModalOpen] = useState(false);
   const [editingKeyResultIndex, setEditingKeyResultIndex] = useState<number | null>(null);
+  const [showCreateCycleModal, setShowCreateCycleModal] = useState(false);
   const isEditMode = !!goal;
 
   // Fetch data yang diperlukan
@@ -557,24 +559,35 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                             </PopoverContent>
                           </Popover>
                         </FormLabel>
-                        <Select 
-                          onValueChange={(value) => field.onChange(value === "none" ? undefined : value)} 
-                          value={field.value || "none"}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pilih siklus" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="none">Tanpa Siklus</SelectItem>
-                            {cycles?.map((cycle) => (
-                              <SelectItem key={cycle.id} value={cycle.id}>
-                                {cycle.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div className="flex gap-2">
+                          <Select 
+                            onValueChange={(value) => field.onChange(value === "none" ? undefined : value)} 
+                            value={field.value || "none"}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih siklus" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="none">Tanpa Siklus</SelectItem>
+                              {cycles?.map((cycle) => (
+                                <SelectItem key={cycle.id} value={cycle.id}>
+                                  {cycle.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowCreateCycleModal(true)}
+                            className="px-3 text-orange-600 border-orange-300 hover:bg-orange-50 hover:border-orange-400"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </Button>
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -1845,6 +1858,21 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
           </form>
         </Form>
       </DialogContent>
+      
+      {/* Create Cycle Modal */}
+      <CreateCycleModal 
+        open={showCreateCycleModal}
+        onOpenChange={setShowCreateCycleModal}
+        onSuccess={() => {
+          // Refresh cycles data
+          queryClient.invalidateQueries({ queryKey: ["/api/cycles"] });
+          toast({
+            title: "Siklus berhasil dibuat",
+            description: "Siklus baru telah berhasil dibuat dan dapat dipilih",
+            className: "border-green-200 bg-green-50 text-green-800",
+          });
+        }}
+      />
     </Dialog>
   );
 }
