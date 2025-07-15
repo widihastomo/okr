@@ -2133,7 +2133,7 @@ export default function CompanyOnboarding() {
         <Card className="shadow-lg border-orange-200">
           <CardHeader className="bg-gradient-to-r from-orange-500 to-amber-500 text-white">
             <CardTitle className="text-2xl font-bold flex items-center gap-2">
-              <Building2 className="w-6 h-6" />
+              <Building className="w-6 h-6" />
               Setup Goal Perusahaan
             </CardTitle>
             <CardDescription className="text-orange-100">
