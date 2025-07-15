@@ -268,9 +268,22 @@ export function DailyUpdateSimple() {
                             </div>
                             <div className="text-xs text-gray-500">
                               {task.dueDate && `Due: ${new Date(task.dueDate).toLocaleDateString('id-ID')}`}
+                              <span className="ml-2">
+                                Status: <span className={`font-medium ${
+                                  task.status === 'selesai' ? 'text-green-600' :
+                                  task.status === 'sedang_berjalan' ? 'text-blue-600' :
+                                  task.status === 'dibatalkan' ? 'text-red-600' :
+                                  'text-gray-600'
+                                }`}>
+                                  {task.status === 'selesai' ? 'Selesai' :
+                                   task.status === 'sedang_berjalan' ? 'Sedang Berjalan' :
+                                   task.status === 'dibatalkan' ? 'Dibatalkan' :
+                                   'Belum Mulai'}
+                                </span>
+                              </span>
                             </div>
                           </div>
-                          <div className="w-36">
+                          <div className="w-36 flex items-center gap-2">
                             <Select
                               value={updateData.tasks.find(t => t.id === task.id)?.newStatus || task.status}
                               onValueChange={(status) => {
@@ -310,6 +323,17 @@ export function DailyUpdateSimple() {
                                 <SelectItem value="dibatalkan">Dibatalkan</SelectItem>
                               </SelectContent>
                             </Select>
+                            {(() => {
+                              const taskUpdate = updateData.tasks.find(t => t.id === task.id);
+                              if (taskUpdate && taskUpdate.newStatus !== task.status) {
+                                return (
+                                  <div className="text-xs text-orange-600 font-medium">
+                                    Berubah
+                                  </div>
+                                );
+                              }
+                              return null;
+                            })()}
                           </div>
                         </div>
                       </div>
