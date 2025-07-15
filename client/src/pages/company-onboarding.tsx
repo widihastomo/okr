@@ -2137,7 +2137,7 @@ export default function CompanyOnboarding() {
               Setup Goal Perusahaan
             </CardTitle>
             <CardDescription className="text-orange-100">
-              Langkah {currentStep} dari 7 - {getStepTitle()}
+              Langkah {onboardingData.currentStep} dari 7 - {currentStepData?.title || "Setup"}
             </CardDescription>
           </CardHeader>
 
