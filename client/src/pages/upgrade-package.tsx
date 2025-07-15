@@ -188,14 +188,27 @@ export default function UpgradePackage() {
               (window as any).snap.pay(data.snapToken, {
                 onSuccess: function(result: any) {
                   console.log('Payment successful:', result);
+                  
+                  // Set payment success state immediately
+                  setPaymentSuccess(true);
+                  setPaymentData({
+                    orderId: result.order_id,
+                    status: 'success',
+                    transactionStatus: result.transaction_status,
+                    statusCode: result.status_code
+                  });
+                  
                   toast({
-                    title: "Pembayaran Berhasil",
-                    description: "Upgrade paket berhasil diproses!",
+                    title: "Pembayaran Berhasil!",
+                    description: "Selamat! Paket berlangganan Anda telah berhasil diupgrade.",
                     variant: "default",
                   });
+                  
                   setShowPaymentModal(false);
-                  // Refresh the page to show updated subscription
-                  window.location.reload();
+                  setIsProcessing(false);
+                  
+                  // Refresh subscription data
+                  queryClient.invalidateQueries({ queryKey: ['/api/organization/subscription'] });
                 },
                 onPending: function(result: any) {
                   console.log('Payment pending:', result);
