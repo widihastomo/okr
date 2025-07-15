@@ -263,6 +263,10 @@ All email configuration now uses environment variables:
   * FIXED: Name display consistency across all components including activity-log-card, initiatives, goal-card, timeline, tasks, key-result-detail, initiative-detail, and profile pages
   * UPDATED: Filter components - searchable-user-select, goal-form-modal, users-page, client-user-management now use consolidated name field
   * FIXED: All search and filter functionality now uses name field for user name matching
+  * UPDATED: Timeline page getUserName and getUserInitials functions now use consolidated name field
+  * FIXED: Global header user display now uses consolidated name field with email username fallback
+  * UPDATED: System role management page avatars and display names now use consolidated name field
+  * FIXED: Task comment editor mention system completely migrated to consolidated name field
   * IMPROVED: Better fallback logic for name extraction from consolidated name field
   * RESULT: Complete migration from firstName/lastName to consolidated name field with proper initials extraction and filtering
 - July 15, 2025. **COMPLETE TOUR SYSTEM REMOVAL** - Successfully removed entire onboarding tour system for cleaner interface:

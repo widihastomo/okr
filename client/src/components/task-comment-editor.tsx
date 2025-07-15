@@ -426,7 +426,7 @@ export function TaskCommentEditor({
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log("Button clicked for user:", user.firstName || user.email);
+                    console.log("Button clicked for user:", user.email);
                     handleMentionSelect(user);
                   }}
                   onMouseDown={(e) => {

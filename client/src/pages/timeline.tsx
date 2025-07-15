@@ -183,18 +183,20 @@ export default function TimelinePage() {
   });
 
   const getUserName = (user: any) => {
-    if (user.firstName && user.lastName) {
-      return `${user.firstName} ${user.lastName}`;
+    if (user.name && user.name.trim() !== '') {
+      return user.name.trim();
     }
-    return user.firstName || user.lastName || user.email?.split('@')[0] || 'User';
+    return user.email?.split('@')[0] || 'User';
   };
 
   const getUserInitials = (user: any) => {
-    if (user.firstName && user.lastName) {
-      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+    if (user.name && user.name.trim() !== '') {
+      const nameParts = user.name.trim().split(' ');
+      if (nameParts.length >= 2) {
+        return `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase();
+      }
+      return nameParts[0][0].toUpperCase();
     }
-    if (user.firstName) return user.firstName[0].toUpperCase();
-    if (user.lastName) return user.lastName[0].toUpperCase();
     if (user.email) return user.email[0].toUpperCase();
     return 'U';
   };

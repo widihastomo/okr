@@ -236,7 +236,7 @@ export default function GlobalHeader({
                 </AvatarFallback>
               </Avatar>
               <span className="text-sm font-medium text-gray-700 hidden md:inline">
-                {(user as any)?.firstName} {(user as any)?.lastName}
+                {(user as any)?.name && (user as any).name.trim() !== '' ? (user as any).name.trim() : (user as any)?.email?.split('@')[0] || 'User'}
               </span>
             </Button>
           </DropdownMenuTrigger>

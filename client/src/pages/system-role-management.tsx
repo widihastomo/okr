@@ -426,12 +426,14 @@ export default function SystemRoleManagement() {
                         <Avatar className="h-8 w-8">
                           <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`} />
                           <AvatarFallback>
-                            {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
+                            {user.name 
+                              ? user.name.trim().split(' ').map(n => n[0]).join('').toUpperCase()
+                              : user.email?.charAt(0).toUpperCase() || 'U'}
                           </AvatarFallback>
                         </Avatar>
                         <div>
                           <div className="font-medium">
-                            {user.firstName} {user.lastName}
+                            {user.name && user.name.trim() !== '' ? user.name.trim() : user.email?.split('@')[0] || 'User'}
                           </div>
                           <div className="text-sm text-gray-500">{user.email}</div>
                         </div>
