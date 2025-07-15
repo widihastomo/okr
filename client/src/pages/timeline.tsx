@@ -71,6 +71,25 @@ interface TimelineReaction {
   };
 }
 
+// Helper functions
+const getUserName = (user: any) => {
+  if (user.firstName && user.lastName) {
+    return `${user.firstName} ${user.lastName}`;
+  }
+  if (user.firstName) return user.firstName;
+  if (user.lastName) return user.lastName;
+  return user.email?.split('@')[0] || 'Unknown User';
+};
+
+const getUserInitials = (user: any) => {
+  if (user.firstName && user.lastName) {
+    return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+  }
+  if (user.firstName) return user.firstName[0].toUpperCase();
+  if (user.lastName) return user.lastName[0].toUpperCase();
+  return user.email?.[0]?.toUpperCase() || 'U';
+};
+
 export default function TimelinePage() {
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
@@ -83,6 +102,10 @@ export default function TimelinePage() {
     queryFn: () => apiRequest("GET", "/api/timeline"),
     retry: 1,
   });
+
+  // Debug logging
+  console.log('Timeline data:', checkInsData);
+  console.log('Is loading:', isLoading);
 
   // Transform check-ins data into timeline format
   const timelineData = Array.isArray(checkInsData) ? checkInsData.map((checkIn: any) => ({
@@ -98,6 +121,8 @@ export default function TimelinePage() {
     comments: [], // Will be loaded separately
     reactions: reactionCounts[checkIn.id] || { like: 0, love: 0, support: 0, celebrate: 0 },
   })) : [];
+  
+  console.log('Transformed timeline data:', timelineData);
 
   const createCommentMutation = useMutation({
     mutationFn: ({ checkInId, content }: { checkInId: string; content: string }) =>
