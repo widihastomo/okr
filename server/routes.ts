@@ -1748,6 +1748,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Extract memberIds from request body
       const { memberIds, ...teamData } = req.body;
       
+      console.log('POST /api/teams - Request body:', req.body);
+      console.log('POST /api/teams - memberIds:', memberIds);
+      console.log('POST /api/teams - teamData:', teamData);
+      
       // Ensure team is created within user's organization
       const teamWithOrg = {
         ...teamData,
@@ -1755,16 +1759,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       const newTeam = await storage.createTeam(teamWithOrg);
+      console.log('POST /api/teams - Created team:', newTeam);
       
       // Add team members if memberIds is provided
       if (memberIds && memberIds.length > 0) {
+        console.log('POST /api/teams - Adding members:', memberIds);
         for (const userId of memberIds) {
+          console.log('POST /api/teams - Adding member:', userId);
           await storage.addTeamMember({
             teamId: newTeam.id,
             userId: userId,
             role: 'member'
           });
         }
+        console.log('POST /api/teams - Members added successfully');
+      } else {
+        console.log('POST /api/teams - No members to add or memberIds is empty');
       }
       
       res.json(newTeam);
