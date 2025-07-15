@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import DailyCheckInButton from "@/components/daily-checkin-button";
 import { 
   Heart, 
   MessageCircle, 
@@ -106,10 +107,6 @@ export default function TimelinePage() {
     retry: 1,
   });
 
-  // Debug logging
-  console.log('Timeline data:', checkInsData);
-  console.log('Is loading:', isLoading);
-
   // Transform check-ins data into timeline format
   const timelineData = Array.isArray(checkInsData) ? checkInsData.map((checkIn: any) => ({
     id: checkIn.id,
@@ -124,8 +121,6 @@ export default function TimelinePage() {
     comments: [], // Will be loaded separately
     reactions: reactionCounts[checkIn.id] || { like: 0, love: 0, support: 0, celebrate: 0 },
   })) : [];
-  
-  console.log('Transformed timeline data:', timelineData);
 
   const createCommentMutation = useMutation({
     mutationFn: ({ checkInId, content }: { checkInId: string; content: string }) =>
@@ -254,9 +249,12 @@ export default function TimelinePage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto p-6">
         <div className="mb-6">
-          <div className="flex items-center space-x-2 mb-2">
-            <Sparkles className="w-6 h-6 text-orange-600" />
-            <h1 className="text-2xl font-bold text-gray-900">Timeline</h1>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center space-x-2">
+              <Sparkles className="w-6 h-6 text-orange-600" />
+              <h1 className="text-2xl font-bold text-gray-900">Timeline</h1>
+            </div>
+            <DailyCheckInButton />
           </div>
           <p className="text-gray-600">Timeline progress dan interaksi tim</p>
         </div>

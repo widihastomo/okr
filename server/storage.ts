@@ -1024,8 +1024,6 @@ export class DatabaseStorage implements IStorage {
 
   // Timeline functionality
   async getTimelineCheckIns(organizationId: string): Promise<(CheckIn & { creator: User, keyResult: KeyResult })[]> {
-    console.log("getTimelineCheckIns called with organizationId:", organizationId);
-    
     const result = await db
       .select({
         checkIn: checkIns,
@@ -1038,16 +1036,11 @@ export class DatabaseStorage implements IStorage {
       .where(eq(checkIns.organizationId, organizationId))
       .orderBy(desc(checkIns.createdAt));
 
-    console.log("Raw database result:", result);
-    
-    const mapped = result.map(row => ({
+    return result.map(row => ({
       ...row.checkIn,
       creator: row.creator,
       keyResult: row.keyResult,
     }));
-    
-    console.log("Mapped result:", mapped);
-    return mapped;
   }
 
   async getTimelineComments(checkInId: string): Promise<(TimelineComment & { creator: User })[]> {
