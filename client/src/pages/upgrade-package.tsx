@@ -52,18 +52,12 @@ export default function UpgradePackage() {
       try {
         const response = await apiRequest('GET', '/api/subscription-plans');
         const data = await response.json();
-        console.log('Plans response:', data);
-        console.log('Plans response type:', typeof data);
-        console.log('Plans is array:', Array.isArray(data));
         
         // Handle the response properly
         if (Array.isArray(data)) {
-          console.log('Plans data:', data);
-          console.log('Plans length:', data.length);
           return data;
         }
         
-        console.log('Response is not an array, returning empty array');
         return [];
       } catch (error) {
         console.error('Error fetching subscription plans:', error);
@@ -171,9 +165,7 @@ export default function UpgradePackage() {
     );
   }
 
-  // Debug: Log the plans data
-  console.log('Plans data:', plans);
-  console.log('Plans length:', plans?.length);
+
 
   if (!plans || plans.length === 0) {
     return (
@@ -224,13 +216,16 @@ export default function UpgradePackage() {
 
       {/* Subscription Plans */}
       <div className="space-y-6">
-        <h2 className="text-xl font-semibold text-gray-900">Pilih Paket Berlangganan</h2>
+        <div className="text-center space-y-2">
+          <h2 className="text-xl font-semibold text-gray-900">Pilih Paket Berlangganan</h2>
+          <p className="text-sm text-gray-600">Semua paket termasuk 14 hari free trial</p>
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {plans?.map((plan) => (
             <Card 
               key={plan.id}
-              className={`cursor-pointer transition-all border-2 ${
+              className={`cursor-pointer transition-all border-2 relative ${
                 selectedPlanId === plan.id 
                   ? 'border-orange-500 bg-orange-50 shadow-lg' 
                   : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
@@ -240,15 +235,23 @@ export default function UpgradePackage() {
                 setSelectedBillingPeriodId(plan.billingPeriods[0]?.id || "");
               }}
             >
+              {plan.slug === 'growth' && (
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                  <Badge variant="secondary" className="bg-orange-500 text-white hover:bg-orange-600">
+                    🔥 Paling Populer
+                  </Badge>
+                </div>
+              )}
+              
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     {getPlanIcon(plan.slug)}
                     <CardTitle className="text-lg">{plan.name}</CardTitle>
                   </div>
-                  {plan.slug === 'growth' && (
+                  {selectedPlanId === plan.id && (
                     <Badge variant="secondary" className="bg-orange-100 text-orange-800">
-                      Populer
+                      Dipilih
                     </Badge>
                   )}
                 </div>
@@ -268,18 +271,32 @@ export default function UpgradePackage() {
                 <Separator />
                 
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-gray-900">Fitur:</p>
+                  <p className="text-sm font-medium text-gray-900">Fitur Utama:</p>
                   <ul className="space-y-1 text-sm">
-                    {JSON.parse(plan.features as any).slice(0, 4).map((feature: string, index: number) => (
+                    {plan.features.slice(0, 4).map((feature: string, index: number) => (
                       <li key={index} className="flex items-center space-x-2">
                         <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
                         <span className="text-gray-700">{feature}</span>
                       </li>
                     ))}
-                    {JSON.parse(plan.features as any).length > 4 && (
-                      <li className="text-gray-500 text-xs">+{JSON.parse(plan.features as any).length - 4} fitur lainnya</li>
+                    {plan.features.length > 4 && (
+                      <li className="text-gray-500 text-xs font-medium">+{plan.features.length - 4} fitur lainnya</li>
                     )}
                   </ul>
+                </div>
+                
+                <div className="pt-2">
+                  <Button 
+                    variant={selectedPlanId === plan.id ? "default" : "outline"}
+                    className={`w-full ${selectedPlanId === plan.id ? 'bg-orange-500 hover:bg-orange-600' : 'border-orange-200 text-orange-600 hover:bg-orange-50'}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedPlanId(plan.id);
+                      setSelectedBillingPeriodId(plan.billingPeriods[0]?.id || "");
+                    }}
+                  >
+                    {selectedPlanId === plan.id ? 'Dipilih' : 'Pilih Paket'}
+                  </Button>
                 </div>
               </CardContent>
             </Card>
