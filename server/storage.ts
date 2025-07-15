@@ -1279,6 +1279,7 @@ export class DatabaseStorage implements IStorage {
       taskId: task.id,
       userId: task.createdBy,
       action: "created",
+      organizationId: task.organizationId,
       oldValue: null,
       newValue: task.title,
       changeDescription: `Task dibuat dengan judul: "${task.title}"`
