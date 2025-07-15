@@ -78,6 +78,14 @@ export default function ClientUserManagement() {
   // Team management states
   const [teamSearchTerm, setTeamSearchTerm] = useState("");
   const [editingTeam, setEditingTeam] = useState<Team | null>(null);
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
+
+  // Reset team form
+  const resetTeamForm = () => {
+    setSelectedMembers([]);
+    setShowCreateTeamModal(false);
+  };
 
   // Check if current user can manage users in their organization
   if (!isOwner) {
@@ -217,6 +225,7 @@ export default function ClientUserManagement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/teams"] });
       queryClient.invalidateQueries({ queryKey: ["/api/team-members"] });
+      resetTeamForm(); // Reset form and close modal
       toast({
         title: "Berhasil",
         description: "Tim berhasil dibuat"
@@ -621,7 +630,7 @@ export default function ClientUserManagement() {
                     Kelola tim dalam organisasi Anda ({filteredTeams.length} tim)
                   </CardDescription>
                 </div>
-                <Dialog>
+                <Dialog open={showCreateTeamModal} onOpenChange={setShowCreateTeamModal}>
                   <DialogTrigger asChild>
                     <Button className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
                       <UserPlus className="h-4 w-4 mr-2" />
@@ -638,12 +647,11 @@ export default function ClientUserManagement() {
                     <form onSubmit={(e) => {
                       e.preventDefault();
                       const formData = new FormData(e.currentTarget);
-                      const memberIds = Array.from(formData.getAll('members')) as string[];
                       createTeamMutation.mutate({
                         name: formData.get('name') as string,
                         description: formData.get('description') as string,
                         ownerId: formData.get('ownerId') as string,
-                        memberIds,
+                        memberIds: selectedMembers,
                       });
                     }}>
                       <div className="space-y-4">
@@ -672,27 +680,64 @@ export default function ClientUserManagement() {
                         </div>
                         <div>
                           <Label>Anggota Tim</Label>
-                          <div className="space-y-2 max-h-40 overflow-y-auto">
-                            {users.map((user) => (
-                              <div key={user.id} className="flex items-center space-x-2">
-                                <input
-                                  type="checkbox"
-                                  id={`member-${user.id}`}
-                                  name="members"
-                                  value={user.id}
-                                  className="rounded border-gray-300"
-                                />
-                                <label htmlFor={`member-${user.id}`} className="text-sm">
-                                  {user.firstName} {user.lastName}
-                                </label>
+                          <div className="space-y-2">
+                            <div className="relative">
+                              <select
+                                multiple
+                                name="members"
+                                value={selectedMembers}
+                                onChange={(e) => {
+                                  const values = Array.from(e.target.selectedOptions, option => option.value);
+                                  setSelectedMembers(values);
+                                }}
+                                className="w-full min-h-[120px] p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                                size={6}
+                              >
+                                {users.map((user) => (
+                                  <option 
+                                    key={user.id} 
+                                    value={user.id} 
+                                    className="py-1 px-2 hover:bg-orange-50 cursor-pointer"
+                                  >
+                                    {user.firstName} {user.lastName}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <p className="text-xs text-gray-500">
+                                Tahan Ctrl (Windows) atau Cmd (Mac) untuk memilih beberapa anggota
+                              </p>
+                              <span className="text-xs text-orange-600 font-medium">
+                                {selectedMembers.length} dipilih
+                              </span>
+                            </div>
+                            {selectedMembers.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-2">
+                                {selectedMembers.map((memberId) => {
+                                  const member = users.find(u => u.id === memberId);
+                                  if (!member) return null;
+                                  return (
+                                    <Badge key={memberId} variant="secondary" className="text-xs">
+                                      {member.firstName} {member.lastName}
+                                      <button
+                                        type="button"
+                                        onClick={() => setSelectedMembers(prev => prev.filter(id => id !== memberId))}
+                                        className="ml-1 text-gray-500 hover:text-red-500"
+                                      >
+                                        ×
+                                      </button>
+                                    </Badge>
+                                  );
+                                })}
                               </div>
-                            ))}
+                            )}
                           </div>
                         </div>
                         <div className="flex justify-end space-x-2">
-                          <DialogTrigger asChild>
-                            <Button type="button" variant="outline">Batal</Button>
-                          </DialogTrigger>
+                          <Button type="button" variant="outline" onClick={resetTeamForm}>
+                            Batal
+                          </Button>
                           <Button type="submit" disabled={createTeamMutation.isPending}>
                             {createTeamMutation.isPending ? "Membuat..." : "Buat Tim"}
                           </Button>
