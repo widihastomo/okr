@@ -4032,7 +4032,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/timeline", requireAuth, async (req, res) => {
     try {
       const user = req.user as User;
+      console.log("Fetching timeline for organization:", user.organizationId);
       const timelineData = await storage.getTimelineCheckIns(user.organizationId);
+      console.log("Timeline data result:", timelineData);
       res.json(timelineData);
     } catch (error) {
       console.error("Error fetching timeline:", error);
