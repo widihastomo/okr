@@ -929,13 +929,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
         <div className="absolute top-3/4 right-1/4 w-8 h-8 bg-blue-300 opacity-15 rotate-12"></div>
         <div className="absolute top-1/2 left-1/6 w-4 h-4 bg-purple-300 opacity-10 rounded-full animate-pulse"></div>
         
-        {/* Subtle pattern overlay */}
-        <div 
-          className="absolute inset-0 opacity-5"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23f97316' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='m0 40l40-40h-40v40zm40 0v-40h-40l40 40z'/%3E%3C/g%3E%3C/svg%3E")`
-          }}
-        />
+
       </div>
       
       <div className="max-w-md w-full relative z-10">
