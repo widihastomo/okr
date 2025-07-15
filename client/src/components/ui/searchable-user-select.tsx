@@ -183,7 +183,7 @@ export function SearchableUserSelect({
                   {users.map((user) => (
                     <CommandItem
                       key={user.id}
-                      value={`${user.firstName || ''} ${user.lastName || ''} ${user.email}`}
+                      value={`${user.name || ''} ${user.email}`}
                       onSelect={() => {
                         onValueChange(user.id);
                         setOpen(false);

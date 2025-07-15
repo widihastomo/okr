@@ -2728,8 +2728,7 @@ export class DatabaseStorage implements IStorage {
           creator: {
             id: users.id,
             email: users.email,
-            firstName: users.firstName,
-            lastName: users.lastName,
+            name: users.name,
             role: users.role
           }
         })
@@ -2794,14 +2793,12 @@ export class DatabaseStorage implements IStorage {
             user: updaterUser ? {
               id: updaterUser.id,
               email: updaterUser.email,
-              firstName: updaterUser.firstName || '',
-              lastName: updaterUser.lastName || '',
+              name: updaterUser.name,
               role: updaterUser.role || 'member'
             } : {
               id: metric.lastUpdateBy,
               email: 'unknown@example.com',
-              firstName: 'Unknown',
-              lastName: 'User',
+              name: 'Unknown User',
               role: 'member'
             }
           });
@@ -2818,8 +2815,7 @@ export class DatabaseStorage implements IStorage {
           user: {
             id: users.id,
             email: users.email,
-            firstName: users.firstName,
-            lastName: users.lastName,
+            name: users.name,
             role: users.role
           }
         })
@@ -2843,8 +2839,7 @@ export class DatabaseStorage implements IStorage {
           user: {
             id: entry.user.id,
             email: entry.user.email,
-            firstName: entry.user.firstName || '',
-            lastName: entry.user.lastName || '',
+            name: entry.user.name,
             role: entry.user.role || 'member'
           }
         });
@@ -2860,8 +2855,7 @@ export class DatabaseStorage implements IStorage {
           user: {
             id: initiativeData.creator.id,
             email: initiativeData.creator.email,
-            firstName: initiativeData.creator.firstName,
-            lastName: initiativeData.creator.lastName,
+            name: initiativeData.creator.name,
             role: initiativeData.creator.role
           }
         });
