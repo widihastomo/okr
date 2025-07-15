@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -67,6 +67,58 @@ export default function UpgradePackage() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedAddOns, setSelectedAddOns] = useState<Set<string>>(new Set());
   const [addOnQuantities, setAddOnQuantities] = useState<Record<string, number>>({});
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [paymentData, setPaymentData] = useState<any>(null);
+
+  // Check for payment success parameters on page load
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
+    const transactionStatus = urlParams.get('transaction_status');
+    const orderId = urlParams.get('order_id');
+    const statusCode = urlParams.get('status_code');
+
+    if (status === 'success' && transactionStatus === 'settlement' && orderId) {
+      setPaymentSuccess(true);
+      setPaymentData({
+        orderId,
+        status,
+        transactionStatus,
+        statusCode
+      });
+      
+      // Show success message
+      toast({
+        title: "Pembayaran Berhasil!",
+        description: "Paket berlangganan Anda telah berhasil diupgrade. Selamat menikmati fitur-fitur baru!",
+        variant: "default",
+      });
+
+      // Clear URL parameters
+      window.history.replaceState({}, document.title, window.location.pathname);
+      
+      // Refresh subscription data
+      queryClient.invalidateQueries({ queryKey: ['/api/organization/subscription'] });
+    } else if (status === 'pending' && orderId) {
+      toast({
+        title: "Pembayaran Pending",
+        description: "Pembayaran sedang diproses. Kami akan memberitahu Anda setelah pembayaran selesai.",
+        variant: "default",
+      });
+      
+      // Clear URL parameters
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (status === 'error' && orderId) {
+      toast({
+        title: "Pembayaran Gagal",
+        description: "Terjadi kesalahan saat memproses pembayaran. Silakan coba lagi.",
+        variant: "destructive",
+      });
+      
+      // Clear URL parameters
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [toast, queryClient]);
 
   // Fetch subscription plans
   const { data: plans, isLoading: isLoadingPlans, error: plansError } = useQuery<SubscriptionPlan[]>({
@@ -394,8 +446,58 @@ export default function UpgradePackage() {
           Tingkatkan paket Anda untuk mendapatkan fitur lebih lengkap dan batas pengguna yang lebih besar
         </p>
         
+        {/* Payment Success Card */}
+        {paymentSuccess && paymentData && (
+          <Card className="max-w-2xl mx-auto border-green-200 bg-green-50">
+            <CardContent className="pt-6">
+              <div className="text-center space-y-4">
+                <div className="flex justify-center">
+                  <div className="p-3 bg-green-100 rounded-full">
+                    <Check className="w-8 h-8 text-green-600" />
+                  </div>
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-green-900">Pembayaran Berhasil!</h2>
+                  <p className="text-green-700">
+                    Selamat! Paket berlangganan Anda telah berhasil diupgrade.
+                  </p>
+                </div>
+                <div className="bg-white rounded-lg p-4 border border-green-200">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="font-medium text-gray-900">Order ID:</p>
+                      <p className="text-gray-600">{paymentData.orderId}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Status:</p>
+                      <Badge variant="secondary" className="bg-green-100 text-green-800">
+                        {paymentData.transactionStatus}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-center space-x-4">
+                  <Button 
+                    onClick={() => window.location.href = '/dashboard'}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    Kembali ke Dashboard
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setPaymentSuccess(false)}
+                    className="border-green-600 text-green-600 hover:bg-green-50"
+                  >
+                    Lihat Paket Lainnya
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        
         {/* Current Plan Status */}
-        {currentSubscription && (
+        {currentSubscription && !paymentSuccess && (
           <Card className="max-w-md mx-auto">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
@@ -425,11 +527,12 @@ export default function UpgradePackage() {
       </div>
 
       {/* Subscription Plans */}
-      <div className="space-y-6">
-        <div className="text-center space-y-2">
-          <h2 className="text-xl font-semibold text-gray-900">Pilih Paket Berlangganan</h2>
-          <p className="text-sm text-gray-600">Upgrade paket untuk mendapatkan fitur unlimited</p>
-        </div>
+      {!paymentSuccess && (
+        <div className="space-y-6">
+          <div className="text-center space-y-2">
+            <h2 className="text-xl font-semibold text-gray-900">Pilih Paket Berlangganan</h2>
+            <p className="text-sm text-gray-600">Upgrade paket untuk mendapatkan fitur unlimited</p>
+          </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {plans?.map((plan) => (
@@ -516,7 +619,8 @@ export default function UpgradePackage() {
             </Card>
           ))}
         </div>
-      </div>
+        </div>
+      )}
 
       {/* Payment Modal */}
       <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
