@@ -79,7 +79,7 @@ export default function TimelinePage() {
   });
 
   // Transform check-ins data into timeline format
-  const timelineData = checkInsData?.map((checkIn: any) => ({
+  const timelineData = Array.isArray(checkInsData) ? checkInsData.map((checkIn: any) => ({
     id: checkIn.id,
     type: 'check-in',
     content: checkIn.feedback,
@@ -90,7 +90,7 @@ export default function TimelinePage() {
     createdAt: checkIn.createdAt,
     comments: [], // Will be loaded separately
     reactions: [], // Will be loaded separately
-  })) || [];
+  })) : [];
 
   const createCommentMutation = useMutation({
     mutationFn: ({ checkInId, content }: { checkInId: string; content: string }) =>
@@ -189,8 +189,17 @@ export default function TimelinePage() {
           </p>
         </div>
 
-        <div className="space-y-6">
-          {timelineData?.map((entry: TimelineEntry) => (
+        {timelineData.length === 0 ? (
+          <Card className="p-8 text-center">
+            <div className="text-gray-500 mb-4">
+              <Clock className="w-12 h-12 mx-auto mb-2" />
+              <p>Belum ada progress yang dilaporkan</p>
+              <p className="text-sm mt-2">Timeline akan menampilkan progress check-in dari semua anggota tim</p>
+            </div>
+          </Card>
+        ) : (
+          <div className="space-y-6">
+            {timelineData.map((entry: TimelineEntry) => (
             <Card key={entry.id} className="border-l-4 border-l-blue-500">
               <CardHeader className="pb-4">
                 <div className="flex items-center space-x-4">
@@ -325,21 +334,8 @@ export default function TimelinePage() {
               </CardContent>
             </Card>
           ))}
-
-          {(!timelineData || timelineData.length === 0) && (
-            <Card className="text-center py-12">
-              <CardContent>
-                <Users className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Belum ada progress yang dilaporkan
-                </h3>
-                <p className="text-gray-600">
-                  Timeline akan muncul ketika ada member yang melaporkan progress mereka
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
