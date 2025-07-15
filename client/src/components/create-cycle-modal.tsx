@@ -17,7 +17,7 @@ import { HelpCircle, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 
-const createCycleFormSchema = insertCycleSchema.omit({ type: true }).extend({
+const createCycleFormSchema = insertCycleSchema.omit({ type: true, description: true }).extend({
   startDate: z.date({ required_error: "Tanggal mulai diperlukan" }),
   endDate: z.date({ required_error: "Tanggal berakhir diperlukan" }),
 });
@@ -38,7 +38,6 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
     resolver: zodResolver(createCycleFormSchema),
     defaultValues: {
       name: "",
-      description: "",
       startDate: undefined,
       endDate: undefined,
     },
@@ -119,45 +118,6 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
                   </FormLabel>
                   <FormControl>
                     <Input placeholder="contoh: Juli 2025" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    Deskripsi
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <button 
-                          type="button" 
-                          className="inline-flex items-center justify-center"
-                        >
-                          <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
-                        </button>
-                      </PopoverTrigger>
-                      <PopoverContent side="right" className="max-w-xs">
-                        <p className="text-sm">
-                          Jelaskan fokus utama atau tema dari siklus ini.
-                          <br /><br />
-                          <strong>Contoh:</strong> "Fokus pertumbuhan penjualan", "Peningkatan efisiensi operasional", "Pengembangan produk dan inovasi"
-                        </p>
-                      </PopoverContent>
-                    </Popover>
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Jelaskan fokus utama siklus ini..."
-                      value={field.value || ""}
-                      onChange={field.onChange}
-                      onBlur={field.onBlur}
-                      name={field.name}
-                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
