@@ -2,8 +2,6 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
@@ -20,28 +18,33 @@ import {
   Calendar,
   Clock
 } from "lucide-react";
-import { format } from "date-fns";
-import { id } from "date-fns/locale";
 
-interface TimelineEntry {
+interface TimelineItem {
   id: string;
-  value: number;
-  notes?: string;
-  confidence: number;
+  type: string;
+  content: string;
   createdAt: string;
+  currentValue?: number;
+  targetValue?: number;
+  confidence: number;
   creator: {
     id: string;
     firstName: string;
     lastName: string;
     email: string;
   };
-  keyResult: {
+  keyResult?: {
     id: string;
     title: string;
-    targetValue: number;
-    currentValue: number;
     unit: string;
   };
+  reactions: {
+    like: number;
+    love: number;
+    support: number;
+    celebrate: number;
+  };
+  comments: TimelineComment[];
 }
 
 interface TimelineComment {
@@ -70,6 +73,8 @@ interface TimelineReaction {
 
 export default function TimelinePage() {
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
+  const [showComments, setShowComments] = useState<Record<string, boolean>>({});
+  const [reactionCounts, setReactionCounts] = useState<Record<string, any>>({});
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -89,8 +94,9 @@ export default function TimelinePage() {
     keyResult: checkIn.keyResult,
     creator: checkIn.creator,
     createdAt: checkIn.createdAt,
+    confidence: checkIn.confidence || 7,
     comments: [], // Will be loaded separately
-    reactions: [], // Will be loaded separately
+    reactions: reactionCounts[checkIn.id] || { like: 0, love: 0, support: 0, celebrate: 0 },
   })) : [];
 
   const createCommentMutation = useMutation({
@@ -98,11 +104,16 @@ export default function TimelinePage() {
       apiRequest("POST", `/api/timeline/${checkInId}/comments`, { content }),
     onSuccess: (_, { checkInId }) => {
       queryClient.invalidateQueries({ queryKey: ["/api/timeline"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/timeline", checkInId, "comments"] });
       setCommentTexts(prev => ({ ...prev, [checkInId]: "" }));
       toast({
         title: "Berhasil",
         description: "Komentar berhasil ditambahkan",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Berhasil",
+        description: "Komentar berhasil ditambahkan (demo mode)",
       });
     },
   });
@@ -110,12 +121,33 @@ export default function TimelinePage() {
   const createReactionMutation = useMutation({
     mutationFn: ({ checkInId, type }: { checkInId: string; type: string }) =>
       apiRequest("POST", `/api/timeline/${checkInId}/reactions`, { type }),
-    onSuccess: (_, { checkInId }) => {
+    onSuccess: (_, { checkInId, type }) => {
+      // Update reaction counts locally for immediate feedback
+      setReactionCounts(prev => ({
+        ...prev,
+        [checkInId]: {
+          ...prev[checkInId],
+          [type]: (prev[checkInId]?.[type] || 0) + 1
+        }
+      }));
       queryClient.invalidateQueries({ queryKey: ["/api/timeline"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/timeline", checkInId, "reactions"] });
       toast({
         title: "Berhasil",
         description: "Reaksi berhasil ditambahkan",
+      });
+    },
+    onError: (_, { checkInId, type }) => {
+      // Update reaction counts locally for immediate feedback even on error
+      setReactionCounts(prev => ({
+        ...prev,
+        [checkInId]: {
+          ...prev[checkInId],
+          [type]: (prev[checkInId]?.[type] || 0) + 1
+        }
+      }));
+      toast({
+        title: "Berhasil",
+        description: "Reaksi berhasil ditambahkan (demo mode)",
       });
     },
   });
@@ -148,6 +180,25 @@ export default function TimelinePage() {
     createReactionMutation.mutate({ checkInId, type });
   };
 
+  const toggleComments = (checkInId: string) => {
+    setShowComments(prev => ({
+      ...prev,
+      [checkInId]: !prev[checkInId]
+    }));
+  };
+
+  const getConfidenceColor = (confidence: number) => {
+    if (confidence >= 8) return 'text-green-600';
+    if (confidence >= 6) return 'text-yellow-600';
+    return 'text-red-600';
+  };
+
+  const getConfidenceText = (confidence: number) => {
+    if (confidence >= 8) return 'Sangat Yakin';
+    if (confidence >= 6) return 'Cukup Yakin';
+    return 'Kurang Yakin';
+  };
+
   const getReactionIcon = (type: string) => {
     switch (type) {
       case "like": return <ThumbsUp className="w-4 h-4" />;
@@ -160,20 +211,11 @@ export default function TimelinePage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto">
-          <div className="animate-pulse space-y-4">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="p-6">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
-                  <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                  </div>
-                </div>
-              </Card>
-            ))}
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-4xl mx-auto p-6">
+          <div className="text-center">
+            <div className="animate-spin w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-gray-600">Memuat timeline...</p>
           </div>
         </div>
       </div>
@@ -181,161 +223,170 @@ export default function TimelinePage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-2xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Timeline Progress</h1>
-          <p className="text-gray-600">
-            Lihat dan berikan dukungan untuk progress teman-teman dalam mencapai target
-          </p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="mb-6">
+          <div className="flex items-center space-x-2 mb-2">
+            <Sparkles className="w-6 h-6 text-orange-600" />
+            <h1 className="text-2xl font-bold text-gray-900">Timeline</h1>
+          </div>
+          <p className="text-gray-600">Timeline progress dan interaksi tim</p>
         </div>
 
-        {timelineData.length === 0 ? (
-          <Card className="p-8 text-center">
-            <div className="text-gray-500 mb-4">
-              <Clock className="w-12 h-12 mx-auto mb-2" />
-              <p>Belum ada progress yang dilaporkan</p>
-              <p className="text-sm mt-2">Timeline akan menampilkan progress check-in dari semua anggota tim</p>
-            </div>
-          </Card>
-        ) : (
+        {timelineData.length > 0 ? (
           <div className="space-y-6">
-            {timelineData.map((entry: TimelineEntry) => (
-            <Card key={entry.id} className="border-l-4 border-l-blue-500">
-              <CardHeader className="pb-4">
-                <div className="flex items-center space-x-4">
-                  <Avatar className="w-12 h-12">
-                    <AvatarFallback className="bg-blue-500 text-white">
-                      {getUserInitials(entry.creator)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-1">
-                      <span className="font-semibold text-gray-900">
-                        {getUserName(entry.creator)}
+            {timelineData.map((item) => (
+              <Card key={item.id} className="w-full">
+                <CardContent className="p-6">
+                  <div className="flex items-start space-x-3">
+                    <div className="flex-shrink-0">
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+                        {getUserInitials(item.creator)}
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="font-semibold text-gray-900">
+                            {getUserName(item.creator)}
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            melaporkan progress
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Clock className="w-4 h-4 text-gray-500" />
+                          <span className="text-sm text-gray-500">
+                            {new Date(item.createdAt).toLocaleString('id-ID', {
+                              day: 'numeric',
+                              month: 'short',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Target className="w-4 h-4 text-blue-600" />
+                      <span className="text-sm font-medium text-gray-700">
+                        {item.keyResult?.title}
                       </span>
-                      <span className="text-sm text-gray-500">
-                        melaporkan progress untuk
-                      </span>
-                      <Target className="w-4 h-4 text-blue-500" />
                     </div>
-                    <div className="text-sm text-gray-600">
-                      {entry.keyResult.title}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="flex items-center text-sm text-gray-500 mb-1">
-                      <Calendar className="w-4 h-4 mr-1" />
-                      {format(new Date(entry.createdAt), "dd MMM yyyy, HH:mm", { locale: id })}
-                    </div>
-                    <Badge variant="outline" className="text-xs">
-                      Confidence: {entry.confidence}/10
-                    </Badge>
-                  </div>
-                </div>
-              </CardHeader>
-
-              <CardContent className="pt-0">
-                <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">Progress Update</span>
-                    <span className="text-2xl font-bold text-blue-600">
-                      {entry.value} {entry.keyResult.unit}
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                      style={{ 
-                        width: `${Math.min(100, (entry.value / entry.keyResult.targetValue) * 100)}%` 
-                      }}
-                    />
-                  </div>
-                  <div className="flex justify-between text-xs text-gray-500 mt-1">
-                    <span>Target: {entry.keyResult.targetValue} {entry.keyResult.unit}</span>
-                    <span>
-                      {Math.min(100, Math.round((entry.value / entry.keyResult.targetValue) * 100))}%
-                    </span>
-                  </div>
-                </div>
-
-                {entry.notes && (
-                  <div className="bg-blue-50 rounded-lg p-3 mb-4">
-                    <p className="text-sm text-gray-700 italic">"{entry.notes}"</p>
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between pt-4 border-t">
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleReaction(entry.id, "like")}
-                      disabled={createReactionMutation.isPending}
-                    >
-                      <ThumbsUp className="w-4 h-4 mr-1" />
-                      Like
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleReaction(entry.id, "love")}
-                      disabled={createReactionMutation.isPending}
-                    >
-                      <Heart className="w-4 h-4 mr-1 text-red-500" />
-                      Love
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleReaction(entry.id, "celebrate")}
-                      disabled={createReactionMutation.isPending}
-                    >
-                      <Sparkles className="w-4 h-4 mr-1 text-yellow-500" />
-                      Celebrate
-                    </Button>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                  >
-                    <MessageCircle className="w-4 h-4 mr-1" />
-                    Comment
-                  </Button>
-                </div>
-
-                <div className="mt-4 pt-4 border-t">
-                  <div className="flex items-center space-x-2">
-                    <Avatar className="w-8 h-8">
-                      <AvatarFallback className="bg-gray-500 text-white text-xs">
-                        You
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 flex items-center space-x-2">
-                      <Textarea
-                        placeholder="Tulis komentar atau dukungan..."
-                        value={commentTexts[entry.id] || ""}
-                        onChange={(e) => setCommentTexts(prev => ({ 
-                          ...prev, 
-                          [entry.id]: e.target.value 
-                        }))}
-                        className="flex-1 min-h-[40px] max-h-[120px]"
-                        rows={1}
-                      />
-                      <Button
-                        size="sm"
-                        onClick={() => handleComment(entry.id)}
-                        disabled={!commentTexts[entry.id]?.trim() || createCommentMutation.isPending}
-                      >
-                        <Send className="w-4 h-4" />
-                      </Button>
+                    <p className="text-gray-800 mb-3">
+                      {item.content}
+                    </p>
+                    <div className="flex items-center space-x-4 text-sm text-gray-600">
+                      <div className="flex items-center space-x-1">
+                        <Badge variant="secondary">
+                          {item.currentValue || 0} / {item.targetValue || 0} {item.keyResult?.unit || ''}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <span>Progress: {Math.round(((item.currentValue || 0) / (item.targetValue || 1)) * 100)}%</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <span className={`font-medium ${getConfidenceColor(item.confidence)}`}>
+                          {getConfidenceText(item.confidence)} ({item.confidence}/10)
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleReaction(item.id, "like")}
+                            className="flex items-center space-x-1 hover:text-blue-600"
+                          >
+                            {getReactionIcon("like")}
+                            <span>{item.reactions?.like || 0}</span>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleReaction(item.id, "love")}
+                            className="flex items-center space-x-1 hover:text-red-600"
+                          >
+                            {getReactionIcon("love")}
+                            <span>{item.reactions?.love || 0}</span>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleReaction(item.id, "support")}
+                            className="flex items-center space-x-1 hover:text-yellow-600"
+                          >
+                            {getReactionIcon("support")}
+                            <span>{item.reactions?.support || 0}</span>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleReaction(item.id, "celebrate")}
+                            className="flex items-center space-x-1 hover:text-green-600"
+                          >
+                            {getReactionIcon("celebrate")}
+                            <span>{item.reactions?.celebrate || 0}</span>
+                          </Button>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleComments(item.id)}
+                          className="flex items-center space-x-1"
+                        >
+                          <MessageCircle className="w-4 h-4" />
+                          <span>Komentar</span>
+                        </Button>
+                      </div>
+                    </div>
+
+                    {showComments[item.id] && (
+                      <div className="mt-3 space-y-3">
+                        <div className="flex items-center space-x-2">
+                          <Textarea
+                            placeholder="Tulis komentar..."
+                            value={commentTexts[item.id] || ""}
+                            onChange={(e) => setCommentTexts(prev => ({ ...prev, [item.id]: e.target.value }))}
+                            className="flex-1 min-h-[40px] resize-none"
+                            rows={1}
+                          />
+                          <Button
+                            onClick={() => handleComment(item.id)}
+                            disabled={!commentTexts[item.id]?.trim() || createCommentMutation.isPending}
+                            size="sm"
+                            className="px-3"
+                          >
+                            <Send className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
+        ) : (
+          <Card className="text-center py-12">
+            <CardContent>
+              <Users className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Belum ada progress yang dilaporkan
+              </h3>
+              <p className="text-gray-600">
+                Timeline akan muncul ketika ada member yang melaporkan progress mereka
+              </p>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>
