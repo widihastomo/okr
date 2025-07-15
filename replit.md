@@ -255,6 +255,15 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 15, 2025. **SCHEMA SYNCHRONIZATION COMPLETED** - Successfully updated shared/schema.ts to reflect all organizationId columns:
+  * UPDATED: achievements table schema to include organizationId column
+  * UPDATED: levelRewards table schema to include organizationId column
+  * UPDATED: trialAchievements table schema to include organizationId column
+  * UPDATED: userTrialAchievements table schema to include organizationId column
+  * UPDATED: invoiceLineItems table schema to include organizationId column
+  * SYNCHRONIZED: All database schema changes now properly reflected in shared/schema.ts
+  * VERIFIED: Schema consistency between database structure and application code
+  * RESULT: Complete schema synchronization ensuring type safety and proper ORM operations
 - July 15, 2025. **VALIDATION ENHANCEMENT** - Successfully implemented mandatory cycle and owner field requirements for goal creation:
   * REMOVED: "Tanpa Siklus" option from cycle selection dropdown
   * UPDATED: Goal form modal validation schema to require cycle selection (z.string().min(1, "Siklus wajib dipilih"))

@@ -23,6 +23,7 @@ export const templates = pgTable("templates", {
   type: text("type").notNull(), // "monthly", "quarterly", "annual"
   isDefault: boolean("is_default").default(false),
   objectives: text("objectives").notNull(), // JSON string of objective templates
+  organizationId: uuid("organization_id").references(() => organizations.id), // organization ID for multi-tenant security
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   lastUpdateBy: uuid("last_update_by").references(() => users.id), // user ID who last updated the template
@@ -191,6 +192,7 @@ export const invoices = pgTable("invoices", {
 export const invoiceLineItems = pgTable("invoice_line_items", {
   id: uuid("id").primaryKey().defaultRandom(),
   invoiceId: uuid("invoice_id").notNull().references(() => invoices.id, { onDelete: "cascade" }),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   type: text("type").notNull().default("subscription"), // "subscription", "addon", "one_time", "fee"
   description: text("description").notNull(), // e.g., "Growth Plan - Quarterly Billing", "Additional User"
   quantity: integer("quantity").notNull().default(1),
@@ -274,6 +276,7 @@ export const users = pgTable("users", {
 export const userPermissions = pgTable("user_permissions", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").notNull().references(() => users.id),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   permission: text("permission").notNull(), // e.g., "create_objectives", "manage_users", "view_analytics"
   resource: text("resource"), // Optional: specific resource ID for fine-grained control
   grantedBy: uuid("granted_by").notNull().references(() => users.id),
@@ -287,7 +290,7 @@ export const roleTemplates = pgTable("role_templates", {
   name: text("name").notNull(), // e.g., "Project Manager", "Team Lead", "HR Admin"
   description: text("description"),
   permissions: jsonb("permissions").notNull(), // Array of permission strings
-  organizationId: uuid("organization_id").references(() => organizations.id), // null for system-wide templates
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   isSystem: boolean("is_system").default(false), // System-defined vs organization-defined
   createdBy: uuid("created_by").notNull().references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
@@ -298,6 +301,7 @@ export const roleTemplates = pgTable("role_templates", {
 export const userActivityLog = pgTable("user_activity_log", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").notNull().references(() => users.id),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   action: text("action").notNull(), // e.g., "login", "permission_changed", "role_updated"
   details: jsonb("details"), // Additional context about the action
   ipAddress: text("ip_address"),
@@ -310,6 +314,7 @@ export const userActivityLog = pgTable("user_activity_log", {
 export const userOnboardingProgress = pgTable("user_onboarding_progress", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").notNull().references(() => users.id),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   completedTours: text("completed_tours").array().notNull().default([""]), // Array of tour IDs
   currentTour: text("current_tour"), // Currently active tour
   currentStepIndex: integer("current_step_index").default(0),
@@ -338,6 +343,7 @@ export const teamMembers = pgTable("team_members", {
   id: uuid("id").primaryKey().defaultRandom(),
   teamId: uuid("team_id").notNull().references(() => teams.id),
   userId: uuid("user_id").notNull().references(() => users.id),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   role: text("role").notNull().default("member"), // "lead", "member", "contributor"
   joinedAt: timestamp("joined_at").defaultNow(),
   createdBy: uuid("created_by").notNull().references(() => users.id), // user ID who added the member
@@ -373,6 +379,7 @@ export const keyResults = pgTable("key_results", {
 export const checkIns = pgTable("check_ins", {
   id: uuid("id").primaryKey().defaultRandom(),
   keyResultId: uuid("key_result_id").references(() => keyResults.id).notNull(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   value: decimal("value", { precision: 15, scale: 2 }).notNull(),
   notes: text("notes"),
   confidence: integer("confidence").notNull().default(5), // 1-10 scale
@@ -425,6 +432,7 @@ export const initiativeMembers = pgTable("initiative_members", {
   id: uuid("id").primaryKey().defaultRandom(),
   initiativeId: uuid("initiative_id").references(() => initiatives.id).notNull(),
   userId: uuid("user_id").references(() => users.id).notNull(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   role: text("role").notNull().default("contributor"), // "lead", "contributor", "reviewer"
   joinedAt: timestamp("joined_at").defaultNow(),
 });
@@ -433,6 +441,7 @@ export const initiativeMembers = pgTable("initiative_members", {
 export const initiativeDocuments = pgTable("initiative_documents", {
   id: uuid("id").primaryKey().defaultRandom(),
   initiativeId: uuid("initiative_id").references(() => initiatives.id).notNull(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   title: text("title").notNull(),
   description: text("description"),
   fileUrl: text("file_url"), // URL to document file
@@ -448,6 +457,7 @@ export const initiativeDocuments = pgTable("initiative_documents", {
 export const initiativeSuccessMetrics = pgTable("initiative_success_metrics", {
   id: uuid("id").primaryKey().defaultRandom(),
   initiativeId: uuid("initiative_id").references(() => initiatives.id).notNull(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   name: text("name").notNull(), // Nama metrik
   target: text("target").notNull(), // Target yang ingin dicapai
   achievement: text("achievement").notNull().default("0"), // Capaian saat ini
@@ -461,6 +471,7 @@ export const initiativeSuccessMetrics = pgTable("initiative_success_metrics", {
 export const successMetricUpdates = pgTable("success_metric_updates", {
   id: uuid("id").primaryKey().defaultRandom(),
   metricId: uuid("metric_id").references(() => initiativeSuccessMetrics.id).notNull(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   achievement: text("achievement").notNull(), // Capaian yang diupdate
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -473,6 +484,7 @@ export const successMetricUpdates = pgTable("success_metric_updates", {
 export const initiativeNotes = pgTable("initiative_notes", {
   id: uuid("id").primaryKey().defaultRandom(),
   initiativeId: uuid("initiative_id").references(() => initiatives.id).notNull(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   type: text("type").notNull().default("update"), // "update", "budget", "milestone", "risk", "decision", "general"
   title: text("title").notNull(),
   content: text("content").notNull(),
@@ -489,6 +501,7 @@ export const initiativeComments = pgTable("initiative_comments", {
   id: uuid("id").primaryKey().defaultRandom(),
   initiativeId: uuid("initiative_id").references(() => initiatives.id).notNull(),
   userId: uuid("user_id").references(() => users.id).notNull(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   content: text("content").notNull(), // HTML content from WYSIWYG editor
   mentionedUsers: text("mentioned_users").array().default([]), // Array of user IDs mentioned in comment
   parentId: uuid("parent_id").references(() => initiativeComments.id), // For reply threading
@@ -523,6 +536,7 @@ export const taskComments = pgTable("task_comments", {
   id: uuid("id").primaryKey().defaultRandom(),
   taskId: uuid("task_id").references(() => tasks.id).notNull(),
   userId: uuid("user_id").references(() => users.id).notNull(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   content: text("content").notNull(), // HTML content from WYSIWYG editor
   mentionedUsers: text("mentioned_users").array().default([]), // Array of user IDs mentioned in comment
   parentId: uuid("parent_id").references(() => taskComments.id), // For reply functionality
@@ -537,6 +551,7 @@ export const taskAuditTrail = pgTable("task_audit_trail", {
   id: uuid("id").primaryKey().defaultRandom(),
   taskId: uuid("task_id").references(() => tasks.id).notNull(),
   userId: uuid("user_id").references(() => users.id).notNull(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   action: text("action").notNull(), // "created", "status_changed", "priority_changed", "assigned", "deadline_changed", "updated"
   oldValue: text("old_value"), // Previous value for comparison
   newValue: text("new_value"), // New value after change
@@ -661,12 +676,14 @@ export const achievements = pgTable("achievements", {
   condition: jsonb("condition").notNull(), // JSON defining achievement conditions
   isActive: boolean("is_active").notNull().default(true),
   rarity: text("rarity").notNull().default("common"), // "common", "rare", "epic", "legendary"
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const userAchievements = pgTable("user_achievements", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").notNull().references(() => users.id),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   achievementId: uuid("achievement_id").notNull().references(() => achievements.id),
   unlockedAt: timestamp("unlocked_at").defaultNow(),
   progress: integer("progress").notNull().default(0), // current progress towards achievement
@@ -676,6 +693,7 @@ export const userAchievements = pgTable("user_achievements", {
 export const userStats = pgTable("user_stats", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").notNull().references(() => users.id).unique(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   totalPoints: integer("total_points").notNull().default(0),
   level: integer("level").notNull().default(1),
   currentStreak: integer("current_streak").notNull().default(0), // days of consecutive activity
@@ -698,11 +716,13 @@ export const levelRewards = pgTable("level_rewards", {
   badgeColor: text("badge_color").notNull(),
   pointsRequired: integer("points_required").notNull(),
   unlockMessage: text("unlock_message").notNull(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
 });
 
 export const activityLogs = pgTable("activity_logs", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").notNull().references(() => users.id),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   action: text("action").notNull(), // "check_in_created", "objective_completed", etc.
   entityType: text("entity_type").notNull(), // "objective", "key_result", "initiative"
   entityId: uuid("entity_id").notNull(),
@@ -990,6 +1010,7 @@ export const trialAchievements = pgTable("trial_achievements", {
   triggerCondition: jsonb("trigger_condition").notNull(), // JSON with conditions
   isActive: boolean("is_active").default(true),
   trialOnly: boolean("trial_only").default(true),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -998,6 +1019,7 @@ export const userTrialAchievements = pgTable("user_trial_achievements", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
   achievementId: uuid("achievement_id").references(() => trialAchievements.id, { onDelete: "cascade" }).notNull(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   unlockedAt: timestamp("unlocked_at").defaultNow(),
   pointsEarned: integer("points_earned").notNull(),
   metadata: jsonb("metadata"), // Additional data about how achievement was earned
