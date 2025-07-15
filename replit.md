@@ -255,6 +255,15 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 15, 2025. Successfully completed removal of cycle status functionality:
+  * REMOVED: Cycle status update endpoint /api/update-cycle-status from backend routes
+  * REMOVED: updateCycleStatuses import from server/routes.ts
+  * REMOVED: Badge import from cycles-content.tsx (no longer needed)
+  * DELETED: Obsolete cycles-page.tsx component that contained status-related code
+  * DELETED: server/cycle-status-updater.ts file completely
+  * CLEANED: All status-related mutations and functions from cycle components
+  * SIMPLIFIED: Cycles system now completely free of status management complexity
+  * RESULT: Clean, streamlined cycles management without any status-related dependencies
 - July 15, 2025. Successfully added comprehensive pagination system to cycles table:
   * ADDED: Pagination controls with configurable items per page (5, 10, 25, 50)
   * IMPLEMENTED: Smart pagination with ellipsis (...) for large page counts

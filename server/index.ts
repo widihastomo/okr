@@ -5,7 +5,7 @@ import rateLimit from "express-rate-limit";
 import mongoSanitize from "express-mongo-sanitize";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import { scheduleCycleStatusUpdates } from "./cycle-status-updater";
+
 import { populateDatabase } from "./populate-postgres";
 import { populateGamificationData } from "./gamification-data";
 import { populateSaaSData } from "./populate-saas-data";
@@ -159,7 +159,7 @@ const config = getConfig();
   const server = await registerRoutes(app);
   
   // Start automatic cycle status updates
-  scheduleCycleStatusUpdates();
+
   
   // Start initiative deadline checking
   scheduleInitiativeDeadlineChecks();

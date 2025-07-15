@@ -9,7 +9,6 @@ export const cycles = pgTable("cycles", {
   type: text("type").notNull(), // "monthly", "quarterly", "annual"
   startDate: text("start_date").notNull(),
   endDate: text("end_date").notNull(),
-  status: text("status").notNull().default("planning"), // "planning", "active", "completed"
   organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID
   createdBy: uuid("created_by").notNull().references(() => users.id), // user ID who created the cycle
   createdAt: timestamp("created_at").defaultNow(),

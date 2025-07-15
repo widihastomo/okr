@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Edit2, Trash2, Calendar, MoreHorizontal, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -12,33 +12,7 @@ import CreateCycleModal from "./create-cycle-modal";
 import EditCycleModal from "./edit-cycle-modal";
 import { DeleteConfirmationModal } from "./delete-confirmation-modal";
 import type { Cycle } from "@shared/schema";
-// Utility functions for cycle status
-const getCycleStatusText = (status: string): string => {
-  switch (status) {
-    case 'planning': return 'Perencanaan';
-    case 'active': return 'Aktif';
-    case 'completed': return 'Selesai';
-    default: return status;
-  }
-};
 
-const getCycleStatusColor = (status: string): string => {
-  switch (status) {
-    case 'active': return 'bg-green-100 text-green-800';
-    case 'completed': return 'bg-gray-100 text-gray-800';
-    case 'planning': return 'bg-blue-100 text-blue-800';
-    default: return 'bg-gray-100 text-gray-800';
-  }
-};
-
-const getStatusBadgeVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
-  switch (status) {
-    case 'active': return 'default';
-    case 'completed': return 'secondary';
-    case 'planning': return 'outline';
-    default: return 'secondary';
-  }
-};
 
 const formatDate = (dateString: string): string => {
   if (!dateString) return '-';
@@ -114,28 +88,7 @@ export default function CyclesContent() {
     }
   });
 
-  const updateStatusMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest("POST", "/api/cycles/update-status");
-      return response.json();
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/cycles"] });
-      const updatedCount = data.updates?.length || 0;
-      toast({
-        title: "Status Update",
-        description: `${updatedCount} siklus diperbarui statusnya`,
-        className: "border-blue-200 bg-blue-50 text-blue-800"
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Gagal memperbarui status siklus",
-        variant: "destructive"
-      });
-    }
-  });
+
 
   const handleEdit = (cycle: Cycle) => {
     setSelectedCycle(cycle);
@@ -173,15 +126,6 @@ export default function CyclesContent() {
           <p className="text-gray-600 mt-1">Kelola periode waktu untuk objective dan target Anda</p>
         </div>
         <div className="flex gap-2">
-          <Button
-            onClick={() => updateStatusMutation.mutate()}
-            disabled={updateStatusMutation.isPending}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <RefreshCw className={`h-4 w-4 ${updateStatusMutation.isPending ? 'animate-spin' : ''}`} />
-            Update Status
-          </Button>
           <Button 
             onClick={() => setCreateModalOpen(true)}
             className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white flex items-center gap-2"
@@ -199,14 +143,14 @@ export default function CyclesContent() {
               <TableHead>Nama Siklus</TableHead>
               <TableHead>Tanggal Mulai</TableHead>
               <TableHead>Tanggal Selesai</TableHead>
-              <TableHead>Status</TableHead>
+
               <TableHead className="w-[70px]">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8">
+                <TableCell colSpan={4} className="text-center py-8">
                   <div className="flex items-center justify-center">
                     <RefreshCw className="h-4 w-4 animate-spin mr-2" />
                     Memuat data...
@@ -215,7 +159,7 @@ export default function CyclesContent() {
               </TableRow>
             ) : cycles.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8">
+                <TableCell colSpan={4} className="text-center py-8">
                   <div className="flex flex-col items-center justify-center text-gray-500">
                     <Calendar className="h-12 w-12 mb-4 text-gray-300" />
                     <p className="text-lg font-medium">Belum ada siklus</p>
@@ -230,11 +174,6 @@ export default function CyclesContent() {
                     <TableCell className="font-medium">{cycle.name}</TableCell>
                     <TableCell>{formatDate(cycle.startDate)}</TableCell>
                     <TableCell>{formatDate(cycle.endDate)}</TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusBadgeVariant(cycle.status)}>
-                        {getCycleStatusText(cycle.status)}
-                      </Badge>
-                    </TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

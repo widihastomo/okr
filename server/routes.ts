@@ -19,7 +19,7 @@ import { setupEmailAuth } from "./authRoutes";
 import { requireAuth, hashPassword } from "./emailAuth";
 import { calculateProgressStatus } from "./progress-tracker";
 import { updateObjectiveWithAutoStatus } from "./storage";
-import { updateCycleStatuses } from "./cycle-status-updater";
+
 import { gamificationService } from "./gamification";
 import { populateGamificationData } from "./gamification-data";
 
@@ -3825,27 +3825,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Manual Cycle Status Update
-  app.post("/api/update-cycle-status", async (req, res) => {
-    try {
-      const updates = await updateCycleStatuses();
-      
-      if (updates.length === 0) {
-        res.json({ 
-          message: "Semua siklus sudah memiliki status yang sesuai", 
-          updates: [] 
-        });
-      } else {
-        res.json({ 
-          message: `Berhasil memperbarui status ${updates.length} siklus`, 
-          updates: updates 
-        });
-      }
-    } catch (error) {
-      console.error("Error updating cycle statuses:", error);
-      res.status(500).json({ message: "Gagal memperbarui status siklus" });
-    }
-  });
+
 
   // Manual Initiative Progress Recalculation
   app.post("/api/update-initiative-progress", async (req, res) => {
