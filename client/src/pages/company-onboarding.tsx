@@ -3081,14 +3081,12 @@ export default function CompanyOnboarding() {
 
     const stepMessages = {
       1: "Setiap bisnis pasti punya tantangan. Ada yang tertinggal omzetnya, ada yang timnya belum sinkron. Tapi semua perubahan dimulai dari fokus. Sekarang, mari tentukan satu area yang paling penting untuk Anda perbaiki dulu. Kita tidak perlu sempurna di semua hal, cukup jadi luar biasa di satu hal.",
-      2: "Tidak ada tim hebat yang dibangun oleh satu orang. Saat Anda mengundang tim, Anda sedang menanamkan rasa tanggung jawab bersama. Bayangkan jika semua anggota tahu tujuan tim, tahu perannya — komunikasi lebih jernih, hasil lebih cepat terlihat",
-      3: "Bayangkan Anda sedang membangun jembatan. Tanpa batas waktu, pekerjaan bisa meluas tak tentu arah. Dengan tenggat waktu goal, Anda tahu kapan harus mulai, mengevaluasi, dan menyesuaikan. Kita tidak sedang maraton tanpa garis akhir — kita sedang sprint kecil yang terarah.",
-      4: "Banyak pemilik usaha terseret ke rutinitas harian dan kehilangan arah. Goal adalah titik utara — kompas yang menjaga Anda tetap di jalur. Mari tuliskan tujuan yang benar-benar Anda pedulikan. Bukan sekadar target, tapi alasan kenapa Anda bangun tiap pagi dan tetap berjuang.",
-      5: "Pernah merasa sudah sibuk setiap hari tapi tak yakin ada hasilnya? Di sinilah pentingnya ukuran keberhasilan. Kita ubah tujuan jadi angka, agar Anda tahu persis kapan Anda berhasil, dan kapan perlu ganti cara. Ukuran ini bukan soal angka — tapi bukti bahwa kerja Anda bermakna.",
-      6: "Kebanyakan strategi gagal bukan karena kurang ide, tapi karena terlalu banyak dan tak tahu mana yang penting. Inisiatif adalah langkah nyata. Kita pilih yang sederhana, bisa langsung dikerjakan, dan berdampak besar. Fokus pada satu tembakan yang paling kena sasaran.",
-      7: "Inisiatif ibarat jalan menuju tujuan — tapi kita tetap butuh langkah konkret agar sampai ke sana. Di sini, Anda bisa memecah inisiatif menjadi tugas-tugas kecil yang bisa segera dikerjakan.",
-      8: "Ritme adalah kunci konsistensi. Seperti olahraga, lebih baik dilakukan rutin meski ringan. Dengan ritme update yang pas, Anda tidak akan kehilangan momentum. Bayangkan sistem ini seperti partner yang selalu mengingatkan, bukan menghakimi.",
-      9: "Selamat! Anda sudah siap untuk memulai perjalanan goal management yang terstruktur. Lihat ringkasan lengkap setup Anda dan sistem akan membantu melacak progress dengan reminder otomatis serta insight yang berguna untuk perbaikan berkelanjutan.",
+      2: "Banyak pemilik usaha terseret ke rutinitas harian dan kehilangan arah. Goal adalah titik utara — kompas yang menjaga Anda tetap di jalur. Mari tuliskan tujuan yang benar-benar Anda pedulikan. Bukan sekadar target, tapi alasan kenapa Anda bangun tiap pagi dan tetap berjuang.",
+      3: "Pernah merasa sudah sibuk setiap hari tapi tak yakin ada hasilnya? Di sinilah pentingnya ukuran keberhasilan. Kita ubah tujuan jadi angka, agar Anda tahu persis kapan Anda berhasil, dan kapan perlu ganti cara. Ukuran ini bukan soal angka — tapi bukti bahwa kerja Anda bermakna.",
+      4: "Kebanyakan strategi gagal bukan karena kurang ide, tapi karena terlalu banyak dan tak tahu mana yang penting. Inisiatif adalah langkah nyata. Kita pilih yang sederhana, bisa langsung dikerjakan, dan berdampak besar. Fokus pada satu tembakan yang paling kena sasaran.",
+      5: "Inisiatif ibarat jalan menuju tujuan — tapi kita tetap butuh langkah konkret agar sampai ke sana. Di sini, Anda bisa memecah inisiatif menjadi tugas-tugas kecil yang bisa segera dikerjakan.",
+      6: "Ritme adalah kunci konsistensi. Seperti olahraga, lebih baik dilakukan rutin meski ringan. Dengan ritme update yang pas, Anda tidak akan kehilangan momentum. Bayangkan sistem ini seperti partner yang selalu mengingatkan, bukan menghakimi.",
+      7: "Selamat! Anda sudah siap untuk memulai perjalanan goal management yang terstruktur. Lihat ringkasan lengkap setup Anda dan sistem akan membantu melacak progress dengan reminder otomatis serta insight yang berguna untuk perbaikan berkelanjutan.",
     };
 
     return (
