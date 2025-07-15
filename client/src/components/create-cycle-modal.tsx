@@ -8,13 +8,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insertCycleSchema } from "@shared/schema";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
 
-const createCycleFormSchema = insertCycleSchema.omit({ type: true });
+const createCycleFormSchema = insertCycleSchema.omit({ type: true }).extend({
+  startDate: z.date({ required_error: "Tanggal mulai diperlukan" }),
+  endDate: z.date({ required_error: "Tanggal berakhir diperlukan" }),
+});
 
 type CreateCycleFormData = z.infer<typeof createCycleFormSchema>;
 
@@ -33,15 +39,21 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
     defaultValues: {
       name: "",
       description: "",
-      startDate: "",
-      endDate: "",
+      startDate: undefined,
+      endDate: undefined,
     },
   });
 
   const mutation = useMutation({
     mutationFn: async (data: CreateCycleFormData) => {
-      // Set default type as monthly when submitting
-      return apiRequest('POST', '/api/cycles', { ...data, type: "monthly" });
+      // Convert dates to ISO string format and set default type as monthly
+      const formattedData = {
+        ...data,
+        startDate: data.startDate.toISOString().split('T')[0],
+        endDate: data.endDate.toISOString().split('T')[0],
+        type: "monthly"
+      };
+      return apiRequest('POST', '/api/cycles', formattedData);
     },
     onSuccess: () => {
       // Invalidate cache to refresh the cycles list
@@ -89,20 +101,19 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
                     Nama Siklus
                     <Popover>
                       <PopoverTrigger asChild>
-                        <HelpCircle className="h-4 w-4 text-blue-500 hover:text-blue-600 cursor-help" />
+                        <button 
+                          type="button" 
+                          className="inline-flex items-center justify-center"
+                        >
+                          <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                        </button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-80">
-                        <div className="space-y-2">
-                          <h4 className="font-medium">Nama Siklus</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Berikan nama yang jelas dan deskriptif untuk siklus ini. Contoh:
-                          </p>
-                          <ul className="text-sm text-muted-foreground space-y-1">
-                            <li>• "Juli 2025" (untuk siklus bulanan)</li>
-                            <li>• "Q3 2025" (untuk siklus kuartalan)</li>
-                            <li>• "Tahun 2025" (untuk siklus tahunan)</li>
-                          </ul>
-                        </div>
+                      <PopoverContent side="right" className="max-w-xs">
+                        <p className="text-sm">
+                          Berikan nama yang jelas dan deskriptif untuk siklus ini.
+                          <br /><br />
+                          <strong>Contoh:</strong> "Juli 2025" (bulanan), "Q3 2025" (kuartalan), "Tahun 2025" (tahunan)
+                        </p>
                       </PopoverContent>
                     </Popover>
                   </FormLabel>
@@ -123,20 +134,19 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
                     Deskripsi
                     <Popover>
                       <PopoverTrigger asChild>
-                        <HelpCircle className="h-4 w-4 text-blue-500 hover:text-blue-600 cursor-help" />
+                        <button 
+                          type="button" 
+                          className="inline-flex items-center justify-center"
+                        >
+                          <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                        </button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-80">
-                        <div className="space-y-2">
-                          <h4 className="font-medium">Deskripsi Siklus</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Jelaskan fokus utama atau tema dari siklus ini. Contoh:
-                          </p>
-                          <ul className="text-sm text-muted-foreground space-y-1">
-                            <li>• "Fokus pertumbuhan penjualan dan ekspansi pasar"</li>
-                            <li>• "Peningkatan efisiensi operasional dan produktivitas"</li>
-                            <li>• "Pengembangan produk dan inovasi teknologi"</li>
-                          </ul>
-                        </div>
+                      <PopoverContent side="right" className="max-w-xs">
+                        <p className="text-sm">
+                          Jelaskan fokus utama atau tema dari siklus ini.
+                          <br /><br />
+                          <strong>Contoh:</strong> "Fokus pertumbuhan penjualan", "Peningkatan efisiensi operasional", "Pengembangan produk dan inovasi"
+                        </p>
                       </PopoverContent>
                     </Popover>
                   </FormLabel>
@@ -164,25 +174,43 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
                       Tanggal Mulai
                       <Popover>
                         <PopoverTrigger asChild>
-                          <HelpCircle className="h-4 w-4 text-blue-500 hover:text-blue-600 cursor-help" />
+                          <button 
+                            type="button" 
+                            className="inline-flex items-center justify-center"
+                          >
+                            <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                          </button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-80">
-                          <div className="space-y-2">
-                            <h4 className="font-medium">Tanggal Mulai Siklus</h4>
-                            <p className="text-sm text-muted-foreground">
-                              Pilih tanggal dimulainya siklus ini. Biasanya:
-                            </p>
-                            <ul className="text-sm text-muted-foreground space-y-1">
-                              <li>• Siklus bulanan: tanggal 1 bulan tersebut</li>
-                              <li>• Siklus kuartalan: tanggal 1 bulan pertama kuartal</li>
-                              <li>• Siklus tahunan: tanggal 1 Januari</li>
-                            </ul>
-                          </div>
+                        <PopoverContent side="right" className="max-w-xs">
+                          <p className="text-sm">
+                            Pilih tanggal dimulainya siklus ini.
+                            <br /><br />
+                            <strong>Biasanya:</strong> Siklus bulanan (tanggal 1), kuartalan (awal kuartal), tahunan (1 Januari)
+                          </p>
                         </PopoverContent>
                       </Popover>
                     </FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start text-left font-normal focus:ring-orange-500 focus:border-orange-500"
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {field.value ? format(field.value, "PPP", { locale: id }) : "Pilih tanggal mulai"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) => date < new Date("1900-01-01")}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -198,25 +226,43 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
                       Tanggal Berakhir
                       <Popover>
                         <PopoverTrigger asChild>
-                          <HelpCircle className="h-4 w-4 text-blue-500 hover:text-blue-600 cursor-help" />
+                          <button 
+                            type="button" 
+                            className="inline-flex items-center justify-center"
+                          >
+                            <HelpCircle className="w-4 h-4 text-blue-500 hover:text-blue-600 cursor-pointer" />
+                          </button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-80">
-                          <div className="space-y-2">
-                            <h4 className="font-medium">Tanggal Berakhir Siklus</h4>
-                            <p className="text-sm text-muted-foreground">
-                              Pilih tanggal berakhirnya siklus ini. Biasanya:
-                            </p>
-                            <ul className="text-sm text-muted-foreground space-y-1">
-                              <li>• Siklus bulanan: tanggal terakhir bulan tersebut</li>
-                              <li>• Siklus kuartalan: tanggal terakhir bulan ketiga kuartal</li>
-                              <li>• Siklus tahunan: tanggal 31 Desember</li>
-                            </ul>
-                          </div>
+                        <PopoverContent side="right" className="max-w-xs">
+                          <p className="text-sm">
+                            Pilih tanggal berakhirnya siklus ini.
+                            <br /><br />
+                            <strong>Biasanya:</strong> Siklus bulanan (akhir bulan), kuartalan (akhir kuartal), tahunan (31 Desember)
+                          </p>
                         </PopoverContent>
                       </Popover>
                     </FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start text-left font-normal focus:ring-orange-500 focus:border-orange-500"
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {field.value ? format(field.value, "PPP", { locale: id }) : "Pilih tanggal berakhir"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) => date < new Date("1900-01-01")}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
