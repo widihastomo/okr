@@ -107,14 +107,58 @@ export default function UpgradePackage() {
   // Create upgrade payment mutation
   const createUpgradePayment = useMutation({
     mutationFn: async (data: { planId: string; billingPeriodId: string; addOns?: any[] }) => {
-      return apiRequest('POST', '/api/upgrade/create-payment', data);
+      const response = await apiRequest('POST', '/api/upgrade/create-payment', data);
+      return response.json();
     },
     onSuccess: (data) => {
-      if (data.redirectUrl) {
+      setIsProcessing(false);
+      if (data.snapToken) {
+        // Handle Midtrans Snap payment
+        if (typeof window !== 'undefined' && (window as any).snap) {
+          (window as any).snap.pay(data.snapToken, {
+            onSuccess: function(result: any) {
+              toast({
+                title: "Pembayaran Berhasil",
+                description: "Upgrade paket berhasil diproses!",
+                variant: "default",
+              });
+              setShowPaymentModal(false);
+              // Refresh the page to show updated subscription
+              window.location.reload();
+            },
+            onPending: function(result: any) {
+              toast({
+                title: "Pembayaran Pending",
+                description: "Pembayaran sedang diproses. Kami akan memberitahu Anda setelah selesai.",
+                variant: "default",
+              });
+              setShowPaymentModal(false);
+            },
+            onError: function(result: any) {
+              toast({
+                title: "Pembayaran Gagal",
+                description: "Terjadi kesalahan saat memproses pembayaran. Silakan coba lagi.",
+                variant: "destructive",
+              });
+              setIsProcessing(false);
+            },
+            onClose: function() {
+              setIsProcessing(false);
+            }
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: "Midtrans Snap belum dimuat. Silakan refresh halaman dan coba lagi.",
+            variant: "destructive",
+          });
+        }
+      } else if (data.redirectUrl) {
         window.location.href = data.redirectUrl;
       }
     },
     onError: (error: any) => {
+      setIsProcessing(false);
       toast({
         title: "Error",
         description: error.message || "Gagal membuat pembayaran upgrade",

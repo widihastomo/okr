@@ -255,6 +255,16 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 15, 2025. Successfully implemented comprehensive add-on system with quantity support and fixed payment processing:
+  * ADDED: "Additional Users" add-on with quantity selection (1-50 users) at Rp 15,000/user/month
+  * ENHANCED: Add-on UI with quantity controls using plus/minus buttons with proper validation
+  * IMPROVED: Dynamic pricing display showing "/pengguna/bulan" for quantity-based add-ons
+  * INTEGRATED: Backend quantity calculation in payment processing and Midtrans item details
+  * FIXED: Payment processing by properly handling Midtrans snapToken and adding Snap script to HTML
+  * ADDED: Midtrans Snap payment integration with proper success/pending/error handling
+  * ENHANCED: Order summary showing quantity indicators (e.g., "Additional Users (5x)")
+  * IMPROVED: State management to properly reset add-on selections and quantities when modal closes
+  * RESULT: Complete add-on system with working payment flow for subscription upgrades
 - July 15, 2025. Successfully improved subscription upgrade page with trial days remaining display and updated messaging:
   * ENHANCED: Added daysRemaining field to OrganizationSubscription interface for proper typing
   * UPDATED: API endpoint /api/organization/subscription now calculates and returns trial days remaining
