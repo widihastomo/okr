@@ -91,6 +91,39 @@ export default function ClientUserManagement() {
   const [ownerSearchOpen, setOwnerSearchOpen] = useState(false);
   const [ownerSearchValue, setOwnerSearchValue] = useState("");
 
+  // Fetch users in the current organization only
+  const { data: users = [], isLoading: loadingUsers } = useQuery<User[]>({
+    queryKey: ["/api/organization/users"],
+  });
+
+  // Fetch teams in the current organization
+  const { data: teams = [], isLoading: teamsLoading } = useQuery<Team[]>({
+    queryKey: ["/api/teams"],
+  });
+
+  // Fetch team members
+  const { data: allTeamMembers = [], isLoading: loadingTeamMembers } = useQuery<TeamMember[]>({
+    queryKey: ["/api/team-members"],
+  });
+
+  // Active users for team management
+  const activeUsers = users.filter(user => user.isActive === true);
+
+  // Helper function to get user display name
+  const getUserDisplayName = (user: User) => {
+    if (user.firstName && user.lastName) {
+      return `${user.firstName} ${user.lastName}`;
+    } else if (user.firstName) {
+      return user.firstName;
+    } else if (user.lastName) {
+      return user.lastName;
+    } else {
+      // Extract name from email if available
+      const emailName = user.email.split('@')[0];
+      return emailName || user.email;
+    }
+  };
+
   // Reset team form
   const resetTeamForm = () => {
     setSelectedMembers([]);
@@ -115,38 +148,7 @@ export default function ClientUserManagement() {
     );
   }
 
-  // Fetch users in the current organization only
-  const { data: users = [], isLoading: loadingUsers } = useQuery<User[]>({
-    queryKey: ["/api/organization/users"],
-  });
 
-  // Active users for team management
-  const activeUsers = users.filter(user => user.isActive === true);
-
-  // Helper function to get user display name
-  const getUserDisplayName = (user: User) => {
-    if (user.firstName && user.lastName) {
-      return `${user.firstName} ${user.lastName}`;
-    } else if (user.firstName) {
-      return user.firstName;
-    } else if (user.lastName) {
-      return user.lastName;
-    } else {
-      // Extract name from email if available
-      const emailName = user.email.split('@')[0];
-      return emailName || user.email;
-    }
-  };
-
-  // Fetch teams in the current organization
-  const { data: teams = [], isLoading: teamsLoading } = useQuery<Team[]>({
-    queryKey: ["/api/teams"],
-  });
-
-  // Fetch team members
-  const { data: allTeamMembers = [] } = useQuery<TeamMember[]>({
-    queryKey: ["/api/team-members"],
-  });
 
   // Invite user mutation
   const inviteUserMutation = useMutation({
