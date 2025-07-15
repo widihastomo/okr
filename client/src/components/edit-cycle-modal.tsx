@@ -45,11 +45,18 @@ export default function EditCycleModal({ cycle, open, onOpenChange }: EditCycleM
 
   const mutation = useMutation({
     mutationFn: async (data: EditCycleFormData) => {
-      // Convert dates to ISO string format and set default type as monthly
+      // Convert dates to local date format to prevent timezone issues
+      const formatDateToLocal = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+      
       const formattedData = {
         ...data,
-        startDate: data.startDate.toISOString().split('T')[0],
-        endDate: data.endDate.toISOString().split('T')[0],
+        startDate: formatDateToLocal(data.startDate),
+        endDate: formatDateToLocal(data.endDate),
         type: "monthly"
       };
       return apiRequest('PATCH', `/api/cycles/${cycle?.id}`, formattedData);
