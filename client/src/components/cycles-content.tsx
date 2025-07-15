@@ -152,14 +152,13 @@ export default function CyclesContent() {
               <TableHead>Tanggal Mulai</TableHead>
               <TableHead>Tanggal Selesai</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Deskripsi</TableHead>
               <TableHead className="w-[70px]">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8">
+                <TableCell colSpan={5} className="text-center py-8">
                   <div className="flex items-center justify-center">
                     <RefreshCw className="h-4 w-4 animate-spin mr-2" />
                     Memuat data...
@@ -168,7 +167,7 @@ export default function CyclesContent() {
               </TableRow>
             ) : cycles.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8">
+                <TableCell colSpan={5} className="text-center py-8">
                   <div className="flex flex-col items-center justify-center text-gray-500">
                     <Calendar className="h-12 w-12 mb-4 text-gray-300" />
                     <p className="text-lg font-medium">Belum ada siklus</p>
@@ -187,9 +186,6 @@ export default function CyclesContent() {
                       <Badge variant={getStatusBadgeVariant(cycle.status)}>
                         {getCycleStatusText(cycle.status)}
                       </Badge>
-                    </TableCell>
-                    <TableCell className="max-w-[200px] truncate">
-                      {cycle.description || "-"}
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>

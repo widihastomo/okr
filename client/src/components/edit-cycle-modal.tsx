@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -23,7 +23,6 @@ export default function EditCycleModal({ cycle, open, onOpenChange }: EditCycleM
     startDate: cycle?.startDate || "",
     endDate: cycle?.endDate || "",
     status: cycle?.status || "planning",
-    description: cycle?.description || "",
   });
 
   const { toast } = useToast();
@@ -63,7 +62,6 @@ export default function EditCycleModal({ cycle, open, onOpenChange }: EditCycleM
         startDate: cycle.startDate,
         endDate: cycle.endDate,
         status: cycle.status,
-        description: cycle.description || "",
       });
     }
   }, [cycle]);
@@ -143,16 +141,7 @@ export default function EditCycleModal({ cycle, open, onOpenChange }: EditCycleM
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="description">Deskripsi</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Masukkan deskripsi siklus (opsional)"
-              rows={3}
-            />
-          </div>
+
 
           <div className="flex justify-end space-x-2 pt-4">
             <Button
