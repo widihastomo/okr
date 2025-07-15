@@ -26,10 +26,10 @@ app.use(helmet({
   contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false
 }));
 
-// Rate limiting - More permissive for production SaaS usage
+// Rate limiting - Very permissive for development, moderate for production
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: process.env.NODE_ENV === 'production' ? 500 : 100, // Higher limit for production
+  max: process.env.NODE_ENV === 'production' ? 500 : 1000, // Very high limit for development
   message: {
     error: "Too many requests from this IP, please try again later.",
     retryAfter: "15 minutes"
@@ -40,13 +40,18 @@ const limiter = rateLimit({
   skipSuccessfulRequests: process.env.NODE_ENV === 'production'
 });
 
-// Apply rate limiting to API routes
-app.use('/api', limiter);
+// Apply rate limiting to API routes only in production
+if (process.env.NODE_ENV === 'production') {
+  app.use('/api', limiter);
+  console.log("🔒 API rate limiting enabled for production");
+} else {
+  console.log("ℹ️ Skipping API rate limiting in development mode");
+}
 
-// Stricter rate limit for auth endpoints only (to prevent brute force)
+// Auth rate limiting - very permissive in development
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // Increased from 5 to 10 for better UX
+  max: process.env.NODE_ENV === 'production' ? 10 : 100, // Very high limit for development
   skipSuccessfulRequests: true,
   message: {
     error: "Too many login attempts from this IP, please try again later.",
@@ -57,7 +62,7 @@ const authLimiter = rateLimit({
 // More permissive rate limit for /api/auth/me endpoint
 const authMeLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // 100 requests per 15 minutes for auth checks
+  max: process.env.NODE_ENV === 'production' ? 100 : 500, // Very high limit for development
   skipSuccessfulRequests: true,
   message: {
     error: "Too many authentication requests from this IP, please try again later.",
@@ -65,9 +70,15 @@ const authMeLimiter = rateLimit({
   }
 });
 
-app.use('/api/auth/login', authLimiter);
-app.use('/api/auth/register', authLimiter);
-app.use('/api/auth/me', authMeLimiter);
+// Apply auth rate limiting only in production
+if (process.env.NODE_ENV === 'production') {
+  app.use('/api/auth/login', authLimiter);
+  app.use('/api/auth/register', authLimiter);
+  app.use('/api/auth/me', authMeLimiter);
+  console.log("🔒 Auth rate limiting enabled for production");
+} else {
+  console.log("ℹ️ Skipping auth rate limiting in development mode");
+}
 
 // Data sanitization
 app.use(mongoSanitize());

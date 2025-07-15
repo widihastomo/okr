@@ -262,7 +262,9 @@ All email configuration now uses environment variables:
   * RESOLVED: Local development no longer experiences "timeout exceeded when trying to connect" errors
   * MAINTAINED: RLS security remains active in production environment
   * OPTIMIZED: Development environment now runs without database connection pool conflicts
-  * RESULT: Local development deployment now works smoothly without RLS-related timeout errors
+  * DISABLED: Rate limiting completely disabled in development mode to prevent "too many requests" login errors
+  * ENHANCED: API and auth rate limiting now only applies in production for better development experience
+  * RESULT: Local development deployment now works smoothly without RLS-related timeout errors or rate limiting issues
 - July 15, 2025. Successfully implemented custom SMTP email configuration:
   * CHANGED: Email service now prioritizes custom SMTP over other providers
   * CONFIGURED: Custom SMTP server (mail.refokus.id:465) as primary email provider
