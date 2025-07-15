@@ -84,16 +84,22 @@ export default function ClientUserManagement() {
   const [teamSearchTerm, setTeamSearchTerm] = useState("");
   const [editingTeam, setEditingTeam] = useState<Team | null>(null);
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [selectedOwnerId, setSelectedOwnerId] = useState<string>("");
   const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
   const [memberSearchOpen, setMemberSearchOpen] = useState(false);
   const [memberSearchValue, setMemberSearchValue] = useState("");
+  const [ownerSearchOpen, setOwnerSearchOpen] = useState(false);
+  const [ownerSearchValue, setOwnerSearchValue] = useState("");
 
   // Reset team form
   const resetTeamForm = () => {
     setSelectedMembers([]);
+    setSelectedOwnerId("");
     setShowCreateTeamModal(false);
     setMemberSearchOpen(false);
     setMemberSearchValue("");
+    setOwnerSearchOpen(false);
+    setOwnerSearchValue("");
   };
 
   // Check if current user can manage users in their organization
@@ -677,7 +683,7 @@ export default function ClientUserManagement() {
                       createTeamMutation.mutate({
                         name: formData.get('name') as string,
                         description: formData.get('description') as string,
-                        ownerId: formData.get('ownerId') as string,
+                        ownerId: selectedOwnerId,
                         memberIds: selectedMembers,
                       });
                     }}>
@@ -691,19 +697,80 @@ export default function ClientUserManagement() {
                           <Input name="description" placeholder="Deskripsi tim" />
                         </div>
                         <div>
-                          <Label htmlFor="ownerId">Pimpinan Tim</Label>
-                          <Select name="ownerId" required>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pilih pimpinan tim" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {activeUsers.map((user) => (
-                                <SelectItem key={user.id} value={user.id}>
-                                  {getUserDisplayName(user)}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          <Label>Pimpinan Tim</Label>
+                          <Popover open={ownerSearchOpen} onOpenChange={setOwnerSearchOpen}>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                aria-expanded={ownerSearchOpen}
+                                className="w-full justify-between"
+                              >
+                                {selectedOwnerId ? (
+                                  <div className="flex items-center gap-2">
+                                    <Avatar className="h-5 w-5">
+                                      <AvatarFallback className="text-xs">
+                                        {getUserDisplayName(activeUsers.find(u => u.id === selectedOwnerId)!).charAt(0).toUpperCase()}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <span>{getUserDisplayName(activeUsers.find(u => u.id === selectedOwnerId)!)}</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-gray-500">Pilih pimpinan tim...</span>
+                                )}
+                                <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-full p-0" align="start">
+                              <Command>
+                                <CommandInput
+                                  placeholder="Cari pimpinan tim..."
+                                  value={ownerSearchValue}
+                                  onValueChange={setOwnerSearchValue}
+                                />
+                                <CommandList>
+                                  <CommandEmpty>Tidak ada pimpinan ditemukan.</CommandEmpty>
+                                  <CommandGroup>
+                                    {activeUsers
+                                      .filter(user => {
+                                        const displayName = getUserDisplayName(user);
+                                        return displayName.toLowerCase().includes(ownerSearchValue.toLowerCase()) ||
+                                               user.email.toLowerCase().includes(ownerSearchValue.toLowerCase());
+                                      })
+                                      .map((user) => {
+                                        const displayName = getUserDisplayName(user);
+                                        const isSelected = selectedOwnerId === user.id;
+                                        
+                                        return (
+                                          <CommandItem
+                                            key={user.id}
+                                            value={user.id}
+                                            onSelect={() => {
+                                              setSelectedOwnerId(user.id);
+                                              setOwnerSearchOpen(false);
+                                            }}
+                                            className="flex items-center gap-2 cursor-pointer"
+                                          >
+                                            <Avatar className="h-6 w-6">
+                                              <AvatarFallback className="text-xs">
+                                                {displayName.charAt(0).toUpperCase()}
+                                              </AvatarFallback>
+                                            </Avatar>
+                                            <div>
+                                              <div className="font-medium">{displayName}</div>
+                                              <div className="text-sm text-gray-500">{user.email}</div>
+                                            </div>
+                                            {isSelected && (
+                                              <Check className="h-4 w-4 text-orange-600 ml-auto" />
+                                            )}
+                                          </CommandItem>
+                                        );
+                                      })}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
                         </div>
                         <div>
                           <Label>Anggota Tim</Label>
@@ -821,7 +888,7 @@ export default function ClientUserManagement() {
                           <Button type="button" variant="outline" onClick={resetTeamForm}>
                             Batal
                           </Button>
-                          <Button type="submit" disabled={createTeamMutation.isPending} className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white">
+                          <Button type="submit" disabled={createTeamMutation.isPending || !selectedOwnerId} className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white">
                             {createTeamMutation.isPending ? "Membuat..." : "Buat Tim"}
                           </Button>
                         </div>
