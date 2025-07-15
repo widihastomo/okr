@@ -65,50 +65,38 @@ const ONBOARDING_STEPS = [
   },
   {
     id: 2,
-    title: "Undang Tim",
-    description: "Siapa saja yang akan berkolaborasi dengan Anda?",
-    icon: UserPlus,
-  },
-  {
-    id: 3,
-    title: "Tentukan Tenggat Waktu Goal",
-    description: "Berapa lama Anda ingin goal ini tercapai?",
-    icon: Calendar,
-  },
-  {
-    id: 4,
     title: "Buat Goal",
     description:
       "Pilih satu tujuan yang penting dan bermakna. Anda dapat menambahkan / merubahnya setelah onboarding selesai",
     icon: Target,
   },
   {
-    id: 5,
+    id: 3,
     title: "Angka Target",
     description: "Tentukan cara mengukur keberhasilan",
     icon: TrendingUp,
   },
   {
-    id: 6,
+    id: 4,
     title: "Pilih Inisiatif Prioritas",
     description:
       "Tentukan langkah-langkah strategis untuk mencapai angka target",
     icon: CheckCircle,
   },
   {
-    id: 7,
+    id: 5,
     title: "Tugas untuk Inisiatif",
     description: "Tentukan tugas-tugas yang harus dikerjakan",
     icon: BarChart,
   },
   {
-    id: 8,
+    id: 6,
     title: "Pilih Ritme",
     description: "Seberapa sering Anda ingin update progress?",
     icon: Clock,
   },
   {
-    id: 9,
+    id: 7,
     title: "Ringkasan",
     description:
       "Lihat ringkasan dari goal dan strategi eksekusi yang sudah anda buat",
@@ -769,193 +757,9 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 2: // Undang Tim
-        return (
-          <div className="space-y-4">
-            <Label>Undang anggota tim (opsional):</Label>
-            <div className="space-y-3">
-              {[0, 1, 2].map((index) => (
-                <div key={index} className="space-y-1">
-                  <Label
-                    htmlFor={`email-${index}`}
-                    className="text-sm text-gray-600"
-                  >
-                    Email anggota tim {index + 1}:
-                  </Label>
-                  <Input
-                    id={`email-${index}`}
-                    type="email"
-                    placeholder={`Contoh: member${index + 1}@company.com`}
-                    value={onboardingData.invitedMembers[index] || ""}
-                    onChange={(e) => {
-                      const newMembers = [...onboardingData.invitedMembers];
-                      // Extend array if necessary
-                      while (newMembers.length <= index) {
-                        newMembers.push("");
-                      }
-                      newMembers[index] = e.target.value;
-                      setOnboardingData({
-                        ...onboardingData,
-                        invitedMembers: newMembers,
-                      });
-                    }}
-                    className="w-full"
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="text-sm text-gray-500">
-              Semua field email bersifat opsional. Anda dapat mengisi sebagian
-              atau mengosongkan semua field.
-            </div>
-          </div>
-        );
 
-      case 3: // Tentukan Goal Cycle
-        return (
-          <div className="space-y-4">
-            <Label htmlFor="cycle-duration">Pilih durasi Goal:</Label>
-            <Select
-              value={onboardingData.cycleDuration}
-              onValueChange={(value) =>
-                setOnboardingData({ ...onboardingData, cycleDuration: value })
-              }
-            >
-              <SelectTrigger className="transition-all duration-300 hover:shadow-md focus:shadow-lg focus:scale-[1.02]">
-                <SelectValue placeholder="Pilih durasi" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem
-                  value="1_bulan"
-                  className="transition-all duration-200 hover:bg-orange-50"
-                >
-                  1 Bulan
-                </SelectItem>
-                <SelectItem
-                  value="3_bulan"
-                  className="transition-all duration-200 hover:bg-orange-50"
-                >
-                  3 Bulan (Quarterly)
-                </SelectItem>
-                <SelectItem
-                  value="6_bulan"
-                  className="transition-all duration-200 hover:bg-orange-50"
-                >
-                  6 Bulan
-                </SelectItem>
-                <SelectItem
-                  value="1_tahun"
-                  className="transition-all duration-200 hover:bg-orange-50"
-                >
-                  1 Tahun
-                </SelectItem>
-              </SelectContent>
-            </Select>
-            {onboardingData.cycleDuration && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="start-date">Tanggal Mulai</Label>
-                  <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full justify-start text-left font-normal transition-all duration-300 hover:shadow-md focus:shadow-lg focus:scale-[1.02]",
-                          !onboardingData.cycleStartDate &&
-                            "text-muted-foreground",
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {onboardingData.cycleStartDate ? (
-                          format(
-                            new Date(onboardingData.cycleStartDate),
-                            "dd MMMM yyyy",
-                          )
-                        ) : (
-                          <span>Pilih tanggal mulai</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <CalendarComponent
-                        mode="single"
-                        selected={
-                          onboardingData.cycleStartDate
-                            ? new Date(onboardingData.cycleStartDate)
-                            : undefined
-                        }
-                        onSelect={(date) => {
-                          if (date) {
-                            const formattedDate = format(date, "yyyy-MM-dd");
-                            setOnboardingData({
-                              ...onboardingData,
-                              cycleStartDate: formattedDate,
-                            });
-                            setStartDateOpen(false); // Close the popover after selection
-                          }
-                        }}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <div>
-                  <Label htmlFor="end-date">Tanggal Selesai</Label>
-                  <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full justify-start text-left font-normal transition-all duration-300 hover:shadow-md focus:shadow-lg focus:scale-[1.02]",
-                          !onboardingData.cycleEndDate &&
-                            "text-muted-foreground",
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {onboardingData.cycleEndDate ? (
-                          format(
-                            new Date(onboardingData.cycleEndDate),
-                            "dd MMMM yyyy",
-                          )
-                        ) : (
-                          <span>Pilih tanggal selesai</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <CalendarComponent
-                        mode="single"
-                        selected={
-                          onboardingData.cycleEndDate
-                            ? new Date(onboardingData.cycleEndDate)
-                            : undefined
-                        }
-                        onSelect={(date) => {
-                          if (date) {
-                            const formattedDate = format(date, "yyyy-MM-dd");
-                            setOnboardingData({
-                              ...onboardingData,
-                              cycleEndDate: formattedDate,
-                            });
-                            setEndDateOpen(false); // Close the popover after selection
-                          }
-                        }}
-                        initialFocus
-                        disabled={(date) =>
-                          onboardingData.cycleStartDate
-                            ? date < new Date(onboardingData.cycleStartDate)
-                            : false
-                        }
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </div>
-            )}
-          </div>
-        );
 
-      case 4: // Buat Objective
+      case 2: // Buat Objective
         const getObjectiveOptions = (teamFocus: string) => {
           const options = {
             penjualan: [
@@ -1030,7 +834,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 5: // Ukuran Keberhasilan
+      case 3: // Ukuran Keberhasilan
         const getKeyResultOptions = (objective: string) => {
           // Key Results untuk objective penjualan
           const salesKeyResults = {
@@ -1183,7 +987,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 8: // Pilih Cadence
+      case 6: // Pilih Cadence
         return (
           <div className="space-y-6">
             <div className="space-y-2">
@@ -1580,7 +1384,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 6: // Pilih Inisiatif Prioritas
+      case 4: // Pilih Inisiatif Prioritas
         const initiativeMapping = {
           // Penjualan - Omzet
           "Mencapai target penjualan Rp 500 juta per bulan": [
@@ -1925,7 +1729,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 7: // Task untuk Inisiatif
+      case 5: // Task untuk Inisiatif
         // Define taskMapping outside functions so it can be reused
         const taskMapping = {
           // Penjualan & Marketing Tasks
@@ -2981,7 +2785,7 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-      case 9: // Ringkasan & Reminder
+      case 7: // Ringkasan & Reminder
         return (
           <div className="space-y-6">
             {/* Success Message */}
