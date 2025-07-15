@@ -1319,6 +1319,21 @@ export class DatabaseStorage implements IStorage {
     );
   }
 
+  async getOKRsWithKeyResultsByOrganization(organizationId: string): Promise<OKRWithKeyResults[]> {
+    const orgObjectives = await this.getObjectivesByOrganization(organizationId);
+    return await Promise.all(
+      orgObjectives.map(async (objective) => {
+        const keyResultsList = await this.getKeyResultsByObjectiveId(objective.id);
+        const overallProgress = this.calculateOverallProgress(keyResultsList);
+        return {
+          ...objective,
+          keyResults: keyResultsList,
+          overallProgress,
+        };
+      })
+    );
+  }
+
   async getOKRWithKeyResults(id: string): Promise<OKRWithKeyResults | undefined> {
     const objective = await this.getObjective(id);
     if (!objective) return undefined;
@@ -1340,6 +1355,48 @@ export class DatabaseStorage implements IStorage {
       objectivesList = await db.select().from(objectives).where(eq(objectives.cycleId, cycleId));
     } else {
       objectivesList = await db.select().from(objectives);
+    }
+
+    return await Promise.all(
+      objectivesList.map(async (objective) => {
+        const keyResultsList = await this.getKeyResultsByObjectiveId(objective.id);
+        
+        const keyResultsWithDetails = await Promise.all(
+          keyResultsList.map(async (kr) => {
+            const [checkInsList, initiativesList] = await Promise.all([
+              this.getCheckInsByKeyResultId(kr.id),
+              this.getInitiativesByKeyResultId(kr.id),
+            ]);
+
+            return {
+              ...kr,
+              checkIns: checkInsList,
+              initiatives: initiativesList,
+              progress: this.calculateProgress(kr.currentValue, kr.targetValue, kr.keyResultType, kr.baseValue),
+            };
+          })
+        );
+
+        const overallProgress = this.calculateOverallProgress(keyResultsList);
+
+        return {
+          ...objective,
+          keyResults: keyResultsWithDetails,
+          overallProgress,
+        };
+      })
+    );
+  }
+
+  async getOKRsWithFullHierarchyByOrganization(organizationId: string, cycleId?: string): Promise<any[]> {
+    let objectivesList: Objective[];
+    
+    if (cycleId) {
+      objectivesList = await db.select().from(objectives)
+        .where(and(eq(objectives.organizationId, organizationId), eq(objectives.cycleId, cycleId)));
+    } else {
+      objectivesList = await db.select().from(objectives)
+        .where(eq(objectives.organizationId, organizationId));
     }
 
     return await Promise.all(

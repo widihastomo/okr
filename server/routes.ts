@@ -2064,13 +2064,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get single OKR with key results by ID
-  app.get("/api/okrs/:id", async (req, res) => {
+  app.get("/api/okrs/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
+      
       const okr = await storage.getOKRWithKeyResults(id);
       if (!okr) {
         return res.status(404).json({ message: "OKR not found" });
       }
+      
+      // Verify user has access to this OKR
+      if (!currentUser.isSystemOwner && okr.organizationId !== currentUser.organizationId) {
+        return res.status(403).json({ message: "Access denied to this OKR" });
+      }
+      
       res.json(okr);
     } catch (error) {
       console.error("Error fetching OKR:", error);
@@ -2079,17 +2087,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all OKRs with key results
-  app.get("/api/okrs", async (req, res) => {
+  app.get("/api/okrs", requireAuth, async (req, res) => {
     try {
+      const currentUser = req.user as User;
       const { status, timeframe } = req.query;
-      let okrs = await storage.getOKRsWithKeyResults();
+      
+      // System owners can access all OKRs, regular users need organization
+      if (!currentUser.isSystemOwner && !currentUser.organizationId) {
+        return res.status(400).json({ message: "User not associated with an organization" });
+      }
+      
+      let okrs;
+      if (currentUser.isSystemOwner) {
+        okrs = await storage.getOKRsWithKeyResults();
+      } else {
+        okrs = await storage.getOKRsWithKeyResultsByOrganization(currentUser.organizationId!);
+      }
       
       // Apply filters
       if (status && status !== "all") {
         okrs = okrs.filter(okr => okr.status === status);
       }
-      
-
       
       res.json(okrs);
     } catch (error) {
@@ -2099,10 +2117,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get OKRs with full 4-level hierarchy (Objective → Key Results → Initiatives → Tasks)
-  app.get("/api/okrs-with-hierarchy", async (req, res) => {
+  app.get("/api/okrs-with-hierarchy", requireAuth, async (req, res) => {
     try {
+      const currentUser = req.user as User;
       const { cycleId } = req.query;
-      const okrs = await storage.getOKRsWithFullHierarchy(cycleId as string | undefined);
+      
+      // System owners can access all OKRs, regular users need organization
+      if (!currentUser.isSystemOwner && !currentUser.organizationId) {
+        return res.status(400).json({ message: "User not associated with an organization" });
+      }
+      
+      let okrs;
+      if (currentUser.isSystemOwner) {
+        okrs = await storage.getOKRsWithFullHierarchy(cycleId as string | undefined);
+      } else {
+        okrs = await storage.getOKRsWithFullHierarchyByOrganization(currentUser.organizationId!, cycleId as string | undefined);
+      }
+      
       res.json(okrs);
     } catch (error) {
       console.error("Error fetching OKRs with hierarchy:", error);
@@ -2126,21 +2157,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get single OKR with key results
-  app.get("/api/okrs/:id", async (req, res) => {
-    try {
-      const id = req.params.id;
-      const okr = await storage.getOKRWithKeyResults(id);
-      
-      if (!okr) {
-        return res.status(404).json({ message: "OKR not found" });
-      }
-      
-      res.json(okr);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch OKR" });
-    }
-  });
+
 
   // Create new OKR with key results
   app.post("/api/okrs", requireAuth, async (req, res) => {
