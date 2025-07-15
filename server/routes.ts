@@ -1702,18 +1702,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
         teams = await storage.getTeamsByOrganization(currentUser.organizationId!);
       }
       
-      // Include member data for each team
-      const teamsWithMembers = await Promise.all(teams.map(async (team) => {
-        const members = await storage.getTeamMembers(team.id);
-        return {
-          ...team,
-          members: members
-        };
-      }));
-      res.json(teamsWithMembers);
+      res.json(teams);
     } catch (error) {
       console.error("Error fetching teams:", error);
       res.status(500).json({ message: "Failed to fetch teams" });
+    }
+  });
+
+  // Get all team members for organization
+  app.get('/api/team-members', requireAuth, async (req, res) => {
+    try {
+      const currentUser = req.user as User;
+      
+      // System owners can access all team members, regular users need organization
+      if (!currentUser.isSystemOwner && !currentUser.organizationId) {
+        return res.status(400).json({ message: "User not associated with an organization" });
+      }
+      
+      let teams;
+      if (currentUser.isSystemOwner) {
+        teams = await storage.getTeams();
+      } else {
+        teams = await storage.getTeamsByOrganization(currentUser.organizationId!);
+      }
+      
+      // Get all team members across all teams
+      const allTeamMembers = [];
+      for (const team of teams) {
+        const members = await storage.getTeamMembers(team.id);
+        allTeamMembers.push(...members);
+      }
+      
+      console.log('GET /api/team-members - returning members:', allTeamMembers.length);
+      res.json(allTeamMembers);
+    } catch (error) {
+      console.error("Error fetching team members:", error);
+      res.status(500).json({ message: "Failed to fetch team members" });
     }
   });
 
