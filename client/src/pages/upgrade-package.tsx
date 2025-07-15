@@ -78,7 +78,10 @@ export default function UpgradePackage() {
     const orderId = urlParams.get('order_id');
     const statusCode = urlParams.get('status_code');
 
+    console.log('URL Parameters:', { status, transactionStatus, orderId, statusCode });
+
     if (status === 'success' && transactionStatus === 'settlement' && orderId) {
+      console.log('Payment success detected, setting state...');
       setPaymentSuccess(true);
       setPaymentData({
         orderId,
@@ -94,11 +97,13 @@ export default function UpgradePackage() {
         variant: "default",
       });
 
-      // Clear URL parameters
-      window.history.replaceState({}, document.title, window.location.pathname);
-      
       // Refresh subscription data
       queryClient.invalidateQueries({ queryKey: ['/api/organization/subscription'] });
+      
+      // Clear URL parameters after a short delay to ensure state is set
+      setTimeout(() => {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }, 1000);
     } else if (status === 'pending' && orderId) {
       toast({
         title: "Pembayaran Pending",
@@ -107,7 +112,9 @@ export default function UpgradePackage() {
       });
       
       // Clear URL parameters
-      window.history.replaceState({}, document.title, window.location.pathname);
+      setTimeout(() => {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }, 1000);
     } else if (status === 'error' && orderId) {
       toast({
         title: "Pembayaran Gagal",
@@ -116,7 +123,9 @@ export default function UpgradePackage() {
       });
       
       // Clear URL parameters
-      window.history.replaceState({}, document.title, window.location.pathname);
+      setTimeout(() => {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }, 1000);
     }
   }, [toast, queryClient]);
 
@@ -436,6 +445,9 @@ export default function UpgradePackage() {
       </div>
     );
   }
+
+  // Debug logging
+  console.log('Render state:', { paymentSuccess, paymentData });
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
