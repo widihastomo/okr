@@ -21,8 +21,7 @@ export default function Profile() {
   
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: (user as any)?.firstName || "",
-    lastName: (user as any)?.lastName || "",
+    name: (user as any)?.name || "",
     email: (user as any)?.email || "",
     role: (user as any)?.role || "member"
   });
@@ -217,29 +216,16 @@ export default function Profile() {
                 </CardHeader>
                 <CardContent className="p-6">
                   <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="firstName">Nama Depan</Label>
-                        <Input
-                          id="firstName"
-                          type="text"
-                          value={formData.firstName}
-                          onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                          disabled={!isEditing}
-                          placeholder="Masukkan nama depan"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="lastName">Nama Belakang</Label>
-                        <Input
-                          id="lastName"
-                          type="text"
-                          value={formData.lastName}
-                          onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                          disabled={!isEditing}
-                          placeholder="Masukkan nama belakang"
-                        />
-                      </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Nama Lengkap</Label>
+                      <Input
+                        id="name"
+                        type="text"
+                        value={formData.name}
+                        onChange={(e) => setFormData({...formData, name: e.target.value})}
+                        disabled={!isEditing}
+                        placeholder="Masukkan nama lengkap"
+                      />
                     </div>
                     
                     <div className="space-y-2">
@@ -309,9 +295,9 @@ export default function Profile() {
                     </Avatar>
                   </div>
                   <CardTitle className="text-lg font-semibold text-gray-900">
-                    {(user as any)?.firstName && (user as any)?.lastName
-                      ? `${(user as any).firstName} ${(user as any).lastName}`
-                      : (user as any)?.email || "User"
+                    {(user as any)?.name && (user as any)?.name.trim() !== ''
+                      ? (user as any).name.trim()
+                      : (user as any)?.email?.split('@')[0] || "User"
                     }
                   </CardTitle>
                   <CardDescription className="flex items-center justify-center gap-2 mt-3">
