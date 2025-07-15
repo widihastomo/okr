@@ -255,6 +255,13 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 15, 2025. Successfully improved subscription upgrade page with trial days remaining display and updated messaging:
+  * ENHANCED: Added daysRemaining field to OrganizationSubscription interface for proper typing
+  * UPDATED: API endpoint /api/organization/subscription now calculates and returns trial days remaining
+  * IMPROVED: Current subscription card now displays "X hari tersisa" for active trials
+  * CHANGED: Subscription plans section description from "Semua paket termasuk 14 hari free trial" to "Upgrade paket untuk mendapatkan fitur unlimited"
+  * BUSINESS RULE: Removed free trial mention from upgrade page as upgrades should not include additional trials
+  * RESULT: Clear trial status information with appropriate messaging for users considering upgrades
 - July 15, 2025. Successfully fixed local development database connection timeout issue:
   * FIXED: RLS middleware now disabled in development mode to prevent connection timeouts
   * ENHANCED: Added timeout handling (5 seconds) to RLS context clearing operations
