@@ -22,15 +22,15 @@ export async function rlsMiddleware(req: Request, res: Response, next: NextFunct
     // Get user from session (set by requireAuth middleware)
     const userId = req.session?.userId;
     if (!userId) {
-      // If no user in session, clear any existing RLS context
-      await clearRLSContext();
+      // If no user in session, clear any existing RLS context (non-blocking)
+      clearRLSContext().catch(err => console.error('Background RLS clear error:', err));
       return next();
     }
 
     // Get user details including organization
     const user = await storage.getUser(userId);
     if (!user) {
-      await clearRLSContext();
+      clearRLSContext().catch(err => console.error('Background RLS clear error:', err));
       return next();
     }
 
@@ -46,12 +46,10 @@ export async function rlsMiddleware(req: Request, res: Response, next: NextFunct
 
   } catch (error) {
     console.error('RLS middleware error:', error);
-    // Don't block request on RLS errors, but clear context for safety
-    try {
-      await clearRLSContext();
-    } catch (clearError) {
+    // Don't block request on RLS errors, but clear context for safety (non-blocking)
+    clearRLSContext().catch(clearError => {
       console.error('Error clearing RLS context:', clearError);
-    }
+    });
     next();
   }
 }
@@ -62,13 +60,11 @@ export async function rlsMiddleware(req: Request, res: Response, next: NextFunct
  */
 export async function rlsCleanupMiddleware(req: Request, res: Response, next: NextFunction) {
   try {
-    // Set up cleanup to run after response is sent
-    res.on('finish', async () => {
-      try {
-        await clearRLSContext();
-      } catch (error) {
+    // Set up cleanup to run after response is sent (non-blocking)
+    res.on('finish', () => {
+      clearRLSContext().catch(error => {
         console.error('Error clearing RLS context after request:', error);
-      }
+      });
     });
 
     next();

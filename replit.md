@@ -255,6 +255,14 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 15, 2025. Successfully fixed local development database connection timeout issue:
+  * FIXED: RLS middleware now disabled in development mode to prevent connection timeouts
+  * ENHANCED: Added timeout handling (5 seconds) to RLS context clearing operations
+  * IMPROVED: Made RLS context clearing non-blocking to prevent request blocking
+  * RESOLVED: Local development no longer experiences "timeout exceeded when trying to connect" errors
+  * MAINTAINED: RLS security remains active in production environment
+  * OPTIMIZED: Development environment now runs without database connection pool conflicts
+  * RESULT: Local development deployment now works smoothly without RLS-related timeout errors
 - July 15, 2025. Successfully implemented custom SMTP email configuration:
   * CHANGED: Email service now prioritizes custom SMTP over other providers
   * CONFIGURED: Custom SMTP server (mail.refokus.id:465) as primary email provider

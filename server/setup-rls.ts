@@ -319,15 +319,24 @@ export async function setRLSContext(userId: string, organizationId: string, isSy
 }
 
 /**
- * Clear database session variables
+ * Clear database session variables with timeout handling
  */
 export async function clearRLSContext() {
   try {
-    await db.execute(sql`RESET app.current_user_id;`);
-    await db.execute(sql`RESET app.current_organization_id;`);
-    await db.execute(sql`RESET app.is_system_owner;`);
+    // Set a timeout for the clear operation
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('RLS context clear timeout')), 5000); // 5 second timeout
+    });
+
+    const clearPromise = Promise.all([
+      db.execute(sql`RESET app.current_user_id;`),
+      db.execute(sql`RESET app.current_organization_id;`),
+      db.execute(sql`RESET app.is_system_owner;`)
+    ]);
+
+    await Promise.race([clearPromise, timeoutPromise]);
   } catch (error) {
     console.error("Error clearing RLS context:", error);
-    // Don't throw here as this is cleanup
+    // Don't throw here as this is cleanup - just log the error
   }
 }
