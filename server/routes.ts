@@ -8285,24 +8285,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { eq } = await import("drizzle-orm");
       const { organizationSubscriptions, subscriptionPlans } = await import("@shared/schema");
       
-      const [subscription] = await db.select({
+      const subscriptionResult = await db.select({
         id: organizationSubscriptions.id,
         planId: organizationSubscriptions.planId,
         planName: subscriptionPlans.name,
         status: organizationSubscriptions.status,
         currentPeriodEnd: organizationSubscriptions.currentPeriodEnd,
-        isTrialActive: organizationSubscriptions.isTrialActive,
-        trialEndsAt: organizationSubscriptions.trialEndsAt
+        trialStart: organizationSubscriptions.trialStart,
+        trialEnd: organizationSubscriptions.trialEnd
       })
       .from(organizationSubscriptions)
       .innerJoin(subscriptionPlans, eq(organizationSubscriptions.planId, subscriptionPlans.id))
-      .where(eq(organizationSubscriptions.organizationId, currentUser.organizationId));
+      .where(eq(organizationSubscriptions.organizationId, currentUser.organizationId))
+      .limit(1);
+      
+      const subscription = subscriptionResult[0];
       
       if (!subscription) {
+        // Return default trial subscription status for organizations without subscription
+        const { organizations } = await import("@shared/schema");
+        const [org] = await db.select().from(organizations).where(eq(organizations.id, currentUser.organizationId));
+        
+        if (org && org.subscriptionStatus === 'trial') {
+          return res.json({
+            id: null,
+            planId: null,
+            planName: "Trial",
+            status: "trialing",
+            currentPeriodEnd: org.trialEndsAt,
+            isTrialActive: true,
+            trialEndsAt: org.trialEndsAt
+          });
+        }
+        
         return res.status(404).json({ message: "No subscription found" });
       }
       
-      res.json(subscription);
+      // Calculate trial status based on trial fields
+      const now = new Date();
+      const isTrialActive = subscription.trialStart && subscription.trialEnd && 
+                           now >= new Date(subscription.trialStart) && 
+                           now <= new Date(subscription.trialEnd);
+      
+      const response = {
+        ...subscription,
+        isTrialActive: isTrialActive || false,
+        trialEndsAt: subscription.trialEnd
+      };
+      
+      res.json(response);
     } catch (error) {
       console.error("Error fetching organization subscription:", error);
       res.status(500).json({ message: "Failed to fetch subscription" });

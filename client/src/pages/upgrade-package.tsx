@@ -46,15 +46,31 @@ export default function UpgradePackage() {
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Fetch subscription plans
-  const { data: plans, isLoading: isLoadingPlans } = useQuery<SubscriptionPlan[]>({
+  const { data: plans, isLoading: isLoadingPlans, error: plansError } = useQuery<SubscriptionPlan[]>({
     queryKey: ['/api/subscription-plans'],
-    queryFn: () => apiRequest('GET', '/api/subscription-plans'),
+    queryFn: async () => {
+      try {
+        const response = await apiRequest('GET', '/api/subscription-plans');
+        return Array.isArray(response) ? response : [];
+      } catch (error) {
+        console.error('Error fetching subscription plans:', error);
+        return [];
+      }
+    },
   });
 
   // Fetch current organization subscription
   const { data: currentSubscription } = useQuery<OrganizationSubscription>({
     queryKey: ['/api/organization/subscription'],
-    queryFn: () => apiRequest('GET', '/api/organization/subscription'),
+    queryFn: async () => {
+      try {
+        const response = await apiRequest('GET', '/api/organization/subscription');
+        return response;
+      } catch (error) {
+        console.error('Error fetching current subscription:', error);
+        return null;
+      }
+    },
   });
 
   // Create upgrade payment mutation
