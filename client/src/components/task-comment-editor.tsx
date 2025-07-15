@@ -462,11 +462,13 @@ export function TaskCommentEditor({
                     fontWeight: 'bold',
                     flexShrink: 0
                   }}>
-                    {user.firstName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
+                    {user.name 
+                      ? user.name.trim().split(' ').map(n => n[0]).join('').toUpperCase()
+                      : user.email?.charAt(0).toUpperCase() || 'U'}
                   </div>
                   <div style={{ textAlign: 'left' }}>
                     <div style={{ fontWeight: '600', color: '#111827', fontSize: '14px' }}>
-                      {user.firstName || user.email}
+                      {user.name && user.name.trim() !== '' ? user.name.trim() : user.email?.split('@')[0] || 'User'}
                     </div>
                     <div style={{ fontSize: '12px', color: '#6b7280' }}>
                       {user.email}
