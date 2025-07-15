@@ -157,6 +157,23 @@ export default function UpgradePackage() {
     );
   }
 
+  // Debug: Log the plans data
+  console.log('Plans data:', plans);
+  console.log('Plans length:', plans?.length);
+
+  if (!plans || plans.length === 0) {
+    return (
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div className="text-center space-y-4">
+          <h1 className="text-3xl font-bold text-gray-900">Upgrade Paket Berlangganan</h1>
+          <p className="text-lg text-gray-600">
+            Tidak ada paket berlangganan tersedia saat ini.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}

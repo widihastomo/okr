@@ -8245,6 +8245,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .leftJoin(billingPeriods, eq(subscriptionPlans.id, billingPeriods.planId))
         .where(eq(subscriptionPlans.isActive, true));
 
+      console.log('Raw plans with billing data:', plansWithBilling.length);
+      
       // Group billing periods by plan
       const groupedPlans = plansWithBilling.reduce((acc: any, row) => {
         const plan = row.subscription_plans;
@@ -8264,7 +8266,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return acc;
       }, {});
 
+      console.log('Grouped plans:', Object.keys(groupedPlans));
+      
       const result = Object.values(groupedPlans).filter((plan: any) => plan.billingPeriods.length > 0);
+      console.log('Final result length:', result.length);
+      
       res.json(result);
     } catch (error) {
       console.error("Error fetching subscription plans:", error);
