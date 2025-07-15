@@ -5653,18 +5653,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // SaaS Subscription Routes
   
-  // Get all subscription plans (public endpoint - only active plans)
-  app.get("/api/subscription-plans", async (req, res) => {
-    try {
-      const { db } = await import("./db");
-      const { eq } = await import("drizzle-orm");
-      const plans = await db.select().from(subscriptionPlans).where(eq(subscriptionPlans.isActive, true));
-      res.json(plans);
-    } catch (error) {
-      console.error("Error fetching subscription plans:", error);
-      res.status(500).json({ message: "Failed to fetch subscription plans" });
-    }
-  });
+  // Note: /api/subscription-plans endpoint moved to upgrade package section (line 8237) with auth and billing periods
 
   // Email Test API Route (System Admin Only) - using env variables
   app.post("/api/admin/email-settings/test", requireAuth, requireSystemOwner, async (req, res) => {
@@ -8235,6 +8224,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get subscription plans for upgrade
   app.get("/api/subscription-plans", requireAuth, async (req, res) => {
+    console.log('DEBUG: Subscription plans endpoint called');
     try {
       const { db } = await import("./db");
       const { eq, and } = await import("drizzle-orm");
