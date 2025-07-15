@@ -66,14 +66,25 @@ export function DailyUpdateSimple() {
     queryKey: ['/api/initiatives'],
   });
 
-  const { data: todayTasks = [] } = useQuery({
+  const { data: allTasks = [] } = useQuery({
     queryKey: ['/api/tasks'],
-    select: (data) => data.filter((task: any) => {
-      const today = new Date().toISOString().split('T')[0];
-      const taskDate = task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : null;
-      return taskDate === today;
-    })
   });
+
+  // Filter tasks for today and overdue
+  const todayTasks = allTasks.filter((task: any) => {
+    const today = new Date().toISOString().split('T')[0];
+    const taskDate = task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : null;
+    return taskDate === today;
+  });
+
+  const overdueTasks = allTasks.filter((task: any) => {
+    if (!task.dueDate || task.status === 'selesai' || task.status === 'dibatalkan') return false;
+    const today = new Date().toISOString().split('T')[0];
+    const taskDate = new Date(task.dueDate).toISOString().split('T')[0];
+    return taskDate < today;
+  });
+
+  const relevantTasks = [...overdueTasks, ...todayTasks];
 
   const { data: successMetrics = [] } = useQuery({
     queryKey: ['/api/success-metrics', initiatives.map(i => i.id).join(',')],
@@ -101,7 +112,7 @@ export function DailyUpdateSimple() {
 
   // Initialize data when modal opens
   React.useEffect(() => {
-    if (isOpen && keyResults.length > 0) {
+    if (isOpen) {
       setUpdateData(prev => ({
         ...prev,
         keyResults: keyResults.map((kr: any) => ({
@@ -122,17 +133,17 @@ export function DailyUpdateSimple() {
           newValue: sm.achievement || '',
           notes: ''
         })),
-        tasks: todayTasks.map((task: any) => ({
+        tasks: relevantTasks.map((task: any) => ({
           id: task.id,
           title: task.title,
           currentStatus: task.status,
           newStatus: task.status
         })),
-        tasksCompleted: todayTasks.filter((task: any) => task.status === 'selesai').length,
-        totalTasks: todayTasks.length
+        tasksCompleted: relevantTasks.filter((task: any) => task.status === 'selesai').length,
+        totalTasks: relevantTasks.length
       }));
     }
-  }, [isOpen, keyResults, successMetrics, todayTasks]);
+  }, [isOpen]);
 
   // Submit mutation
   const submitMutation = useMutation({
@@ -237,47 +248,31 @@ export function DailyUpdateSimple() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Clock className="h-5 w-5 text-orange-600" />
-                Task Hari Ini
+                Task ({overdueTasks.length} Overdue, {todayTasks.length} Hari Ini)
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {todayTasks.length === 0 ? (
+              <div className="space-y-2">
+                {relevantTasks.length === 0 ? (
                   <div className="text-center p-4">
-                    <div className="text-gray-500">Tidak ada task untuk hari ini</div>
+                    <div className="text-gray-500">Tidak ada task yang perlu diupdate</div>
                   </div>
                 ) : (
-                  <>
-                    <div className="text-center mb-4">
-                      <div className="text-2xl font-bold text-green-600">
-                        {todayTasks.length} Task Hari Ini
-                      </div>
-                    </div>
-                    {todayTasks.map((task: any) => (
-                      <div key={task.id} className="border rounded-lg p-4 bg-white">
-                        <div className="flex items-start justify-between">
+                  relevantTasks.map((task: any) => {
+                    const isOverdue = overdueTasks.some(t => t.id === task.id);
+                    return (
+                      <div key={task.id} className={`border rounded-lg p-3 ${isOverdue ? 'bg-red-50 border-red-200' : 'bg-white'}`}>
+                        <div className="flex items-center justify-between mb-2">
                           <div className="flex-1">
-                            <div className="font-medium text-gray-900 mb-1">{task.title}</div>
-                            <div className="text-sm text-gray-600 mb-2">
-                              Status saat ini: <span className={`font-medium ${
-                                task.status === 'selesai' ? 'text-green-600' :
-                                task.status === 'sedang_berjalan' ? 'text-blue-600' :
-                                task.status === 'dibatalkan' ? 'text-red-600' :
-                                'text-gray-600'
-                              }`}>
-                                {task.status === 'selesai' ? 'Selesai' :
-                                 task.status === 'sedang_berjalan' ? 'Sedang Berjalan' :
-                                 task.status === 'dibatalkan' ? 'Dibatalkan' :
-                                 'Belum Mulai'}
-                              </span>
+                            <div className="font-medium text-gray-900 text-sm">
+                              {task.title.length > 40 ? `${task.title.substring(0, 40)}...` : task.title}
+                              {isOverdue && <span className="ml-2 text-xs bg-red-100 text-red-800 px-2 py-1 rounded">Terlambat</span>}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {task.dueDate && `Due: ${new Date(task.dueDate).toLocaleDateString('id-ID')}`}
                             </div>
                           </div>
-                        </div>
-                        <div className="mt-3">
-                          <label className="text-sm font-medium text-gray-700 mb-2 block">
-                            Update Status:
-                          </label>
-                          <div className="flex gap-2 flex-wrap">
+                          <div className="flex gap-1">
                             {['belum_mulai', 'sedang_berjalan', 'selesai', 'dibatalkan'].map((status) => (
                               <button
                                 key={status}
@@ -296,7 +291,7 @@ export function DailyUpdateSimple() {
                                   }
                                   setUpdateData({ ...updateData, tasks: newTasks });
                                 }}
-                                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                                className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
                                   (updateData.tasks.find(t => t.id === task.id)?.newStatus || task.status) === status
                                     ? status === 'selesai' ? 'bg-green-100 text-green-800 border-green-300' :
                                       status === 'sedang_berjalan' ? 'bg-blue-100 text-blue-800 border-blue-300' :
@@ -304,18 +299,22 @@ export function DailyUpdateSimple() {
                                       'bg-gray-100 text-gray-800 border-gray-300'
                                     : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
                                 } border`}
+                                title={status === 'selesai' ? 'Selesai' :
+                                       status === 'sedang_berjalan' ? 'Sedang Berjalan' :
+                                       status === 'dibatalkan' ? 'Dibatalkan' :
+                                       'Belum Mulai'}
                               >
-                                {status === 'selesai' ? 'Selesai' :
-                                 status === 'sedang_berjalan' ? 'Sedang Berjalan' :
-                                 status === 'dibatalkan' ? 'Dibatalkan' :
-                                 'Belum Mulai'}
+                                {status === 'selesai' ? '✓' :
+                                 status === 'sedang_berjalan' ? '▶' :
+                                 status === 'dibatalkan' ? '✗' :
+                                 '○'}
                               </button>
                             ))}
                           </div>
                         </div>
                       </div>
-                    ))}
-                  </>
+                    );
+                  })
                 )}
               </div>
             </CardContent>
