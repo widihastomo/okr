@@ -59,7 +59,7 @@ import { type CompanyOnboardingData } from "@shared/schema";
 const ONBOARDING_STEPS = [
   {
     id: 1,
-    title: "Fokus Tim",
+    title: "Fokus",
     description: "Bagian mana di bisnis Anda yang ingin ditingkatkan?",
     icon: Building,
   },
@@ -67,13 +67,13 @@ const ONBOARDING_STEPS = [
     id: 2,
     title: "Buat Goal",
     description:
-      "Pilih satu tujuan yang penting dan bermakna. Anda dapat menambahkan / merubahnya setelah onboarding selesai",
+      "Pilih satu tujuan yang paling penting dan bermakna. Anda dapat merubahnya setelah onboarding selesai",
     icon: Target,
   },
   {
     id: 3,
     title: "Angka Target",
-    description: "Tentukan cara mengukur keberhasilan",
+    description: "Bagaimana Anda tahu bahwa tujuan tadi benar-benar tercapai?",
     icon: TrendingUp,
   },
   {
@@ -177,8 +177,12 @@ export default function CompanyOnboarding() {
   // Error handling for ResizeObserver and other common errors
   useEffect(() => {
     const handleGlobalError = (e: ErrorEvent) => {
-      if (e.message && typeof e.message === 'string') {
-        if (e.message.includes("ResizeObserver loop completed with undelivered notifications")) {
+      if (e.message && typeof e.message === "string") {
+        if (
+          e.message.includes(
+            "ResizeObserver loop completed with undelivered notifications",
+          )
+        ) {
           e.preventDefault();
           e.stopPropagation();
           return false;
@@ -188,7 +192,11 @@ export default function CompanyOnboarding() {
           e.stopPropagation();
           return false;
         }
-        if (e.message.includes("Cannot read properties of undefined (reading 'frame')")) {
+        if (
+          e.message.includes(
+            "Cannot read properties of undefined (reading 'frame')",
+          )
+        ) {
           e.preventDefault();
           e.stopPropagation();
           return false;
@@ -205,27 +213,41 @@ export default function CompanyOnboarding() {
 
     const originalConsoleError = console.error;
     const originalConsoleWarn = console.warn;
-    
+
     console.error = (...args) => {
-      const message = String(args[0] || '');
-      if (message.includes("ResizeObserver loop completed with undelivered notifications") ||
-          message.includes("Non-Error promise rejection captured") ||
-          message.includes("Cannot read properties of undefined (reading 'frame')")) {
+      const message = String(args[0] || "");
+      if (
+        message.includes(
+          "ResizeObserver loop completed with undelivered notifications",
+        ) ||
+        message.includes("Non-Error promise rejection captured") ||
+        message.includes(
+          "Cannot read properties of undefined (reading 'frame')",
+        )
+      ) {
         return;
       }
       // Log important errors for debugging
-      if (message.includes("completeOnboardingMutation") || 
-          (message.includes("TypeError") && !message.includes("frame")) || 
-          message.includes("ReferenceError")) {
+      if (
+        message.includes("completeOnboardingMutation") ||
+        (message.includes("TypeError") && !message.includes("frame")) ||
+        message.includes("ReferenceError")
+      ) {
         console.log("🔍 Important error caught:", args);
       }
       originalConsoleError(...args);
     };
 
     console.warn = (...args) => {
-      const message = String(args[0] || '');
-      if (message.includes("ResizeObserver loop completed with undelivered notifications") ||
-          message.includes("Cannot read properties of undefined (reading 'frame')")) {
+      const message = String(args[0] || "");
+      if (
+        message.includes(
+          "ResizeObserver loop completed with undelivered notifications",
+        ) ||
+        message.includes(
+          "Cannot read properties of undefined (reading 'frame')",
+        )
+      ) {
         return;
       }
       originalConsoleWarn(...args);
@@ -233,10 +255,13 @@ export default function CompanyOnboarding() {
 
     window.addEventListener("error", handleGlobalError);
     window.addEventListener("unhandledrejection", handleUnhandledRejection);
-    
+
     return () => {
       window.removeEventListener("error", handleGlobalError);
-      window.removeEventListener("unhandledrejection", handleUnhandledRejection);
+      window.removeEventListener(
+        "unhandledrejection",
+        handleUnhandledRejection,
+      );
       console.error = originalConsoleError;
       console.warn = originalConsoleWarn;
     };
@@ -273,44 +298,11 @@ export default function CompanyOnboarding() {
         if (!data.teamFocus) {
           return {
             isValid: false,
-            message: "Silakan pilih fokus tim terlebih dahulu",
+            message: "Silakan pilih fokus bisnis terlebih dahulu",
           };
         }
         break;
       case 2:
-        // Step 2 is optional - users can skip inviting members
-        // But if they enter emails, they must be valid
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        for (const email of data.invitedMembers) {
-          if (email && email.trim() && !emailRegex.test(email.trim())) {
-            return {
-              isValid: false,
-              message: `Format email tidak valid: ${email}`,
-            };
-          }
-        }
-        break;
-      case 3:
-        if (!data.cycleDuration) {
-          return {
-            isValid: false,
-            message: "Silakan pilih durasi tenggat waktu goal",
-          };
-        }
-        if (!data.cycleStartDate) {
-          return {
-            isValid: false,
-            message: "Silakan pilih tanggal mulai",
-          };
-        }
-        if (!data.cycleEndDate) {
-          return {
-            isValid: false,
-            message: "Silakan pilih tanggal berakhir",
-          };
-        }
-        break;
-      case 4:
         if (!data.objective.trim()) {
           return {
             isValid: false,
@@ -318,7 +310,7 @@ export default function CompanyOnboarding() {
           };
         }
         break;
-      case 5:
+      case 3:
         if (data.keyResults.length === 0) {
           return {
             isValid: false,
@@ -326,7 +318,7 @@ export default function CompanyOnboarding() {
           };
         }
         break;
-      case 6:
+      case 4:
         if (data.initiatives.length === 0) {
           return {
             isValid: false,
@@ -334,7 +326,7 @@ export default function CompanyOnboarding() {
           };
         }
         break;
-      case 7:
+      case 5:
         if (data.tasks.length === 0) {
           return {
             isValid: false,
@@ -342,7 +334,7 @@ export default function CompanyOnboarding() {
           };
         }
         break;
-      case 8:
+      case 6:
         if (!data.cadence) {
           return { isValid: false, message: "Silakan pilih ritme check-in" };
         }
@@ -363,8 +355,8 @@ export default function CompanyOnboarding() {
           };
         }
         break;
-      case 9:
-        // Step 9 is now just a summary page - no validation needed
+      case 7:
+        // Step 7 is now just a summary page - no validation needed
         break;
       default:
         break;
@@ -399,28 +391,28 @@ export default function CompanyOnboarding() {
         reminderDay: onboardingData.reminderDay,
         reminderDate: onboardingData.reminderDate,
         teamFocus: onboardingData.teamFocus,
-        fullData: onboardingData
+        fullData: onboardingData,
       });
       return apiRequest("POST", "/api/onboarding/complete", { onboardingData });
     },
     onSuccess: () => {
       // Set redirecting state first to prevent double clicks
       setIsRedirecting(true);
-      
+
       toast({
         title: "Selamat!",
         description:
           "Onboarding berhasil diselesaikan. Goal pertama telah dibuat!",
         variant: "success",
       });
-      
+
       // Immediate cache invalidation
       queryClient.invalidateQueries({ queryKey: ["/api/onboarding/status"] });
       queryClient.invalidateQueries({ queryKey: ["/api/onboarding/progress"] });
-      
+
       // Force redirect with both navigate and window.location as fallback
       console.log("🔄 Attempting redirect to dashboard...");
-      
+
       // Try wouter navigation first
       try {
         navigate("/");
@@ -428,7 +420,7 @@ export default function CompanyOnboarding() {
       } catch (error) {
         console.error("❌ Wouter navigation failed:", error);
       }
-      
+
       // Add window.location fallback after short delay
       setTimeout(() => {
         console.log("🔄 Fallback redirect using window.location");
@@ -459,9 +451,10 @@ export default function CompanyOnboarding() {
   const progressPercentage =
     onboardingData.currentStep === 0
       ? 0
-      : onboardingData.currentStep === ONBOARDING_STEPS.length
-      ? 100 // Show 100% when at the final step (step 9)
-      : (onboardingData.completedSteps.length / ONBOARDING_STEPS.length) * 100;
+      : onboardingData.currentStep === 7
+        ? 100 // Show 100% when at the final step (step 7)
+        : (onboardingData.completedSteps.length / ONBOARDING_STEPS.length) *
+          100;
 
   // Dynamic color system based on progress
   const getProgressColor = () => {
@@ -504,7 +497,7 @@ export default function CompanyOnboarding() {
       }
     }
 
-    if (onboardingData.currentStep < ONBOARDING_STEPS.length) {
+    if (onboardingData.currentStep < 7) {
       const newCompletedSteps =
         onboardingData.currentStep === 0
           ? []
@@ -553,7 +546,7 @@ export default function CompanyOnboarding() {
     if (completeOnboardingMutation.isPending || isRedirecting) {
       return;
     }
-    
+
     const finalData = {
       ...onboardingData,
       completedSteps: [
@@ -578,7 +571,8 @@ export default function CompanyOnboarding() {
                 Pilih fokus bisnis Anda:
               </Label>
               <p className="text-sm text-gray-600">
-                Pilih area yang paling ingin Anda tingkatkan dalam organisasi
+                Pilih area yang paling ingin Anda tingkatkan dalam 1 - 3 bulan
+                kedepan.
               </p>
             </div>
             <RadioGroup
@@ -757,8 +751,6 @@ export default function CompanyOnboarding() {
           </div>
         );
 
-
-
       case 2: // Buat Objective
         const getObjectiveOptions = (teamFocus: string) => {
           const options = {
@@ -793,7 +785,9 @@ export default function CompanyOnboarding() {
             {objectiveOptions.length > 0 && (
               <div className="space-y-3">
                 <Label>
-                  Pilih Goal yang sesuai untuk fokus {onboardingData.teamFocus}:
+                  Dari beberapa goal yang bisa dipilih, mana yang bisa anda
+                  fokuskan supaya terjadi peningkatan {onboardingData.teamFocus}
+                  :
                 </Label>
                 <RadioGroup
                   value={onboardingData.objective}
@@ -845,7 +839,7 @@ export default function CompanyOnboarding() {
                 "Menambah 100 transaksi baru setiap bulan",
               ],
             "Membangun basis pelanggan yang kuat dan loyal": [
-              "Mendapatkan 20 pelanggan baru setiap bulan",
+              "Mendapatkan 100 pelanggan baru setiap bulan",
               "Mencapai conversion rate 15% dari lead ke customer",
               "Meningkatkan customer retention rate menjadi 85%",
             ],
@@ -934,7 +928,8 @@ export default function CompanyOnboarding() {
             {keyResultOptions.length > 0 && (
               <div className="space-y-3">
                 <Label>
-                  Pilih Angka Target untuk Goal: "{onboardingData.objective}"
+                  Pilih Angka Target (Alat ukur kuantitatif) untuk mengetahui
+                  kemajual Goal : "{onboardingData.objective}"
                 </Label>
                 <div className="space-y-2">
                   {keyResultOptions.map((option, index) => (
@@ -1404,7 +1399,7 @@ export default function CompanyOnboarding() {
           ],
 
           // Penjualan - Pelanggan Baru
-          "Mendapatkan 20 pelanggan baru setiap bulan": [
+          "Mendapatkan 100 pelanggan baru setiap bulan": [
             "Mengembangkan content marketing strategy di blog dan sosmed",
             "Mengadakan event networking dan product demo",
             "Menyediakan program trial gratis untuk prospek",
@@ -3110,12 +3105,16 @@ export default function CompanyOnboarding() {
                 <ArrowRight className="w-6 h-6 text-orange-600 animate-bounce" />
               </div>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Menuju Dashboard...</h3>
-            <p className="text-gray-600">Onboarding selesai! Mempersiapkan dashboard untuk Anda.</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Menuju Dashboard...
+            </h3>
+            <p className="text-gray-600">
+              Onboarding selesai! Mempersiapkan dashboard untuk Anda.
+            </p>
           </div>
         </div>
       )}
-      
+
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
@@ -3314,10 +3313,12 @@ export default function CompanyOnboarding() {
                   </Button>
                 )}
 
-                {onboardingData.currentStep === ONBOARDING_STEPS.length ? (
+                {onboardingData.currentStep === 7 ? (
                   <Button
                     onClick={handleComplete}
-                    disabled={completeOnboardingMutation.isPending || isRedirecting}
+                    disabled={
+                      completeOnboardingMutation.isPending || isRedirecting
+                    }
                     className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:hover:scale-100 disabled:hover:shadow-none"
                   >
                     {isRedirecting ? "Menuju Dashboard..." : "Selesai"}
