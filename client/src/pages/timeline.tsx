@@ -88,8 +88,8 @@ export default function TimelinePage() {
   const timelineData = Array.isArray(checkInsData) ? checkInsData.map((checkIn: any) => ({
     id: checkIn.id,
     type: 'check-in',
-    content: checkIn.feedback,
-    currentValue: checkIn.currentValue,
+    content: checkIn.notes || checkIn.feedback,
+    currentValue: parseFloat(checkIn.value) || checkIn.currentValue,
     targetValue: checkIn.targetValue,
     keyResult: checkIn.keyResult,
     creator: checkIn.creator,
