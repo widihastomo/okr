@@ -1201,9 +1201,9 @@ export default function DailyFocusPage() {
                 <SelectItem value="all">Semua Anggota Tim</SelectItem>
                 {activeUsers?.map((user: any) => (
                   <SelectItem key={user.id} value={user.id}>
-                    {user.firstName && user.lastName
-                      ? `${user.firstName} ${user.lastName}`
-                      : user.email || user.username || "Unknown"}
+                    {user.name && user.name.trim() !== ''
+                      ? user.name.trim()
+                      : user.email?.split('@')[0] || user.username || "Unknown"}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -1224,10 +1224,13 @@ export default function DailyFocusPage() {
             <span>
               Menampilkan objective, task, dan aktivitas untuk:{" "}
               <span className="font-medium">
-                {activeUsers?.find((u: any) => u.id === selectedUserId)?.firstName &&
-                activeUsers?.find((u: any) => u.id === selectedUserId)?.lastName
-                  ? `${activeUsers.find((u: any) => u.id === selectedUserId)?.firstName} ${activeUsers.find((u: any) => u.id === selectedUserId)?.lastName}`
-                  : "Unknown"}
+                {(() => {
+                  const selectedUser = activeUsers?.find((u: any) => u.id === selectedUserId);
+                  if (selectedUser?.name && selectedUser.name.trim() !== '') {
+                    return selectedUser.name.trim();
+                  }
+                  return selectedUser?.email?.split('@')[0] || selectedUser?.username || "Unknown";
+                })()}
               </span>
             </span>
           </div>

@@ -274,6 +274,7 @@ All email configuration now uses environment variables:
   * FIXED: Client user management page avatars and display names now use consolidated name field
   * FIXED: Accept invitation functionality migrated to use consolidated name field in both frontend and backend
   * FIXED: Goal-card.tsx avatar fallback logic now uses getUserInitials function instead of goal.owner.split(' ')
+  * FIXED: Daily-focus.tsx user filter dropdown and filter indicator now use consolidated name field (lines 1204-1206 and 1227-1230)
   * IMPROVED: Better fallback logic for name extraction from consolidated name field
   * RESULT: Complete migration from firstName/lastName to consolidated name field with proper initials extraction and filtering
 - July 15, 2025. **COMPLETE TOUR SYSTEM REMOVAL** - Successfully removed entire onboarding tour system for cleaner interface:
