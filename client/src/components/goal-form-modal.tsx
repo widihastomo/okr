@@ -282,7 +282,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
         ownerName = team?.name || "";
       } else if (data.objective.ownerType === "user" && data.objective.ownerId) {
         const user = users?.find(u => u.id === data.objective.ownerId);
-        ownerName = user ? `${user.firstName} ${user.lastName}` : "";
+        ownerName = user ? (user.name && user.name.trim() !== '' ? user.name.trim() : user.email?.split('@')[0] || '') : "";
       }
 
 

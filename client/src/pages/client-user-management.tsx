@@ -334,7 +334,7 @@ export default function ClientUserManagement() {
   // Filter users
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase());
+                         (user.name && user.name.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesStatus = statusFilter === "all" || 
                          (statusFilter === "active" && user.isActive) ||
                          (statusFilter === "inactive" && !user.isActive) ||

@@ -184,8 +184,7 @@ export default function UsersPage() {
   // Filter users based on search term and role
   const filteredUsers = users.filter((user: User) => {
     const matchesSearch = 
-      user.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.id.toLowerCase().includes(searchTerm.toLowerCase());
     

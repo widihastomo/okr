@@ -204,7 +204,7 @@ export function SearchableUserSelect({
                           "font-medium truncate",
                           effectiveValue === user.id ? "text-blue-900" : "text-gray-900"
                         )}>
-                          {`${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email}
+                          {user.name && user.name.trim() !== '' ? user.name.trim() : user.email}
                         </span>
                         <span className={cn(
                           "text-sm truncate",

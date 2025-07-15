@@ -255,14 +255,16 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
-- July 15, 2025. **USER FUNCTION MIGRATION TO CONSOLIDATED NAME FIELD** - Successfully migrated all getUserName and getUserInitials functions to use consolidated name field:
+- July 15, 2025. **COMPLETE MIGRATION TO CONSOLIDATED NAME FIELD** - Successfully migrated all components from firstName/lastName to consolidated name field:
   * UPDATED: All getUserName functions across components to use consolidated name field instead of firstName/lastName
   * UPDATED: All getUserInitials functions to properly handle single name field with space-separated parts
   * ENHANCED: getUserName functions now use name field first, then fallback to email username extraction
   * ENHANCED: getUserInitials functions now extract first letter of first name and last name from consolidated name field
   * FIXED: Name display consistency across all components including activity-log-card, initiatives, goal-card, timeline, tasks, key-result-detail, initiative-detail, and profile pages
+  * UPDATED: Filter components - searchable-user-select, goal-form-modal, users-page, client-user-management now use consolidated name field
+  * FIXED: All search and filter functionality now uses name field for user name matching
   * IMPROVED: Better fallback logic for name extraction from consolidated name field
-  * RESULT: Complete migration from firstName/lastName to consolidated name field with proper initials extraction
+  * RESULT: Complete migration from firstName/lastName to consolidated name field with proper initials extraction and filtering
 - July 15, 2025. **COMPLETE TOUR SYSTEM REMOVAL** - Successfully removed entire onboarding tour system for cleaner interface:
   * REMOVED: All tour-related components (tour-tooltip, tour-launcher, onboarding-overlay, welcome-wizard)
   * REMOVED: All tour-related contexts, hooks, and TypeScript interfaces
