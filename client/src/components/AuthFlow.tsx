@@ -450,7 +450,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                     type="email"
                     placeholder="Masukkan email Anda"
                     {...loginForm.register("email")}
-                    className="pl-10 h-11"
+                    className="pl-10 h-11 border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200"
                   />
                 </div>
                 {loginForm.formState.errors.email && (
@@ -467,7 +467,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                     type={showPassword ? "text" : "password"}
                     placeholder="Masukkan password Anda"
                     {...loginForm.register("password")}
-                    className="pl-10 pr-10 h-11"
+                    className="pl-10 pr-10 h-11 border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200"
                   />
                   <button
                     type="button"
@@ -486,7 +486,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                 <Button
                   type="submit"
                   disabled={loginMutation.isPending}
-                  className="w-full h-11 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium"
+                  className="w-full h-11 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   {loginMutation.isPending ? (
                     <>
@@ -494,7 +494,10 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                       Memproses...
                     </>
                   ) : (
-                    "Masuk"
+                    <>
+                      <ArrowRight className="mr-2 h-4 w-4" />
+                      Masuk
+                    </>
                   )}
                 </Button>
               </div>
@@ -532,7 +535,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                     id="name"
                     placeholder="Masukkan nama lengkap Anda"
                     {...registerForm.register("name")}
-                    className="pl-10 h-11"
+                    className="pl-10 h-11 border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200"
                   />
                 </div>
                 {registerForm.formState.errors.name && (
@@ -548,7 +551,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                     id="businessName"
                     placeholder="Masukkan nama bisnis/organisasi"
                     {...registerForm.register("businessName")}
-                    className="pl-10 h-11"
+                    className="pl-10 h-11 border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200"
                   />
                 </div>
                 {registerForm.formState.errors.businessName && (
@@ -564,7 +567,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                     id="whatsappNumber"
                     placeholder="08123456789 atau +628123456789"
                     {...registerForm.register("whatsappNumber")}
-                    className="pl-10 h-11"
+                    className="pl-10 h-11 border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200"
                   />
                 </div>
                 {registerForm.formState.errors.whatsappNumber && (
@@ -584,7 +587,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                     type="email"
                     placeholder="Masukkan email Anda"
                     {...registerForm.register("email")}
-                    className="pl-10 h-11"
+                    className="pl-10 h-11 border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200"
                   />
                 </div>
                 {registerForm.formState.errors.email && (
@@ -601,7 +604,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                     type={showPassword ? "text" : "password"}
                     placeholder="Masukkan password (minimal 6 karakter)"
                     {...registerForm.register("password")}
-                    className="pl-10 pr-10 h-11"
+                    className="pl-10 pr-10 h-11 border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200"
                   />
                   <button
                     type="button"
@@ -620,7 +623,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                 <Button
                   type="submit"
                   disabled={registerMutation.isPending}
-                  className="w-full h-11 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium"
+                  className="w-full h-11 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   {registerMutation.isPending ? (
                     <>
@@ -628,7 +631,10 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                       Mendaftar...
                     </>
                   ) : (
-                    "Daftar Akun"
+                    <>
+                      <User className="mr-2 h-4 w-4" />
+                      Daftar Akun
+                    </>
                   )}
                 </Button>
               </div>
@@ -674,7 +680,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
             <Button
               onClick={handleEmailVerification}
               disabled={isVerifying || verificationCode.length !== 6}
-              className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium h-11"
+              className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium h-11 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
             >
               {isVerifying ? (
                 <>
@@ -682,7 +688,10 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                   Memverifikasi...
                 </>
               ) : (
-                "Verifikasi Email"
+                <>
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Verifikasi Email
+                </>
               )}
             </Button>
             
@@ -900,18 +909,56 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Ornaments */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Top left ornament */}
+        <div className="absolute -top-16 -left-16 w-32 h-32 bg-gradient-to-br from-orange-200 to-orange-300 rounded-full opacity-20 animate-pulse"></div>
+        
+        {/* Top right ornament */}
+        <div className="absolute -top-8 -right-8 w-24 h-24 bg-gradient-to-br from-blue-200 to-blue-300 rounded-full opacity-15"></div>
+        
+        {/* Bottom left ornament */}
+        <div className="absolute -bottom-12 -left-12 w-28 h-28 bg-gradient-to-br from-purple-200 to-purple-300 rounded-full opacity-10"></div>
+        
+        {/* Bottom right ornament */}
+        <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-gradient-to-br from-orange-300 to-orange-400 rounded-full opacity-15 animate-pulse"></div>
+        
+        {/* Floating geometric shapes */}
+        <div className="absolute top-1/4 left-1/4 w-6 h-6 bg-orange-300 opacity-20 rotate-45 animate-bounce"></div>
+        <div className="absolute top-3/4 right-1/4 w-8 h-8 bg-blue-300 opacity-15 rotate-12"></div>
+        <div className="absolute top-1/2 left-1/6 w-4 h-4 bg-purple-300 opacity-10 rounded-full animate-pulse"></div>
+        
+        {/* Subtle pattern overlay */}
+        <div 
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23f97316' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='m0 40l40-40h-40v40zm40 0v-40h-40l40 40z'/%3E%3C/g%3E%3C/svg%3E")`
+          }}
+        />
+      </div>
+      
+      <div className="max-w-md w-full relative z-10">
         <div className="text-center mb-8">
-          <img 
-            src={refokusLogo} 
-            alt="Refokus Logo" 
-            className="h-12 w-auto mx-auto"
-          />
+          <div className="relative inline-block">
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full blur-lg opacity-30 animate-pulse"></div>
+            <div className="relative bg-white rounded-full p-4 shadow-xl">
+              <img 
+                src={refokusLogo} 
+                alt="Refokus Logo" 
+                className="h-12 w-auto mx-auto"
+              />
+            </div>
+          </div>
         </div>
         
-        <Card className="border-0 shadow-2xl">
-          <CardHeader className="text-center pb-8 pt-8">
+        <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm relative overflow-hidden">
+          {/* Card ornaments */}
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600"></div>
+          <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-orange-100 to-transparent rounded-bl-full opacity-50"></div>
+          <div className="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-tr from-orange-50 to-transparent rounded-tr-full opacity-30"></div>
+          
+          <CardHeader className="text-center pb-8 pt-8 relative">
             <CardTitle className="text-2xl font-bold text-gray-900">
               {stepConfig.title}
             </CardTitle>
@@ -919,7 +966,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
               {stepConfig.description}
             </CardDescription>
           </CardHeader>
-          <CardContent className="px-8 pb-8">
+          <CardContent className="px-8 pb-8 relative">
             {renderStepContent()}
           </CardContent>
         </Card>
