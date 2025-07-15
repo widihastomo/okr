@@ -51,7 +51,19 @@ export default function UpgradePackage() {
     queryFn: async () => {
       try {
         const response = await apiRequest('GET', '/api/subscription-plans');
-        return Array.isArray(response) ? response : [];
+        console.log('Plans response:', response);
+        console.log('Plans response type:', typeof response);
+        console.log('Plans is array:', Array.isArray(response));
+        
+        // Handle the response properly
+        if (Array.isArray(response)) {
+          console.log('Plans data:', response);
+          console.log('Plans length:', response.length);
+          return response;
+        }
+        
+        console.log('Response is not an array, returning empty array');
+        return [];
       } catch (error) {
         console.error('Error fetching subscription plans:', error);
         return [];
