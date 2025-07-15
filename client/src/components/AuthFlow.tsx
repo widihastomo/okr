@@ -940,15 +940,11 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
       
       <div className="max-w-md w-full relative z-10">
         <div className="text-center mb-8">
-          <div className="relative inline-block">
-            <div className="relative bg-white rounded-full p-4 shadow-xl">
-              <img 
-                src={refokusLogo} 
-                alt="Refokus Logo" 
-                className="h-12 w-auto mx-auto"
-              />
-            </div>
-          </div>
+          <img 
+            src={refokusLogo} 
+            alt="Refokus Logo" 
+            className="h-12 w-auto mx-auto"
+          />
         </div>
         
         <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm relative overflow-hidden">
