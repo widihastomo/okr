@@ -52,6 +52,9 @@ interface AddOn {
   price: string;
   icon: React.ReactNode;
   category: string;
+  allowQuantity?: boolean;
+  maxQuantity?: number;
+  minQuantity?: number;
 }
 
 export default function UpgradePackage() {
@@ -63,6 +66,7 @@ export default function UpgradePackage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedAddOns, setSelectedAddOns] = useState<Set<string>>(new Set());
+  const [addOnQuantities, setAddOnQuantities] = useState<Record<string, number>>({});
 
   // Fetch subscription plans
   const { data: plans, isLoading: isLoadingPlans, error: plansError } = useQuery<SubscriptionPlan[]>({
@@ -155,6 +159,17 @@ export default function UpgradePackage() {
   // Available Add-ons
   const availableAddOns: AddOn[] = [
     {
+      id: "additional-users",
+      name: "Additional Users",
+      description: "Tambahan pengguna aktif untuk melebihi batas paket langganan",
+      price: "15000",
+      icon: <Users className="w-5 h-5" />,
+      category: "Users",
+      allowQuantity: true,
+      maxQuantity: 50,
+      minQuantity: 1
+    },
+    {
       id: "advanced-analytics",
       name: "Advanced Analytics",
       description: "Dashboard analitik mendalam dengan insights dan reporting otomatis",
@@ -190,18 +205,48 @@ export default function UpgradePackage() {
 
   const toggleAddOn = (addOnId: string) => {
     const newSelection = new Set(selectedAddOns);
+    const addOn = availableAddOns.find(a => a.id === addOnId);
+    
     if (newSelection.has(addOnId)) {
       newSelection.delete(addOnId);
+      // Remove quantity when deselecting
+      const newQuantities = { ...addOnQuantities };
+      delete newQuantities[addOnId];
+      setAddOnQuantities(newQuantities);
     } else {
       newSelection.add(addOnId);
+      // Set default quantity for add-ons that allow quantity
+      if (addOn?.allowQuantity) {
+        setAddOnQuantities(prev => ({
+          ...prev,
+          [addOnId]: addOn.minQuantity || 1
+        }));
+      }
     }
     setSelectedAddOns(newSelection);
+  };
+
+  const updateAddOnQuantity = (addOnId: string, quantity: number) => {
+    const addOn = availableAddOns.find(a => a.id === addOnId);
+    if (addOn?.allowQuantity) {
+      const clampedQuantity = Math.max(
+        addOn.minQuantity || 1,
+        Math.min(addOn.maxQuantity || 50, quantity)
+      );
+      setAddOnQuantities(prev => ({
+        ...prev,
+        [addOnId]: clampedQuantity
+      }));
+    }
   };
 
   const getSelectedAddOnsTotal = () => {
     return Array.from(selectedAddOns).reduce((total, addOnId) => {
       const addOn = availableAddOns.find(a => a.id === addOnId);
-      return total + (addOn ? parseFloat(addOn.price) : 0);
+      if (!addOn) return total;
+      
+      const quantity = addOn.allowQuantity ? (addOnQuantities[addOnId] || 1) : 1;
+      return total + (parseFloat(addOn.price) * quantity);
     }, 0);
   };
 
@@ -224,7 +269,15 @@ export default function UpgradePackage() {
     setIsProcessing(true);
     const selectedAddOnsList = Array.from(selectedAddOns).map(addOnId => {
       const addOn = availableAddOns.find(a => a.id === addOnId);
-      return addOn ? { id: addOn.id, name: addOn.name, price: addOn.price } : null;
+      if (!addOn) return null;
+      
+      const quantity = addOn.allowQuantity ? (addOnQuantities[addOnId] || 1) : 1;
+      return { 
+        id: addOn.id, 
+        name: addOn.name, 
+        price: addOn.price,
+        quantity: quantity
+      };
     }).filter(Boolean);
 
     createUpgradePayment.mutate({
@@ -383,6 +436,7 @@ export default function UpgradePackage() {
                       setSelectedPlanId(plan.id);
                       setSelectedBillingPeriodId(plan.billingPeriods[0]?.id || "");
                       setSelectedAddOns(new Set());
+                      setAddOnQuantities({});
                       setShowPaymentModal(true);
                     }}
                   >
@@ -524,7 +578,7 @@ export default function UpgradePackage() {
                               </div>
                               <p className="text-sm text-gray-600 mt-1">{addOn.description}</p>
                               <div className="mt-2 text-lg font-semibold text-orange-600">
-                                +{formatPrice(addOn.price)}/bulan
+                                +{formatPrice(addOn.price)}{addOn.allowQuantity ? "/pengguna" : ""}/bulan
                               </div>
                             </div>
                           </div>
@@ -538,6 +592,37 @@ export default function UpgradePackage() {
                             )}
                           </div>
                         </div>
+
+                        {/* Quantity Controls for Additional Users */}
+                        {selectedAddOns.has(addOn.id) && addOn.allowQuantity && (
+                          <div className="mt-4 pt-3 border-t border-gray-200" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium text-gray-700">Jumlah:</span>
+                              <div className="flex items-center space-x-2">
+                                <button
+                                  onClick={() => updateAddOnQuantity(addOn.id, (addOnQuantities[addOn.id] || 1) - 1)}
+                                  className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-colors"
+                                  disabled={(addOnQuantities[addOn.id] || 1) <= (addOn.minQuantity || 1)}
+                                >
+                                  <Minus className="w-4 h-4" />
+                                </button>
+                                <span className="w-8 text-center font-medium">
+                                  {addOnQuantities[addOn.id] || 1}
+                                </span>
+                                <button
+                                  onClick={() => updateAddOnQuantity(addOn.id, (addOnQuantities[addOn.id] || 1) + 1)}
+                                  className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-colors"
+                                  disabled={(addOnQuantities[addOn.id] || 1) >= (addOn.maxQuantity || 50)}
+                                >
+                                  <Plus className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
+                            <div className="mt-2 text-sm text-gray-600">
+                              Subtotal: {formatPrice((parseFloat(addOn.price) * (addOnQuantities[addOn.id] || 1)).toString())}/bulan
+                            </div>
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
                   ))}
@@ -549,14 +634,22 @@ export default function UpgradePackage() {
                     <div className="space-y-2">
                       {Array.from(selectedAddOns).map(addOnId => {
                         const addOn = availableAddOns.find(a => a.id === addOnId);
-                        return addOn ? (
+                        if (!addOn) return null;
+                        
+                        const quantity = addOn.allowQuantity ? (addOnQuantities[addOnId] || 1) : 1;
+                        const subtotal = parseFloat(addOn.price) * quantity;
+                        
+                        return (
                           <div key={addOn.id} className="flex items-center justify-between">
-                            <span className="text-sm text-orange-800">{addOn.name}</span>
+                            <span className="text-sm text-orange-800">
+                              {addOn.name}
+                              {addOn.allowQuantity && ` (${quantity}x)`}
+                            </span>
                             <span className="text-sm font-medium text-orange-600">
-                              +{formatPrice(addOn.price)}/bulan
+                              +{formatPrice(subtotal.toString())}/bulan
                             </span>
                           </div>
-                        ) : null;
+                        );
                       })}
                     </div>
                   </div>
@@ -637,6 +730,7 @@ export default function UpgradePackage() {
                           setSelectedPlanId("");
                           setSelectedBillingPeriodId("");
                           setSelectedAddOns(new Set());
+                          setAddOnQuantities({});
                           setIsProcessing(false);
                         }}
                         className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"

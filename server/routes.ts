@@ -8446,7 +8446,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Calculate total price including add-ons
       const basePrice = parseInt(billing.price);
-      const addOnsTotal = addOns.reduce((total: number, addOn: any) => total + parseInt(addOn.price), 0);
+      const addOnsTotal = addOns.reduce((total: number, addOn: any) => {
+        const quantity = addOn.quantity || 1;
+        return total + (parseInt(addOn.price) * quantity);
+      }, 0);
       const totalPrice = basePrice + addOnsTotal;
 
       // Build item details
@@ -8462,11 +8465,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Add add-ons to item details
       addOns.forEach((addOn: any) => {
+        const quantity = addOn.quantity || 1;
         itemDetails.push({
           id: addOn.id,
           price: parseInt(addOn.price),
-          quantity: 1,
-          name: `Add-on: ${addOn.name}`
+          quantity: quantity,
+          name: `Add-on: ${addOn.name}${quantity > 1 ? ` (${quantity}x)` : ''}`
         });
       });
 
