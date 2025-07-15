@@ -171,12 +171,6 @@ export default function Sidebar({
       active: location === "/cycles",
     },
     {
-      label: "Template",
-      icon: FileText,
-      path: "/templates",
-      active: location === "/templates",
-    },
-    {
       label: "Pencapaian",
       icon: Trophy,
       path: "/achievements",
