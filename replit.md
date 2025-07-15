@@ -225,9 +225,9 @@ All email configuration now uses environment variables:
 - `GMAIL_EMAIL`, `GMAIL_PASSWORD`, `GMAIL_FROM`
 
 ### Current Configuration
-- **Primary SMTP**: mail.refokus.id:465 (SSL enabled) ✅ WORKING
+- **Primary SMTP**: mx3.mailspace.id:465 (SSL enabled) ✅ UPDATED
 - **Authentication**: admin@refokus.id ✅ VERIFIED
-- **From Address**: admin@refokus.id ✅ VALID SENDER
+- **From Address**: no-reply@mail.refokus.id ✅ PROFESSIONAL SENDER
 - **SSL/TLS**: Auto-detection based on port (465 = SSL, 587 = TLS) ✅ ACTIVE
 - **Self-signed certificates**: Accepted for custom SMTP servers
 - **Email Delivery**: Successfully tested with member invitations ✅ CONFIRMED

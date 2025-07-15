@@ -356,7 +356,8 @@ export const emailService = new EmailService();
 
 // Log the email service configuration on startup
 console.log('📧 Email service initialized with custom SMTP configuration:');
-console.log('  - Primary provider: Custom SMTP (mail.refokus.id)');
+console.log('  - Primary provider: Custom SMTP (mx3.mailspace.id)');
 console.log('  - Port: 465 (SSL)');
+console.log('  - Sender: no-reply@mail.refokus.id');
 console.log('  - Fallback providers: Mailtrap → SendGrid → Gmail');
 console.log('  - Configuration loaded from environment variables');
