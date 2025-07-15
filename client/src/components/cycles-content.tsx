@@ -1,8 +1,10 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Edit2, Trash2, Calendar, MoreHorizontal, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Edit2, Trash2, Calendar, MoreHorizontal, RefreshCw, ChevronLeft, ChevronRight, Eye, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -28,6 +30,7 @@ export default function CyclesContent() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [selectedCycle, setSelectedCycle] = useState<Cycle | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -41,6 +44,22 @@ export default function CyclesContent() {
       console.log('Cycles data received:', data);
     }
   });
+
+  // Fetch objectives to count how many are connected to each cycle
+  const { data: objectives = [] } = useQuery({
+    queryKey: ["/api/objectives"],
+    queryFn: () => apiRequest("GET", "/api/objectives").then(res => res.json()),
+  });
+
+  // Function to count objectives for a specific cycle
+  const getObjectiveCount = (cycleId: string): number => {
+    return objectives.filter((obj: any) => obj.cycleId === cycleId).length;
+  };
+
+  // Function to get objectives for a specific cycle for preview
+  const getObjectivesForCycle = (cycleId: string): any[] => {
+    return objectives.filter((obj: any) => obj.cycleId === cycleId);
+  };
 
   // Pagination calculations
   const totalItems = cycles.length;
@@ -79,6 +98,11 @@ export default function CyclesContent() {
   const handleDelete = (cycle: Cycle) => {
     setSelectedCycle(cycle);
     setDeleteModalOpen(true);
+  };
+
+  const handlePreview = (cycle: Cycle) => {
+    setSelectedCycle(cycle);
+    setPreviewModalOpen(true);
   };
 
   const formatDate = (dateStr: string) => {
@@ -124,14 +148,14 @@ export default function CyclesContent() {
               <TableHead>Nama Siklus</TableHead>
               <TableHead>Tanggal Mulai</TableHead>
               <TableHead>Tanggal Selesai</TableHead>
-
+              <TableHead>Objectives</TableHead>
               <TableHead className="w-[70px]">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-8">
+                <TableCell colSpan={5} className="text-center py-8">
                   <div className="flex items-center justify-center">
                     <RefreshCw className="h-4 w-4 animate-spin mr-2" />
                     Memuat data...
@@ -140,7 +164,7 @@ export default function CyclesContent() {
               </TableRow>
             ) : cycles.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-8">
+                <TableCell colSpan={5} className="text-center py-8">
                   <div className="flex flex-col items-center justify-center text-gray-500">
                     <Calendar className="h-12 w-12 mb-4 text-gray-300" />
                     <p className="text-lg font-medium">Belum ada siklus</p>
@@ -150,11 +174,32 @@ export default function CyclesContent() {
               </TableRow>
             ) : (
               paginatedCycles.map((cycle) => {
+                const objectiveCount = getObjectiveCount(cycle.id);
+                const cycleObjectives = getObjectivesForCycle(cycle.id);
+                
                 return (
                   <TableRow key={cycle.id}>
                     <TableCell className="font-medium">{cycle.name}</TableCell>
                     <TableCell>{formatDate(cycle.startDate)}</TableCell>
                     <TableCell>{formatDate(cycle.endDate)}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm text-gray-700">
+                          {objectiveCount} objectives
+                        </span>
+                        {objectiveCount > 0 && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 px-2 text-xs text-blue-600 hover:text-blue-800"
+                            onClick={() => handlePreview(cycle)}
+                          >
+                            <Eye className="w-3 h-3 mr-1" />
+                            Lihat
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -285,6 +330,58 @@ export default function CyclesContent() {
         cycle={selectedCycle}
         onSuccess={handleDeleteSuccess}
       />
+
+      {/* Preview Modal */}
+      <Dialog open={previewModalOpen} onOpenChange={setPreviewModalOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <Target className="w-5 h-5" />
+              <span>Objectives dalam Siklus "{selectedCycle?.name}"</span>
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedCycle && getObjectivesForCycle(selectedCycle.id).length > 0 ? (
+              <div className="space-y-3">
+                {getObjectivesForCycle(selectedCycle.id).map((objective: any) => (
+                  <Card key={objective.id} className="border-l-4 border-l-orange-500">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-medium text-gray-900">
+                        {objective.title}
+                      </CardTitle>
+                      {objective.description && (
+                        <CardDescription className="text-xs text-gray-600">
+                          {objective.description}
+                        </CardDescription>
+                      )}
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <Badge variant="secondary" className="text-xs">
+                            {objective.priority || 'Medium'}
+                          </Badge>
+                          <span className="text-xs text-gray-500">
+                            ID: {objective.id.slice(0, 8)}...
+                          </span>
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {objective.ownerId && `Owner: ${objective.ownerId.slice(0, 8)}...`}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <Target className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                <p>Belum ada objectives dalam siklus ini</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
