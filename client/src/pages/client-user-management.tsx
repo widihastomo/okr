@@ -15,7 +15,10 @@ import {
   Mail,
   Calendar,
   Trash2,
-  Building2
+  Building2,
+  Check,
+  ChevronDown,
+  X
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,6 +32,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
@@ -80,11 +85,15 @@ export default function ClientUserManagement() {
   const [editingTeam, setEditingTeam] = useState<Team | null>(null);
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
+  const [memberSearchOpen, setMemberSearchOpen] = useState(false);
+  const [memberSearchValue, setMemberSearchValue] = useState("");
 
   // Reset team form
   const resetTeamForm = () => {
     setSelectedMembers([]);
     setShowCreateTeamModal(false);
+    setMemberSearchOpen(false);
+    setMemberSearchValue("");
   };
 
   // Check if current user can manage users in their organization
@@ -681,55 +690,116 @@ export default function ClientUserManagement() {
                         <div>
                           <Label>Anggota Tim</Label>
                           <div className="space-y-2">
-                            <div className="relative">
-                              <select
-                                multiple
-                                name="members"
-                                value={selectedMembers}
-                                onChange={(e) => {
-                                  const values = Array.from(e.target.selectedOptions, option => option.value);
-                                  setSelectedMembers(values);
-                                }}
-                                className="w-full min-h-[120px] p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
-                                size={6}
-                              >
-                                {users.map((user) => (
-                                  <option 
-                                    key={user.id} 
-                                    value={user.id} 
-                                    className="py-1 px-2 hover:bg-orange-50 cursor-pointer"
-                                  >
-                                    {user.firstName} {user.lastName}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <p className="text-xs text-gray-500">
-                                Tahan Ctrl (Windows) atau Cmd (Mac) untuk memilih beberapa anggota
-                              </p>
-                              <span className="text-xs text-orange-600 font-medium">
-                                {selectedMembers.length} dipilih
-                              </span>
-                            </div>
+                            <Popover open={memberSearchOpen} onOpenChange={setMemberSearchOpen}>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  role="combobox"
+                                  aria-expanded={memberSearchOpen}
+                                  className="w-full justify-between min-h-10 h-auto p-2"
+                                >
+                                  {selectedMembers.length === 0 ? (
+                                    <span className="text-gray-500">Pilih anggota tim...</span>
+                                  ) : (
+                                    <span className="text-left">
+                                      {selectedMembers.length} anggota dipilih
+                                    </span>
+                                  )}
+                                  <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-full p-0" align="start">
+                                <Command>
+                                  <CommandInput
+                                    placeholder="Cari anggota tim..."
+                                    value={memberSearchValue}
+                                    onValueChange={setMemberSearchValue}
+                                  />
+                                  <CommandList>
+                                    <CommandEmpty>Tidak ada anggota ditemukan.</CommandEmpty>
+                                    <CommandGroup>
+                                      {users
+                                        .filter(user => {
+                                          const name = user.firstName && user.lastName 
+                                            ? `${user.firstName} ${user.lastName}` 
+                                            : user.email;
+                                          return name.toLowerCase().includes(memberSearchValue.toLowerCase());
+                                        })
+                                        .map((user) => {
+                                          const isSelected = selectedMembers.includes(user.id);
+                                          const displayName = user.firstName && user.lastName 
+                                            ? `${user.firstName} ${user.lastName}` 
+                                            : user.email;
+                                          
+                                          return (
+                                            <CommandItem
+                                              key={user.id}
+                                              value={user.id}
+                                              onSelect={() => {
+                                                if (isSelected) {
+                                                  setSelectedMembers(prev => prev.filter(id => id !== user.id));
+                                                } else {
+                                                  setSelectedMembers(prev => [...prev, user.id]);
+                                                }
+                                              }}
+                                              className="flex items-center gap-2 cursor-pointer"
+                                            >
+                                              <div className="flex items-center gap-2 flex-1">
+                                                <Avatar className="h-6 w-6">
+                                                  <AvatarFallback className="text-xs">
+                                                    {displayName.charAt(0).toUpperCase()}
+                                                  </AvatarFallback>
+                                                </Avatar>
+                                                <div>
+                                                  <div className="font-medium">{displayName}</div>
+                                                  <div className="text-sm text-gray-500">{user.email}</div>
+                                                </div>
+                                              </div>
+                                              {isSelected && (
+                                                <Check className="h-4 w-4 text-orange-600" />
+                                              )}
+                                            </CommandItem>
+                                          );
+                                        })}
+                                    </CommandGroup>
+                                  </CommandList>
+                                </Command>
+                              </PopoverContent>
+                            </Popover>
+                            
+                            {/* Selected members display */}
                             {selectedMembers.length > 0 && (
-                              <div className="flex flex-wrap gap-1 mt-2">
-                                {selectedMembers.map((memberId) => {
-                                  const member = users.find(u => u.id === memberId);
-                                  if (!member) return null;
-                                  return (
-                                    <Badge key={memberId} variant="secondary" className="text-xs">
-                                      {member.firstName} {member.lastName}
-                                      <button
-                                        type="button"
-                                        onClick={() => setSelectedMembers(prev => prev.filter(id => id !== memberId))}
-                                        className="ml-1 text-gray-500 hover:text-red-500"
-                                      >
-                                        ×
-                                      </button>
-                                    </Badge>
-                                  );
-                                })}
+                              <div className="space-y-2">
+                                <div className="text-sm text-gray-700">
+                                  Anggota yang dipilih:
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                  {selectedMembers.map((memberId) => {
+                                    const member = users.find(u => u.id === memberId);
+                                    if (!member) return null;
+                                    const displayName = member.firstName && member.lastName 
+                                      ? `${member.firstName} ${member.lastName}` 
+                                      : member.email;
+                                    
+                                    return (
+                                      <Badge key={memberId} variant="secondary" className="bg-orange-100 text-orange-800 border-orange-300 flex items-center gap-1">
+                                        <Avatar className="h-4 w-4">
+                                          <AvatarFallback className="text-xs">
+                                            {displayName.charAt(0).toUpperCase()}
+                                          </AvatarFallback>
+                                        </Avatar>
+                                        {displayName}
+                                        <button
+                                          type="button"
+                                          onClick={() => setSelectedMembers(prev => prev.filter(id => id !== memberId))}
+                                          className="ml-1 text-orange-600 hover:text-orange-800"
+                                        >
+                                          <X className="h-3 w-3" />
+                                        </button>
+                                      </Badge>
+                                    );
+                                  })}
+                                </div>
                               </div>
                             )}
                           </div>
