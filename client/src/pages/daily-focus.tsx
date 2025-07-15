@@ -982,41 +982,53 @@ export default function DailyFocusPage() {
 
 
 
+  // Helper function to categorize tasks by date - matching Tasks page logic
+  const categorizeTaskByDate = (task: any): 'overdue' | 'today' | 'upcoming' => {
+    if (!task.dueDate) return 'upcoming';
+    
+    const today = new Date();
+    const dueDate = new Date(task.dueDate);
+    
+    // Reset time to compare only dates
+    today.setHours(0, 0, 0, 0);
+    dueDate.setHours(0, 0, 0, 0);
+    
+    if (dueDate < today && task.status !== 'completed' && task.status !== 'cancelled') {
+      return 'overdue';
+    } else if (dueDate.getTime() === today.getTime()) {
+      return 'today';
+    } else {
+      return 'upcoming';
+    }
+  };
+
   // Filter data for today's focus
   const todayTasks = filteredTasks.filter((task: any) => {
-    const dueDate = task.dueDate ? task.dueDate.split("T")[0] : null;
     // Include tasks due today or in progress tasks
-    return dueDate === todayStr || task.status === "in_progress";
+    return categorizeTaskByDate(task) === 'today' || task.status === "in_progress";
   });
 
   const overdueTasks = filteredTasks.filter((task: any) => {
-    const dueDate = task.dueDate ? task.dueDate.split("T")[0] : null;
     // Only consider tasks overdue if they were due BEFORE today (not including today)
-    return (
-      dueDate &&
-      dueDate < todayStr &&
-      task.status !== "completed" &&
-      task.status !== "cancelled"
-    );
+    return categorizeTaskByDate(task) === 'overdue';
   });
 
-  // Tomorrow's tasks - tasks due tomorrow (using GMT+7 timezone)
+  // Tomorrow's tasks - tasks due tomorrow
   const tomorrowTasks = filteredTasks.filter((task: any) => {
-    const dueDate = task.dueDate ? task.dueDate.split("T")[0] : null;
-    // Calculate tomorrow's date using GMT+7 timezone
-    const tomorrow = new Date();
-    const utcTomorrow =
-      tomorrow.getTime() + tomorrow.getTimezoneOffset() * 60000;
-    const gmt7Tomorrow = new Date(utcTomorrow + 7 * 3600000); // GMT+7
-    gmt7Tomorrow.setDate(gmt7Tomorrow.getDate() + 1);
-    const tomorrowStr =
-      gmt7Tomorrow.getFullYear() +
-      "-" +
-      String(gmt7Tomorrow.getMonth() + 1).padStart(2, "0") +
-      "-" +
-      String(gmt7Tomorrow.getDate()).padStart(2, "0");
+    if (!task.dueDate) return false;
+    
+    const today = new Date();
+    const dueDate = new Date(task.dueDate);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    // Reset time to compare only dates
+    today.setHours(0, 0, 0, 0);
+    dueDate.setHours(0, 0, 0, 0);
+    tomorrow.setHours(0, 0, 0, 0);
+    
     return (
-      dueDate === tomorrowStr &&
+      dueDate.getTime() === tomorrow.getTime() &&
       task.status !== "completed" &&
       task.status !== "cancelled"
     );

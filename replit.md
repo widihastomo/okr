@@ -255,6 +255,22 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 15, 2025. **FIXED DAILY FOCUS OVERDUE DETECTION LOGIC** - Successfully resolved incorrect overdue task categorization in daily-focus page:
+  * IDENTIFIED: Tasks due today were incorrectly showing as overdue due to timezone and string comparison issues
+  * FIXED: Replaced string-based date comparison with proper Date object comparison matching Tasks page logic
+  * ENHANCED: Added categorizeTaskByDate helper function with proper timezone handling (setHours(0,0,0,0))
+  * IMPROVED: Tomorrow's tasks filtering now uses consistent Date object comparison instead of GMT+7 string manipulation
+  * STANDARDIZED: Daily focus page now uses same overdue detection logic as Tasks page for consistency
+  * RESULT: Tasks due today now correctly appear in "Task Hari Ini" section instead of "Task Terlambat" section
+- July 15, 2025. **MULTI-TENANT SECURITY ENHANCEMENT** - Successfully fixed critical security issue with objectives showing from all organizations:
+  * FIXED: Added requireAuth middleware to /api/okrs endpoint for proper authentication
+  * IMPLEMENTED: organizationId filtering in /api/okrs endpoint - system owners see all, regular users see only their organization
+  * CREATED: getOKRsWithKeyResultsByOrganization method in storage layer for organization-specific OKR filtering
+  * ADDED: organizationId filtering to /api/okrs-with-hierarchy endpoint with proper authentication
+  * CREATED: getOKRsWithFullHierarchyByOrganization method for hierarchy filtering by organization
+  * ADDED: authentication and organization access control to /api/okrs/:id endpoint
+  * REMOVED: duplicate /api/okrs/:id endpoint definition
+  * RESULT: Complete multi-tenant security implementation ensuring users only see objectives from their organization
 - July 15, 2025. **ONBOARDING SAVE BUTTON ANIMATION ENHANCEMENT** - Successfully added comprehensive animations to onboarding completion button:
   * ADDED: Loader2 spinner icon that rotates during save process
   * IMPLEMENTED: Dynamic text states "Menyimpan..." → "Menuju Dashboard..." → "Selesai"
