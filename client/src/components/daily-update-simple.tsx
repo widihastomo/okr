@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Zap, TrendingUp, Target, Clock } from 'lucide-react';
 
@@ -223,27 +224,20 @@ export function DailyUpdateSimple() {
     submitMutation.mutate(updateData);
   };
 
-  if (!isOpen) {
-    return (
-      <Button
-        onClick={() => setIsOpen(true)}
-        className="bg-orange-600 hover:bg-orange-700 text-white w-full sm:w-auto"
-      >
-        <Zap className="mr-2 h-4 w-4" />
-        Update Harian Instan
-      </Button>
-    );
-  }
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">Update Harian Instan</h2>
-          <p className="text-gray-600 mt-1">Update cepat progress hari ini</p>
-        </div>
-
-        <div className="p-6 space-y-6">
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button className="bg-orange-600 hover:bg-orange-700 text-white w-full sm:w-auto">
+          <Zap className="mr-2 h-4 w-4" />
+          Update Harian Instan
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Update Harian Instan</DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-6">
           {/* Tasks Summary */}
           <Card>
             <CardHeader>
@@ -450,7 +444,7 @@ export function DailyUpdateSimple() {
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-200 flex justify-end gap-3">
+        <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
           <Button
             variant="outline"
             onClick={() => setIsOpen(false)}
@@ -466,7 +460,7 @@ export function DailyUpdateSimple() {
             {submitMutation.isPending ? 'Menyimpan...' : 'Simpan Update Harian'}
           </Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
