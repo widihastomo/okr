@@ -7,15 +7,13 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insertCycleSchema } from "@shared/schema";
 
-const createCycleFormSchema = insertCycleSchema.extend({
-  type: z.enum(["monthly", "quarterly", "annual"]),
-});
+const createCycleFormSchema = insertCycleSchema.omit({ type: true });
 
 type CreateCycleFormData = z.infer<typeof createCycleFormSchema>;
 
@@ -34,7 +32,6 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
     defaultValues: {
       name: "",
       description: "",
-      type: "monthly",
       startDate: "",
       endDate: "",
     },
@@ -42,7 +39,8 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
 
   const mutation = useMutation({
     mutationFn: async (data: CreateCycleFormData) => {
-      return apiRequest('POST', '/api/cycles', data);
+      // Set default type as monthly when submitting
+      return apiRequest('POST', '/api/cycles', { ...data, type: "monthly" });
     },
     onSuccess: () => {
       // Invalidate cache to refresh the cycles list
@@ -69,39 +67,6 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
     mutation.mutate(data);
   };
 
-  const handleTypeChange = (type: "monthly" | "quarterly" | "annual") => {
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth();
-    
-    if (type === "monthly") {
-      const monthNames = [
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
-      ];
-      const monthStart = new Date(currentYear, currentMonth, 1);
-      const monthEnd = new Date(currentYear, currentMonth + 1, 0);
-      
-      form.setValue("name", `${monthNames[currentMonth]} ${currentYear}`);
-      form.setValue("startDate", monthStart.toISOString().split('T')[0]);
-      form.setValue("endDate", monthEnd.toISOString().split('T')[0]);
-    } else if (type === "quarterly") {
-      const quarter = Math.floor(currentMonth / 3) + 1;
-      const quarterStart = new Date(currentYear, (quarter - 1) * 3, 1);
-      const quarterEnd = new Date(currentYear, quarter * 3, 0);
-      
-      form.setValue("name", `Q${quarter} ${currentYear}`);
-      form.setValue("startDate", quarterStart.toISOString().split('T')[0]);
-      form.setValue("endDate", quarterEnd.toISOString().split('T')[0]);
-    } else {
-      const yearStart = new Date(currentYear, 0, 1);
-      const yearEnd = new Date(currentYear, 11, 31);
-      
-      form.setValue("name", `Annual ${currentYear}`);
-      form.setValue("startDate", yearStart.toISOString().split('T')[0]);
-      form.setValue("endDate", yearEnd.toISOString().split('T')[0]);
-    }
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px] w-[95vw] max-h-[90vh] overflow-y-auto">
@@ -114,34 +79,6 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Type</FormLabel>
-                  <Select 
-                    onValueChange={(value) => {
-                      field.onChange(value);
-                      handleTypeChange(value as "monthly" | "quarterly" | "annual");
-                    }}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select cycle type" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="monthly">Monthly</SelectItem>
-                      <SelectItem value="quarterly">Quarterly</SelectItem>
-                      <SelectItem value="annual">Annual</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             <FormField
               control={form.control}
               name="name"

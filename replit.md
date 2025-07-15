@@ -255,6 +255,15 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 15, 2025. Successfully completed subscription upgrade system implementation and UI improvements:
+  * FIXED: Payment success processing - backend now properly updates subscription after successful Midtrans payment
+  * ADDED: Storage methods for subscription operations (getSubscriptionPlan, getBillingPeriod, updateOrganizationSubscription)
+  * IMPLEMENTED: New API endpoint /api/upgrade/process-payment-success for processing payment success with proper authentication
+  * ENHANCED: Frontend payment success handler now calls backend to process subscription upgrades automatically
+  * VERIFIED: System now properly upgrades subscription plan and billing period in database after successful payment
+  * IMPROVED: Subscription data properly refreshed in UI after successful upgrade
+  * SIMPLIFIED: Removed Type field from create cycle modal - cycles now default to "monthly" type for cleaner UX
+  * RESULT: Complete subscription upgrade workflow with proper database updates and user feedback
 - July 15, 2025. Successfully implemented comprehensive add-on system with quantity support and fixed payment processing:
   * ADDED: "Additional Users" add-on with quantity selection (1-50 users) at Rp 15,000/user/month
   * ENHANCED: Add-on UI with quantity controls using plus/minus buttons with proper validation
