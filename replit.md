@@ -246,6 +246,17 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 15, 2025. Successfully implemented comprehensive team editing functionality:
+  * ADDED: Edit team mutation with PUT endpoint integration for updating team information
+  * IMPLEMENTED: Edit team handler function that populates form with existing team data
+  * ENHANCED: Team creation modal now supports both create and edit modes with dynamic titles
+  * INTEGRATED: Form inputs pre-populate with existing team data when editing (name, description, owner, members)
+  * UPDATED: Submit button text dynamically changes based on mode (Buat Tim/Simpan Perubahan)
+  * FIXED: Team editing dropdown now properly triggers edit functionality
+  * IMPROVED: Form validation includes both create and edit mutation states
+  * ENHANCED: Reset form function clears editing state for proper modal behavior
+  * COMPLETED: Full team CRUD operations with consistent UI patterns
+  * RESULT: Users can now edit existing teams with proper form population and validation
 - July 14, 2025. Successfully removed artificial root nodes and implemented vertical layout for dashboard D3 tree:
   * REMOVED: Artificial root "Dashboard Goals" node that was automatically created for multiple root nodes
   * IMPLEMENTED: Vertical layout for multiple root nodes displayed top-to-bottom instead of side-by-side

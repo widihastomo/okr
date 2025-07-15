@@ -133,6 +133,7 @@ export default function ClientUserManagement() {
     setMemberSearchValue("");
     setOwnerSearchOpen(false);
     setOwnerSearchValue("");
+    setEditingTeam(null);
   };
 
   // Check if current user can manage users in their organization
@@ -276,6 +277,37 @@ export default function ClientUserManagement() {
     }
   });
 
+  const editTeamMutation = useMutation({
+    mutationFn: async ({ id, name, description, ownerId, memberIds }: 
+      { id: string; name: string; description: string; ownerId: string; memberIds: string[] }) => {
+      const response = await apiRequest("PUT", `/api/teams/${id}`, {
+        name,
+        description,
+        ownerId,
+        memberIds,
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/teams"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/team-members"] });
+      setEditingTeam(null);
+      resetTeamForm();
+      toast({
+        title: "Berhasil",
+        description: "Tim berhasil diperbarui",
+        variant: "success"
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Gagal memperbarui tim",
+        variant: "destructive"
+      });
+    }
+  });
+
   const deleteTeamMutation = useMutation({
     mutationFn: async (teamId: string) => {
       const response = await apiRequest("DELETE", `/api/teams/${teamId}`);
@@ -337,6 +369,40 @@ export default function ClientUserManagement() {
 
   const handleResendInvitation = (userId: string) => {
     resendInvitationMutation.mutate(userId);
+  };
+
+  const handleCreateTeam = (formData: FormData) => {
+    createTeamMutation.mutate({
+      name: formData.get('name') as string,
+      description: formData.get('description') as string,
+      ownerId: selectedOwnerId,
+      memberIds: selectedMembers
+    });
+  };
+
+  const handleUpdateTeam = (formData: FormData) => {
+    if (editingTeam) {
+      editTeamMutation.mutate({
+        id: editingTeam.id,
+        name: formData.get('name') as string,
+        description: formData.get('description') as string,
+        ownerId: selectedOwnerId,
+        memberIds: selectedMembers
+      });
+    }
+  };
+
+  const handleEditTeam = (team: Team) => {
+    setEditingTeam(team);
+    setSelectedOwnerId(team.ownerId);
+    
+    // Get current team members
+    const currentMembers = allTeamMembers
+      .filter(member => member.teamId === team.id)
+      .map(member => member.userId);
+    
+    setSelectedMembers(currentMembers);
+    setShowCreateTeamModal(true);
   };
 
   const getRoleBadge = (role: string) => {
@@ -676,29 +742,37 @@ export default function ClientUserManagement() {
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Buat Tim Baru</DialogTitle>
+                      <DialogTitle>{editingTeam ? 'Edit Tim' : 'Buat Tim Baru'}</DialogTitle>
                       <DialogDescription>
-                        Buat tim baru dan tentukan anggotanya
+                        {editingTeam ? 'Ubah informasi tim dan anggotanya' : 'Buat tim baru dan tentukan anggotanya'}
                       </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={(e) => {
                       e.preventDefault();
                       const formData = new FormData(e.currentTarget);
-                      createTeamMutation.mutate({
-                        name: formData.get('name') as string,
-                        description: formData.get('description') as string,
-                        ownerId: selectedOwnerId,
-                        memberIds: selectedMembers,
-                      });
+                      if (editingTeam) {
+                        handleUpdateTeam(formData);
+                      } else {
+                        handleCreateTeam(formData);
+                      }
                     }}>
                       <div className="space-y-4">
                         <div>
                           <Label htmlFor="name">Nama Tim</Label>
-                          <Input name="name" placeholder="Nama tim" required />
+                          <Input 
+                            name="name" 
+                            placeholder="Nama tim" 
+                            defaultValue={editingTeam?.name || ''}
+                            required 
+                          />
                         </div>
                         <div>
                           <Label htmlFor="description">Deskripsi</Label>
-                          <Input name="description" placeholder="Deskripsi tim" />
+                          <Input 
+                            name="description" 
+                            placeholder="Deskripsi tim" 
+                            defaultValue={editingTeam?.description || ''}
+                          />
                         </div>
                         <div>
                           <Label>Pimpinan Tim</Label>
@@ -892,8 +966,11 @@ export default function ClientUserManagement() {
                           <Button type="button" variant="outline" onClick={resetTeamForm}>
                             Batal
                           </Button>
-                          <Button type="submit" disabled={createTeamMutation.isPending || !selectedOwnerId} className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white">
-                            {createTeamMutation.isPending ? "Membuat..." : "Buat Tim"}
+                          <Button type="submit" disabled={(createTeamMutation.isPending || editTeamMutation.isPending) || !selectedOwnerId} className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white">
+                            {editingTeam ? 
+                              (editTeamMutation.isPending ? "Menyimpan..." : "Simpan Perubahan") :
+                              (createTeamMutation.isPending ? "Membuat..." : "Buat Tim")
+                            }
                           </Button>
                         </div>
                       </div>
@@ -953,7 +1030,7 @@ export default function ClientUserManagement() {
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem
-                                  onClick={() => setEditingTeam(team)}
+                                  onClick={() => handleEditTeam(team)}
                                 >
                                   <Edit className="h-4 w-4 mr-2" />
                                   Edit Tim
