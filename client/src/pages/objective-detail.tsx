@@ -2289,6 +2289,13 @@ export default function GoalDetail() {
                   prioritas untuk memastikan eksekusi yang efektif.
                 </p>
               </div>
+              <Button
+                onClick={() => setShowTaskModal(true)}
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Tambah Task
+              </Button>
             </div>
 
             {/* Quick Stats */}
