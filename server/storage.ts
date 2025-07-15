@@ -2050,18 +2050,31 @@ export class DatabaseStorage implements IStorage {
         throw new Error("User must be associated with an organization");
       }
       
-      // Use current date as onboarding start date
+      // Use current date as onboarding start date with GMT+7 timezone
       const onboardingDate = new Date();
       const year = onboardingDate.getFullYear();
       
       console.log(`🔄 Creating cycle structure for onboarding date: ${onboardingDate.toISOString()}`);
       
-      // 1. Create Annual Cycle
+      // Helper function to create date with GMT+7 timezone
+      const createGMT7Date = (year: number, month: number, day: number, isEndOfDay: boolean = false) => {
+        const date = new Date(year, month - 1, day);
+        if (isEndOfDay) {
+          date.setHours(23, 59, 59, 999);
+        } else {
+          date.setHours(0, 0, 0, 0);
+        }
+        // Adjust for GMT+7 timezone (subtract 7 hours to get UTC)
+        const gmt7Date = new Date(date.getTime() - (7 * 60 * 60 * 1000));
+        return gmt7Date.toISOString();
+      };
+      
+      // 1. Create Annual Cycle (1 Jan - 31 Dec)
       const annualCycle = {
         name: `Tahunan ${year}`,
         type: 'annual',
-        startDate: `${year}-01-01T00:00:00.000Z`,
-        endDate: `${year}-12-31T23:59:59.999Z`,
+        startDate: createGMT7Date(year, 1, 1, false), // 1 January
+        endDate: createGMT7Date(year, 12, 31, true),  // 31 December
         organizationId: user.organizationId,
         createdBy: userId,
         lastUpdateBy: userId,
@@ -2074,19 +2087,21 @@ export class DatabaseStorage implements IStorage {
       
       // 2. Create 4 Quarterly Cycles
       const quarterlyPromises = [];
+      const quarterDates = [
+        { start: { month: 1, day: 1 }, end: { month: 3, day: 31 } },   // Q1: Jan 1 - Mar 31
+        { start: { month: 4, day: 1 }, end: { month: 6, day: 30 } },   // Q2: Apr 1 - Jun 30
+        { start: { month: 7, day: 1 }, end: { month: 9, day: 30 } },   // Q3: Jul 1 - Sep 30
+        { start: { month: 10, day: 1 }, end: { month: 12, day: 31 } }  // Q4: Oct 1 - Dec 31
+      ];
+      
       for (let quarter = 1; quarter <= 4; quarter++) {
-        const quarterStartMonth = (quarter - 1) * 3 + 1;
-        const quarterEndMonth = quarter * 3;
-        
-        const quarterStartDate = new Date(year, quarterStartMonth - 1, 1);
-        const quarterEndDate = new Date(year, quarterEndMonth, 0); // Last day of quarter
-        quarterEndDate.setHours(23, 59, 59, 999);
+        const quarterData = quarterDates[quarter - 1];
         
         const quarterlyCycle = {
           name: `Q${quarter} ${year}`,
           type: 'quarterly',
-          startDate: quarterStartDate.toISOString(),
-          endDate: quarterEndDate.toISOString(),
+          startDate: createGMT7Date(year, quarterData.start.month, quarterData.start.day, false),
+          endDate: createGMT7Date(year, quarterData.end.month, quarterData.end.day, true),
           organizationId: user.organizationId,
           createdBy: userId,
           lastUpdateBy: userId,
@@ -2106,15 +2121,15 @@ export class DatabaseStorage implements IStorage {
       ];
       
       const currentMonth = onboardingDate.getMonth() + 1;
-      const monthStartDate = new Date(year, currentMonth - 1, 1);
-      const monthEndDate = new Date(year, currentMonth, 0); // Last day of current month
-      monthEndDate.setHours(23, 59, 59, 999);
+      
+      // Get the last day of the current month
+      const lastDayOfMonth = new Date(year, currentMonth, 0).getDate();
       
       const currentMonthlyCycle = {
         name: `${monthNames[currentMonth - 1]} ${year}`,
         type: 'monthly',
-        startDate: monthStartDate.toISOString(),
-        endDate: monthEndDate.toISOString(),
+        startDate: createGMT7Date(year, currentMonth, 1, false), // First day of month
+        endDate: createGMT7Date(year, currentMonth, lastDayOfMonth, true), // Last day of month
         organizationId: user.organizationId,
         createdBy: userId,
         lastUpdateBy: userId,
