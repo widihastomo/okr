@@ -8245,8 +8245,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .from(subscriptionPlans)
         .where(eq(subscriptionPlans.isActive, true));
 
+      console.log('All plans:', plans.length);
+      
       // Filter out free-trial plan and get billing periods for each plan
       const filteredPlans = plans.filter(plan => plan.slug !== 'free-trial');
+      console.log('Filtered plans (no free-trial):', filteredPlans.length);
       
       // Get billing periods for each plan
       const result = await Promise.all(
@@ -8258,6 +8261,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               eq(billingPeriods.isActive, true)
             ));
           
+          console.log(`Plan ${plan.name}: ${billingPeriodsForPlan.length} billing periods`);
+          
           return {
             ...plan,
             billingPeriods: billingPeriodsForPlan
@@ -8265,8 +8270,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
       );
 
-      console.log('Final result length:', result.length);
-      res.json(result);
+      // Only return plans that have billing periods
+      const finalResult = result.filter(plan => plan.billingPeriods.length > 0);
+      console.log('Final result length:', finalResult.length);
+      res.json(finalResult);
     } catch (error) {
       console.error("Error fetching subscription plans:", error);
       res.status(500).json({ message: "Failed to fetch subscription plans" });
