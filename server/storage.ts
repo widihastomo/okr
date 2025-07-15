@@ -472,15 +472,14 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getCyclesByOrganization(organizationId: string): Promise<Cycle[]> {
-    // Cycles don't have organizationId, so we need to get cycles that have objectives from this organization
+    // Now cycles have organizationId, so we can directly filter by it
     const result = await db
-      .selectDistinct({ cycle: cycles })
+      .select()
       .from(cycles)
-      .leftJoin(objectives, eq(objectives.cycleId, cycles.id))
-      .leftJoin(users, eq(users.id, objectives.ownerId))
-      .where(eq(users.organizationId, organizationId));
+      .where(eq(cycles.organizationId, organizationId))
+      .orderBy(desc(cycles.createdAt));
     
-    return result.map(r => r.cycle).filter(Boolean) as Cycle[];
+    return result as Cycle[];
   }
 
   async getCycle(id: string): Promise<Cycle | undefined> {

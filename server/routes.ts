@@ -1124,10 +1124,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const currentUser = req.user as User;
       const data = insertCycleSchema.parse(req.body);
       
-      // Add created_by field for audit trail
+      // Ensure user has an organization
+      if (!currentUser.organizationId) {
+        return res.status(400).json({ message: "User not associated with an organization" });
+      }
+      
+      // Add created_by field and organization_id for audit trail and filtering
       const cycleData = {
         ...data,
-        createdBy: currentUser.id
+        createdBy: currentUser.id,
+        organizationId: currentUser.organizationId
       };
       
       const cycle = await storage.createCycle(cycleData);
