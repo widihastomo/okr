@@ -10917,18 +10917,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/member-invitations/accept/:token", async (req, res) => {
     try {
       const { token } = req.params;
-      const { firstName, lastName, password } = req.body;
+      const { name, password } = req.body;
       
       console.log("🔍 Accept invitation request data:", {
         token,
-        firstName,
-        lastName: lastName || '[EMPTY]',
+        name,
         password: password ? '[PROVIDED]' : '[MISSING]'
       });
       
-      if (!firstName || !password) {
+      if (!name || !password) {
         console.log("❌ Validation failed - missing required fields");
-        return res.status(400).json({ message: "First name and password are required" });
+        return res.status(400).json({ message: "Name and password are required" });
       }
       
       const invitation = await storage.getMemberInvitationByToken(token);
@@ -10953,8 +10952,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Update user with password and personal information
       const user = await storage.acceptMemberInvitation(token, {
-        firstName,
-        lastName,
+        name,
         password: hashedPassword,
       });
       
@@ -10967,8 +10965,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         user: {
           id: user.id,
           email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
+          name: user.name,
           role: user.role,
           organizationId: user.organizationId,
         },

@@ -84,13 +84,11 @@ export default function AcceptInvitation() {
 
     setIsLoading(true);
     try {
-      // Split fullName into firstName and lastName
-      const nameParts = data.fullName.trim().split(' ');
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || '';
+      // Use consolidated name field
+      const name = data.fullName.trim();
       
-      // Ensure we have at least firstName
-      if (!firstName) {
+      // Ensure we have a name
+      if (!name) {
         toast({
           title: "Error",
           description: "Nama lengkap diperlukan",
@@ -100,14 +98,12 @@ export default function AcceptInvitation() {
       }
       
       console.log("🔍 Sending invitation acceptance data:", {
-        firstName,
-        lastName,
+        name,
         password: "[HIDDEN]",
       });
       
       const response = await apiRequest("POST", `/api/member-invitations/accept/${token}`, {
-        firstName,
-        lastName: lastName || '', // Send empty string instead of undefined
+        name,
         password: data.password,
       });
 
