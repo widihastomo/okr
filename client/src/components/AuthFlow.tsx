@@ -941,7 +941,6 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
       <div className="max-w-md w-full relative z-10">
         <div className="text-center mb-8">
           <div className="relative inline-block">
-            <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full blur-lg opacity-30 animate-pulse"></div>
             <div className="relative bg-white rounded-full p-4 shadow-xl">
               <img 
                 src={refokusLogo} 
