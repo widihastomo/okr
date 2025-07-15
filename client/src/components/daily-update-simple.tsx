@@ -26,6 +26,12 @@ interface SimpleUpdateData {
     newValue: string;
     notes: string;
   }>;
+  tasks: Array<{
+    id: string;
+    title: string;
+    currentStatus: string;
+    newStatus: string;
+  }>;
   reflection: {
     whatWorkedWell: string;
     challenges: string;
@@ -42,6 +48,7 @@ export function DailyUpdateSimple() {
   const [updateData, setUpdateData] = useState<SimpleUpdateData>({
     keyResults: [],
     successMetrics: [],
+    tasks: [],
     reflection: {
       whatWorkedWell: '',
       challenges: ''
@@ -115,7 +122,13 @@ export function DailyUpdateSimple() {
           newValue: sm.achievement || '',
           notes: ''
         })),
-        tasksCompleted: todayTasks.filter((task: any) => task.status === 'completed').length,
+        tasks: todayTasks.map((task: any) => ({
+          id: task.id,
+          title: task.title,
+          currentStatus: task.status,
+          newStatus: task.status
+        })),
+        tasksCompleted: todayTasks.filter((task: any) => task.status === 'selesai').length,
         totalTasks: todayTasks.length
       }));
     }
@@ -146,12 +159,11 @@ export function DailyUpdateSimple() {
         }
       }
 
-      // Mark all today's tasks as completed
-      for (const task of todayTasks) {
-        if (task.status !== 'completed') {
-          await apiRequest('PATCH', `/api/tasks/${task.id}`, {
-            status: 'completed',
-            completed: true
+      // Update task statuses based on user selections
+      for (const taskUpdate of data.tasks) {
+        if (taskUpdate.newStatus !== taskUpdate.currentStatus) {
+          await apiRequest('PATCH', `/api/tasks/${taskUpdate.id}`, {
+            status: taskUpdate.newStatus
           });
         }
       }
@@ -165,7 +177,7 @@ export function DailyUpdateSimple() {
             challenges: data.reflection.challenges,
             keyResultUpdates: data.keyResults.filter(kr => kr.notes),
             successMetricUpdates: data.successMetrics.filter(sm => sm.notes),
-            tasksCompleted: todayTasks.length
+            tasksCompleted: data.tasks.filter(t => t.newStatus === 'selesai').length
           });
         } catch (error) {
           console.error('Error creating daily reflection:', error);
@@ -229,18 +241,82 @@ export function DailyUpdateSimple() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-center p-4">
-                <div className="text-2xl font-bold text-green-600">
-                  {updateData.totalTasks} Task
-                </div>
-                <div className="text-sm text-gray-600">
-                  Semua task akan dimark selesai saat submit
-                </div>
-                {todayTasks.map((task: any) => (
-                  <div key={task.id} className="text-sm bg-gray-50 rounded p-2 mt-2">
-                    ✓ {task.title}
+              <div className="space-y-3">
+                {todayTasks.length === 0 ? (
+                  <div className="text-center p-4">
+                    <div className="text-gray-500">Tidak ada task untuk hari ini</div>
                   </div>
-                ))}
+                ) : (
+                  <>
+                    <div className="text-center mb-4">
+                      <div className="text-2xl font-bold text-green-600">
+                        {todayTasks.length} Task Hari Ini
+                      </div>
+                    </div>
+                    {todayTasks.map((task: any) => (
+                      <div key={task.id} className="border rounded-lg p-4 bg-white">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-900 mb-1">{task.title}</div>
+                            <div className="text-sm text-gray-600 mb-2">
+                              Status saat ini: <span className={`font-medium ${
+                                task.status === 'selesai' ? 'text-green-600' :
+                                task.status === 'sedang_berjalan' ? 'text-blue-600' :
+                                task.status === 'dibatalkan' ? 'text-red-600' :
+                                'text-gray-600'
+                              }`}>
+                                {task.status === 'selesai' ? 'Selesai' :
+                                 task.status === 'sedang_berjalan' ? 'Sedang Berjalan' :
+                                 task.status === 'dibatalkan' ? 'Dibatalkan' :
+                                 'Belum Mulai'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="mt-3">
+                          <label className="text-sm font-medium text-gray-700 mb-2 block">
+                            Update Status:
+                          </label>
+                          <div className="flex gap-2 flex-wrap">
+                            {['belum_mulai', 'sedang_berjalan', 'selesai', 'dibatalkan'].map((status) => (
+                              <button
+                                key={status}
+                                onClick={() => {
+                                  const newTasks = [...updateData.tasks];
+                                  const taskIndex = newTasks.findIndex(t => t.id === task.id);
+                                  if (taskIndex !== -1) {
+                                    newTasks[taskIndex].newStatus = status;
+                                  } else {
+                                    newTasks.push({
+                                      id: task.id,
+                                      title: task.title,
+                                      currentStatus: task.status,
+                                      newStatus: status
+                                    });
+                                  }
+                                  setUpdateData({ ...updateData, tasks: newTasks });
+                                }}
+                                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                                  (updateData.tasks.find(t => t.id === task.id)?.newStatus || task.status) === status
+                                    ? status === 'selesai' ? 'bg-green-100 text-green-800 border-green-300' :
+                                      status === 'sedang_berjalan' ? 'bg-blue-100 text-blue-800 border-blue-300' :
+                                      status === 'dibatalkan' ? 'bg-red-100 text-red-800 border-red-300' :
+                                      'bg-gray-100 text-gray-800 border-gray-300'
+                                    : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                                } border`}
+                              >
+                                {status === 'selesai' ? 'Selesai' :
+                                 status === 'sedang_berjalan' ? 'Sedang Berjalan' :
+                                 status === 'dibatalkan' ? 'Dibatalkan' :
+                                 'Belum Mulai'}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                )}
               </div>
             </CardContent>
           </Card>
