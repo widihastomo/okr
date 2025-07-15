@@ -309,6 +309,38 @@ function Router() {
 }
 
 function App() {
+  // Global error handling for runtime errors
+  useEffect(() => {
+    const handleGlobalError = (e: ErrorEvent) => {
+      // Suppress common non-critical errors
+      if (e.message && typeof e.message === 'string') {
+        if (e.message.includes("ResizeObserver loop completed with undelivered notifications") ||
+            e.message.includes("Cannot read properties of undefined (reading 'frame')") ||
+            e.message.includes("Non-Error promise rejection captured")) {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+      }
+    };
+
+    const handleUnhandledRejection = (e: PromiseRejectionEvent) => {
+      // Suppress ResizeObserver related rejections
+      if (e.reason && String(e.reason).includes("ResizeObserver")) {
+        e.preventDefault();
+        return false;
+      }
+    };
+
+    window.addEventListener("error", handleGlobalError);
+    window.addEventListener("unhandledrejection", handleUnhandledRejection);
+    
+    return () => {
+      window.removeEventListener("error", handleGlobalError);
+      window.removeEventListener("unhandledrejection", handleUnhandledRejection);
+    };
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>

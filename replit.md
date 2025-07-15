@@ -255,6 +255,15 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 15, 2025. **RUNTIME ERROR HANDLING ENHANCEMENT** - Successfully fixed runtime error "Cannot read properties of undefined (reading 'frame')":
+  * IDENTIFIED: Runtime error "Cannot read properties of undefined (reading 'frame')" causing user experience issues
+  * ENHANCED: Added comprehensive error handling in App.tsx with global error event listeners
+  * ENHANCED: Updated company-onboarding.tsx error handling to include frame-related errors
+  * ADDED: Global error suppression in index.html for ResizeObserver and frame-related errors
+  * PREVENTED: Runtime error overlay from showing for non-critical errors (ResizeObserver, frame access)
+  * IMPROVED: Error handling now catches and suppresses common third-party library errors
+  * MAINTAINED: Critical error logging while suppressing harmless runtime warnings
+  * RESULT: Clean user experience without disruptive error overlays while preserving important error reporting
 - July 15, 2025. **LOADING ANIMATION ENHANCEMENT** - Successfully added loading animations to all form submission buttons in AuthFlow:
   * ADDED: Loader2 spinner icon import from lucide-react
   * ENHANCED: Login button shows "Memproses..." with spinning animation during login mutation

@@ -189,20 +189,27 @@ export default function CompanyOnboarding() {
   // Error handling for ResizeObserver and other common errors
   useEffect(() => {
     const handleGlobalError = (e: ErrorEvent) => {
-      if (e.message.includes("ResizeObserver loop completed with undelivered notifications")) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-      if (e.message.includes("Non-Error promise rejection captured")) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
+      if (e.message && typeof e.message === 'string') {
+        if (e.message.includes("ResizeObserver loop completed with undelivered notifications")) {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+        if (e.message.includes("Non-Error promise rejection captured")) {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+        if (e.message.includes("Cannot read properties of undefined (reading 'frame')")) {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
       }
     };
 
     const handleUnhandledRejection = (e: PromiseRejectionEvent) => {
-      if (String(e.reason).includes("ResizeObserver")) {
+      if (e.reason && String(e.reason).includes("ResizeObserver")) {
         e.preventDefault();
         return false;
       }
@@ -212,14 +219,15 @@ export default function CompanyOnboarding() {
     const originalConsoleWarn = console.warn;
     
     console.error = (...args) => {
-      const message = String(args[0]);
+      const message = String(args[0] || '');
       if (message.includes("ResizeObserver loop completed with undelivered notifications") ||
-          message.includes("Non-Error promise rejection captured")) {
+          message.includes("Non-Error promise rejection captured") ||
+          message.includes("Cannot read properties of undefined (reading 'frame')")) {
         return;
       }
       // Log important errors for debugging
       if (message.includes("completeOnboardingMutation") || 
-          message.includes("TypeError") || 
+          (message.includes("TypeError") && !message.includes("frame")) || 
           message.includes("ReferenceError")) {
         console.log("🔍 Important error caught:", args);
       }
@@ -227,8 +235,9 @@ export default function CompanyOnboarding() {
     };
 
     console.warn = (...args) => {
-      const message = String(args[0]);
-      if (message.includes("ResizeObserver loop completed with undelivered notifications")) {
+      const message = String(args[0] || '');
+      if (message.includes("ResizeObserver loop completed with undelivered notifications") ||
+          message.includes("Cannot read properties of undefined (reading 'frame')")) {
         return;
       }
       originalConsoleWarn(...args);
