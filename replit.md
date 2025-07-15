@@ -246,6 +246,16 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 15, 2025. Successfully fixed team member saving issue and enhanced team display:
+  * FIXED: Added missing /api/team-members endpoint that was causing members not to display
+  * RESOLVED: Team members now properly saved to database and displayed in UI
+  * ENHANCED: Improved team member display with better avatar styling and layout
+  * IMPROVED: Owner display with blue badge and enhanced avatar styling
+  * ADDED: Individual member cards with proper name display and avatar fallbacks
+  * UPGRADED: Member list now shows up to 3 members individually with "X anggota lainnya" for overflow
+  * STYLED: Enhanced spacing, colors, and typography for better visual hierarchy
+  * COMPLETED: Full team member management with proper frontend-backend integration
+  * RESULT: Team creation and editing now properly saves and displays all members
 - July 15, 2025. Successfully implemented comprehensive team editing functionality:
   * ADDED: Edit team mutation with PUT endpoint integration for updating team information
   * IMPLEMENTED: Edit team handler function that populates form with existing team data

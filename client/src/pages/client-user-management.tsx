@@ -1070,19 +1070,19 @@ export default function ClientUserManagement() {
                           </div>
                         </CardHeader>
                         <CardContent>
-                          <div className="space-y-3">
+                          <div className="space-y-4">
                             {/* Owner */}
-                            <div className="flex items-center space-x-2">
-                              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                            <div className="flex items-center space-x-3">
+                              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs">
                                 Pimpinan
                               </Badge>
                               <div className="flex items-center space-x-2">
-                                <Avatar className="h-6 w-6">
-                                  <AvatarFallback className="text-xs">
+                                <Avatar className="h-7 w-7">
+                                  <AvatarFallback className="text-xs bg-blue-100 text-blue-700">
                                     {owner ? getUserDisplayName(owner).charAt(0).toUpperCase() : '?'}
                                   </AvatarFallback>
                                 </Avatar>
-                                <span className="text-sm font-medium">
+                                <span className="text-sm font-medium text-gray-900">
                                   {owner ? getUserDisplayName(owner) : 'Unknown'}
                                 </span>
                               </div>
@@ -1090,25 +1090,36 @@ export default function ClientUserManagement() {
                             
                             {/* Members */}
                             <div>
-                              <p className="text-sm text-gray-600 mb-2">
-                                Anggota ({teamMembersForTeam.length})
-                              </p>
-                              <div className="flex flex-wrap gap-1">
-                                {teamMembersForTeam.slice(0, 3).map((member) => (
-                                  <Avatar key={member.id} className="h-6 w-6">
-                                    <AvatarFallback className="text-xs">
-                                      {`${member.user.firstName?.[0]}${member.user.lastName?.[0]}`}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                ))}
-                                {teamMembersForTeam.length > 3 && (
-                                  <div className="h-6 w-6 rounded-full bg-gray-200 flex items-center justify-center">
-                                    <span className="text-xs text-gray-600">
-                                      +{teamMembersForTeam.length - 3}
-                                    </span>
-                                  </div>
-                                )}
+                              <div className="flex items-center justify-between mb-2">
+                                <p className="text-sm text-gray-600">
+                                  Anggota ({teamMembersForTeam.length})
+                                </p>
                               </div>
+                              {teamMembersForTeam.length > 0 ? (
+                                <div className="space-y-2">
+                                  {teamMembersForTeam.slice(0, 3).map((member) => (
+                                    <div key={member.id} className="flex items-center space-x-2">
+                                      <Avatar className="h-6 w-6">
+                                        <AvatarFallback className="text-xs bg-gray-100 text-gray-700">
+                                          {getUserDisplayName(member.user).charAt(0).toUpperCase()}
+                                        </AvatarFallback>
+                                      </Avatar>
+                                      <span className="text-sm text-gray-700">
+                                        {getUserDisplayName(member.user)}
+                                      </span>
+                                    </div>
+                                  ))}
+                                  {teamMembersForTeam.length > 3 && (
+                                    <div className="text-xs text-gray-500 pl-8">
+                                      +{teamMembersForTeam.length - 3} anggota lainnya
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <p className="text-sm text-gray-500 italic pl-2">
+                                  Belum ada anggota
+                                </p>
+                              )}
                             </div>
                           </div>
                         </CardContent>
