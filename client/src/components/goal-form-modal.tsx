@@ -124,6 +124,39 @@ const objectiveFormSchema = z.object({
 type ObjectiveFormData = z.infer<typeof objectiveFormSchema>;
 export type KeyResultFormData = z.infer<typeof keyResultSchema>;
 
+// Function to find the closest cycle to today's date
+function findClosestCycle(cycles: Cycle[]): string {
+  if (!cycles || cycles.length === 0) return "";
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Set to start of day for comparison
+  
+  let closestCycle = cycles[0];
+  let smallestDifference = Infinity;
+  
+  for (const cycle of cycles) {
+    const startDate = new Date(cycle.startDate);
+    const endDate = new Date(cycle.endDate);
+    
+    // Check if today is within the cycle
+    if (today >= startDate && today <= endDate) {
+      return cycle.id; // Return immediately if today is within a cycle
+    }
+    
+    // Calculate the minimum distance to the cycle (either to start or end)
+    const distanceToStart = Math.abs(today.getTime() - startDate.getTime());
+    const distanceToEnd = Math.abs(today.getTime() - endDate.getTime());
+    const minDistance = Math.min(distanceToStart, distanceToEnd);
+    
+    if (minDistance < smallestDifference) {
+      smallestDifference = minDistance;
+      closestCycle = cycle;
+    }
+  }
+  
+  return closestCycle.id;
+}
+
 
 
 interface ObjectiveFormModalProps {
@@ -180,7 +213,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
         ownerType: "user",
         ownerId: "",
         status: "in_progress",
-        cycleId: "",
+        cycleId: findClosestCycle(cycles || []),
         teamId: undefined,
         parentId: undefined,
       },
@@ -218,6 +251,8 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
           })) || [],
         });
       } else {
+        // For new goals, auto-select the closest cycle to today
+        const closestCycleId = findClosestCycle(cycles || []);
         form.reset({
           objective: {
             title: "",
@@ -226,7 +261,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
             ownerType: "user",
             ownerId: "",
             status: "not_started",
-            cycleId: "",
+            cycleId: closestCycleId,
             teamId: undefined,
             parentId: undefined,
           },
@@ -234,7 +269,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
         });
       }
     }
-  }, [open, goal, isEditMode, form]);
+  }, [open, goal, isEditMode, form, cycles]);
 
 
 
