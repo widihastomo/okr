@@ -52,6 +52,29 @@ export default function GoalCard({ goal, onEditProgress, onEditKeyResult, onDele
     return userId;
   };
 
+  // Helper function to get user initials for avatar fallback
+  const getUserInitials = (userId: string): string => {
+    if (!users) return userId.charAt(0).toUpperCase();
+    const user = users.find((u: any) => u.id === userId);
+    if (!user) return userId.charAt(0).toUpperCase();
+    
+    // Use consolidated name field
+    if (user.name && user.name.trim() !== '') {
+      const nameParts = user.name.trim().split(' ');
+      if (nameParts.length >= 2) {
+        return (nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0)).toUpperCase();
+      }
+      return nameParts[0].charAt(0).toUpperCase();
+    }
+    
+    // Fallback to email username
+    if (user.email) {
+      return user.email.charAt(0).toUpperCase();
+    }
+    
+    return userId.charAt(0).toUpperCase();
+  };
+
   // Helper function to truncate text with character limit (responsive)
   const truncateText = (text: string, maxLength: number, mobileLength?: number) => {
     // Use shorter length for mobile if provided
@@ -402,11 +425,11 @@ export default function GoalCard({ goal, onEditProgress, onEditKeyResult, onDele
               <Avatar className="w-6 h-6">
                 <AvatarImage src="" alt={goal.owner} />
                 <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
-                  {goal.owner.split(' ').map(n => n[0]).join('').toUpperCase()}
+                  {getUserInitials(goal.ownerId || goal.owner)}
                 </AvatarFallback>
               </Avatar>
             )}
-            {goal.owner}
+            {goal.ownerType === 'team' ? goal.owner : getUserName(goal.ownerId || goal.owner)}
           </span>
           
           {cycle && (
