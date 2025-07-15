@@ -821,7 +821,7 @@ export default function ClientUserManagement() {
                           <Button type="button" variant="outline" onClick={resetTeamForm}>
                             Batal
                           </Button>
-                          <Button type="submit" disabled={createTeamMutation.isPending}>
+                          <Button type="submit" disabled={createTeamMutation.isPending} className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white">
                             {createTeamMutation.isPending ? "Membuat..." : "Buat Tim"}
                           </Button>
                         </div>
