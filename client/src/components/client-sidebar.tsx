@@ -106,12 +106,6 @@ export default function Sidebar({
       active: location === "/system-admin/subscriptions",
     },
     {
-      label: "Kelola Add-Ons",
-      icon: Package,
-      path: "/system-admin/add-ons",
-      active: location === "/system-admin/add-ons",
-    },
-    {
       label: "Kode Referral",
       icon: Gift,
       path: "/referral-codes",
@@ -199,13 +193,6 @@ export default function Sidebar({
       icon: Settings,
       path: "/organization-settings",
       active: location === "/organization-settings",
-    },
-
-    {
-      label: "Add-Ons",
-      icon: Package,
-      path: "/add-ons",
-      active: location === "/add-ons",
     },
   ];
 
