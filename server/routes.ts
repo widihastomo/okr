@@ -2121,7 +2121,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           title: z.string().min(1, "Title is required"),
           description: z.string().optional(),
           cycleId: z.string().nullable().optional(),
-          ownerId: z.string().optional(), // Will be overridden by currentUser
+          ownerId: z.string().optional(), // Selected owner ID (user or team)
           ownerType: z.enum(["user", "team"]).default("user"),
           teamId: z.string().nullable().optional(),
           parentId: z.string().nullable().optional(),
@@ -2141,12 +2141,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = createOKRSchema.parse(req.body);
       console.log("Validated data:", JSON.stringify(validatedData, null, 2));
       
-      // Ensure ownerId is set to current user for security
+      // Use selected owner or fallback to current user
+      const selectedOwnerId = validatedData.objective.ownerId || currentUser.id;
+      
+      // Get owner information for the backward compatibility field
+      let ownerName = 'Unknown User';
+      if (validatedData.objective.ownerType === 'team') {
+        // For teams, fetch team name
+        const team = await storage.getTeam(selectedOwnerId);
+        ownerName = team?.name || 'Unknown Team';
+      } else {
+        // For users, fetch user name
+        if (selectedOwnerId === currentUser.id) {
+          ownerName = currentUser.username || currentUser.email || 'Unknown User';
+        } else {
+          const user = await storage.getUser(selectedOwnerId);
+          ownerName = user ? (user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.firstName || user.lastName || user.email || 'Unknown User') : 'Unknown User';
+        }
+      }
+      
       const objectiveData = {
         ...validatedData.objective,
-        ownerId: currentUser.id,
-        owner: currentUser.username || currentUser.email || 'Unknown User', // Add backward compatibility field
-        teamId: validatedData.objective.ownerType === 'team' ? validatedData.objective.ownerId : null,
+        ownerId: selectedOwnerId,
+        owner: ownerName,
+        teamId: validatedData.objective.ownerType === 'team' ? selectedOwnerId : null,
         createdBy: currentUser.id // Add created_by field
       };
       
