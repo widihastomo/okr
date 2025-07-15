@@ -186,7 +186,7 @@ export default function UpgradePackage() {
             console.log('Initializing Midtrans payment...');
             try {
               (window as any).snap.pay(data.snapToken, {
-                onSuccess: function(result: any) {
+                onSuccess: async function(result: any) {
                   console.log('Payment successful:', result);
                   
                   // Set payment success state immediately
@@ -198,11 +198,45 @@ export default function UpgradePackage() {
                     statusCode: result.status_code
                   });
                   
-                  toast({
-                    title: "Pembayaran Berhasil!",
-                    description: "Selamat! Paket berlangganan Anda telah berhasil diupgrade.",
-                    variant: "default",
-                  });
+                  // Process the payment success on backend
+                  try {
+                    const response = await fetch('/api/upgrade/process-payment-success', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        orderId: result.order_id,
+                        planId: selectedPlan?.id,
+                        billingPeriodId: selectedBillingPeriod?.id
+                      }),
+                    });
+                    
+                    if (response.ok) {
+                      const data = await response.json();
+                      console.log("Subscription updated successfully:", data);
+                      
+                      toast({
+                        title: "Upgrade Berhasil!",
+                        description: `Paket berlangganan berhasil diupgrade ke ${data.planName}`,
+                        variant: "default",
+                      });
+                    } else {
+                      console.error("Failed to process payment success:", response.statusText);
+                      toast({
+                        title: "Upgrade Gagal",
+                        description: "Terjadi kesalahan saat memproses upgrade. Silakan hubungi support.",
+                        variant: "destructive",
+                      });
+                    }
+                  } catch (error) {
+                    console.error("Error processing payment success:", error);
+                    toast({
+                      title: "Upgrade Gagal",
+                      description: "Terjadi kesalahan saat memproses upgrade. Silakan hubungi support.",
+                      variant: "destructive",
+                    });
+                  }
                   
                   setShowPaymentModal(false);
                   setIsProcessing(false);

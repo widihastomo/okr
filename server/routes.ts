@@ -8506,6 +8506,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Process payment success manually (called from frontend)
+  app.post("/api/upgrade/process-payment-success", requireAuth, async (req, res) => {
+    try {
+      const { orderId, planId, billingPeriodId } = req.body;
+      const user = req.user as User;
+      
+      if (!orderId || !planId || !billingPeriodId) {
+        return res.status(400).json({ message: "Missing required parameters" });
+      }
+      
+      // Get plan and billing period details
+      const plan = await storage.getSubscriptionPlan(planId);
+      const billingPeriod = await storage.getBillingPeriod(billingPeriodId);
+      
+      if (!plan || !billingPeriod) {
+        return res.status(404).json({ message: "Plan or billing period not found" });
+      }
+      
+      // Calculate end date
+      const planStartDate = new Date();
+      const planEndDate = new Date(Date.now() + (billingPeriod.durationMonths * 30 * 24 * 60 * 60 * 1000));
+      
+      // Update organization subscription
+      await storage.updateOrganizationSubscription(user.organizationId, {
+        planId: planId,
+        billingPeriodId: billingPeriodId,
+        isTrialActive: false,
+        trialEndsAt: null,
+        planStartDate: planStartDate,
+        planEndDate: planEndDate,
+        maxUsers: plan.maxUsers,
+        subscriptionStatus: 'active'
+      });
+      
+      console.log(`Manual payment processing: Subscription updated for organization ${user.organizationId}`);
+      
+      res.json({ 
+        status: 'success',
+        message: 'Subscription updated successfully',
+        planName: plan.name,
+        billingPeriod: billingPeriod.name
+      });
+    } catch (error) {
+      console.error("Error processing payment success:", error);
+      res.status(500).json({ message: "Failed to process payment success" });
+    }
+  });
+
   // Handle Midtrans payment notification (webhook)
   app.post("/api/upgrade/payment-notification", async (req, res) => {
     try {
@@ -8521,12 +8569,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Extract organization ID from order ID
         const orgId = order_id.split('-')[1];
         
-        // Update organization subscription
-        // Implementation depends on your specific upgrade logic
         console.log(`Payment successful for organization ${orgId}`);
         
-        // TODO: Update organization subscription plan
-        // This would involve updating the organizationSubscriptions table
+        // For now, just log - the frontend will handle processing
+        console.log(`Webhook received for organization ${orgId}, order ${order_id}`);
         
         res.json({ status: 'success' });
       } else {

@@ -2,6 +2,7 @@ import {
   cycles, templates, objectives, keyResults, users, teams, teamMembers, checkIns, initiatives, tasks, taskComments, taskAuditTrail,
   initiativeMembers, initiativeDocuments, initiativeNotes, initiativeComments, initiativeSuccessMetrics, successMetricUpdates,
   notifications, notificationPreferences, userOnboardingProgress, organizations, applicationSettings, auditTrail,
+  subscriptionPlans, billingPeriods, organizationSubscriptions,
   type Cycle, type Template, type Objective, type KeyResult, type User, type Team, type TeamMember,
   type CheckIn, type Initiative, type Task, type TaskComment, type TaskAuditTrail, type KeyResultWithDetails, type InitiativeMember, type InitiativeDocument,
   type InitiativeNote, type InitiativeComment, type InsertCycle, type InsertTemplate, type InsertObjective, type InsertKeyResult, 
@@ -71,6 +72,11 @@ export interface IStorage {
   
   // Organizations
   getOrganization(id: string): Promise<Organization | undefined>;
+  
+  // Subscription Plans
+  getSubscriptionPlan(id: string): Promise<any>;
+  getBillingPeriod(id: string): Promise<any>;
+  updateOrganizationSubscription(organizationId: string, update: any): Promise<void>;
   
   // Teams
   getTeam(id: string): Promise<Team | undefined>;
@@ -2713,6 +2719,33 @@ export class DatabaseStorage implements IStorage {
       console.error("Error creating audit trail:", error);
       throw error;
     }
+  }
+
+  // Subscription Plans
+  async getSubscriptionPlan(id: string): Promise<any> {
+    const [plan] = await db
+      .select()
+      .from(subscriptionPlans)
+      .where(eq(subscriptionPlans.id, id));
+    return plan || undefined;
+  }
+
+  async getBillingPeriod(id: string): Promise<any> {
+    const [billingPeriod] = await db
+      .select()
+      .from(billingPeriods)
+      .where(eq(billingPeriods.id, id));
+    return billingPeriod || undefined;
+  }
+
+  async updateOrganizationSubscription(organizationId: string, update: any): Promise<void> {
+    await db
+      .update(organizationSubscriptions)
+      .set({
+        ...update,
+        updatedAt: new Date()
+      })
+      .where(eq(organizationSubscriptions.organizationId, organizationId));
   }
 }
 
