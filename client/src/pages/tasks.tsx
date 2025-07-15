@@ -161,8 +161,13 @@ const TasksPage = () => {
   const getUserInitials = (userId: string) => {
     const user = users.find(u => u.id === userId);
     if (!user) return 'U';
-    if (user.firstName && user.lastName) {
-      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+    const name = user.name || "";
+    if (name && name.trim() !== '') {
+      const nameParts = name.trim().split(' ');
+      if (nameParts.length >= 2) {
+        return `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase();
+      }
+      return nameParts[0][0].toUpperCase();
     }
     return user.email ? user.email[0].toUpperCase() : 'U';
   };

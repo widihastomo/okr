@@ -255,6 +255,23 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 15, 2025. **USER FUNCTION MIGRATION TO CONSOLIDATED NAME FIELD** - Successfully migrated all getUserName and getUserInitials functions to use consolidated name field:
+  * UPDATED: All getUserName functions across components to use consolidated name field instead of firstName/lastName
+  * UPDATED: All getUserInitials functions to properly handle single name field with space-separated parts
+  * ENHANCED: getUserName functions now use name field first, then fallback to email username extraction
+  * ENHANCED: getUserInitials functions now extract first letter of first name and last name from consolidated name field
+  * FIXED: Name display consistency across all components including activity-log-card, initiatives, goal-card, timeline, tasks, key-result-detail, initiative-detail, and profile pages
+  * IMPROVED: Better fallback logic for name extraction from consolidated name field
+  * RESULT: Complete migration from firstName/lastName to consolidated name field with proper initials extraction
+- July 15, 2025. **COMPLETE TOUR SYSTEM REMOVAL** - Successfully removed entire onboarding tour system for cleaner interface:
+  * REMOVED: All tour-related components (tour-tooltip, tour-launcher, onboarding-overlay, welcome-wizard)
+  * REMOVED: All tour-related contexts, hooks, and TypeScript interfaces
+  * REMOVED: All tour-related CSS animations and styles from index.css
+  * REMOVED: All data-tour attributes and onboarding highlight classes
+  * CLEANED: Removed all tour-related imports and references from components
+  * ELIMINATED: Tour animation CSS including pulse-glow, highlight-border, spotlight, breathing animations
+  * SIMPLIFIED: Removed onboarding context provider and useOnboardingProgress hook
+  * RESULT: Clean, minimalist interface without guided tours or excessive animations
 - July 15, 2025. **UI CLEANUP AND ONBOARDING ENHANCEMENT** - Successfully removed background ornaments and enhanced interactive onboarding tour:
   * REMOVED: Background pattern overlay from AuthFlow component for cleaner login interface
   * REMOVED: Tour restart button from daily-focus page to reduce UI clutter

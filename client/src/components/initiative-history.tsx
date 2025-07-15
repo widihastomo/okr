@@ -38,8 +38,13 @@ export function InitiativeHistory({ initiativeId }: InitiativeHistoryProps) {
   const history = Array.isArray(historyData) ? historyData : [];
 
   const getUserInitials = (user: InitiativeHistoryEntry['user']) => {
-    if (user.firstName || user.lastName) {
-      return `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`.toUpperCase();
+    const name = user.name || "";
+    if (name && name.trim() !== '') {
+      const nameParts = name.trim().split(' ');
+      if (nameParts.length >= 2) {
+        return `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase();
+      }
+      return nameParts[0][0].toUpperCase();
     }
     return user.email?.[0]?.toUpperCase() || 'U';
   };

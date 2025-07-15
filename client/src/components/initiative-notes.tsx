@@ -260,7 +260,15 @@ export function InitiativeNotes({ initiativeId }: InitiativeNotesProps) {
 
   const getUserInitials = (user: any) => {
     if (!user) return "?";
-    return `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase() || "?";
+    const name = user.name || "";
+    if (name && name.trim() !== '') {
+      const nameParts = name.trim().split(' ');
+      if (nameParts.length >= 2) {
+        return `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase();
+      }
+      return nameParts[0][0].toUpperCase();
+    }
+    return user.email?.[0]?.toUpperCase() || "?";
   };
 
   if (isLoading) {

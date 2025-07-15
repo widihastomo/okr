@@ -175,7 +175,19 @@ export default function Inisiatif({ userFilter, filteredKeyResultIds }: Inisiati
   const getUserName = (userId: string | null) => {
     if (!userId) return "Unassigned";
     const user = users.find((u) => u.id === userId);
-    return user ? `${user.firstName} ${user.lastName}` : "Unknown User";
+    if (!user) return "Unknown User";
+    
+    // Use consolidated name field
+    if (user.name && user.name.trim() !== '') {
+      return user.name.trim();
+    }
+    
+    // Fallback to email username
+    if (user.email) {
+      return user.email.split('@')[0];
+    }
+    
+    return "Unknown User";
   };
 
   // Helper function to get initiative members

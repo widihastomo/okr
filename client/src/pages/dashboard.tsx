@@ -45,7 +45,7 @@ import {
   ChevronRight,
   Network,
 } from "lucide-react";
-import TourLauncher from "@/components/onboarding/tour-launcher";
+
 import { useAuth } from "@/hooks/useAuth";
 
 import { ObjectiveStatusBadge } from "@/components/objective-status-badge";
@@ -576,8 +576,7 @@ export default function Dashboard() {
 
             </div>
             <div className="flex-shrink-0 flex gap-2">
-              <TourLauncher />
-              <CreateGoalButton data-tour="create-goal-button" />
+              <CreateGoalButton />
             </div>
           </div>
 

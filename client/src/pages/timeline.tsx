@@ -74,12 +74,19 @@ interface TimelineReaction {
 
 // Helper functions
 const getUserName = (user: any) => {
-  if (user.firstName && user.lastName) {
-    return `${user.firstName} ${user.lastName}`;
+  if (!user) return 'Unknown User';
+  
+  // Use consolidated name field
+  if (user.name && user.name.trim() !== '') {
+    return user.name.trim();
   }
-  if (user.firstName) return user.firstName;
-  if (user.lastName) return user.lastName;
-  return user.email?.split('@')[0] || 'Unknown User';
+  
+  // Fallback to email username
+  if (user.email) {
+    return user.email.split('@')[0];
+  }
+  
+  return 'Unknown User';
 };
 
 const getUserInitials = (user: any) => {

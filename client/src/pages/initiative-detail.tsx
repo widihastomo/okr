@@ -755,9 +755,15 @@ export default function InitiativeDetailPage() {
   const getUserInitials = (userId: string): string => {
     const user = users?.find(u => u.id === userId);
     if (!user) return "U";
-    const firstName = user.firstName || "";
-    const lastName = user.lastName || "";
-    return firstName.charAt(0) + lastName.charAt(0);
+    const name = user.name || "";
+    if (name && name.trim() !== '') {
+      const nameParts = name.trim().split(' ');
+      if (nameParts.length >= 2) {
+        return `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase();
+      }
+      return nameParts[0][0].toUpperCase();
+    }
+    return user.email ? user.email[0].toUpperCase() : "U";
   };
 
   const { data: relatedInitiatives } = useQuery({

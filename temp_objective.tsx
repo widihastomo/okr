@@ -410,10 +410,19 @@ export default function GoalDetail() {
   const getUserName = (userId: string): string => {
     if (!users) return userId;
     const user = users.find((u: any) => u.id === userId);
-    if (user && user.firstName && user.lastName) {
-      return `${user.firstName} ${user.lastName}`;
+    if (!user) return userId;
+    
+    // Use consolidated name field
+    if (user.name && user.name.trim() !== '') {
+      return user.name.trim();
     }
-    return user?.email || userId;
+    
+    // Fallback to email username
+    if (user.email) {
+      return user.email.split('@')[0];
+    }
+    
+    return userId;
   };
 
   // Calculate days remaining based on cycle end date
