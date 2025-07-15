@@ -7,11 +7,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insertCycleSchema } from "@shared/schema";
+import { HelpCircle } from "lucide-react";
 
 const createCycleFormSchema = insertCycleSchema.omit({ type: true });
 
@@ -71,9 +72,9 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px] w-[95vw] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-lg">Create New Cycle</DialogTitle>
+          <DialogTitle className="text-lg">Buat Siklus Baru</DialogTitle>
           <DialogDescription className="text-sm">
-            Create a new Goal cycle for your organization
+            Buat siklus tujuan baru untuk organisasi Anda
           </DialogDescription>
         </DialogHeader>
         
@@ -84,9 +85,29 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel className="flex items-center gap-2">
+                    Nama Siklus
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <HelpCircle className="h-4 w-4 text-blue-500 hover:text-blue-600 cursor-help" />
+                      </PopoverTrigger>
+                      <PopoverContent className="w-80">
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Nama Siklus</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Berikan nama yang jelas dan deskriptif untuk siklus ini. Contoh:
+                          </p>
+                          <ul className="text-sm text-muted-foreground space-y-1">
+                            <li>• "Juli 2025" (untuk siklus bulanan)</li>
+                            <li>• "Q3 2025" (untuk siklus kuartalan)</li>
+                            <li>• "Tahun 2025" (untuk siklus tahunan)</li>
+                          </ul>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Q1 2025" {...field} />
+                    <Input placeholder="contoh: Juli 2025" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -98,10 +119,30 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel className="flex items-center gap-2">
+                    Deskripsi
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <HelpCircle className="h-4 w-4 text-blue-500 hover:text-blue-600 cursor-help" />
+                      </PopoverTrigger>
+                      <PopoverContent className="w-80">
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Deskripsi Siklus</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Jelaskan fokus utama atau tema dari siklus ini. Contoh:
+                          </p>
+                          <ul className="text-sm text-muted-foreground space-y-1">
+                            <li>• "Fokus pertumbuhan penjualan dan ekspansi pasar"</li>
+                            <li>• "Peningkatan efisiensi operasional dan produktivitas"</li>
+                            <li>• "Pengembangan produk dan inovasi teknologi"</li>
+                          </ul>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder="Brief description of this cycle's focus"
+                      placeholder="Jelaskan fokus utama siklus ini..."
                       value={field.value || ""}
                       onChange={field.onChange}
                       onBlur={field.onBlur}
@@ -119,7 +160,27 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
                 name="startDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Start Date</FormLabel>
+                    <FormLabel className="flex items-center gap-2">
+                      Tanggal Mulai
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <HelpCircle className="h-4 w-4 text-blue-500 hover:text-blue-600 cursor-help" />
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Tanggal Mulai Siklus</h4>
+                            <p className="text-sm text-muted-foreground">
+                              Pilih tanggal dimulainya siklus ini. Biasanya:
+                            </p>
+                            <ul className="text-sm text-muted-foreground space-y-1">
+                              <li>• Siklus bulanan: tanggal 1 bulan tersebut</li>
+                              <li>• Siklus kuartalan: tanggal 1 bulan pertama kuartal</li>
+                              <li>• Siklus tahunan: tanggal 1 Januari</li>
+                            </ul>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </FormLabel>
                     <FormControl>
                       <Input type="date" {...field} />
                     </FormControl>
@@ -133,7 +194,27 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
                 name="endDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>End Date</FormLabel>
+                    <FormLabel className="flex items-center gap-2">
+                      Tanggal Berakhir
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <HelpCircle className="h-4 w-4 text-blue-500 hover:text-blue-600 cursor-help" />
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Tanggal Berakhir Siklus</h4>
+                            <p className="text-sm text-muted-foreground">
+                              Pilih tanggal berakhirnya siklus ini. Biasanya:
+                            </p>
+                            <ul className="text-sm text-muted-foreground space-y-1">
+                              <li>• Siklus bulanan: tanggal terakhir bulan tersebut</li>
+                              <li>• Siklus kuartalan: tanggal terakhir bulan ketiga kuartal</li>
+                              <li>• Siklus tahunan: tanggal 31 Desember</li>
+                            </ul>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </FormLabel>
                     <FormControl>
                       <Input type="date" {...field} />
                     </FormControl>
@@ -149,14 +230,14 @@ export default function CreateCycleModal({ open, onOpenChange, onSuccess }: Crea
                 variant="outline" 
                 onClick={() => onOpenChange(false)}
               >
-                Cancel
+                Batal
               </Button>
               <Button 
                 type="submit" 
                 disabled={mutation.isPending}
                 className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
               >
-                {mutation.isPending ? "Creating..." : "Create Cycle"}
+                {mutation.isPending ? "Membuat..." : "Buat Siklus"}
               </Button>
             </div>
           </form>
