@@ -13,6 +13,19 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Cycle, Objective } from "@shared/schema";
 
+// Function to format status in Indonesian
+const formatStatus = (status: string): string => {
+  const statusMap: { [key: string]: string } = {
+    draft: "Draft",
+    active: "Aktif",
+    completed: "Selesai",
+    archived: "Diarsipkan",
+    cancelled: "Dibatalkan",
+    // Add more status mappings as needed
+  };
+  return statusMap[status] || status;
+};
+
 interface CycleDeletionModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -266,7 +279,7 @@ export default function CycleDeletionModal({ open, onOpenChange, cycle, onSucces
                         <div key={objective.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
                           <span className="text-sm font-medium">{objective.title}</span>
                           <Badge variant="outline" className="text-xs">
-                            {objective.status}
+                            {formatStatus(objective.status)}
                           </Badge>
                         </div>
                       ))}
