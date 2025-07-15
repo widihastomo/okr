@@ -31,6 +31,7 @@ export const templates = pgTable("templates", {
 export const objectives = pgTable("objectives", {
   id: uuid("id").primaryKey().defaultRandom(),
   cycleId: uuid("cycle_id").references(() => cycles.id),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   title: text("title").notNull(),
   description: text("description"),
   owner: text("owner").notNull(), // kept for backward compatibility
@@ -348,6 +349,7 @@ export const teamMembers = pgTable("team_members", {
 export const keyResults = pgTable("key_results", {
   id: uuid("id").primaryKey().defaultRandom(),
   objectiveId: uuid("objective_id").notNull(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   title: text("title").notNull(),
   description: text("description"),
   currentValue: decimal("current_value", { precision: 15, scale: 2 }).notNull().default("0"),
@@ -385,6 +387,7 @@ export const checkIns = pgTable("check_ins", {
 export const initiatives = pgTable("initiatives", {
   id: uuid("id").primaryKey().defaultRandom(),
   keyResultId: uuid("key_result_id").references(() => keyResults.id).notNull(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   title: text("title").notNull(),
   description: text("description"),
   status: text("status").notNull().default("draft"), // "draft", "sedang_berjalan", "selesai", "dibatalkan"
@@ -501,6 +504,7 @@ export const initiativeComments = pgTable("initiative_comments", {
 export const tasks = pgTable("tasks", {
   id: uuid("id").primaryKey().defaultRandom(),
   initiativeId: uuid("initiative_id").references(() => initiatives.id), // Made nullable for standalone tasks
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id), // organization ID for multi-tenant security
   title: text("title").notNull(),
   description: text("description"),
   status: text("status").notNull().default("not_started"), // "not_started", "in_progress", "completed", "cancelled"

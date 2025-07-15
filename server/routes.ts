@@ -2199,7 +2199,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ownerId: selectedOwnerId,
         owner: ownerName,
         teamId: validatedData.objective.ownerType === 'team' ? selectedOwnerId : null,
-        createdBy: currentUser.id // Add created_by field
+        createdBy: currentUser.id, // Add created_by field
+        organizationId: currentUser.organizationId // Add organization_id field
       };
       
       // Create objective
@@ -2602,6 +2603,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create standalone key result
   app.post("/api/key-results", requireAuth, async (req, res) => {
     try {
+      const currentUser = req.user as User;
       const keyResultData = insertKeyResultSchema.parse({
         ...req.body,
         // Ensure proper defaults for required fields
@@ -2610,7 +2612,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         baseValue: req.body.baseValue === "" ? "0" : req.body.baseValue,
         unit: req.body.unit || "number",
         status: req.body.status || "in_progress",
-        assignedTo: req.body.assignedTo === "" ? null : req.body.assignedTo
+        assignedTo: req.body.assignedTo === "" ? null : req.body.assignedTo,
+        organizationId: currentUser.organizationId // Add organization_id field
       });
 
       const keyResult = await storage.createKeyResult(keyResultData);
@@ -2820,6 +2823,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...initiativeData,
         keyResultId,
         createdBy: currentUser.id,
+        organizationId: currentUser.organizationId, // Add organization_id field
         picId: initiativeData.picId === "none" || !initiativeData.picId ? null : initiativeData.picId,
         budget: initiativeData.budget ? initiativeData.budget.toString() : null,
         startDate: initiativeData.startDate ? new Date(initiativeData.startDate) : null,
@@ -2846,6 +2850,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             ...taskData,
             initiativeId: initiative.id,
             createdBy: currentUser.id,
+            organizationId: currentUser.organizationId, // Add organization_id field
             assignedTo: taskData.assignedTo === "none" || !taskData.assignedTo ? null : taskData.assignedTo,
             dueDate: taskData.dueDate ? new Date(taskData.dueDate) : null,
           });
@@ -4107,6 +4112,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...initiative,
         keyResultId: req.body.keyResultId,
         createdBy: currentUser.id,
+        organizationId: currentUser.organizationId, // Add organization_id field
       };
 
       // Validate initiative data
@@ -4543,6 +4549,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: req.body.status || "not_started",
         priority: req.body.priority || "medium",
         createdBy: currentUserId,
+        organizationId: currentUser.organizationId, // Add organization_id field
         assignedTo: req.body.assignedTo === "unassigned" || !req.body.assignedTo ? null : req.body.assignedTo,
         dueDate: req.body.dueDate ? new Date(req.body.dueDate) : null,
         initiativeId: req.body.initiativeId === "no-initiative" || !req.body.initiativeId ? null : req.body.initiativeId,
@@ -4671,6 +4678,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...req.body,
         initiativeId,
         createdBy: currentUserId,
+        organizationId: currentUser.organizationId, // Add organization_id field
         assignedTo: req.body.assignedTo === "unassigned" || !req.body.assignedTo ? null : req.body.assignedTo,
         dueDate: req.body.dueDate ? new Date(req.body.dueDate) : null,
       };

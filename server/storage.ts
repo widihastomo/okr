@@ -666,14 +666,7 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getObjectivesByOrganization(organizationId: string): Promise<Objective[]> {
-    // Join with users to filter by organization
-    const result = await db
-      .select({ objective: objectives })
-      .from(objectives)
-      .innerJoin(users, eq(users.id, objectives.ownerId))
-      .where(eq(users.organizationId, organizationId));
-    
-    return result.map(r => r.objective);
+    return await db.select().from(objectives).where(eq(objectives.organizationId, organizationId));
   }
 
   async getObjective(id: string): Promise<Objective | undefined> {
@@ -781,19 +774,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getKeyResultsByOrganization(organizationId: string): Promise<KeyResult[]> {
-    // Join with objectives and users to filter by organization
-    const result = await db
-      .select({ keyResult: keyResults })
-      .from(keyResults)
-      .innerJoin(objectives, eq(objectives.id, keyResults.objectiveId))
-      .innerJoin(users, eq(users.id, objectives.ownerId))
-      .where(eq(users.organizationId, organizationId));
+    const keyResultsData = await db.select().from(keyResults).where(eq(keyResults.organizationId, organizationId));
     
     // Calculate progress for each key result using the shared progress calculator
     const { calculateKeyResultProgress } = await import("../shared/progress-calculator");
     
-    return result.map(r => {
-      const kr = r.keyResult;
+    return keyResultsData.map(kr => {
       const progressResult = calculateKeyResultProgress(
         kr.currentValue,
         kr.targetValue,
@@ -1018,14 +1004,7 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getInitiativesByOrganization(organizationId: string): Promise<Initiative[]> {
-    // Join with users through createdBy to filter by organization
-    const result = await db
-      .select({ initiative: initiatives })
-      .from(initiatives)
-      .innerJoin(users, eq(users.id, initiatives.createdBy))
-      .where(eq(users.organizationId, organizationId));
-    
-    return result.map(r => r.initiative);
+    return await db.select().from(initiatives).where(eq(initiatives.organizationId, organizationId));
   }
 
   async getAllInitiativeMembers(): Promise<InitiativeMember[]> {
@@ -1188,14 +1167,7 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getTasksByOrganization(organizationId: string): Promise<Task[]> {
-    // Join with users through createdBy to filter by organization
-    const result = await db
-      .select({ task: tasks })
-      .from(tasks)
-      .innerJoin(users, eq(users.id, tasks.createdBy))
-      .where(eq(users.organizationId, organizationId));
-    
-    return result.map(r => r.task);
+    return await db.select().from(tasks).where(eq(tasks.organizationId, organizationId));
   }
 
   async getTasksByInitiativeId(initiativeId: string): Promise<Task[]> {
