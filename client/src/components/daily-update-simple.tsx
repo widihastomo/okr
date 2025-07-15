@@ -4,6 +4,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Zap, TrendingUp, Target, Clock } from 'lucide-react';
 
@@ -272,44 +273,35 @@ export function DailyUpdateSimple() {
                               {task.dueDate && `Due: ${new Date(task.dueDate).toLocaleDateString('id-ID')}`}
                             </div>
                           </div>
-                          <div className="flex gap-1">
-                            {['belum_mulai', 'sedang_berjalan', 'selesai', 'dibatalkan'].map((status) => (
-                              <button
-                                key={status}
-                                onClick={() => {
-                                  const newTasks = [...updateData.tasks];
-                                  const taskIndex = newTasks.findIndex(t => t.id === task.id);
-                                  if (taskIndex !== -1) {
-                                    newTasks[taskIndex].newStatus = status;
-                                  } else {
-                                    newTasks.push({
-                                      id: task.id,
-                                      title: task.title,
-                                      currentStatus: task.status,
-                                      newStatus: status
-                                    });
-                                  }
-                                  setUpdateData({ ...updateData, tasks: newTasks });
-                                }}
-                                className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
-                                  (updateData.tasks.find(t => t.id === task.id)?.newStatus || task.status) === status
-                                    ? status === 'selesai' ? 'bg-green-100 text-green-800 border-green-300' :
-                                      status === 'sedang_berjalan' ? 'bg-blue-100 text-blue-800 border-blue-300' :
-                                      status === 'dibatalkan' ? 'bg-red-100 text-red-800 border-red-300' :
-                                      'bg-gray-100 text-gray-800 border-gray-300'
-                                    : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
-                                } border`}
-                                title={status === 'selesai' ? 'Selesai' :
-                                       status === 'sedang_berjalan' ? 'Sedang Berjalan' :
-                                       status === 'dibatalkan' ? 'Dibatalkan' :
-                                       'Belum Mulai'}
-                              >
-                                {status === 'selesai' ? '✓' :
-                                 status === 'sedang_berjalan' ? '▶' :
-                                 status === 'dibatalkan' ? '✗' :
-                                 '○'}
-                              </button>
-                            ))}
+                          <div className="w-36">
+                            <Select
+                              value={updateData.tasks.find(t => t.id === task.id)?.newStatus || task.status}
+                              onValueChange={(status) => {
+                                const newTasks = [...updateData.tasks];
+                                const taskIndex = newTasks.findIndex(t => t.id === task.id);
+                                if (taskIndex !== -1) {
+                                  newTasks[taskIndex].newStatus = status;
+                                } else {
+                                  newTasks.push({
+                                    id: task.id,
+                                    title: task.title,
+                                    currentStatus: task.status,
+                                    newStatus: status
+                                  });
+                                }
+                                setUpdateData({ ...updateData, tasks: newTasks });
+                              }}
+                            >
+                              <SelectTrigger className="h-8 text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="belum_mulai">Belum Mulai</SelectItem>
+                                <SelectItem value="sedang_berjalan">Sedang Berjalan</SelectItem>
+                                <SelectItem value="selesai">Selesai</SelectItem>
+                                <SelectItem value="dibatalkan">Dibatalkan</SelectItem>
+                              </SelectContent>
+                            </Select>
                           </div>
                         </div>
                       </div>
