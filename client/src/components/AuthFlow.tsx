@@ -909,49 +909,33 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-orange-100 via-teal-50 to-blue-100">
-      {/* Expressive wavy gradient background */}
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Ornaments */}
       <div className="absolute inset-0 overflow-hidden">
-        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1200 800" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="wave-gradient-1" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#ff7b3d" />
-              <stop offset="30%" stopColor="#ff9a56" />
-              <stop offset="70%" stopColor="#14b8a6" />
-              <stop offset="100%" stopColor="#0ea5e9" />
-            </linearGradient>
-            <linearGradient id="wave-gradient-2" x1="0%" y1="100%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#8b5cf6" />
-              <stop offset="50%" stopColor="#3b82f6" />
-              <stop offset="100%" stopColor="#06b6d4" />
-            </linearGradient>
-            <linearGradient id="wave-gradient-3" x1="0%" y1="50%" x2="100%" y2="50%">
-              <stop offset="0%" stopColor="#f59e0b" />
-              <stop offset="50%" stopColor="#10b981" />
-              <stop offset="100%" stopColor="#6366f1" />
-            </linearGradient>
-            <radialGradient id="radial-gradient" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#fbbf24" />
-              <stop offset="100%" stopColor="#f59e0b" />
-            </radialGradient>
-          </defs>
-          
-          {/* Multiple expressive wave layers */}
-          <path d="M0,600 Q200,400 400,600 T800,600 T1200,600 L1200,800 L0,800 Z" fill="url(#wave-gradient-1)" opacity="0.8"/>
-          <path d="M0,500 Q300,200 600,500 T1200,500 L1200,800 L0,800 Z" fill="url(#wave-gradient-2)" opacity="0.6"/>
-          <path d="M0,400 Q150,150 300,400 T600,400 T900,400 T1200,400 L1200,800 L0,800 Z" fill="url(#wave-gradient-3)" opacity="0.4"/>
-          <path d="M0,350 Q400,100 800,350 T1200,350 L1200,800 L0,800 Z" fill="url(#radial-gradient)" opacity="0.3"/>
-          
-          {/* Additional flowing layers */}
-          <path d="M0,650 Q250,450 500,650 T1000,650 T1200,650 L1200,800 L0,800 Z" fill="url(#wave-gradient-1)" opacity="0.5"/>
-          <path d="M0,300 Q100,50 200,300 T400,300 T600,300 T800,300 T1000,300 T1200,300 L1200,800 L0,800 Z" fill="url(#wave-gradient-2)" opacity="0.3"/>
-        </svg>
+        {/* Top left ornament */}
+        <div className="absolute -top-16 -left-16 w-32 h-32 bg-gradient-to-br from-orange-200 to-orange-300 rounded-full opacity-20 animate-pulse"></div>
         
-        {/* Floating gradient orbs for extra expressiveness */}
-        <div className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-br from-orange-400/30 to-yellow-400/30 rounded-full blur-xl animate-pulse"></div>
-        <div className="absolute top-40 right-32 w-24 h-24 bg-gradient-to-br from-teal-400/25 to-blue-400/25 rounded-full blur-lg animate-bounce"></div>
-        <div className="absolute bottom-32 left-40 w-28 h-28 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-20 w-20 h-20 bg-gradient-to-br from-indigo-400/25 to-cyan-400/25 rounded-full blur-lg animate-bounce"></div>
+        {/* Top right ornament */}
+        <div className="absolute -top-8 -right-8 w-24 h-24 bg-gradient-to-br from-blue-200 to-blue-300 rounded-full opacity-15"></div>
+        
+        {/* Bottom left ornament */}
+        <div className="absolute -bottom-12 -left-12 w-28 h-28 bg-gradient-to-br from-purple-200 to-purple-300 rounded-full opacity-10"></div>
+        
+        {/* Bottom right ornament */}
+        <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-gradient-to-br from-orange-300 to-orange-400 rounded-full opacity-15 animate-pulse"></div>
+        
+        {/* Floating geometric shapes */}
+        <div className="absolute top-1/4 left-1/4 w-6 h-6 bg-orange-300 opacity-20 rotate-45 animate-bounce"></div>
+        <div className="absolute top-3/4 right-1/4 w-8 h-8 bg-blue-300 opacity-15 rotate-12"></div>
+        <div className="absolute top-1/2 left-1/6 w-4 h-4 bg-purple-300 opacity-10 rounded-full animate-pulse"></div>
+        
+        {/* Subtle pattern overlay */}
+        <div 
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23f97316' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='m0 40l40-40h-40v40zm40 0v-40h-40l40 40z'/%3E%3C/g%3E%3C/svg%3E")`
+          }}
+        />
       </div>
       
       <div className="max-w-md w-full relative z-10">
