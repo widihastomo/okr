@@ -18,7 +18,8 @@ import {
   User,
   Building,
   Phone,
-  ArrowRight
+  ArrowRight,
+  Loader2
 } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 // Button will be replaced with Button
@@ -83,6 +84,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
   const [verificationEmail, setVerificationEmail] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isResendingCode, setIsResendingCode] = useState(false);
   const [resetCode, setResetCode] = useState("");
   const { toast } = useToast();
   const [, navigate] = useLocation();
@@ -299,6 +301,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
   const handleResendCode = async () => {
     if (!verificationEmail) return;
 
+    setIsResendingCode(true);
     try {
       const response = await apiRequest("POST", "/api/auth/resend-verification", {
         email: verificationEmail,
@@ -324,6 +327,8 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
         description: "Terjadi kesalahan saat mengirim kode",
         variant: "destructive",
       });
+    } finally {
+      setIsResendingCode(false);
     }
   };
 
@@ -481,10 +486,16 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                 <Button
                   type="submit"
                   disabled={loginMutation.isPending}
-                  
                   className="w-full h-11 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium"
                 >
-                  Masuk
+                  {loginMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Memproses...
+                    </>
+                  ) : (
+                    "Masuk"
+                  )}
                 </Button>
               </div>
             </form>
@@ -609,10 +620,16 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
                 <Button
                   type="submit"
                   disabled={registerMutation.isPending}
-                  
                   className="w-full h-11 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium"
                 >
-                  Daftar Akun
+                  {registerMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Mendaftar...
+                    </>
+                  ) : (
+                    "Daftar Akun"
+                  )}
                 </Button>
               </div>
             </form>
@@ -659,7 +676,14 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
               disabled={isVerifying || verificationCode.length !== 6}
               className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-medium h-11"
             >
-              Verifikasi Email
+              {isVerifying ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Memverifikasi...
+                </>
+              ) : (
+                "Verifikasi Email"
+              )}
             </Button>
             
             <div className="text-center">
@@ -667,10 +691,20 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
               <Button
                 variant="ghost"
                 onClick={handleResendCode}
+                disabled={isResendingCode}
                 className="text-orange-600 hover:text-orange-700 font-medium"
               >
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Kirim Ulang Kode
+                {isResendingCode ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Mengirim...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Kirim Ulang Kode
+                  </>
+                )}
               </Button>
             </div>
             
@@ -733,10 +767,16 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
               <Button
                 type="submit"
                 disabled={forgotPasswordMutation.isPending}
-                
                 className="w-full h-11 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-medium"
               >
-                Kirim Kode Reset
+                {forgotPasswordMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Mengirim...
+                  </>
+                ) : (
+                  "Kirim Kode Reset"
+                )}
               </Button>
             </form>
             
@@ -813,10 +853,16 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
               <Button
                 type="submit"
                 disabled={resetPasswordMutation.isPending}
-                
                 className="w-full h-11 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-medium"
               >
-                Reset Password
+                {resetPasswordMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Mereset...
+                  </>
+                ) : (
+                  "Reset Password"
+                )}
               </Button>
             </form>
             

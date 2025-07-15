@@ -255,6 +255,17 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 15, 2025. **LOADING ANIMATION ENHANCEMENT** - Successfully added loading animations to all form submission buttons in AuthFlow:
+  * ADDED: Loader2 spinner icon import from lucide-react
+  * ENHANCED: Login button shows "Memproses..." with spinning animation during login mutation
+  * ENHANCED: Register button shows "Mendaftar..." with spinning animation during registration mutation
+  * ENHANCED: Email verification button shows "Memverifikasi..." with spinning animation during verification
+  * ENHANCED: Forgot password button shows "Mengirim..." with spinning animation during password reset request
+  * ENHANCED: Reset password button shows "Mereset..." with spinning animation during password reset
+  * ENHANCED: Resend code button shows "Mengirim..." with spinning animation during resend operation
+  * IMPROVED: All buttons properly disabled during loading states to prevent multiple submissions
+  * CONSISTENT: Loading animations use orange-themed Loader2 spinner with "animate-spin" class
+  * RESULT: Professional loading feedback across all authentication forms with consistent user experience
 - July 15, 2025. **SCHEMA SYNCHRONIZATION COMPLETED** - Successfully updated shared/schema.ts to reflect all organizationId columns:
   * UPDATED: achievements table schema to include organizationId column
   * UPDATED: levelRewards table schema to include organizationId column
