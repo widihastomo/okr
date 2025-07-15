@@ -99,7 +99,10 @@ export default function TimelinePage() {
 
   const { data: checkInsData, isLoading } = useQuery({
     queryKey: ["/api/timeline"],
-    queryFn: () => apiRequest("GET", "/api/timeline"),
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/timeline");
+      return await response.json();
+    },
     retry: 1,
   });
 
