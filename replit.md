@@ -255,6 +255,25 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 15, 2025. Successfully added comprehensive pagination system to cycles table:
+  * ADDED: Pagination controls with configurable items per page (5, 10, 25, 50)
+  * IMPLEMENTED: Smart pagination with ellipsis (...) for large page counts
+  * ENHANCED: Navigation buttons (Previous/Next) with proper disable states
+  * ADDED: Item count display showing current range and total items
+  * OPTIMIZED: Automatic page adjustment when deleting items from current page
+  * IMPROVED: Reset pagination when changing items per page
+  * STYLED: Professional pagination controls with consistent button styling
+  * RESPONSIVE: Proper spacing and layout for pagination controls
+  * RESULT: Complete pagination system for better cycles table management
+- July 15, 2025. Successfully resolved organizationId filtering issue for cycles system:
+  * FIXED: Added organizationId column to cycles table schema and database
+  * UPDATED: All existing cycles now properly associated with organizations
+  * ENHANCED: getCyclesByOrganization method now filters directly by organizationId
+  * IMPROVED: POST /api/cycles endpoint includes organizationId when creating cycles
+  * SECURED: Set organizationId as NOT NULL constraint in database
+  * OPTIMIZED: Removed complex joins in favor of direct organizationId filtering
+  * VERIFIED: Cycles now properly display only for user's organization
+  * RESULT: Complete cycles isolation by organization with proper multi-tenant security
 - July 15, 2025. Successfully completed subscription upgrade system implementation and UI improvements:
   * FIXED: Payment success processing - backend now properly updates subscription after successful Midtrans payment
   * ADDED: Storage methods for subscription operations (getSubscriptionPlan, getBillingPeriod, updateOrganizationSubscription)
