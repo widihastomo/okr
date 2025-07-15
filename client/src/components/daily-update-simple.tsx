@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Zap, TrendingUp, Target, Clock } from 'lucide-react';
 
@@ -235,6 +235,9 @@ export function DailyUpdateSimple() {
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Update Harian Instan</DialogTitle>
+          <DialogDescription>
+            Update cepat progress hari ini
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-6">
@@ -287,7 +290,18 @@ export function DailyUpdateSimple() {
                               }}
                             >
                               <SelectTrigger className="h-8 text-xs">
-                                <SelectValue />
+                                <SelectValue placeholder="Pilih status">
+                                  {(() => {
+                                    const currentStatus = updateData.tasks.find(t => t.id === task.id)?.newStatus || task.status;
+                                    switch (currentStatus) {
+                                      case 'belum_mulai': return 'Belum Mulai';
+                                      case 'sedang_berjalan': return 'Sedang Berjalan';
+                                      case 'selesai': return 'Selesai';
+                                      case 'dibatalkan': return 'Dibatalkan';
+                                      default: return 'Pilih status';
+                                    }
+                                  })()}
+                                </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="belum_mulai">Belum Mulai</SelectItem>
