@@ -225,8 +225,7 @@ export default function CyclesContent() {
         open={createModalOpen}
         onOpenChange={setCreateModalOpen}
         onSuccess={() => {
-          setCreateModalOpen(false);
-          queryClient.invalidateQueries({ queryKey: ["/api/cycles"] });
+          // Modal handles its own cache invalidation and closing
         }}
       />
 
