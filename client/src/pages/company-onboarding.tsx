@@ -9,6 +9,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -51,6 +52,9 @@ import {
   MessageSquare,
   Zap,
   CalendarIcon,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
 } from "lucide-react";
 import { ReminderSettings } from "@/components/ReminderSettings";
 import { type CompanyOnboardingData } from "@shared/schema";
@@ -2146,16 +2150,16 @@ export default function CompanyOnboarding() {
             <div className="mb-6">
               <div className="flex justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700">
-                  Progress: {Math.round((currentStep / 7) * 100)}%
+                  Progress: {Math.round((onboardingData.currentStep / 7) * 100)}%
                 </span>
                 <span className="text-sm text-gray-500">
-                  {currentStep} / 7
+                  {onboardingData.currentStep} / 7
                 </span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div
                   className="bg-gradient-to-r from-orange-500 to-amber-500 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${(currentStep / 7) * 100}%` }}
+                  style={{ width: `${(onboardingData.currentStep / 7) * 100}%` }}
                 ></div>
               </div>
             </div>
@@ -2168,7 +2172,7 @@ export default function CompanyOnboarding() {
             <Button
               variant="outline"
               onClick={handlePrevious}
-              disabled={currentStep === 1}
+              disabled={onboardingData.currentStep === 1}
               className="flex items-center gap-2"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -2176,7 +2180,7 @@ export default function CompanyOnboarding() {
             </Button>
 
             <div className="flex items-center gap-2">
-              {currentStep < 7 ? (
+              {onboardingData.currentStep < 7 ? (
                 <Button
                   onClick={handleNext}
                   disabled={!canProceedToNext()}
