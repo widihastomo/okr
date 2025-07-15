@@ -8237,40 +8237,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/subscription-plans", requireAuth, async (req, res) => {
     try {
       const { db } = await import("./db");
-      const { eq } = await import("drizzle-orm");
+      const { eq, and } = await import("drizzle-orm");
       const { subscriptionPlans, billingPeriods } = await import("@shared/schema");
       
-      const plansWithBilling = await db.select()
+      // First get all active subscription plans (excluding free-trial)
+      const plans = await db.select()
         .from(subscriptionPlans)
-        .leftJoin(billingPeriods, eq(subscriptionPlans.id, billingPeriods.planId))
         .where(eq(subscriptionPlans.isActive, true));
 
-      console.log('Raw plans with billing data:', plansWithBilling.length);
+      // Filter out free-trial plan and get billing periods for each plan
+      const filteredPlans = plans.filter(plan => plan.slug !== 'free-trial');
       
-      // Group billing periods by plan
-      const groupedPlans = plansWithBilling.reduce((acc: any, row) => {
-        const plan = row.subscription_plans;
-        const billing = row.billing_periods;
-        
-        if (!acc[plan.id]) {
-          acc[plan.id] = {
+      // Get billing periods for each plan
+      const result = await Promise.all(
+        filteredPlans.map(async (plan) => {
+          const billingPeriodsForPlan = await db.select()
+            .from(billingPeriods)
+            .where(and(
+              eq(billingPeriods.planId, plan.id),
+              eq(billingPeriods.isActive, true)
+            ));
+          
+          return {
             ...plan,
-            billingPeriods: []
+            billingPeriods: billingPeriodsForPlan
           };
-        }
-        
-        if (billing && billing.isActive) {
-          acc[plan.id].billingPeriods.push(billing);
-        }
-        
-        return acc;
-      }, {});
+        })
+      );
 
-      console.log('Grouped plans:', Object.keys(groupedPlans));
-      
-      const result = Object.values(groupedPlans).filter((plan: any) => plan.billingPeriods.length > 0);
       console.log('Final result length:', result.length);
-      
       res.json(result);
     } catch (error) {
       console.error("Error fetching subscription plans:", error);
