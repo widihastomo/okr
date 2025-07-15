@@ -8240,40 +8240,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { eq, and } = await import("drizzle-orm");
       const { subscriptionPlans, billingPeriods } = await import("@shared/schema");
       
-      // First get all active subscription plans (excluding free-trial)
-      const plans = await db.select()
-        .from(subscriptionPlans)
-        .where(eq(subscriptionPlans.isActive, true));
+      // Set cache control headers to prevent caching during development
+      res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.set('Pragma', 'no-cache');
+      res.set('Expires', '0');
+      
+      // Get all subscription plans with their billing periods
+      const plansWithBilling = await db.select({
+        planId: subscriptionPlans.id,
+        planName: subscriptionPlans.name,
+        planSlug: subscriptionPlans.slug,
+        planPrice: subscriptionPlans.price,
+        planMaxUsers: subscriptionPlans.maxUsers,
+        planFeatures: subscriptionPlans.features,
+        planStripeProductId: subscriptionPlans.stripeProductId,
+        planStripePriceId: subscriptionPlans.stripePriceId,
+        planIsActive: subscriptionPlans.isActive,
+        planCreatedAt: subscriptionPlans.createdAt,
+        planUpdatedAt: subscriptionPlans.updatedAt,
+        billingId: billingPeriods.id,
+        billingPeriodType: billingPeriods.periodType,
+        billingPeriodMonths: billingPeriods.periodMonths,
+        billingPrice: billingPeriods.price,
+        billingDiscountPercentage: billingPeriods.discountPercentage,
+        billingStripePriceId: billingPeriods.stripePriceId,
+        billingIsActive: billingPeriods.isActive
+      })
+      .from(subscriptionPlans)
+      .leftJoin(billingPeriods, eq(subscriptionPlans.id, billingPeriods.planId))
+      .where(eq(subscriptionPlans.isActive, true));
 
-      console.log('All plans:', plans.length);
+      console.log('DEBUG: Plans with billing raw data:', plansWithBilling.length);
       
-      // Filter out free-trial plan and get billing periods for each plan
-      const filteredPlans = plans.filter(plan => plan.slug !== 'free-trial');
-      console.log('Filtered plans (no free-trial):', filteredPlans.length);
-      
-      // Get billing periods for each plan
-      const result = await Promise.all(
-        filteredPlans.map(async (plan) => {
-          const billingPeriodsForPlan = await db.select()
-            .from(billingPeriods)
-            .where(and(
-              eq(billingPeriods.planId, plan.id),
-              eq(billingPeriods.isActive, true)
-            ));
-          
-          console.log(`Plan ${plan.name}: ${billingPeriodsForPlan.length} billing periods`);
-          
-          return {
-            ...plan,
-            billingPeriods: billingPeriodsForPlan
+      // Group by plan
+      const groupedPlans = plansWithBilling.reduce((acc: any, row) => {
+        const planId = row.planId;
+        
+        if (!acc[planId]) {
+          acc[planId] = {
+            id: row.planId,
+            name: row.planName,
+            slug: row.planSlug,
+            price: row.planPrice,
+            maxUsers: row.planMaxUsers,
+            features: row.planFeatures,
+            stripeProductId: row.planStripeProductId,
+            stripePriceId: row.planStripePriceId,
+            isActive: row.planIsActive,
+            createdAt: row.planCreatedAt,
+            updatedAt: row.planUpdatedAt,
+            billingPeriods: []
           };
-        })
-      );
+        }
+        
+        if (row.billingId && row.billingIsActive) {
+          acc[planId].billingPeriods.push({
+            id: row.billingId,
+            periodType: row.billingPeriodType,
+            periodMonths: row.billingPeriodMonths,
+            price: row.billingPrice,
+            discountPercentage: row.billingDiscountPercentage,
+            stripePriceId: row.billingStripePriceId,
+            isActive: row.billingIsActive
+          });
+        }
+        
+        return acc;
+      }, {});
 
-      // Only return plans that have billing periods
-      const finalResult = result.filter(plan => plan.billingPeriods.length > 0);
-      console.log('Final result length:', finalResult.length);
-      res.json(finalResult);
+      // Filter out free-trial plan and only include plans with billing periods
+      const result = Object.values(groupedPlans).filter((plan: any) => 
+        plan.slug !== 'free-trial' && plan.billingPeriods.length > 0
+      );
+      console.log('DEBUG: Final result:', result.length);
+      res.json(result);
     } catch (error) {
       console.error("Error fetching subscription plans:", error);
       res.status(500).json({ message: "Failed to fetch subscription plans" });
