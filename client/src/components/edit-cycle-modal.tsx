@@ -82,8 +82,8 @@ export default function EditCycleModal({ cycle, open, onOpenChange }: EditCycleM
     if (cycle) {
       form.reset({
         name: cycle.name,
-        startDate: new Date(cycle.startDate),
-        endDate: new Date(cycle.endDate),
+        startDate: cycle.startDate ? new Date(cycle.startDate + 'T00:00:00') : undefined,
+        endDate: cycle.endDate ? new Date(cycle.endDate + 'T00:00:00') : undefined,
       });
     }
   }, [cycle, form]);
