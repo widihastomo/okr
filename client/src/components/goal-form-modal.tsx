@@ -114,7 +114,7 @@ const objectiveFormSchema = z.object({
     ownerType: z.enum(["user", "team"]).default("user"),
     ownerId: z.string().min(1, "Pemilik wajib dipilih"),
     status: z.string().default("in_progress"),
-    cycleId: z.string().optional().nullable(),
+    cycleId: z.string().min(1, "Siklus wajib dipilih"),
     teamId: z.string().optional().nullable(),
     parentId: z.string().optional().nullable(),
   }),
@@ -157,7 +157,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
         ownerType: goal.ownerType as "user" | "team",
         ownerId: goal.ownerId,
         status: goal.status,
-        cycleId: goal.cycleId === null ? undefined : goal.cycleId,
+        cycleId: goal.cycleId === null ? "" : goal.cycleId,
         teamId: goal.teamId === null ? undefined : goal.teamId,
         parentId: goal.parentId === null ? undefined : goal.parentId,
       },
@@ -180,7 +180,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
         ownerType: "user",
         ownerId: "",
         status: "in_progress",
-        cycleId: undefined,
+        cycleId: "",
         teamId: undefined,
         parentId: undefined,
       },
@@ -201,7 +201,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
             ownerType: goal.ownerType as "user" | "team",
             ownerId: goal.ownerId,
             status: goal.status,
-            cycleId: goal.cycleId === null ? undefined : goal.cycleId,
+            cycleId: goal.cycleId === null ? "" : goal.cycleId,
             teamId: goal.teamId === null ? undefined : goal.teamId,
             parentId: goal.parentId === null ? undefined : goal.parentId,
           },
@@ -226,7 +226,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
             ownerType: "user",
             ownerId: "",
             status: "not_started",
-            cycleId: undefined,
+            cycleId: "",
             teamId: undefined,
             parentId: undefined,
           },
@@ -258,8 +258,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
         objective: {
           ...data.objective,
           owner: ownerName,
-          // Convert "none" values back to null for the database
-          cycleId: data.objective.cycleId === undefined ? null : data.objective.cycleId,
+          // cycleId is now required, so no conversion to null
           teamId: data.objective.teamId === undefined ? null : data.objective.teamId,
           parentId: data.objective.parentId === undefined ? null : data.objective.parentId,
         },
@@ -323,8 +322,10 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
       // Validate required step 1 fields before proceeding
       const titleValid = await form.trigger("objective.title");
       const ownerTypeValid = await form.trigger("objective.ownerType");
+      const ownerIdValid = await form.trigger("objective.ownerId");
+      const cycleIdValid = await form.trigger("objective.cycleId");
       
-      if (titleValid && ownerTypeValid) {
+      if (titleValid && ownerTypeValid && ownerIdValid && cycleIdValid) {
         setCurrentStep(2);
       }
     }
@@ -537,7 +538,7 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="flex items-center gap-2">
-                          Siklus
+                          Siklus*
                           <Popover>
                             <PopoverTrigger asChild>
                               <button 
@@ -558,8 +559,8 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                           </Popover>
                         </FormLabel>
                         <Select 
-                          onValueChange={(value) => field.onChange(value === "none" ? undefined : value)} 
-                          value={field.value || "none"}
+                          onValueChange={field.onChange} 
+                          value={field.value || ""}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -567,7 +568,6 @@ export default function GoalFormModal({ goal, open, onOpenChange }: ObjectiveFor
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="none">Tanpa Siklus</SelectItem>
                             {cycles?.map((cycle) => (
                               <SelectItem key={cycle.id} value={cycle.id}>
                                 {cycle.name}
