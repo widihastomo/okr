@@ -30,6 +30,25 @@ const getCycleStatusColor = (status: string): string => {
   }
 };
 
+const getStatusBadgeVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
+  switch (status) {
+    case 'active': return 'default';
+    case 'completed': return 'secondary';
+    case 'planning': return 'outline';
+    default: return 'secondary';
+  }
+};
+
+const formatDate = (dateString: string): string => {
+  if (!dateString) return '-';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('id-ID', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+};
+
 export default function CyclesContent() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -40,7 +59,10 @@ export default function CyclesContent() {
 
   const { data: cycles = [], isLoading } = useQuery({
     queryKey: ["/api/cycles"],
-    queryFn: () => apiRequest("GET", "/api/cycles").then(res => res.json() as Promise<Cycle[]>)
+    queryFn: () => apiRequest("GET", "/api/cycles").then(res => res.json() as Promise<Cycle[]>),
+    onSuccess: (data) => {
+      console.log('Cycles data received:', data);
+    }
   });
 
   const deleteMutation = useMutation({
