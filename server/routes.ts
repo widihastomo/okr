@@ -1174,9 +1174,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Check cycle deletion dependencies
+  app.get("/api/cycles/:id/dependencies", requireAuth, async (req, res) => {
+    try {
+      const id = req.params.id;
+      const objectives = await storage.getObjectivesByCycleId(id);
+      
+      res.json({
+        cycleId: id,
+        hasObjectives: objectives.length > 0,
+        objectives: objectives,
+        objectiveCount: objectives.length
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to check cycle dependencies" });
+    }
+  });
+
+  // Delete cycle with objective transfer option
   app.delete("/api/cycles/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const { transferToCycleId } = req.body;
+      
+      // If transferToCycleId is provided, move objectives to the new cycle
+      if (transferToCycleId) {
+        const objectives = await storage.getObjectivesByCycleId(id);
+        for (const objective of objectives) {
+          await storage.updateObjective(objective.id, { cycleId: transferToCycleId });
+        }
+      }
+      
       const deleted = await storage.deleteCycle(id);
       
       if (!deleted) {

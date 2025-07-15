@@ -10,7 +10,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import CreateCycleModal from "./create-cycle-modal";
 import EditCycleModal from "./edit-cycle-modal";
-import { DeleteConfirmationModal } from "./delete-confirmation-modal";
+import CycleDeletionModal from "./cycle-deletion-modal";
 import type { Cycle } from "@shared/schema";
 
 
@@ -57,36 +57,17 @@ export default function CyclesContent() {
     setCurrentPage(1);
   };
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      await apiRequest("DELETE", `/api/cycles/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/cycles"] });
-      
-      // Reset to previous page if current page becomes empty
-      const newTotalItems = totalItems - 1;
-      const newTotalPages = Math.ceil(newTotalItems / itemsPerPage);
-      if (currentPage > newTotalPages && newTotalPages > 0) {
-        setCurrentPage(newTotalPages);
-      }
-      
-      toast({
-        title: "Siklus dihapus",
-        description: "Siklus berhasil dihapus",
-        className: "border-green-200 bg-green-50 text-green-800"
-      });
-      setDeleteModalOpen(false);
-      setSelectedCycle(null);
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Gagal menghapus siklus",
-        variant: "destructive"
-      });
+  const handleDeleteSuccess = () => {
+    // Reset to previous page if current page becomes empty
+    const newTotalItems = totalItems - 1;
+    const newTotalPages = Math.ceil(newTotalItems / itemsPerPage);
+    if (currentPage > newTotalPages && newTotalPages > 0) {
+      setCurrentPage(newTotalPages);
     }
-  });
+    
+    setDeleteModalOpen(false);
+    setSelectedCycle(null);
+  };
 
 
 
@@ -298,17 +279,11 @@ export default function CyclesContent() {
         onOpenChange={setEditModalOpen}
       />
 
-      <DeleteConfirmationModal
+      <CycleDeletionModal
         open={deleteModalOpen}
         onOpenChange={setDeleteModalOpen}
-        onConfirm={() => {
-          if (selectedCycle) {
-            deleteMutation.mutate(selectedCycle.id);
-          }
-        }}
-        title="Hapus Siklus"
-        description={`Apakah Anda yakin ingin menghapus siklus "${selectedCycle?.name}"? Tindakan ini tidak dapat dibatalkan.`}
-        itemName={selectedCycle?.name}
+        cycle={selectedCycle}
+        onSuccess={handleDeleteSuccess}
       />
     </div>
   );
