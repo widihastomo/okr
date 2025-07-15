@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Check, Crown, Users, Zap, Shield, Star, CreditCard, Clock, ArrowRight, X, Sparkles } from "lucide-react";
+import { Check, Crown, Users, Zap, Shield, Star, CreditCard, Clock, ArrowRight, X, Sparkles, Plus, Minus, Settings, BarChart, Database, Headphones } from "lucide-react";
 
 interface SubscriptionPlan {
   id: string;
@@ -45,6 +45,15 @@ interface OrganizationSubscription {
   daysRemaining?: number;
 }
 
+interface AddOn {
+  id: string;
+  name: string;
+  description: string;
+  price: string;
+  icon: React.ReactNode;
+  category: string;
+}
+
 export default function UpgradePackage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -53,6 +62,7 @@ export default function UpgradePackage() {
   const [selectedBillingPeriodId, setSelectedBillingPeriodId] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedAddOns, setSelectedAddOns] = useState<Set<string>>(new Set());
 
   // Fetch subscription plans
   const { data: plans, isLoading: isLoadingPlans, error: plansError } = useQuery<SubscriptionPlan[]>({
@@ -92,7 +102,7 @@ export default function UpgradePackage() {
 
   // Create upgrade payment mutation
   const createUpgradePayment = useMutation({
-    mutationFn: async (data: { planId: string; billingPeriodId: string }) => {
+    mutationFn: async (data: { planId: string; billingPeriodId: string; addOns?: any[] }) => {
       return apiRequest('POST', '/api/upgrade/create-payment', data);
     },
     onSuccess: (data) => {
@@ -142,6 +152,65 @@ export default function UpgradePackage() {
   const selectedPlan = plans?.find(plan => plan.id === selectedPlanId);
   const selectedBillingPeriod = selectedPlan?.billingPeriods.find(period => period.id === selectedBillingPeriodId);
 
+  // Available Add-ons
+  const availableAddOns: AddOn[] = [
+    {
+      id: "advanced-analytics",
+      name: "Advanced Analytics",
+      description: "Dashboard analitik mendalam dengan insights dan reporting otomatis",
+      price: "50000",
+      icon: <BarChart className="w-5 h-5" />,
+      category: "Analytics"
+    },
+    {
+      id: "priority-support",
+      name: "Priority Support",
+      description: "Dukungan prioritas 24/7 dengan response time maksimal 2 jam",
+      price: "75000",
+      icon: <Headphones className="w-5 h-5" />,
+      category: "Support"
+    },
+    {
+      id: "extra-storage",
+      name: "Extra Storage",
+      description: "Tambahan 100GB storage untuk file dan dokumen tim",
+      price: "25000",
+      icon: <Database className="w-5 h-5" />,
+      category: "Storage"
+    },
+    {
+      id: "advanced-customization",
+      name: "Advanced Customization",
+      description: "Kustomisasi workflow dan template sesuai kebutuhan bisnis",
+      price: "100000",
+      icon: <Settings className="w-5 h-5" />,
+      category: "Customization"
+    }
+  ];
+
+  const toggleAddOn = (addOnId: string) => {
+    const newSelection = new Set(selectedAddOns);
+    if (newSelection.has(addOnId)) {
+      newSelection.delete(addOnId);
+    } else {
+      newSelection.add(addOnId);
+    }
+    setSelectedAddOns(newSelection);
+  };
+
+  const getSelectedAddOnsTotal = () => {
+    return Array.from(selectedAddOns).reduce((total, addOnId) => {
+      const addOn = availableAddOns.find(a => a.id === addOnId);
+      return total + (addOn ? parseFloat(addOn.price) : 0);
+    }, 0);
+  };
+
+  const getTotalPrice = () => {
+    const basePrice = selectedBillingPeriod ? parseFloat(selectedBillingPeriod.price) : 0;
+    const addOnsTotal = getSelectedAddOnsTotal();
+    return basePrice + addOnsTotal;
+  };
+
   const handleUpgrade = async () => {
     if (!selectedPlanId || !selectedBillingPeriodId) {
       toast({
@@ -153,9 +222,15 @@ export default function UpgradePackage() {
     }
 
     setIsProcessing(true);
+    const selectedAddOnsList = Array.from(selectedAddOns).map(addOnId => {
+      const addOn = availableAddOns.find(a => a.id === addOnId);
+      return addOn ? { id: addOn.id, name: addOn.name, price: addOn.price } : null;
+    }).filter(Boolean);
+
     createUpgradePayment.mutate({
       planId: selectedPlanId,
       billingPeriodId: selectedBillingPeriodId,
+      addOns: selectedAddOnsList,
     });
   };
 
@@ -307,6 +382,7 @@ export default function UpgradePackage() {
                       e.stopPropagation();
                       setSelectedPlanId(plan.id);
                       setSelectedBillingPeriodId(plan.billingPeriods[0]?.id || "");
+                      setSelectedAddOns(new Set());
                       setShowPaymentModal(true);
                     }}
                   >
@@ -408,6 +484,85 @@ export default function UpgradePackage() {
                 </RadioGroup>
               </div>
 
+              {/* Add-ons Selection */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+                  <Plus className="w-5 h-5 text-orange-500" />
+                  <span>Pilih Add-on (Opsional)</span>
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Tingkatkan pengalaman Anda dengan fitur-fitur tambahan
+                </p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {availableAddOns.map((addOn) => (
+                    <Card 
+                      key={addOn.id} 
+                      className={`cursor-pointer transition-all border-2 ${
+                        selectedAddOns.has(addOn.id) 
+                          ? 'border-orange-500 bg-orange-50 shadow-lg' 
+                          : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                      }`}
+                      onClick={() => toggleAddOn(addOn.id)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-start space-x-3 flex-1">
+                            <div className={`p-2 rounded-full ${
+                              selectedAddOns.has(addOn.id) 
+                                ? 'bg-orange-200 text-orange-600' 
+                                : 'bg-gray-100 text-gray-600'
+                            }`}>
+                              {addOn.icon}
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-2">
+                                <h4 className="font-medium text-gray-900">{addOn.name}</h4>
+                                <Badge variant="secondary" className="text-xs">
+                                  {addOn.category}
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-gray-600 mt-1">{addOn.description}</p>
+                              <div className="mt-2 text-lg font-semibold text-orange-600">
+                                +{formatPrice(addOn.price)}/bulan
+                              </div>
+                            </div>
+                          </div>
+                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                            selectedAddOns.has(addOn.id) 
+                              ? 'border-orange-500 bg-orange-500' 
+                              : 'border-gray-300'
+                          }`}>
+                            {selectedAddOns.has(addOn.id) && (
+                              <Check className="w-3 h-3 text-white" />
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+                
+                {selectedAddOns.size > 0 && (
+                  <div className="mt-4 p-4 bg-orange-50 rounded-lg border border-orange-200">
+                    <h4 className="font-medium text-orange-900 mb-2">Add-on Terpilih:</h4>
+                    <div className="space-y-2">
+                      {Array.from(selectedAddOns).map(addOnId => {
+                        const addOn = availableAddOns.find(a => a.id === addOnId);
+                        return addOn ? (
+                          <div key={addOn.id} className="flex items-center justify-between">
+                            <span className="text-sm text-orange-800">{addOn.name}</span>
+                            <span className="text-sm font-medium text-orange-600">
+                              +{formatPrice(addOn.price)}/bulan
+                            </span>
+                          </div>
+                        ) : null;
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Order Summary */}
               {selectedBillingPeriod && (
                 <Card className="border-2 border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50">
@@ -435,6 +590,24 @@ export default function UpgradePackage() {
                           {selectedPlan.maxUsers ? `Hingga ${selectedPlan.maxUsers}` : 'Unlimited'}
                         </span>
                       </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-700">Harga Paket:</span>
+                        <span className="font-medium text-gray-900">{formatPrice(selectedBillingPeriod.price)}</span>
+                      </div>
+                      {selectedAddOns.size > 0 && (
+                        <div className="space-y-2">
+                          <div className="text-sm font-medium text-gray-700">Add-on yang dipilih:</div>
+                          {Array.from(selectedAddOns).map(addOnId => {
+                            const addOn = availableAddOns.find(a => a.id === addOnId);
+                            return addOn ? (
+                              <div key={addOn.id} className="flex justify-between items-center pl-4">
+                                <span className="text-sm text-gray-600">{addOn.name}</span>
+                                <span className="text-sm font-medium text-gray-900">+{formatPrice(addOn.price)}</span>
+                              </div>
+                            ) : null;
+                          })}
+                        </div>
+                      )}
                     </div>
                     
                     <Separator />
@@ -442,11 +615,16 @@ export default function UpgradePackage() {
                     <div className="space-y-3">
                       <div className="flex justify-between items-center text-xl font-semibold">
                         <span className="text-gray-900">Total:</span>
-                        <span className="text-orange-600">{formatPrice(selectedBillingPeriod.price)}</span>
+                        <span className="text-orange-600">{formatPrice(getTotalPrice().toString())}</span>
                       </div>
                       {selectedBillingPeriod.discountPercentage > 0 && (
                         <div className="text-sm text-green-600 font-medium">
                           🎉 Hemat {selectedBillingPeriod.discountPercentage}% dari harga bulanan
+                        </div>
+                      )}
+                      {selectedAddOns.size > 0 && (
+                        <div className="text-sm text-orange-600 font-medium">
+                          ⚡ Termasuk {selectedAddOns.size} add-on premium
                         </div>
                       )}
                     </div>
@@ -454,7 +632,13 @@ export default function UpgradePackage() {
                     <div className="flex space-x-3 pt-4">
                       <Button 
                         variant="outline"
-                        onClick={() => setShowPaymentModal(false)}
+                        onClick={() => {
+                          setShowPaymentModal(false);
+                          setSelectedPlanId("");
+                          setSelectedBillingPeriodId("");
+                          setSelectedAddOns(new Set());
+                          setIsProcessing(false);
+                        }}
                         className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
                       >
                         <X className="w-4 h-4 mr-2" />

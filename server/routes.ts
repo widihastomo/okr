@@ -8401,7 +8401,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/upgrade/create-payment", requireAuth, async (req, res) => {
     try {
       const currentUser = req.user as User;
-      const { planId, billingPeriodId } = req.body;
+      const { planId, billingPeriodId, addOns = [] } = req.body;
       
       if (!currentUser.organizationId) {
         return res.status(400).json({ message: "User not associated with an organization" });
@@ -8444,24 +8444,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { createSnapTransaction } = await import("./midtrans");
       const orderId = `upg-${currentUser.organizationId.slice(0, 8)}-${Date.now()}`;
       
+      // Calculate total price including add-ons
+      const basePrice = parseInt(billing.price);
+      const addOnsTotal = addOns.reduce((total: number, addOn: any) => total + parseInt(addOn.price), 0);
+      const totalPrice = basePrice + addOnsTotal;
+
+      // Build item details
+      const itemDetails = [
+        {
+          id: plan.id,
+          price: basePrice,
+          quantity: 1,
+          name: `${plan.name} - ${billing.periodType === 'monthly' ? 'Bulanan' : 
+                 billing.periodType === 'quarterly' ? 'Triwulan' : 'Tahunan'}`
+        }
+      ];
+
+      // Add add-ons to item details
+      addOns.forEach((addOn: any) => {
+        itemDetails.push({
+          id: addOn.id,
+          price: parseInt(addOn.price),
+          quantity: 1,
+          name: `Add-on: ${addOn.name}`
+        });
+      });
+
       const paymentData = {
         orderId,
-        grossAmount: parseInt(billing.price),
+        grossAmount: totalPrice,
         customerDetails: {
           first_name: currentUser.firstName || "User",
           last_name: currentUser.lastName || "",
           email: currentUser.email,
           phone: currentUser.phone || ""
         },
-        itemDetails: [
-          {
-            id: plan.id,
-            price: parseInt(billing.price),
-            quantity: 1,
-            name: `${plan.name} - ${billing.periodType === 'monthly' ? 'Bulanan' : 
-                   billing.periodType === 'quarterly' ? 'Triwulan' : 'Tahunan'}`
-          }
-        ]
+        itemDetails
       };
       
       const baseUrl = process.env.NODE_ENV === 'production' 
