@@ -1036,7 +1036,7 @@ export default function CompanyOnboarding() {
           (init) => init && init.trim() !== "",
         );
         
-        const selectedTasks = useMemo(() => {
+        const selectedTasks = (() => {
           const tasks: string[] = [];
           selectedInitiatives.forEach((initiative) => {
             const mapping = taskMapping[initiative];
@@ -1045,7 +1045,7 @@ export default function CompanyOnboarding() {
             }
           });
           return tasks;
-        }, [selectedInitiatives]);
+        })();
         
         return (
           <div className="space-y-6">
