@@ -592,12 +592,12 @@ export default function Dashboard() {
             <div className="flex items-center">
               <div>
                 <h1
-                  className="text-lg sm:text-2xl font-semibold text-gray-900"
+                  className="text-2xl font-bold text-gray-900"
                   data-tour="dashboard-header"
                 >
                   Goals
                 </h1>
-                <p className="text-gray-600 mt-0.5 sm:mt-1 text-xs sm:text-base">
+                <p className="text-gray-600 mt-1">
                   Kelola objective, angka target, dan inisiatif Anda
                 </p>
               </div>

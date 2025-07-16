@@ -283,6 +283,22 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 16, 2025. **DASHBOARD FONT CONSISTENCY FIX** - Successfully standardized dashboard header font with other pages:
+  * FIXED: Changed h1 from responsive text-lg/text-2xl to consistent text-2xl font-bold
+  * STANDARDIZED: Header font now matches tasks page and other pages throughout the application
+  * ENHANCED: Removed responsive font sizing variations that caused inconsistency
+  * RESULT: Dashboard header now has consistent typography with rest of application
+- July 16, 2025. **TASKS PAGE MOBILE OPTIMIZATION** - Successfully optimized tasks page for mobile devices:
+  * ENHANCED: Header layout now responsive with full-width button on mobile
+  * IMPROVED: Tabs show only icons on mobile, hiding text labels to save space
+  * OPTIMIZED: Filter indicators use tighter spacing and whitespace-nowrap for mobile
+  * AUTOMATED: Filter section auto-collapses on mobile for cleaner interface
+  * RESULT: Tasks page now fully optimized for mobile use with better space utilization
+- July 16, 2025. **INITIATIVE MEMBERS DATABASE ERROR FIX** - Successfully resolved database constraint error:
+  * FIXED: Added missing organizationId parameter to createInitiativeMember calls
+  * RESOLVED: "null value in column organization_id" error no longer occurs
+  * ENHANCED: Multi-tenant security maintained with proper organization filtering
+  * RESULT: Initiative member creation now works correctly without database errors
 - July 16, 2025. **TRIAL STATUS HEADER REDIRECT FIX** - Successfully fixed redirect issue in trial status header:
   * FIXED: Changed Link component from "/pricing" to "/upgrade-package" route
   * RESOLVED: Mobile upgrade button now redirects to correct upgrade package page
