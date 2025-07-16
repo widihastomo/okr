@@ -927,7 +927,7 @@ export default function KeyResultDetailPage() {
                 {/* Key Result Details */}
                 <div className="flex flex-wrap gap-4 mt-3 text-sm">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-600">Type:</span>
+                    <span className="font-medium text-gray-600">Tipe:</span>
                     <Badge variant="outline" className="text-xs">
                       {keyResult.keyResultType.replace('_', ' ')}
                     </Badge>
@@ -940,7 +940,7 @@ export default function KeyResultDetailPage() {
                   </div>
                   {keyResult.lastUpdated && (
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-gray-600">Last Updated:</span>
+                      <span className="font-medium text-gray-600">Terakhir Diperbarui:</span>
                       <span className="text-gray-500 text-xs">
                         {format(new Date(keyResult.lastUpdated), "MMM dd, yyyy")}
                       </span>
@@ -950,7 +950,7 @@ export default function KeyResultDetailPage() {
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="text-center p-3 bg-blue-50 rounded-lg">
-                  <p className="text-sm text-gray-600">Current</p>
+                  <p className="text-sm text-gray-600">Saat Ini</p>
                   <p className="font-semibold text-blue-600">
                     {formatValue(keyResult.currentValue, keyResult.unit)}
                   </p>
@@ -1010,11 +1010,11 @@ export default function KeyResultDetailPage() {
                 <div className="flex items-center gap-4 text-xs text-gray-500">
                   <div className="flex items-center gap-1">
                     <div className="w-3 h-3 bg-blue-600 rounded"></div>
-                    <span>Current Progress</span>
+                    <span>Progress Saat Ini</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <div className="w-0.5 h-3 bg-gray-600"></div>
-                    <span>Ideal Target</span>
+                    <span>Target Ideal</span>
                   </div>
                 </div>
               </div>
@@ -1034,10 +1034,10 @@ export default function KeyResultDetailPage() {
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     <TrendingUp className="h-5 w-5" />
-                    Achievement
+                    Pencapaian
                   </CardTitle>
                   <CardDescription>
-                    Progress tracking over time compared to ideal timeline
+                    Pelacakan progress dari waktu ke waktu dibandingkan dengan timeline ideal
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -1078,21 +1078,21 @@ export default function KeyResultDetailPage() {
                                     {actualData && actualData.value && (
                                       <div className="flex items-center gap-2">
                                         <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                                        <span className="text-sm text-gray-600">Actual Progress:</span>
+                                        <span className="text-sm text-gray-600">Progress Aktual:</span>
                                         <span className="text-sm font-medium">{Number(actualData.value).toFixed(1)}%</span>
                                       </div>
                                     )}
                                     {guidelineData && guidelineData.value && (
                                       <div className="flex items-center gap-2">
                                         <div className="w-3 h-3 border-2 border-gray-600 border-dashed rounded-full"></div>
-                                        <span className="text-sm text-gray-600">Target Guideline:</span>
+                                        <span className="text-sm text-gray-600">Panduan Target:</span>
                                         <span className="text-sm font-medium">{Number(guidelineData.value).toFixed(1)}%</span>
                                       </div>
                                     )}
                                     {idealData && idealData.value && (
                                       <div className="flex items-center gap-2">
                                         <div className="w-3 h-3 border-2 border-gray-400 border-dashed rounded-full"></div>
-                                        <span className="text-sm text-gray-600">Current Ideal:</span>
+                                        <span className="text-sm text-gray-600">Ideal Saat Ini:</span>
                                         <span className="text-sm font-medium">{Number(idealData.value).toFixed(1)}%</span>
                                       </div>
                                     )}
@@ -1139,7 +1139,7 @@ export default function KeyResultDetailPage() {
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <TrendingUp className="h-5 w-5" />
-                  Progress History
+                  Riwayat Progress
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -1171,7 +1171,7 @@ export default function KeyResultDetailPage() {
                                   onClick={() => toggleNoteExpansion(checkIn.id)}
                                   className="text-xs text-blue-600 hover:text-blue-800 mt-1 font-medium"
                                 >
-                                  {expandedNotes.has(checkIn.id) ? 'View Less' : 'View More'}
+                                  {expandedNotes.has(checkIn.id) ? 'Lihat Lebih Sedikit' : 'Lihat Lebih Banyak'}
                                 </button>
                               )}
                             </div>
@@ -1194,8 +1194,8 @@ export default function KeyResultDetailPage() {
                 ) : (
                   <div className="text-center py-8 text-gray-500">
                     <BarChart3 className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                    <p>No updates yet</p>
-                    <p className="text-sm">Add your first update to track progress over time.</p>
+                    <p>Belum ada update</p>
+                    <p className="text-sm">Tambahkan update pertama untuk melacak progress dari waktu ke waktu.</p>
                   </div>
                 )}
               </CardContent>
@@ -1209,10 +1209,10 @@ export default function KeyResultDetailPage() {
                 <div>
                   <CardTitle className="text-lg flex items-center gap-2">
                     <Target className="h-5 w-5" />
-                    Initiatives
+                    Inisiatif
                   </CardTitle>
                   <CardDescription>
-                    Strategic actions and projects to achieve this key result
+                    Tindakan strategis dan proyek untuk mencapai hasil kunci ini
                   </CardDescription>
                 </div>
                 <div className="flex gap-2">
@@ -1237,12 +1237,12 @@ export default function KeyResultDetailPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Title</TableHead>
+                      <TableHead>Judul</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead>Priority</TableHead>
+                      <TableHead>Prioritas</TableHead>
                       <TableHead>Progress</TableHead>
-                      <TableHead>Due Date</TableHead>
-                      <TableHead>Actions</TableHead>
+                      <TableHead>Tanggal Jatuh Tempo</TableHead>
+                      <TableHead>Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -1346,7 +1346,7 @@ export default function KeyResultDetailPage() {
                                   {format(new Date(initiative.dueDate), "MMM dd, yyyy")}
                                 </span>
                               ) : (
-                                <span className="text-sm text-gray-400">No due date</span>
+                                <span className="text-sm text-gray-400">Tidak ada tanggal jatuh tempo</span>
                               )}
                             </TableCell>
                             <TableCell>
@@ -1366,9 +1366,9 @@ export default function KeyResultDetailPage() {
                                   </AlertDialogTrigger>
                                   <AlertDialogContent>
                                     <AlertDialogHeader>
-                                      <AlertDialogTitle>Hapus Initiative</AlertDialogTitle>
+                                      <AlertDialogTitle>Hapus Inisiatif</AlertDialogTitle>
                                       <AlertDialogDescription>
-                                        Apakah Anda yakin ingin menghapus initiative "{initiative.title}"? 
+                                        Apakah Anda yakin ingin menghapus inisiatif "{initiative.title}"? 
                                         Tindakan ini tidak dapat dibatalkan.
                                       </AlertDialogDescription>
                                     </AlertDialogHeader>
@@ -1487,7 +1487,7 @@ export default function KeyResultDetailPage() {
                                                       <AlertDialogTrigger asChild>
                                                         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                                                           <Trash2 className="h-4 w-4 mr-2" />
-                                                          Delete Task
+                                                          Hapus Task
                                                         </DropdownMenuItem>
                                                       </AlertDialogTrigger>
                                                       <AlertDialogContent>
@@ -1517,7 +1517,7 @@ export default function KeyResultDetailPage() {
                                       })}
                                     </div>
                                   ) : (
-                                    <p className="text-sm text-gray-500">No tasks available</p>
+                                    <p className="text-sm text-gray-500">Tidak ada task tersedia</p>
                                   )}
                                 </div>
                               </TableCell>
@@ -1531,8 +1531,8 @@ export default function KeyResultDetailPage() {
               ) : (
                 <div className="text-center py-8 text-gray-500">
                   <Target className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                  <p>No initiatives yet</p>
-                  <p className="text-sm">Create your first initiative to start working towards this key result.</p>
+                  <p>Belum ada inisiatif</p>
+                  <p className="text-sm">Buat inisiatif pertama untuk mulai bekerja menuju hasil kunci ini.</p>
                 </div>
               )}
             </CardContent>
@@ -1573,7 +1573,7 @@ export default function KeyResultDetailPage() {
         <DialogHeader>
           <DialogTitle>Edit Task</DialogTitle>
           <DialogDescription>
-            Update the task details below.
+            Perbarui detail task di bawah ini.
           </DialogDescription>
         </DialogHeader>
         <Form {...taskForm}>
@@ -1636,18 +1636,18 @@ export default function KeyResultDetailPage() {
                 name="priority"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Priority</FormLabel>
+                    <FormLabel>Prioritas</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select priority" />
+                          <SelectValue placeholder="Pilih prioritas" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="critical">Critical</SelectItem>
+                        <SelectItem value="low">Rendah</SelectItem>
+                        <SelectItem value="medium">Sedang</SelectItem>
+                        <SelectItem value="high">Tinggi</SelectItem>
+                        <SelectItem value="critical">Kritis</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -1661,15 +1661,15 @@ export default function KeyResultDetailPage() {
               name="assignedTo"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Assigned To</FormLabel>
+                  <FormLabel>Ditugaskan Kepada</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select user" />
+                        <SelectValue placeholder="Pilih pengguna" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="unassigned">Unassigned</SelectItem>
+                      <SelectItem value="unassigned">Tidak Ditugaskan</SelectItem>
                       {users?.map((user: any) => (
                         <SelectItem key={user.id} value={user.id}>
                           {user.firstName} {user.lastName}
@@ -1698,10 +1698,10 @@ export default function KeyResultDetailPage() {
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setEditTaskOpen(false)}>
-                Cancel
+                Batal
               </Button>
               <Button type="submit" className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600">
-                Update Task
+                Perbarui Task
               </Button>
             </DialogFooter>
           </form>
