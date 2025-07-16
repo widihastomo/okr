@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Check, Crown, Users, Zap, Shield, Star, CreditCard, Clock, ArrowRight, X, Sparkles, Plus, Minus, Settings, BarChart, Database, Headphones } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Check, Crown, Users, Zap, Shield, Star, CreditCard, Clock, ArrowRight, X, Sparkles, Plus, Minus, Settings, BarChart, Database, Headphones, AlertCircle } from "lucide-react";
 
 interface SubscriptionPlan {
   id: string;
@@ -60,6 +61,66 @@ interface AddOn {
 export default function UpgradePackage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  
+  // Role-based access control for members
+  if (user?.role === "member") {
+    return (
+      <div className="max-w-4xl mx-auto py-8">
+        <Card className="border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50">
+          <CardContent className="p-8">
+            <div className="text-center space-y-6">
+              <div className="flex justify-center">
+                <div className="p-4 bg-orange-100 rounded-full">
+                  <AlertCircle className="w-12 h-12 text-orange-600" />
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <h1 className="text-2xl font-bold text-gray-900">
+                  Akses Terbatas
+                </h1>
+                <p className="text-lg text-gray-700 max-w-2xl mx-auto">
+                  Hanya Administrator dan Pemilik organisasi yang dapat mengakses halaman upgrade paket berlangganan.
+                </p>
+                <div className="bg-white rounded-lg p-6 border border-orange-200">
+                  <p className="text-gray-600 mb-4">
+                    Untuk melakukan upgrade paket berlangganan, silakan hubungi:
+                  </p>
+                  <ul className="text-left space-y-2 text-gray-700">
+                    <li className="flex items-center space-x-2">
+                      <Check className="w-4 h-4 text-green-500" />
+                      <span><strong>Administrator</strong> organisasi Anda</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <Check className="w-4 h-4 text-green-500" />
+                      <span><strong>Pemilik</strong> organisasi Anda</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="flex justify-center space-x-4">
+                <Button 
+                  onClick={() => window.location.href = '/'}
+                  className="bg-orange-600 hover:bg-orange-700 text-white"
+                >
+                  Kembali ke Beranda
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => window.location.href = '/organization-settings'}
+                  className="border-orange-600 text-orange-600 hover:bg-orange-50"
+                >
+                  Pengaturan Organisasi
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
   
   const [selectedPlanId, setSelectedPlanId] = useState<string>("");
   const [selectedBillingPeriodId, setSelectedBillingPeriodId] = useState<string>("");

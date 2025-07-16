@@ -283,6 +283,13 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 16, 2025. **UPGRADE PACKAGE ROLE-BASED ACCESS CONTROL** - Successfully implemented role-based access control for upgrade package page:
+  * ADDED: Role-based access control preventing members from accessing upgrade package page
+  * IMPLEMENTED: Professional access denied page with clear messaging in Indonesian
+  * ENHANCED: Visual indicators explaining who can access upgrade functionality (Administrator and Owner only)
+  * ADDED: Helpful navigation buttons directing users to contact organization admins
+  * SECURED: Complete protection ensuring only administrators and owners can manage subscription upgrades
+  * RESULT: Proper role-based access control for subscription management with clear user guidance
 - July 16, 2025. **LEADERBOARD MULTI-TENANT SECURITY FIX** - Successfully implemented organization-based filtering for leaderboard to prevent cross-organization data exposure:
   * FIXED: Added organizationId parameter to getLeaderboard method in gamification service
   * ENHANCED: Updated leaderboard API endpoint to pass user's organizationId for proper filtering
