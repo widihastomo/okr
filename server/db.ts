@@ -37,12 +37,13 @@ function ensureDatabaseUrl() {
     );
   }
   
-  // Ensure SSL for production if not present in URL
+  // Ensure SSL for production and development if not present in URL
   let databaseUrl = process.env.DATABASE_URL;
-  if (process.env.NODE_ENV === 'production' && !databaseUrl.includes('ssl')) {
+  // Always add SSL for secure databases (Neon requires SSL even in development)
+  if (!databaseUrl.includes('ssl') && !databaseUrl.includes('localhost') && !databaseUrl.includes('127.0.0.1')) {
     const separator = databaseUrl.includes('?') ? '&' : '?';
     databaseUrl = `${databaseUrl}${separator}sslmode=require`;
-    console.log("✅ Added SSL requirement to DATABASE_URL for production");
+    console.log("✅ Added SSL requirement to DATABASE_URL for secure connection");
   }
   
   return databaseUrl;
