@@ -31,6 +31,7 @@ import {
   Gift,
   Mail,
   Rss,
+  Newspaper,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -160,7 +161,7 @@ export default function Sidebar({
     },
     {
       label: "Timeline",
-      icon: Rss,
+      icon: Newspaper,
       path: "/timeline",
       active: location === "/timeline",
     },
