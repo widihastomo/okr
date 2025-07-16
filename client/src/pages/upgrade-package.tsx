@@ -16,6 +16,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
+import { useLocation } from "wouter";
 import { Check, Crown, Users, Zap, Shield, Star, CreditCard, Clock, ArrowRight, X, Sparkles, Plus, Minus, Settings, BarChart, Database, Headphones, AlertCircle } from "lucide-react";
 
 interface SubscriptionPlan {
@@ -62,6 +63,7 @@ export default function UpgradePackage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const [, setLocation] = useLocation();
   
   // Role-based access control for members
   if (user?.role === "member") {
@@ -102,7 +104,7 @@ export default function UpgradePackage() {
               
               <div className="flex justify-center">
                 <Button 
-                  onClick={() => window.location.assign('/')}
+                  onClick={() => setLocation('/')}
                   className="bg-orange-600 hover:bg-orange-700 text-white"
                 >
                   Kembali ke Beranda
