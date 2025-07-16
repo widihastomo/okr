@@ -175,17 +175,17 @@ export default function Profile() {
           </div>
 
           <div className="grid lg:grid-cols-3 gap-6">
-            {/* Profile Information Card */}
+            {/* Combined Profile Information and Change Password Card */}
             <div className="lg:col-span-2">
               <Card className="shadow-sm border-0 bg-white">
                 <CardHeader className="flex flex-row items-center justify-between pb-6">
                 <div>
                   <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-900">
                     <User className="w-5 h-5 text-blue-600" />
-                    Informasi Profil
+                    Informasi Profil & Keamanan
                   </CardTitle>
                   <CardDescription className="mt-2 text-gray-600">
-                    Perbarui informasi profil dan pengaturan akun Anda
+                    Kelola informasi profil dan pengaturan keamanan akun Anda
                   </CardDescription>
                 </div>
                   {!isEditing ? (
@@ -215,69 +215,137 @@ export default function Profile() {
                   )}
                 </CardHeader>
                 <CardContent className="p-6">
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Nama Lengkap</Label>
-                      <Input
-                        id="name"
-                        type="text"
-                        value={formData.name}
-                        onChange={(e) => setFormData({...formData, name: e.target.value})}
-                        disabled={!isEditing}
-                        placeholder="Masukkan nama lengkap"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({...formData, email: e.target.value})}
-                        disabled={!isEditing}
-                        placeholder="Masukkan email"
-                      />
-                    </div>
+                  {/* Profile Information Section */}
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
+                        <User className="w-4 h-4 text-blue-600" />
+                        Informasi Profil
+                      </h3>
+                      <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="space-y-2">
+                          <Label htmlFor="name">Nama Lengkap</Label>
+                          <Input
+                            id="name"
+                            type="text"
+                            value={formData.name}
+                            onChange={(e) => setFormData({...formData, name: e.target.value})}
+                            disabled={!isEditing}
+                            placeholder="Masukkan nama lengkap"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="email">Email</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            value={formData.email}
+                            onChange={(e) => setFormData({...formData, email: e.target.value})}
+                            disabled={!isEditing}
+                            placeholder="Masukkan email"
+                          />
+                        </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="role">Role</Label>
-                      <div className="flex items-center gap-2">
-                        <Badge className={getRoleBadgeColor((user as any)?.role || "member")}>
-                          {getRoleLabel((user as any)?.role || "member")}
-                        </Badge>
-                        <span className="text-sm text-gray-500">
-                          (Role tidak dapat diubah sendiri)
-                        </span>
-                      </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="role">Role</Label>
+                          <div className="flex items-center gap-2">
+                            <Badge className={getRoleBadgeColor((user as any)?.role || "member")}>
+                              {getRoleLabel((user as any)?.role || "member")}
+                            </Badge>
+                            <span className="text-sm text-gray-500">
+                              (Role tidak dapat diubah sendiri)
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <h4 className="font-medium text-gray-900 mb-3">Informasi Tambahan</h4>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span>Dibuat pada:</span>
+                              <span>
+                                {(user as any)?.createdAt 
+                                  ? new Date((user as any).createdAt).toLocaleDateString('id-ID')
+                                  : 'N/A'
+                                }
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Terakhir diperbarui:</span>
+                              <span>
+                                {(user as any)?.updatedAt 
+                                  ? new Date((user as any).updatedAt).toLocaleDateString('id-ID')
+                                  : 'N/A'
+                                }
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
                     </div>
 
                     <Separator />
                     
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <h4 className="font-medium text-gray-900 mb-3">Informasi Tambahan</h4>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span>Dibuat pada:</span>
-                          <span>
-                            {(user as any)?.createdAt 
-                              ? new Date((user as any).createdAt).toLocaleDateString('id-ID')
-                              : 'N/A'
-                            }
-                          </span>
+                    {/* Change Password Section */}
+                    <div>
+                      <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
+                        <Shield className="w-4 h-4 text-blue-600" />
+                        Ganti Password
+                      </h3>
+                      <form onSubmit={handlePasswordChange} className="space-y-6">
+                        <div className="space-y-2">
+                          <Label htmlFor="currentPassword">Password Saat Ini</Label>
+                          <Input
+                            id="currentPassword"
+                            type="password"
+                            placeholder="Masukkan password saat ini"
+                            value={passwordData.currentPassword}
+                            onChange={(e) => setPasswordData(prev => ({...prev, currentPassword: e.target.value}))}
+                            required
+                            className="h-11"
+                          />
                         </div>
-                        <div className="flex justify-between">
-                          <span>Terakhir diperbarui:</span>
-                          <span>
-                            {(user as any)?.updatedAt 
-                              ? new Date((user as any).updatedAt).toLocaleDateString('id-ID')
-                              : 'N/A'
-                            }
-                          </span>
+                        
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="newPassword">Password Baru</Label>
+                            <Input
+                              id="newPassword"
+                              type="password"
+                              placeholder="Masukkan password baru"
+                              value={passwordData.newPassword}
+                              onChange={(e) => setPasswordData(prev => ({...prev, newPassword: e.target.value}))}
+                              required
+                              className="h-11"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="confirmPassword">Konfirmasi Password Baru</Label>
+                            <Input
+                              id="confirmPassword"
+                              type="password"
+                              placeholder="Konfirmasi password baru"
+                              value={passwordData.confirmPassword}
+                              onChange={(e) => setPasswordData(prev => ({...prev, confirmPassword: e.target.value}))}
+                              required
+                              className="h-11"
+                            />
+                          </div>
                         </div>
-                      </div>
+                        
+                        <div className="flex justify-end pt-4">
+                          <Button 
+                            type="submit" 
+                            className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 h-11 px-8"
+                            disabled={changePasswordMutation.isPending}
+                          >
+                            {changePasswordMutation.isPending ? "Memperbarui..." : "Perbarui Password"}
+                          </Button>
+                        </div>
+                      </form>
                     </div>
-                  </form>
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -322,74 +390,6 @@ export default function Profile() {
               </Card>
             </div>
           </div>
-
-          {/* Change Password Section */}
-          <Card className="shadow-sm border-0 bg-white mt-6">
-            <CardHeader className="pb-6">
-              <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-900">
-                <Shield className="w-5 h-5 text-blue-600" />
-                Ganti Password
-              </CardTitle>
-              <CardDescription className="mt-2 text-gray-600">
-                Perbarui password untuk keamanan akun Anda
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-6">
-              <form onSubmit={handlePasswordChange} className="space-y-6">
-                <div className="grid gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="currentPassword">Password Saat Ini</Label>
-                    <Input
-                      id="currentPassword"
-                      type="password"
-                      placeholder="Masukkan password saat ini"
-                      value={passwordData.currentPassword}
-                      onChange={(e) => setPasswordData(prev => ({...prev, currentPassword: e.target.value}))}
-                      required
-                      className="h-11"
-                    />
-                  </div>
-                  
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="newPassword">Password Baru</Label>
-                      <Input
-                        id="newPassword"
-                        type="password"
-                        placeholder="Masukkan password baru"
-                        value={passwordData.newPassword}
-                        onChange={(e) => setPasswordData(prev => ({...prev, newPassword: e.target.value}))}
-                        required
-                        className="h-11"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="confirmPassword">Konfirmasi Password Baru</Label>
-                      <Input
-                        id="confirmPassword"
-                        type="password"
-                        placeholder="Konfirmasi password baru"
-                        value={passwordData.confirmPassword}
-                        onChange={(e) => setPasswordData(prev => ({...prev, confirmPassword: e.target.value}))}
-                        required
-                        className="h-11"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-end pt-4">
-                    <Button 
-                      type="submit" 
-                      className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 h-11 px-8"
-                      disabled={changePasswordMutation.isPending}
-                    >
-                      {changePasswordMutation.isPending ? "Memperbarui..." : "Perbarui Password"}
-                    </Button>
-                  </div>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>
