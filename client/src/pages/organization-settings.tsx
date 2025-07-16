@@ -537,8 +537,10 @@ export default function OrganizationSettings() {
     );
   }
 
-  // Access control - only owner can access this page
-  if (!isOwner) {
+  // Access control - members can only access notifications
+  if ((user as any)?.role === "member") {
+    // Members can access but will be restricted to notifications tab
+  } else if (!isOwner) {
     setLocation("/dashboard");
     return null;
   }
@@ -551,7 +553,7 @@ export default function OrganizationSettings() {
         <p className="text-sm sm:text-base text-gray-600">Kelola pengaturan dan informasi organisasi Anda</p>
       </div>
 
-      <Tabs defaultValue="general" className="space-y-6" onValueChange={(value) => {
+      <Tabs defaultValue={(user as any)?.role === "member" ? "notifications" : "general"} className="space-y-6" onValueChange={(value) => {
         // Reset notification settings when switching to notifications tab
         if (value === 'notifications' && apiReminderSettings) {
           const updatedSettings = {
@@ -579,32 +581,43 @@ export default function OrganizationSettings() {
           }
         }
       }}>
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 max-w-4xl gap-1 h-auto">
-          <TabsTrigger value="general" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
-            <Building2 className="h-4 w-4" />
-            <span className="text-xs sm:text-sm">Umum</span>
-          </TabsTrigger>
-          <TabsTrigger value="subscription" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
-            <CreditCard className="h-4 w-4" />
-            <span className="text-xs sm:text-sm">Langganan</span>
-          </TabsTrigger>
-          <TabsTrigger value="roles" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
-            <Shield className="h-4 w-4" />
-            <span className="text-xs sm:text-sm">Roles</span>
-          </TabsTrigger>
+        <TabsList className={`grid w-full max-w-4xl gap-1 h-auto ${
+          (user as any)?.role === "member" 
+            ? "grid-cols-1" 
+            : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"
+        }`}>
+          {(user as any)?.role !== "member" && (
+            <>
+              <TabsTrigger value="general" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
+                <Building2 className="h-4 w-4" />
+                <span className="text-xs sm:text-sm">Umum</span>
+              </TabsTrigger>
+              <TabsTrigger value="subscription" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
+                <CreditCard className="h-4 w-4" />
+                <span className="text-xs sm:text-sm">Langganan</span>
+              </TabsTrigger>
+              <TabsTrigger value="roles" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
+                <Shield className="h-4 w-4" />
+                <span className="text-xs sm:text-sm">Roles</span>
+              </TabsTrigger>
+            </>
+          )}
           <TabsTrigger value="notifications" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
             <Bell className="h-4 w-4" />
             <span className="text-xs sm:text-sm">Notifikasi</span>
           </TabsTrigger>
-          <TabsTrigger value="settings" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
-            <Settings className="h-4 w-4" />
-            <span className="text-xs sm:text-sm">Lanjutan</span>
-          </TabsTrigger>
+          {(user as any)?.role !== "member" && (
+            <TabsTrigger value="settings" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3">
+              <Settings className="h-4 w-4" />
+              <span className="text-xs sm:text-sm">Lanjutan</span>
+            </TabsTrigger>
+          )}
         </TabsList>
 
         {/* General Tab */}
-        <TabsContent value="general">
-          <Card>
+        {(user as any)?.role !== "member" && (
+          <TabsContent value="general">
+            <Card>
             <CardHeader>
               <CardTitle>Informasi Organisasi</CardTitle>
               <CardDescription>
@@ -667,9 +680,11 @@ export default function OrganizationSettings() {
             </CardContent>
           </Card>
         </TabsContent>
+        )}
 
         {/* Subscription Tab */}
-        <TabsContent value="subscription" className="space-y-6">
+        {(user as any)?.role !== "member" && (
+          <TabsContent value="subscription" className="space-y-6">
           {/* Current Subscription Info */}
           <Card>
             <CardHeader>
@@ -760,9 +775,11 @@ export default function OrganizationSettings() {
           {/* Invoice Management Section */}
           <InvoiceManagementSection />
         </TabsContent>
+        )}
 
         {/* Roles Tab */}
-        <TabsContent value="roles">
+        {(user as any)?.role !== "member" && (
+          <TabsContent value="roles">
           <Card>
             <CardHeader>
               <CardTitle>Sistem Roles & Permissions</CardTitle>
@@ -980,6 +997,7 @@ export default function OrganizationSettings() {
             </CardContent>
           </Card>
         </TabsContent>
+        )}
 
         {/* Notifications Tab */}
         <TabsContent value="notifications" key={`notifications-${apiReminderSettings?.reminderTime || 'default'}`}>
@@ -1469,8 +1487,9 @@ export default function OrganizationSettings() {
         </TabsContent>
 
         {/* Advanced Settings Tab */}
-        <TabsContent value="settings">
-          <Card>
+        {(user as any)?.role !== "member" && (
+          <TabsContent value="settings">
+            <Card>
             <CardHeader>
               <CardTitle>Pengaturan Lanjutan</CardTitle>
               <CardDescription>
@@ -1555,6 +1574,7 @@ export default function OrganizationSettings() {
             </CardContent>
           </Card>
         </TabsContent>
+        )}
       </Tabs>
     </div>
   );
