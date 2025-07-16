@@ -2227,10 +2227,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         // For users, fetch user name
         if (selectedOwnerId === currentUser.id) {
-          ownerName = currentUser.username || currentUser.email || 'Unknown User';
+          ownerName = currentUser.name || currentUser.email || 'Unknown User';
         } else {
           const user = await storage.getUser(selectedOwnerId);
-          ownerName = user ? (user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.firstName || user.lastName || user.email || 'Unknown User') : 'Unknown User';
+          ownerName = user ? (user.name || user.email || 'Unknown User') : 'Unknown User';
         }
       }
       
