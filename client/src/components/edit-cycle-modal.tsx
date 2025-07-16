@@ -87,10 +87,31 @@ export default function EditCycleModal({ cycle, open, onOpenChange }: EditCycleM
   // Update form data when cycle changes
   useEffect(() => {
     if (cycle) {
+      const parseDate = (dateString: string | null | undefined) => {
+        if (!dateString) return undefined;
+        try {
+          // Handle different date formats
+          const date = new Date(dateString);
+          if (isNaN(date.getTime())) {
+            // Try parsing as YYYY-MM-DD format
+            const dateParts = dateString.split('-');
+            if (dateParts.length === 3) {
+              const parsedDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+              return isNaN(parsedDate.getTime()) ? undefined : parsedDate;
+            }
+            return undefined;
+          }
+          return date;
+        } catch (error) {
+          console.error('Error parsing date:', error);
+          return undefined;
+        }
+      };
+
       form.reset({
         name: cycle.name,
-        startDate: cycle.startDate ? new Date(cycle.startDate + 'T00:00:00') : undefined,
-        endDate: cycle.endDate ? new Date(cycle.endDate + 'T00:00:00') : undefined,
+        startDate: parseDate(cycle.startDate),
+        endDate: parseDate(cycle.endDate),
       });
     }
   }, [cycle, form]);
