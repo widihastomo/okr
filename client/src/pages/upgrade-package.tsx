@@ -102,7 +102,7 @@ export default function UpgradePackage() {
               
               <div className="flex justify-center">
                 <Button 
-                  onClick={() => window.location.href = '/'}
+                  onClick={() => window.location.assign('/')}
                   className="bg-orange-600 hover:bg-orange-700 text-white"
                 >
                   Kembali ke Beranda
