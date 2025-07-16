@@ -52,7 +52,6 @@ import {
   Sparkles,
   HelpCircle,
   Check,
-  User,
 } from "lucide-react";
 import { Link } from "wouter";
 import { CheckInModal } from "@/components/check-in-modal";
