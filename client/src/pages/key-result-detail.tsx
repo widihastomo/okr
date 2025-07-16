@@ -10,6 +10,7 @@ import { ArrowLeft, Calendar, Target, TrendingUp, Users, Clock, BarChart3, Edit,
 import { CheckInModal } from "@/components/check-in-modal";
 import InitiativeFormModal from "@/components/initiative-form-modal";
 import { ProgressStatus } from "@/components/progress-status";
+import EditKeyResultModal from "@/components/edit-key-result-modal";
 import { format } from "date-fns";
 import type { KeyResultWithDetails } from "@shared/schema";
 import {
@@ -115,6 +116,7 @@ export default function KeyResultDetailPage() {
   const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set());
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [showInitiativeFormModal, setShowInitiativeFormModal] = useState(false);
+  const [showEditKeyResultModal, setShowEditKeyResultModal] = useState(false);
 
   // Task form for editing/adding
   const taskForm = useForm<TaskFormData>({
@@ -643,6 +645,24 @@ export default function KeyResultDetailPage() {
     });
   };
 
+  // Handler for edit key result
+  const handleEditKeyResult = () => {
+    setShowEditKeyResultModal(true);
+  };
+
+  // Handler for edit key result success
+  const handleEditKeyResultSuccess = () => {
+    queryClient.invalidateQueries({
+      queryKey: [`/api/key-results/${keyResultId}`]
+    });
+    queryClient.invalidateQueries({
+      queryKey: [`/api/objectives/${keyResult?.objectiveId}`]
+    });
+    setShowEditKeyResultModal(false);
+  };
+
+
+
   // Prepare chart data from check-ins with diagonal guideline
   const prepareChartData = () => {
     // Get dates from objective's cycle
@@ -883,7 +903,7 @@ export default function KeyResultDetailPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleEditKeyResult}>
                 <Edit className="w-4 h-4 mr-2" />
                 Edit Angka Target
               </DropdownMenuItem>
@@ -2151,6 +2171,16 @@ export default function KeyResultDetailPage() {
         )}
       </SheetContent>
     </Sheet>
+
+    {/* Edit Key Result Modal */}
+    {keyResult && (
+      <EditKeyResultModal
+        open={showEditKeyResultModal}
+        onOpenChange={setShowEditKeyResultModal}
+        keyResult={keyResult}
+        onSuccess={handleEditKeyResultSuccess}
+      />
+    )}
 
     {/* Delete Key Result Confirmation Dialog */}
     <AlertDialog open={showDeleteConfirmation} onOpenChange={setShowDeleteConfirmation}>

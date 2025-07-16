@@ -117,6 +117,7 @@ interface EditKeyResultModalProps {
   onOpenChange: (open: boolean) => void;
   keyResult?: KeyResult;
   objectiveId?: string;
+  onSuccess?: () => void;
 }
 
 export default function EditKeyResultModal({
@@ -124,6 +125,7 @@ export default function EditKeyResultModal({
   onOpenChange,
   keyResult,
   objectiveId,
+  onSuccess,
 }: EditKeyResultModalProps) {
 
   const { toast } = useToast();
@@ -215,6 +217,11 @@ export default function EditKeyResultModal({
       
       onOpenChange(false);
       form.reset();
+      
+      // Call the onSuccess callback if provided
+      if (onSuccess) {
+        onSuccess();
+      }
     },
     onError: (error: any) => {
       toast({
