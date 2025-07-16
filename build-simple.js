@@ -1,4 +1,3 @@
-
 // Simple production build - ensures deployment compatibility
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { execSync } from 'child_process';
@@ -17,7 +16,7 @@ try {
   mkdirSync('dist/public', { recursive: true });
 
   console.log('⚡ Creating server bundle...');
-  
+
   // Create reliable production server that works in deployment
   const serverScript = `#!/usr/bin/env node
 
@@ -88,7 +87,7 @@ process.on('SIGINT', () => {
 
   // Create ES module version (.js)
   writeFileSync('dist/index.js', serverScript, { mode: 0o755 });
-  
+
   // Create CommonJS version (.cjs) - primary for deployment
   const cjsScript = `#!/usr/bin/env node
 
@@ -102,7 +101,6 @@ console.log('🌍 Environment:', process.env.NODE_ENV || 'production');
 console.log('📡 Host: 0.0.0.0');
 console.log('📡 Port:', process.env.PORT || 5000);
 console.log('📍 Working directory:', process.cwd());
-console.log('📍 Server path will be:', path.resolve(__dirname, '..', 'server', 'index.ts'));
 
 // Load environment variables for production if .env exists
 try {
@@ -115,48 +113,83 @@ try {
 // Ensure production environment
 process.env.NODE_ENV = 'production';
 
-// Launch server using tsx
+// Resolve server path
 const serverPath = path.resolve(__dirname, '..', 'server', 'index.ts');
-
-console.log('⚡ Starting server at:', serverPath);
+console.log('📍 Server path resolved to:', serverPath);
 
 // Verify server file exists
 if (!fs.existsSync(serverPath)) {
   console.error('❌ Server file not found:', serverPath);
+  console.log('📁 Available files in server directory:');
+  try {
+    const serverDir = path.resolve(__dirname, '..', 'server');
+    const files = fs.readdirSync(serverDir);
+    files.forEach(file => console.log('  -', file));
+  } catch (dirError) {
+    console.error('❌ Cannot read server directory:', dirError.message);
+  }
   process.exit(1);
 }
 
+console.log('⚡ Starting server with tsx...');
+
+// Enhanced spawn with better error handling
 const server = spawn('npx', ['tsx', serverPath], {
   stdio: 'inherit',
   env: {
     ...process.env,
-    NODE_ENV: 'production'
+    NODE_ENV: 'production',
+    PORT: process.env.PORT || '5000'
   },
-  cwd: path.resolve(__dirname, '..')
+  cwd: path.resolve(__dirname, '..'),
+  shell: true // Enable shell mode for better compatibility
 });
 
 server.on('error', (err) => {
-  console.error('❌ Server error:', err.message);
-  process.exit(1);
+  console.error('❌ Server spawn error:', err.message);
+  console.error('📍 Error code:', err.code);
+
+  // Try alternative launch method
+  console.log('🔄 Attempting alternative launch method...');
+  try {
+    require(serverPath);
+  } catch (requireError) {
+    console.error('❌ Alternative launch failed:', requireError.message);
+    process.exit(1);
+  }
 });
 
-// Handle shutdown signals
-process.on('SIGTERM', () => {
-  console.log('Received SIGTERM, shutting down...');
-  server.kill('SIGTERM');
+server.on('close', (code, signal) => {
+  console.log(\`🔄 Server process closed with code \${code} and signal \${signal}\`);
+  if (code !== 0 && code !== null) {
+    console.error(\`❌ Server exited with non-zero code: \${code}\`);
+    process.exit(code);
+  }
 });
 
-process.on('SIGINT', () => {
-  console.log('Received SIGINT, shutting down...');
-  server.kill('SIGINT');
-});
-`;
+// Handle shutdown signals gracefully
+const shutdown = (signal) => {
+  console.log(\`📍 Received \${signal}, shutting down gracefully...\`);
+  if (server && !server.killed) {
+    server.kill(signal);
+  }
+  setTimeout(() => {
+    console.log('🔴 Force exit after timeout');
+    process.exit(0);
+  }, 5000);
+};
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
+
+// Keep process alive
+process.stdin.resume();`;
 
   writeFileSync('dist/index.cjs', cjsScript, { mode: 0o755 });
   console.log('✅ Server bundle created successfully');
 
   console.log('🌐 Creating production frontend...');
-  
+
   // Create production frontend
   const productionHTML = `<!DOCTYPE html>
 <html lang="en">
@@ -229,7 +262,7 @@ process.on('SIGINT', () => {
             <a href="/api/objectives" class="api-link">View Objectives</a>
         </div>
     </div>
-    
+
     <script>
         // Auto-refresh to connect to the application
         setTimeout(() => {
@@ -258,21 +291,21 @@ process.on('SIGINT', () => {
     nodeVersion: process.version,
     files: ['dist/index.cjs', 'dist/public/index.html']
   };
-  
+
   writeFileSync('dist/deploy-info.json', JSON.stringify(deployInfo, null, 2));
 
   // Verify files were created
   if (!existsSync('dist/index.js')) {
     throw new Error('Failed to create dist/index.js');
   }
-  
+
   if (!existsSync('dist/index.cjs')) {
     throw new Error('Failed to create dist/index.cjs');
   }
-  
+
   // Verify .cjs file has executable permissions
   execSync('chmod +x dist/index.cjs', { stdio: 'pipe' });
-  
+
   if (!existsSync('dist/public/index.html')) {
     throw new Error('Failed to create dist/public/index.html');
   }
