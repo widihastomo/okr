@@ -2722,12 +2722,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Organization ID is required" });
       }
 
+      if (!req.session.user?.id) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
       const checkInData = {
         keyResultId,
         value: req.body.value,
         notes: req.body.notes || null,
         confidence: req.body.confidence || 5,
-        createdBy: req.session.user?.id || '550e8400-e29b-41d4-a716-446655440001',
+        createdBy: req.session.user.id,
         organizationId: req.body.organizationId
       };
       
