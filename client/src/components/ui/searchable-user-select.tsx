@@ -34,6 +34,7 @@ interface SearchableUserSelectProps {
   disabled?: boolean;
   className?: string;
   defaultValue?: string;
+  currentUser?: User; // Add currentUser prop
 }
 
 export function SearchableUserSelect({
@@ -47,13 +48,14 @@ export function SearchableUserSelect({
   disabled = false,
   className,
   defaultValue,
+  currentUser,
 }: SearchableUserSelectProps) {
   const [open, setOpen] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const scrollState = useScrollProgress(scrollContainerRef);
 
-  // Use defaultValue if value is not provided and defaultValue is set
-  const effectiveValue = value || defaultValue;
+  // Use currentUser as default if no value is provided and currentUser is set
+  const effectiveValue = value || (currentUser && !defaultValue ? currentUser.id : defaultValue);
   const selectedUser = users.find(user => user.id === effectiveValue);
 
   const getDisplayText = () => {

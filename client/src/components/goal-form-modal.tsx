@@ -1283,7 +1283,7 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
         });
       }
     }
-  }, [open, isEditing, editingKeyResult, keyResultForm]);
+  }, [open, isEditing, editingKeyResult, keyResultForm, user?.id]);
 
   // Watch for keyResultType changes and clear inappropriate fields
   const currentKeyResultType = keyResultForm.watch("keyResultType");
@@ -1457,6 +1457,7 @@ export function KeyResultModal({ open, onOpenChange, onSubmit, editingKeyResult,
                       onValueChange={field.onChange}
                       placeholder="Pilih penanggung jawab..."
                       allowUnassigned={true}
+                      currentUser={user}
                     />
                   </FormControl>
                   <FormMessage />
