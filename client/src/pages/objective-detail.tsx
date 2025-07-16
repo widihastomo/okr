@@ -883,28 +883,21 @@ export default function GoalDetail() {
       return response.json();
     },
     onMutate: () => {
-      // Show loading toast
+      // Show loading toast and redirect immediately
       toast({
         title: "Menghapus goal...",
-        description: "Sedang menghapus goal, mohon tunggu...",
+        description: "Goal sedang dihapus...",
         className: "border-orange-200 bg-orange-50 text-orange-800",
       });
+      
+      // Redirect immediately, deletion continues in background
+      window.location.href = "/";
     },
     onSuccess: () => {
-      // Show success toast
-      toast({
-        title: "Goal berhasil dihapus",
-        description: "Goal telah dihapus secara permanen.",
-        className: "border-green-200 bg-green-50 text-green-800",
-      });
-      
-      // Invalidate all objective-related queries
+      // Invalidate all objective-related queries (for when user returns)
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
       queryClient.invalidateQueries({ queryKey: [`/api/objectives/${id}`] });
-      
-      // Redirect to index immediately after successful deletion
-      window.location.href = "/";
     },
     onError: (error: any) => {
       toast({
