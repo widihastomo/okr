@@ -682,41 +682,39 @@ export default function ClientUserManagement() {
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            {user.invitationStatus === "pending" && (
+                        {user.role !== "owner" && user.role !== "organization_admin" && (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {user.invitationStatus === "pending" && (
+                                <DropdownMenuItem 
+                                  onClick={() => handleResendInvitation(user.id)}
+                                  disabled={resendInvitationMutation.isPending}
+                                >
+                                  <Mail className="mr-2 h-4 w-4" />
+                                  Kirim Ulang Undangan
+                                </DropdownMenuItem>
+                              )}
                               <DropdownMenuItem 
-                                onClick={() => handleResendInvitation(user.id)}
-                                disabled={resendInvitationMutation.isPending}
+                                onClick={() => handleToggleUserStatus(user.id, user.isActive)}
                               >
-                                <Mail className="mr-2 h-4 w-4" />
-                                Kirim Ulang Undangan
+                                <Power className="mr-2 h-4 w-4" />
+                                {user.isActive ? "Nonaktifkan" : "Aktifkan"}
                               </DropdownMenuItem>
-                            )}
-                            {user.role !== "owner" && user.role !== "organization_admin" && (
-                              <>
-                                <DropdownMenuItem 
-                                  onClick={() => handleToggleUserStatus(user.id, user.isActive)}
-                                >
-                                  <Power className="mr-2 h-4 w-4" />
-                                  {user.isActive ? "Nonaktifkan" : "Aktifkan"}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem 
-                                  onClick={() => handleRemoveUser(user.id)}
-                                  className="text-red-600"
-                                >
-                                  <Users className="mr-2 h-4 w-4" />
-                                  Hapus dari Organisasi
-                                </DropdownMenuItem>
-                              </>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                              <DropdownMenuItem 
+                                onClick={() => handleRemoveUser(user.id)}
+                                className="text-red-600"
+                              >
+                                <Users className="mr-2 h-4 w-4" />
+                                Hapus dari Organisasi
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))
