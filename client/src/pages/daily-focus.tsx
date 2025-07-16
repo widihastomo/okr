@@ -1615,9 +1615,15 @@ export default function DailyFocusPage() {
       {/* Main Content Tabs */}
       <Tabs defaultValue="tasks" className="w-full" data-tour="main-tabs">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="tasks">Task Prioritas</TabsTrigger>
-          <TabsTrigger value="progress">Update Progress</TabsTrigger>
-          <TabsTrigger value="initiatives">Kelola Inisiatif</TabsTrigger>
+          <TabsTrigger value="tasks">
+            Task Prioritas ({overdueTasks.length + todayTasks.length + tomorrowTasks.length})
+          </TabsTrigger>
+          <TabsTrigger value="progress">
+            Update Progress ({activeKeyResults.length})
+          </TabsTrigger>
+          <TabsTrigger value="initiatives">
+            Kelola Inisiatif ({activeInitiatives.length})
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="tasks" className="space-y-4">
