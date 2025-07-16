@@ -71,38 +71,35 @@ export default function TimelineIconDefault({ className }: { className?: string 
     <svg
       className={className}
       viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      fill="currentColor"
+      stroke="none"
     >
-      {/* Outer circle with dashed border */}
+      {/* Outer circle filled */}
       <circle
         cx="12"
         cy="12"
         r="10"
-        stroke="currentColor"
-        strokeDasharray="3 3"
-        fill="none"
+        fill="currentColor"
+        fillOpacity="0.9"
       />
       
-      {/* Inner circle with checkmark */}
+      {/* Inner circle with lighter fill */}
       <circle
         cx="12"
         cy="12"
         r="6"
         fill="currentColor"
-        fillOpacity="0.1"
-        stroke="currentColor"
+        fillOpacity="0.3"
       />
       
       {/* Checkmark */}
       <path
         d="M9 12l2 2 4-4"
-        stroke="currentColor"
+        stroke="white"
         strokeWidth="2"
         fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
