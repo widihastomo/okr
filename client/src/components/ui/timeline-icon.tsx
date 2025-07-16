@@ -73,7 +73,7 @@ export default function TimelineIconDefault({ className }: { className?: string 
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2.5"
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -84,7 +84,6 @@ export default function TimelineIconDefault({ className }: { className?: string 
         r="10"
         stroke="currentColor"
         strokeDasharray="3 3"
-        strokeWidth="2.5"
         fill="none"
       />
       
@@ -96,14 +95,13 @@ export default function TimelineIconDefault({ className }: { className?: string 
         fill="currentColor"
         fillOpacity="0.1"
         stroke="currentColor"
-        strokeWidth="2.5"
       />
       
       {/* Checkmark */}
       <path
         d="M9 12l2 2 4-4"
         stroke="currentColor"
-        strokeWidth="2.5"
+        strokeWidth="2"
         fill="none"
       />
     </svg>
