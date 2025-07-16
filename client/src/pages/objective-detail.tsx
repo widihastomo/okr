@@ -414,6 +414,7 @@ export default function GoalDetail() {
   const [editingInitiative, setEditingInitiative] = useState<Initiative | null>(null);
   const [deletingInitiative, setDeletingInitiative] = useState<Initiative | null>(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
+  const [deleteObjectiveModal, setDeleteObjectiveModal] = useState(false);
   const queryClient = useQueryClient();
   const [tourStep, setTourStep] = useState<number>(0);
   const [showTour, setShowTour] = useState(false);
@@ -687,6 +688,17 @@ export default function GoalDetail() {
     }
   };
 
+  const handleDeleteObjective = () => {
+    setDeleteObjectiveModal(true);
+  };
+
+  const confirmDeleteObjective = () => {
+    if (id) {
+      deleteObjectiveMutation.mutate(id);
+    }
+    setDeleteObjectiveModal(false);
+  };
+
   // Create initiative with success metrics mutation
   const createInitiativeWithMetricsMutation = useMutation({
     mutationFn: async (data: { initiative: any; successMetrics: any[] }) => {
@@ -850,6 +862,36 @@ export default function GoalDetail() {
       toast({
         title: "Error",
         description: error.message || "Gagal memperbarui status task",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete objective mutation
+  const deleteObjectiveMutation = useMutation({
+    mutationFn: async (objectiveId: string) => {
+      const response = await apiRequest("DELETE", `/api/objectives/${objectiveId}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Goal berhasil dihapus",
+        description: "Goal telah dihapus secara permanen.",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+      
+      // Invalidate all objective-related queries
+      queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/objectives/${id}`] });
+      
+      // Navigate back to dashboard
+      window.location.href = "/dashboard";
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal menghapus goal",
         variant: "destructive",
       });
     },
@@ -1090,7 +1132,10 @@ export default function GoalDetail() {
                   <FileText className="w-4 h-4 mr-2" />
                   Duplikat Goal
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-red-600 hover:text-red-700">
+                <DropdownMenuItem 
+                  className="text-red-600 hover:text-red-700"
+                  onClick={handleDeleteObjective}
+                >
                   <Trash2 className="w-4 h-4 mr-2" />
                   Hapus Goal
                 </DropdownMenuItem>
@@ -2987,6 +3032,38 @@ export default function GoalDetail() {
             <AlertDialogCancel>Batal</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteInitiative}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Objective Confirmation Dialog */}
+      <AlertDialog open={deleteObjectiveModal} onOpenChange={setDeleteObjectiveModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Goal</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus goal "{goal?.title}"?
+              <br />
+              <br />
+              Tindakan ini tidak dapat dibatalkan dan akan menghapus:
+              <br />
+              • Goal dan semua data terkait
+              <br />
+              • Semua Angka Target (Key Results)
+              <br />
+              • Semua Inisiatif dan Tasks
+              <br />
+              • Riwayat progress dan check-in
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteObjective}
               className="bg-red-600 hover:bg-red-700"
             >
               Hapus
