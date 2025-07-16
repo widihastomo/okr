@@ -292,7 +292,10 @@ The system includes comprehensive database connection troubleshooting tools:
   * CHANGED: Card title from "Angka Target Overview" to display actual key result name while keeping Target icon
   * REMOVED: Redundant h1 element that duplicated the key result title for cleaner visual hierarchy
   * ENHANCED: Chart tooltips and progress indicators with Indonesian terminology
-  * RESULT: Complete Indonesian language implementation across all key result detail page components
+  * TRANSLATED: Key result types to Indonesian (increase_to: Peningkatan, decrease_to: Penurunan, achieve_or_not: Ya/Tidak)
+  * TRANSLATED: Key result status labels to Indonesian (on_track: Sesuai Target, at_risk: Berisiko, behind: Tertinggal, completed: Selesai, ahead: Unggul)
+  * TRANSLATED: Initiative status labels to Indonesian (draft: Draft, sedang_berjalan: Sedang Berjalan, selesai: Selesai, dibatalkan: Dibatalkan, on_hold: Ditunda)
+  * RESULT: Complete Indonesian language implementation across all key result detail page components with consistent terminology
 - July 16, 2025. **MULTI-SELECT CYCLE FILTER IMPLEMENTED** - Successfully implemented multi-select cycle filtering while maintaining select box appearance:
   * CREATED: MultiSelectCycle component with select box UI appearance
   * UPDATED: Dashboard to use array-based cycle filtering instead of single selection

@@ -843,11 +843,11 @@ export default function KeyResultDetailPage() {
     };
 
     const statusLabels = {
-      on_track: "On Track",
-      at_risk: "At Risk", 
-      behind: "Behind",
-      completed: "Completed",
-      ahead: "Ahead"
+      on_track: "Sesuai Target",
+      at_risk: "Berisiko", 
+      behind: "Tertinggal",
+      completed: "Selesai",
+      ahead: "Unggul"
     };
 
     return (
@@ -928,7 +928,18 @@ export default function KeyResultDetailPage() {
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-gray-600">Tipe:</span>
                     <Badge variant="outline" className="text-xs">
-                      {keyResult.keyResultType.replace('_', ' ')}
+                      {(() => {
+                        switch (keyResult.keyResultType) {
+                          case 'increase_to':
+                            return 'Peningkatan';
+                          case 'decrease_to':
+                            return 'Penurunan';
+                          case 'achieve_or_not':
+                            return 'Ya/Tidak';
+                          default:
+                            return keyResult.keyResultType.replace('_', ' ');
+                        }
+                      })()}
                     </Badge>
                   </div>
                   <div className="flex items-center gap-2">
@@ -1283,7 +1294,26 @@ export default function KeyResultDetailPage() {
                                 initiative.status === "on_hold" ? "destructive" :
                                 "outline"
                               }>
-                                {initiative.status?.replace('_', ' ')}
+                                {(() => {
+                                  switch (initiative.status) {
+                                    case 'draft':
+                                      return 'Draft';
+                                    case 'sedang_berjalan':
+                                      return 'Sedang Berjalan';
+                                    case 'selesai':
+                                      return 'Selesai';
+                                    case 'dibatalkan':
+                                      return 'Dibatalkan';
+                                    case 'completed':
+                                      return 'Selesai';
+                                    case 'in_progress':
+                                      return 'Sedang Berjalan';
+                                    case 'on_hold':
+                                      return 'Ditunda';
+                                    default:
+                                      return initiative.status || 'Belum Dimulai';
+                                  }
+                                })()}
                               </Badge>
                             </TableCell>
                             <TableCell>
