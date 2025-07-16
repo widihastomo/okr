@@ -698,19 +698,23 @@ export default function ClientUserManagement() {
                                 Kirim Ulang Undangan
                               </DropdownMenuItem>
                             )}
-                            <DropdownMenuItem 
-                              onClick={() => handleToggleUserStatus(user.id, user.isActive)}
-                            >
-                              <Power className="mr-2 h-4 w-4" />
-                              {user.isActive ? "Nonaktifkan" : "Aktifkan"}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => handleRemoveUser(user.id)}
-                              className="text-red-600"
-                            >
-                              <Users className="mr-2 h-4 w-4" />
-                              Hapus dari Organisasi
-                            </DropdownMenuItem>
+                            {user.role !== "owner" && user.role !== "organization_admin" && (
+                              <>
+                                <DropdownMenuItem 
+                                  onClick={() => handleToggleUserStatus(user.id, user.isActive)}
+                                >
+                                  <Power className="mr-2 h-4 w-4" />
+                                  {user.isActive ? "Nonaktifkan" : "Aktifkan"}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  onClick={() => handleRemoveUser(user.id)}
+                                  className="text-red-600"
+                                >
+                                  <Users className="mr-2 h-4 w-4" />
+                                  Hapus dari Organisasi
+                                </DropdownMenuItem>
+                              </>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
