@@ -1,4 +1,9 @@
-export function generateVerificationEmail(userName: string, businessName: string, verificationCode: string, verificationLink: string): string {
+export function generateVerificationEmail(
+  userName: string,
+  businessName: string,
+  verificationCode: string,
+  verificationLink: string,
+): string {
   return `
     <!DOCTYPE html>
     <html>
@@ -22,7 +27,7 @@ export function generateVerificationEmail(userName: string, businessName: string
         </div>
         <div class="content">
           <p>Halo <strong>${userName}</strong>!</p>
-          <p>Terima kasih telah mendaftar di Platform OKR untuk <strong>${businessName}</strong>.</p>
+          <p>Terima kasih telah mendaftarkan <strong>${businessName}</strong> di Refokus.</p>
           
           <p>Untuk mengaktifkan akun Anda, silakan gunakan kode verifikasi berikut:</p>
           
@@ -43,7 +48,7 @@ export function generateVerificationEmail(userName: string, businessName: string
         </div>
         <div class="footer">
           <p>Email ini dikirim secara otomatis oleh sistem. Jangan balas email ini.</p>
-          <p>© 2025 Platform OKR. Semua hak dilindungi.</p>
+          <p>© 2025 Refokus. Semua hak dilindungi.</p>
         </div>
       </div>
     </body>
@@ -51,7 +56,11 @@ export function generateVerificationEmail(userName: string, businessName: string
   `;
 }
 
-export function generateResendVerificationEmail(userName: string, verificationCode: string, verificationLink: string): string {
+export function generateResendVerificationEmail(
+  userName: string,
+  verificationCode: string,
+  verificationLink: string,
+): string {
   return `
     <!DOCTYPE html>
     <html>

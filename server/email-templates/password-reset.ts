@@ -1,4 +1,7 @@
-export function generatePasswordResetEmail(userName: string, resetCode: string): string {
+export function generatePasswordResetEmail(
+  userName: string,
+  resetCode: string,
+): string {
   return `
     <!DOCTYPE html>
     <html>
@@ -36,7 +39,7 @@ export function generatePasswordResetEmail(userName: string, resetCode: string):
         </div>
         <div class="footer">
           <p>Email ini dikirim secara otomatis oleh sistem. Jangan balas email ini.</p>
-          <p>© 2025 Platform OKR. Semua hak dilindungi.</p>
+          <p>© 2025 Refokus. Semua hak dilindungi.</p>
         </div>
       </div>
     </body>

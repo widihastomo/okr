@@ -1,4 +1,8 @@
-export function generateInvitationEmail(inviterName: string, organizationName: string, invitationLink: string): string {
+export function generateInvitationEmail(
+  inviterName: string,
+  organizationName: string,
+  invitationLink: string,
+): string {
   return `
     <!DOCTYPE html>
     <html>
@@ -21,12 +25,12 @@ export function generateInvitationEmail(inviterName: string, organizationName: s
         </div>
         <div class="content">
           <p>Halo!</p>
-          <p><strong>${inviterName}</strong> mengundang Anda untuk bergabung dengan tim <strong>${organizationName}</strong> dalam platform manajemen goal kami.</p>
+          <p><strong>${inviterName}</strong> mengundang Anda untuk bergabung dengan tim <strong>${organizationName}</strong> dalam platform manajemen strategi - Refokus.</p>
           
           <p>Dengan bergabung, Anda dapat:</p>
           <ul>
             <li>Berkolaborasi dalam menetapkan dan mencapai tujuan tim</li>
-            <li>Melacak progress key results secara real-time</li>
+            <li>Melacak capaian progress secara real-time</li>
             <li>Mengelola inisiatif dan tugas bersama</li>
             <li>Mendapatkan insights dan analytics mendalam</li>
           </ul>
@@ -42,7 +46,7 @@ export function generateInvitationEmail(inviterName: string, organizationName: s
         </div>
         <div class="footer">
           <p>Email ini dikirim secara otomatis oleh sistem. Jangan balas email ini.</p>
-          <p>Jika Anda memiliki pertanyaan, hubungi administrator tim Anda.</p>
+          <p>© 2025 Refokus. Semua hak dilindungi.</p>
         </div>
       </div>
     </body>
