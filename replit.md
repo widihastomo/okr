@@ -255,6 +255,14 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 16, 2025. **ADDED SUCCESS METRICS AUDIT TRAIL** - Implemented comprehensive audit trail for all success metrics operations:
+  * ADDED: Audit trail entries for success metrics creation with metric name and target details
+  * ADDED: Audit trail entries for success metrics updates with before/after values for achievement updates
+  * ADDED: Audit trail entries for success metrics edits with detailed field changes (name, target, achievement)
+  * ADDED: Audit trail entries for success metrics deletion with metric name
+  * ENHANCED: Initiative history now tracks all metrics operations (create, update, edit, delete)
+  * INTEGRATED: Audit trail entries appear in initiative history timeline with proper user attribution
+  * RESULT: Complete tracking of all success metrics changes in initiative history for accountability
 - July 16, 2025. **FIXED SUCCESS METRICS CREATION ERROR** - Resolved organizationId validation error when creating success metrics:
   * ADDED: useAuth hook to success-metrics-modal-simple.tsx for user authentication
   * FIXED: organizationId now included in success metrics creation payload  

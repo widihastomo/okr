@@ -3587,6 +3587,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const metric = await storage.createSuccessMetric(result.data);
+      
+      // Create audit trail entry for success metric creation
+      try {
+        await storage.createAuditTrail({
+          entityType: 'initiative',
+          entityId: initiativeId,
+          userId: currentUser.id,
+          organizationId: currentUser.organizationId,
+          action: 'metric_created',
+          changeDescription: `Metrik keberhasilan "${metric.name}" ditambahkan dengan target: ${metric.target}`
+        });
+      } catch (auditError) {
+        console.error("Error creating audit trail for success metric creation:", auditError);
+        // Don't fail the main operation if audit trail fails
+      }
+      
       res.status(201).json(metric);
     } catch (error) {
       console.error("Error creating success metric:", error);
@@ -3650,9 +3666,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
         
-        // Log metric update activity (audit trail disabled due to foreign key constraint)
+        // Log metric update activity for console and create audit trail
         if (changeDescription) {
           console.log("SUCCESS METRIC UPDATE:", changeDescription);
+          
+          // Add audit trail entry to initiative history
+          await storage.createAuditTrail({
+            entityType: 'initiative',
+            entityId: currentMetric.initiativeId,
+            userId: currentUser.id,
+            organizationId: currentUser.organizationId,
+            action: isAchievementUpdate ? 'metric_updated' : 'metric_edited',
+            changeDescription: changeDescription
+          });
         }
       } catch (logError) {
         console.error("Error logging metric update:", logError);
@@ -3669,10 +3695,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/success-metrics/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
+      const currentUser = req.user as User;
+      
+      // Get metric data before deletion for audit trail
+      const metricToDelete = await storage.getSuccessMetric(id);
+      if (!metricToDelete) {
+        return res.status(404).json({ message: "Success metric not found" });
+      }
+      
       const deleted = await storage.deleteSuccessMetric(id);
       
       if (!deleted) {
         return res.status(404).json({ message: "Success metric not found" });
+      }
+      
+      // Create audit trail entry for success metric deletion
+      try {
+        await storage.createAuditTrail({
+          entityType: 'initiative',
+          entityId: metricToDelete.initiativeId,
+          userId: currentUser.id,
+          organizationId: currentUser.organizationId,
+          action: 'metric_deleted',
+          changeDescription: `Metrik keberhasilan "${metricToDelete.name}" dihapus`
+        });
+      } catch (auditError) {
+        console.error("Error creating audit trail for success metric deletion:", auditError);
+        // Don't fail the main operation if audit trail fails
       }
       
       res.status(204).send();
