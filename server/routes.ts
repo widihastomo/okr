@@ -50,15 +50,9 @@ function getTaskStatusLabel(status: string): string {
 // System Owner middleware to protect admin endpoints
 const requireSystemOwner = (req: any, res: any, next: any) => {
   const user = req.user as User;
-  console.log('🔍 System owner check for user:', user?.id, user?.email);
-  console.log('🔍 isSystemOwner value:', user?.isSystemOwner);
-  console.log('🔍 User object keys:', Object.keys(user || {}));
-  
   if (!user?.isSystemOwner) {
-    console.log('❌ Access denied - not system owner');
     return res.status(403).json({ message: "Access denied. System owner access required." });
   }
-  console.log('✅ System owner access granted');
   next();
 };
 
@@ -7406,7 +7400,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Organization subscription assignment endpoints (System Owner only)
   
   // Get organization with subscription details
-  app.get("/api/admin/organizations/:id/subscription", requireSystemOwner, async (req, res) => {
+  app.get("/api/admin/organizations/:id/subscription", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { id } = req.params;
       const { db } = await import("./db");
@@ -7437,7 +7431,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Assign subscription plan to organization
-  app.post("/api/admin/organizations/:id/subscription", requireSystemOwner, async (req, res) => {
+  app.post("/api/admin/organizations/:id/subscription", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { id } = req.params;
       const { planId } = req.body;
@@ -7512,7 +7506,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Remove subscription from organization
-  app.delete("/api/admin/organizations/:id/subscription", requireSystemOwner, async (req, res) => {
+  app.delete("/api/admin/organizations/:id/subscription", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { id } = req.params;
       const { db } = await import("./db");
@@ -7963,7 +7957,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Note: using requireSystemOwner middleware defined at the top of the file
 
   // Get all organizations (system admin)
-  app.get("/api/admin/organizations", requireSystemOwner, async (req, res) => {
+  app.get("/api/admin/organizations", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
       const { eq, sql } = await import("drizzle-orm");
@@ -7992,7 +7986,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get all users (system admin)
   // System Admin Add-On Management Routes
-  app.get("/api/admin/addon-stats", requireSystemOwner, async (req, res) => {
+  app.get("/api/admin/addon-stats", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
       const { count, sum, eq } = await import("drizzle-orm");
@@ -8050,7 +8044,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/admin/add-ons", requireSystemOwner, async (req, res) => {
+  app.get("/api/admin/add-ons", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
       const { count, sum, eq } = await import("drizzle-orm");
@@ -8090,7 +8084,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin/add-ons", requireSystemOwner, async (req, res) => {
+  app.post("/api/admin/add-ons", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { name, slug, description, price, type } = req.body;
       
@@ -8121,7 +8115,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/admin/add-ons/:id", requireSystemOwner, async (req, res) => {
+  app.put("/api/admin/add-ons/:id", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { id } = req.params;
       const { name, slug, description, price, type } = req.body;
@@ -8161,7 +8155,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/admin/add-ons/:id/status", requireSystemOwner, async (req, res) => {
+  app.patch("/api/admin/add-ons/:id/status", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { id } = req.params;
       const { isActive } = req.body;
@@ -8193,7 +8187,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/admin/add-ons/:id", requireSystemOwner, async (req, res) => {
+  app.delete("/api/admin/add-ons/:id", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { id } = req.params;
       
@@ -8424,7 +8418,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/admin/users", requireSystemOwner, async (req, res) => {
+  app.get("/api/admin/users", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
       
@@ -8811,7 +8805,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get system stats (system admin)
-  app.get("/api/admin/stats", requireSystemOwner, async (req, res) => {
+  app.get("/api/admin/stats", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { db } = await import("./db");
       const { sql } = await import("drizzle-orm");
@@ -11252,7 +11246,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Application Settings Management Routes (System Owner only)
-  app.get("/api/admin/application-settings", requireSystemOwner, async (req, res) => {
+  app.get("/api/admin/application-settings", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const settings = await storage.getApplicationSettings();
       res.json(settings);
@@ -11262,7 +11256,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/admin/application-settings/:key", requireSystemOwner, async (req, res) => {
+  app.get("/api/admin/application-settings/:key", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { key } = req.params;
       const setting = await storage.getApplicationSetting(key);
@@ -11278,7 +11272,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin/application-settings", requireSystemOwner, async (req, res) => {
+  app.post("/api/admin/application-settings", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const result = insertApplicationSettingSchema.safeParse(req.body);
       if (!result.success) {
@@ -11300,7 +11294,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/admin/application-settings/:key", requireSystemOwner, async (req, res) => {
+  app.put("/api/admin/application-settings/:key", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { key } = req.params;
       const result = updateApplicationSettingSchema.safeParse(req.body);
@@ -11325,7 +11319,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/admin/application-settings/:key", requireSystemOwner, async (req, res) => {
+  app.delete("/api/admin/application-settings/:key", requireAuth, requireSystemOwner, async (req, res) => {
     try {
       const { key } = req.params;
       const deleted = await storage.deleteApplicationSetting(key);
