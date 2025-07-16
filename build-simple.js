@@ -89,7 +89,7 @@ process.on('SIGINT', () => {
   // Create ES module version (.js)
   writeFileSync('dist/index.js', serverScript, { mode: 0o755 });
   
-  // Create CommonJS version (.cjs)
+  // Create CommonJS version (.cjs) - primary for deployment
   const cjsScript = `#!/usr/bin/env node
 
 // Production server for deployment (CommonJS)
@@ -269,6 +269,9 @@ process.on('SIGINT', () => {
   if (!existsSync('dist/index.cjs')) {
     throw new Error('Failed to create dist/index.cjs');
   }
+  
+  // Verify .cjs file has executable permissions
+  execSync('chmod +x dist/index.cjs', { stdio: 'pipe' });
   
   if (!existsSync('dist/public/index.html')) {
     throw new Error('Failed to create dist/public/index.html');

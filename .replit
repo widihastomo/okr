@@ -7,7 +7,7 @@ channel = "stable-24_05"
 
 [deployment]
 deploymentTarget = "cloudrun"
-build = ["sh", "-c", "node build-simple.js"]
+build = ["node", "build-simple.js"]
 run = ["sh", "-c", "NODE_ENV=production node dist/index.cjs"]
 
 [[ports]]
