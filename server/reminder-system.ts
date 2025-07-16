@@ -221,71 +221,18 @@ export class ReminderSystem {
    * Process all active reminders
    */
   async processReminders(): Promise<void> {
-    try {
-      console.log('🔄 Processing reminder checks...');
-
-      // Get all users with reminder configs (fix: should NOT be null)
-      const usersWithReminders = await db.select()
-        .from(users)
-        .where(isNotNull(users.reminderConfig));
-
-      const activeUsers = usersWithReminders.filter(user => 
-        user.reminderConfig && user.reminderConfig !== null
-      );
-
-      console.log(`📋 Found ${activeUsers.length} users with reminder configs`);
-
-      for (const user of activeUsers) {
-        try {
-          let config: ReminderConfig;
-          
-          // Debug logging
-          console.log(`Processing user ${user.id}, reminderConfig type: ${typeof user.reminderConfig}, value:`, user.reminderConfig);
-          
-          // Handle both object and JSON string formats for backward compatibility
-          if (typeof user.reminderConfig === 'string') {
-            try {
-              config = JSON.parse(user.reminderConfig) as ReminderConfig;
-            } catch (parseError) {
-              console.error(`❌ Error parsing JSON for user ${user.id}:`, parseError);
-              continue; // Skip this user if JSON parsing fails
-            }
-          } else if (typeof user.reminderConfig === 'object' && user.reminderConfig !== null) {
-            config = user.reminderConfig as ReminderConfig;
-          } else {
-            console.warn(`⚠️ Invalid reminder config format for user ${user.id}`);
-            continue; // Skip this user if config format is invalid
-          }
-          
-          if (this.shouldSendReminder(config)) {
-            await this.sendReminderNotification(user.id, config);
-          }
-        } catch (error) {
-          console.error(`❌ Error processing reminder for user ${user.id}:`, error);
-        }
-      }
-
-      console.log('✅ Reminder processing completed');
-    } catch (error) {
-      console.error('❌ Error in reminder processing:', error);
-    }
+    // Reminder processing is disabled to prevent looping
+    console.log('🔇 Reminder processing is disabled');
+    return;
   }
 
   /**
    * Start reminder scheduler (runs every minute)
    */
   startReminderScheduler(): void {
-    console.log('🚀 Starting reminder scheduler...');
-    
-    // Run immediately
-    this.processReminders();
-
-    // Then run every minute
-    setInterval(() => {
-      this.processReminders();
-    }, 60 * 1000); // 1 minute
-
-    console.log('⏰ Reminder scheduler started - checking every minute');
+    // Reminder scheduler is disabled to prevent looping
+    console.log('🔇 Reminder scheduler is disabled');
+    return;
   }
 
   /**
