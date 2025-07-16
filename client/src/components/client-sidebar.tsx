@@ -176,7 +176,7 @@ export default function Sidebar({
 
     {
       label: "Siklus",
-      icon: RotateCcw,
+      icon: Calendar,
       path: "/cycles",
       active: location === "/cycles",
     },
