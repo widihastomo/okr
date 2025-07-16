@@ -9716,15 +9716,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "User not associated with an organization" });
       }
 
-      // Only organization owners can access this endpoint
+      // Allow organization owners, administrators, and members to view user list
       const organization = await db.select().from(organizations).where(eq(organizations.id, user.organizationId)).limit(1);
       if (organization.length === 0) {
         return res.status(404).json({ error: "Organization not found" });
       }
 
-      const isOwner = organization[0].ownerId === user.id || user.role === "admin" || user.isSystemOwner;
-      if (!isOwner) {
-        return res.status(403).json({ error: "Access denied. Only organization owners can manage users." });
+      const canViewUsers = organization[0].ownerId === user.id || user.role === "admin" || user.role === "member" || user.isSystemOwner;
+      if (!canViewUsers) {
+        return res.status(403).json({ error: "Access denied. Only organization members can view users." });
       }
 
       // Get all users in the organization using storage method
