@@ -55,6 +55,7 @@ interface TaskModalProps {
   onClose: () => void;
   task?: any;
   initiativeId?: string;
+  objectiveId?: string;
   isAdding?: boolean;
 }
 
@@ -78,6 +79,7 @@ export default function TaskModal({
   onClose,
   task,
   initiativeId,
+  objectiveId,
   isAdding,
 }: TaskModalProps) {
   const { toast } = useToast();
@@ -159,9 +161,9 @@ export default function TaskModal({
     queryKey: ["/api/users"],
   });
 
-  // Fetch all initiatives for assignment
+  // Fetch initiatives for assignment - filter by objective if objectiveId is provided
   const { data: initiatives = [] } = useQuery({
-    queryKey: ["/api/initiatives"],
+    queryKey: objectiveId ? [`/api/initiatives/objective/${objectiveId}`] : ["/api/initiatives"],
   });
 
   // Fetch initiative details to get PIC and members

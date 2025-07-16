@@ -2984,6 +2984,7 @@ export default function GoalDetail() {
         onClose={() => setShowTaskModal(false)}
         task={undefined}
         initiativeId={undefined}
+        objectiveId={id}
         isAdding={true}
       />
 
