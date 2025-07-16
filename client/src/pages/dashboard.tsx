@@ -35,6 +35,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { SearchableUserSelect } from "@/components/ui/searchable-user-select";
+import { MultiSelectCycle } from "@/components/ui/multi-select-cycle";
 import {
   Plus,
   Target,
@@ -93,7 +94,7 @@ export default function Dashboard() {
 
   const [location, setLocation] = useLocation();
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [cycleFilter, setCycleFilter] = useState<string>("all");
+  const [cycleFilter, setCycleFilter] = useState<string[]>([]);
   const [userFilter, setUserFilter] = useState<string>("all");
   const [hasAutoSelected, setHasAutoSelected] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("list");
@@ -159,7 +160,7 @@ export default function Dashboard() {
 
     const cycleParam = urlParams.get("cycle");
     if (cycleParam) {
-      setCycleFilter(cycleParam);
+      setCycleFilter(cycleParam.split(',').filter(Boolean));
       setHasAutoSelected(true); // Prevent auto-selection when loading from URL
     }
 
@@ -207,10 +208,10 @@ export default function Dashboard() {
   };
 
   // Update URL when cycle filter changes
-  const handleCycleFilterChange = (newCycle: string) => {
-    setCycleFilter(newCycle);
+  const handleCycleFilterChange = (selectedCycles: string[]) => {
+    setCycleFilter(selectedCycles);
     setHasAutoSelected(true);
-    updateURL({ cycle: newCycle });
+    updateURL({ cycle: selectedCycles.join(',') });
   };
 
   // Update URL when user filter changes
@@ -237,20 +238,20 @@ export default function Dashboard() {
   const closestCycleId = findClosestCycle(cycles);
   const defaultCycle = cycles.find(cycle => cycle.id === closestCycleId) || null;
 
-  // Initialize cycle filter with longest active cycle on first load only if no URL param exists
+  // Initialize cycle filter with closest cycle on first load only if no URL param exists
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const cycleParam = urlParams.get("cycle");
 
-    // Only auto-select if no URL parameter exists and filter is 'all'
+    // Only auto-select if no URL parameter exists and filter is empty
     if (
       defaultCycle &&
-      cycleFilter === "all" &&
+      cycleFilter.length === 0 &&
       cycles.length > 0 &&
       !hasAutoSelected &&
       !cycleParam
     ) {
-      setCycleFilter(defaultCycle.id);
+      setCycleFilter([defaultCycle.id]);
       setHasAutoSelected(true);
     }
   }, [defaultCycle?.id, hasAutoSelected]); // Only auto-select once
@@ -280,35 +281,39 @@ export default function Dashboard() {
     queryKey: ["/api/okrs"],
   });
 
-  // Helper function to check if a cycle is related to selected cycle
+  // Helper function to check if a cycle is related to selected cycles
   const isRelatedCycle = (
     goalCycleId: string | null,
-    selectedCycleId: string,
+    selectedCycleIds: string[],
   ) => {
-    // Always return true for "all cycles" filter
-    if (selectedCycleId === "all") return true;
+    // Always return true for empty filter (show all)
+    if (selectedCycleIds.length === 0) return true;
 
     // Handle null cycleId (Goals without cycles)
-    if (!goalCycleId) return selectedCycleId === "all";
+    if (!goalCycleId) return false;
 
-    // Direct match
-    if (goalCycleId === selectedCycleId) return true;
+    // Check if goal cycle is in the selected cycles
+    if (selectedCycleIds.includes(goalCycleId)) return true;
 
-    // Find the selected cycle and Goal cycle
-    const selectedCycle = cycles.find((c) => c.id === selectedCycleId);
-    const goalCycle = cycles.find((c) => c.id === goalCycleId);
+    // Check for hierarchical relationships
+    for (const selectedCycleId of selectedCycleIds) {
+      const selectedCycle = cycles.find((c) => c.id === selectedCycleId);
+      const goalCycle = cycles.find((c) => c.id === goalCycleId);
 
-    if (!selectedCycle || !goalCycle) return false;
+      if (!selectedCycle || !goalCycle) continue;
 
-    // If selected cycle is quarterly, include monthly cycles within that quarter
-    if (selectedCycle.type === "quarterly" && goalCycle.type === "monthly") {
-      const selectedStart = new Date(selectedCycle.startDate);
-      const selectedEnd = new Date(selectedCycle.endDate);
-      const goalStart = new Date(goalCycle.startDate);
-      const goalEnd = new Date(goalCycle.endDate);
+      // If selected cycle is quarterly, include monthly cycles within that quarter
+      if (selectedCycle.type === "quarterly" && goalCycle.type === "monthly") {
+        const selectedStart = new Date(selectedCycle.startDate);
+        const selectedEnd = new Date(selectedCycle.endDate);
+        const goalStart = new Date(goalCycle.startDate);
+        const goalEnd = new Date(goalCycle.endDate);
 
-      // Check if monthly cycle falls within quarterly cycle period
-      return goalStart >= selectedStart && goalEnd <= selectedEnd;
+        // Check if monthly cycle falls within quarterly cycle period
+        if (goalStart >= selectedStart && goalEnd <= selectedEnd) {
+          return true;
+        }
+      }
     }
 
     return false;
@@ -629,19 +634,13 @@ export default function Dashboard() {
               </SelectContent>
             </Select>
 
-            <Select value={cycleFilter} onValueChange={handleCycleFilterChange}>
-              <SelectTrigger className="w-full sm:w-[150px] md:w-[180px] text-xs sm:text-sm h-8 sm:h-10">
-                <SelectValue placeholder="Pilih Cycle" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Cycle</SelectItem>
-                {cycles.map((cycle) => (
-                  <SelectItem key={cycle.id} value={cycle.id}>
-                    {cycle.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <MultiSelectCycle
+              cycles={cycles}
+              selectedCycles={cycleFilter}
+              onSelectionChange={handleCycleFilterChange}
+              placeholder="Pilih Cycle"
+              className="w-full sm:w-[150px] md:w-[180px] text-xs sm:text-sm h-8 sm:h-10"
+            />
 
             <SearchableUserSelect
               users={users?.filter(user => user.isActive === true) || []}
