@@ -553,6 +553,7 @@ export default function ClientUserManagement() {
                         <Button
                           onClick={handleInviteUser}
                           disabled={inviteUserMutation.isPending}
+                          className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white"
                         >
                           {inviteUserMutation.isPending ? (
                             <>
