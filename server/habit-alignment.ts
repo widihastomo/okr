@@ -1,7 +1,8 @@
-import OpenAI from "openai";
+// OpenAI imports disabled due to quota limitations
+// import OpenAI from "openai";
 import type { OKRWithKeyResults } from "@shared/schema";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export interface HabitPreferences {
   timeAvailable: string; // minutes per day
@@ -32,104 +33,12 @@ export interface HabitAlignmentRequest {
 
 /**
  * Generate AI-powered habit suggestions based on user objectives and preferences
+ * NOTE: OpenAI functionality disabled due to quota limitations - using fallback only
  */
 export async function generateHabitSuggestions(request: HabitAlignmentRequest): Promise<{ suggestions: HabitSuggestion[] }> {
-  try {
-    const { objectives, preferences } = request;
-    
-    // Build context for AI
-    const objectiveContext = objectives.map(obj => ({
-      title: obj.title,
-      description: obj.description,
-      keyResults: obj.keyResults?.map(kr => ({
-        title: kr.title,
-        type: kr.keyResultType,
-        currentValue: kr.currentValue,
-        targetValue: kr.targetValue,
-        unit: kr.unit
-      })) || [],
-      progress: obj.overallProgress || 0
-    }));
-
-    const prompt = `
-Analyze these business objectives and generate personalized daily/weekly habits that will directly accelerate progress toward these goals.
-
-OBJECTIVES:
-${JSON.stringify(objectiveContext, null, 2)}
-
-USER PREFERENCES:
-- Available time per day: ${preferences.timeAvailable} minutes
-- Difficulty preference: ${preferences.difficulty}
-- Focus areas: ${preferences.focusAreas.join(', ') || 'None specified'}
-
-REQUIREMENTS:
-1. Generate 3-5 highly specific, actionable habits
-2. Each habit should directly connect to at least one objective
-3. Focus on high-impact activities that compound over time
-4. Make habits concrete and measurable
-5. Consider the user's time constraints and difficulty preference
-6. Provide 2-3 specific examples for each habit
-
-Respond with a JSON object containing an array of habits with this exact structure:
-{
-  "suggestions": [
-    {
-      "id": "unique-id",
-      "title": "Habit Name",
-      "description": "Clear description of what the habit involves and why it helps",
-      "category": "daily|weekly|monthly",
-      "difficulty": "easy|medium|hard",
-      "impactScore": 75,
-      "alignedObjectives": ["objective-id-1"],
-      "timeCommitment": "20 menit",
-      "frequency": "Setiap hari",
-      "examples": ["Specific action 1", "Specific action 2", "Specific action 3"]
-    }
-  ]
-}
-
-Use Indonesian language for all user-facing text. Focus on business/professional habits that directly support the objectives.
-`;
-
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-      messages: [
-        {
-          role: "system",
-          content: "You are an expert in habit formation and business productivity. You specialize in creating personalized habit recommendations that align with specific business objectives and accelerate goal achievement."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.7,
-      max_tokens: 2000
-    });
-
-    const result = JSON.parse(response.choices[0].message.content || '{"suggestions": []}');
-    
-    // Validate and enhance the suggestions
-    const validatedSuggestions = result.suggestions.map((suggestion: any, index: number) => ({
-      id: suggestion.id || `ai-habit-${index}`,
-      title: suggestion.title || "Untitled Habit",
-      description: suggestion.description || "",
-      category: ['daily', 'weekly', 'monthly'].includes(suggestion.category) ? suggestion.category : 'daily',
-      difficulty: ['easy', 'medium', 'hard'].includes(suggestion.difficulty) ? suggestion.difficulty : preferences.difficulty,
-      impactScore: Math.max(0, Math.min(100, suggestion.impactScore || 75)),
-      alignedObjectives: Array.isArray(suggestion.alignedObjectives) ? suggestion.alignedObjectives : [],
-      timeCommitment: suggestion.timeCommitment || `${preferences.timeAvailable} menit`,
-      frequency: suggestion.frequency || "Setiap hari",
-      examples: Array.isArray(suggestion.examples) ? suggestion.examples.slice(0, 5) : []
-    }));
-
-    return { suggestions: validatedSuggestions };
-
-  } catch (error) {
-    console.error('Error generating AI habit suggestions:', error);
-    throw new Error('Failed to generate habit suggestions');
-  }
+  // OpenAI functionality disabled - directly use fallback suggestions
+  console.log('OpenAI functionality disabled - using fallback habit suggestions');
+  return generateFallbackHabitSuggestions(request);
 }
 
 /**
