@@ -556,7 +556,6 @@ export default function KeyResultDetailPage() {
     if (!userId || !users) return 'Unknown User';
     const user = users.find((u: any) => u.id === userId);
     if (!user) {
-      console.log('User not found for ID:', userId, 'Available users:', users.map(u => ({ id: u.id, name: u.name, email: u.email })));
       return 'Unknown User';
     }
     
@@ -1148,9 +1147,7 @@ export default function KeyResultDetailPage() {
                   <div className="space-y-3 max-h-80 overflow-y-auto">
                     {keyResult.checkIns
                       .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
-                      .map((checkIn) => {
-                        console.log('Check-in data:', checkIn);
-                        return (
+                      .map((checkIn) => (
                       <div key={checkIn.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
                         <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                         <div className="flex-1 min-w-0">
@@ -1214,8 +1211,7 @@ export default function KeyResultDetailPage() {
                           </div>
                         </div>
                       </div>
-                    );
-                  })}
+                    ))}
                   </div>
                 ) : (
                   <div className="text-center py-8 text-gray-500">
