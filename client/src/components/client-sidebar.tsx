@@ -271,7 +271,7 @@ export default function Sidebar({
                         }
                       }}
                     >
-                      <item.icon className="flex-shrink-0 w-5 h-5" />
+                      <item.icon className="flex-shrink-0 w-5 h-5" fill="currentColor" />
                       {/* Desktop: show label only when not collapsed, Mobile: always show label */}
                       <span
                         className={cn(
@@ -330,7 +330,7 @@ export default function Sidebar({
                           }
                         }}
                       >
-                        <User className="w-5 h-5" />
+                        <User className="w-5 h-5" fill="currentColor" />
                       </button>
                     </Link>
                   </TooltipTrigger>
@@ -358,7 +358,7 @@ export default function Sidebar({
                     }
                   }}
                 >
-                  <User className="w-5 h-5" />
+                  <User className="w-5 h-5" fill="currentColor" />
                   <span>Profile</span>
                 </button>
               </Link>
