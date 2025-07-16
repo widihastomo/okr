@@ -190,8 +190,8 @@ export default function GlobalHeader({
     };
   }, []);
 
-  // Calculate header position based on trial status
-  const hasTrialStatus = trialStatus?.isTrialActive;
+  // Calculate header position based on trial status (excluding system owners)
+  const hasTrialStatus = trialStatus?.isTrialActive && !(user as any)?.isSystemOwner;
   const headerTop = hasTrialStatus ? '44px' : '0px';
 
   return (
