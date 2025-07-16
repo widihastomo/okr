@@ -944,6 +944,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createKeyResult(keyResultData: InsertKeyResult): Promise<KeyResult> {
+    console.log("Storage - createKeyResult data:", JSON.stringify(keyResultData, null, 2));
     const [keyResult] = await db.insert(keyResults).values(keyResultData).returning();
     return keyResult;
   }

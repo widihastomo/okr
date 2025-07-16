@@ -2300,6 +2300,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           createdBy: currentUser.id, // Add created_by field
           organizationId: currentUser.organizationId // Add organization_id field
         };
+        console.log("Creating key result with data:", JSON.stringify(processedKrData, null, 2));
         const keyResult = await storage.createKeyResult(processedKrData);
         keyResults.push(keyResult);
 
