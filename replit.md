@@ -255,6 +255,12 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 16, 2025. **FIXED INVITATION EMAIL UNDEFINED NAME** - Successfully resolved "undefined" user names in invitation emails:
+  * FIXED: Changed invitation email to use user.name instead of user.firstName/lastName fields
+  * FIXED: Updated verification email template to use consolidated name field
+  * FIXED: Updated password reset email template to use consolidated name field  
+  * ENHANCED: All email templates now use user.name || user.email.split('@')[0] for consistent fallback
+  * RESULT: Invitation emails now properly display user names instead of "undefined"
 - July 16, 2025. **ADDED SUCCESS METRICS AUDIT TRAIL** - Implemented comprehensive audit trail for all success metrics operations:
   * ADDED: Audit trail entries for success metrics creation with metric name and target details
   * ADDED: Audit trail entries for success metrics updates with before/after values for achievement updates

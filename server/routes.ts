@@ -619,7 +619,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 <h1>Kode Verifikasi Baru</h1>
               </div>
               <div class="content">
-                <p>Halo <strong>${user.firstName}</strong>!</p>
+                <p>Halo <strong>${user.name || user.email.split('@')[0]}</strong>!</p>
                 <p>Anda telah meminta kode verifikasi baru untuk akun Anda.</p>
                 
                 <p>Kode verifikasi baru Anda adalah:</p>
@@ -735,7 +735,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 <h1>Reset Password</h1>
               </div>
               <div class="content">
-                <p>Halo <strong>${user.firstName}</strong>!</p>
+                <p>Halo <strong>${user.name || user.email.split('@')[0]}</strong>!</p>
                 <p>Anda telah meminta reset password untuk akun Anda.</p>
                 
                 <p>Kode reset password Anda adalah:</p>
@@ -9947,7 +9947,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Send invitation email
         try {
           const organization = await storage.getOrganization(user.organizationId);
-          const inviterName = `${user.firstName} ${user.lastName}`.trim() || user.email;
+          const inviterName = user.name || user.email.split('@')[0];
           const organizationName = organization?.name || "Organization";
           
           // Construct the invitation link
