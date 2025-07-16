@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { Calendar, TrendingUp } from "lucide-react";
 
 // Utility functions for number formatting
@@ -81,6 +82,7 @@ export function CheckInModal({
   const [showNumberWarning, setShowNumberWarning] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   // Sync local value state with updated currentValue prop
   useEffect(() => {
@@ -89,7 +91,10 @@ export function CheckInModal({
 
   const checkInMutation = useMutation({
     mutationFn: async (data: { value: string; notes: string }) => {
-      return await apiRequest("POST", `/api/key-results/${keyResultId}/check-ins`, data);
+      return await apiRequest("POST", `/api/key-results/${keyResultId}/check-ins`, {
+        ...data,
+        organizationId: user?.organizationId
+      });
     },
     onSuccess: (response: any) => {
       toast({

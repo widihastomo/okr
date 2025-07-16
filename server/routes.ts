@@ -2706,7 +2706,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Check-ins for progress tracking
-  app.post("/api/key-results/:id/check-ins", async (req, res) => {
+  app.post("/api/key-results/:id/check-ins", requireAuth, async (req, res) => {
     try {
       const keyResultId = req.params.id;
       
@@ -2718,12 +2718,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Value is required" });
       }
 
+      if (!req.body.organizationId) {
+        return res.status(400).json({ message: "Organization ID is required" });
+      }
+
       const checkInData = {
         keyResultId,
         value: req.body.value,
         notes: req.body.notes || null,
         confidence: req.body.confidence || 5,
-        createdBy: req.body.createdBy || '550e8400-e29b-41d4-a716-446655440001'
+        createdBy: req.session.user?.id || '550e8400-e29b-41d4-a716-446655440001',
+        organizationId: req.body.organizationId
       };
       
       const checkIn = await storage.createCheckIn(checkInData);
