@@ -131,18 +131,36 @@ process.on('SIGINT', () => {
 
   writeFileSync('dist/public/index.html', html);
 
-  // Verify files created with detailed logging
-  const requiredFiles = ['dist/index.cjs', 'dist/public/index.html'];
+  // Enhanced verification with file size checking
+  const requiredFiles = [
+    { path: 'dist/index.cjs', minSize: 1000 },
+    { path: 'dist/public/index.html', minSize: 500 }
+  ];
+  
   console.log('🔍 Verifying build output...');
   
   for (const file of requiredFiles) {
-    if (!existsSync(file)) {
-      throw new Error(`Missing file: ${file}`);
+    if (!existsSync(file.path)) {
+      throw new Error(`Missing file: ${file.path}`);
     }
-    console.log(`✅ ${file} created successfully`);
+    
+    const stats = require('fs').statSync(file.path);
+    if (stats.size < file.minSize) {
+      throw new Error(`File too small: ${file.path} (${stats.size} bytes, minimum ${file.minSize})`);
+    }
+    
+    console.log(`✅ ${file.path} created successfully (${stats.size} bytes)`);
   }
 
-  // List all created files
+  // Verify executable permissions
+  try {
+    execSync('chmod +x dist/index.cjs', { stdio: 'pipe' });
+    console.log('✅ Executable permissions set on dist/index.cjs');
+  } catch (error) {
+    console.warn('⚠️  Warning: Could not set executable permissions');
+  }
+
+  // List all created files with sizes
   const distContents = readdirSync('dist');
   const publicContents = readdirSync('dist/public');
   
@@ -150,10 +168,29 @@ process.on('SIGINT', () => {
   console.log(`   dist/ contains: ${distContents.join(', ')}`);
   console.log(`   dist/public/ contains: ${publicContents.join(', ')}`);
   
+  // Test that the main file can be read
+  try {
+    const mainContent = readFileSync('dist/index.cjs', 'utf8');
+    if (mainContent.includes('spawn') && mainContent.includes('tsx')) {
+      console.log('✅ Main launcher file contains expected content');
+    } else {
+      throw new Error('Main launcher file missing expected content');
+    }
+  } catch (error) {
+    throw new Error(`Failed to verify main launcher: ${error.message}`);
+  }
+  
   console.log('✅ Standalone build completed');
   console.log('✅ Server launcher: dist/index.cjs');
   console.log('✅ Frontend: dist/public/index.html');
   console.log('📦 Ready for deployment');
+  
+  // Final verification summary
+  console.log('\n🎯 Deployment Summary:');
+  console.log('  Build Command: node build-standalone.js');
+  console.log('  Output File: dist/index.cjs');
+  console.log('  Run Command: node dist/index.cjs');
+  console.log('  Status: ✅ READY');
 
 } catch (error) {
   console.error('❌ Build failed:', error.message);

@@ -1,5 +1,5 @@
 // Simple production build - ensures deployment compatibility
-import { existsSync, mkdirSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, writeFileSync, readFileSync, readdirSync, statSync } from 'fs';
 import { execSync } from 'child_process';
 
 console.log('🚀 Starting deployment build...');
@@ -294,31 +294,74 @@ process.stdin.resume();`;
 
   writeFileSync('dist/deploy-info.json', JSON.stringify(deployInfo, null, 2));
 
-  // Verify files were created
-  if (!existsSync('dist/index.js')) {
-    throw new Error('Failed to create dist/index.js');
+  // Enhanced verification with file size checking and detailed error reporting
+  const requiredFiles = [
+    { path: 'dist/index.js', minSize: 1000, description: 'ES Module server bundle' },
+    { path: 'dist/index.cjs', minSize: 1000, description: 'CommonJS server bundle (deployment target)' },
+    { path: 'dist/public/index.html', minSize: 500, description: 'Production frontend' }
+  ];
+  
+  console.log('🔍 Verifying build output...');
+  
+  for (const file of requiredFiles) {
+    if (!existsSync(file.path)) {
+      console.error(`❌ Missing file: ${file.path}`);
+      console.error(`📋 This file is required for: ${file.description}`);
+      throw new Error(`Build verification failed: Missing ${file.path}`);
+    }
+    
+    const stats = statSync(file.path);
+    if (stats.size < file.minSize) {
+      console.error(`❌ File too small: ${file.path} (${stats.size} bytes, minimum ${file.minSize})`);
+      throw new Error(`Build verification failed: ${file.path} is too small`);
+    }
+    
+    console.log(`✅ ${file.path} created successfully (${stats.size} bytes)`);
   }
 
-  if (!existsSync('dist/index.cjs')) {
-    throw new Error('Failed to create dist/index.cjs');
+  // Verify and set executable permissions with error handling
+  try {
+    execSync('chmod +x dist/index.cjs', { stdio: 'pipe' });
+    console.log('✅ Executable permissions set on dist/index.cjs');
+  } catch (error) {
+    console.warn('⚠️  Warning: Could not set executable permissions on dist/index.cjs');
+    console.warn('   This may cause deployment issues on some platforms');
   }
 
-  // Verify .cjs file has executable permissions
-  execSync('chmod +x dist/index.cjs', { stdio: 'pipe' });
-
-  if (!existsSync('dist/public/index.html')) {
-    throw new Error('Failed to create dist/public/index.html');
+  // Test that the main deployment file can be read and contains expected content
+  try {
+    const mainContent = readFileSync('dist/index.cjs', 'utf8');
+    if (mainContent.includes('spawn') && mainContent.includes('tsx') && mainContent.includes('server')) {
+      console.log('✅ Main deployment file contains expected server startup code');
+    } else {
+      throw new Error('Main deployment file missing expected server startup code');
+    }
+  } catch (error) {
+    throw new Error(`Failed to verify main deployment file: ${error.message}`);
   }
+
+  // List directory contents for debugging
+  const distContents = readdirSync('dist');
+  const publicContents = readdirSync('dist/public');
+  
+  console.log('📁 Build verification:');
+  console.log(`   dist/ contains: ${distContents.join(', ')}`);
+  console.log(`   dist/public/ contains: ${publicContents.join(', ')}`);
 
   console.log('✅ Build completed successfully');
   console.log('');
   console.log('📋 Build Summary:');
-  console.log('  ✅ dist/index.js: Server bundle (primary)');
-  console.log('  ✅ dist/index.cjs: Server bundle (compatibility)');
-  console.log('  ✅ dist/public/index.html: Frontend');
-  console.log('  ✅ dist/deploy-info.json: Deployment info');
+  console.log('  ✅ dist/index.js: ES Module server bundle');
+  console.log('  ✅ dist/index.cjs: CommonJS server bundle (DEPLOYMENT TARGET)');
+  console.log('  ✅ dist/public/index.html: Production frontend');
+  console.log('  ✅ dist/deploy-info.json: Deployment metadata');
   console.log('');
   console.log('🚀 Ready for deployment!');
+  console.log('');
+  console.log('🎯 Deployment Commands:');
+  console.log('  Build: node build-simple.js');
+  console.log('  Start: node dist/index.cjs');
+  console.log('  Expected Output: dist/index.cjs (✅ VERIFIED)');
 
 } catch (error) {
   console.error('❌ Build failed:', error.message);
