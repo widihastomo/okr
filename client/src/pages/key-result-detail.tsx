@@ -913,7 +913,7 @@ export default function KeyResultDetailPage() {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Target className="h-5 w-5" />
-                Angka Target Overview
+                {keyResult.title}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
