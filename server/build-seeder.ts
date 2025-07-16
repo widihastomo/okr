@@ -268,18 +268,18 @@ async function createSubscriptionPlans() {
     }
   }
 
-  // Create billing periods using actual plan IDs
+  // Create billing periods using actual plan IDs with correct schema fields
   const periods = [
-    { planId: planIds['free-trial'], period: 'trial', duration: 7, price: 0 },
-    { planId: planIds['starter'], period: 'monthly', duration: 1, price: 199000 },
-    { planId: planIds['starter'], period: 'quarterly', duration: 3, price: 549000 },
-    { planId: planIds['starter'], period: 'annual', duration: 12, price: 1990000 },
-    { planId: planIds['growth'], period: 'monthly', duration: 1, price: 499000 },
-    { planId: planIds['growth'], period: 'quarterly', duration: 3, price: 1347000 },
-    { planId: planIds['growth'], period: 'annual', duration: 12, price: 4990000 },
-    { planId: planIds['enterprise'], period: 'monthly', duration: 1, price: 999000 },
-    { planId: planIds['enterprise'], period: 'quarterly', duration: 3, price: 2697000 },
-    { planId: planIds['enterprise'], period: 'annual', duration: 12, price: 9990000 }
+    { planId: planIds['free-trial'], periodType: 'trial', periodMonths: 1, price: 0 },
+    { planId: planIds['starter'], periodType: 'monthly', periodMonths: 1, price: 199000 },
+    { planId: planIds['starter'], periodType: 'quarterly', periodMonths: 3, price: 549000 },
+    { planId: planIds['starter'], periodType: 'annual', periodMonths: 12, price: 1990000 },
+    { planId: planIds['growth'], periodType: 'monthly', periodMonths: 1, price: 499000 },
+    { planId: planIds['growth'], periodType: 'quarterly', periodMonths: 3, price: 1347000 },
+    { planId: planIds['growth'], periodType: 'annual', periodMonths: 12, price: 4990000 },
+    { planId: planIds['enterprise'], periodType: 'monthly', periodMonths: 1, price: 999000 },
+    { planId: planIds['enterprise'], periodType: 'quarterly', periodMonths: 3, price: 2697000 },
+    { planId: planIds['enterprise'], periodType: 'annual', periodMonths: 12, price: 9990000 }
   ];
 
   for (const period of periods) {
