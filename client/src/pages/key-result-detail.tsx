@@ -958,6 +958,23 @@ export default function KeyResultDetailPage() {
                       {keyResult.unit}
                     </Badge>
                   </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-gray-600">PIC:</span>
+                    {keyResult.assignedTo ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                          {getUserName(keyResult.assignedTo).charAt(0).toUpperCase()}
+                        </div>
+                        <span className="text-xs text-gray-700 font-medium">
+                          {getUserName(keyResult.assignedTo)}
+                        </span>
+                      </div>
+                    ) : (
+                      <Badge variant="outline" className="text-xs text-gray-500">
+                        Belum ditugaskan
+                      </Badge>
+                    )}
+                  </div>
                   {keyResult.lastUpdated && (
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-gray-600">Terakhir Diperbarui:</span>
