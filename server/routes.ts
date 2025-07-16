@@ -2218,11 +2218,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         keyResults: z.array(z.object({
           title: z.string().min(1, "Title is required"),
           currentValue: z.string().default("0"),
-          targetValue: z.string().min(1, "Target value is required"),
+          targetValue: z.string().optional(),
           baseValue: z.string().nullable().optional(),
           unit: z.string().default("number"),
           keyResultType: z.enum(["increase_to", "decrease_to", "achieve_or_not", "should_stay_above", "should_stay_below"]).default("increase_to"),
           assignedTo: z.string().nullable().optional(),
+        }).refine((data) => {
+          // For achieve_or_not type, targetValue is not required
+          if (data.keyResultType === "achieve_or_not") {
+            return true;
+          }
+          // For all other types, targetValue is required
+          return data.targetValue && data.targetValue.length > 0;
+        }, {
+          message: "Target value is required for this key result type",
+          path: ["targetValue"]
         })).optional().default([])
       });
       
@@ -2282,9 +2292,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ...krData,
           objectiveId: objective.id,
           baseValue: krData.baseValue === "" ? null : krData.baseValue,
-          // Schema requires targetValue and currentValue to be non-null, use "0" as default
-          targetValue: krData.targetValue === "" ? "0" : krData.targetValue,
-          currentValue: krData.currentValue === "" ? "0" : krData.currentValue,
+          // For achieve_or_not type, targetValue can be empty, otherwise use "0" as default
+          targetValue: krData.keyResultType === "achieve_or_not" ? (krData.targetValue || "") : (krData.targetValue === "" ? "0" : krData.targetValue),
+          currentValue: krData.keyResultType === "achieve_or_not" ? (krData.currentValue || "") : (krData.currentValue === "" ? "0" : krData.currentValue),
           // Handle empty assignedTo field - convert empty string to null
           assignedTo: krData.assignedTo === "" ? null : krData.assignedTo,
           createdBy: currentUser.id // Add created_by field
@@ -2381,7 +2391,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (updated) keyResults.push(updated);
         } else {
           // Create new key result - ensure required fields are present
-          if (krData.title && krData.targetValue) {
+          if (krData.title && (krData.keyResultType === "achieve_or_not" || krData.targetValue)) {
             const created = await storage.createKeyResult({
               ...processedKrData,
               objectiveId: id,

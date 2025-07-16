@@ -255,6 +255,28 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 16, 2025. **FIXED OBJECTIVE SAVE VALIDATION ERROR** - Successfully resolved "achieve_or_not" key result type validation issues:
+  * FIXED: Server-side Zod schema validation now properly allows empty targetValue for achieve_or_not type
+  * UPDATED: POST /api/okrs endpoint refined validation to only require targetValue for non-achieve_or_not types
+  * ENHANCED: PATCH /api/okrs endpoint updated to allow creating key results without targetValue for achieve_or_not type
+  * RESOLVED: Data processing logic now preserves empty targetValue and currentValue for achieve_or_not type
+  * COMPLETED: Goal creation with achieve_or_not key results now works without validation errors
+  * IMPROVED: Backend validation aligns with frontend form behavior for different key result types
+  * RESULT: Users can now successfully create and save objectives with achieve_or_not key results without server validation errors
+- July 16, 2025. **CONSOLIDATED NAME FIELD MIGRATION COMPLETED** - Successfully fixed name display in goal-form-modal.tsx:
+  * ADDED: getUserName and getUserInitials helper functions using consolidated name field
+  * UPDATED: Desktop table view to show proper names and initials in key result assignments
+  * FIXED: Mobile card view to display names correctly in Penanggung Jawab section
+  * CONSISTENT: Name display now uses consolidated name field with email username fallback
+  * ENHANCED: Both desktop and mobile views show user names and initials properly
+  * RESULT: Goal creation form now displays user names correctly in all views
+- July 16, 2025. **DYNAMIC ITEM COUNT DISPLAY IMPLEMENTED** - Successfully added real-time item counts to daily-focus tabs:
+  * ADDED: Task Prioritas tab shows total count of overdue + today's + tomorrow's tasks
+  * IMPLEMENTED: Update Progress tab displays count of active key results needing updates
+  * ENHANCED: Kelola Inisiatif tab shows count of active initiatives
+  * CALCULATED: Counts update dynamically based on filtered data for each tab
+  * IMPROVED: Users can now see workload distribution across tabs at a glance
+  * RESULT: Better daily focus prioritization with clear visibility of pending work items
 - July 15, 2025. **COMPLETE MIGRATION TO CONSOLIDATED NAME FIELD** - Successfully migrated all components from firstName/lastName to consolidated name field:
   * UPDATED: All getUserName functions across components to use consolidated name field instead of firstName/lastName
   * UPDATED: All getUserInitials functions to properly handle single name field with space-separated parts
