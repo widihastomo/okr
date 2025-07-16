@@ -64,3 +64,46 @@ export const TimelineIcon: React.FC<TimelineIconProps> = ({
     </svg>
   );
 };
+
+// Create a default export that works like Lucide icons in the sidebar
+export default function TimelineIconDefault({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {/* Outer circle with dashed border */}
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeDasharray="3 3"
+        fill="none"
+      />
+      
+      {/* Inner circle with checkmark */}
+      <circle
+        cx="12"
+        cy="12"
+        r="6"
+        fill="currentColor"
+        fillOpacity="0.1"
+        stroke="currentColor"
+      />
+      
+      {/* Checkmark */}
+      <path
+        d="M9 12l2 2 4-4"
+        stroke="currentColor"
+        strokeWidth="2"
+        fill="none"
+      />
+    </svg>
+  );
+}
