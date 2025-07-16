@@ -1074,15 +1074,6 @@ export default function GoalDetail() {
             <Button
               variant="outline"
               size="sm"
-              onClick={startTour}
-              className="text-blue-600 border-blue-600 hover:bg-blue-50"
-            >
-              <Target className="w-4 h-4 mr-2" />
-              Tour Fitur
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
               onClick={() => setEditObjectiveModal(true)}
             >
               <Edit className="w-4 h-4 mr-2" />
