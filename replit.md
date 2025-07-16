@@ -255,6 +255,17 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 16, 2025. **REORGANIZED EMAIL TEMPLATES** - Successfully moved email templates to dedicated folder structure for better code organization:
+  * CREATED: server/email-templates/ folder with separate files for different email types
+  * CREATED: server/email-templates/invitation.ts - Invitation email template
+  * CREATED: server/email-templates/verification.ts - Verification and resend verification email templates
+  * CREATED: server/email-templates/password-reset.ts - Password reset email template
+  * CREATED: server/email-templates/index.ts - Central export file for all email templates
+  * UPDATED: server/routes.ts to import and use modular email templates instead of inline HTML
+  * UPDATED: server/email-service.ts to use imported template functions
+  * CLEANED: Removed all inline HTML email templates from routes.ts for better maintainability
+  * IMPROVED: Better separation of concerns with email templates in dedicated folder
+  * RESULT: Cleaner, more maintainable email system with proper template organization
 - July 16, 2025. **FIXED INVITATION EMAIL UNDEFINED NAME** - Successfully resolved "undefined" user names in invitation emails:
   * FIXED: Changed invitation email to use user.name instead of user.firstName/lastName fields
   * FIXED: Updated verification email template to use consolidated name field

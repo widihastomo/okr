@@ -36,6 +36,7 @@ import { eq, and, desc, inArray, isNotNull, sql } from "drizzle-orm";
 import { createSnapTransaction } from "./midtrans";
 import { reminderSystem } from "./reminder-system";
 import { emailService } from "./email-service";
+import { generateInvitationEmail, generateVerificationEmail, generateResendVerificationEmail, generatePasswordResetEmail } from './email-templates';
 import { setupSubscriptionRoutes } from "./subscription-routes";
 import crypto from "crypto";
 
@@ -395,56 +396,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         const verificationLink = `${process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000'}/verify-email?code=${verificationCode}&email=${encodeURIComponent(email)}`;
         
-        const emailHtml = `
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta charset="utf-8">
-            <title>Verifikasi Email - Platform OKR</title>
-            <style>
-              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-              .header { background: linear-gradient(135deg, #ea580c 0%, #fb923c 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-              .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px; }
-              .code { background: #fff; border: 2px solid #ea580c; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; color: #ea580c; border-radius: 5px; margin: 20px 0; }
-              .button { display: inline-block; background: linear-gradient(135deg, #ea580c 0%, #fb923c 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 20px 0; }
-              .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 14px; color: #666; }
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              <div class="header">
-                <h1>Verifikasi Email Anda</h1>
-              </div>
-              <div class="content">
-                <p>Halo <strong>${name}</strong>!</p>
-                <p>Terima kasih telah mendaftar di Platform OKR untuk <strong>${businessName}</strong>.</p>
-                
-                <p>Untuk mengaktifkan akun Anda, silakan gunakan kode verifikasi berikut:</p>
-                
-                <div class="code">${verificationCode}</div>
-                
-                <p>Atau klik tombol di bawah untuk verifikasi otomatis:</p>
-                
-                <div style="text-align: center;">
-                  <a href="${verificationLink}" class="button">Verifikasi Email</a>
-                </div>
-                
-                <p>Jika tombol di atas tidak berfungsi, Anda dapat menyalin dan menempel link berikut di browser:</p>
-                <p style="background: #e9ecef; padding: 10px; border-radius: 5px; word-break: break-all;">${verificationLink}</p>
-                
-                <p>Kode verifikasi ini akan kedaluwarsa dalam 24 jam.</p>
-                
-                <p>Jika Anda tidak mendaftar untuk akun ini, silakan abaikan email ini.</p>
-              </div>
-              <div class="footer">
-                <p>Email ini dikirim secara otomatis oleh sistem. Jangan balas email ini.</p>
-                <p>© 2025 Platform OKR. Semua hak dilindungi.</p>
-              </div>
-            </div>
-          </body>
-          </html>
-        `;
+        const emailHtml = generateVerificationEmail(name, businessName, verificationCode, verificationLink);
         
         console.log(`📧 Attempting to send verification email to: ${email}`);
         
@@ -597,53 +549,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         const verificationLink = `${process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000'}/verify-email?code=${newVerificationCode}&email=${encodeURIComponent(email)}`;
         
-        const emailHtml = `
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta charset="utf-8">
-            <title>Kode Verifikasi Baru - Platform OKR</title>
-            <style>
-              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-              .header { background: linear-gradient(135deg, #ea580c 0%, #fb923c 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-              .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px; }
-              .code { background: #fff; border: 2px solid #ea580c; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; color: #ea580c; border-radius: 5px; margin: 20px 0; }
-              .button { display: inline-block; background: linear-gradient(135deg, #ea580c 0%, #fb923c 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 20px 0; }
-              .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 14px; color: #666; }
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              <div class="header">
-                <h1>Kode Verifikasi Baru</h1>
-              </div>
-              <div class="content">
-                <p>Halo <strong>${user.name || user.email.split('@')[0]}</strong>!</p>
-                <p>Anda telah meminta kode verifikasi baru untuk akun Anda.</p>
-                
-                <p>Kode verifikasi baru Anda adalah:</p>
-                
-                <div class="code">${newVerificationCode}</div>
-                
-                <p>Atau klik tombol di bawah untuk verifikasi otomatis:</p>
-                
-                <div style="text-align: center;">
-                  <a href="${verificationLink}" class="button">Verifikasi Email</a>
-                </div>
-                
-                <p>Kode verifikasi ini akan kedaluwarsa dalam 24 jam.</p>
-                
-                <p>Jika Anda tidak meminta kode verifikasi baru, silakan abaikan email ini.</p>
-              </div>
-              <div class="footer">
-                <p>Email ini dikirim secara otomatis oleh sistem. Jangan balas email ini.</p>
-                <p>© 2025 Platform OKR. Semua hak dilindungi.</p>
-              </div>
-            </div>
-          </body>
-          </html>
-        `;
+        const emailHtml = generateResendVerificationEmail(user.name || user.email.split('@')[0], newVerificationCode, verificationLink);
         
         console.log(`📧 Attempting to send resend verification email to: ${email}`);
         
@@ -713,49 +619,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Send reset email
       try {
-        const emailHtml = `
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta charset="utf-8">
-            <title>Reset Password - Platform OKR</title>
-            <style>
-              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-              .header { background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-              .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px; }
-              .code { background: #fff; border: 2px solid #2563eb; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; color: #2563eb; border-radius: 5px; margin: 20px 0; }
-              .button { display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 20px 0; }
-              .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 14px; color: #666; }
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              <div class="header">
-                <h1>Reset Password</h1>
-              </div>
-              <div class="content">
-                <p>Halo <strong>${user.name || user.email.split('@')[0]}</strong>!</p>
-                <p>Anda telah meminta reset password untuk akun Anda.</p>
-                
-                <p>Kode reset password Anda adalah:</p>
-                
-                <div class="code">${resetCode}</div>
-                
-                <p>Masukkan kode ini di halaman reset password untuk membuat password baru.</p>
-                
-                <p>Kode ini akan kedaluwarsa dalam 1 jam.</p>
-                
-                <p>Jika Anda tidak meminta reset password, silakan abaikan email ini.</p>
-              </div>
-              <div class="footer">
-                <p>Email ini dikirim secara otomatis oleh sistem. Jangan balas email ini.</p>
-                <p>© 2025 Platform OKR. Semua hak dilindungi.</p>
-              </div>
-            </div>
-          </body>
-          </html>
-        `;
+        const emailHtml = generatePasswordResetEmail(user.name || user.email.split('@')[0], resetCode);
         
         await emailService.sendEmail({
           from: "no-reply@platform-okr.com",
@@ -9954,7 +9818,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const baseUrl = `${req.protocol}://${req.get('host')}`;
           const invitationLink = `${baseUrl}/accept-invitation?token=${invitation.invitationToken}`;
           
-          const emailHtml = emailService.generateInvitationEmail(
+          const emailHtml = generateInvitationEmail(
             inviterName,
             organizationName,
             invitationLink
