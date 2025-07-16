@@ -414,6 +414,7 @@ export default function GoalDetail() {
   const [editingInitiative, setEditingInitiative] = useState<Initiative | null>(null);
   const [deletingInitiative, setDeletingInitiative] = useState<Initiative | null>(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [deleteObjectiveModal, setDeleteObjectiveModal] = useState(false);
   const queryClient = useQueryClient();
   const [tourStep, setTourStep] = useState<number>(0);
@@ -976,8 +977,7 @@ export default function GoalDetail() {
 
   // Handle task edit
   const handleEditTask = (task: Task) => {
-    // You could implement this by opening a TaskModal with the task data
-    // For now, we'll just show the task modal
+    setEditingTask(task);
     setShowTaskModal(true);
   };
 
@@ -3027,11 +3027,14 @@ export default function GoalDetail() {
       {/* Task Modal */}
       <TaskModal
         open={showTaskModal}
-        onClose={() => setShowTaskModal(false)}
-        task={undefined}
+        onClose={() => {
+          setShowTaskModal(false);
+          setEditingTask(null);
+        }}
+        task={editingTask}
         initiativeId={undefined}
         objectiveId={id}
-        isAdding={true}
+        isAdding={!editingTask}
       />
 
       {/* Delete Key Result Confirmation Dialog */}
