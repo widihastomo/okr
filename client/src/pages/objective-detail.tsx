@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
@@ -494,10 +494,32 @@ export default function GoalDetail() {
   });
 
   // Fetch tugas for inisiatif
-  const { data: tugas = [] } = useQuery<TaskWithInitiative[]>({
+  const { data: rawTugas = [] } = useQuery<TaskWithInitiative[]>({
     queryKey: [`/api/tasks/objective/${id}`],
     enabled: !!id,
   });
+
+  // Sort tasks by due date and priority
+  const tugas = useMemo(() => {
+    return [...rawTugas].sort((a, b) => {
+      // First, sort by due date (earliest first, null dates last)
+      if (a.dueDate && b.dueDate) {
+        const dueDateComparison = new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+        if (dueDateComparison !== 0) return dueDateComparison;
+      } else if (a.dueDate && !b.dueDate) {
+        return -1; // a has date, b doesn't - a comes first
+      } else if (!a.dueDate && b.dueDate) {
+        return 1; // b has date, a doesn't - b comes first
+      }
+      
+      // If due dates are same or both null, sort by priority
+      const priorityOrder = { high: 1, medium: 2, low: 3 };
+      const aPriority = priorityOrder[a.priority as keyof typeof priorityOrder] || 2;
+      const bPriority = priorityOrder[b.priority as keyof typeof priorityOrder] || 2;
+      
+      return aPriority - bPriority;
+    });
+  }, [rawTugas]);
 
   // Fetch users for name display
   const { data: users = [] } = useQuery<User[]>({
