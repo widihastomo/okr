@@ -46,6 +46,10 @@ export default function Profile() {
       });
       setIsEditing(false);
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      // Reload page after successful update
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     },
     onError: (error) => {
       toast({
