@@ -293,7 +293,7 @@ The system includes comprehensive database connection troubleshooting tools:
   * REMOVED: Redundant h1 element that duplicated the key result title for cleaner visual hierarchy
   * ENHANCED: Chart tooltips and progress indicators with Indonesian terminology
   * TRANSLATED: Key result types to Indonesian (increase_to: Peningkatan, decrease_to: Penurunan, achieve_or_not: Ya/Tidak)
-  * TRANSLATED: Key result status labels to Indonesian (on_track: Sesuai Target, at_risk: Berisiko, behind: Tertinggal, completed: Selesai, ahead: Unggul)
+  * TRANSLATED: Key result status labels to Indonesian (on_track: Sesuai Target, at_risk: Berisiko, behind: Tertinggal, completed: Selesai, ahead: Lebih Cepat)
   * TRANSLATED: Initiative status labels to Indonesian (draft: Draft, sedang_berjalan: Sedang Berjalan, selesai: Selesai, dibatalkan: Dibatalkan, on_hold: Ditunda)
   * OPTIMIZED: Status badge rendering performance using pre-computed configurations for faster display
   * RESULT: Complete Indonesian language implementation across all key result detail page components with consistent terminology and optimized performance
