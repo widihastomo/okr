@@ -283,6 +283,13 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 16, 2025. **ROLE-BASED ACCESS CONTROL FOR CYCLES** - Successfully implemented role-based access control for cycle editing and deletion:
+  * ADDED: Role-based access control for members - they cannot edit or delete cycles
+  * IMPLEMENTED: Warning toast notifications when members try to edit or delete cycles
+  * ENHANCED: Dropdown menu items now show disabled states for members with visual indicators
+  * ADDED: Proper error messages in Indonesian explaining permission requirements
+  * SECURED: Only administrators and owners can edit/delete cycles, members are restricted
+  * RESULT: Complete role-based access control system preventing unauthorized cycle modifications
 - July 16, 2025. **EDIT CYCLE INVALID TIME VALUE ERROR FIXED** - Successfully resolved "Invalid time value" error in edit cycle functionality:
   * FIXED: Replaced unsafe date string concatenation with robust date parsing function
   * ENHANCED: Added proper error handling for invalid date formats and null/undefined values

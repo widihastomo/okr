@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Edit2, Trash2, Calendar, MoreHorizontal, RefreshCw, ChevronLeft, ChevronRight, Eye, Target } from "lucide-react";
+import { Plus, Edit2, Trash2, Calendar, MoreHorizontal, RefreshCw, ChevronLeft, ChevronRight, Eye, Target, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
@@ -8,8 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import CreateCycleModal from "./create-cycle-modal";
 import EditCycleModal from "./edit-cycle-modal";
 import CycleDeletionModal from "./cycle-deletion-modal";
@@ -36,6 +38,7 @@ export default function CyclesContent() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const { data: cycles = [], isLoading } = useQuery({
     queryKey: ["/api/cycles"],
@@ -91,11 +94,27 @@ export default function CyclesContent() {
 
 
   const handleEdit = (cycle: Cycle) => {
+    if (user?.role === "member") {
+      toast({
+        title: "Akses Ditolak",
+        description: "Anda tidak memiliki izin untuk mengedit siklus. Hanya administrator dan pemilik yang dapat mengedit siklus.",
+        variant: "destructive",
+      });
+      return;
+    }
     setSelectedCycle(cycle);
     setEditModalOpen(true);
   };
 
   const handleDelete = (cycle: Cycle) => {
+    if (user?.role === "member") {
+      toast({
+        title: "Akses Ditolak", 
+        description: "Anda tidak memiliki izin untuk menghapus siklus. Hanya administrator dan pemilik yang dapat menghapus siklus.",
+        variant: "destructive",
+      });
+      return;
+    }
     setSelectedCycle(cycle);
     setDeleteModalOpen(true);
   };
@@ -208,13 +227,18 @@ export default function CyclesContent() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleEdit(cycle)}>
+                          <DropdownMenuItem 
+                            onClick={() => handleEdit(cycle)}
+                            disabled={user?.role === "member"}
+                            className={user?.role === "member" ? "opacity-50 cursor-not-allowed" : ""}
+                          >
                             <Edit2 className="mr-2 h-4 w-4" />
                             Edit
                           </DropdownMenuItem>
                           <DropdownMenuItem 
                             onClick={() => handleDelete(cycle)}
-                            className="text-red-600"
+                            disabled={user?.role === "member"}
+                            className={user?.role === "member" ? "opacity-50 cursor-not-allowed" : "text-red-600"}
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
                             Hapus
