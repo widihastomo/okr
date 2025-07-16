@@ -283,6 +283,12 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 16, 2025. **LEADERBOARD MULTI-TENANT SECURITY FIX** - Successfully implemented organization-based filtering for leaderboard to prevent cross-organization data exposure:
+  * FIXED: Added organizationId parameter to getLeaderboard method in gamification service
+  * ENHANCED: Updated leaderboard API endpoint to pass user's organizationId for proper filtering
+  * IMPLEMENTED: SQL query now filters users by organization_id ensuring multi-tenant security
+  * SECURED: Leaderboard now shows only users from the current user's organization
+  * RESULT: Complete data isolation for gamification leaderboard preventing unauthorized access to other organizations' user data
 - July 16, 2025. **ROLE-BASED ACCESS CONTROL FOR CYCLES** - Successfully implemented role-based access control for cycle editing and deletion:
   * ADDED: Role-based access control for members - they cannot edit or delete cycles
   * IMPLEMENTED: Warning toast notifications when members try to edit or delete cycles

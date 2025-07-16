@@ -355,7 +355,7 @@ export class GamificationService {
   /**
    * Get leaderboard
    */
-  async getLeaderboard(limit: number = 10): Promise<(UserStats & { user: any })[]> {
+  async getLeaderboard(limit: number = 10, organizationId?: string): Promise<(UserStats & { user: any })[]> {
     const leaderboard = await db.execute(sql`
       SELECT 
         us.*,
@@ -364,6 +364,7 @@ export class GamificationService {
         u.email as user_email
       FROM user_stats us
       JOIN users u ON us.user_id = u.id
+      ${organizationId ? sql`WHERE u.organization_id = ${organizationId}` : sql``}
       ORDER BY us.total_points DESC, us.level DESC
       LIMIT ${limit}
     `);

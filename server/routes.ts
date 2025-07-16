@@ -5623,7 +5623,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/gamification/leaderboard", requireAuth, async (req, res) => {
     try {
       const limit = parseInt(req.query.limit as string) || 10;
-      const leaderboard = await gamificationService.getLeaderboard(limit);
+      const user = req.user as User;
+      const organizationId = user.organizationId;
+      const leaderboard = await gamificationService.getLeaderboard(limit, organizationId);
       res.json(leaderboard);
     } catch (error) {
       console.error("Error fetching leaderboard:", error);
