@@ -37,6 +37,15 @@ console.log('📡 Port:', process.env.PORT || 5000);
 console.log('📍 Working directory:', process.cwd());
 console.log('📍 Server path will be:', path.resolve(__dirname, '..', 'server', 'index.ts'));
 
+// Load environment variables for production if .env exists
+try {
+  const { config } = await import('dotenv');
+  config();
+  console.log('✅ Environment variables loaded from .env file');
+} catch (error) {
+  console.log('📍 Using system environment variables (no .env file)');
+}
+
 // Ensure production environment
 process.env.NODE_ENV = 'production';
 

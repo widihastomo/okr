@@ -1,4 +1,15 @@
-import 'dotenv/config';
+// Load environment variables for all environments
+if (process.env.NODE_ENV !== 'production') {
+  try {
+    const { config } = await import('dotenv');
+    config();
+    console.log("✅ Environment variables loaded from .env file");
+  } catch (error) {
+    console.log("⚠️  dotenv not available, using process.env directly");
+  }
+} else {
+  console.log("📍 Production mode - using system environment variables");
+}
 import express, { type Request, Response, NextFunction } from "express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
