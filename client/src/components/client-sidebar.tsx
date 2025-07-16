@@ -167,8 +167,8 @@ export default function Sidebar({
     {
       label: "Goals",
       icon: Target,
-      path: "/dashboard",
-      active: location === "/dashboard",
+      path: "/goals",
+      active: location === "/goals",
     },
 
     {

@@ -255,6 +255,12 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 16, 2025. **CHANGED GOALS PAGE ROUTING** - Updated routing slug from "/dashboard" to "/goals":
+  * UPDATED: App.tsx route changed from "/dashboard" to "/goals" for goals page
+  * UPDATED: Client sidebar navigation path changed from "/dashboard" to "/goals"
+  * UPDATED: Delete objective functionality now redirects to index page ("/") after successful deletion
+  * ENHANCED: Consistent routing structure with more descriptive URL paths
+  * RESULT: Goals page now accessible at "/goals" instead of "/dashboard"
 - July 16, 2025. **FIXED OBJECTIVE SAVE VALIDATION ERROR** - Successfully resolved "achieve_or_not" key result type validation issues:
   * FIXED: Server-side Zod schema validation now properly allows empty targetValue for achieve_or_not type
   * UPDATED: POST /api/okrs endpoint refined validation to only require targetValue for non-achieve_or_not types

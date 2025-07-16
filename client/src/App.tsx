@@ -223,7 +223,7 @@ function Router() {
               <Route path="/daily-focus" component={DailyFocusPage} />
               <Route path="/tasks" component={TasksPage} />
               <Route path="/timeline" component={TimelinePage} />
-              <Route path="/dashboard" component={Dashboard} />
+              <Route path="/goals" component={Dashboard} />
               <Route path="/home" component={Home} />
               <Route path="/profile" component={Profile} />
 
