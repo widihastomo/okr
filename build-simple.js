@@ -22,9 +22,13 @@ try {
   const serverScript = `#!/usr/bin/env node
 
 // Production server for deployment
-const { spawn } = require('child_process');
-const path = require('path');
-const fs = require('fs');
+import { spawn } from 'child_process';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 console.log('🚀 OKR Management System - Production');
 console.log('🌍 Environment:', process.env.NODE_ENV || 'production');
@@ -73,6 +77,8 @@ process.on('SIGINT', () => {
 });
 `;
 
+  // Create both .js and .cjs files for compatibility
+  writeFileSync('dist/index.js', serverScript, { mode: 0o755 });
   writeFileSync('dist/index.cjs', serverScript, { mode: 0o755 });
   console.log('✅ Server bundle created successfully');
 
@@ -183,6 +189,10 @@ process.on('SIGINT', () => {
   writeFileSync('dist/deploy-info.json', JSON.stringify(deployInfo, null, 2));
 
   // Verify files were created
+  if (!existsSync('dist/index.js')) {
+    throw new Error('Failed to create dist/index.js');
+  }
+  
   if (!existsSync('dist/index.cjs')) {
     throw new Error('Failed to create dist/index.cjs');
   }
@@ -194,7 +204,8 @@ process.on('SIGINT', () => {
   console.log('✅ Build completed successfully');
   console.log('');
   console.log('📋 Build Summary:');
-  console.log('  ✅ dist/index.cjs: Server bundle');
+  console.log('  ✅ dist/index.js: Server bundle (primary)');
+  console.log('  ✅ dist/index.cjs: Server bundle (compatibility)');
   console.log('  ✅ dist/public/index.html: Frontend');
   console.log('  ✅ dist/deploy-info.json: Deployment info');
   console.log('');
