@@ -376,7 +376,7 @@ function MissionCard({ missions, className }: MissionCardProps) {
 
 export default function GoalDetail() {
   const { id } = useParams();
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const { toast } = useToast();
   const { user } = useAuth();
   const [checkInModal, setCheckInModal] = useState<{
@@ -737,7 +737,7 @@ export default function GoalDetail() {
       });
       
       // Redirect immediately, then start deletion in background
-      window.location.href = "/";
+      setLocation("/");
       
       // Start deletion process in background
       deleteObjectiveMutation.mutate(id);
