@@ -261,8 +261,8 @@ export default function Sidebar({
                         // Desktop: collapsed = center, expanded = space between
                         // Mobile: always space between (show labels)
                         isCollapsed
-                          ? "lg:px-3 lg:py-2 lg:justify-center px-3 py-2 space-x-3"
-                          : "px-3 py-2 space-x-3",
+                          ? "lg:px-4 lg:py-3 lg:justify-center px-4 py-3 space-x-4"
+                          : "px-4 py-3 space-x-4",
                       )}
                       onClick={() => {
                         // Only close sidebar on mobile, don't affect desktop collapsed state
@@ -271,7 +271,7 @@ export default function Sidebar({
                         }
                       }}
                     >
-                      <item.icon className="flex-shrink-0 w-5 h-5" />
+                      <item.icon className="flex-shrink-0 w-6 h-6" />
                       {/* Desktop: show label only when not collapsed, Mobile: always show label */}
                       <span
                         className={cn(
@@ -318,7 +318,7 @@ export default function Sidebar({
                     <Link href="/profile">
                       <button
                         className={cn(
-                          "flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full",
+                          "flex items-center justify-center px-4 py-3 rounded-lg text-sm font-medium transition-colors w-full",
                           location === "/profile"
                             ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
                             : "text-gray-700 hover:bg-gray-100",
@@ -330,7 +330,7 @@ export default function Sidebar({
                           }
                         }}
                       >
-                        <User className="w-5 h-5" />
+                        <User className="w-6 h-6" />
                       </button>
                     </Link>
                   </TooltipTrigger>
@@ -346,7 +346,7 @@ export default function Sidebar({
               <Link href="/profile">
                 <button
                   className={cn(
-                    "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full text-left",
+                    "flex items-center space-x-4 px-4 py-3 rounded-lg text-sm font-medium transition-colors w-full text-left",
                     location === "/profile"
                       ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white"
                       : "text-gray-700 hover:bg-gray-100",
@@ -358,7 +358,7 @@ export default function Sidebar({
                     }
                   }}
                 >
-                  <User className="w-5 h-5" />
+                  <User className="w-6 h-6" />
                   <span>Profile</span>
                 </button>
               </Link>
