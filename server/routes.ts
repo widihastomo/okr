@@ -9913,6 +9913,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Set password and activate user endpoint
+  app.post("/api/organization/users/:userId/set-password", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { userId } = req.params;
+      const { password } = req.body;
+
+      if (!user.organizationId) {
+        return res.status(400).json({ error: "User not associated with an organization" });
+      }
+
+      if (!password || password.trim().length < 6) {
+        return res.status(400).json({ error: "Password must be at least 6 characters long" });
+      }
+
+      // Only organization owners can set passwords
+      const organization = await db.select().from(organizations).where(eq(organizations.id, user.organizationId)).limit(1);
+      if (organization.length === 0) {
+        return res.status(404).json({ error: "Organization not found" });
+      }
+
+      const isOwner = organization[0].ownerId === user.id || user.role === "admin" || user.isSystemOwner;
+      if (!isOwner) {
+        return res.status(403).json({ error: "Access denied. Only organization owners can set passwords." });
+      }
+
+      // Get target user
+      const targetUser = await db.select().from(users)
+        .where(and(eq(users.id, userId), eq(users.organizationId, user.organizationId)))
+        .limit(1);
+
+      if (targetUser.length === 0) {
+        return res.status(404).json({ error: "User not found in organization" });
+      }
+
+      // Hash password and activate user
+      const hashedPassword = await hashPassword(password);
+      
+      await db.update(users)
+        .set({ 
+          password: hashedPassword,
+          isActive: true,
+          isEmailVerified: true,
+          invitationStatus: 'accepted',
+          updatedAt: new Date()
+        })
+        .where(and(eq(users.id, userId), eq(users.organizationId, user.organizationId)));
+
+      res.json({ message: "Password set and user activated successfully" });
+    } catch (error) {
+      console.error("Error setting password:", error);
+      res.status(500).json({ error: "Failed to set password" });
+    }
+  });
+
   // Resend invitation endpoint
   app.post("/api/organization/users/:userId/resend-invitation", requireAuth, async (req, res) => {
     try {

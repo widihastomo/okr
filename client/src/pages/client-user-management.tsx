@@ -90,6 +90,11 @@ export default function ClientUserManagement() {
   const [memberSearchValue, setMemberSearchValue] = useState("");
   const [ownerSearchOpen, setOwnerSearchOpen] = useState(false);
   const [ownerSearchValue, setOwnerSearchValue] = useState("");
+  
+  // Password dialog states
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [selectedUserForPassword, setSelectedUserForPassword] = useState<User | null>(null);
+  const [defaultPassword, setDefaultPassword] = useState("");
 
   // Fetch users in the current organization only
   const { data: users = [], isLoading: loadingUsers } = useQuery<User[]>({
@@ -246,6 +251,32 @@ export default function ClientUserManagement() {
     },
   });
 
+  // Set password mutation
+  const setPasswordMutation = useMutation({
+    mutationFn: async ({ userId, password }: { userId: string; password: string }) => {
+      const response = await apiRequest("POST", `/api/organization/users/${userId}/set-password`, { password });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/organization/users"] });
+      toast({
+        title: "Berhasil",
+        description: "Password berhasil diset dan user telah diaktifkan",
+        variant: "success",
+      });
+      setShowPasswordDialog(false);
+      setSelectedUserForPassword(null);
+      setDefaultPassword("");
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Gagal mengatur password",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Team management mutations
   const createTeamMutation = useMutation({
     mutationFn: async ({ name, description, ownerId, memberIds }: 
@@ -358,7 +389,26 @@ export default function ClientUserManagement() {
   };
 
   const handleToggleUserStatus = (userId: string, currentStatus: boolean) => {
-    updateUserStatusMutation.mutate({ userId, isActive: !currentStatus });
+    if (!currentStatus) {
+      // If user is inactive, show password dialog before activating
+      const user = users.find(u => u.id === userId);
+      if (user) {
+        setSelectedUserForPassword(user);
+        setShowPasswordDialog(true);
+      }
+    } else {
+      // If user is active, directly deactivate
+      updateUserStatusMutation.mutate({ userId, isActive: !currentStatus });
+    }
+  };
+
+  const handleSetPassword = () => {
+    if (selectedUserForPassword && defaultPassword.trim()) {
+      setPasswordMutation.mutate({
+        userId: selectedUserForPassword.id,
+        password: defaultPassword.trim()
+      });
+    }
   };
 
   const handleRemoveUser = (userId: string) => {
@@ -1137,6 +1187,63 @@ export default function ClientUserManagement() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Password Dialog */}
+      <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Aktifkan User dan Set Password</DialogTitle>
+            <DialogDescription>
+              Set password default untuk user <strong>{selectedUserForPassword?.email}</strong> dan aktifkan akun mereka.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="password">Password Default</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Masukkan password default (minimal 6 karakter)"
+                value={defaultPassword}
+                onChange={(e) => setDefaultPassword(e.target.value)}
+                className="mt-1"
+                minLength={6}
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                Password minimal 6 karakter. User dapat mengubah password ini setelah login pertama kali.
+              </p>
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => {
+                  setShowPasswordDialog(false);
+                  setSelectedUserForPassword(null);
+                  setDefaultPassword("");
+                }}
+              >
+                Batal
+              </Button>
+              <Button 
+                type="button" 
+                onClick={handleSetPassword}
+                disabled={setPasswordMutation.isPending || !defaultPassword.trim() || defaultPassword.length < 6}
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600"
+              >
+                {setPasswordMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Mengaktifkan...
+                  </>
+                ) : (
+                  "Aktifkan & Set Password"
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
