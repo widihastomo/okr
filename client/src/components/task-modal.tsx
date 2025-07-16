@@ -256,6 +256,14 @@ export default function TaskModal({
         refetchType: "active",
       });
 
+      // Invalidate objective-specific task queries
+      if (objectiveId) {
+        queryClient.invalidateQueries({
+          queryKey: [`/api/tasks/objective/${objectiveId}`],
+          refetchType: "active",
+        });
+      }
+
       // Show success toast for task creation
       toast({
         title: "Task berhasil dibuat",
@@ -330,6 +338,14 @@ export default function TaskModal({
         queryKey: ["/api/tasks"],
         refetchType: "active",
       });
+
+      // Invalidate objective-specific task queries
+      if (objectiveId) {
+        queryClient.invalidateQueries({
+          queryKey: [`/api/tasks/objective/${objectiveId}`],
+          refetchType: "active",
+        });
+      }
 
       // Show success toast for task update
       toast({
