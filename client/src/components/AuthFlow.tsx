@@ -338,7 +338,7 @@ export default function AuthFlow({ initialStep = "login", onSuccess }: AuthFlowP
       case "login":
         return {
           title: "Masuk ke Akun Anda",
-          description: "Kelola objective dan angka target Anda",
+          description: "Ubah tujuan menjadi aksi nyata yang terukur",
           showBackButton: false,
         };
       case "register":
