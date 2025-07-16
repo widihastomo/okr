@@ -150,16 +150,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: Settings,
       },
       {
-        title: "Kelola Pengguna",
-        url: "/client-users",
-        icon: Users,
-      },
-      {
         title: "Kelola Role",
         url: "/role-management",
         icon: Shield,
       }
     )
+  }
+
+  // Add user management for owners and members
+  if ((isOwner || user?.role === "member") && !isSystemOwner) {
+    clientMenuItems.push({
+      title: "Kelola Pengguna",
+      url: "/client-users",
+      icon: Users,
+    })
   }
 
   // Add notification settings for all non-system users

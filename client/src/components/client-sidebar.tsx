@@ -194,8 +194,8 @@ export default function Sidebar({
     },
   ];
 
-  // Add organization management items for organization owners
-  if (isOwner && !isSystemOwner) {
+  // Add organization management items for organization owners and members
+  if ((isOwner || user?.role === "member") && !isSystemOwner) {
     regularUserMenuItems.push({
       label: "Kelola Pengguna",
       icon: Users,

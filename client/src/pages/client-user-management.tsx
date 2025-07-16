@@ -141,21 +141,6 @@ export default function ClientUserManagement() {
     setEditingTeam(null);
   };
 
-  // Check if current user can manage users in their organization
-  if (!isOwner) {
-    return (
-      <div className="h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Users className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Akses Ditolak</h1>
-          <p className="text-gray-600">Hanya pemilik organisasi yang dapat mengelola pengguna.</p>
-        </div>
-      </div>
-    );
-  }
-
-
-
   // Invite user mutation
   const inviteUserMutation = useMutation({
     mutationFn: async ({ email, role }: { email: string; role: string }) => {
@@ -468,6 +453,20 @@ export default function ClientUserManagement() {
     const config = roleConfig[role as keyof typeof roleConfig] || { label: role, color: "bg-gray-100 text-gray-800" };
     return <Badge className={`${config.color} border-0`}>{config.label}</Badge>;
   };
+
+  // Check if current user can access user management page
+  const canViewUsers = isOwner || user?.role === "member";
+  if (!canViewUsers) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Users className="h-16 w-16 text-red-500 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Akses Ditolak</h1>
+          <p className="text-gray-600">Hanya pemilik organisasi dan member yang dapat melihat pengguna.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">

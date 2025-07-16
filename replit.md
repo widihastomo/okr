@@ -283,6 +283,12 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 16, 2025. **MEMBER ACCESS TO USER LIST IMPLEMENTATION** - Successfully enabled member role access to view organization user lists:
+  * UPDATED: /api/organization/users endpoint to allow members, administrators, and owners to view user lists
+  * ENHANCED: client-sidebar.tsx and app-sidebar.tsx to show "Kelola Pengguna" menu item for members
+  * UPDATED: client-user-management.tsx to allow members to access user management page for viewing
+  * MAINTAINED: Management capabilities (invite, edit, delete) remain restricted to owners only
+  * RESULT: Members can now view organization user lists while maintaining security for management operations
 - July 16, 2025. **REACT ROUTER NAVIGATION MIGRATION** - Successfully migrated all navigation from window.location to React Router:
   * UPDATED: Upgrade package role-based access control to use setLocation('/') instead of window.location.assign('/')
   * UPDATED: Delete objective functionality to use setLocation('/') instead of window.location.href = '/'
