@@ -692,6 +692,13 @@ export default function GoalDetail() {
     setDeleteObjectiveModal(true);
   };
 
+  // Handle duplicate objective
+  const handleDuplicateObjective = () => {
+    if (goal?.id) {
+      duplicateObjectiveMutation.mutate(goal.id);
+    }
+  };
+
   const confirmDeleteObjective = () => {
     if (id) {
       deleteObjectiveMutation.mutate(id);
@@ -892,6 +899,35 @@ export default function GoalDetail() {
       toast({
         title: "Error",
         description: error.message || "Gagal menghapus goal",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Duplicate objective mutation
+  const duplicateObjectiveMutation = useMutation({
+    mutationFn: async (objectiveId: string) => {
+      const response = await apiRequest("POST", `/api/objectives/${objectiveId}/duplicate`);
+      return response.json();
+    },
+    onSuccess: (duplicatedObjective) => {
+      toast({
+        title: "Goal berhasil diduplikasi",
+        description: "Goal telah diduplikasi dengan status baru.",
+        className: "border-green-200 bg-green-50 text-green-800",
+      });
+      
+      // Invalidate all objective-related queries
+      queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
+      
+      // Navigate to the duplicated objective
+      window.location.href = `/objectives/${duplicatedObjective.id}`;
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal menduplikasi goal",
         variant: "destructive",
       });
     },
@@ -1128,9 +1164,12 @@ export default function GoalDetail() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={handleDuplicateObjective}
+                  disabled={duplicateObjectiveMutation.isPending}
+                >
                   <FileText className="w-4 h-4 mr-2" />
-                  Duplikat Goal
+                  {duplicateObjectiveMutation.isPending ? "Menduplikasi..." : "Duplikat Goal"}
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   className="text-red-600 hover:text-red-700"

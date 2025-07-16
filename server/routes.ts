@@ -1470,6 +1470,116 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Duplicate objective endpoint
+  app.post("/api/objectives/:id/duplicate", requireAuth, async (req, res) => {
+    try {
+      const objectiveId = req.params.id;
+      const currentUser = req.user as User;
+      
+      // Get the original objective
+      const originalObjective = await storage.getObjective(objectiveId);
+      if (!originalObjective) {
+        return res.status(404).json({ message: "Objective not found" });
+      }
+      
+      // Check organization access
+      if (!currentUser.isSystemOwner && originalObjective.organizationId !== currentUser.organizationId) {
+        return res.status(403).json({ message: "Access denied. You cannot duplicate objectives from other organizations." });
+      }
+      
+      // Create duplicate objective with modified title
+      const duplicateObjectiveData = {
+        ...originalObjective,
+        title: `${originalObjective.title} (Copy)`,
+        status: "not_started",
+        createdBy: currentUser.id,
+        lastUpdateBy: currentUser.id
+      };
+      
+      // Remove fields that shouldn't be duplicated
+      delete duplicateObjectiveData.id;
+      delete duplicateObjectiveData.createdAt;
+      delete duplicateObjectiveData.updatedAt;
+      
+      const duplicateObjective = await storage.createObjective(duplicateObjectiveData);
+      
+      // Get and duplicate key results
+      const originalKeyResults = await storage.getKeyResultsByObjectiveId(objectiveId);
+      const duplicateKeyResults = [];
+      
+      for (const keyResult of originalKeyResults) {
+        const duplicateKeyResultData = {
+          ...keyResult,
+          objectiveId: duplicateObjective.id,
+          currentValue: keyResult.baseValue || "0", // Reset to baseline
+          status: "not_started",
+          createdBy: currentUser.id,
+          lastUpdateBy: currentUser.id
+        };
+        
+        // Remove fields that shouldn't be duplicated
+        delete duplicateKeyResultData.id;
+        delete duplicateKeyResultData.createdAt;
+        delete duplicateKeyResultData.updatedAt;
+        
+        const duplicateKeyResult = await storage.createKeyResult(duplicateKeyResultData);
+        duplicateKeyResults.push(duplicateKeyResult);
+      }
+      
+      // Get and duplicate initiatives
+      const originalInitiatives = await storage.getInitiativesByObjectiveId(objectiveId);
+      
+      for (const initiative of originalInitiatives) {
+        const duplicateInitiativeData = {
+          ...initiative,
+          objectiveId: duplicateObjective.id,
+          status: "draft",
+          createdBy: currentUser.id,
+          lastUpdateBy: currentUser.id
+        };
+        
+        // Remove fields that shouldn't be duplicated
+        delete duplicateInitiativeData.id;
+        delete duplicateInitiativeData.createdAt;
+        delete duplicateInitiativeData.updatedAt;
+        
+        const duplicateInitiative = await storage.createInitiative(duplicateInitiativeData);
+        
+        // Get and duplicate tasks for this initiative
+        const originalTasks = await storage.getTasksByInitiativeId(initiative.id);
+        
+        for (const task of originalTasks) {
+          const duplicateTaskData = {
+            ...task,
+            initiativeId: duplicateInitiative.id,
+            objectiveId: duplicateObjective.id,
+            status: "not_started",
+            createdBy: currentUser.id,
+            lastUpdateBy: currentUser.id
+          };
+          
+          // Remove fields that shouldn't be duplicated
+          delete duplicateTaskData.id;
+          delete duplicateTaskData.createdAt;
+          delete duplicateTaskData.updatedAt;
+          
+          await storage.createTask(duplicateTaskData);
+        }
+      }
+      
+      // Return the duplicate objective with key results
+      const duplicateObjectiveWithKeyResults = {
+        ...duplicateObjective,
+        keyResults: duplicateKeyResults
+      };
+      
+      res.json(duplicateObjectiveWithKeyResults);
+    } catch (error) {
+      console.error("Error duplicating objective:", error);
+      res.status(500).json({ message: "Failed to duplicate objective" });
+    }
+  });
+
   app.delete("/api/objectives/:id", requireAuth, async (req, res) => {
     try {
       const id = req.params.id;
