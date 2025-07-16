@@ -51,6 +51,8 @@ import {
   Flag,
   Sparkles,
   HelpCircle,
+  Check,
+  User,
 } from "lucide-react";
 import { Link } from "wouter";
 import { CheckInModal } from "@/components/check-in-modal";
@@ -120,7 +122,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Check } from "lucide-react";
 import TaskModal from "@/components/task-modal";
 
 import ObjectiveOverviewCard from "@/components/objective-overview-card";
@@ -132,8 +133,8 @@ import type {
   Initiative,
   Task,
   Cycle,
-  User,
   Team,
+  User as UserType,
 } from "@shared/schema";
 import {
   calculateIdealProgress,
@@ -2517,11 +2518,11 @@ export default function GoalDetail() {
         {/* Tugas Tab */}
         <TabsContent value="tasks" className="space-y-6 tour-tasks">
           {/* Header with Description */}
-          <div className="bg-gradient-to-r from-purple-50 to-violet-50 p-6 rounded-lg border border-purple-200">
-            <div className="flex items-start justify-between mb-4">
+          <div className="bg-gradient-to-r from-purple-50 to-violet-50 p-4 md:p-6 rounded-lg border border-purple-200">
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4 space-y-3 md:space-y-0">
               <div className="flex-1">
-                <h3 className="text-xl font-semibold text-purple-900 mb-2 flex items-center gap-2">
-                  <CheckSquare className="w-6 h-6 text-purple-600" />
+                <h3 className="text-lg md:text-xl font-semibold text-purple-900 mb-2 flex items-center gap-2">
+                  <CheckSquare className="w-5 h-5 md:w-6 md:h-6 text-purple-600" />
                   Tugas & Aktivitas
                   <Popover>
                     <PopoverTrigger asChild>
@@ -2553,7 +2554,7 @@ export default function GoalDetail() {
                     </PopoverContent>
                   </Popover>
                 </h3>
-                <p className="text-purple-700 text-sm leading-relaxed">
+                <p className="text-purple-700 text-sm leading-relaxed hidden md:block">
                   Tugas adalah aktivitas operasional yang mendukung pelaksanaan
                   inisiatif. Setiap tugas memiliki PIC, deadline, dan tingkat
                   prioritas untuk memastikan eksekusi yang efektif.
@@ -2561,7 +2562,7 @@ export default function GoalDetail() {
               </div>
               <Button
                 onClick={() => setShowTaskModal(true)}
-                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 w-full md:w-auto"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Tambah Task
@@ -2569,39 +2570,39 @@ export default function GoalDetail() {
             </div>
 
             {/* Quick Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 mt-4">
-              <div className="bg-white p-4 rounded-lg border border-purple-100">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mt-4">
+              <div className="bg-white p-3 md:p-4 rounded-lg border border-purple-100">
                 <div className="flex items-center gap-2 mb-1">
                   <CheckCircle2 className="w-4 h-4 text-green-600" />
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-xs md:text-sm font-medium text-gray-700">
                     Selesai
                   </span>
                 </div>
-                <div className="text-2xl font-bold text-green-600">
+                <div className="text-xl md:text-2xl font-bold text-green-600">
                   {tugas.filter((t) => t.status === "completed").length}
                 </div>
               </div>
 
-              <div className="bg-white p-4 rounded-lg border border-purple-100">
+              <div className="bg-white p-3 md:p-4 rounded-lg border border-purple-100">
                 <div className="flex items-center gap-2 mb-1">
                   <Clock className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-xs md:text-sm font-medium text-gray-700">
                     Berlangsung
                   </span>
                 </div>
-                <div className="text-2xl font-bold text-blue-600">
+                <div className="text-xl md:text-2xl font-bold text-blue-600">
                   {tugas.filter((t) => t.status === "in_progress").length}
                 </div>
               </div>
 
-              <div className="bg-white p-4 rounded-lg border border-purple-100">
+              <div className="bg-white p-3 md:p-4 rounded-lg border border-purple-100">
                 <div className="flex items-center gap-2 mb-1">
                   <AlertTriangle className="w-4 h-4 text-red-600" />
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-xs md:text-sm font-medium text-gray-700">
                     Terlambat
                   </span>
                 </div>
-                <div className="text-2xl font-bold text-red-600">
+                <div className="text-xl md:text-2xl font-bold text-red-600">
                   {
                     tugas.filter(
                       (t) =>
@@ -2613,26 +2614,26 @@ export default function GoalDetail() {
                 </div>
               </div>
 
-              <div className="bg-white p-4 rounded-lg border border-purple-100">
+              <div className="bg-white p-3 md:p-4 rounded-lg border border-purple-100">
                 <div className="flex items-center gap-2 mb-1">
                   <TrendingUp className="w-4 h-4 text-orange-600" />
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-xs md:text-sm font-medium text-gray-700">
                     Prioritas Tinggi
                   </span>
                 </div>
-                <div className="text-2xl font-bold text-orange-600">
+                <div className="text-xl md:text-2xl font-bold text-orange-600">
                   {tugas.filter((t) => t.priority === "high").length}
                 </div>
               </div>
 
-              <div className="bg-white p-4 rounded-lg border border-purple-100">
+              <div className="bg-white p-3 md:p-4 rounded-lg border border-purple-100 md:col-span-1 col-span-2">
                 <div className="flex items-center gap-2 mb-1">
                   <UserIcon className="w-4 h-4 text-indigo-600" />
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-xs md:text-sm font-medium text-gray-700">
                     Ditugaskan
                   </span>
                 </div>
-                <div className="text-2xl font-bold text-indigo-600">
+                <div className="text-xl md:text-2xl font-bold text-indigo-600">
                   {tugas.filter((t) => t.assignedTo).length}
                 </div>
               </div>
@@ -2848,37 +2849,35 @@ export default function GoalDetail() {
                     </div>
 
                     {/* Mobile Card View */}
-                    <div className="md:hidden space-y-3 p-4">
+                    <div className="md:hidden space-y-3 p-3">
                       {tugas.map((task) => (
                         <div
                           key={task.id}
-                          className="p-3 bg-gray-50 border border-gray-200 rounded-lg space-y-2"
+                          className={`p-4 bg-white border rounded-lg space-y-3 ${
+                            task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "completed" 
+                              ? 'border-red-200 bg-red-50' 
+                              : 'border-gray-200'
+                          }`}
                         >
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
+                          {/* Header with title and status */}
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1 pr-3">
                               <Link
                                 href={`/tasks/${task.id}`}
-                                className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
+                                className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer text-sm line-clamp-2"
                               >
                                 {task.title}
                               </Link>
                               {task.initiative && (
-                                <div className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded mt-1 inline-block">
+                                <div className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded mt-2 inline-block">
                                   Inisiatif: {task.initiative.title}
                                 </div>
                               )}
-                              <div className="flex items-center gap-2 mt-1">
-                                <Badge
-                                  className={getTaskPriorityColor(task.priority || "medium")}
-                                >
-                                  {getTaskPriorityLabel(task.priority || "medium")}
-                                </Badge>
-                              </div>
                             </div>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <button
-                                  className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium`}
+                                  className={`${getTaskStatusColor(task.status)} text-xs px-2 py-1 cursor-pointer hover:opacity-80 flex items-center gap-1 rounded-full border font-medium flex-shrink-0`}
                                 >
                                   {getTaskStatusLabel(task.status)}
                                   <ChevronDown className="h-3 w-3" />
@@ -2932,35 +2931,56 @@ export default function GoalDetail() {
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </div>
-                          <div className="text-xs text-gray-600 mt-2">
-                            <span className="font-medium">Tenggat:</span>{" "}
-                            {task.dueDate
-                              ? new Date(task.dueDate).toLocaleDateString("id-ID")
-                              : "Tidak ada"}
-                          </div>
-                          <div className="text-xs text-gray-600 flex items-center gap-1">
-                            <span className="font-medium">PIC:</span>
-                            <div className="flex items-center gap-1">
-                              {task.assignedTo ? (
-                                <Avatar className="w-4 h-4">
-                                  <AvatarImage
-                                    src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
-                                  />
-                                  <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
-                                    {getUserInitials(task.assignedTo)}
-                                  </AvatarFallback>
-                                </Avatar>
-                              ) : (
-                                <User className="w-3 h-3" />
-                              )}
-                              <span>
-                                {task.assignedTo
-                                  ? getUserName(task.assignedTo)
-                                  : "Belum ditugaskan"}
+
+                          {/* Priority and Due Date */}
+                          <div className="flex items-center justify-between">
+                            <Badge
+                              className={getTaskPriorityColor(task.priority || "medium")}
+                            >
+                              {getTaskPriorityLabel(task.priority || "medium")}
+                            </Badge>
+                            <div className="text-xs text-gray-600 flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              <span
+                                className={`${
+                                  task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "completed"
+                                    ? "text-red-600 font-medium"
+                                    : "text-gray-600"
+                                }`}
+                              >
+                                {task.dueDate
+                                  ? new Date(task.dueDate).toLocaleDateString("id-ID", {
+                                      day: "2-digit",
+                                      month: "short",
+                                    })
+                                  : "Tidak ada"}
                               </span>
                             </div>
                           </div>
-                          <div className="flex justify-end pt-2 border-t border-gray-100">
+
+                          {/* Assignee */}
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500">PIC:</span>
+                              {task.assignedTo ? (
+                                <div className="flex items-center gap-2">
+                                  <Avatar className="w-5 h-5">
+                                    <AvatarImage
+                                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${getUserName(task.assignedTo)}`}
+                                    />
+                                    <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
+                                      {getUserInitials(task.assignedTo)}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <span className="text-xs text-gray-700 font-medium">
+                                    {getUserName(task.assignedTo)}
+                                  </span>
+                                </div>
+                              ) : (
+                                <span className="text-xs text-gray-400">Belum ditugaskan</span>
+                              )}
+                            </div>
+                            
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <button className="p-1 hover:bg-gray-100 rounded-full">
