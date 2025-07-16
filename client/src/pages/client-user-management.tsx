@@ -407,6 +407,8 @@ export default function ClientUserManagement() {
 
   const getRoleBadge = (role: string) => {
     const roleConfig = {
+      system_owner: { label: "system owner", color: "bg-purple-100 text-purple-800" },
+      organization_admin: { label: "owner", color: "bg-red-100 text-red-800" },
       owner: { label: "owner", color: "bg-red-100 text-red-800" },
       administrator: { label: "administrator", color: "bg-blue-100 text-blue-800" },
       member: { label: "member", color: "bg-green-100 text-green-800" },
