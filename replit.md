@@ -283,6 +283,13 @@ The system includes comprehensive database connection troubleshooting tools:
 
 ## Changelog
 ```
+- July 16, 2025. **INITIATIVE DEADLINE CHECKER DISABLED** - Successfully disabled initiative deadline checker and notification functions:
+  * DISABLED: checkInitiativeDeadlines() function now returns immediately without processing
+  * DISABLED: sendOverdueNotification() function completely disabled to prevent SSL connection errors
+  * DISABLED: sendApproachingDeadlineNotification() function completely disabled
+  * DISABLED: scheduleInitiativeDeadlineChecks() function disabled to prevent background processes
+  * FIXED: SSL connection errors in local development environment by disabling background database operations
+  * RESULT: Application now runs without SSL connection errors from notification system
 - July 16, 2025. **ROLE-BASED SIDEBAR FILTERING IMPLEMENTED** - Successfully added role-based access control for settings menu:
   * IMPLEMENTED: Users with "member" role no longer see "Pengaturan Organisasi" (Organization Settings) menu item
   * ENHANCED: Role-based filtering in client-sidebar.tsx using user.role field from authentication
