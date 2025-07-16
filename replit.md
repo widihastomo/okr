@@ -255,6 +255,12 @@ All email configuration now uses environment variables:
 
 ## Changelog
 ```
+- July 16, 2025. **IMPROVED DELETE OBJECTIVE UX** - Optimized delete objective user experience with immediate redirect:
+  * ENHANCED: Delete objective now redirects immediately to index page instead of waiting for deletion completion
+  * IMPROVED: User gets instant feedback and doesn't have to wait for deletion process to finish
+  * OPTIMIZED: Deletion process continues in background after redirect for better user experience
+  * UPDATED: confirmDeleteObjective function now calls window.location.href = "/" before mutation
+  * RESULT: Smoother delete flow with immediate navigation away from deleted objective page
 - July 16, 2025. **CHANGED GOALS PAGE ROUTING** - Updated routing slug from "/dashboard" to "/goals":
   * UPDATED: App.tsx route changed from "/dashboard" to "/goals" for goals page
   * UPDATED: Client sidebar navigation path changed from "/dashboard" to "/goals"

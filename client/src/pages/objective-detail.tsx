@@ -701,6 +701,10 @@ export default function GoalDetail() {
 
   const confirmDeleteObjective = () => {
     if (id) {
+      // Redirect immediately to index page
+      window.location.href = "/";
+      
+      // Then execute the deletion in the background
       deleteObjectiveMutation.mutate(id);
     }
     setDeleteObjectiveModal(false);
@@ -891,9 +895,6 @@ export default function GoalDetail() {
       queryClient.invalidateQueries({ queryKey: ["/api/objectives"] });
       queryClient.invalidateQueries({ queryKey: ["/api/okrs"] });
       queryClient.invalidateQueries({ queryKey: [`/api/objectives/${id}`] });
-      
-      // Navigate back to index
-      window.location.href = "/";
     },
     onError: (error: any) => {
       toast({
