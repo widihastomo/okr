@@ -6059,8 +6059,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const result = await db.execute(sql`
         SELECT 
           o.*,
-          u.first_name as owner_first_name,
-          u.last_name as owner_last_name,
+          u.name as owner_name,
           u.email as owner_email,
           COUNT(DISTINCT org_users.id) as user_count
         FROM organizations o
@@ -6090,9 +6089,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdAt: row.created_at,
         updatedAt: row.updated_at,
         userCount: parseInt(row.user_count) || 0,
-        owner: row.owner_first_name ? {
-          firstName: row.owner_first_name,
-          lastName: row.owner_last_name,
+        owner: row.owner_name ? {
+          name: row.owner_name,
           email: row.owner_email,
         } : null,
       }));
@@ -7261,8 +7259,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         orderId: simpleOrderId,
         grossAmount: totalAmount,
         customerDetails: {
-          first_name: invoice.user?.firstName || "Customer",
-          last_name: invoice.user?.lastName || "",
+          first_name: invoice.user?.name?.split(' ')[0] || "Customer",
+          last_name: invoice.user?.name?.split(' ').slice(1).join(' ') || "",
           email: invoice.user?.email || "customer@example.com"
         },
         itemDetails: calculatedItemDetails
@@ -8700,8 +8698,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         orderId,
         grossAmount: totalPrice,
         customerDetails: {
-          first_name: currentUser.firstName || "User",
-          last_name: currentUser.lastName || "",
+          first_name: currentUser.name?.split(' ')[0] || "User",
+          last_name: currentUser.name?.split(' ').slice(1).join(' ') || "",
           email: currentUser.email,
           phone: currentUser.phone || ""
         },
